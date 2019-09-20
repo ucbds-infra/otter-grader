@@ -83,7 +83,7 @@ class JSONParser:
 			metdata = f.read()
 
 		# parse string with json library
-		self._metadata = json.loads(metdata, parse_int=str)
+		self._metadata = json.loads(metdata)
 
 		# check that the JSON file has the correct structure
 		assert type(self._metadata) == list, "JSON metadata is not a list"
@@ -113,10 +113,6 @@ class YAMLParser:
 		# open the YAML file and parse with yaml library
 		with open(file_path) as f:
 			self._metadata = yaml.safe_load(f)
-
-		# convert any integer identifiers to strings
-		for file in self._metadata:
-			file["identifier"] = str(file["identifier"])
 
 		# check that the YAML file has the correct structure
 		assert type(self._metadata) == list, "YAML metadata is not a list"
