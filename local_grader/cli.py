@@ -14,7 +14,13 @@ def main():
 	parser.add_argument("-v", "--verbose", action="store_true")
 	parser.add_argument("-cf", "--custom-file", default="/")
 	params = vars(parser.parse_args())
-	#TODO : Default custom file 
+	
+	# Default Custom Files for json/yaml metadata
+	if params["custom-file"] == "/":
+		if params["json"]:
+			params["custom-file"] = "student_data.json"
+		elif params["yaml"]:
+			params["custom-file"] = "student_data.yaml"
 
 	# Asserts that exactly one metadata flag is provided
 	assert sum([params["gradescope"], \
@@ -23,16 +29,13 @@ def main():
 					params["yaml"]]) == 1, \
 				"You must supply exactly one metadata flag (-g, -j, -y, -c)"
 
-#TODO: incorporate for list of dfs
-def merge_csv(csv_path, output_path):
-	os.chdir(csv_path)
-	dfs = [pd.read_csv(f, index_col=[0], parse_dates=[0])\
-        for f in os.listdir(os.getcwd()) if f.endswith('csv')]
-	finaldf = pd.concat(dfs, axis=1, join='inner').sort_index()
-
-# Extract information such as path to files, tests
-# CSV Merging (attempted)
-# Replace underscore with hyphens (done)
+# Exports a list of dataframes as a single, merged csv file
+def merge_export_csv(dataframes, output_path):
+	original_directory = os.getcwd()
+	os.chdir(output_path)
+	final_dataframe = pd.concat(dataframes, axis=1, join='inner').sort_index()
+	final_dataframe.to_csv("final_grades.csv")
+	os.chdir(original_directory)
 
 if __name__ == "__main__":
 	main()
