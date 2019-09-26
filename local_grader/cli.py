@@ -6,8 +6,8 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-g", "--gradescope", action="store_true")
 	parser.add_argument("-c", "--canvas", action="store_true")
-	parser.add_argument("-j", "--json", action="store_true")
-	parser.add_argument("-y", "--yaml", action="store_true")
+	parser.add_argument("-j", "--json", nargs="?", default="student_data.json", action="store_true")
+	parser.add_argument("-y", "--yaml", nargs="?", default="student_data.json", action="store_true")
 	parser.add_argument("-n", "--notebooks-path",  type=str, default="/")
 	parser.add_argument("-t", "--tests-path", type=str, default="/tests/")
 	parser.add_argument("-o", "--output-path", type=str, default="/")
@@ -16,11 +16,11 @@ def main():
 	params = vars(parser.parse_args())
 	
 	# Default Custom Files for json/yaml metadata
-	if params["custom-file"] == "/":
-		if params["json"]:
-			params["custom-file"] = "student_data.json"
-		elif params["yaml"]:
-			params["custom-file"] = "student_data.yaml"
+	# if params["custom-file"] == "/":
+	# 	if params["json"]:
+	# 		params["custom-file"] = "student_data.json"
+	# 	elif params["yaml"]:
+	# 		params["custom-file"] = "student_data.yaml"
 
 	# Asserts that exactly one metadata flag is provided
 	assert sum([params["gradescope"], \
