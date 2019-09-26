@@ -4,26 +4,35 @@ import argparse
 import pandas as pd
 import os
 
-from metadata import *
-from docker import *
+from local_grader.metadata import *
+from local_grader.docker import *
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-g", "--gradescope", action="store_true", default=False,)
-	parser.add_argument("-c", "--canvas", action="store_true", default=False)
-	parser.add_argument("-j", "--json", default=False)
-	parser.add_argument("-y", "--yaml", default=False)
-	parser.add_argument("-n", "--notebooks-path", dest="notebooks-path", type=str, default="./")
-	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/")
-	parser.add_argument("-o", "--output-path", type=str, default="./")
+	parser.add_argument("-g", "--gradescope", action="store_true")
+	parser.add_argument("-c", "--canvas", action="store_true")
+	parser.add_argument("-j", "--json", nargs="?", default="student_data.json", action="store_true")
+	parser.add_argument("-y", "--yaml", nargs="?", default="student_data.json", action="store_true")
+	parser.add_argument("-n", "--notebooks-path",  type=str, default="/")
+	parser.add_argument("-t", "--tests-path", type=str, default="/tests/")
+	parser.add_argument("-o", "--output-path", type=str, default="/")
 	parser.add_argument("-v", "--verbose", action="store_true")
+	# parser.add_argument("-cf", "--custom-file", default="/")
 	params = vars(parser.parse_args())
 
 	# Asserts that exactly one metadata flag is provided
-	assert sum([meta != False for meta in [params["gradescope"], 
-		params["canvas"], 
-		params["json"], 
-		params["yaml"]]]) == 1, "You must supply exactly one metadata flag (-g, -j, -y, -c)"
+	assert sum([params["gradescope"], \
+					params["canvas"], \
+					params["json"], \
+					params["yaml"]]) == 1, \
+				"You must supply exactly one metadata flag (-g, -j, -y, -c)"
+	
+	# Default Custom Files for json/yaml metadata
+	# if params["custom-file"] == "/":
+	# 	if params["json"]:
+	# 		params["custom-file"] = "student_data.json"
+	# 	elif params["yaml"]:
+	# 		params["custom-file"] = "student_data.yaml"
 
 	# Hand off metadata to parser
 	if params["gradescope"]:

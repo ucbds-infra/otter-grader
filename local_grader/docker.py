@@ -25,7 +25,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="spoof_docker"):
     # Now we have the notebooks in hom/notebooks, we should tell the container to execute the grade command....
     # TODO tell grader to do this csv_command
     # Placeholder just copy over some csv for now
-    grade_command = ["docker", "cp", "eg_grades.csv", container_id+ ":/home/grades.csv"]
+    grade_command = ["docker", "cp", "./eg_grades.csv", container_id+ ":/home/grades.csv"]
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
     # get the grades back from the container and read to date frame so we can merge later
     csv_command = ["docker", "cp", container_id+ ":/home/grades.csv", "./grades"+id+".csv"]
