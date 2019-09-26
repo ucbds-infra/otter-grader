@@ -15,7 +15,7 @@ def main():
 	parser.add_argument("-y", "--yaml", default=False)
 	parser.add_argument("-n", "--notebooks-path", dest="notebooks-path", type=str, default="./")
 	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/")
-	parser.add_argument("-o", "--output-path", type=str, default="./")
+	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./")
 	parser.add_argument("-v", "--verbose", action="store_true")
 	params = vars(parser.parse_args())
 
@@ -47,7 +47,7 @@ def merge_export_csv(dataframes, output_path):
 	original_directory = os.getcwd()
 	os.chdir(output_path)
 	final_dataframe = pd.concat(dataframes, axis=1, join='inner').sort_index()
-	final_dataframe.to_csv("final_grades.csv")
+	final_dataframe.to_csv("final_grades.csv", index=False)
 	os.chdir(original_directory)
 
 if __name__ == "__main__":

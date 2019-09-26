@@ -15,6 +15,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="spoof_docker"):
     # launch our docker conainer
     launch_command = ["docker", "run", "-d","-it", image]
     launch = subprocess.run(launch_command, stdout=PIPE, stderr=PIPE)
+    # print(launch.stderr)
     container_id = launch.stdout.decode('utf-8')[:-1]
     # copy the notebook files to the container
     copy_command = ["docker", "cp", notebooks_dir, container_id+ ":/home/notebooks/"]
