@@ -100,7 +100,7 @@ class JSONParser:
 		assert type(self._metadata) == list, "JSON metadata is not a list"
 		
 		# check that each item in the JSON file is of correct type
-		# and as "identifier" and "filename" keys
+		# and has "identifier" and "filename" keys
 		for file in self._metadata:
 			assert type(file) == dict, "JSON metadata does not have dictionaries"
 			assert "identifier" in file.keys(), "JSON metadata does not contain \"identifier\" key"
