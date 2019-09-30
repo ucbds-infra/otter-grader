@@ -12,7 +12,6 @@ from utils import *
 
 class GradescopeParser:
 	"""Metadata parser for Gradescope exports"""
-
 	def __init__(self, submissions_dir, group=False):
 		# open metadata file and load into Python object
 		with open(os.path.join(submissions_dir, "submission_metadata.yml")) as f:
