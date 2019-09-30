@@ -32,7 +32,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="spoof_docker"):
     csv_command = ["docker", "cp", container_id+ ":/home/grades.csv", "./grades"+id+".csv"]
     csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
     df = pd.read_csv("./grades"+id+".csv")
-        # delete the file we just read
+    # delete the file we just read
     csv_cleanup_command = ["rm", "./grades"+id+".csv"]
     csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
     # cleanup the docker container
