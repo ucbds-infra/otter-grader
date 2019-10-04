@@ -29,13 +29,21 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="spoof_docker"):
     
     # Now we have the notebooks in hom/notebooks, we should tell the container to execute the grade command....
     # Placeholder just copy over some csv for now
-    grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grades", "./notebooks"]
+    grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "./notebooks"]
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
     
     # get the grades back from the container and read to date frame so we can merge later
     csv_command = ["docker", "cp", container_id+ ":/home/grades.csv", "./grades"+id+".csv"]
     csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
     df = pd.read_csv("./grades"+id+".csv")
+
+
+    mkdir_pdf = ["mkdir", "manual_submissions"]
+    subprocess.run(mkdir_pdf, stdout=PIPE, stderr=PIPE)
+    # copy out manual submissions
+    for pdf in df["manual"]:
+        copy_cmd = ["docker", "cp", container_id + ":/home/" + pdf, "./manual_submissions/" + pdf]
+        subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
     
     # delete the file we just read
     csv_cleanup_command = ["rm", "./grades"+id+".csv"]
