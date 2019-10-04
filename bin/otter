@@ -4,8 +4,8 @@ import argparse
 import pandas as pd
 import os
 
-from metadata import *
-from docker import *
+from otter.metadata import *
+from otter.docker import *
 
 def main():
 	parser = argparse.ArgumentParser()
