@@ -35,7 +35,7 @@ def main():
 	    score = grade(ipynb_path)
 	    pdf_path = re.sub(r"\.ipynb$", ".pdf", ipynb_path)
 	    all_results["score"].append(score)
-	    all_results["manual"].append(re.sub(r"\/home\/notebooks", "manual_submissions", pdf_path))
+	    all_results["manual"].append(pdf_path)
 
 	final_results = pd.DataFrame(all_results)
 	final_results.to_csv("grades.csv", index=False)

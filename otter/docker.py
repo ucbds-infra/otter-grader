@@ -31,20 +31,11 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader"):
     
     # Now we have the notebooks in hom/notebooks, we should tell the container to execute the grade command....
     # Placeholder just copy over some csv for now
-    grade_command = ["docker", "exec", "-t", container_id, "python3", "/home/grade.py", "/home/notebooks"]
+    grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "/home/notebooks"]
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
-    # print(grade.stdout)
-    # print(grade.stderr)
     
     ls = ["docker", "exec", "-t", container_id, "ls", "-a", "/home/notebooks"]
     ls_out = subprocess.run(ls, stdout=PIPE, stderr=PIPE)
-    # print(ls_out.stdout)
-
-    # cat_cmd = ["docker", "exec", "-t", container_id, "cat", "/home/notebooks/test-nb.ipynb"]
-    # cat = subprocess.run(cat_cmd, stdout=PIPE, stderr=PIPE)
-    # nb = json.loads(cat.stdout.decode("utf-8"))
-    # with open("docker-out.ipynb", "w+") as f:
-    #     json.dump(nb, f)
 
     # get the grades back from the container and read to date frame so we can merge later
     csv_command = ["docker", "cp", container_id+ ":/home/grades.csv", "./grades"+id+".csv"]
@@ -53,12 +44,17 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader"):
 
     mkdir_pdf = ["mkdir", "manual_submissions"]
     subprocess.run(mkdir_pdf, stdout=PIPE, stderr=PIPE)
+    
     # copy out manual submissions
     for pdf in df["manual"]:
         copy_cmd = ["docker", "cp", container_id + ":" + pdf, "./manual_submissions/" + re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1]]
         copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
-        # print(copy.stdout)
-        # print(copy.stderr)
+
+    def clean_pdf_filepaths(row):
+        path = row["manual"]
+        return re.sub(r"\/home\/notebooks", "manual_submissions", path)
+
+    df["manual"] = df.apply(clean_pdf_filepaths, axis=1)
     
     # delete the file we just read
     csv_cleanup_command = ["rm", "./grades"+id+".csv"]
