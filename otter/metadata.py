@@ -12,22 +12,32 @@ from utils import *
 
 class GradescopeParser:
 	"""Metadata parser for Gradescope exports"""
-
-	def __init__(self, submissions_dir):
+	def __init__(self, submissions_dir, group=False):
 		# open metadata file and load into Python object
 		with open(os.path.join(submissions_dir, "submission_metadata.yml")) as f:
 			metadata = yaml.safe_load(f)
 
 		# initialize metadata list
 		self._metadata = []
-		for file in metadata:
-			self._metadata += [{
+		if not group:
+			for file in metadata:
+				self._metadata += [{
 
-				# metadata is separated by filename into a list of submitters
-				# and we use the SID as the identifier
-				"identifier": metadata[file][":submitters"][0][":sid"],
-				"filename": file
-			}]
+					# metadata is separated by filename into a list of submitters
+					# and we use the SID as the identifier
+					"identifier": metadata[file][":submitters"][0][":sid"],
+					"filename": file
+				}]
+		else:
+			for file in metadata:
+				for submitter in metadata[file][":submitters"]:
+					self._metadata += [{
+
+						# metadata is separated by filename into a list of submitters
+						# and we use the SID as the identifier
+						"identifier": submitter[":sid"],
+						"filename": file
+					}]
 
 	def get_metadata(self):
 		"""Returns mapping of identifiers to files"""
@@ -89,7 +99,7 @@ class JSONParser:
 		assert type(self._metadata) == list, "JSON metadata is not a list"
 		
 		# check that each item in the JSON file is of correct type
-		# and as "identifier" and "filename" keys
+		# and has "identifier" and "filename" keys
 		for file in self._metadata:
 			assert type(file) == dict, "JSON metadata does not have dictionaries"
 			assert "identifier" in file.keys(), "JSON metadata does not contain \"identifier\" key"
