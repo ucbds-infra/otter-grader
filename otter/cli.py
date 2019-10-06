@@ -4,8 +4,8 @@ import argparse
 import pandas as pd
 import os
 
-from metadata import *
-from docker import *
+from .metadata import *
+from .docker import *
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -39,7 +39,10 @@ def main():
 	grades_df = grade_assignments(params["tests-path"], params["notebooks-path"], "42")
 
 	# Merge Dataframes
-	merge_export_csv([grades_df], params["output-path"])
+	output_df = merge_export_csv([grades_df], params["output-path"])
+
+	# def map_files_to_ids(row):
+	# 	return meta_parser.file
 
 
 # Exports a list of dataframes as a single, merged csv file
@@ -47,8 +50,5 @@ def merge_export_csv(dataframes, output_path):
 	original_directory = os.getcwd()
 	os.chdir(output_path)
 	final_dataframe = pd.concat(dataframes, axis=1, join='inner').sort_index()
-	final_dataframe.to_csv("final_grades.csv", index=False)
 	os.chdir(original_directory)
-
-if __name__ == "__main__":
-	main()
+	return final_dataframe
