@@ -11,12 +11,7 @@ import re
 
 def grade(ipynb_path):
 	base_path = os.path.dirname(ipynb_path)
-	# assert False, ipynb_path
 	test_files = glob('/home/tests/*.py')
-	# with open(ipynb_path) as f:
-	# 	os.listdir(base_path)
-	# 	print(ipynb_path)
-	# 	print(f.read())
 	result = grade_notebook(ipynb_path, test_files)
 	nb2pdf.convert(ipynb_path)
 	return result
