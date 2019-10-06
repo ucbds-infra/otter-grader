@@ -35,6 +35,14 @@ class GradescopeParser:
 		"""Returns mapping of identifiers to files"""
 		return self._metadata
 
+	def file_to_id(self):
+		"""Returns a mapping of filenames to identifiers"""
+		return {file["filename"] : file["identifier"] for file in self._metadata}
+
+	def id_to_file(self):
+		"""Returns a mapping of filenames to identifiers"""
+		return {file["identifier"] : file["filename"] for file in self._metadata}
+
 	def get_identifiers(self):
 		"""Returns list of submission identifiers"""
 		return [file["identifier"] for file in self._metadata]
@@ -67,6 +75,14 @@ class CanvasParser:
 	def get_metadata(self):
 		"""Returns mapping of identifiers to files"""
 		return self._metadata
+
+	def file_to_id(self):
+		"""Returns a mapping of filenames to identifiers"""
+		return {file["filename"] : file["identifier"] for file in self._metadata}
+
+	def id_to_file(self):
+		"""Returns a mapping of filenames to identifiers"""
+		return {file["identifier"] : file["filename"] for file in self._metadata}
 
 	def get_identifiers(self):
 		"""Returns list of submission identifiers"""
@@ -101,6 +117,14 @@ class JSONParser:
 		"""Returns mapping of identifiers to files"""
 		return self._metadata
 
+	def file_to_id(self):
+		"""Returns a mapping of filenames to identifiers"""
+		return {file["filename"] : file["identifier"] for file in self._metadata}
+
+	def id_to_file(self):
+		"""Returns a mapping of filenames to identifiers"""
+		return {file["identifier"] : file["filename"] for file in self._metadata}
+
 	def get_identifiers(self):
 		"""Returns list of submission identifiers"""
 		return [file["identifier"] for file in self._metadata]
@@ -133,6 +157,14 @@ class YAMLParser:
 	def get_metadata(self):
 		"""Returns mapping of identifiers to files"""
 		return self._metadata
+
+	def file_to_id(self):
+		"""Returns a mapping of filenames to identifiers"""
+		return {file["filename"] : file["identifier"] for file in self._metadata}
+
+	def id_to_file(self):
+		"""Returns a mapping of filenames to identifiers"""
+		return {file["identifier"] : file["filename"] for file in self._metadata}
 
 	def get_identifiers(self):
 		"""Returns list of submission identifiers"""
