@@ -41,8 +41,15 @@ def main():
 	# Merge Dataframes
 	output_df = merge_export_csv([grades_df], params["output-path"])
 
-	# def map_files_to_ids(row):
-	# 	return meta_parser.file
+	def map_files_to_ids(row):
+		"""Returns the identifier for the filename in the specified row"""
+		return meta_parser.file_to_id(row["file"])
+
+	# add in identifier column
+	output_df["identifier"] = output_df.apply(map_files_to_ids, axis=1)
+
+	# write to CSV file
+	output_df.write_csv(os.path.join(params["output-path"], "final_grades.csv"), index=False)
 
 
 # Exports a list of dataframes as a single, merged csv file
