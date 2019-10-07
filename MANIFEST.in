@@ -1,1 +1,1 @@
-include otter-grader/Dockerfile
+include docker/Dockerfile
