@@ -25,18 +25,35 @@ def main():
 		params["json"], 
 		params["yaml"]]]) == 1, "You must supply exactly one metadata flag (-g, -j, -y, -c)"
 
+	# verbose flag
+	verbose = params["verbose"]
+
 	# Hand off metadata to parser
 	if params["gradescope"]:
 		meta_parser = GradescopeParser(params["notebooks-path"])
+		if verbose:
+			print("Found Gradescope metadata...")
 	elif params["canvas"]:
 		meta_parser = CanvasParser(params["notebooks-path"])
+		if verbose:
+			print("Found Canvas metadata...")
 	elif params["json"]:
 		meta_parser = JSONParser(os.path.join(params["notebooks-path"], params["json"]))
+		if verbose:
+			print("Found JSON metadata...")
 	else:
 		meta_parser = YAMLParser(os.path.join(params["notebooks-path"], params["yaml"]))
+		if verbose:
+			print("Found YAML metadata...")
+
+	if verbose:
+		print("Launching docker containers...")
 
 	# Docker
 	grades_df = grade_assignments(params["tests-path"], params["notebooks-path"], "42")
+
+	if verbose:
+		print("Combining grades and saving...")
 
 	# Merge Dataframes
 	merge_export_csv([grades_df], params["output-path"])
