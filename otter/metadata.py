@@ -8,7 +8,7 @@ import glob
 import os
 import re
 
-from utils import *
+from .utils import *
 
 class GradescopeParser:
 	"""Metadata parser for Gradescope exports"""

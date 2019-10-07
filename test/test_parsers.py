@@ -13,6 +13,15 @@ class TestGradescopeParser(unittest.TestCase):
 		}, {
 			"identifier": "someName",
 			"filename": "odd_filename--s2034.ipynb"
+		}, {
+			"identifier": "someName",
+			"filename": "GROUPodd_filename--s2034.ipynb"
+		}, {
+			"identifier": "someOtherName",
+			"filename": "GROUPodd_filename--s2034.ipynb"
+		}, {
+			"identifier": "someOtherOtherName",
+			"filename": "GROUPodd_filename--s2034.ipynb"
 		}]
 
 	def test_metadata(self):
