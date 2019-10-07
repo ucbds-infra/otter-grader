@@ -31,9 +31,21 @@ class GradescopeParser:
 					"filename": file
 				}]
 
+		# TODO: handle group subs in _file_to_id because second sub will overwrite first
+		self._file_to_id = {file["filename"] : file["identifier"] for file in self._metadata}
+		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
+
 	def get_metadata(self):
 		"""Returns mapping of identifiers to files"""
 		return self._metadata
+
+	def file_to_id(self, file):
+		"""Returns a identifier given a filename"""
+		return self._file_to_id[file]
+
+	def id_to_file(self, identifier):
+		"""Returns a filename given an identifier"""
+		return self._id_to_file[identifier]
 
 	def get_identifiers(self):
 		"""Returns list of submission identifiers"""
@@ -64,9 +76,20 @@ class CanvasParser:
 				"filename": file
 			}]
 
+		self._file_to_id = {file["filename"] : file["identifier"] for file in self._metadata}
+		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
+
 	def get_metadata(self):
 		"""Returns mapping of identifiers to files"""
 		return self._metadata
+
+	def file_to_id(self, file):
+		"""Returns a identifier given a filename"""
+		return self._file_to_id[file]
+
+	def id_to_file(self, identifier):
+		"""Returns a filename given an identifier"""
+		return self._id_to_file[identifier]
 
 	def get_identifiers(self):
 		"""Returns list of submission identifiers"""
@@ -97,9 +120,20 @@ class JSONParser:
 			assert "identifier" in file.keys(), "JSON metadata does not contain \"identifier\" key"
 			assert "filename" in file.keys(), "JSON metadata does not contain \"filename\" key"
 
+		self._file_to_id = {file["filename"] : file["identifier"] for file in self._metadata}
+		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
+
 	def get_metadata(self):
 		"""Returns mapping of identifiers to files"""
 		return self._metadata
+
+	def file_to_id(self, file):
+		"""Returns a identifier given a filename"""
+		return self._file_to_id[file]
+
+	def id_to_file(self, identifier):
+		"""Returns a filename given an identifier"""
+		return self._id_to_file[identifier]
 
 	def get_identifiers(self):
 		"""Returns list of submission identifiers"""
@@ -130,9 +164,20 @@ class YAMLParser:
 			assert "identifier" in file.keys(), "YAML metadata does not contain \"identifier\" key"
 			assert "filename" in file.keys(), "YAML metadata does not contain \"filename\" key"
 
+		self._file_to_id = {file["filename"] : file["identifier"] for file in self._metadata}
+		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
+
 	def get_metadata(self):
 		"""Returns mapping of identifiers to files"""
 		return self._metadata
+
+	def file_to_id(self, file):
+		"""Returns a identifier given a filename"""
+		return self._file_to_id[file]
+
+	def id_to_file(self, identifier):
+		"""Returns a filename given an identifier"""
+		return self._id_to_file[identifier]
 
 	def get_identifiers(self):
 		"""Returns list of submission identifiers"""
