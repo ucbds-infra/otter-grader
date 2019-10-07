@@ -50,7 +50,7 @@ def main():
 		print("Launching docker containers...")
 
 	# Docker
-	grades_df = grade_assignments(params["tests-path"], params["notebooks-path"], "42")
+	grades_df = grade_assignments(params["tests-path"], params["notebooks-path"], "42", verbose=verbose)
 
 	if verbose:
 		print("Combining grades and saving...")

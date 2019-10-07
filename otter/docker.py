@@ -4,7 +4,7 @@ from subprocess import PIPE
 import json
 import re
 
-def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader"):
+def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbose=False):
     """
     Args:
         tests_dir: directory of test files
@@ -20,6 +20,9 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader"):
     
     # print(launch.stderr)
     container_id = launch.stdout.decode('utf-8')[:-1]
+
+    if verbose:
+        print("Launched container {}...".format(container_id[:7]))
     
     # copy the notebook files to the container
     copy_command = ["docker", "cp", notebooks_dir, container_id+ ":/home/notebooks/"]
@@ -28,14 +31,19 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader"):
     # copy the test files to the container
     tests_command = ["docker", "cp", tests_dir, container_id+ ":/home/tests/"]
     tests = subprocess.run(tests_command, stdout=PIPE, stderr=PIPE)
+
+    if verbose:
+        print("Grading notebooks in container {}...".format(container_id[:7]))
     
-    # Now we have the notebooks in hom/notebooks, we should tell the container to execute the grade command....
-    # Placeholder just copy over some csv for now
+    # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command....
     grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "/home/notebooks"]
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
     
     ls = ["docker", "exec", "-t", container_id, "ls", "-a", "/home/notebooks"]
     ls_out = subprocess.run(ls, stdout=PIPE, stderr=PIPE)
+
+    if verbose:
+        print("Copying grades from container {}...".format(container_id[:7]))
 
     # get the grades back from the container and read to date frame so we can merge later
     csv_command = ["docker", "cp", container_id+ ":/home/grades.csv", "./grades"+id+".csv"]
@@ -60,6 +68,9 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader"):
     csv_cleanup_command = ["rm", "./grades"+id+".csv"]
     csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
     
+    if verbose:
+        print("Stopping container {}...".format(container_id[:7]))
+
     # cleanup the docker container
     stop_command = ["docker", "stop", container_id]
     stop = subprocess.run(stop_command, stdout=PIPE, stderr=PIPE)
