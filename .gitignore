@@ -4,3 +4,5 @@ dist
 build
 *.egg-info
 .ipynb_checkpoints
+test/test-grading-notebook.ipynb
+test/tests
