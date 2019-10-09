@@ -4,7 +4,7 @@ from subprocess import PIPE
 import json
 import re
 
-def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbose=False, pdfs=False):
+def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbose=False, pdfs=False, reqs=None):
     """
     Args:
         tests_dir: directory of test files
@@ -32,6 +32,17 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     tests_command = ["docker", "cp", tests_dir, container_id+ ":/home/tests/"]
     tests = subprocess.run(tests_command, stdout=PIPE, stderr=PIPE)
 
+    # copy the requirements file to the container
+    if reqs:
+        if verbose:
+            print("Installing requirements in container {}...".format(container_id[:7]))
+        reqs_command = ["docker", "cp", reqs, container_id+ ":/home"]
+        requirements = subprocess.run(reqs_command, stdout=PIPE, stderr=PIPE)
+
+        # install requirements
+        install_command = ["docker", "exec", "-t", container_id, "pip3", "install", "-r", "/home/requirements.txt"]
+        install = subprocess.run(install_command, stdout=PIPE, stderr=PIPE)
+
     if verbose:
         print("Grading notebooks in container {}...".format(container_id[:7]))
     
@@ -43,9 +54,6 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
         grade_command += ["--pdf"]
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
-    
-    ls = ["docker", "exec", "-t", container_id, "ls", "-a", "/home/notebooks"]
-    ls_out = subprocess.run(ls, stdout=PIPE, stderr=PIPE)
 
     if verbose:
         print("Copying grades from container {}...".format(container_id[:7]))
@@ -56,8 +64,8 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     df = pd.read_csv("./grades"+id+".csv")
 
     if pdfs:
-        mkdir_pdf = ["mkdir", "manual_submissions"]
-        subprocess.run(mkdir_pdf, stdout=PIPE, stderr=PIPE)
+        mkdir_pdf_command = ["mkdir", "manual_submissions"]
+        mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
         
         # copy out manual submissions
         for pdf in df["manual"]:
@@ -84,7 +92,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
     
     # check that no commands errored, if they did rais an informative exception
-    all_commands = [launch, copy, tests, grade, csv, csv_cleanup, stop, remove]
+    all_commands = [launch, copy, tests, requirements, install, grade, csv, csv_cleanup, stop, remove]
     for command in all_commands:
         if command.stderr.decode('utf-8') != '':
             raise Exception("Error running ", command, " failed with error: ", command.stderr.decode('utf-8'))
