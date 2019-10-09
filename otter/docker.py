@@ -4,7 +4,7 @@ from subprocess import PIPE
 import json
 import re
 
-def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbose=False):
+def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbose=False, pdfs=False):
     """
     Args:
         tests_dir: directory of test files
@@ -37,6 +37,11 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     
     # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command....
     grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "/home/notebooks"]
+
+    # if we want PDF output, add the --pdf flag
+    if pdfs:
+        grade_command += ["--pdf"]
+
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
     
     ls = ["docker", "exec", "-t", container_id, "ls", "-a", "/home/notebooks"]
@@ -50,19 +55,20 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
     df = pd.read_csv("./grades"+id+".csv")
 
-    mkdir_pdf = ["mkdir", "manual_submissions"]
-    subprocess.run(mkdir_pdf, stdout=PIPE, stderr=PIPE)
-    
-    # copy out manual submissions
-    for pdf in df["manual"]:
-        copy_cmd = ["docker", "cp", container_id + ":" + pdf, "./manual_submissions/" + re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1]]
-        copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
+    if pdfs:
+        mkdir_pdf = ["mkdir", "manual_submissions"]
+        subprocess.run(mkdir_pdf, stdout=PIPE, stderr=PIPE)
+        
+        # copy out manual submissions
+        for pdf in df["manual"]:
+            copy_cmd = ["docker", "cp", container_id + ":" + pdf, "./manual_submissions/" + re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1]]
+            copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
 
-    def clean_pdf_filepaths(row):
-        path = row["manual"]
-        return re.sub(r"\/home\/notebooks", "manual_submissions", path)
+        def clean_pdf_filepaths(row):
+            path = row["manual"]
+            return re.sub(r"\/home\/notebooks", "manual_submissions", path)
 
-    df["manual"] = df.apply(clean_pdf_filepaths, axis=1)
+        df["manual"] = df.apply(clean_pdf_filepaths, axis=1)
     
     # delete the file we just read
     csv_cleanup_command = ["rm", "./grades"+id+".csv"]
