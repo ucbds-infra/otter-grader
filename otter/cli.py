@@ -17,6 +17,7 @@ def main():
 	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/")
 	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./")
 	parser.add_argument("-v", "--verbose", action="store_true")
+	parser.add_argument("--pdf", action="store_true", default=False)
 	params = vars(parser.parse_args())
 
 	# Asserts that exactly one metadata flag is provided
@@ -50,7 +51,7 @@ def main():
 		print("Launching docker containers...")
 
 	# Docker
-	grades_df = grade_assignments(params["tests-path"], params["notebooks-path"], "42", verbose=verbose)
+	grades_df = grade_assignments(params["tests-path"], params["notebooks-path"], "42", verbose=verbose, pdfs=params["pdf"])
 
 	if verbose:
 		print("Combining grades and saving...")
@@ -66,7 +67,7 @@ def main():
 	output_df["identifier"] = output_df.apply(map_files_to_ids, axis=1)
 
 	# write to CSV file
-	output_df.write_csv(os.path.join(params["output-path"], "final_grades.csv"), index=False)
+	output_df.to_csv(os.path.join(params["output-path"], "final_grades.csv"), index=False)
 
 
 # Exports a list of dataframes as a single, merged csv file
