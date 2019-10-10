@@ -30,13 +30,13 @@ If a cell falls within one of the 3 categories listed above but you do not want 
 
 ### Ok-Formatted Tests
 
-You can use [https://oktests.herokuapp.com/](https://oktests.herokuapp.com/) to generate your tests in the okpy format. Place all generated test files in the /tests directory. 
+You can use [https://oktests.herokuapp.com/](https://oktests.herokuapp.com/) to generate your tests in the okpy format. Place all generated test files in the tests directory. 
 
 ### In-Notebook Usage
 
 #### Instantiating the Autograder
 
-Otter has functionality to allow it to be used in Jupyter Notebooks to allow students to check their progress against tests distributed with the notebook. This functionality is encapsulated in the `otter.Notebook` object which allows you to run tests as you go through the notebook. When this class is intialized, it automatically assumes that the tests are located in the `tests` subdirectory of the directory that contains the notebook, e.g.
+Otter has functionality to allow it to be used in Jupyter Notebooks to allow students to check their progress against tests distributed with the notebook. This functionality is encapsulated in the `otter.Notebook` class which allows you to run tests as you go through the notebook. When this class is initialized, it automatically assumes that the tests are located in the `tests` subdirectory of the directory that contains the notebook, e.g.
 
 ```
 lab01
@@ -47,7 +47,7 @@ lab01
   ...
 ```
 
-To intialize the class, simply import it and create an instance:
+To initialize the class, simply import it and create an instance:
 
 ```python
 import otter
@@ -71,7 +71,7 @@ grader.check("q1_1")
 
 Note the lack of the `.py` extension; `Notebook.check` automatically adds this when finding the test case.
 
-Although it is possible to export manual submission PDFs from the command line usage of otter, the `Notebook` object includes a method that exports the notebook for each student so that they can submit these themselves. This functionality is included because generating all PDFs at once requires a significant amount of time. To have students export their own notebooks, add the cell below to the notebook.
+Although it is possible to export manual submission PDFs from the command line usage of otter, the `Notebook` API includes a method that exports the notebook for each student so that they can submit these themselves. This functionality is included because generating all PDFs at once requires a significant amount of time. To have students export their own notebooks, add the cell below to the notebook.
 
 ```python
 grader.export("/path/to/notebook")
