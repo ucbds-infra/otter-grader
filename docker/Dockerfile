@@ -14,4 +14,4 @@ RUN pip3 install --no-cache-dir \
        scipy \
        gofer-grader==1.0.3 \
        nb2pdf==0.0.1 \
-       otter-grader==0.0.6
+       otter-grader==0.0.8
