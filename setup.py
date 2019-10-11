@@ -19,5 +19,6 @@ setuptools.setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
 	],
+	install_requires=["gofer-grader==1.0.3", "nb2pdf==0.0.1"],
 	scripts=["bin/otter"]
 )
