@@ -13,5 +13,5 @@ RUN pip3 install --no-cache-dir \
        ipywidgets \
        scipy \
        gofer-grader==1.0.3 \
-       nb2pdf==0.0.1 \
+       nb2pdf==0.0.2 \
        otter-grader==0.0.9
