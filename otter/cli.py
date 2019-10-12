@@ -69,7 +69,7 @@ def main():
 		print("Combining grades and saving...")
 
 	# Merge Dataframes
-	output_df = merge_export_csv([grades_df], params["output-path"])
+	output_df = merge_csv([grades_df], params["output-path"])
 
 	def map_files_to_ids(row):
 		"""Returns the identifier for the filename in the specified row"""
@@ -78,12 +78,16 @@ def main():
 	# add in identifier column
 	output_df["identifier"] = output_df.apply(map_files_to_ids, axis=1)
 
+	# reorder cols in output_df
+	cols = output_df.columns.tolist()
+	output_df = output_df[cols[-1:] + cols[:-1]]
+
 	# write to CSV file
 	output_df.to_csv(os.path.join(params["output-path"], "final_grades.csv"), index=False)
 
 
 # Exports a list of dataframes as a single, merged csv file
-def merge_export_csv(dataframes, output_path):
+def merge_csv(dataframes, output_path):
 	original_directory = os.getcwd()
 	os.chdir(output_path)
 	final_dataframe = pd.concat(dataframes, axis=1, join='inner').sort_index()
