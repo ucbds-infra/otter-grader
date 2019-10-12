@@ -49,8 +49,9 @@ def main():
 			print("Found YAML metadata...")
 
 	# check that reqs file is valid
-	assert os.path.exists(params["requirements"]) and \
-		os.path.isfile(params["requirements"]), "Requirements file '{}' does not exist.".format(params["requirements"])
+	if params["requirements"]:
+		assert os.path.exists(params["requirements"]) and \
+			os.path.isfile(params["requirements"]), "Requirements file '{}' does not exist.".format(params["requirements"])
 
 	if verbose:
 		print("Launching docker containers...")

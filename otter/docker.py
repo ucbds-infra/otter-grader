@@ -92,7 +92,11 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
     
     # check that no commands errored, if they did rais an informative exception
-    all_commands = [launch, copy, tests, requirements, install, grade, csv, csv_cleanup, stop, remove]
+    all_commands = [launch, copy, tests, grade, csv, csv_cleanup, stop, remove]
+    try:
+        all_commands += [requirements, install]
+    except UnboundLocalError:
+        pass
     for command in all_commands:
         if command.stderr.decode('utf-8') != '':
             raise Exception("Error running ", command, " failed with error: ", command.stderr.decode('utf-8'))
