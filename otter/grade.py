@@ -110,7 +110,6 @@ def main():
             all_results["manual"].append(pdf_path)
 
     # expand mappings in all_results["score"]
-    print(all_results["score"])
     for q in all_results["score"][0].keys():
         all_results[q] = []
 

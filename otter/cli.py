@@ -88,8 +88,6 @@ def main():
 
 # Exports a list of dataframes as a single, merged csv file
 def merge_csv(dataframes, output_path):
-	original_directory = os.getcwd()
-	os.chdir(output_path)
-	final_dataframe = pd.concat(dataframes, axis=1, join='inner').sort_index()
-	os.chdir(original_directory)
+	"""Merges dataframes returned by Docker containers"""
+	final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
 	return final_dataframe
