@@ -12,15 +12,15 @@ pip install otter-grader
 
 ### Docker
 
-#### Pull from Dockerhub
+#### Pull from DockerHub
 
-To pull the image from Dockerhub, run `docker pull ucbdsinfra/otter-grader`.
+To pull the image from DockerHub, run `docker pull ucbdsinfra/otter-grader`.
 
-#### Download the Dockerfile from Github
+#### Download the Dockerfile from GitHub
 
-To install from the Github repo, follow the steps below:
+To install from the GitHub repo, follow the steps below:
 
-1. Clone the Github repo
+1. Clone the GitHub repo
 2. `cd` into the `otter-grader/docker` directory
 3. Build the Docker image with this command: `docker build . -t otter-grader`
 
