@@ -13,7 +13,6 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 
 	# list all notebooks in the dir
 	dir_path = os.path.abspath(notebooks_dir)
-	print(dir_path)
 	# os.chdir(os.path.dirname(dir_path))
 	notebooks = [(f, os.path.join(dir_path, f)) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f[-6:] == ".ipynb"]
 
@@ -22,9 +21,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 
 	# copy notebooks into tmp directories
 	for i in range(num_containers + 1):
-		print(os.path.join(dir_path, "tmp{}".format(i)))
 		os.mkdir(os.path.join(dir_path, "tmp{}".format(i)))
-		print(len(os.listdir(dir_path)))
 		for j in range(i * num_per_group, (i+1) * num_per_group):
 			try:
 				cp_cmd = ["cp", notebooks[j][1], os.path.join(dir_path, "tmp{}".format(i))]
