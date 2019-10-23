@@ -60,7 +60,6 @@ def main():
 	# Docker
 	grades_dfs = launch_parallel_containers(params["tests-path"], 
 		params["notebooks-path"], 
-		"42", 
 		verbose=verbose, 
 		pdfs=params["pdf"], 
 		reqs=params["requirements"],
