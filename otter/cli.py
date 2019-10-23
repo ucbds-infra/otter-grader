@@ -6,6 +6,7 @@ import os
 
 from .metadata import *
 from .docker import *
+from .parallel import *
 
 def main():
 	parser = argparse.ArgumentParser()
