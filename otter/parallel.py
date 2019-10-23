@@ -1,4 +1,4 @@
-from otter.docker import grade_assignments
+from .docker import grade_assignments
 from concurrent.futures import ThreadPoolExecutor, wait
 import os
 import shutil
@@ -10,7 +10,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 	"""Grades notebooks in parallel docker containers"""
 	if not num_containers:
 		num_containers = 4
-		
+
 	# list all notebooks in the dir
 	dir_path = os.path.abspath(notebooks_dir)
 	print(dir_path)
