@@ -9,17 +9,17 @@ from .docker import *
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-g", "--gradescope", action="store_true", default=False,)
-	parser.add_argument("-c", "--canvas", action="store_true", default=False)
-	parser.add_argument("-j", "--json", default=False)
-	parser.add_argument("-y", "--yaml", default=False)
-	parser.add_argument("-n", "--notebooks-path", dest="notebooks-path", type=str, default="./")
-	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/")
-	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./")
-	parser.add_argument("-v", "--verbose", action="store_true")
-	parser.add_argument("-r", "--requirements", type=str)
+	parser.add_argument("-g", "--gradescope", action="store_true", default=False, help="Flag for Gradescope export")
+	parser.add_argument("-c", "--canvas", action="store_true", default=False, help="flag for Canvas export")
+	parser.add_argument("-j", "--json", default=False, help="Flag for path to JSON metadata")
+	parser.add_argument("-y", "--yaml", default=False, help="Flag for path to YAML metadata")
+	parser.add_argument("-n", "--notebooks-path", dest="notebooks-path", type=str, default="./", help="Path to directory of notebooks")
+	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/", help="Path to directory of tests")
+	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./", help="Path to which to write output")
+	parser.add_argument("-v", "--verbose", action="store_true", help="Flag for verbose output")
+	parser.add_argument("-r", "--requirements", type=str, help="Flag for Python requirements file path")
 	parser.add_argument("--containers", dest="num-containers", type=int, help="Specify number of containers to run in parallel")
-	parser.add_argument("--pdf", action="store_true", default=False)
+	parser.add_argument("--pdf", action="store_true", default=False, help="Create PDFs as manual-graded submissions")
 	params = vars(parser.parse_args())
 
 	# Asserts that exactly one metadata flag is provided
