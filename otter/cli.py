@@ -18,6 +18,7 @@ def main():
 	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./")
 	parser.add_argument("-v", "--verbose", action="store_true")
 	parser.add_argument("-r", "--requirements", type=str)
+	parser.add_argument("--containers", dest="num-containers", type=int, help="Specify number of containers to run in parallel")
 	parser.add_argument("--pdf", action="store_true", default=False)
 	params = vars(parser.parse_args())
 
@@ -57,19 +58,20 @@ def main():
 		print("Launching docker containers...")
 
 	# Docker
-	grades_df = grade_assignments(params["tests-path"], 
+	grades_dfs = launch_parallel_containers(params["tests-path"], 
 		params["notebooks-path"], 
 		"42", 
 		verbose=verbose, 
 		pdfs=params["pdf"], 
-		reqs=params["requirements"]
+		reqs=params["requirements"],
+		num_containers=params["num-containers"]
 	)
 
 	if verbose:
 		print("Combining grades and saving...")
 
 	# Merge Dataframes
-	output_df = merge_csv([grades_df], params["output-path"])
+	output_df = merge_csv(grades_dfs, params["output-path"])
 
 	def map_files_to_ids(row):
 		"""Returns the identifier for the filename in the specified row"""
