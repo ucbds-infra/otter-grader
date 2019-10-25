@@ -14,22 +14,16 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 	# list all notebooks in the dir
 	dir_path = os.path.abspath(notebooks_dir)
 	# os.chdir(os.path.dirname(dir_path))
-	notebooks = [(f, os.path.join(dir_path, f)) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f[-6:] == ".ipynb"]
+	notebooks = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f[-6:] == ".ipynb"]
 
 	# set indices of notebooks
 	num_per_group = int(len(notebooks) / num_containers)
 
-	# copy notebooks into tmp directories
-	for i in range(num_containers + 1):
+	for i in range(num_containers):
 		os.mkdir(os.path.join(dir_path, "tmp{}".format(i)))
-		for j in range(i * num_per_group, (i+1) * num_per_group):
-			try:
-				cp_cmd = ["cp", notebooks[j][1], os.path.join(dir_path, "tmp{}".format(i))]
-			except IndexError:
-				break
-			cp = subprocess.run(cp_cmd, stdout=PIPE, stderr=PIPE)
-			if cp.stderr.decode("utf-8"):
-				raise Exception(f"Error copying {notebooks[j]} into the tmp{j} directory.")
+
+	for k, v in enumerate(notebooks):
+		shutil.copy(v, os.path.join(dir_path, "tmp{}".format(k % num_containers)))
 
 		# copy all non-notebook files into each tmp directory
 		for file in os.listdir(dir_path):
@@ -37,9 +31,9 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 				shutil.copy(os.path.join(dir_path, file), os.path.join(dir_path, "tmp{}".format(i)))
 
 	# execute containers in parallel
-	pool = ThreadPoolExecutor(num_containers + 1)
+	pool = ThreadPoolExecutor(num_containers)
 	futures = []
-	for i in range(num_containers + 1):
+	for i in range(num_containers):
 		futures += [pool.submit(grade_assignments, 
 			tests_dir, 
 			os.path.join(dir_path, "tmp{}".format(i)), 
@@ -52,7 +46,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 	finished_futures = wait(futures)
 
 	# clean up tmp directories
-	for i in range(num_containers + 1):
+	for i in range(num_containers):
 		shutil.rmtree(os.path.join(dir_path, "tmp{}".format(i)))
 
 	# return list of dataframes
