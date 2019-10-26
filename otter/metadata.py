@@ -7,8 +7,11 @@ import json
 import glob
 import os
 import re
+import shutil
 
 from .utils import *
+
+FILENAME_REGEX = r"^.+\."
 
 class GradescopeParser:
 	"""Metadata parser for Gradescope exports"""
@@ -20,15 +23,29 @@ class GradescopeParser:
 
 		# initialize metadata list
 		self._metadata = []
-		for file in metadata:
+		for folder in metadata:
+			# copy submission contents into export root directory
+			for file in os.listdir(os.path.join(submissions_dir, folder)):
+				if os.path.isfile(os.path.join(submissions_dir, folder, file)) and file[-6:] == ".ipynb":
+					# create new filename
+					new_filename = re.sub(FILENAME_REGEX, folder + ".", file)
+
+					# ensure we are not overwriting another IPYNB file
+					assert not os.path.exists(os.path.join(submissions_dir, folder + ".ipynb")), \
+					"Extracting files from folder {} would overwrite another file in the submissions directory.".format(folder)
+
+					# copy the file
+					shutil.copy(os.path.join(submissions_dir, folder, file), 
+						os.path.join(submissions_dir, new_filename))
+
 			# iterate through submitters for group submissions
 			for submitter in metadata[file][":submitters"]:
 				self._metadata += [{
 
 					# metadata is separated by filename into a list of submitters
-					# and we use the SID as the identifier
-					"identifier": submitter[":sid"],
-					"filename": file
+					# and we use the name as the identifier
+					"identifier": submitter[":name"],
+					"filename": folder + ".ipynb"
 				}]
 
 		# TODO: handle group subs in _file_to_id because second sub will overwrite first
