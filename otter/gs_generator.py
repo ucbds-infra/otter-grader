@@ -49,7 +49,7 @@ pip3 install -r /autograder/source/requirements.txt
 """
 
 def main():
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(help="Generates zipfile to configure Gradescope autograder")
 	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/")
 	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./")
 	# parser.add_argument("-v", "--verbose", action="store_true")
