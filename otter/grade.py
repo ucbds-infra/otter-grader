@@ -96,7 +96,7 @@ def main():
 
     # get all ipynb files
     dir_path = os.path.abspath(args.notebook_directory)
-    os.chdir(os.path.dirname(dir_path))
+    os.chdir(dir_path)
     all_ipynb = [(f, join(dir_path, f)) for f in os.listdir(dir_path) if isfile(join(dir_path, f)) and f[-6:] == ".ipynb"]
 
     all_results = {"file": [], "score": [], "manual": []}

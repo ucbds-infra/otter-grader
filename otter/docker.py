@@ -59,7 +59,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
         print("Copying grades from container {}...".format(container_id[:12]))
 
     # get the grades back from the container and read to date frame so we can merge later
-    csv_command = ["docker", "cp", container_id+ ":/home/grades.csv", "./grades"+id+".csv"]
+    csv_command = ["docker", "cp", container_id+ ":/home/notebooks/grades.csv", "./grades"+id+".csv"]
     csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
     df = pd.read_csv("./grades"+id+".csv")
 
