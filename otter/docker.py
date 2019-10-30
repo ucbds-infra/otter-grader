@@ -22,7 +22,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     container_id = launch.stdout.decode('utf-8')[:-1]
 
     if verbose:
-        print("Launched container {}...".format(container_id[:7]))
+        print("Launched container {}...".format(container_id[:12]))
     
     # copy the notebook files to the container
     copy_command = ["docker", "cp", notebooks_dir, container_id+ ":/home/notebooks/"]
@@ -35,7 +35,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     # copy the requirements file to the container
     if reqs:
         if verbose:
-            print("Installing requirements in container {}...".format(container_id[:7]))
+            print("Installing requirements in container {}...".format(container_id[:12]))
         reqs_command = ["docker", "cp", reqs, container_id+ ":/home"]
         requirements = subprocess.run(reqs_command, stdout=PIPE, stderr=PIPE)
 
@@ -44,7 +44,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
         install = subprocess.run(install_command, stdout=PIPE, stderr=PIPE)
 
     if verbose:
-        print("Grading notebooks in container {}...".format(container_id[:7]))
+        print("Grading notebooks in container {}...".format(container_id[:12]))
     
     # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command....
     grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "/home/notebooks"]
@@ -56,10 +56,10 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
 
     if verbose:
-        print("Copying grades from container {}...".format(container_id[:7]))
+        print("Copying grades from container {}...".format(container_id[:12]))
 
     # get the grades back from the container and read to date frame so we can merge later
-    csv_command = ["docker", "cp", container_id+ ":/home/grades.csv", "./grades"+id+".csv"]
+    csv_command = ["docker", "cp", container_id+ ":/home/notebooks/grades.csv", "./grades"+id+".csv"]
     csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
     df = pd.read_csv("./grades"+id+".csv")
 
@@ -83,7 +83,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbos
     csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
     
     if verbose:
-        print("Stopping container {}...".format(container_id[:7]))
+        print("Stopping container {}...".format(container_id[:12]))
 
     # cleanup the docker container
     stop_command = ["docker", "stop", container_id]

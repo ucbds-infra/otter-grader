@@ -39,7 +39,7 @@ class GradescopeParser:
 						os.path.join(submissions_dir, new_filename))
 
 			# iterate through submitters for group submissions
-			for submitter in metadata[file][":submitters"]:
+			for submitter in metadata[folder][":submitters"]:
 				self._metadata += [{
 
 					# metadata is separated by filename into a list of submitters
