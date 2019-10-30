@@ -13,7 +13,7 @@ import json
 import itertools
 
 # copied from https://github.com/data-8/Gofer-Grader/blob/master/gofer/ok.py#L210
-def grade_notebook(notebook_path, tests_glob=None, name=None):
+def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True):
     """
     Grade a notebook file & return grade
     """
@@ -36,7 +36,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None):
     if name:
         initial_env["__name__"] = name
 
-    global_env = execute_notebook(nb, secret, initial_env, ignore_errors=True)
+    global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors)
 
     test_results = global_env[results_array]
 
