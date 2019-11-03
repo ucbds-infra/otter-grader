@@ -16,6 +16,7 @@ import subprocess
 import re
 
 UTILS_IMPORT_REGEX = r"\\"from utils import [\\w\\*, ]+"
+NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\\(.+\\)"
 
 if __name__ == "__main__":
 	# put files into submission directory
@@ -39,6 +40,7 @@ if __name__ == "__main__":
 			contents = f.read()
 
 	contents = re.sub(UTILS_IMPORT_REGEX, "\\"from .utils import *", contents)
+	contents = re.sub(NOTEBOOK_INSTANCE_REGEX, "otter.Notebook()", contents)
 
 	try:
 		with open(nb_path, "w") as f:
@@ -83,7 +85,7 @@ seaborn
 sklearn
 gofer-grader==1.0.3
 nb2pdf==0.0.2
-otter-grader==0.0.17
+otter-grader==0.0.18
 """
 
 SETUP_SH = """#!/usr/bin/env bash
