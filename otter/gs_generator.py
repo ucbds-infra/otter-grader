@@ -2,6 +2,8 @@ import os
 import shutil
 import argparse
 from glob import glob
+from subprocess import PIPE
+import subprocess
 
 RUN_AUTOGRADER = """#!/usr/bin/env python3
 
@@ -10,6 +12,10 @@ from glob import glob
 import json
 import os
 import shutil
+import subprocess
+import re
+
+UTILS_IMPORT_REGEX = r"\\"from utils import [\\w\\*, ]+"
 
 if __name__ == "__main__":
 	# put files into submission directory
@@ -17,12 +23,49 @@ if __name__ == "__main__":
 		for filename in glob("/autograder/source/files/*.*"):
 			shutil.copy(filename, "/autograder/submission")
 
+	# create __init__.py files
+	subprocess.run(["touch", "/autograder/__init__.py"])
+	subprocess.run(["touch", "/autograder/submission/__init__.py"])
+
 	os.chdir("/autograder/submission")
 	nb_path = glob("*.ipynb")[0]
-	scores = grade_notebook(nb_path, "/autograder/source/tests/*.py")
 
-	output = {{}}
-	output["score"] = scores["total"]
+	# fix utils import
+	try:
+		with open(nb_path) as f:
+			contents = f.read()
+	except UnicodeDecodeError:
+		with open(nb_path, "r", encoding="utf-8") as f:
+			contents = f.read()
+
+	contents = re.sub(UTILS_IMPORT_REGEX, "\\"from .utils import *", contents)
+
+	try:
+		with open(nb_path, "w") as f:
+			f.write(contents)
+	except UnicodeEncodeError:
+		with open(nb_path, "w", encoding="utf-8") as f:
+			f.write(contents)
+
+	try:
+		os.mkdir("/autograder/submission/tests")
+	except FileExistsError:
+		pass
+		
+	tests_glob = glob("/autograder/source/tests/*.py")
+	for file in tests_glob:
+		shutil.copy(file, "/autograder/submission/tests")
+
+	scores = grade_notebook(nb_path, tests_glob, name="submission", ignore_errors=True)
+	print(scores)
+
+	output = {"tests" : []}
+	for key in scores:
+		if key != "total":
+			output["tests"] += [{
+				"score" : scores[key],
+				"number" : key
+			}]
 	output["visibility"] = "hidden"
 
 	with open("/autograder/results/results.json", "w+") as f:
@@ -36,9 +79,11 @@ matplotlib
 pandas
 ipywidgets
 scipy
+seaborn
+sklearn
 gofer-grader==1.0.3
 nb2pdf==0.0.2
-otter-grader==0.0.11
+otter-grader==0.1.0
 """
 
 SETUP_SH = """#!/usr/bin/env bash
@@ -49,13 +94,14 @@ pip3 install -r /autograder/source/requirements.txt
 """
 
 def main():
-	parser = argparse.ArgumentParser(help="Generates zipfile to configure Gradescope autograder")
-	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/")
-	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./")
-	# parser.add_argument("-v", "--verbose", action="store_true")
-	parser.add_argument("-r", "--requirements", type=str)
-	parser.add_argument(dest="files", nargs=argparse.REMAINDER)
-	params = vars(parser.parse_args())
+	parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
+	parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")
+	parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")
+	parser.add_argument("-r", "--requirements", nargs='?', type=str, help="Path to requirements.txt file")
+	parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
+	
+	params, files = parser.parse_known_args()
+	params = vars(params)
 
 	# create tmp directory to zip inside
 	os.mkdir("./tmp")
@@ -63,7 +109,7 @@ def main():
 	# copy tests into tmp
 	os.mkdir(os.path.join("tmp", "tests"))
 	for file in glob(os.path.join(params["tests-path"], "*.py")):
-		shutil.copy(file, os.path.join(os.getcwd(), "tmp", "tests"))
+		shutil.copy(file, os.path.join("tmp", "tests"))
 
 	reqs = REQUIREMENTS
 
@@ -83,15 +129,17 @@ def main():
 		f.write(RUN_AUTOGRADER)
 
 	# copy files into tmp
-	if params["files"]:
+	if len(files) > 0:
 		os.mkdir(os.path.join("tmp", "files"))
 
 		for file in files:
-			shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files", os.path.split(file)[1]))
+			if file == "gen":
+				continue
+			shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))
 
 	os.chdir("./tmp")
 
-	zip_cmd = ["zip", os.path.join("..", params["output-path"], "autograder.zip"), "run_autograder",
+	zip_cmd = ["zip", "-r", os.path.join("..", params["output-path"], "autograder.zip"), "run_autograder",
 			   "setup.sh", "requirements.txt", "tests"]
 
 	if params["files"]:
@@ -101,3 +149,9 @@ def main():
 
 	if zipped.stderr.decode("utf-8"):
 		raise Exception(zipped.stderr.decode("utf-8"))
+
+	# move back to tmp parent directory
+	os.chdir("..")
+
+	# delete tmp directory
+	shutil.rmtree("tmp")
