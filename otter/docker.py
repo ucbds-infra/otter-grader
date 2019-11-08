@@ -4,7 +4,7 @@ from subprocess import PIPE
 import json
 import re
 
-def grade_assignments(tests_dir, notebooks_dir, id, image="otter-grader", verbose=False, pdfs=False, reqs=None):
+def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, pdfs=False, reqs=None):
     """
     Args:
         tests_dir: directory of test files

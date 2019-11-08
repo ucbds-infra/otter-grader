@@ -21,6 +21,7 @@ def main():
 	parser.add_argument("-r", "--requirements", type=str, help="Flag for Python requirements file path")
 	parser.add_argument("--containers", dest="num-containers", type=int, help="Specify number of containers to run in parallel")
 	parser.add_argument("--pdf", action="store_true", default=False, help="Create PDFs as manual-graded submissions")
+	parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
 	params = vars(parser.parse_args())
 
 	# Asserts that exactly one metadata flag is provided
@@ -64,7 +65,8 @@ def main():
 		verbose=verbose, 
 		pdfs=params["pdf"], 
 		reqs=params["requirements"],
-		num_containers=params["num-containers"]
+		num_containers=params["num-containers"],
+		image=params["image"]
 	)
 
 	if verbose:

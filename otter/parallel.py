@@ -6,7 +6,7 @@ from subprocess import PIPE
 import subprocess
 import time
 
-def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=False, reqs=None, num_containers=None):
+def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader"):
 	"""Grades notebooks in parallel docker containers"""
 	if not num_containers:
 		num_containers = 4
@@ -40,7 +40,8 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 			str(i), 
 			verbose=verbose, 
 			pdfs=pdfs, 
-			reqs=reqs)]
+			reqs=reqs,
+			image=image)]
 
 	# stop execution while containers are running
 	finished_futures = wait(futures)

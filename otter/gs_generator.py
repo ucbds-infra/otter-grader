@@ -85,7 +85,7 @@ seaborn
 sklearn
 gofer-grader==1.0.3
 nb2pdf==0.0.2
-otter-grader==0.0.18
+otter-grader==0.0.19
 """
 
 SETUP_SH = """#!/usr/bin/env bash
