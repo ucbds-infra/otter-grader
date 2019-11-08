@@ -97,20 +97,27 @@ The help entry for the `otter` command is given below.
 
 ```
 usage: otter [-h] [-g] [-c] [-j JSON] [-y YAML] [-n NOTEBOOKS-PATH]
-             [-t TESTS-PATH] [-o OUTPUT-PATH] [-v] [-r REQUIREMENTS] [--pdf]
+             [-t TESTS-PATH] [-o OUTPUT-PATH] [-v] [-r REQUIREMENTS]
+             [--containers NUM-CONTAINERS] [--pdf]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -g, --gradescope
-  -c, --canvas
-  -j JSON, --json JSON
-  -y YAML, --yaml YAML
+  -g, --gradescope      Flag for Gradescope export
+  -c, --canvas          flag for Canvas export
+  -j JSON, --json JSON  Flag for path to JSON metadata
+  -y YAML, --yaml YAML  Flag for path to YAML metadata
   -n NOTEBOOKS-PATH, --notebooks-path NOTEBOOKS-PATH
+                        Path to directory of notebooks
   -t TESTS-PATH, --tests-path TESTS-PATH
+                        Path to directory of tests
   -o OUTPUT-PATH, --output-path OUTPUT-PATH
-  -v, --verbose
+                        Path to which to write output
+  -v, --verbose         Flag for verbose output
   -r REQUIREMENTS, --requirements REQUIREMENTS
-  --pdf
+                        Flag for Python requirements file path
+  --containers NUM-CONTAINERS
+                        Specify number of containers to run in parallel
+  --pdf                 Create PDFs as manual-graded submissions
 ```
 
 Using otter requires a metadata file, which can be set for Gradescope (`-g`) or Canvas (`-c`) exports, JSON format (`-j`), or YAML format (`-y`). The JSON and YAML flags require an argument corresponding to the name of the metadata file _relative to the `--notebooks-path` argument_. Note that you can only specify ONE (1) of the metadata flags. The defaults for certain flags are given below.
