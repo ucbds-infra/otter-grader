@@ -194,7 +194,7 @@ Otter is compatible with the Gradescope autograder, and has a command line tool 
 
 
 ```
-usage: otter [-h] [-t [TESTS-PATH]] [-o [OUTPUT-PATH]] [-r [REQUIREMENTS]]
+usage: otter gen [-h] [-t [TESTS-PATH]] [-o [OUTPUT-PATH]] [-r [REQUIREMENTS]]
              [files [files ...]]
 
 Generates zipfile to configure Gradescope autograder
