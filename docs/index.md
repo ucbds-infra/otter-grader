@@ -219,7 +219,7 @@ The `otter gen` command creates a zipfile at `OUTPUT-PATH/autograder.zip` which 
 * `setup.sh`: a file that instructs Ubuntu on how to install dependencies
 * `requirements.txt`: Python's list of necessary dependencies
 * `tests`: the folder of test cases
-* `files`: any files needed for the notebooks to execute (e.g. data files)
+* `files`: a folder containing any files needed for the notebooks to execute (e.g. data files)
 
 The requirements file create automatically includes the otter dependencies (see [Installing Requirements](#installing-requirements)), but you can optionally include your own, other ones by passing a filepath to the `-r` flag. Any files included that are not passed to a flag are automatically placed into the `files` folder in the zipfile and will be copied into the notebook directory in the Gradescope container.
 
