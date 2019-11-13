@@ -1,4 +1,4 @@
-# Otter-Grader Onboarding Guide
+# Otter-Grader Documentation
 
 Otter-grader is a new, open-source, local grader from the Division of Data Science, External Pedagogy Infrastructure at UC Berkeley. It is designed to be a scalable grader that utilizes temporal docker containers in order to remove the traditional overhead requirement of a live server. 
 
@@ -12,6 +12,8 @@ pip install otter-grader
 
 ### Docker
 
+Otter also requires you to have its Docker image installed, which is where it executes notebooks. The docker image can be installed in two ways:
+
 #### Pull from DockerHub
 
 To pull the image from DockerHub, run `docker pull ucbdsinfra/otter-grader`.
@@ -22,11 +24,13 @@ To install from the GitHub repo, follow the steps below:
 
 1. Clone the GitHub repo
 2. `cd` into the `otter-grader/docker` directory
-3. Build the Docker image with this command: `docker build . -t otter-grader`
+3. Build the Docker image with this command: `docker build . -t YOUR_DESIRED_IMAGE_NAME`
+
+_Note:_ With this setup, you will need to pass in a custom docker image name when using the CLI (see [below](#custom-docker-images)).
 
 ## Usage
 
-### Notebook Design
+### Notebook Design: PDF Generation
 
 Otter-grader uses nb2pdf to generate manual submissions as PDFs. When generating the PDF, the following cells will be included by default:
 
@@ -38,7 +42,7 @@ If a cell falls within one of the 3 categories listed above but you do not want 
 
 ### Ok-Formatted Tests
 
-You can use [https://oktests.herokuapp.com/](https://oktests.herokuapp.com/) to generate your tests in the okpy format. Place all generated test files in the tests directory. 
+You can use [https://oktests.herokuapp.com/](https://oktests.herokuapp.com/) to generate your tests in the ok format. Place all generated test files in the tests directory. 
 
 ### In-Notebook Usage
 
@@ -73,7 +77,7 @@ grader = otter.Notebook("/path/to/your/tests")
 
 To run a test case, use the `Notebook.check` function, which takes the test name as its argument. For example, if I wanted to run the test located in `tests/q1_1.py`, I would call
 
-```
+```python
 grader.check("q1_1")
 ```
 
@@ -91,6 +95,8 @@ For example, if I was working in a notebook called `lab01.ipynb`, my call to `No
 grader.export("lab01.ipynb")
 ```
 
+This will create a file called `lab01.pdf` in the notebook's directory which students can submit. For more information on how nb2pdf filters cells, see the [Notebook Design](#notebook-design-pdf-generation) section.
+
 ### Command Line Usage
 
 The help entry for the `otter` command is given below.
@@ -98,7 +104,7 @@ The help entry for the `otter` command is given below.
 ```
 usage: otter [-h] [-g] [-c] [-j JSON] [-y YAML] [-n NOTEBOOKS-PATH]
              [-t TESTS-PATH] [-o OUTPUT-PATH] [-v] [-r REQUIREMENTS]
-             [--containers NUM-CONTAINERS] [--pdf]
+             [--containers NUM-CONTAINERS] [--pdf] [--image IMAGE]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -118,9 +124,10 @@ optional arguments:
   --containers NUM-CONTAINERS
                         Specify number of containers to run in parallel
   --pdf                 Create PDFs as manual-graded submissions
+  --image IMAGE         Custom docker image to run on
 ```
 
-Using otter requires a metadata file, which can be set for Gradescope (`-g`) or Canvas (`-c`) exports, JSON format (`-j`), or YAML format (`-y`). The JSON and YAML flags require an argument corresponding to the name of the metadata file _relative to the `--notebooks-path` argument_. Note that you can only specify ONE (1) of the metadata flags. The defaults for certain flags are given below.
+Using otter requires a metadata file, which can be set for Gradescope (`-g`) or Canvas (`-c`) exports, JSON format (`-j`), or YAML format (`-y`). The JSON and YAML flags require an argument corresponding to the name of the metadata file _relative to the `NOTEBOOKS-PATH` argument_. Note that you can only specify ONE (1) of the metadata flags. The defaults for certain flags are given below.
 
 | Flag | Default Value |
 |------|---------------|
@@ -128,15 +135,17 @@ Using otter requires a metadata file, which can be set for Gradescope (`-g`) or 
 | `-t` | `./tests`, the `tests` subdirectory of the current working directory |
 | `-o` | `./`, the current working directory |
 
+Otter executes the notebooks in parallel Docker containers. Depending on the number and size of the notebooks you are grading, you may wish to change the default number of containers (4) so that your grading can be executed quicker. To do this, pass the number of containers you want created to the `--containers` flag.
+
 An example command would be
 
 ```
-otter -g -n ./notebooks -t ./tests -o ./outputs -v
+otter -g -n ./notebooks -t ./tests -o ./outputs --containers 6 -v
 ```
 
-This command tells otter that we have a Gradescope export located in the `./notebooks` directory with tests in the `./tests` directory and that we want output in the `./outputs` directory. It also tells otter to include verbose output with the `-v` flag.
+This command tells otter that we have a Gradescope export located in the `./notebooks` directory with tests in the `./tests` directory and that we want output in the `./outputs` directory. It also tells otter to spin up 6 (rather than 4) docker containers and to include verbose output with the `-v` flag.
 
-The output of the command line tool is a CSV file which contains one row for each student and lists the student's identifier, the filename of their submission, and their final grade. This CSV file is output as `OUTPUT-PATH/final_grades.csv`, where `OUTPUT-PATH` is the value passed to the `-o` flag (defaults to `./`). _We are currently working on a feature that will also add columns for each individual test case to provide a score breakdown._
+The output of the command line tool is a CSV file which contains one row for each student and lists the student's identifier, the filename of their submission, their score breakdown by test case, and their final grade. This CSV file is output as `OUTPUT-PATH/final_grades.csv`, where `OUTPUT-PATH` is the value passed to the `-o` flag (defaults to `./`).
 
 #### Installing Requirements
 
@@ -150,8 +159,8 @@ The Docker image for the grader comes with the following Python packages install
 * ipywidgets
 * scipy
 * gofer-grader==1.0.3
-* nb2pdf==0.0.1
-* otter-grader==0.0.6
+* nb2pdf==0.0.2
+* otter-grader==0.0.19
 
 If you require packages other than these, place them in a `requirements.txt` file and pass the path to this file to the `-r` flag, e.g.
 
@@ -170,3 +179,11 @@ otter -j meta.json --pdf
 This will create a subdirectory `manual_submissions/` of the current working directory and put the PDF exports of each notebook into this directory, leaving the filename unchanged (with the exception of the extension); e.g., `lab01-123456.ipynb` would be `lab01-123456.pdf`.
 
 Given the time and execution cost of generating all of the PDFs at once, if you are distributing the in-notebook checker from otter, _it is recommended that you have students generate and upload their own PDF submissions_.
+
+#### Custom Docker Images
+
+It is possible to use a custom Docker image to execute the notebooks, but it must include the Python packages listed above, along with pandoc and xetex (if you intend to generate PDFs). To use a custom image, pass the image name to the `--image` flag when calling otter. For example,
+
+```
+otter -y meta.yml --image my_docker_image
+```
