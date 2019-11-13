@@ -187,3 +187,56 @@ It is possible to use a custom Docker image to execute the notebooks, but it mus
 ```
 otter -y meta.yml --image my_docker_image
 ```
+
+### Gradescope Compatibility
+
+Otter is compatible with the Gradescope autograder, and has a command line tool to generate the zipfile that is used to configure the Docker container that Gradescope's autograder usage. The base command for this utility is `otter gen`, and its help entry is given below.
+
+
+```
+usage: otter [-h] [-t [TESTS-PATH]] [-o [OUTPUT-PATH]] [-r [REQUIREMENTS]]
+             [files [files ...]]
+
+Generates zipfile to configure Gradescope autograder
+
+positional arguments:
+  files                 Other support files needed for grading (e.g. .py
+                        files, data files)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -t [TESTS-PATH], --tests-path [TESTS-PATH]
+                        Path to test files
+  -o [OUTPUT-PATH], --output-path [OUTPUT-PATH]
+                        Path to which to write zipfile
+  -r [REQUIREMENTS], --requirements [REQUIREMENTS]
+                        Path to requirements.txt file
+```
+
+The `otter gen` command creates a zipfile at `OUTPUT-PATH/autograder.zip` which contains the necessary files for the Gradescope autograder:
+
+* `run_autograder`: the script that executes otter
+* `setup.sh`: a file that instructs Ubuntu on how to install dependencies
+* `requirements.txt`: Python's list of necessary dependencies
+* `tests`: the folder of test cases
+* `files`: any files needed for the notebooks to execute (e.g. data files)
+
+The requirements file create automatically includes the otter dependencies (see [Installing Requirements](#installing-requirements)), but you can optionally include your own, other ones by passing a filepath to the `-r` flag. Any files included that are not passed to a flag are automatically placed into the `files` folder in the zipfile and will be copied into the notebook directory in the Gradescope container.
+
+An example command would be
+
+```
+otter gen -t ./hidden-tests -r requirements.txt my_data.csv my_other_data.json utils.py
+```
+
+This tells `otter gen` to copy the tests from `./hidden-tests`, add the requirements from `./requirements.txt`, and to include the files `my_data.csv`, `my_other_data.json`, and `utils.py`. All of these files will be made available to the notebook when it is executed.
+
+#### Relative Imports on Gradescope
+
+Because of the way that the Gradescope autograder is set up, our script must change relative import syntax in order to ensure that the necessary files are loaded. **Because we cannot differentiate between package imports and relative imports, `otter gen` automatically assumes that if you are importing a .py file that it is called `utils.py`.** The regex used to change the import syntax will _only_ change the syntax if you're using the import statment
+
+```python
+from utils import *
+```
+
+For this reason, if you have any functions you need in a file that is going to be imported, _make sure that it is called `utils.py`._
