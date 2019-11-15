@@ -5,7 +5,8 @@ import os
 from os.path import isfile, join
 from glob import glob
 from gofer import ok
-from gofer.notebook import execute_notebook
+from gofer.notebook import *
+from gofer.utils import hide_outputs
 import pandas as pd
 import nb2pdf
 import re
@@ -13,7 +14,7 @@ import json
 import itertools
 
 # copied from https://github.com/data-8/Gofer-Grader/blob/master/gofer/ok.py#L210
-def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True):
+def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False):
     """
     Grade a notebook file & return grade
     """
@@ -36,7 +37,10 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     if name:
         initial_env["__name__"] = name
 
-    global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors)
+    if script:
+        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors)
+    else:
+        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors)
 
     test_results = global_env[results_array]
 
@@ -64,7 +68,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 score_mapping[test_name] = r.grade
         except IndexError:
             pass
-    
+
     # add in total score and avoid divide by zero error if there are no tests
     total_score = sum([r.grade for r in test_results])/max(len(test_results), 1)
     score_mapping["total"] = total_score
@@ -87,8 +91,45 @@ def grade(ipynb_path, pdf):
 
     return result
 
+def execute_script(script, secret='secret', initial_env=None, ignore_errors=False):
+    """
+    Execute script & return the global environment that results from execution.
+    If ignore_errors is True, exceptions are swallowed.
+    secret contains random digits so check_results and check are not easily modifiable
+    script is passed in as a string
+    """
+    with hide_outputs():
+        if initial_env:
+            global_env = initial_env.copy()
+        else:
+            global_env = {}
+        source = ""
+        try:
+            exec(script, global_env)
+            source += nb
+        except:
+            if not ignore_errors:
+                raise
+        tree = ast.parse(source)
+        if find_check_assignment(tree) or find_check_definition(tree):
+            # an empty global_env will fail all the tests
+            return global_env
+        # wrap check(..) calls into a check_results_X.append(check(..))
+        transformer = CheckCallWrapper(secret)
+        tree = transformer.visit(tree)
+        ast.fix_missing_locations(tree)
+        cleaned_source = compile(tree, filename="nb-ast", mode="exec")
+        try:
+            with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
+                exec(cleaned_source, global_env)
+        except:
+            if not ignore_errors:
+                raise
+        return global_env
+
 def main():
     # implement argparser
+
     argparser = argparse.ArgumentParser()
     argparser.add_argument('notebook_directory', help='Path to directory with ipynb\'s to grade')
     argparser.add_argument("--pdf", action="store_true", default=False)
@@ -100,10 +141,10 @@ def main():
     all_ipynb = [(f, join(dir_path, f)) for f in os.listdir(dir_path) if isfile(join(dir_path, f)) and f[-6:] == ".ipynb"]
 
     all_results = {"file": [], "score": [], "manual": []}
-    
+
     if not args.pdf:
         del all_results["manual"]
-    
+
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
         score = grade(ipynb_path, args.pdf)
