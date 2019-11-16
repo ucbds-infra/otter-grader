@@ -91,7 +91,7 @@ def grade(ipynb_path, pdf, script):
     test_files = glob('/home/tests/*.py')
 
     # get score
-    result = grade_notebook(ipynb_path, test_files, script=script)
+    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=True)
 
     # output PDF
     if pdf:
@@ -149,7 +149,6 @@ def main():
     os.chdir(dir_path)
     file_extension = (".py", ".ipynb")[not args.scripts]
     all_ipynb = [(f, join(dir_path, f)) for f in os.listdir(dir_path) if isfile(join(dir_path, f)) and f.endswith(file_extension)]
-    print(all_ipynb)
 
     all_results = {"file": [], "score": [], "manual": []}
 
@@ -165,13 +164,17 @@ def main():
             pdf_path = re.sub(r"\.ipynb$", ".pdf", ipynb_path)
             all_results["manual"].append(pdf_path)
 
-    # expand mappings in all_results["score"]
-    for q in all_results["score"][0].keys():
-        all_results[q] = []
+    try:
+        # expand mappings in all_results["score"]
+        for q in all_results["score"][0].keys():
+            all_results[q] = []
 
-    for score in all_results["score"]:
-        for q in score:
-            all_results[q] += [score[q]]
+        for score in all_results["score"]:
+            for q in score:
+                all_results[q] += [score[q]]
+
+    except IndexError:
+        pass
 
     del all_results["score"]
 

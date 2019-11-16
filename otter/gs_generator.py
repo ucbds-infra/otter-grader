@@ -83,9 +83,9 @@ ipywidgets
 scipy
 seaborn
 sklearn
-gofer-grader==1.0.3
+gofer-grader==1.1.0
 nb2pdf==0.0.2
-otter-grader==0.0.24
+otter-grader==0.0.25
 """
 
 SETUP_SH = """#!/usr/bin/env bash
