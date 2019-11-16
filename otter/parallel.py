@@ -6,15 +6,15 @@ from subprocess import PIPE
 import subprocess
 import time
 
-def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader"):
+def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", scripts=False):
 	"""Grades notebooks in parallel docker containers"""
 	if not num_containers:
 		num_containers = 4
 
 	# list all notebooks in the dir
 	dir_path = os.path.abspath(notebooks_dir)
-	# os.chdir(os.path.dirname(dir_path))
-	notebooks = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f[-6:] == ".ipynb"]
+	file_extension = (".py", ".ipynb")[not scripts]
+	notebooks = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f.endswith(file_extension)]
 
 	# set indices of notebooks
 	num_per_group = int(len(notebooks) / num_containers)
@@ -24,7 +24,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 
 		# copy all non-notebook files into each tmp directory
 		for file in os.listdir(dir_path):
-			if os.path.isfile(os.path.join(dir_path, file)) and file[-6:] != ".ipynb":
+			if os.path.isfile(os.path.join(dir_path, file)) and not file.endswith(file_extension):
 				shutil.copy(os.path.join(dir_path, file), os.path.join(dir_path, "tmp{}".format(i)))
 
 	for k, v in enumerate(notebooks):
@@ -41,7 +41,8 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
 			verbose=verbose, 
 			pdfs=pdfs, 
 			reqs=reqs,
-			image=image)]
+			image=image,
+			scripts=scripts)]
 
 	# stop execution while containers are running
 	finished_futures = wait(futures)

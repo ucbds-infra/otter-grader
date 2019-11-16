@@ -25,8 +25,12 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     except NameError:
         pass
 
-    with open(notebook_path) as f:
-        nb = json.load(f)
+    if not script:
+        with open(notebook_path) as f:
+            nb = json.load(f)
+    else:
+        with open(notebook_path) as f:
+            nb = f.read()
 
     secret = ok.id_generator()
     results_array = "check_results_{}".format(secret)
@@ -75,7 +79,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
 
     return score_mapping
 
-def grade(ipynb_path, pdf):
+def grade(ipynb_path, pdf, script):
     # get path of notebook file
     base_path = os.path.dirname(ipynb_path)
 
@@ -83,7 +87,7 @@ def grade(ipynb_path, pdf):
     test_files = glob('/home/tests/*.py')
 
     # get score
-    result = grade_notebook(ipynb_path, test_files)
+    result = grade_notebook(ipynb_path, test_files, script=script)
 
     # output PDF
     if pdf:
@@ -133,12 +137,15 @@ def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('notebook_directory', help='Path to directory with ipynb\'s to grade')
     argparser.add_argument("--pdf", action="store_true", default=False)
+    argparser.add_argument("--scripts", action="store_true", default=False)
     args = argparser.parse_args()
 
     # get all ipynb files
     dir_path = os.path.abspath(args.notebook_directory)
     os.chdir(dir_path)
-    all_ipynb = [(f, join(dir_path, f)) for f in os.listdir(dir_path) if isfile(join(dir_path, f)) and f[-6:] == ".ipynb"]
+    file_extension = (".py", ".ipynb")[not args.scripts]
+    all_ipynb = [(f, join(dir_path, f)) for f in os.listdir(dir_path) if isfile(join(dir_path, f)) and f.endswith(file_extension)]
+    print(all_ipynb)
 
     all_results = {"file": [], "score": [], "manual": []}
 
@@ -147,13 +154,14 @@ def main():
 
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
-        score = grade(ipynb_path, args.pdf)
+        score = grade(ipynb_path, args.pdf, args.scripts)
         all_results["score"].append(score)
         if args.pdf:
             pdf_path = re.sub(r"\.ipynb$", ".pdf", ipynb_path)
             all_results["manual"].append(pdf_path)
 
     # expand mappings in all_results["score"]
+    print(all_results)
     for q in all_results["score"][0].keys():
         all_results[q] = []
 

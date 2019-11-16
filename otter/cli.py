@@ -14,6 +14,7 @@ def main():
 	parser.add_argument("-c", "--canvas", action="store_true", default=False, help="flag for Canvas export")
 	parser.add_argument("-j", "--json", default=False, help="Flag for path to JSON metadata")
 	parser.add_argument("-y", "--yaml", default=False, help="Flag for path to YAML metadata")
+	parser.add_argument("-s", "--scripts", action="store_true", default=False, help="Flag to incidicate grading Python scripts")
 	parser.add_argument("-n", "--notebooks-path", dest="notebooks-path", type=str, default="./", help="Path to directory of notebooks")
 	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/", help="Path to directory of tests")
 	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./", help="Path to which to write output")
@@ -66,7 +67,8 @@ def main():
 		pdfs=params["pdf"], 
 		reqs=params["requirements"],
 		num_containers=params["num-containers"],
-		image=params["image"]
+		image=params["image"],
+		scripts=params["scripts"]
 	)
 
 	if verbose:

@@ -4,7 +4,7 @@ from subprocess import PIPE
 import json
 import re
 
-def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, pdfs=False, reqs=None):
+def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, pdfs=False, reqs=None, scripts=False):
     """
     Args:
         tests_dir: directory of test files
@@ -44,7 +44,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         install = subprocess.run(install_command, stdout=PIPE, stderr=PIPE)
 
     if verbose:
-        print("Grading notebooks in container {}...".format(container_id[:12]))
+        print("Grading {} in container {}...".format(("notebooks", "scripts")[scripts] container_id[:12]))
     
     # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command....
     grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "/home/notebooks"]
@@ -52,6 +52,8 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     # if we want PDF output, add the --pdf flag
     if pdfs:
         grade_command += ["--pdf"]
+    if scripts:
+        grade_command += ["--scripts"]
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
 
