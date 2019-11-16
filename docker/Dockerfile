@@ -15,4 +15,4 @@ RUN pip3 install --no-cache-dir \
        gofer-grader==1.0.3 \
        nb2pdf==0.0.2 
 RUN apt-get install nano -y
-RUN pip3 install otter-grader==0.0.21
+RUN pip3 install otter-grader==0.0.24

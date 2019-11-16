@@ -2,10 +2,14 @@
 
 from otter import cli
 from otter import gs_generator
+from otter import script
 import sys
 
 if __name__ == "__main__":
 	if sys.argv[1] == "gen":
 		gs_generator.main()
+	elif sys.argv[1] == "check":
+		del sys.argv[1]
+		script.main()
 	else:
 		cli.main()

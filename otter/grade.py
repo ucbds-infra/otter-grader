@@ -65,11 +65,15 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         test_results += extra_results
 
     score_mapping = {}
+    score_mapping["TEST_HINTS"] = {}
     for r in test_results:
         try:
             for test in r.tests:
                 test_name = os.path.split(test.name)[1][:-3]
                 score_mapping[test_name] = r.grade
+            for tup in r.failed_tests:
+                test_name = os.path.split(tup[0].name)[1][:-3]
+                score_mapping["TEST_HINTS"][test_name] = tup[1]
         except IndexError:
             pass
 
@@ -110,7 +114,7 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
         source = ""
         try:
             exec(script, global_env)
-            source += nb
+            source += script
         except:
             if not ignore_errors:
                 raise
@@ -155,13 +159,13 @@ def main():
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
         score = grade(ipynb_path, args.pdf, args.scripts)
+        del score["TEST_HINTS"]
         all_results["score"].append(score)
         if args.pdf:
             pdf_path = re.sub(r"\.ipynb$", ".pdf", ipynb_path)
             all_results["manual"].append(pdf_path)
 
     # expand mappings in all_results["score"]
-    print(all_results)
     for q in all_results["score"][0].keys():
         all_results[q] = []
 

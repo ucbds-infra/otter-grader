@@ -44,7 +44,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         install = subprocess.run(install_command, stdout=PIPE, stderr=PIPE)
 
     if verbose:
-        print("Grading {} in container {}...".format(("notebooks", "scripts")[scripts] container_id[:12]))
+        print("Grading {} in container {}...".format(("notebooks", "scripts")[scripts], container_id[:12]))
     
     # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command....
     grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "/home/notebooks"]
