@@ -50,9 +50,9 @@ class TestIntegration(unittest.TestCase):
 
     def test_hundred_scripts(self):
         """
-        Check that the example of 100 notebooks runs correctely locally.
+        Check that the example of 100 scripts runs correctely locally.
         """
-        # grade the 100 notebooks
+        # grade the 100 scripts
         grade_command = ["otter", 
             "-sy", "meta.yml", 
             "-n", "test/integration/py-tests/", 
