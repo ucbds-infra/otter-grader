@@ -6,21 +6,14 @@ test = {
 			"cases": [ 
 				{
 					"code": r"""
-					>>> import tqdm
-					>>> print(tqdm.__name__)
-					tqdm
-					>>> 1 == 1
+					>>> negate(1 == 1)
+					False
+					>>> negate(True ^ False)
+					False
+					>>> negate(True ^ True)
 					True
 					"""
-				}, {
-					"code": r"""
-					>>> import tqdm
-					>>> print(tqdm.__name__)
-					tqdm
-					>>> 1 == 1
-					True
-					"""
-				}
+				},
 			],
 			"scored": False,
 			"setup": "",
