@@ -99,6 +99,75 @@ def grade(ipynb_path, pdf, script):
 
     return result
 
+def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False):
+    """
+    Execute notebook & return the global environment that results from execution.
+    TODO: write a note about the injection of check_results
+    If ignore_errors is True, exceptions are swallowed.
+    secret contains random digits so check_results and check are not easily modifiable
+    nb is passed in as a dictionary that's a parsed ipynb file
+    """
+    with hide_outputs():
+        if initial_env:
+            global_env = initial_env.copy()
+        else:
+            global_env = {}
+        source = ""
+
+        # Before rewriting AST, find cells of code that generate errors.
+        # One round of execution is done beforehand to mimic the Jupyter notebook style of running
+        # (e.g. code runs up to the point of execution).
+        # The reason this is workaround is introduced is because once the
+        # source code is parsed into an AST, there is no sense of local cells
+
+        for cell in nb['cells']:
+            if cell['cell_type'] == 'code':
+                # transform the input to executable Python
+                # FIXME: use appropriate IPython functions here
+                isp = IPythonInputSplitter(line_input_checker=False)
+                try:
+                    code_lines = []
+                    cell_source_lines = cell['source']
+                    source_is_str_bool = False
+                    if isinstance(cell_source_lines, str):
+                        source_is_str_bool = True
+                        cell_source_lines = cell_source_lines.split('\n')
+
+                    for line in cell_source_lines:
+                        # Filter out ipython magic commands
+                        # Filter out interact widget
+                        if not line.startswith('%'):
+                            if "interact(" not in line:
+                                code_lines.append(line)
+                                if source_is_str_bool:
+                                    code_lines.append('\n')
+                    cell_source = isp.transform_cell(''.join(code_lines))
+                    exec(cell_source, global_env)
+                    source += cell_source
+                except:
+                    if not ignore_errors:
+                        raise
+
+        tree = ast.parse(source)
+        # # CODE BELOW COMMENTED OUT BECAUSE the only check function is within the Notebook class
+        # if find_check_assignment(tree) or find_check_definition(tree):
+        #     # an empty global_env will fail all the tests
+        #     return global_env
+
+        # wrap check(..) calls into a check_results_X.append(check(..))
+        transformer = CheckCallWrapper(secret)
+        tree = transformer.visit(tree)
+        ast.fix_missing_locations(tree)
+
+        cleaned_source = compile(tree, filename="nb-ast", mode="exec")
+        try:
+            with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
+                exec(cleaned_source, global_env)
+        except:
+            if not ignore_errors:
+                raise
+        return global_env
+
 def execute_script(script, secret='secret', initial_env=None, ignore_errors=False):
     """
     Execute script & return the global environment that results from execution.
@@ -119,9 +188,11 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
             if not ignore_errors:
                 raise
         tree = ast.parse(source)
-        if find_check_assignment(tree) or find_check_definition(tree):
-            # an empty global_env will fail all the tests
-            return global_env
+        # # CODE BELOW COMMENTED OUT BECAUSE the only check function is within the Notebook class
+        # if find_check_assignment(tree) or find_check_definition(tree):
+        #     # an empty global_env will fail all the tests
+        #     return global_env
+
         # wrap check(..) calls into a check_results_X.append(check(..))
         transformer = CheckCallWrapper(secret)
         tree = transformer.visit(tree)
