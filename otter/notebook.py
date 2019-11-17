@@ -44,8 +44,9 @@ class Notebook:
 
 	def check_all(self):
 		tests = glob(os.path.join(self._path, "*.py"))
+		global_env = inspect.currentframe().f_back.f_globals
 		for file in sorted(tests):
 			test_name = os.path.split(file)[1][:-3]
-			check_html = self.check(test_name)._repr_html_()
+			check_html = self.check(test_name, global_env)._repr_html_()
 			check_html = "<p><strong>{}</strong></p>".format(test_name) + check_html
 			display(HTML(check_html))
