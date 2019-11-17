@@ -17,3 +17,8 @@ print(y[0:5])
 # this plot should be excluded, since it's tagged as "ignore"
 plt.plot(x,y**2)
 
+def square(x):
+	return x**2
+
+def negate(cond):
+	return not cond

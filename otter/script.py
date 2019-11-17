@@ -40,7 +40,7 @@ def main():
 	if params["question"]:
 		test_path = os.path.join(TESTS_PATH, params["question"] + ".py")
 		assert os.path.exists(test_path) and \
-			os.path.isfile(test_path), "Test {} does not exist".format(question)
+			os.path.isfile(test_path), "Test {} does not exist".format(params["question"])
 		qs = [test_path]
 	else:
 		qs = glob(os.path.join(TESTS_PATH, "*.py"))

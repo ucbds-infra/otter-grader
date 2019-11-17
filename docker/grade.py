@@ -91,7 +91,7 @@ def grade(ipynb_path, pdf, script):
     test_files = glob('/home/tests/*.py')
 
     # get score
-    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=True)
+    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=False)
 
     # output PDF
     if pdf:
@@ -137,13 +137,8 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False)
                         # Filter out ipython magic commands
                         # Filter out interact widget
                         if not line.startswith('%'):
-                            if "interact(" not in line and not re.search(r"otter\.Notebook\(.*?\)", line):
+                            if "interact(" not in line:
                                 code_lines.append(line)
-                                if source_is_str_bool:
-                                    code_lines.append('\n')
-                            elif re.search(r"otter\.Notebook\(.*?\)", line):
-                                line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
-                                ode_lines.append(line)
                                 if source_is_str_bool:
                                     code_lines.append('\n')
                     cell_source = isp.transform_cell(''.join(code_lines))
