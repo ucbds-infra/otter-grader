@@ -83,7 +83,7 @@ ipywidgets
 scipy
 seaborn
 sklearn
-gofer-grader==1.1.0
+gofer-grader==1.0.10
 nb2pdf==0.0.2
 otter-grader==0.0.28
 """
