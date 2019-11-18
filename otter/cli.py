@@ -10,19 +10,28 @@ from .parallel import *
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-g", "--gradescope", action="store_true", default=False, help="Flag for Gradescope export")
-	parser.add_argument("-c", "--canvas", action="store_true", default=False, help="flag for Canvas export")
-	parser.add_argument("-j", "--json", default=False, help="Flag for path to JSON metadata")
-	parser.add_argument("-y", "--yaml", default=False, help="Flag for path to YAML metadata")
-	parser.add_argument("-s", "--scripts", action="store_true", default=False, help="Flag to incidicate grading Python scripts")
-	parser.add_argument("-n", "--notebooks-path", dest="notebooks-path", type=str, default="./", help="Path to directory of notebooks")
+	# necessary path arguments
+	parser.add_argument("-p", "--path", dest="notebooks-path", type=str, default="./", help="Path to directory of submissions")
 	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/", help="Path to directory of tests")
 	parser.add_argument("-o", "--output-path", dest="output-path", type=str, default="./", help="Path to which to write output")
+	
+	# metadata parser arguments
+	parser.add_argument("-g", "--gradescope", action="store_true", default=False, help="Flag for Gradescope export")
+	parser.add_argument("-c", "--canvas", action="store_true", default=False, help="Flag for Canvas export")
+	parser.add_argument("-j", "--json", default=False, help="Flag for path to JSON metadata")
+	parser.add_argument("-y", "--yaml", default=False, help="Flag for path to YAML metadata")
+	
+	# script grading argument
+	parser.add_argument("-s", "--scripts", action="store_true", default=False, help="Flag to incidicate grading Python scripts")
+
+	# other settings and optional arguments
 	parser.add_argument("-v", "--verbose", action="store_true", help="Flag for verbose output")
 	parser.add_argument("-r", "--requirements", type=str, help="Flag for Python requirements file path")
 	parser.add_argument("--containers", dest="num-containers", type=int, help="Specify number of containers to run in parallel")
 	parser.add_argument("--pdf", action="store_true", default=False, help="Create PDFs as manual-graded submissions")
 	parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
+	
+	# parse args
 	params = vars(parser.parse_args())
 
 	# Asserts that exactly one metadata flag is provided
@@ -44,11 +53,11 @@ def main():
 		if verbose:
 			print("Found Canvas metadata...")
 	elif params["json"]:
-		meta_parser = JSONParser(os.path.join(params["notebooks-path"], params["json"]))
+		meta_parser = JSONParser(os.path.join(params["json"]))
 		if verbose:
 			print("Found JSON metadata...")
 	else:
-		meta_parser = YAMLParser(os.path.join(params["notebooks-path"], params["yaml"]))
+		meta_parser = YAMLParser(os.path.join(params["yaml"]))
 		if verbose:
 			print("Found YAML metadata...")
 

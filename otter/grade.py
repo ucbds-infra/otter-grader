@@ -66,11 +66,15 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
 
     score_mapping = {}
     score_mapping["TEST_HINTS"] = {}
+    points_possible = 0
+    total_score = 0
     for r in test_results:
         try:
             for test in r.tests:
                 test_name = os.path.split(test.name)[1][:-3]
-                score_mapping[test_name] = r.grade
+                score_mapping[test_name] = r.grade * test.value
+                total_score += r.grade * test.value
+                points_possible += test.value
             for tup in r.failed_tests:
                 test_name = os.path.split(tup[0].name)[1][:-3]
                 score_mapping["TEST_HINTS"][test_name] = tup[1]
@@ -78,8 +82,8 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             pass
 
     # add in total score and avoid divide by zero error if there are no tests
-    total_score = sum([r.grade for r in test_results])/max(len(test_results), 1)
     score_mapping["total"] = total_score
+    score_mapping["possible"] = points_possible
 
     return score_mapping
 

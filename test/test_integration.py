@@ -23,8 +23,8 @@ class TestIntegration(unittest.TestCase):
         """
         # grade the 100 notebooks
         grade_command = ["otter", 
-            "-y", "meta.yml", 
-            "-n", "test/integration/manual-test/", 
+            "-y", "test/integration/manual-test/meta.yml", 
+            "-p", "test/integration/manual-test/", 
             "-t", "test/integration/tests/", 
             "-r", "test/integration/requirements.txt",
             "-o", "test/"
@@ -54,8 +54,8 @@ class TestIntegration(unittest.TestCase):
         """
         # grade the 100 scripts
         grade_command = ["otter", 
-            "-sy", "meta.yml", 
-            "-n", "test/integration/py-tests/", 
+            "-sy", "test/integration/py-tests/meta.yml", 
+            "-p", "test/integration/py-tests/", 
             "-t", "test/integration/tests/", 
             "-r", "test/integration/requirements.txt",
             "-o", "test/"
