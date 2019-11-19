@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
 	output = {"tests" : []}
 	for key in scores:
-		if key != "total":
+		if key != "total" and key != "TEST_HINTS" and key != "possible":
 			output["tests"] += [{
 				"score" : scores[key],
 				"number" : key
@@ -84,7 +84,8 @@ scipy
 seaborn
 sklearn
 nb2pdf==0.0.2
-otter-grader==0.1.3
+tornado==5.1.1
+otter-grader==0.1.5
 """
 
 SETUP_SH = """#!/usr/bin/env bash

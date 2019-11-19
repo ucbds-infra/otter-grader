@@ -150,7 +150,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False)
                                     code_lines.append('\n')
                             elif re.search(r"otter\.Notebook\(.*?\)", line):
                                 line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
-                                ode_lines.append(line)
+                                code_lines.append(line)
                                 if source_is_str_bool:
                                     code_lines.append('\n')
                     cell_source = isp.transform_cell(''.join(code_lines))
