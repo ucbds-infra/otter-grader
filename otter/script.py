@@ -1,5 +1,5 @@
 from .grade import grade_notebook
-from gofer.ok import check
+from .gofer import check
 import argparse
 import os
 from glob import glob

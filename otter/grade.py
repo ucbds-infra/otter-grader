@@ -4,14 +4,17 @@ import argparse
 import os
 from os.path import isfile, join
 from glob import glob
-from gofer import ok
-from gofer.notebook import *
-from gofer.utils import hide_outputs
+from otter.gofer import *
 import pandas as pd
 import nb2pdf
 import re
 import json
 import itertools
+
+try:
+    from IPython.core.inputsplitter import IPythonInputSplitter
+except ImportError:
+    raise ImportError('IPython needs to be installed for notebook grading')
 
 # copied from https://github.com/data-8/Gofer-Grader/blob/master/gofer/ok.py#L210
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False):
@@ -32,7 +35,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         with open(notebook_path) as f:
             nb = f.read()
 
-    secret = ok.id_generator()
+    secret = id_generator()
     results_array = "check_results_{}".format(secret)
     initial_env = {
         results_array: []
@@ -60,7 +63,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 if tested in t:     # e.g. if 'tests/q1.py' is in /srv/repo/lab01/tests/q1.py'
                     include = False
             if include:
-                extra_tests.append(ok.OKTests([t]))
+                extra_tests.append(OKTests([t]))
         extra_results = [t.run(global_env, include_grade=False) for t in extra_tests]
         test_results += extra_results
 

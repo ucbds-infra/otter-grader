@@ -2,7 +2,7 @@
 ##### In-Notebook Checks for Otter-Grader #####
 ###############################################
 
-from gofer.ok import check
+from .gofer import check
 import inspect
 import os
 from nb2pdf import convert

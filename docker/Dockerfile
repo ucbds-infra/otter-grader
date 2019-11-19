@@ -13,7 +13,6 @@ RUN pip3 install --no-cache-dir \
        ipywidgets \
        scipy
 RUN apt-get install nano -y
-RUN pip3 install gofer-grader==1.0.10
 RUN pip3 install nb2pdf==0.0.2
 RUN pip3 install tornado==5.1.1
-RUN pip3 install otter-grader==0.1.2
+RUN pip3 install otter-grader==0.1.3
