@@ -1,8 +1,66 @@
+########################################################
+##### Docker Container Management for Otter-Grader #####
+########################################################
+
 import pandas as pd
 import subprocess
 from subprocess import PIPE
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor, wait
+import os
+import shutil
+
+def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", scripts=False):
+    """Grades notebooks in parallel docker containers"""
+    if not num_containers:
+        num_containers = 4
+
+    # list all notebooks in the dir
+    dir_path = os.path.abspath(notebooks_dir)
+    file_extension = (".py", ".ipynb")[not scripts]
+    notebooks = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f.endswith(file_extension)]
+
+    # calculate number of notebooks per container
+    num_per_group = int(len(notebooks) / num_containers)
+
+    # create tmp directories and add non-notebook files
+    for i in range(num_containers):
+        os.mkdir(os.path.join(dir_path, "tmp{}".format(i)))
+
+        # copy all non-notebook files into each tmp directory
+        for file in os.listdir(dir_path):
+            if os.path.isfile(os.path.join(dir_path, file)) and not file.endswith(file_extension):
+                shutil.copy(os.path.join(dir_path, file), os.path.join(dir_path, "tmp{}".format(i)))
+
+    # copy notebooks in tmp directories
+    for k, v in enumerate(notebooks):
+        shutil.copy(v, os.path.join(dir_path, "tmp{}".format(k % num_containers)))
+
+    # execute containers in parallel
+    pool = ThreadPoolExecutor(num_containers)
+    futures = []
+    for i in range(num_containers):
+        futures += [pool.submit(grade_assignments, 
+            tests_dir, 
+            os.path.join(dir_path, "tmp{}".format(i)), 
+            str(i), 
+            verbose=verbose, 
+            pdfs=pdfs, 
+            reqs=reqs,
+            image=image,
+            scripts=scripts)]
+
+    # stop execution while containers are running
+    finished_futures = wait(futures)
+
+    # clean up tmp directories
+    for i in range(num_containers):
+        shutil.rmtree(os.path.join(dir_path, "tmp{}".format(i)))
+
+    # return list of dataframes
+    return [df.result() for df in finished_futures[0]]
+
 
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, pdfs=False, reqs=None, scripts=False):
     """

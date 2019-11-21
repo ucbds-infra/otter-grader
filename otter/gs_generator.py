@@ -1,3 +1,7 @@
+#################################################
+##### Gradescope Generator for Otter-Grader #####
+#################################################
+
 import os
 import shutil
 import argparse

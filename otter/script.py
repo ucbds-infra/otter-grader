@@ -1,3 +1,7 @@
+########################################################
+##### Command Line Script Checker for Otter-Grader #####
+########################################################
+
 from .grade import grade_notebook
 from .gofer import check
 import argparse

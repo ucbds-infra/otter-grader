@@ -1,15 +1,18 @@
-#!/usr/bin/env python
+###################################################
+##### Command Line Interface for Otter-Grader #####
+###################################################
 
 import argparse
 import pandas as pd
 import os
 
 from .metadata import *
-from .docker import *
-from .parallel import *
+from .containers import *
+from .utils import *
 
 def main():
 	parser = argparse.ArgumentParser()
+
 	# necessary path arguments
 	parser.add_argument("-p", "--path", dest="notebooks-path", type=str, default="./", help="Path to directory of submissions")
 	parser.add_argument("-t", "--tests-path", dest="tests-path", type=str, default="./tests/", help="Path to directory of tests")
@@ -99,10 +102,3 @@ def main():
 
 	# write to CSV file
 	output_df.to_csv(os.path.join(params["output-path"], "final_grades.csv"), index=False)
-
-
-# Exports a list of dataframes as a single, merged csv file
-def merge_csv(dataframes, output_path):
-	"""Merges dataframes returned by Docker containers"""
-	final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
-	return final_dataframe

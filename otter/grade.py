@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+###########################################
+##### Grading Script for Otter-Grader #####
+###########################################
 
 import argparse
 import os

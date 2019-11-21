@@ -1,5 +1,5 @@
 #######################################
-##### Utilities from Gofer-Grader #####
+##### Functions from Gofer-Grader #####
 #######################################
 
 from contextlib import redirect_stderr, redirect_stdout, contextmanager
