@@ -8,6 +8,7 @@ import argparse
 from glob import glob
 from subprocess import PIPE
 import subprocess
+import sys
 
 RUN_AUTOGRADER = """#!/usr/bin/env python3
 
@@ -105,9 +106,7 @@ def main():
 	parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")
 	parser.add_argument("-r", "--requirements", nargs='?', type=str, help="Path to requirements.txt file")
 	parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
-	
-	params, files = parser.parse_known_args()
-	params = vars(params)
+	params = vars(parser.parse_args())
 
 	# create tmp directory to zip inside
 	os.mkdir("./tmp")
@@ -135,10 +134,10 @@ def main():
 		f.write(RUN_AUTOGRADER)
 
 	# copy files into tmp
-	if len(files) > 0:
+	if len(params["files"]) > 0:
 		os.mkdir(os.path.join("tmp", "files"))
 
-		for file in files:
+		for file in params["files"]:
 			if file == "gen":
 				continue
 			shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))

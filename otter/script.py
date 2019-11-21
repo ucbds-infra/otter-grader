@@ -43,7 +43,7 @@ def main():
 	if params["question"]:
 		test_path = os.path.join(params["tests-path"], params["question"] + ".py")
 		assert os.path.exists(test_path) and \
-			os.path.isfile(test_path), "Test {} does not exist".format(os.path.join(params["tests-path"], params["question"]))
+			os.path.isfile(test_path), "Test {} does not exist".format(params["question"])
 		qs = [test_path]
 	else:
 		qs = glob(os.path.join(params["tests-path"], "*.py"))
@@ -83,5 +83,4 @@ def main():
 	print(output)
 
 if __name__ == "__main__":
-	del sys.argv[1]
 	main()

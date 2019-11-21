@@ -1,19 +1,23 @@
 test = {
-	"name": "q5",
+	"name": "q2",
 	"points": 1,
 	"suites": [ 
 		{
 			"cases": [ 
 				{
 					"code": r"""
-					>>> negate(1 == 1)
+					>>> 1 == 1
 					False
-					>>> negate(True ^ False)
-					False
-					>>> negate(True ^ True)
-					True
+					""",
+					"hidden": False,
+					"locked": False,
+				}, {
+					"code": r"""
+					>>> import tqdm
+					>>> print(tqdm.__name__)
+					tqdm
 					"""
-				},
+				}
 			],
 			"scored": False,
 			"setup": "",
