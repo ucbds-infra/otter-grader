@@ -19,8 +19,6 @@ def blockPrint():
 def enablePrint():
     sys.stdout = sys.__stdout__
 
-TESTS_PATH = "tests"
-
 SUB_BEFORE_ASTERISK = r"(.*\n)*^\s*\*"
 
 HTML_TAG_REGEX = r"</?[\w\" \d=:#%;'&-]*>"
@@ -39,15 +37,16 @@ def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("file", help="Python file to grade")
 	parser.add_argument("-q", dest="question", help="Grade a specific test")
+	parser.add_argument("-t", dest="tests-path", default="tests", help="Path to test files")
 	params = vars(parser.parse_args())
 
 	if params["question"]:
-		test_path = os.path.join(TESTS_PATH, params["question"] + ".py")
+		test_path = os.path.join(params["tests-path"], params["question"] + ".py")
 		assert os.path.exists(test_path) and \
-			os.path.isfile(test_path), "Test {} does not exist".format(params["question"])
+			os.path.isfile(test_path), "Test {} does not exist".format(os.path.join(params["tests-path"], params["question"]))
 		qs = [test_path]
 	else:
-		qs = glob(os.path.join(TESTS_PATH, "*.py"))
+		qs = glob(os.path.join(params["tests-path"], "*.py"))
 
 	blockPrint()
 	results = grade_notebook(
@@ -82,3 +81,7 @@ def main():
 	)
 
 	print(output)
+
+if __name__ == "__main__":
+	del sys.argv[1]
+	main()

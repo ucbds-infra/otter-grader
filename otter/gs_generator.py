@@ -161,3 +161,6 @@ def main():
 
 	# delete tmp directory
 	shutil.rmtree("tmp")
+
+if __name__ == "__main__":
+	main()

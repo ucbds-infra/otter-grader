@@ -3,6 +3,7 @@ import pandas as pd
 import unittest
 import subprocess
 from subprocess import PIPE
+from glob import glob
 
 class TestIntegration(unittest.TestCase):
 
@@ -15,14 +16,14 @@ class TestIntegration(unittest.TestCase):
         inspect = subprocess.run(inspect_command, stdout=PIPE, stderr=PIPE)
 
         # assert that it didn't fail, it will fail if it is not installed
-        self.assertEqual(len(inspect.stderr), 0)
+        self.assertEqual(len(inspect.stderr), 0, inspect.stderr)
 
-    def test_hundred(self):
+    def test_hundred_notebooks(self):
         """
         Check that the example of 100 notebooks runs correctely locally.
         """
         # grade the 100 notebooks
-        grade_command = ["otter", 
+        grade_command = ["python3", "-m", "otter.cli",
             "-y", "test/integration/manual-test/meta.yml", 
             "-p", "test/integration/manual-test/", 
             "-t", "test/integration/tests/", 
@@ -53,7 +54,7 @@ class TestIntegration(unittest.TestCase):
         Check that the example of 100 scripts runs correctely locally.
         """
         # grade the 100 scripts
-        grade_command = ["otter", 
+        grade_command = ["python3", "-m", "otter.cli",
             "-sy", "test/integration/py-tests/meta.yml", 
             "-p", "test/integration/py-tests/", 
             "-t", "test/integration/tests/", 
@@ -78,3 +79,80 @@ class TestIntegration(unittest.TestCase):
 
         # assert cleanup worked
         self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
+
+    # def test_gs_generator(self):
+    #     """
+    #     Check that the correct zipfile is created by gs_generator.py
+    #     """
+    #     # create the zipfile
+    #     gen_command = ["python3", "-m", "otter.gs_generator",
+    #         "-t", "test/integration/tests",
+    #         "-o", "test/",
+    #         "-r", "test/integration/requirements.txt",
+    #         "test/integration/test-df.csv"
+    #     ]
+    #     gen = subprocess.run(gen_command, stdout=PIPE, stderr=PIPE)
+
+    #     # assert that otter-grader succesfully ran
+    #     self.assertEqual(len(gen.stderr), 0, gen.stderr)
+
+    #     # unzip the zipfile
+    #     unzip_command = ["unzip", "-n", "test/autograder.zip", "-d", "test/autograder"]
+    #     unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
+    #     self.assertEqual(len(unzip.stderr), 0, unzip.stderr)
+
+    #     # go through files and ensure that they are correct
+    #     for file in glob("test/autograder/*"):
+    #         if os.path.isfile(file):
+    #             correct_file_path = os.path.join("test/integration/autograder-correct", os.path.split(file)[1])
+    #             with open(file) as f:
+    #                 with open(correct_file_path) as g:
+    #                     self.assertEqual(f.read(), g.read(), "{} does not match {}".format(file, correct_file_path))
+    #         else:
+    #             for subfile in glob(os.path.join(file, "*")):
+    #                 correct_file_path = os.path.join("test/integration/autograder-correct", os.path.split(file)[1], os.path.split(subfile)[1])
+    #                 with open(subfile) as f:
+    #                     with open(correct_file_path) as g:
+    #                         self.assertEqual(f.read(), g.read(), "{} does not match {}".format(subfile, correct_file_path))
+
+    #     # cleanup files
+    #     cleanup_command = ["rm", "-rf", "test/autograder", "test/autograder.zip"]
+    #     cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
+
+    #     # assert cleanup worked
+    #     self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
+
+    # def test_script_checker(self):
+    #     """
+    #     Checks that the script checker works
+    #     """
+    #     # run for each individual test
+    #     for file in glob("test/integration/tests/*.py"):
+    #         check_command = ["python3", "-m", "otter.script", "check", 
+    #             "test/integration/py-tests/file0.py", 
+    #             "-q", os.path.split(file)[1],
+    #             "-t", os.path.split(file)[0]
+    #         ]
+    #         check = subprocess.run(check_command, stdout=PIPE, stderr=PIPE)
+
+    #         print(file)
+
+    #         # make sure there is no error
+    #         self.assertEqual(len(check.stderr), 0, check.stderr)
+
+    #         # make sure all tests except q2 pass
+    #         if os.path.split(file)[1] != "q2.py":
+    #             self.assertEqual(check.stdout.decode("utf-8"), "All tests passed!", check.stdout)
+
+    #     # run checker command
+    #     check_command = check_command = ["python3", "-m", "otter.script", "check", 
+    #             "test/integration/py-tests/file0.py", 
+    #             "-t", "test/integration/tests"
+    #         ]
+    #     check = subprocess.run(check_command, stdout=PIPE, stderr=PIPE)
+
+    #     # make sure there is no error
+    #     self.assertEqual(len(check.stderr), 0, check.stderr)
+
+    #     # make sure there is a failed test
+    #     self.assertNotEqual(check.stdout.decode("utf-8"), "All tests passed!", check.stdout)

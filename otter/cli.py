@@ -102,3 +102,6 @@ def main():
 
 	# write to CSV file
 	output_df.to_csv(os.path.join(params["output-path"], "final_grades.csv"), index=False)
+
+if __name__ == "__main__":
+	main()

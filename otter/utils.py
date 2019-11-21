@@ -3,6 +3,7 @@
 ######################################
 
 import os
+import pandas as pd
 
 def list_files(path):
 	"""Returns a list of all non-hidden files in a directory"""
