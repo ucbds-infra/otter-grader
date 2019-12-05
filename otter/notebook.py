@@ -30,9 +30,9 @@ class Notebook:
 		# pass the check to gofer
 		return check(test_path, global_env)
 
-	def export(self, nb_path):
+	def export(self, nb_path, filtering=True):
 		"""Exports notebook to PDF"""
-		convert(nb_path)
+		convert(nb_path, filtering=filtering)
 
 		# create and display output HTML
 		out_html = """
