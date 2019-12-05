@@ -27,11 +27,14 @@ def main():
 	# script grading argument
 	parser.add_argument("-s", "--scripts", action="store_true", default=False, help="Flag to incidicate grading Python scripts")
 
+	# PDF export options
+	parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
+	parser.add_argument("--filter-pdf", dest="filter-pdf", action="store_true", default=False, help="Create filtered PDF for manual grading")
+
 	# other settings and optional arguments
 	parser.add_argument("-v", "--verbose", action="store_true", help="Flag for verbose output")
 	parser.add_argument("-r", "--requirements", type=str, help="Flag for Python requirements file path")
 	parser.add_argument("--containers", dest="num-containers", type=int, help="Specify number of containers to run in parallel")
-	parser.add_argument("--pdf", action="store_true", default=False, help="Create PDFs as manual-graded submissions")
 	parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
 	
 	# parse args
@@ -42,6 +45,9 @@ def main():
 		params["canvas"], 
 		params["json"], 
 		params["yaml"]]]) == 1, "You must supply exactly one metadata flag (-g, -j, -y, -c)"
+
+	# Asserts that either --pdf of --filter-pdf but not both provided
+	assert sum([params["pdf"], params["filter-pdf"]]) <= 1, "Cannot provide more than 1 PDF flag"
 
 	# verbose flag
 	verbose = params["verbose"]
@@ -76,7 +82,8 @@ def main():
 	grades_dfs = launch_parallel_containers(params["tests-path"], 
 		params["notebooks-path"], 
 		verbose=verbose, 
-		pdfs=params["pdf"], 
+		unfiltered_pdfs=params["pdf"], 
+		filtered_pdfs=params["filter-pdf"],
 		reqs=params["requirements"],
 		num_containers=params["num-containers"],
 		image=params["image"],

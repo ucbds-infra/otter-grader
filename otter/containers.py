@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 import os
 import shutil
 
-def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", scripts=False):
+def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, filtered_pdfs=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", scripts=False):
     """Grades notebooks in parallel docker containers"""
     if not num_containers:
         num_containers = 4
@@ -46,7 +46,8 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
             os.path.join(dir_path, "tmp{}".format(i)), 
             str(i), 
             verbose=verbose, 
-            pdfs=pdfs, 
+            unfiltered_pdfs=unfiltered_pdfs, 
+            filtered_pdfs=filtered_pdfs,
             reqs=reqs,
             image=image,
             scripts=scripts)]
@@ -62,7 +63,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Fal
     return [df.result() for df in finished_futures[0]]
 
 
-def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, pdfs=False, reqs=None, scripts=False):
+def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, unfiltered_pdfs=False, filtered_pdfs=False, reqs=None, scripts=False):
     """
     Args:
         tests_dir: directory of test files
@@ -107,9 +108,13 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command....
     grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "/home/notebooks"]
 
-    # if we want PDF output, add the --pdf flag
-    if pdfs:
+    # if we want PDF output, add the necessary flag
+    if unfiltered_pdfs:
         grade_command += ["--pdf"]
+    if filtered_pdfs:
+        grade_command += ["--filter-pdf"]
+
+    # if we are grading scripts, add the --script flag
     if scripts:
         grade_command += ["--scripts"]
 
@@ -123,7 +128,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
     df = pd.read_csv("./grades"+id+".csv")
 
-    if pdfs:
+    if unfiltered_pdfs or filtered_pdfs:
         mkdir_pdf_command = ["mkdir", "manual_submissions"]
         mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
         
