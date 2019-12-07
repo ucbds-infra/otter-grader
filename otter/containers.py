@@ -120,6 +120,15 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
 
+    all_commands = [launch, copy, tests, grade]
+    try:
+        all_commands += [requirements, install]
+    except UnboundLocalError:
+        pass
+    for command in all_commands:
+        if command.stderr.decode('utf-8') != '':
+            raise Exception("Error running ", command, " failed with error: ", command.stderr.decode('utf-8'))
+
     if verbose:
         print("Copying grades from container {}...".format(container_id[:12]))
 
