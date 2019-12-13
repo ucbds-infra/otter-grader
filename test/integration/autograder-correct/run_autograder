@@ -22,6 +22,12 @@ if __name__ == "__main__":
 	subprocess.run(["touch", "/autograder/submission/__init__.py"])
 
 	os.chdir("/autograder/submission")
+
+	# check for *.ipynb.json files
+	jsons = glob("*.ipynb.json")
+	for file in jsons:
+		shutil.copy(file, file[:-5])
+	
 	nb_path = glob("*.ipynb")[0]
 
 	# fix utils import
