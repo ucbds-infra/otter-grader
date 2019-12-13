@@ -34,6 +34,12 @@ if __name__ == "__main__":
 	subprocess.run(["touch", "/autograder/submission/__init__.py"])
 
 	os.chdir("/autograder/submission")
+
+	# check for *.ipynb.json files
+	jsons = glob("*.ipynb.json")
+	for file in jsons:
+		shutil.copy(file, file[:-5])
+	
 	nb_path = glob("*.ipynb")[0]
 
 	# fix utils import
@@ -90,7 +96,7 @@ seaborn
 sklearn
 nb2pdf==0.1.1
 tornado==5.1.1
-otter-grader==0.1.8
+otter-grader==0.1.9
 """
 
 SETUP_SH = """#!/usr/bin/env bash

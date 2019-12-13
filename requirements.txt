@@ -9,4 +9,4 @@ tqdm
 codecov
 nb2pdf==0.1.1
 tornado==5.1.1
-otter-grader==0.1.8
+otter-grader==0.1.9
