@@ -12,6 +12,7 @@ import nb2pdf
 import re
 import json
 import itertools
+from unittest import mock
 
 try:
     from IPython.core.inputsplitter import IPythonInputSplitter
@@ -158,7 +159,11 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False)
                                 if source_is_str_bool:
                                     code_lines.append('\n')
                     cell_source = isp.transform_cell(''.join(code_lines))
-                    exec(cell_source, global_env)
+
+                    # patch otter.Notebook.export so that we don't create PDFs in notebooks
+                    m = mock.mock_open()
+                    with mock.patch('otter.Notebook.export', m):
+                        exec(cell_source, global_env)
                     source += cell_source
                 except:
                     if not ignore_errors:
