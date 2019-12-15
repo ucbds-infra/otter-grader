@@ -32,8 +32,12 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         pass
 
     if not script:
-        with open(notebook_path) as f:
-            nb = json.load(f)
+        try:
+            with open(notebook_path) as f:
+                nb = json.load(f)
+        except UnicodeDecodeError:
+            with open(notebook_path, encoding='utf-8') as f:
+                nb = json.load(f)
     else:
         with open(notebook_path) as f:
             nb = f.read()

@@ -7,3 +7,4 @@ build
 test/test-grading-notebook.ipynb
 test/tests
 .coverage
+.vscode

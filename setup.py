@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
 	name = "otter-grader",
-	version = "0.1.12",
+	version = "0.1.13",
 	author = "UC Berkeley Division of Data Science and Information",
 	author_email = "cpyles@berkeley.edu",
 	description = "Jupyter Notebook Autograder",
