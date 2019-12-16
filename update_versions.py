@@ -1,13 +1,13 @@
 import re
 
-CURRENT_VERSION = "0.1.13"
-NEW_VERSION = "0.1.14"
+CURRENT_VERSION = "0.1.12"
+NEW_VERSION = "0.1.13"
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "docker/Dockerfile",
     "otter/gs_generator.py",
     "test/integration/autograder-correct/requirements.txt",
-    "requirments.txt"
+    "requirements.txt"
 ]
 
 def main():
