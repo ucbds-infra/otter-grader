@@ -19,6 +19,7 @@ import os
 import shutil
 import subprocess
 import re
+import pprint
 
 UTILS_IMPORT_REGEX = r"\\"from utils import [\\w\\*, ]+"
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\\(.+\\)"
@@ -70,11 +71,11 @@ if __name__ == "__main__":
 		shutil.copy(file, "/autograder/submission/tests")
 
 	scores = grade_notebook(nb_path, tests_glob, name="submission", ignore_errors=True)
-	print(scores)
+	del scores["TEST_HINTS"]
 
 	output = {"tests" : []}
 	for key in scores:
-		if key != "total" and key != "TEST_HINTS" and key != "possible":
+		if key != "total" and key != "possible":
 			output["tests"] += [{
 				"score" : scores[key],
 				"number" : key
@@ -83,6 +84,9 @@ if __name__ == "__main__":
 
 	with open("/autograder/results/results.json", "w+") as f:
 		json.dump(output, f)
+
+	print("\\n\\n")
+	pprint.pprint(output, indent=2)
 """
 
 REQUIREMENTS = """datascience
@@ -96,7 +100,7 @@ seaborn
 sklearn
 nb2pdf==0.1.1
 tornado==5.1.1
-otter-grader==0.1.13
+otter-grader==0.1.15
 """
 
 SETUP_SH = """#!/usr/bin/env bash
