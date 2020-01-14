@@ -208,7 +208,7 @@ class OKTest:
 class OKTests:
     def __init__(self, test_paths):
         self.paths = test_paths
-        self.tests = [OKTest.from_file(path) for path in self.paths]
+        self.tests = [OKTest.from_file(path) for path in self.paths if "__init__.py" not in path]
 
     def run(self, global_environment, include_grade=True):
         passed_tests = []

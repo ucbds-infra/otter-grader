@@ -1,4 +1,4 @@
-# Otter-Grader Documentation
+# Otter-Grader Documentation [OUTDATED]
 
 Otter-grader is a new, open-source, local grader from the Division of Data Science, External Pedagogy Infrastructure at UC Berkeley. It is designed to be a scalable grader that utilizes temporal docker containers in order to remove the traditional overhead requirement of a live server. 
 

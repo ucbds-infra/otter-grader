@@ -31,7 +31,7 @@ class Notebook:
 		return check(test_path, global_env)
 
 	@staticmethod
-	def export(self, nb_path, filtering=True):
+	def export(nb_path, filtering=True):
 		"""Exports notebook to PDF"""
 		convert(nb_path, filtering=filtering)
 
