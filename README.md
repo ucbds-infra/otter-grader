@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master)](https://travis-ci.org/ucbds-infra/otter-grader)
 [![codecov](https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg)](https://codecov.io/gh/ucbds-infra/otter-grader)
+[![Demo](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ucbds-infra/otter-grader/master?filepath=demo%2Fdemo.ipynb)
 
 Otter-grader is a new, open-source, local grader from the Division of Data Science, External Pedagogy Infrastructure at UC Berkeley. It is designed to be a scalable grader that utilizes temporal docker containers in order to remove the traditional overhead requirement of a live server. 
 
@@ -33,4 +34,4 @@ _Note:_ With this setup, you will need to pass in a custom docker image name whe
 
 ## Documentation
 
-You can find the documentation in the demo notebook by clicking the Binder link above, or by viewing the static HTML version [here]().
+You can find the documentation in the demo notebook by clicking the Binder link above, or by viewing the static HTML version [here](https://nbviewer.jupyter.org/github/ucbds-infra/otter-grader/blob/master/demo/demo.ipynb).
