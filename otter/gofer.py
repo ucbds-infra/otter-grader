@@ -43,8 +43,8 @@ def flush_inline_matplotlib_plots():
         from ipykernel.pylab.backend_inline import flush_figures
     except ImportError:
         return
-    except KeyError:
-        return
+    # except KeyError:
+    #     return
 
     if mpl.get_backend() == 'module://ipykernel.pylab.backend_inline':
         flush_figures()

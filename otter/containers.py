@@ -21,6 +21,10 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
     file_extension = (".py", ".ipynb")[not scripts]
     notebooks = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f.endswith(file_extension)]
 
+    # fix number of containers (overriding user input if necessary)
+    if len(notebooks) < num_containers:
+        num_containers = len(notebooks)
+
     # calculate number of notebooks per container
     num_per_group = int(len(notebooks) / num_containers)
 
