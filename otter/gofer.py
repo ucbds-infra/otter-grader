@@ -226,7 +226,10 @@ class OKTests:
             else:
                 failed_tests.append((t, hint))
 
-        grade /= total
+        try:
+            grade /= total
+        except ZeroDivisionError:
+            grade = 0
 
         return OKTestsResult(grade, self.paths, self.tests, passed_tests,
                              failed_tests, include_grade)
