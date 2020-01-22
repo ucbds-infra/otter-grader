@@ -9,6 +9,9 @@ import subprocess
 import re
 import pprint
 
+SCORE_THRESHOLD = None
+POINTS_POSSIBLE = None
+
 UTILS_IMPORT_REGEX = r"\"from utils import [\w\*, ]+"
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
 
@@ -28,7 +31,7 @@ if __name__ == "__main__":
 	jsons = glob("*.ipynb.json")
 	for file in jsons:
 		shutil.copy(file, file[:-5])
-	
+
 	nb_path = glob("*.ipynb")[0]
 
 	# fix utils import
@@ -53,7 +56,7 @@ if __name__ == "__main__":
 		os.mkdir("/autograder/submission/tests")
 	except FileExistsError:
 		pass
-		
+
 	tests_glob = glob("/autograder/source/tests/*.py")
 	for file in tests_glob:
 		shutil.copy(file, "/autograder/submission/tests")
@@ -69,6 +72,15 @@ if __name__ == "__main__":
 				"number" : key
 			}]
 	output["visibility"] = "hidden"
+
+	if POINTS_POSSIBLE is not None:
+		output["score"] = scores["total"] / scores["possible"] * POINTS_POSSIBLE
+
+	if SCORE_THRESHOLD is not None:
+		if scores["total"] / scores["possible"] >= SCORE_THRESHOLD:
+			output["score"] = POINTS_POSSIBLE or scores["possible"]
+		else:
+			output["score"] = 0
 
 	with open("/autograder/results/results.json", "w+") as f:
 		json.dump(output, f)

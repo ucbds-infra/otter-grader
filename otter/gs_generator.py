@@ -10,7 +10,44 @@ from subprocess import PIPE
 import subprocess
 import sys
 
-RUN_AUTOGRADER = """#!/usr/bin/env python3
+REQUIREMENTS = """datascience
+jupyter_client
+ipykernel
+matplotlib
+pandas
+ipywidgets
+scipy
+seaborn
+sklearn
+nb2pdf==0.1.1
+tornado==5.1.1
+otter-grader==0.2.2
+"""
+
+SETUP_SH = """#!/usr/bin/env bash
+
+apt-get install -y python3 python3-pip
+
+pip3 install -r /autograder/source/requirements.txt
+"""
+
+def main():
+	# TODO: add overriding max points
+	parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
+	parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")
+	parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")
+	parser.add_argument("-r", "--requirements", nargs='?', type=str, help="Path to requirements.txt file")
+	parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
+	parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
+	parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
+	params = vars(parser.parse_args())
+
+	assert params["threshold"] is None or 0 <= params["threshold"] <= 1, "{} is not a valid threshold".format(
+		params["threshold"]
+	)
+
+	# format threshold
+	RUN_AUTOGRADER = """#!/usr/bin/env python3
 
 from otter.grade import grade_notebook
 from glob import glob
@@ -20,6 +57,9 @@ import shutil
 import subprocess
 import re
 import pprint
+
+SCORE_THRESHOLD = """ + str(params["threshold"]) + """
+POINTS_POSSIBLE = """ + str(params["points"]) + """
 
 UTILS_IMPORT_REGEX = r"\\"from utils import [\\w\\*, ]+"
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\\(.+\\)"
@@ -40,7 +80,7 @@ if __name__ == "__main__":
 	jsons = glob("*.ipynb.json")
 	for file in jsons:
 		shutil.copy(file, file[:-5])
-	
+
 	nb_path = glob("*.ipynb")[0]
 
 	# fix utils import
@@ -65,7 +105,7 @@ if __name__ == "__main__":
 		os.mkdir("/autograder/submission/tests")
 	except FileExistsError:
 		pass
-		
+
 	tests_glob = glob("/autograder/source/tests/*.py")
 	for file in tests_glob:
 		shutil.copy(file, "/autograder/submission/tests")
@@ -82,41 +122,21 @@ if __name__ == "__main__":
 			}]
 	output["visibility"] = "hidden"
 
+	if POINTS_POSSIBLE is not None:
+		output["score"] = scores["total"] / scores["possible"] * POINTS_POSSIBLE
+
+	if SCORE_THRESHOLD is not None:
+		if scores["total"] / scores["possible"] >= SCORE_THRESHOLD:
+			output["score"] = POINTS_POSSIBLE or scores["possible"]
+		else:
+			output["score"] = 0
+
 	with open("/autograder/results/results.json", "w+") as f:
 		json.dump(output, f)
 
 	print("\\n\\n")
 	pprint.pprint(output, indent=2)
 """
-
-REQUIREMENTS = """datascience
-jupyter_client
-ipykernel
-matplotlib
-pandas
-ipywidgets
-scipy
-seaborn
-sklearn
-nb2pdf==0.1.1
-tornado==5.1.1
-otter-grader==0.1.21
-"""
-
-SETUP_SH = """#!/usr/bin/env bash
-
-apt-get install -y python3 python3-pip
-
-pip3 install -r /autograder/source/requirements.txt
-"""
-
-def main():
-	parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
-	parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")
-	parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")
-	parser.add_argument("-r", "--requirements", nargs='?', type=str, help="Path to requirements.txt file")
-	parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
-	params = vars(parser.parse_args())
 
 	# create tmp directory to zip inside
 	os.mkdir("./tmp")
