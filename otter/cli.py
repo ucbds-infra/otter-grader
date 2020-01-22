@@ -11,7 +11,11 @@ from .containers import *
 from .utils import *
 
 def main():
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(description="""
+	Local autograder for Jupyter Notebooks and Python scripts. Launches parallel Docker containers to grade notebooks/scripts and returns a CSV of grades.
+	Requires a metadata file if not exported from Gradescope or Canvas. Add support files by putting them into the SUBMISSIONS-DIR folder or using the -f flag.
+	Can optionally create PDFs of Jupyter Notebooks for manual grading.
+	""")
 
 	# necessary path arguments
 	parser.add_argument("-p", "--path", dest="notebooks-path", type=str, default="./", help="Path to directory of submissions")
@@ -32,6 +36,7 @@ def main():
 	parser.add_argument("--filter-pdf", dest="filter-pdf", action="store_true", default=False, help="Create filtered PDF for manual grading")
 
 	# other settings and optional arguments
+	parser.add_argument("-f", "--files", nargs="+", help="Specify support files needed to execute code (e.g. utils, data files)")
 	parser.add_argument("-v", "--verbose", action="store_true", help="Flag for verbose output")
 	parser.add_argument("-r", "--requirements", type=str, help="Flag for Python requirements file path")
 	parser.add_argument("--containers", dest="num-containers", type=int, help="Specify number of containers to run in parallel")
