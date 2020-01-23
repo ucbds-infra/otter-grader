@@ -97,7 +97,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
 
     return score_mapping
 
-def grade(ipynb_path, pdf, filter_pdf, script):
+def grade(ipynb_path, pdf, tag_filter, html_filter, script):
     # get path of notebook file
     base_path = os.path.dirname(ipynb_path)
 
@@ -110,8 +110,10 @@ def grade(ipynb_path, pdf, filter_pdf, script):
     # output PDF
     if pdf:
         nb2pdf.convert(ipynb_path)
-    elif filter_pdf:
-        nb2pdf.convert(ipynb_path, filtering=True)
+    elif tag_filter:
+        nb2pdf.convert(ipynb_path, filtering=True, filter_type="tags")
+    elif html_filter:
+        nb2pdf.convert(ipynb_path, filtering=True, filter_type="html")
 
     return result
 
@@ -237,8 +239,10 @@ def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('notebook_directory', help='Path to directory with ipynb\'s to grade')
     argparser.add_argument("--pdf", action="store_true", default=False)
-    argparser.add_argument("--filter-pdf", action="store_true", default=False)
+    argparser.add_argument("--tag-filter", action="store_true", default=False)
+    argparser.add_argument("--html-filter", action="store_true", default=False)
     argparser.add_argument("--scripts", action="store_true", default=False)
+
     args = argparser.parse_args()
 
     # get all ipynb files
@@ -254,7 +258,7 @@ def main():
 
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
-        score = grade(ipynb_path, args.pdf, args.filter_pdf, args.scripts)
+        score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts)
         del score["TEST_HINTS"]
         all_results["score"].append(score)
         if args.pdf or args.filter_pdf:

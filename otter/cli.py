@@ -33,7 +33,8 @@ def main():
 
 	# PDF export options
 	parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
-	parser.add_argument("--filter-pdf", dest="filter-pdf", action="store_true", default=False, help="Create filtered PDF for manual grading")
+	parser.add_argument("--tag-filter", dest="tag-filter", action="store_true", default=False, help="Create a tag-filtered PDF for manual grading")
+	parser.add_argument("--html-filter", dest="html-filter", action="store_true", default=False, help="Create an HTML comment-filtered PDF for manual grading")
 
 	# other settings and optional arguments
 	parser.add_argument("-f", "--files", nargs="+", help="Specify support files needed to execute code (e.g. utils, data files)")
@@ -51,8 +52,8 @@ def main():
 		params["json"], 
 		params["yaml"]]]) == 1, "You must supply exactly one metadata flag (-g, -j, -y, -c)"
 
-	# Asserts that either --pdf of --filter-pdf but not both provided
-	assert sum([params["pdf"], params["filter-pdf"]]) <= 1, "Cannot provide more than 1 PDF flag"
+	# Asserts that either --pdf, --tag-filter, or --html-filter but not both provided
+	assert sum([params["pdf"], params["tag-filter"], params["html-filter"]]) <= 1, "Cannot provide more than 1 PDF flag"
 
 	# verbose flag
 	verbose = params["verbose"]
@@ -88,11 +89,13 @@ def main():
 		params["notebooks-path"], 
 		verbose=verbose, 
 		unfiltered_pdfs=params["pdf"], 
-		filtered_pdfs=params["filter-pdf"],
+		tag_filter=params["tag-filter"],
+		html_filter=params["html-filter"],
 		reqs=params["requirements"],
 		num_containers=params["num-containers"],
 		image=params["image"],
-		scripts=params["scripts"]
+		scripts=params["scripts"],
+
 	)
 
 	if verbose:

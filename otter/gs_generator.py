@@ -19,9 +19,9 @@ ipywidgets
 scipy
 seaborn
 sklearn
-nb2pdf==0.1.1
+nb2pdf==0.2.0
 tornado==5.1.1
-otter-grader==0.2.2
+otter-grader==0.2.3
 """
 
 SETUP_SH = """#!/usr/bin/env bash

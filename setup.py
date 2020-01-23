@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
 	name = "otter-grader",
-	version = "0.2.2",
+	version = "0.2.3",
 	author = "UC Berkeley Division of Data Science and Information",
 	author_email = "cpyles@berkeley.edu",
 	description = "Jupyter Notebook Autograder",
@@ -20,7 +20,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
 	],
 	install_requires=[
-		"nb2pdf==0.1.1",
+		"nb2pdf==0.2.0",
 		"tornado==5.1.1"
 	],
 	scripts=["bin/otter"]
