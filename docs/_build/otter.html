@@ -1,0 +1,631 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>otter package &mdash; Otter-Grader  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'',
+              LANGUAGE:'en',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: white" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Otter-Grader
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">Test Files</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Otter-Grader</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>otter package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/otter.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="otter-package">
+<h1>otter package<a class="headerlink" href="#otter-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-otter.cli">
+<span id="otter-cli-module"></span><h2>otter.cli module<a class="headerlink" href="#module-otter.cli" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.cli.main">
+<code class="descclassname">otter.cli.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.cli.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-otter.containers">
+<span id="otter-containers-module"></span><h2>otter.containers module<a class="headerlink" href="#module-otter.containers" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.containers.grade_assignments">
+<code class="descclassname">otter.containers.</code><code class="descname">grade_assignments</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>id</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>scripts=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.grade_assignments" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tests_dir</strong> – directory of test files</li>
+<li><strong>notebooks_dir</strong> – directory of notebooks to grade</li>
+<li><strong>id</strong> – id of this function for mc use</li>
+<li><strong>image</strong> – docker image to do grading in</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A dataframe of file to grades information</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.containers.launch_parallel_containers">
+<code class="descclassname">otter.containers.</code><code class="descname">launch_parallel_containers</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>num_containers=None</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>scripts=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.launch_parallel_containers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grades notebooks in parallel docker containers</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.gofer">
+<span id="otter-gofer-module"></span><h2>otter.gofer module<a class="headerlink" href="#module-otter.gofer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="otter.gofer.CheckCallWrapper">
+<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">CheckCallWrapper</code><span class="sig-paren">(</span><em>secret</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.CheckCallWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ast.NodeTransformer</span></code></p>
+<p>NodeTransformer visits and replaces nodes in place.
+CheckCallWrapper finds nodes with check(..) and replaces it with
+check_results_&lt;secret&gt;(check(…))</p>
+<dl class="method">
+<dt id="otter.gofer.CheckCallWrapper.node_constructor">
+<code class="descname">node_constructor</code><span class="sig-paren">(</span><em>expression</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.CheckCallWrapper.node_constructor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates node that wraps expression in a list (check_results_XX) append call</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.gofer.CheckCallWrapper.visit_Call">
+<code class="descname">visit_Call</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.CheckCallWrapper.visit_Call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that handles whether a given function call is a ‘check’ call
+and transforms the node accordingly.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.gofer.OKTest">
+<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">OKTest</code><span class="sig-paren">(</span><em>name</em>, <em>tests</em>, <em>value=1</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A single DocTest defined by OKPy.
+Instances of this class are callable. When called, it takes
+a global_environment dict, and returns a TestResult object.
+We only take a global_environment, <em>not</em> a local_environment.
+This makes tests not useful inside functions, methods or
+other scopes with local variables. This is a limitation of
+doctest, so we roll with it.</p>
+<dl class="classmethod">
+<dt id="otter.gofer.OKTest.from_file">
+<em class="property">classmethod </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTest.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a ok test file &amp; return an OKTest</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.gofer.OKTest.result_fail_template">
+<code class="descname">result_fail_template</code><em class="property"> = &lt;Template memory:10e7db588&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.result_fail_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.gofer.OKTest.result_pass_template">
+<code class="descname">result_pass_template</code><em class="property"> = &lt;Template memory:10e7b2438&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.result_pass_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.gofer.OKTest.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>global_environment</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTest.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.gofer.OKTests">
+<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">OKTests</code><span class="sig-paren">(</span><em>test_paths</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="otter.gofer.OKTests.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>global_environment</em>, <em>include_grade=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTests.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.gofer.OKTestsResult">
+<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">OKTestsResult</code><span class="sig-paren">(</span><em>grade</em>, <em>paths</em>, <em>tests</em>, <em>passed_tests</em>, <em>failed_tests</em>, <em>include_grade=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTestsResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Displayable result from running OKTests</p>
+<dl class="attribute">
+<dt id="otter.gofer.OKTestsResult.result_template">
+<code class="descname">result_template</code><em class="property"> = &lt;Template memory:10f5c4eb8&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.result_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.gofer.check">
+<code class="descclassname">otter.gofer.</code><code class="descname">check</code><span class="sig-paren">(</span><em>test_file_path</em>, <em>global_env=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>check global_env against given test_file in oktest format
+If global_env is none, the global environment of the calling
+function is used. The following two calls are equivalent:
+check(‘tests/q1.py’)
+check(‘tests/q1.py’, globals())
+Returns a TestResult object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.gofer.flush_inline_matplotlib_plots">
+<code class="descclassname">otter.gofer.</code><code class="descname">flush_inline_matplotlib_plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.flush_inline_matplotlib_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flush matplotlib plots immediately, rather than asynchronously.
+Basically, the inline backend only shows the plot after the entire
+cell executes, which means we can’t easily use a contextmanager to
+suppress displaying it. See <a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets/issues/1181/">https://github.com/jupyter-widgets/ipywidgets/issues/1181/</a>
+and <a class="reference external" href="https://github.com/ipython/ipython/issues/10376">https://github.com/ipython/ipython/issues/10376</a> for more details. This
+function displays flushes any pending matplotlib plots if we are using
+the inline backend.
+Stolen from <a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35">https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.gofer.hide_outputs">
+<code class="descclassname">otter.gofer.</code><code class="descname">hide_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.hide_outputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager for hiding outputs from display() calls.
+IPython handles matplotlib outputs specially, so those are supressed too.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.gofer.id_generator">
+<code class="descclassname">otter.gofer.</code><code class="descname">id_generator</code><span class="sig-paren">(</span><em>size=6</em>, <em>chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.id_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to generate a dynamic variable name for grading functions</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.gofer.run_doctest">
+<code class="descclassname">otter.gofer.</code><code class="descname">run_doctest</code><span class="sig-paren">(</span><em>name</em>, <em>doctest_string</em>, <em>global_environment</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.run_doctest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a single test with given global_environment.
+Returns (True, ‘’) if the doctest passes.
+Returns (False, failure_message) if the doctest fails.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.grade">
+<span id="otter-grade-module"></span><h2>otter.grade module<a class="headerlink" href="#module-otter.grade" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.grade.execute_notebook">
+<code class="descclassname">otter.grade.</code><code class="descname">execute_notebook</code><span class="sig-paren">(</span><em>nb</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.execute_notebook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute notebook &amp; return the global environment that results from execution.
+TODO: write a note about the injection of check_results
+If ignore_errors is True, exceptions are swallowed.
+secret contains random digits so check_results and check are not easily modifiable
+nb is passed in as a dictionary that’s a parsed ipynb file</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.grade.execute_script">
+<code class="descclassname">otter.grade.</code><code class="descname">execute_script</code><span class="sig-paren">(</span><em>script</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.execute_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute script &amp; return the global environment that results from execution.
+If ignore_errors is True, exceptions are swallowed.
+secret contains random digits so check_results and check are not easily modifiable
+script is passed in as a string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.grade.grade">
+<code class="descclassname">otter.grade.</code><code class="descname">grade</code><span class="sig-paren">(</span><em>ipynb_path</em>, <em>pdf</em>, <em>tag_filter</em>, <em>html_filter</em>, <em>script</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.grade" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.grade.grade_notebook">
+<code class="descclassname">otter.grade.</code><code class="descname">grade_notebook</code><span class="sig-paren">(</span><em>notebook_path</em>, <em>tests_glob=None</em>, <em>name=None</em>, <em>ignore_errors=True</em>, <em>script=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.grade_notebook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grade a notebook file &amp; return grade</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.grade.main">
+<code class="descclassname">otter.grade.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-otter.gs_generator">
+<span id="otter-gs-generator-module"></span><h2>otter.gs_generator module<a class="headerlink" href="#module-otter.gs_generator" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.gs_generator.main">
+<code class="descclassname">otter.gs_generator.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.gs_generator.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-otter.metadata">
+<span id="otter-metadata-module"></span><h2>otter.metadata module<a class="headerlink" href="#module-otter.metadata" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="otter.metadata.CanvasParser">
+<em class="property">class </em><code class="descclassname">otter.metadata.</code><code class="descname">CanvasParser</code><span class="sig-paren">(</span><em>submissions_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.CanvasParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Metadata parser for Canvas exports</p>
+<dl class="method">
+<dt id="otter.metadata.CanvasParser.file_to_id">
+<code class="descname">file_to_id</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.CanvasParser.file_to_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a identifier given a filename</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.CanvasParser.get_filenames">
+<code class="descname">get_filenames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.CanvasParser.get_filenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of filenames in the submission directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.CanvasParser.get_identifiers">
+<code class="descname">get_identifiers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.CanvasParser.get_identifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of submission identifiers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.CanvasParser.get_metadata">
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.CanvasParser.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mapping of identifiers to files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.CanvasParser.id_to_file">
+<code class="descname">id_to_file</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.CanvasParser.id_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a filename given an identifier</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.metadata.GradescopeParser">
+<em class="property">class </em><code class="descclassname">otter.metadata.</code><code class="descname">GradescopeParser</code><span class="sig-paren">(</span><em>submissions_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.GradescopeParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Metadata parser for Gradescope exports</p>
+<dl class="method">
+<dt id="otter.metadata.GradescopeParser.file_to_id">
+<code class="descname">file_to_id</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.GradescopeParser.file_to_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a identifier given a filename</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.GradescopeParser.get_filenames">
+<code class="descname">get_filenames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.GradescopeParser.get_filenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of filenames in the submission directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.GradescopeParser.get_identifiers">
+<code class="descname">get_identifiers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.GradescopeParser.get_identifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of submission identifiers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.GradescopeParser.get_metadata">
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.GradescopeParser.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mapping of identifiers to files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.GradescopeParser.id_to_file">
+<code class="descname">id_to_file</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.GradescopeParser.id_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a filename given an identifier</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.metadata.JSONParser">
+<em class="property">class </em><code class="descclassname">otter.metadata.</code><code class="descname">JSONParser</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.JSONParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Metadata parser for JSON format</p>
+<dl class="method">
+<dt id="otter.metadata.JSONParser.file_to_id">
+<code class="descname">file_to_id</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.JSONParser.file_to_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a identifier given a filename</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.JSONParser.get_filenames">
+<code class="descname">get_filenames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.JSONParser.get_filenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of filenames in the submission directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.JSONParser.get_identifiers">
+<code class="descname">get_identifiers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.JSONParser.get_identifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of submission identifiers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.JSONParser.get_metadata">
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.JSONParser.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mapping of identifiers to files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.JSONParser.id_to_file">
+<code class="descname">id_to_file</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.JSONParser.id_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a filename given an identifier</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.metadata.YAMLParser">
+<em class="property">class </em><code class="descclassname">otter.metadata.</code><code class="descname">YAMLParser</code><span class="sig-paren">(</span><em>file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.YAMLParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Metadata parser for YAML format</p>
+<dl class="method">
+<dt id="otter.metadata.YAMLParser.file_to_id">
+<code class="descname">file_to_id</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.YAMLParser.file_to_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a identifier given a filename</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.YAMLParser.get_filenames">
+<code class="descname">get_filenames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.YAMLParser.get_filenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of filenames in the submission directory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.YAMLParser.get_identifiers">
+<code class="descname">get_identifiers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.YAMLParser.get_identifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of submission identifiers</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.YAMLParser.get_metadata">
+<code class="descname">get_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.YAMLParser.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mapping of identifiers to files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.metadata.YAMLParser.id_to_file">
+<code class="descname">id_to_file</code><span class="sig-paren">(</span><em>identifier</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.metadata.YAMLParser.id_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a filename given an identifier</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.notebook">
+<span id="otter-notebook-module"></span><h2>otter.notebook module<a class="headerlink" href="#module-otter.notebook" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="otter.notebook.Notebook">
+<em class="property">class </em><code class="descclassname">otter.notebook.</code><code class="descname">Notebook</code><span class="sig-paren">(</span><em>test_dir='./tests'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Notebook class for in-notebook autograding</p>
+<dl class="method">
+<dt id="otter.notebook.Notebook.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>question</em>, <em>global_env=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks question using gofer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.notebook.Notebook.check_all">
+<code class="descname">check_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.check_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="otter.notebook.Notebook.export">
+<em class="property">static </em><code class="descname">export</code><span class="sig-paren">(</span><em>nb_path</em>, <em>filtering=True</em>, <em>filter_type='html'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports notebook to PDF</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.script">
+<span id="otter-script-module"></span><h2>otter.script module<a class="headerlink" href="#module-otter.script" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.script.blockPrint">
+<code class="descclassname">otter.script.</code><code class="descname">blockPrint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.script.blockPrint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.script.enablePrint">
+<code class="descclassname">otter.script.</code><code class="descname">enablePrint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.script.enablePrint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.script.main">
+<code class="descclassname">otter.script.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.script.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-otter.utils">
+<span id="otter-utils-module"></span><h2>otter.utils module<a class="headerlink" href="#module-otter.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.utils.list_files">
+<code class="descclassname">otter.utils.</code><code class="descname">list_files</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.list_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of all non-hidden files in a directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.utils.merge_csv">
+<code class="descclassname">otter.utils.</code><code class="descname">merge_csv</code><span class="sig-paren">(</span><em>dataframes</em>, <em>output_path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.merge_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges dataframes returned by Docker containers</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-otter" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

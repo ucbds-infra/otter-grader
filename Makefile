@@ -21,3 +21,6 @@ docker-image:
 
 docker-test:
 	docker build ./docker -t otter-test
+
+documentation:
+	sphinx-build -b html docs docs/_build -aEv

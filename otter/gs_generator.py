@@ -57,6 +57,7 @@ import shutil
 import subprocess
 import re
 import pprint
+import pandas as pd
 
 SCORE_THRESHOLD = """ + str(params["threshold"]) + """
 POINTS_POSSIBLE = """ + str(params["points"]) + """
@@ -135,7 +136,7 @@ if __name__ == "__main__":
 		json.dump(output, f)
 
 	print("\\n\\n")
-	pprint.pprint(output, indent=2)
+	print(pd.DataFrame(output["tests"]))
 """
 
 	# create tmp directory to zip inside
