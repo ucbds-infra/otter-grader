@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import re
 import pprint
+import pandas as pd
 
 SCORE_THRESHOLD = None
 POINTS_POSSIBLE = None
@@ -86,4 +87,4 @@ if __name__ == "__main__":
 		json.dump(output, f)
 
 	print("\n\n")
-	pprint.pprint(output, indent=2)
+	print(pd.DataFrame(output["tests"]))

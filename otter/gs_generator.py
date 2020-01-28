@@ -21,7 +21,7 @@ seaborn
 sklearn
 nb2pdf==0.2.0
 tornado==5.1.1
-otter-grader==0.2.3
+otter-grader==0.2.6
 """
 
 SETUP_SH = """#!/usr/bin/env bash

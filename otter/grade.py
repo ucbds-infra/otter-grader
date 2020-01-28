@@ -253,7 +253,7 @@ def main():
 
     all_results = {"file": [], "score": [], "manual": []}
 
-    if not args.pdf and not args.filter_pdf:
+    if not args.pdf and not args.html_filter and not args.tag_filter:
         del all_results["manual"]
 
     for ipynb_name, ipynb_path in all_ipynb:
@@ -261,7 +261,7 @@ def main():
         score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts)
         del score["TEST_HINTS"]
         all_results["score"].append(score)
-        if args.pdf or args.filter_pdf:
+        if args.pdf or args.html_filter or args.tag_filter:
             pdf_path = re.sub(r"\.ipynb$", ".pdf", ipynb_path)
             all_results["manual"].append(pdf_path)
 
