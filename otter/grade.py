@@ -75,25 +75,52 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         test_results += extra_results
 
     score_mapping = {}
-    score_mapping["TEST_HINTS"] = {}
-    points_possible = 0
-    total_score = 0
+    points_possible, total_score = 0, 0
     for r in test_results:
         try:
             for test in r.tests:
                 test_name = os.path.split(test.name)[1][:-3]
-                score_mapping[test_name] = r.grade * test.value
+                score_mapping[test_name] = {
+                    "score": r.grade * test.value,
+                    "possible": test.value,
+                    "hidden": test.hidden
+                }
                 total_score += r.grade * test.value
                 points_possible += test.value
             for tup in r.failed_tests:
                 test_name = os.path.split(tup[0].name)[1][:-3]
-                score_mapping["TEST_HINTS"][test_name] = tup[1]
+                if test_name in score_mapping:
+                    score_mapping[test_name]["hint"] = tup[1]
+                else:
+                    score_mapping[test_name] = {
+                        "hint": tup[1]
+                    }
         except IndexError:
             pass
 
     # add in total score and avoid divide by zero error if there are no tests
     score_mapping["total"] = total_score
     score_mapping["possible"] = points_possible
+
+    # score_mapping["TEST_HINTS"] = {}
+    # points_possible = 0
+    # total_score = 0
+    # for r in test_results:
+    #     try:
+    #         for test in r.tests:
+    #             test_name = os.path.split(test.name)[1][:-3]
+    #             score_mapping[test_name] = r.grade * test.value
+    #             total_score += r.grade * test.value
+    #             points_possible += test.value
+    #         for tup in r.failed_tests:
+    #             test_name = os.path.split(tup[0].name)[1][:-3]
+    #             score_mapping["TEST_HINTS"][test_name] = tup[1]
+    #     except IndexError:
+    #         pass
+
+    # # add in total score and avoid divide by zero error if there are no tests
+    # score_mapping["total"] = total_score
+    # score_mapping["possible"] = points_possible
 
     return score_mapping
 
@@ -259,8 +286,8 @@ def main():
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
         score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts)
-        del score["TEST_HINTS"]
-        all_results["score"].append(score)
+        # del score["TEST_HINTS"]
+        all_results["score"].append({t : score[t]["score"] if type(t) == dict else t for t in score})
         if args.pdf or args.html_filter or args.tag_filter:
             pdf_path = re.sub(r"\.ipynb$", ".pdf", ipynb_path)
             all_results["manual"].append(pdf_path)
@@ -272,7 +299,7 @@ def main():
 
         for score in all_results["score"]:
             for q in score:
-                all_results[q] += [score[q]]
+                all_results[q] += [score[q]["score"]]
 
     except IndexError:
         pass

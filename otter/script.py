@@ -2,6 +2,7 @@
 ##### Command Line Script Checker for Otter-Grader #####
 ########################################################
 
+from .utils import remove_html_in_hint
 from .grade import grade_notebook
 from .gofer import check
 import argparse
@@ -18,10 +19,6 @@ def blockPrint():
 # Restore
 def enablePrint():
     sys.stdout = sys.__stdout__
-
-SUB_BEFORE_ASTERISK = r"(.*\n)*^\s*\*"
-
-HTML_TAG_REGEX = r"</?[\w\" \d=:#%;'&-]*>"
 
 RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ scores|length - 2 }} tests passed
 {% if passed_tests %}
@@ -56,27 +53,17 @@ def main():
 	)
 	enablePrint()
 
-	for q in results["TEST_HINTS"]:
-		results["TEST_HINTS"][q] = re.sub(
-			SUB_BEFORE_ASTERISK,
-			"",
-			results["TEST_HINTS"][q],
-			flags=re.MULTILINE
-		)
-		results["TEST_HINTS"][q] = re.sub(
-			HTML_TAG_REGEX,
-			"",
-			results["TEST_HINTS"][q],
-			flags=re.MULTILINE
-		)
-		results["TEST_HINTS"][q] = results["TEST_HINTS"][q].strip() + "\n\n"
+	for q in results:
+		if "hint" in q:
+			results[q]["hint"] = remove_html_in_hint(results[q]["hint"])
 
-	passed_tests = [test for test in results if test not in ["TEST_HINTS", "total"] and results[test] == 1]
+	passed_tests = [test for test in results if test not in ["possible", "total"] and results[test] == 1 and "hint" not in results[test]]
+	failed_tests = [test for test in results if test not in ["possible", "total"] and "hint" in results[test]]
 
 	output = RESULT_TEMPLATE.render(
 		grade=results["total"],
 		passed_tests=passed_tests,
-		failed_tests=results["TEST_HINTS"],
+		failed_tests=failed_tests,
 		scores=results
 	)
 

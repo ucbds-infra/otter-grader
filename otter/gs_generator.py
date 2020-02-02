@@ -19,9 +19,9 @@ ipywidgets
 scipy
 seaborn
 sklearn
-nb2pdf==0.2.0
+nb2pdf
 tornado==5.1.1
-otter-grader==0.2.6
+otter-grader==0.3.0
 """
 
 SETUP_SH = """#!/usr/bin/env bash
@@ -49,6 +49,7 @@ def main():
 	# format threshold
 	RUN_AUTOGRADER = """#!/usr/bin/env python3
 
+from otter.utils import remove_html_in_hint
 from otter.grade import grade_notebook
 from glob import glob
 import json
@@ -112,15 +113,19 @@ if __name__ == "__main__":
 		shutil.copy(file, "/autograder/submission/tests")
 
 	scores = grade_notebook(nb_path, tests_glob, name="submission", ignore_errors=True)
-	del scores["TEST_HINTS"]
+	# del scores["TEST_HINTS"]
 
 	output = {"tests" : []}
 	for key in scores:
 		if key != "total" and key != "possible":
 			output["tests"] += [{
-				"score" : scores[key],
-				"number" : key
+				"name" : key,
+				"score" : scores[key]["score"],
+				"possible": scores[key]["possible"],
+				"visibility": ("visible", "hidden")[scores[key]["hidden"]]
 			}]
+			if "hint" in scores[key]:
+				output["tests"][-1]["output"] = remove_html_in_hint(scores[key]["hint"])
 	output["visibility"] = "hidden"
 
 	if POINTS_POSSIBLE is not None:
@@ -136,7 +141,11 @@ if __name__ == "__main__":
 		json.dump(output, f)
 
 	print("\\n\\n")
-	print(pd.DataFrame(output["tests"]))
+	df = pd.DataFrame(output["tests"])
+	if "output" in df.columns:
+		df.drop(columns=["output"], inplace=True)
+	# df.drop(columns=["hidden"], inplace=True)
+	print(df)
 """
 
 	# create tmp directory to zip inside

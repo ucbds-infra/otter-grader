@@ -152,13 +152,14 @@ class OKTest:
     <p><strong>Test result:</strong><pre>{{test_result}}</pre></p>
     """)
 
-    def __init__(self, name, tests, value=1):
+    def __init__(self, name, tests, value=1, hidden=True):
         """
         tests is list of doctests that should be run.
         """
         self.name = name
         self.tests = tests
         self.value = value
+        self.hidden = hidden
 
     def run(self, global_environment):
         for i, t in enumerate(self.tests):
@@ -205,7 +206,7 @@ class OKTest:
         for i, test_case in enumerate(test_spec['suites'][0]['cases']):
             tests.append(dedent(test_case['code']))
 
-        return cls(path, tests, test_spec.get('points', 1))
+        return cls(path, tests, test_spec.get('points', 1), test_spec.get('hidden', True))
 
 class OKTests:
     def __init__(self, test_paths):
