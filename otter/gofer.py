@@ -142,15 +142,42 @@ class OKTest:
     other scopes with local variables. This is a limitation of
     doctest, so we roll with it.
     """
-    result_pass_template = Template("""
+    html_result_pass_template = Template("""
     <p><strong>{{ name }}</strong> passed!</p>
     """)
 
-    result_fail_template = Template("""
+    plain_result_pass_template = Template("{{ name }} passed!")
+
+    html_result_fail_template = Template("""
     <p><strong style='color: red;'>{{ name }}</strong></p>
     <p><strong>Test code:</strong><pre>{{test_code}}</pre></p>
     <p><strong>Test result:</strong><pre>{{test_result}}</pre></p>
     """)
+
+    plain_result_fail_template = Template("""   {{ name }}
+
+Test result:
+{{test_result}}""")
+
+    def _repr_html_(self):
+        if self.passed:
+            return OKTest.html_result_pass_template.render(name=self.name)
+        else:
+            return OKTest.html_result_fail_template.render(
+                name=self.name,
+                test_code=highlight(self.failed_test, PythonConsoleLexer(), HtmlFormatter(noclasses=True)),
+                test_result=self.result
+            )
+
+    def __repr__(self):
+        if self.passed:
+            return OKTest.plain_result_pass_template.render(name=self.name)
+        else:
+            return OKTest.plain_result_fail_template.render(
+                name=self.name,
+                test_code=self.failed_test, # highlight(self.failed_test, PythonConsoleLexer(), HtmlFormatter(noclasses=True)),
+                test_result=self.result
+            )
 
     def __init__(self, name, tests, value=1, hidden=True):
         """
@@ -160,17 +187,19 @@ class OKTest:
         self.tests = tests
         self.value = value
         self.hidden = hidden
+        self.passed = None
+        self.failed_test = None
 
     def run(self, global_environment):
         for i, t in enumerate(self.tests):
             passed, result = run_doctest(self.name + ' ' + str(i), t, global_environment)
             if not passed:
-                return False, OKTest.result_fail_template.render(
-                    name=self.name,
-                    test_code=highlight(t, PythonConsoleLexer(), HtmlFormatter(noclasses=True)),
-                    test_result=result
-                )
-        return True, OKTest.result_pass_template.render(name=self.name)
+                self.passed = False
+                self.failed_test = t
+                self.result = result
+                return False, self
+        self.passed = True
+        return True, self
 
     @classmethod
     def from_file(cls, path):
@@ -220,12 +249,12 @@ class OKTests:
         total = 0
         for t in self.tests:
             total += t.value
-            passed, hint = t.run(global_environment)
+            passed, test_obj = t.run(global_environment)
             if passed:
                 grade += t.value
                 passed_tests.append(t)
             else:
-                failed_tests.append((t, hint))
+                failed_tests.append((t, test_obj))
 
         try:
             grade /= total
@@ -239,7 +268,7 @@ class OKTestsResult:
     """
     Displayable result from running OKTests
     """
-    result_template = Template("""
+    html_result_template = Template("""
     {% if include_grade %}
     <strong>Grade: {{ grade }}</strong>
     {% endif %}
@@ -255,11 +284,25 @@ class OKTestsResult:
         {% if failed_tests %}
         <p> <strong>Tests failed: </strong>
             <ul>
-            {% for failed_test, failed_test_hint in failed_tests %}
-                <li> {{ failed_test_hint }} </li>
+            {% for failed_test, failed_test_obj in failed_tests %}
+                <li> {{ failed_test_obj._repr_html_() }} </li>
             {% endfor %}
             </ul>
         {% endif %}
+    {% endif %}
+    """)
+
+    plain_result_template = Template("""{% if include_grade %}Grade: {{ grade }}{% endif %}
+    {% if grade == 1.0 %}All tests passed!{% else %}
+    {{ passed_tests|length }} of {{ tests|length }} tests passed
+    {% if passed_tests %}
+    Tests passed: {% for passed_test in passed_tests %} {{ passed_test.name }} {% endfor %}{% endif %}
+    {% if failed_tests %}
+    Tests failed: 
+    {% for failed_test, failed_test_obj in failed_tests %}
+        {{ failed_test_obj.__repr__() }}
+    {% endfor %}
+    {% endif %}
     {% endif %}
     """)
 
@@ -273,7 +316,16 @@ class OKTestsResult:
         self.include_grade = include_grade
 
     def _repr_html_(self):
-        return OKTestsResult.result_template.render(
+        return OKTestsResult.html_result_template.render(
+            grade=self.grade,
+            passed_tests=self.passed_tests,
+            failed_tests=self.failed_tests,
+            tests=self.tests,
+            include_grade=self.include_grade
+        )
+
+    def __repr__(self):
+        return OKTestsResult.plain_result_template.render(
             grade=self.grade,
             passed_tests=self.passed_tests,
             failed_tests=self.failed_tests,

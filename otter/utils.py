@@ -18,18 +18,18 @@ def merge_csv(dataframes, output_path):
 	final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
 	return final_dataframe
 
-def remove_html_in_hint(hint):
-	hint = re.sub(
-		SUB_BEFORE_ASTERISK,
-		"",
-		hint,
-		flags=re.MULTILINE
-	)
-	hint = re.sub(
-		HTML_TAG_REGEX,
-		"",
-		hint,
-		flags=re.MULTILINE
-	)
-	hint = hint.strip() + "\n\n"
-	return hint
+# def remove_html_in_hint(hint):
+# 	hint = re.sub(
+# 		SUB_BEFORE_ASTERISK,
+# 		"",
+# 		hint,
+# 		flags=re.MULTILINE
+# 	)
+# 	hint = re.sub(
+# 		HTML_TAG_REGEX,
+# 		"",
+# 		hint,
+# 		flags=re.MULTILINE
+# 	)
+# 	hint = hint.strip() + "\n\n"
+# 	return hint

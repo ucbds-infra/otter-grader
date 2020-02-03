@@ -2,7 +2,7 @@
 ##### Command Line Script Checker for Otter-Grader #####
 ########################################################
 
-from .utils import remove_html_in_hint
+# from .utils import remove_html_in_hint
 from .grade import grade_notebook
 from .gofer import check
 import argparse
@@ -27,7 +27,7 @@ Tests passed:
 {% endif %}
 {% if failed_tests %}
 Tests failed: 
-{% for failed_test in failed_tests %}{{ failed_tests[failed_test] }}{% endfor %}{% endif %}{% endif %}
+{% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
 """)
 
 def main():
@@ -58,7 +58,7 @@ def main():
 			results[q]["hint"] = remove_html_in_hint(results[q]["hint"])
 
 	passed_tests = [test for test in results if test not in ["possible", "total"] and results[test] == 1 and "hint" not in results[test]]
-	failed_tests = [test for test in results if test not in ["possible", "total"] and "hint" in results[test]]
+	failed_tests = [results[test]["hint"] for test in results if test not in ["possible", "total"] and "hint" in results[test]]
 
 	output = RESULT_TEMPLATE.render(
 		grade=results["total"],

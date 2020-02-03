@@ -90,10 +90,10 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             for tup in r.failed_tests:
                 test_name = os.path.split(tup[0].name)[1][:-3]
                 if test_name in score_mapping:
-                    score_mapping[test_name]["hint"] = tup[1]
+                    score_mapping[test_name]["hint"] = tup[1]#.__repr__()
                 else:
                     score_mapping[test_name] = {
-                        "hint": tup[1]
+                        "hint": tup[1]#.__repr__()
                     }
         except IndexError:
             pass
