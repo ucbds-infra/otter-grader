@@ -7,13 +7,18 @@ from glob import glob
 from otter import Notebook
 
 class TestIntegration(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        create_image_cmd = ["make", "docker-test"]
+        create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
+        # cls.assertEqual(len(create_image.stderr), 0, create_image.stderr.decode("utf-8"))
 
     def test_docker(self):
         """
         Check that we have the right container installed and that docker is running
         """
         # use docker image inspect to see that the image is installed and tagged as otter-grader
-        inspect_command = ["docker", "image", "inspect", "ucbdsinfra/otter-grader"]
+        inspect_command = ["docker", "image", "inspect", "otter-test"]
         inspect = subprocess.run(inspect_command, stdout=PIPE, stderr=PIPE)
 
         # assert that it didn't fail, it will fail if it is not installed
@@ -29,7 +34,8 @@ class TestIntegration(unittest.TestCase):
             "-p", "test/integration/manual-test/", 
             "-t", "test/integration/tests/", 
             "-r", "test/integration/requirements.txt",
-            "-o", "test/"
+            "-o", "test/",
+            "--image", "otter-test"
         ]
         grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
 
@@ -60,7 +66,8 @@ class TestIntegration(unittest.TestCase):
             "-p", "test/integration/py-tests/", 
             "-t", "test/integration/tests/", 
             "-r", "test/integration/requirements.txt",
-            "-o", "test/"
+            "-o", "test/",
+            "--image", "otter-test"
         ]
         grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
 

@@ -287,7 +287,7 @@ def main():
         all_results["file"].append(ipynb_name)
         score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts)
         # del score["TEST_HINTS"]
-        all_results["score"].append({t : score[t]["score"] if type(t) == dict else t for t in score})
+        all_results["score"].append({t : score[t]["score"] if type(score[t]) == dict else score[t] for t in score})
         if args.pdf or args.html_filter or args.tag_filter:
             pdf_path = re.sub(r"\.ipynb$", ".pdf", ipynb_path)
             all_results["manual"].append(pdf_path)
@@ -299,7 +299,7 @@ def main():
 
         for score in all_results["score"]:
             for q in score:
-                all_results[q] += [score[q]["score"]]
+                all_results[q] += [score[q]]#["score"]]
 
     except IndexError:
         pass

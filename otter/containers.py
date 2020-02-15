@@ -11,7 +11,10 @@ from concurrent.futures import ThreadPoolExecutor, wait
 import os
 import shutil
 
-def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", scripts=False):
+def launch_parallel_containers(
+    tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, tag_filter=False, 
+    html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
+    scripts=False, no_kill=False):
     """Grades notebooks in parallel docker containers"""
     if not num_containers:
         num_containers = 4
@@ -55,7 +58,9 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
             html_filter=html_filter,
             reqs=reqs,
             image=image,
-            scripts=scripts)]
+            scripts=scripts,
+            no_kill=no_kill
+        )]
 
     # stop execution while containers are running
     finished_futures = wait(futures)
@@ -68,7 +73,8 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
     return [df.result() for df in finished_futures[0]]
 
 
-def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, scripts=False):
+def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
+unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, scripts=False, no_kill=False):
     """
     Args:
         tests_dir: directory of test files
@@ -111,6 +117,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         print("Grading {} in container {}...".format(("notebooks", "scripts")[scripts], container_id[:12]))
     
     # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command....
+    # grade_command = ["docker", "exec", "-t", container_id, "python3", "/home/grade.py", "/home/notebooks"]
     grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", "/home/notebooks"]
 
     # if we want PDF output, add the necessary flag
@@ -126,51 +133,69 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         grade_command += ["--scripts"]
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
+    # print(grade.stdout.decode("utf-8"))
+    # print(grade.stderr.decode("utf-8"))
 
     all_commands = [launch, copy, tests, grade]
     try:
         all_commands += [requirements, install]
     except UnboundLocalError:
         pass
-    for command in all_commands:
-        if command.stderr.decode('utf-8') != '':
-            raise Exception("Error running ", command, " failed with error: ", command.stderr.decode('utf-8'))
 
-    if verbose:
-        print("Copying grades from container {}...".format(container_id[:12]))
+    try:
+        for command in all_commands:
+            if command.stderr.decode('utf-8') != '':
+                raise Exception("Error running ", command, " failed with error: ", command.stderr.decode('utf-8'))
 
-    # get the grades back from the container and read to date frame so we can merge later
-    csv_command = ["docker", "cp", container_id+ ":/home/notebooks/grades.csv", "./grades"+id+".csv"]
-    csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
-    df = pd.read_csv("./grades"+id+".csv")
+        if verbose:
+            print("Copying grades from container {}...".format(container_id[:12]))
 
-    if unfiltered_pdfs or tag_filter or html_filter:
-        mkdir_pdf_command = ["mkdir", "manual_submissions"]
-        mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
+        # get the grades back from the container and read to date frame so we can merge later
+        csv_command = ["docker", "cp", container_id+ ":/home/notebooks/grades.csv", "./grades"+id+".csv"]
+        csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
+        df = pd.read_csv("./grades"+id+".csv")
+
+        if unfiltered_pdfs or tag_filter or html_filter:
+            mkdir_pdf_command = ["mkdir", "manual_submissions"]
+            mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
+            
+            # copy out manual submissions
+            for pdf in df["manual"]:
+                copy_cmd = ["docker", "cp", container_id + ":" + pdf, "./manual_submissions/" + re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1]]
+                copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
+
+            def clean_pdf_filepaths(row):
+                path = row["manual"]
+                return re.sub(r"\/home\/notebooks", "manual_submissions", path)
+
+            df["manual"] = df.apply(clean_pdf_filepaths, axis=1)
         
-        # copy out manual submissions
-        for pdf in df["manual"]:
-            copy_cmd = ["docker", "cp", container_id + ":" + pdf, "./manual_submissions/" + re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1]]
-            copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
+        # delete the file we just read
+        csv_cleanup_command = ["rm", "./grades"+id+".csv"]
+        csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
 
-        def clean_pdf_filepaths(row):
-            path = row["manual"]
-            return re.sub(r"\/home\/notebooks", "manual_submissions", path)
+        if not no_kill:
+            if verbose:
+                print("Stopping container {}...".format(container_id[:12]))
 
-        df["manual"] = df.apply(clean_pdf_filepaths, axis=1)
-    
-    # delete the file we just read
-    csv_cleanup_command = ["rm", "./grades"+id+".csv"]
-    csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
-    
-    if verbose:
-        print("Stopping container {}...".format(container_id[:12]))
+            # cleanup the docker container
+            stop_command = ["docker", "stop", container_id]
+            stop = subprocess.run(stop_command, stdout=PIPE, stderr=PIPE)
+            remove_command = ["docker", "rm", container_id]
+            remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
 
-    # cleanup the docker container
-    stop_command = ["docker", "stop", container_id]
-    stop = subprocess.run(stop_command, stdout=PIPE, stderr=PIPE)
-    remove_command = ["docker", "rm", container_id]
-    remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
+    except BaseException as e:
+        if not no_kill:
+            if verbose:
+                print("Stopping container {}...".format(container_id[:12]))
+
+            # cleanup the docker container
+            stop_command = ["docker", "stop", container_id]
+            stop = subprocess.run(stop_command, stdout=PIPE, stderr=PIPE)
+            remove_command = ["docker", "rm", container_id]
+            remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
+        
+        raise e
     
     # check that no commands errored, if they did rais an informative exception
     all_commands = [launch, copy, tests, grade, csv, csv_cleanup, stop, remove]
