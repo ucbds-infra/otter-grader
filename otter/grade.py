@@ -23,6 +23,19 @@ except ImportError:
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False):
     """
     Grade a notebook file & return grade
+
+    This function grades a single ipython notebook using the provided tests.
+
+    Args:
+        notebook_path (str): path to a single notebook
+        tests_glob (:obj:`list` of :obj:`str`, optional): names of test files
+        name (str, optional): initial environment name
+        ignore_errors (bool, optional): whether errors should be ignored, passed as an arg to 
+            execute functions
+        script (bool, optional): true if the notebook_path is a python script, false if notebook
+
+    Returns:
+        dict: a score mapping with values for each test, student score, and total points possible 
     """
     # ensure this is not being executed inside a notebook
     try:
@@ -125,6 +138,22 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     return score_mapping
 
 def grade(ipynb_path, pdf, tag_filter, html_filter, script):
+    """
+    Grades a single ipython notebook and returns the score
+
+    If no PDF is needed, set the pdf, tag_filter, and html_filter parameters to false. For .py
+    files, set script to true.
+
+    Args:
+        ipynb_path (str): path to the ipython notebook
+        pdf (bool): set true if no filtering needed to generate pdf 
+        tag_filter (bool): whether cells should be filtered by tag
+        html_filter (bool): whether cells should be filtered by comments
+        script (bool): whether the input file is a python script
+
+    Returns:
+        dict: a score mapping with values for each test, student score, and total points possible 
+    """
     # get path of notebook file
     base_path = os.path.dirname(ipynb_path)
 
@@ -146,11 +175,22 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script):
 
 def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False):
     """
+    Executes an ipython notebook and return the global environment that results from execution.
+
     Execute notebook & return the global environment that results from execution.
     TODO: write a note about the injection of check_results
     If ignore_errors is True, exceptions are swallowed.
     secret contains random digits so check_results and check are not easily modifiable
     nb is passed in as a dictionary that's a parsed ipynb file
+
+    Args:
+        nb (dict of str: int): json representation of ipython notebook
+        secret (str, optional): secret string for naming check function
+        initial_env (str, optional): name of initial environment
+        ignore_errors (bool): whether exceptions should be ignored
+    
+    Results:
+        dict: global environment resulting from executing all code of the input notebook
     """
     with hide_outputs():
         if initial_env:
@@ -224,10 +264,21 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False)
 
 def execute_script(script, secret='secret', initial_env=None, ignore_errors=False):
     """
+    Executes code of a python (.py) script and returns the resulting global environment
+
     Execute script & return the global environment that results from execution.
     If ignore_errors is True, exceptions are swallowed.
     secret contains random digits so check_results and check are not easily modifiable
     script is passed in as a string
+
+    Args:
+        script (str): string representation of python script code
+        secret (str, optional): secret string for naming check function
+        initial_env (str, optional): name of initial environment
+        ignore_errors (bool): whether exceptions should be ignored
+    
+    Results:
+        dict: global environment resulting from executing all code of the input script
     """
     with hide_outputs():
         if initial_env:
