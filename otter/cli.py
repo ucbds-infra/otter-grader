@@ -42,6 +42,7 @@ def main():
 	parser.add_argument("-r", "--requirements", type=str, help="Flag for Python requirements file path")
 	parser.add_argument("--containers", dest="num-containers", type=int, help="Specify number of containers to run in parallel")
 	parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
+	parser.add_argument("--no-kill", dest="no-kill", action="store_true", default=False, help="Do not kill containers after grading")
 	
 	# parse args
 	params = vars(parser.parse_args())
@@ -95,7 +96,7 @@ def main():
 		num_containers=params["num-containers"],
 		image=params["image"],
 		scripts=params["scripts"],
-
+		no_kill=params["no-kill"]
 	)
 
 	if verbose:

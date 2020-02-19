@@ -20,7 +20,14 @@ docker-image:
 	docker push ucbdsinfra/otter-grader
 
 docker-test:
-	docker build ./docker -t otter-test
+	cp -r ./docker test-docker
+	cp -r ./otter test-docker
+	cp setup.py test-docker
+	cp README.md test-docker
+	cp -r ./bin test-docker
+	printf "\nADD . /home/otter-grader\nRUN pip3 install /home/otter-grader" >> ./test-docker/Dockerfile
+	docker build ./test-docker -t otter-test
+	rm -rf ./test-docker
 
 documentation:
 	sphinx-build -b html docs docs/_build -aEv
