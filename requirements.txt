@@ -9,4 +9,8 @@ tqdm
 codecov
 nb2pdf
 tornado==5.1.1
+<<<<<<< HEAD
 otter-grader==0.3.7
+=======
+otter-grader==0.3.8
+>>>>>>> ac4bcf9... fixed gs_generator
