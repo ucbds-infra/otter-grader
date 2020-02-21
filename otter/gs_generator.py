@@ -21,7 +21,7 @@ seaborn
 sklearn
 nb2pdf
 tornado==5.1.1
-otter-grader==0.3.7
+otter-grader==0.3.8
 """
 
 SETUP_SH = """#!/usr/bin/env bash
@@ -49,7 +49,6 @@ def main():
 	# format threshold
 	RUN_AUTOGRADER = """#!/usr/bin/env python3
 
-from otter.utils import remove_html_in_hint
 from otter.grade import grade_notebook
 from glob import glob
 import json
