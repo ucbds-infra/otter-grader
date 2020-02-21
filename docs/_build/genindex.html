@@ -18,43 +18,33 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'en',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
 
+  
+  
     
 
   
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: white" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -91,6 +81,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests.html">Test Files</a></li>
 </ul>
 
@@ -170,6 +161,7 @@
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
@@ -292,6 +284,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.html#otter.gofer.hide_outputs">hide_outputs() (in module otter.gofer)</a>
 </li>
+      <li><a href="otter.html#otter.gofer.OKTest.html_result_fail_template">html_result_fail_template (otter.gofer.OKTest attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.OKTest.html_result_pass_template">html_result_pass_template (otter.gofer.OKTest attribute)</a>
+</li>
+      <li><a href="otter.html#otter.gofer.OKTestsResult.html_result_template">html_result_template (otter.gofer.OKTestsResult attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -399,16 +399,22 @@
   </ul></td>
 </tr></table>
 
-<h2 id="R">R</h2>
+<h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="otter.html#otter.gofer.OKTest.result_fail_template">result_fail_template (otter.gofer.OKTest attribute)</a>
-</li>
-      <li><a href="otter.html#otter.gofer.OKTest.result_pass_template">result_pass_template (otter.gofer.OKTest attribute)</a>
-</li>
-      <li><a href="otter.html#otter.gofer.OKTestsResult.result_template">result_template (otter.gofer.OKTestsResult attribute)</a>
+      <li><a href="otter.html#otter.gofer.OKTest.plain_result_fail_template">plain_result_fail_template (otter.gofer.OKTest attribute)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.OKTest.plain_result_pass_template">plain_result_pass_template (otter.gofer.OKTest attribute)</a>
+</li>
+      <li><a href="otter.html#otter.gofer.OKTestsResult.plain_result_template">plain_result_template (otter.gofer.OKTestsResult attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.html#otter.gofer.OKTest.run">run() (otter.gofer.OKTest method)</a>
 
@@ -416,6 +422,8 @@
         <li><a href="otter.html#otter.gofer.OKTests.run">(otter.gofer.OKTests method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.html#otter.gofer.run_doctest">run_doctest() (in module otter.gofer)</a>
 </li>
   </ul></td>
@@ -449,7 +457,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information
+        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.
 
     </p>
   </div>
@@ -466,16 +474,35 @@
   
 
 
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
