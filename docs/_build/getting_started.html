@@ -84,9 +84,13 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#local-grading">Local Grading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gradescope">Gradescope</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tests.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
 </ul>
 
             
@@ -202,7 +206,7 @@
 <h3>Grading<a class="headerlink" href="#grading" title="Permalink to this headline">¶</a></h3>
 <p>Now that you’ve set up the directory, let’s get down to grading. Go to the terminal, <code class="docutils literal notranslate"><span class="pre">cd</span></code> into your grading directory (<code class="docutils literal notranslate"><span class="pre">grading</span></code> in the example above), and let’s build the <code class="docutils literal notranslate"><span class="pre">otter</span></code> command. The first thing we need is our notebooks path or <code class="docutils literal notranslate"><span class="pre">-p</span></code> argument. Otter assumes this is <code class="docutils literal notranslate"><span class="pre">./</span></code>, but our notebooks are located in <code class="docutils literal notranslate"><span class="pre">./submissions</span></code>, so we’ll need <code class="docutils literal notranslate"><span class="pre">-p</span> <span class="pre">submissions</span></code> in our command. We also need a tests directory, which otter assumes is at <code class="docutils literal notranslate"><span class="pre">./tests</span></code>; because this is where our tests are, we’re alright on this front, and don’t need a <code class="docutils literal notranslate"><span class="pre">-t</span></code> argument.</p>
 <p>Now we need to tell otter how we’ve structured our metadata. If you’re using a Gradescope or Canvas export, just pass the <code class="docutils literal notranslate"><span class="pre">-g</span></code> or <code class="docutils literal notranslate"><span class="pre">-c</span></code> flag, respectively, with no arguments. If you’re using a custom metadata file, as in our example, pass the <code class="docutils literal notranslate"><span class="pre">-j</span></code> or <code class="docutils literal notranslate"><span class="pre">-y</span></code> flag with the path to the metadata file as its argument; in our case, we will pass <code class="docutils literal notranslate"><span class="pre">-y</span> <span class="pre">submissions/meta.yml</span></code>.</p>
-<p>At this point, we need to make a decision: do we want PDFs? If there are questions that need to be manually graded, it might be nice to generate a PDF of each submission so that it can be easily read; if you want to generate PDFs, pass one of the <code class="docutils literal notranslate"><span class="pre">--pdf</span></code>, <code class="docutils literal notranslate"><span class="pre">--tag-filter</span></code>, or <code class="docutils literal notranslate"><span class="pre">--html-filter</span></code> flags (cf. <a class="reference external" href="pdfs">PDFs</a>). For our example, let’s say that we <em>do</em> want PDFs.</p>
+<p>At this point, we need to make a decision: do we want PDFs? If there are questions that need to be manually graded, it might be nice to generate a PDF of each submission so that it can be easily read; if you want to generate PDFs, pass one of the <code class="docutils literal notranslate"><span class="pre">--pdf</span></code>, <code class="docutils literal notranslate"><span class="pre">--tag-filter</span></code>, or <code class="docutils literal notranslate"><span class="pre">--html-filter</span></code> flags (cf. <a class="reference internal" href="pdfs.html"><span class="doc">PDFs</span></a>). For our example, let’s say that we <em>do</em> want PDFs.</p>
 <p>Now that we’ve made all of these decisions, let’s put our command together. Our command is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="o">-</span><span class="n">p</span> <span class="n">submissions</span> <span class="o">-</span><span class="n">y</span> <span class="n">meta</span><span class="o">.</span><span class="n">yml</span> <span class="o">--</span><span class="n">pdf</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="o">-</span><span class="n">v</span>
 </pre></div>
@@ -226,7 +230,41 @@
 </div>
 <p>Otter created the <code class="docutils literal notranslate"><span class="pre">final_grades.csv</span></code> file with the grades for each student, broken down by test, and the <code class="docutils literal notranslate"><span class="pre">manual_submissions</span></code> directory to house the PDF that was generated of each notebook.</p>
 <p><strong>Congrats, you’re done!</strong> You can use the grades in the CSV file and the PDFs to complete grading however you want.</p>
+<p>You can find more information about the command line utility <a class="reference internal" href="command-line.html"><span class="doc">here</span></a></p>
 </div>
+</div>
+<div class="section" id="gradescope">
+<h2>Gradescope<a class="headerlink" href="#gradescope" title="Permalink to this headline">¶</a></h2>
+<p>To get started using otter with Gradescope, create some <a class="reference internal" href="tests.html"><span class="doc">test cases</span></a> and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">gradescope</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">utils</span><span class="o">.</span><span class="n">py</span>
+  <span class="o">|</span> <span class="n">tests</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">q1</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">q2</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>To create the zipfile for Gradescope, use the <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">gen</span></code> command after <code class="docutils literal notranslate"><span class="pre">cd</span></code>ing into the directory you created. For the directory above, once I’ve <code class="docutils literal notranslate"><span class="pre">cd</span></code>ed into <code class="docutils literal notranslate"><span class="pre">gradescope</span></code>, I would run the following to generate the zipfile:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">gen</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="n">utils</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">-r</span></code> flag indicates that we have additional requirements in a requirements.txt file and all of the additional files required are placed at the end of the command. Notice that we didn’t indicate the path to the tests directory; this is because the default argument of the <code class="docutils literal notranslate"><span class="pre">-t</span></code> flag is <code class="docutils literal notranslate"><span class="pre">./tests</span></code>, so otter found them automatically.</p>
+<p>After this command finishes running, you should have a file called <code class="docutils literal notranslate"><span class="pre">autograder.zip</span></code> in the current working directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">gradescope</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">autograder</span><span class="o">.</span><span class="n">zip</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">utils</span><span class="o">.</span><span class="n">py</span>
+  <span class="o">|</span> <span class="n">tests</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">q1</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">q2</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student’s submission.</p>
+<p>You can find more information about Gradescope usage <a class="reference internal" href="gradescope.html"><span class="doc">here</span></a></p>
 </div>
 </div>
 

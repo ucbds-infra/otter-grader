@@ -14,6 +14,9 @@
    install
    getting_started
    tests
+   command-line
+   gradescope
+   pdfs
 ```
 
 [![Build Status](https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master)](https://travis-ci.org/ucbds-infra/otter-grader)

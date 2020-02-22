@@ -86,6 +86,45 @@ Otter created the `final_grades.csv` file with the grades for each student, brok
 
 **Congrats, you're done!** You can use the grades in the CSV file and the PDFs to complete grading however you want.
 
+You can find more information about the command line utility [here](command-line.md)
+
 ## Gradescope
 
-To get started using otter with G
+To get started using otter with Gradescope, create some [test cases](tests.md) and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:
+
+```
+| gradescope
+  | - data.csv
+  | - requirements.txt
+  | - utils.py
+  | tests
+    | - q1.py
+    | - q2.py
+    ...
+```
+
+To create the zipfile for Gradescope, use the `otter gen` command after `cd`ing into the directory you created. For the directory above, once I've `cd`ed into `gradescope`, I would run the following to generate the zipfile:
+
+```
+otter gen -r requirements.txt data.csv utils.py
+```
+
+The `-r` flag indicates that we have additional requirements in a requirements.txt file and all of the additional files required are placed at the end of the command. Notice that we didn't indicate the path to the tests directory; this is because the default argument of the `-t` flag is `./tests`, so otter found them automatically.
+
+After this command finishes running, you should have a file called `autograder.zip` in the current working directory:
+
+```
+| gradescope
+  | - autograder.zip
+  | - data.csv
+  | - requirements.txt
+  | - utils.py
+  | tests
+    | - q1.py
+    | - q2.py
+    ...
+```
+
+To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
+
+You can find more information about Gradescope usage [here](gradescope.md)
