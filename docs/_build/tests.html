@@ -17,44 +17,35 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'en',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
 
+  
+  
     
 
   
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Installation" href="install.html" /> 
+    <link rel="next" title="Command Line Utility" href="command-line.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: white" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -91,7 +82,16 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Test Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ok-format-caveats">OK Format Caveats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sample-test">Sample Test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-ok-tests">Writing OK Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
 </ul>
 
             
@@ -158,40 +158,60 @@
             
   <div class="section" id="test-files">
 <h1>Test Files<a class="headerlink" href="#test-files" title="Permalink to this headline">¶</a></h1>
-<p>Otter requires ok-formatted tests to check students’ work against. These have a very specific format:</p>
+<p>Otter requires OK-formatted tests to check students’ work against. These have a very specific format, described in detail in the <a class="reference external" href="https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests">OK documentation</a>.</p>
+<div class="section" id="ok-format-caveats">
+<h2>OK Format Caveats<a class="headerlink" href="#ok-format-caveats" title="Permalink to this headline">¶</a></h2>
+<p>While otter uses OK format, there are a few caveats to the tests when using them with otter.</p>
+<ul class="simple">
+<li>Otter only allows a single suite in each test, although the suite can have any number of cases. This means that <code class="docutils literal notranslate"><span class="pre">test[&quot;suite&quot;]</span></code> should be a list of length 1, whose only element is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>.</li>
+<li>Otter has an additional key in the <code class="docutils literal notranslate"><span class="pre">test</span></code> dict, called <code class="docutils literal notranslate"><span class="pre">hidden</span></code>. <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> should evaluate to a boolean. This is used to indicate whether or not the test should be shown on Gradescope when students submit their work. If <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then all cases will be shown to students on Gradescope. <strong>This is not to be confused with the <code class="docutils literal notranslate"><span class="pre">hidden</span></code> key of each case, which are ignored by otter.</strong></li>
+</ul>
+</div>
+<div class="section" id="sample-test">
+<h2>Sample Test<a class="headerlink" href="#sample-test" title="Permalink to this headline">¶</a></h2>
+<p>Here is an annotated sample OK test:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="p">{</span>
-	<span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;q1&quot;</span><span class="p">,</span>       <span class="c1"># name of the test</span>
-	<span class="s2">&quot;points&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>        <span class="c1"># number of points for the entire suite</span>
-	<span class="s2">&quot;suites&quot;</span><span class="p">:</span> <span class="p">[</span>         <span class="c1"># list of suites, only 1 suite allowed</span>
-		<span class="p">{</span>
-			<span class="s2">&quot;cases&quot;</span><span class="p">:</span> <span class="p">[</span>              <span class="c1"># list of test cases</span>
-				<span class="p">{</span>
-					<span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;    # test, formatted for Python interpreter</span>
-<span class="s2">					&gt;&gt;&gt; 1 == 1</span>
-<span class="s2">					True</span>
-<span class="s2">					&quot;&quot;&quot;</span><span class="p">,</span>
-					<span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-					<span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-				<span class="p">},</span> 
-				<span class="p">{</span>
-					<span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">					&gt;&gt;&gt; 1 == 2</span>
-<span class="s2">					False</span>
-<span class="s2">					&quot;&quot;&quot;</span><span class="p">,</span>
-					<span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-					<span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-				<span class="p">},</span> 
-			<span class="p">],</span>
-			<span class="s2">&quot;scored&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-			<span class="s2">&quot;setup&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-			<span class="s2">&quot;teardown&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-			<span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;doctest&quot;</span>
-		<span class="p">},</span> 
-	<span class="p">]</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;q1&quot;</span><span class="p">,</span>       <span class="c1"># name of the test</span>
+    <span class="s2">&quot;points&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>        <span class="c1"># number of points for the entire suite</span>
+    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>    <span class="c1"># whether the test is hidden on Gradescope</span>
+    <span class="s2">&quot;suites&quot;</span><span class="p">:</span> <span class="p">[</span>         <span class="c1"># list of suites, only 1 suite allowed!</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;cases&quot;</span><span class="p">:</span> <span class="p">[</span>                  <span class="c1"># list of test cases</span>
+                <span class="p">{</span>                       <span class="c1"># each case is a dict</span>
+                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;        # test, formatted for Python interpreter</span>
+<span class="s2">                    &gt;&gt;&gt; 1 == 1          # note that in any subsequence line of a multiline</span>
+<span class="s2">                    True                # statement, the prompt becomes ... (see below)</span>
+<span class="s2">                    &quot;&quot;&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>    <span class="c1"># ignored by otter</span>
+                    <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>    <span class="c1"># ignored by otter</span>
+                <span class="p">},</span> 
+                <span class="p">{</span>
+                    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    &gt;&gt;&gt; for i in range(4):</span>
+<span class="s2">                    ... 	print(i == 1)</span>
+<span class="s2">                    False</span>
+<span class="s2">                    True</span>
+<span class="s2">                    False</span>
+<span class="s2">                    False</span>
+<span class="s2">                    &quot;&quot;&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                <span class="p">},</span> 
+            <span class="p">],</span>
+            <span class="s2">&quot;scored&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>            <span class="c1"># ignored by otter</span>
+            <span class="s2">&quot;setup&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                <span class="c1"># ignored by otter</span>
+            <span class="s2">&quot;teardown&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="c1"># ignored by otter</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;doctest&quot;</span>           <span class="c1"># the type of test; only &quot;doctest&quot; allowed</span>
+        <span class="p">},</span>
+    <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>You can find an online <a class="reference external" href="https://oktests.herokuapp.com">ok test generator</a> that will assist you in generating this file.</p>
+</div>
+<div class="section" id="writing-ok-tests">
+<h2>Writing OK Tests<a class="headerlink" href="#writing-ok-tests" title="Permalink to this headline">¶</a></h2>
+<p>You can find an online <a class="reference external" href="https://oktests.herokuapp.com">OK test generator</a> that will assist you in generating these test files.</p>
+</div>
 </div>
 
 
@@ -202,8 +222,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="command-line.html" class="btn btn-neutral float-right" title="Command Line Utility" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="getting_started.html" class="btn btn-neutral" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -212,7 +234,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information
+        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.
 
     </p>
   </div>
@@ -229,16 +251,35 @@
   
 
 
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

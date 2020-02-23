@@ -17,43 +17,33 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'en',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
 
+  
+  
     
 
   
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: white" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -90,7 +80,11 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
 </ul>
 
             
@@ -172,7 +166,7 @@
 <span id="otter-containers-module"></span><h2>otter.containers module<a class="headerlink" href="#module-otter.containers" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="otter.containers.grade_assignments">
-<code class="descclassname">otter.containers.</code><code class="descname">grade_assignments</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>id</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>scripts=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.grade_assignments" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">otter.containers.</code><code class="descname">grade_assignments</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>id</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>scripts=False</em>, <em>no_kill=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.grade_assignments" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -194,7 +188,7 @@
 
 <dl class="function">
 <dt id="otter.containers.launch_parallel_containers">
-<code class="descclassname">otter.containers.</code><code class="descname">launch_parallel_containers</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>num_containers=None</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>scripts=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.launch_parallel_containers" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">otter.containers.</code><code class="descname">launch_parallel_containers</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>num_containers=None</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>scripts=False</em>, <em>no_kill=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.launch_parallel_containers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grades notebooks in parallel docker containers</p>
 </dd></dl>
 
@@ -225,7 +219,7 @@ and transforms the node accordingly.</p>
 
 <dl class="class">
 <dt id="otter.gofer.OKTest">
-<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">OKTest</code><span class="sig-paren">(</span><em>name</em>, <em>tests</em>, <em>value=1</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTest" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">OKTest</code><span class="sig-paren">(</span><em>name</em>, <em>tests</em>, <em>value=1</em>, <em>hidden=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A single DocTest defined by OKPy.
 Instances of this class are callable. When called, it takes
@@ -241,13 +235,23 @@ doctest, so we roll with it.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="otter.gofer.OKTest.result_fail_template">
-<code class="descname">result_fail_template</code><em class="property"> = &lt;Template memory:10e7db588&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.result_fail_template" title="Permalink to this definition">¶</a></dt>
+<dt id="otter.gofer.OKTest.html_result_fail_template">
+<code class="descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:10e8da828&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="otter.gofer.OKTest.result_pass_template">
-<code class="descname">result_pass_template</code><em class="property"> = &lt;Template memory:10e7b2438&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.result_pass_template" title="Permalink to this definition">¶</a></dt>
+<dt id="otter.gofer.OKTest.html_result_pass_template">
+<code class="descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:10f6bc7f0&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.gofer.OKTest.plain_result_fail_template">
+<code class="descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:10f6cbb70&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.gofer.OKTest.plain_result_pass_template">
+<code class="descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:10ea4a780&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -274,8 +278,13 @@ doctest, so we roll with it.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Displayable result from running OKTests</p>
 <dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.result_template">
-<code class="descname">result_template</code><em class="property"> = &lt;Template memory:10f5c4eb8&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.result_template" title="Permalink to this definition">¶</a></dt>
+<dt id="otter.gofer.OKTestsResult.html_result_template">
+<code class="descname">html_result_template</code><em class="property"> = &lt;Template memory:10f6cbda0&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.gofer.OKTestsResult.plain_result_template">
+<code class="descname">plain_result_template</code><em class="property"> = &lt;Template memory:10f6cbf98&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -599,7 +608,7 @@ script is passed in as a string</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information
+        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.
 
     </p>
   </div>
@@ -616,16 +625,35 @@ script is passed in as a string</p>
   
 
 
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

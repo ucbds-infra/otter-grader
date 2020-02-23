@@ -124,7 +124,7 @@ if __name__ == "__main__":
 				"visibility": ("visible", "hidden")[scores[key]["hidden"]]
 			}]
 			if "hint" in scores[key]:
-				output["tests"][-1]["output"] = remove_html_in_hint(scores[key]["hint"])
+				output["tests"][-1]["output"] = repr(scores[key]["hint"])
 	output["visibility"] = "hidden"
 
 	if POINTS_POSSIBLE is not None:
