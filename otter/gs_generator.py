@@ -32,6 +32,9 @@ pip3 install -r /autograder/source/requirements.txt
 """
 
 def main():
+	"""
+	Main function for configuring a Gradescope based autograder.
+	"""
 	# TODO: add overriding max points
 	parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
 	parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")

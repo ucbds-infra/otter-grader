@@ -24,7 +24,8 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     """
     Grade a notebook file & return grade
 
-    This function grades a single ipython notebook using the provided tests.
+    This function grades a single ipython notebook using the provided tests. If grading a .py file,
+    set script to true. 
 
     Args:
         notebook_path (str): path to a single notebook
@@ -184,13 +185,13 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False)
     nb is passed in as a dictionary that's a parsed ipynb file
 
     Args:
-        nb (dict of str: int): json representation of ipython notebook
-        secret (str, optional): secret string for naming check function
+        nb (dict of str: str): json representation of ipython notebook
+        secret (str, optional): randomly generated integer used to rebind check function
         initial_env (str, optional): name of initial environment
-        ignore_errors (bool): whether exceptions should be ignored
+        ignore_errors (bool, optional): whether exceptions should be ignored
     
     Results:
-        dict: global environment resulting from executing all code of the input notebook
+        dict of str: object: global environment resulting from executing all code of the input notebook
     """
     with hide_outputs():
         if initial_env:
@@ -312,6 +313,9 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
         return global_env
 
 def main():
+    """
+    When executing this file from the command line, this function will be run.
+    """
     # implement argparser
 
     argparser = argparse.ArgumentParser()

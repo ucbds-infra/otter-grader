@@ -71,13 +71,29 @@ def hide_outputs():
 class CheckCallWrapper(ast.NodeTransformer):
     """NodeTransformer visits and replaces nodes in place.
     CheckCallWrapper finds nodes with check(..) and replaces it with
-    check_results_<secret>(check(...))"""
+    check_results_<secret>(check(...))
+    
+    Args:
+        secret (str): Random digits string that prevents check function from being modified
+    
+    Attributes:
+        secret (str): Random digits string that prevents check function from being modified
+
+    """
 
     def __init__(self, secret):
         self.secret = secret
 
     def node_constructor(self, expression):
-        """Creates node that wraps expression in a list (check_results_XX) append call"""
+        """Creates node that wraps expression in a list (check_results_XX) append call
+        
+        Args:
+            expression (ast.Name): Name for check function
+
+        Returns:
+            ast.Call: Function call object from calling check
+
+        """
         args = [expression]
         func = ast.Attribute(attr='append',
                              value=ast.Name(id='check_results_{}'.format(self.secret),
@@ -88,7 +104,15 @@ class CheckCallWrapper(ast.NodeTransformer):
 
     def visit_Call(self, node):
         """Function that handles whether a given function call is a 'check' call
-        and transforms the node accordingly."""
+        and transforms the node accordingly.
+        
+        Args:
+            node (ast.Call): Function call object, calling the check function
+
+        Returns:
+            ast.Call: Transformed version of input node
+
+        """
         # test case is if check is .check
         if isinstance(node.func, ast.Attribute):
             return node
@@ -105,6 +129,16 @@ def run_doctest(name, doctest_string, global_environment):
     Run a single test with given global_environment.
     Returns (True, '') if the doctest passes.
     Returns (False, failure_message) if the doctest fails.
+
+    Args:
+        name (str): Name of doctest
+        doctest_string (str): Doctest in string form
+        global_environment (dict of str: str): Global environment resulting from the execution
+            of a python script/notebook
+    
+    Returns:
+        (bool, str): Results from running the test
+
     """
     examples = doctest.DocTestParser().parse(
         doctest_string,
@@ -141,6 +175,23 @@ class OKTest:
     This makes tests not useful inside functions, methods or
     other scopes with local variables. This is a limitation of
     doctest, so we roll with it.
+
+    The last 2 attributes (passed, failed_test) are set after calling run().
+
+    Args:
+        name (str): Name of test
+        tests (:obj:`list` of :obj:`str`): List of docstring tests to be run
+        value (int, optional): Point value of this test, defaults to 1
+        hidden (bool, optional): Set true if this test should be hidden
+
+    Attributes:
+        name (str): Name of test
+        tests (:obj:`list` of :obj:`str`): List of docstring tests to be run
+        value (int): Point value of this test object, defaults to 1
+        hidden (bool): True if this test should be hidden
+        passed (bool): True if all tests passed
+        failed_test (str): Docstring of first failed test, if any
+
     """
     html_result_pass_template = Template("""
     <p><strong>{{ name }}</strong> passed!</p>
@@ -191,6 +242,15 @@ Test result:
         self.failed_test = None
 
     def run(self, global_environment):
+        """Runs tests on a given global_environment.
+        
+        Arguments:
+            global_environment (dict of str: str): Result of executing a python notebook/script
+        
+        Returns:
+            (bool, OKTest): Whether the test passed and a pointer to the current OKTest object
+
+        """
         for i, t in enumerate(self.tests):
             passed, result = run_doctest(self.name + ' ' + str(i), t, global_environment)
             if not passed:
@@ -204,7 +264,15 @@ Test result:
     @classmethod
     def from_file(cls, path):
         """
-            Parse a ok test file & return an OKTest
+        Parse an ok test file & return an OKTest
+
+        Args:
+            cls (OKTest): Uses this to create a new OKTest object from the given file
+            path (str): Path to ok test file
+
+        Returns:
+            OKTest: new OKTest object created from the given file
+
         """
         # ok test files are python files, with a global 'test' defined
         test_globals = {}
@@ -238,11 +306,33 @@ Test result:
         return cls(path, tests, test_spec.get('points', 1), test_spec.get('hidden', True))
 
 class OKTests:
+    """Test Class for Ok-style tests used to grade assignments.
+    
+    Args:
+        test_paths (:obj:`list` of :obj:`str`): List of paths to ok tests
+    
+    Attributes:
+        paths (:obj:`list` of :obj:`str`): List of paths to ok tests
+        tests (:obj:`list` of :obj:`OKTest`): List of OKTest objects for each path
+
+    """
     def __init__(self, test_paths):
         self.paths = test_paths
         self.tests = [OKTest.from_file(path) for path in self.paths if "__init__.py" not in path]
 
     def run(self, global_environment, include_grade=True):
+        """Run this object's tests on a given global environment (from running a notebook/script)
+        
+        Arguments:
+            global_environment (dict of str: str): Result of executing a python notebook/script
+                see grade.execute_notebook for more
+            include_grade (boolean, optional): Set true if grade should be included in result
+        
+        Returns:
+            OKTestsResult: Object resulting from running tests on GLOBAL_ENVIRONMENT, with grade,
+                tests passed, and more information.
+
+        """
         passed_tests = []
         failed_tests = []
         grade = 0
@@ -267,6 +357,25 @@ class OKTests:
 class OKTestsResult:
     """
     Displayable result from running OKTests
+
+    Args:
+        grade (float): Grade as a decimal in the range [0, 1]
+        paths (:obj:`list` of :obj:`str`): List of paths to ok tests
+        tests (:obj:`list` of :obj:`OKTest`): List of OKTest objects for each path
+        passed_tests (:obj:`list` of :obj:`str`): List of passed test docstrings
+        failed_tests (:obj:`list` of :obj:`str`, :obj:`OKTest`): List of failed test docstrings and
+            OKTest objects
+        include_grade (boolean, optional): Set true if grade should be included in result
+
+    Attributes:
+        grade (float): Grade as a decimal in the range [0, 1]
+        paths (:obj:`list` of :obj:`str`): List of paths to ok tests
+        tests (:obj:`list` of :obj:`OKTest`): List of OKTest objects for each path
+        passed_tests (:obj:`list` of :obj:`str`): List of passed test docstrings
+        failed_tests (:obj:`list` of :obj:`str`, :obj:`OKTest`): List of failed test docstrings and
+            OKTest objects
+        include_grade (boolean, optional): Set true if grade should be included in result
+
     """
     html_result_template = Template("""
     {% if include_grade %}
@@ -334,7 +443,18 @@ class OKTestsResult:
         )
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    """Used to generate a dynamic variable name for grading functions"""
+    """Used to generate a dynamic variable name for grading functions
+
+    This function generates a random name using the given length and character set.
+    
+    Args:
+        size (int): Length of output name
+        chars (str): Set of characters used to create function name
+    
+    Returns:
+        str: Randomized string name for grading function
+
+    """
     return ''.join(random.choice(chars) for _ in range(size))
 
 def check(test_file_path, global_env=None):
@@ -344,7 +464,15 @@ def check(test_file_path, global_env=None):
     function is used. The following two calls are equivalent:
     check('tests/q1.py')
     check('tests/q1.py', globals())
-    Returns a TestResult object.
+    
+    Args:
+        test_file_path (str): Path to ok test file
+        global_env (dict of str: str, optional): A global environment resulting from the execution 
+            of a python script or notebook.
+
+    Returns:
+        OKTestsResult: result of running the tests in the given global environment.
+
     """
     tests = OKTests([test_file_path])
 

@@ -14,7 +14,19 @@ from .utils import *
 FILENAME_REGEX = r"^.+\."
 
 class GradescopeParser:
-	"""Metadata parser for Gradescope exports"""
+	"""Metadata parser for Gradescope exports
+
+    Args:
+        submissions_dir (str): Path to directory with student submission files which contains 
+			the submission_metadata.yml file
+
+    Attributes:
+        _metadata (list): List of dictionaries with identifier and filename information for each
+			submitter
+		_file_to_id (dict): Mapping of filenames to identifiers
+		_id_to_file (dict): Mapping of identifiers to filenames
+
+	"""
 
 	def __init__(self, submissions_dir):
 		# open metadata file and load into Python object
@@ -26,13 +38,15 @@ class GradescopeParser:
 		for folder in metadata:
 			# copy submission contents into export root directory
 			for file in os.listdir(os.path.join(submissions_dir, folder)):
-				if os.path.isfile(os.path.join(submissions_dir, folder, file)) and file[-6:] == ".ipynb":
+				if os.path.isfile(os.path.join(submissions_dir, folder, file)) \
+					and file[-6:] == ".ipynb":
 					# create new filename
 					new_filename = re.sub(FILENAME_REGEX, folder + ".", file)
 
 					# ensure we are not overwriting another IPYNB file
 					assert not os.path.exists(os.path.join(submissions_dir, folder + ".ipynb")), \
-					"Extracting files from folder {} would overwrite another file in the submissions directory.".format(folder)
+					"Extracting files from folder {} would overwrite another file in the\
+					submissions directory.".format(folder)
 
 					# copy the file
 					shutil.copy(os.path.join(submissions_dir, folder, file), 
@@ -53,27 +67,69 @@ class GradescopeParser:
 		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
 
 	def get_metadata(self):
-		"""Returns mapping of identifiers to files"""
+		"""Returns mapping of identifiers to files
+		
+		Returns:
+			dict: List of dictionaries with identifier and filename information for each submitter
+
+		"""
 		return self._metadata
 
 	def file_to_id(self, file):
-		"""Returns a identifier given a filename"""
+		"""Returns a identifier given a filename
+		
+		Args:
+			file (str): Filename
+		
+		Returns:
+			str: identifier corresponding to filename
+
+		"""
 		return self._file_to_id[file]
 
 	def id_to_file(self, identifier):
-		"""Returns a filename given an identifier"""
+		"""Returns a filename given an identifier
+		
+		Args:
+			identifier (str): Identifier of a submitter
+
+		Returns:
+			str: filename of that submitter's submission
+		
+		"""
 		return self._id_to_file[identifier]
 
 	def get_identifiers(self):
-		"""Returns list of submission identifiers"""
+		"""Returns list of submission identifiers
+		
+		Returns:
+			list: all identifiers from this parser
+
+		"""
 		return [file["identifier"] for file in self._metadata]
 
 	def get_filenames(self):
-		"""Returns list of filenames in the submission directory"""
+		"""Returns list of filenames in the submission directory
+		
+		Returns:
+			list: all filenames from this parser
+
+		"""
 		return [file["filename"] for file in self._metadata]
 
 class CanvasParser:
-	"""Metadata parser for Canvas exports"""
+	"""Metadata parser for Canvas exports
+	
+	Args:
+        submissions_dir (str): Path to directory with student submission files
+
+    Attributes:
+        _metadata (list): List of dictionaries with identifier and filename information for each
+			submitter
+		_file_to_id (dict): Mapping of filenames to identifiers
+		_id_to_file (dict): Mapping of identifiers to filenames
+
+	"""
 	def __init__(self, submissions_dir):
 		# list all files in the submissions directory since Canvas
 		# doesn't output a metadata file
@@ -97,28 +153,70 @@ class CanvasParser:
 		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
 
 	def get_metadata(self):
-		"""Returns mapping of identifiers to files"""
+		"""Returns mapping of identifiers to files
+		
+		Returns:
+			dict: List of dictionaries with identifier and filename information for each submitter
+		
+		"""
 		return self._metadata
 
 	def file_to_id(self, file):
-		"""Returns a identifier given a filename"""
+		"""Returns a identifier given a filename
+		
+		Args:
+			file (str): Filename
+		
+		Returns:
+			str: Identifier corresponding to filename
+		
+		"""
 		return self._file_to_id[file]
 
 	def id_to_file(self, identifier):
-		"""Returns a filename given an identifier"""
+		"""Returns a filename given an identifier
+		
+		Args:
+			identifier (str): Identifier of a submitter
+
+		Returns:
+			str: filename of that submitter's submission
+		
+		"""
 		return self._id_to_file[identifier]
 
 	def get_identifiers(self):
-		"""Returns list of submission identifiers"""
+		"""Returns list of submission identifiers
+		
+		Returns:
+			list: all identifiers from this parser
+		
+		"""
 		return [file["identifier"] for file in self._metadata]
 
 	def get_filenames(self):
-		"""Returns list of filenames in the submission directory"""
+		"""Returns list of filenames in the submission directory
+		
+		Returns:
+			list: all filenames from this parser
+			
+		"""
 		return [file["filename"] for file in self._metadata]
 
 
 class JSONParser:
-	"""Metadata parser for JSON format"""
+	"""Metadata parser for JSON format
+	
+	Args:
+        submissions_dir (str): Path to directory with student submission files
+
+    Attributes:
+        _metadata (list): List of dictionaries with identifier and filename information for each
+			submitter
+		_file_to_id (dict): Mapping of filenames to identifiers
+		_id_to_file (dict): Mapping of identifiers to filenames
+	
+	"""
 	def __init__(self, file_path):
 		# open JSON file and load contents into a string
 		with open(file_path) as f:
@@ -141,27 +239,69 @@ class JSONParser:
 		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
 
 	def get_metadata(self):
-		"""Returns mapping of identifiers to files"""
+		"""Returns mapping of identifiers to files
+		
+		Returns:
+			dict: List of dictionaries with identifier and filename information for each submitter
+
+		"""
 		return self._metadata
 
 	def file_to_id(self, file):
-		"""Returns a identifier given a filename"""
+		"""Returns a identifier given a filename
+		
+		Args:
+			file (str): Filename
+		
+		Returns:
+			str: Identifier corresponding to filename
+		
+		"""
 		return self._file_to_id[file]
 
 	def id_to_file(self, identifier):
-		"""Returns a filename given an identifier"""
+		"""Returns a filename given an identifier
+		
+		Args:
+			identifier (str): Identifier of a submitter
+
+		Returns:
+			str: filename of that submitter's submission
+			
+		"""
 		return self._id_to_file[identifier]
 
 	def get_identifiers(self):
-		"""Returns list of submission identifiers"""
+		"""Returns list of submission identifiers
+		
+		Returns:
+			list: all identifiers from this parser
+			
+		"""
 		return [file["identifier"] for file in self._metadata]
 
 	def get_filenames(self):
-		"""Returns list of filenames in the submission directory"""
+		"""Returns list of filenames in the submission directory
+		
+		Returns:
+			list: all filenames from this parser
+		
+		"""
 		return [file["filename"] for file in self._metadata]
 
 class YAMLParser:
-	"""Metadata parser for YAML format"""
+	"""Metadata parser for YAML format
+	
+	Args:
+        submissions_dir (str): Path to directory with student submission files
+
+    Attributes:
+        _metadata (list): List of dictionaries with identifier and filename information for each
+			submitter
+		_file_to_id (dict): Mapping of filenames to identifiers
+		_id_to_file (dict): Mapping of identifiers to filenames
+
+	"""
 	def __init__(self, file_path):
 		# open the YAML file and parse with yaml library
 		with open(file_path) as f:
@@ -185,21 +325,52 @@ class YAMLParser:
 		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
 
 	def get_metadata(self):
-		"""Returns mapping of identifiers to files"""
+		"""Returns mapping of identifiers to files
+		
+		Returns:
+			dict: List of dictionaries with identifier and filename information for each submitter
+		
+		"""
 		return self._metadata
 
 	def file_to_id(self, file):
-		"""Returns a identifier given a filename"""
+		"""Returns a identifier given a filename
+		
+		Args:
+			file (str): Filename
+		
+		Returns:
+			str: Identifier corresponding to filename
+			
+		"""
 		return self._file_to_id[file]
 
 	def id_to_file(self, identifier):
-		"""Returns a filename given an identifier"""
+		"""Returns a filename given an identifier
+		
+		Args:
+			identifier (str): Identifier of a submitter
+
+		Returns:
+			str: filename of that submitter's submission
+		
+		"""
 		return self._id_to_file[identifier]
 
 	def get_identifiers(self):
-		"""Returns list of submission identifiers"""
+		"""Returns list of submission identifiers
+		
+		Returns:
+			list: all identifiers from this parser
+		
+		"""
 		return [file["identifier"] for file in self._metadata]
 
 	def get_filenames(self):
-		"""Returns list of filenames in the submission directory"""
+		"""Returns list of filenames in the submission directory
+		
+		Returns:
+			list: all filenames from this parser
+		
+		"""
 		return [file["filename"] for file in self._metadata]
