@@ -20,7 +20,7 @@ except ImportError:
     raise ImportError('IPython needs to be installed for notebook grading')
 
 # copied from https://github.com/data-8/Gofer-Grader/blob/master/gofer/ok.py#L210
-def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False):
+def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, gradescope=False):
     """
     Grade a notebook file & return grade
     """
@@ -54,7 +54,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     if script:
         global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors)
     else:
-        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors)
+        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope)
 
     test_results = global_env[results_array]
 
@@ -144,7 +144,7 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script):
 
     return result
 
-def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False):
+def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, gradescope=False):
     """
     Execute notebook & return the global environment that results from execution.
     TODO: write a note about the injection of check_results
@@ -187,7 +187,10 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False)
                                 if source_is_str_bool:
                                     code_lines.append('\n')
                             elif re.search(r"otter\.Notebook\(.*?\)", line):
-                                line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
+                                if gradescope:
+                                    line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
+                                else:
+                                    line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
                                 code_lines.append(line)
                                 if source_is_str_bool:
                                     code_lines.append('\n')

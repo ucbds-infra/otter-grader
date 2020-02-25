@@ -2,11 +2,6 @@ language: python
 python:
   - 3.6
   - 3.7
-  - "nightly"
-
-matrix:
-  allow_failures:
-    - python: "nightly"
 
 sudo: false
 
