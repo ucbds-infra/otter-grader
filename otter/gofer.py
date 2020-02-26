@@ -26,9 +26,9 @@ from pygments.formatters import HtmlFormatter
 def flush_inline_matplotlib_plots():
     """
     Flush matplotlib plots immediately, rather than asynchronously.
-    Basically, the inline backend only shows the plot after the entire 
+    Basically, the inline backend only shows the plot after the entire
     cell executes, which means we can't easily use a contextmanager to
-    suppress displaying it. See https://github.com/jupyter-widgets/ipywidgets/issues/1181/ 
+    suppress displaying it. See https://github.com/jupyter-widgets/ipywidgets/issues/1181/
     and https://github.com/ipython/ipython/issues/10376 for more details. This
     function displays flushes any pending matplotlib plots if we are using
     the inline backend.
@@ -89,9 +89,10 @@ class CheckCallWrapper(ast.NodeTransformer):
     def visit_Call(self, node):
         """Function that handles whether a given function call is a 'check' call
         and transforms the node accordingly."""
-        # test case is if check is .check
-        if isinstance(node.func, ast.Attribute):
-            return node
+        # Handle case where call is of the form `xxx.check()`
+        if isinstance(node.func, ast.Attribute) and node.func.attr == 'check':
+            return self.node_constructor(node)
+        # Handle case where call is of the form `check()`
         elif isinstance(node.func, ast.Name):
             if node.func.id == 'check':
                 return self.node_constructor(node)
@@ -298,7 +299,7 @@ class OKTestsResult:
     {% if passed_tests %}
     Tests passed: {% for passed_test in passed_tests %} {{ passed_test.name }} {% endfor %}{% endif %}
     {% if failed_tests %}
-    Tests failed: 
+    Tests failed:
     {% for failed_test, failed_test_obj in failed_tests %}
         {{ failed_test_obj.__repr__() }}
     {% endfor %}
