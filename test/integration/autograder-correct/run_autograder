@@ -33,6 +33,11 @@ if __name__ == "__main__":
 	for file in jsons:
 		shutil.copy(file, file[:-5])
 
+	# check for *.ipynb.html files
+	htmls = glob("*.ipynb.html")
+	for file in htmls:
+		shutil.copy(file, file[:-5])
+
 	nb_path = glob("*.ipynb")[0]
 
 	# fix utils import

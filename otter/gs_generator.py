@@ -23,7 +23,7 @@ sklearn
 jinja2
 nb2pdf
 tornado==5.1.1
-otter-grader==0.4.1{% if other_requirements %}
+otter-grader==0.4.2{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
@@ -67,6 +67,11 @@ if __name__ == "__main__":
 	# check for *.ipynb.json files
 	jsons = glob("*.ipynb.json")
 	for file in jsons:
+		shutil.copy(file, file[:-5])
+
+	# check for *.ipynb.html files
+	htmls = glob("*.ipynb.html")
+	for file in htmls:
 		shutil.copy(file, file[:-5])
 
 	nb_path = glob("*.ipynb")[0]
