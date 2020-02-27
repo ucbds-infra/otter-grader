@@ -7,11 +7,11 @@ import os
 import shutil
 import subprocess
 import re
-import pprint
 import pandas as pd
 
 SCORE_THRESHOLD = None
 POINTS_POSSIBLE = None
+SHOW_ALL_ON_RELEASE = False
 
 UTILS_IMPORT_REGEX = r"\"from utils import [\w\*, ]+"
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
@@ -62,9 +62,10 @@ if __name__ == "__main__":
 	for file in tests_glob:
 		shutil.copy(file, "/autograder/submission/tests")
 
-	scores = grade_notebook(nb_path, tests_glob, name="submission", ignore_errors=True, gradescope=True)
+	scores = grade_notebook(nb_path, tests_glob, name="submission", ignore_errors=True)
 	# del scores["TEST_HINTS"]
 
+	failed_test_output = "Failed Tests:"
 	output = {"tests" : []}
 	for key in scores:
 		if key != "total" and key != "possible":
@@ -76,7 +77,10 @@ if __name__ == "__main__":
 			}]
 			if "hint" in scores[key]:
 				output["tests"][-1]["output"] = repr(scores[key]["hint"])
-	output["visibility"] = "hidden"
+	# output["visibility"] = "hidden"
+	
+	if SHOW_ALL_ON_RELEASE:
+		output["stdout_visibility"] = "after_published"
 
 	if POINTS_POSSIBLE is not None:
 		output["score"] = scores["total"] / scores["possible"] * POINTS_POSSIBLE
