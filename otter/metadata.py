@@ -20,12 +20,6 @@ class GradescopeParser:
         submissions_dir (str): Path to directory with student submission files which contains 
 			the submission_metadata.yml file
 
-    Attributes:
-        _metadata (list): List of dictionaries with identifier and filename information for each
-			submitter
-		_file_to_id (dict): Mapping of filenames to identifiers
-		_id_to_file (dict): Mapping of identifiers to filenames
-
 	"""
 
 	def __init__(self, submissions_dir):
@@ -123,12 +117,6 @@ class CanvasParser:
 	Args:
         submissions_dir (str): Path to directory with student submission files
 
-    Attributes:
-        _metadata (list): List of dictionaries with identifier and filename information for each
-			submitter
-		_file_to_id (dict): Mapping of filenames to identifiers
-		_id_to_file (dict): Mapping of identifiers to filenames
-
 	"""
 	def __init__(self, submissions_dir):
 		# list all files in the submissions directory since Canvas
@@ -209,12 +197,6 @@ class JSONParser:
 	
 	Args:
         submissions_dir (str): Path to directory with student submission files
-
-    Attributes:
-        _metadata (list): List of dictionaries with identifier and filename information for each
-			submitter
-		_file_to_id (dict): Mapping of filenames to identifiers
-		_id_to_file (dict): Mapping of identifiers to filenames
 	
 	"""
 	def __init__(self, file_path):
@@ -294,12 +276,6 @@ class YAMLParser:
 	
 	Args:
         submissions_dir (str): Path to directory with student submission files
-
-    Attributes:
-        _metadata (list): List of dictionaries with identifier and filename information for each
-			submitter
-		_file_to_id (dict): Mapping of filenames to identifiers
-		_id_to_file (dict): Mapping of identifiers to filenames
 
 	"""
 	def __init__(self, file_path):

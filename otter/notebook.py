@@ -15,9 +15,6 @@ class Notebook:
 	Args:
 		test_dir (str, optional): Path to tests directory
 
-	Attributes:
-		_path (str): Path to tests directory
-
 	"""
 
 	def __init__(self, test_dir="./tests"):
