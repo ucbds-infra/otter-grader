@@ -17,44 +17,34 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'',
-              LANGUAGE:'en',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
 
+  
+  
     
 
   
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installation" href="install.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: white" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -91,7 +81,11 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tests.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
 </ul>
 
             
@@ -163,9 +157,10 @@
 <h1>Otter-Grader Documentation<a class="headerlink" href="#otter-grader-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p><a class="reference external" href="https://travis-ci.org/ucbds-infra/otter-grader"><img alt="Build Status" src="https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master" /></a>
-<a class="reference external" href="https://codecov.io/gh/ucbds-infra/otter-grader"><img alt="codecov" src="https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg" /></a>
-<a class="reference external" href="https://mybinder.org/v2/gh/ucbds-infra/otter-grader/master?filepath=demo%2Fdemo.ipynb"><img alt="Demo" src="https://mybinder.org/badge_logo.svg" /></a></p>
+<p><a class="reference external" href="https://travis-ci.org/ucbds-infra/otter-grader"><img alt="https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master" src="https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master" /></a>
+<a class="reference external" href="https://codecov.io/gh/ucbds-infra/otter-grader"><img alt="https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg" src="https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg" /></a>
+<a class="reference external" href="https://mybinder.org/v2/gh/ucbds-infra/otter-grader/master?filepath=demo%2Fdemo.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" /></a>
+<a class="reference external" href="https://join.slack.com/t/otter-grader/shared_invite/enQtOTM5MTQ0MzkwMTk0LTBiNWIzZTYxNDA2NDZmM2JkMzcwZjA4YWViNDM4ZTgyNDVhNDgwOTQ0NjNlZjcwNmY5YzJiZjZhZGNhNzc5MjA"><img alt="https://img.shields.io/endpoint?logo=slack&amp;url=https%3A%2F%2Fraw.githubusercontent.com%2Fucbds-infra%2Fotter-grader%2Fmaster%2Fslack-shields.json" src="https://img.shields.io/endpoint?logo=slack&amp;url=https%3A%2F%2Fraw.githubusercontent.com%2Fucbds-infra%2Fotter-grader%2Fmaster%2Fslack-shields.json" /></a></p>
 <p>Otter-grader is a new, open-source, local grader from the Division of Data Science, External Pedagogy Infrastructure at UC Berkeley. It is designed to be a scalable grader that utilizes temporal docker containers in order to remove the traditional overhead requirement of a live server.</p>
 </div>
 
@@ -187,7 +182,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information
+        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.
 
     </p>
   </div>
@@ -204,16 +199,35 @@
   
 
 
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

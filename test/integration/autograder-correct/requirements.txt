@@ -7,7 +7,8 @@ ipywidgets
 scipy
 seaborn
 sklearn
+jinja2
 nb2pdf
 tornado==5.1.1
-otter-grader==0.3.7
+otter-grader==0.4.2
 tqdm

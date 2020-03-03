@@ -1,5 +1,6 @@
 # Installation
 
+Otter is a Python package that can be installed using pip:
 
 ```
 pip install otter-grader
@@ -7,11 +8,11 @@ pip install otter-grader
 
 ## Docker
 
-Otter also requires you to have its Docker image installed, which is where it executes notebooks. The docker image can be installed in two ways:
+Otter uses Docker to create containers in which to run the students' submissions. Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks.
 
 ### Pull from DockerHub
 
-To pull the image from DockerHub, run `docker pull ucbdsinfra/otter-grader`.
+To pull the image from DockerHub, run `docker pull ucbdsinfra/otter-grader`. If you choose this method, otter will automatically use this image for you.
 
 ### Download the Dockerfile from GitHub
 

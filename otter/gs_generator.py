@@ -9,8 +9,9 @@ from glob import glob
 from subprocess import PIPE
 import subprocess
 import sys
+from jinja2 import Template
 
-REQUIREMENTS = """datascience
+REQUIREMENTS = Template("""datascience
 jupyter_client
 ipykernel
 matplotlib
@@ -19,10 +20,12 @@ ipywidgets
 scipy
 seaborn
 sklearn
+jinja2
 nb2pdf
 tornado==5.1.1
-otter-grader==0.3.7
-"""
+otter-grader==0.4.2{% if other_requirements %}
+{{ other_requirements }}{% endif %}
+""")
 
 SETUP_SH = """#!/usr/bin/env bash
 
@@ -31,28 +34,8 @@ apt-get install -y python3 python3-pip
 pip3 install -r /autograder/source/requirements.txt
 """
 
-def main():
-	"""
-	Main function for configuring a Gradescope based autograder.
-	"""
-	# TODO: add overriding max points
-	parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
-	parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")
-	parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")
-	parser.add_argument("-r", "--requirements", nargs='?', type=str, help="Path to requirements.txt file")
-	parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
-	parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
-	parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
-	params = vars(parser.parse_args())
+RUN_AUTOGRADER = Template("""#!/usr/bin/env python3
 
-	assert params["threshold"] is None or 0 <= params["threshold"] <= 1, "{} is not a valid threshold".format(
-		params["threshold"]
-	)
-
-	# format threshold
-	RUN_AUTOGRADER = """#!/usr/bin/env python3
-
-from otter.utils import remove_html_in_hint
 from otter.grade import grade_notebook
 from glob import glob
 import json
@@ -60,14 +43,14 @@ import os
 import shutil
 import subprocess
 import re
-import pprint
 import pandas as pd
 
-SCORE_THRESHOLD = """ + str(params["threshold"]) + """
-POINTS_POSSIBLE = """ + str(params["points"]) + """
+SCORE_THRESHOLD = {{ threshold }}
+POINTS_POSSIBLE = {{ points }}
+SHOW_ALL_ON_RELEASE = {{ show_all }}
 
-UTILS_IMPORT_REGEX = r"\\"from utils import [\\w\\*, ]+"
-NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\\(.+\\)"
+UTILS_IMPORT_REGEX = r"\\"from utils import [\w\*, ]+"
+NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
 
 if __name__ == "__main__":
 	# put files into submission directory
@@ -84,6 +67,11 @@ if __name__ == "__main__":
 	# check for *.ipynb.json files
 	jsons = glob("*.ipynb.json")
 	for file in jsons:
+		shutil.copy(file, file[:-5])
+
+	# check for *.ipynb.html files
+	htmls = glob("*.ipynb.html")
+	for file in htmls:
 		shutil.copy(file, file[:-5])
 
 	nb_path = glob("*.ipynb")[0]
@@ -118,6 +106,7 @@ if __name__ == "__main__":
 	scores = grade_notebook(nb_path, tests_glob, name="submission", ignore_errors=True)
 	# del scores["TEST_HINTS"]
 
+	failed_test_output = "Failed Tests:"
 	output = {"tests" : []}
 	for key in scores:
 		if key != "total" and key != "possible":
@@ -128,8 +117,11 @@ if __name__ == "__main__":
 				"visibility": ("visible", "hidden")[scores[key]["hidden"]]
 			}]
 			if "hint" in scores[key]:
-				output["tests"][-1]["output"] = remove_html_in_hint(scores[key]["hint"])
-	output["visibility"] = "hidden"
+				output["tests"][-1]["output"] = repr(scores[key]["hint"])
+	# output["visibility"] = "hidden"
+	
+	if SHOW_ALL_ON_RELEASE:
+		output["stdout_visibility"] = "after_published"
 
 	if POINTS_POSSIBLE is not None:
 		output["score"] = scores["total"] / scores["possible"] * POINTS_POSSIBLE
@@ -149,7 +141,32 @@ if __name__ == "__main__":
 		df.drop(columns=["output"], inplace=True)
 	# df.drop(columns=["hidden"], inplace=True)
 	print(df)
-"""
+""")
+
+def main():
+  """
+	Main function for configuring a Gradescope based autograder.
+	"""
+	parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
+	parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")
+	parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")
+	parser.add_argument("-r", "--requirements", nargs='?', type=str, help="Path to requirements.txt file")
+	parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
+	parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
+	parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
+	parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
+	params = vars(parser.parse_args())
+
+	assert params["threshold"] is None or 0 <= params["threshold"] <= 1, "{} is not a valid threshold".format(
+		params["threshold"]
+	)
+
+	# format run_autograder
+	run_autograder = RUN_AUTOGRADER.render(
+		threshold = str(params["threshold"]),
+		points = str(params["points"]),
+		show_all = str(params["show_results"])
+	)
 
 	# create tmp directory to zip inside
 	os.mkdir("./tmp")
@@ -159,22 +176,22 @@ if __name__ == "__main__":
 	for file in glob(os.path.join(params["tests-path"], "*.py")):
 		shutil.copy(file, os.path.join("tmp", "tests"))
 
-	reqs = REQUIREMENTS
-
 	if params["requirements"]:
 		with open(params["requirements"]) as f:
-			reqs += f.read()
+			requirements = REQUIREMENTS.render(
+				other_requirements = f.read()
+			)
 
 	# copy requirements into tmp
 	with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
-		f.write(reqs)
+		f.write(requirements)
 
 	# write setup.sh and run_autograder to tmp
 	with open(os.path.join(os.getcwd(), "tmp", "setup.sh"), "w+") as f:
 		f.write(SETUP_SH)
 
 	with open(os.path.join(os.getcwd(), "tmp", "run_autograder"), "w+") as f:
-		f.write(RUN_AUTOGRADER)
+		f.write(run_autograder)
 
 	# copy files into tmp
 	if len(params["files"]) > 0:
