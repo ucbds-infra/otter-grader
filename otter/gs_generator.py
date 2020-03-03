@@ -144,6 +144,9 @@ if __name__ == "__main__":
 """)
 
 def main():
+  """
+	Main function for configuring a Gradescope based autograder.
+	"""
 	parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
 	parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")
 	parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")

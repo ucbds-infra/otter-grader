@@ -11,6 +11,9 @@ from .containers import *
 from .utils import *
 
 def main():
+	"""
+	Main function for running otter from the command line.
+	"""
 	parser = argparse.ArgumentParser(description="""
 	Local autograder for Jupyter Notebooks and Python scripts. Launches parallel Docker containers to grade notebooks/scripts and returns a CSV of grades.
 	Requires a metadata file if not exported from Gradescope or Canvas. Add support files by putting them into the SUBMISSIONS-DIR folder or using the -f flag.
