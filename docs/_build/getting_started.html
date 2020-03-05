@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Test Files" href="tests_files.html" />
+    <link rel="next" title="Test Files" href="test_files.html" />
     <link rel="prev" title="Installation" href="install.html" /> 
 
   
@@ -87,7 +87,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#gradescope">Gradescope</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tests_files.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
@@ -163,7 +163,7 @@
 <p>Otter has two major use cases: grading on the instructor’s machine (local grading), and generating files to use Gradescope’s autograding infrastructure.</p>
 <div class="section" id="local-grading">
 <h2>Local Grading<a class="headerlink" href="#local-grading" title="Permalink to this headline">¶</a></h2>
-<p>Once you’ve <a class="reference internal" href="install.html"><span class="doc">installed otter</span></a>, get started by creating some <a class="reference internal" href="tests_files.html"><span class="doc">test cases</span></a> and creating a requirements.txt file (if necessary).</p>
+<p>Once you’ve <a class="reference internal" href="install.html"><span class="doc">installed otter</span></a>, get started by creating some <a class="reference internal" href="test_files.html"><span class="doc">test cases</span></a> and creating a requirements.txt file (if necessary).</p>
 <div class="section" id="collecting-student-submissions">
 <h3>Collecting Student Submissions<a class="headerlink" href="#collecting-student-submissions" title="Permalink to this headline">¶</a></h3>
 <p>The first major decision is how you’ll collect student submissions. You can collect these however you want, although otter has builtin compatibility with Gradescope and Canvas. If you choose either Gradescope or Canvas, just export the submissions and unzip that into some directory. If you are collecting another way, you’ll need to create a metadata file. You can use either JSON or YAML format, and the structure is pretty simple: each element needs to have a filename and a student identifier. A sample YAML metadata file would be:</p>
@@ -238,7 +238,7 @@
 </div>
 <div class="section" id="gradescope">
 <h2>Gradescope<a class="headerlink" href="#gradescope" title="Permalink to this headline">¶</a></h2>
-<p>To get started using otter with Gradescope, create some <a class="reference internal" href="tests_files.html"><span class="doc">test cases</span></a> and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:</p>
+<p>To get started using otter with Gradescope, create some <a class="reference internal" href="test_files.html"><span class="doc">test cases</span></a> and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">gradescope</span>
   <span class="o">|</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
   <span class="o">|</span> <span class="o">-</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
@@ -279,7 +279,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tests_files.html" class="btn btn-neutral float-right" title="Test Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="test_files.html" class="btn btn-neutral float-right" title="Test Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="install.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

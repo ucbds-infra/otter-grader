@@ -13,7 +13,7 @@
 
    install
    getting_started
-   tests_files
+   test_files
    metadata_files
    student_usage
    command-line
