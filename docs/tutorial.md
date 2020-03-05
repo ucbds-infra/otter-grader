@@ -1,4 +1,4 @@
-# Getting Started
+# Tutorial
 
 Otter has two major use cases: grading on the instructor's machine (local grading), and generating files to use Gradescope's autograding infrastructure.
 
@@ -127,4 +127,4 @@ After this command finishes running, you should have a file called `autograder.z
 
 To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
 
-You can find more information about Gradescope usage [here](gradescope.md)
+You can find more information about Gradescope usage [here](gradescope.md).

@@ -12,7 +12,7 @@
    :hidden:
 
    install
-   getting_started
+   tutorial
    test_files
    metadata_files
    student_usage
