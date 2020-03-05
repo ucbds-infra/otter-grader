@@ -82,10 +82,13 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tests.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
 </ul>
 
             
@@ -166,6 +169,8 @@
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
  
@@ -217,6 +222,10 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.OKTest.failed_test">failed_test (otter.gofer.OKTest attribute)</a>
+</li>
+      <li><a href="otter.html#otter.gofer.OKTestsResult.failed_tests">failed_tests (otter.gofer.OKTestsResult attribute)</a>
+</li>
       <li><a href="otter.html#otter.metadata.CanvasParser.file_to_id">file_to_id() (otter.metadata.CanvasParser method)</a>
 
       <ul>
@@ -271,6 +280,8 @@
         <li><a href="otter.html#otter.metadata.YAMLParser.get_metadata">(otter.metadata.YAMLParser method)</a>
 </li>
       </ul></li>
+      <li><a href="otter.html#otter.gofer.OKTestsResult.grade">grade (otter.gofer.OKTestsResult attribute)</a>
+</li>
       <li><a href="otter.html#otter.grade.grade">grade() (in module otter.grade)</a>
 </li>
       <li><a href="otter.html#otter.containers.grade_assignments">grade_assignments() (in module otter.containers)</a>
@@ -285,12 +296,14 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="otter.html#otter.gofer.hide_outputs">hide_outputs() (in module otter.gofer)</a>
+      <li><a href="otter.html#otter.gofer.OKTest.hidden">hidden (otter.gofer.OKTest attribute)</a>
 </li>
-      <li><a href="otter.html#otter.gofer.OKTest.html_result_fail_template">html_result_fail_template (otter.gofer.OKTest attribute)</a>
+      <li><a href="otter.html#otter.gofer.hide_outputs">hide_outputs() (in module otter.gofer)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.OKTest.html_result_fail_template">html_result_fail_template (otter.gofer.OKTest attribute)</a>
+</li>
       <li><a href="otter.html#otter.gofer.OKTest.html_result_pass_template">html_result_pass_template (otter.gofer.OKTest attribute)</a>
 </li>
       <li><a href="otter.html#otter.gofer.OKTestsResult.html_result_template">html_result_template (otter.gofer.OKTestsResult attribute)</a>
@@ -313,6 +326,10 @@
         <li><a href="otter.html#otter.metadata.YAMLParser.id_to_file">(otter.metadata.YAMLParser method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.OKTestsResult.include_grade">include_grade (otter.gofer.OKTestsResult attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -359,10 +376,12 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="otter.html#otter.gofer.CheckCallWrapper.node_constructor">node_constructor() (otter.gofer.CheckCallWrapper method)</a>
+      <li><a href="otter.html#otter.gofer.OKTest.name">name (otter.gofer.OKTest attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.CheckCallWrapper.node_constructor">node_constructor() (otter.gofer.CheckCallWrapper method)</a>
+</li>
       <li><a href="otter.html#otter.notebook.Notebook">Notebook (class in otter.notebook)</a>
 </li>
   </ul></td>
@@ -405,10 +424,20 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="otter.html#otter.gofer.OKTest.plain_result_fail_template">plain_result_fail_template (otter.gofer.OKTest attribute)</a>
+      <li><a href="otter.html#otter.gofer.OKTest.passed">passed (otter.gofer.OKTest attribute)</a>
 </li>
+      <li><a href="otter.html#otter.gofer.OKTestsResult.passed_tests">passed_tests (otter.gofer.OKTestsResult attribute)</a>
+</li>
+      <li><a href="otter.html#otter.gofer.OKTests.paths">paths (otter.gofer.OKTests attribute)</a>
+
+      <ul>
+        <li><a href="otter.html#otter.gofer.OKTestsResult.paths">(otter.gofer.OKTestsResult attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.OKTest.plain_result_fail_template">plain_result_fail_template (otter.gofer.OKTest attribute)</a>
+</li>
       <li><a href="otter.html#otter.gofer.OKTest.plain_result_pass_template">plain_result_pass_template (otter.gofer.OKTest attribute)</a>
 </li>
       <li><a href="otter.html#otter.gofer.OKTestsResult.plain_result_template">plain_result_template (otter.gofer.OKTestsResult attribute)</a>
@@ -432,8 +461,34 @@
   </ul></td>
 </tr></table>
 
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.CheckCallWrapper.secret">secret (otter.gofer.CheckCallWrapper attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.OKTest.tests">tests (otter.gofer.OKTest attribute)</a>
+
+      <ul>
+        <li><a href="otter.html#otter.gofer.OKTests.tests">(otter.gofer.OKTests attribute)</a>
+</li>
+        <li><a href="otter.html#otter.gofer.OKTestsResult.tests">(otter.gofer.OKTestsResult attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.gofer.OKTest.value">value (otter.gofer.OKTest attribute)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.html#otter.gofer.CheckCallWrapper.visit_Call">visit_Call() (otter.gofer.CheckCallWrapper method)</a>
 </li>

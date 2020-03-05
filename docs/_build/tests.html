@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Command Line Utility" href="command-line.html" />
+    <link rel="next" title="Metadata" href="metadata.html" />
     <link rel="prev" title="Getting Started" href="getting_started.html" /> 
 
   
@@ -89,6 +89,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#writing-ok-tests">Writing OK Tests</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="metadata.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
@@ -173,7 +174,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;q1&quot;</span><span class="p">,</span>       <span class="c1"># name of the test</span>
     <span class="s2">&quot;points&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>        <span class="c1"># number of points for the entire suite</span>
-    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>    <span class="c1"># whether the test is hidden on Gradescope</span>
+    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># whether the test is hidden on Gradescope</span>
     <span class="s2">&quot;suites&quot;</span><span class="p">:</span> <span class="p">[</span>         <span class="c1"># list of suites, only 1 suite allowed!</span>
         <span class="p">{</span>
             <span class="s2">&quot;cases&quot;</span><span class="p">:</span> <span class="p">[</span>                  <span class="c1"># list of test cases</span>
@@ -182,8 +183,8 @@
 <span class="s2">                    &gt;&gt;&gt; 1 == 1          # note that in any subsequence line of a multiline</span>
 <span class="s2">                    True                # statement, the prompt becomes ... (see below)</span>
 <span class="s2">                    &quot;&quot;&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>    <span class="c1"># ignored by otter</span>
-                    <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>    <span class="c1"># ignored by otter</span>
+                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># ignored by otter</span>
+                    <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># ignored by otter</span>
                 <span class="p">},</span> 
                 <span class="p">{</span>
                     <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
@@ -194,11 +195,11 @@
 <span class="s2">                    False</span>
 <span class="s2">                    False</span>
 <span class="s2">                    &quot;&quot;&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-                    <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
                 <span class="p">},</span> 
             <span class="p">],</span>
-            <span class="s2">&quot;scored&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>            <span class="c1"># ignored by otter</span>
+            <span class="s2">&quot;scored&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>            <span class="c1"># ignored by otter</span>
             <span class="s2">&quot;setup&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                <span class="c1"># ignored by otter</span>
             <span class="s2">&quot;teardown&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="c1"># ignored by otter</span>
             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;doctest&quot;</span>           <span class="c1"># the type of test; only &quot;doctest&quot; allowed</span>
@@ -222,7 +223,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="command-line.html" class="btn btn-neutral float-right" title="Command Line Utility" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="metadata.html" class="btn btn-neutral float-right" title="Metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="getting_started.html" class="btn btn-neutral" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

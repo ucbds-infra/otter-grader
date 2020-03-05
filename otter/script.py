@@ -14,11 +14,17 @@ import sys
 
 # Disable
 def blockPrint():
-    sys.stdout = open(os.devnull, 'w')
+	"""
+	Disables printing to stdout.
+	"""
+	sys.stdout = open(os.devnull, 'w')
 
 # Restore
 def enablePrint():
-    sys.stdout = sys.__stdout__
+	"""
+	Enables printing to stdout.
+	"""
+	sys.stdout = sys.__stdout__
 
 RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ scores|length - 2 }} tests passed
 {% if passed_tests %}

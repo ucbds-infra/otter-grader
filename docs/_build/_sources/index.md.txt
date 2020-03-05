@@ -13,10 +13,13 @@
 
    install
    getting_started
-   tests
+   test_files
+   metadata_files
+   student_usage
    command-line
    gradescope
    pdfs
+   The Otter API <otter>
 ```
 
 [![](https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master "Build Status")](https://travis-ci.org/ucbds-infra/otter-grader)
