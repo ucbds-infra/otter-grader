@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; Otter-Grader  documentation</title>
+  <title>Metadata &mdash; Otter-Grader  documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting Started" href="getting_started.html" />
-    <link rel="prev" title="Otter-Grader Documentation" href="index.html" /> 
+    <link rel="next" title="Command Line Utility" href="command-line.html" />
+    <link rel="prev" title="Test Files" href="tests.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,18 +81,13 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#docker">Docker</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tests_files.html">Test Files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">Test Files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
 </ul>
 
             
@@ -138,13 +133,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>Metadata</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/install.md.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/metadata.md.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -157,30 +152,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>Otter is a Python package that can be installed using pip:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">otter</span><span class="o">-</span><span class="n">grader</span>
-</pre></div>
-</div>
-<div class="section" id="docker">
-<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
-<p>Otter uses Docker to create containers in which to run the students’ submissions. Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks.</p>
-<div class="section" id="pull-from-dockerhub">
-<h3>Pull from DockerHub<a class="headerlink" href="#pull-from-dockerhub" title="Permalink to this headline">¶</a></h3>
-<p>To pull the image from DockerHub, run <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span> <span class="pre">ucbdsinfra/otter-grader</span></code>. If you choose this method, otter will automatically use this image for you.</p>
-</div>
-<div class="section" id="download-the-dockerfile-from-github">
-<h3>Download the Dockerfile from GitHub<a class="headerlink" href="#download-the-dockerfile-from-github" title="Permalink to this headline">¶</a></h3>
-<p>To install from the GitHub repo, follow the steps below:</p>
-<ol class="simple">
-<li>Clone the GitHub repo</li>
-<li><code class="docutils literal notranslate"><span class="pre">cd</span></code> into the <code class="docutils literal notranslate"><span class="pre">otter-grader/docker</span></code> directory</li>
-<li>Build the Docker image with this command: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">build</span> <span class="pre">.</span> <span class="pre">-t</span> <span class="pre">YOUR_DESIRED_IMAGE_NAME</span></code></li>
-</ol>
-<p><em>Note:</em> With this setup, you will need to pass in a custom docker image name when using the CLI with the <code class="docutils literal notranslate"><span class="pre">--image</span></code> flag.</p>
-</div>
-</div>
+  <div class="section" id="metadata">
+<h1>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -191,10 +164,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="command-line.html" class="btn btn-neutral float-right" title="Command Line Utility" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Otter-Grader Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="tests.html" class="btn btn-neutral" title="Test Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

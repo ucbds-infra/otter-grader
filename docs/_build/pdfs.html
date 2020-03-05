@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="otter package" href="otter.html" />
     <link rel="prev" title="Gradescope" href="gradescope.html" /> 
 
   
@@ -82,10 +83,16 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tests.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests_files.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">PDF Generation and Filtering</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PDF Generation and Filtering</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cell-filtering">Cell Filtering</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
 </ul>
 
             
@@ -152,6 +159,27 @@
             
   <div class="section" id="pdf-generation-and-filtering">
 <h1>PDF Generation and Filtering<a class="headerlink" href="#pdf-generation-and-filtering" title="Permalink to this headline">¶</a></h1>
+<p>When exporting IPython notebooks as PDFs, Otter uses the library nb2pdf that relies on nbpdfexport and chromium to export notebooks without pandoc or LaTeX. This requires that chromium be installed both in the Docker container being used for grading and on the JupyterHub distribution on which students export their notebooks from the <code class="docutils literal notranslate"><span class="pre">Notebook</span></code> API.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code> function encapsulates PDF generation on the student end, and by default filtering is turned on. To generate unfiltered PDFs with <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code>, set <code class="docutils literal notranslate"><span class="pre">filtering=False</span></code> in your call. To generate unfiltered PDFs from the command line, use the <code class="docutils literal notranslate"><span class="pre">--pdf</span></code> flag when calling <code class="docutils literal notranslate"><span class="pre">otter</span></code>.</p>
+<div class="section" id="cell-filtering">
+<h2>Cell Filtering<a class="headerlink" href="#cell-filtering" title="Permalink to this headline">¶</a></h2>
+<p>nb2pdf supports two different formats for filtering cells when exporting notebooks: using cell tags and using HTML comments.</p>
+<div class="section" id="cell-tag-filtering">
+<h3>Cell Tag Filtering<a class="headerlink" href="#cell-tag-filtering" title="Permalink to this headline">¶</a></h3>
+<p>When generating the PDF (if filtering is indicated by the <code class="docutils literal notranslate"><span class="pre">--tag-filter</span></code> flag or by setting <code class="docutils literal notranslate"><span class="pre">filter_type=&quot;tags&quot;</span></code> in <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code>), the following cells will be <strong>included</strong> in the export:</p>
+<ul class="simple">
+<li>All Markdown cells</li>
+<li>Code cells that have an image in their output</li>
+<li>All cells tagged with <code class="docutils literal notranslate"><span class="pre">include</span></code></li>
+</ul>
+<p>If you would like to override the behavior above, tag a cell with <code class="docutils literal notranslate"><span class="pre">ignore</span></code> and it will not be included.</p>
+</div>
+<div class="section" id="html-comment-filtering">
+<h3>HTML Comment Filtering<a class="headerlink" href="#html-comment-filtering" title="Permalink to this headline">¶</a></h3>
+<p>Alternatively, you can place HTML comments in Markdown cells to capture everything in between them in the output. To start a filtering group, place the comment <code class="docutils literal notranslate"><span class="pre">&lt;!--</span> <span class="pre">BEGIN</span> <span class="pre">QUESTION</span> <span class="pre">--&gt;</span></code> whereever you want to start exporting and place <code class="docutils literal notranslate"><span class="pre">&lt;!--</span> <span class="pre">END</span> <span class="pre">QUESTION</span> <span class="pre">--&gt;</span></code> at the end of the filtering group. Everything capture between these comments will be exported, and everything outside them removed. You can have multiple filtering groups in a notebook.</p>
+<p>This filtering behavior is triggered with the <code class="docutils literal notranslate"><span class="pre">--html-filter</span></code> flag or in the default behavior of <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code> (as the <code class="docutils literal notranslate"><span class="pre">filter_type</span></code> argument defaults to <code class="docutils literal notranslate"><span class="pre">&quot;html&quot;</span></code>).</p>
+</div>
+</div>
 </div>
 
 
@@ -161,6 +189,8 @@
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="otter.html" class="btn btn-neutral float-right" title="otter package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="gradescope.html" class="btn btn-neutral" title="Gradescope" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
