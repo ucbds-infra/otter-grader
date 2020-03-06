@@ -152,7 +152,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
     parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")
     parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")
-    parser.add_argument("-r", "--requirements", nargs='?', type=str, help="Path to requirements.txt file")
+    parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
     parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
     parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
     parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
@@ -178,11 +178,17 @@ def main():
     for file in glob(os.path.join(params["tests-path"], "*.py")):
         shutil.copy(file, os.path.join("tmp", "tests"))
 
-    if params["requirements"]:
+    if os.path.isfile(params["requirements"]):
         with open(params["requirements"]) as f:
             requirements = REQUIREMENTS.render(
                 other_requirements = f.read()
             )
+    elif params["requirements"] != "requirements.txt":
+        assert False, "requirements file {} not found".format(params["requirements"])
+    else:
+        requirements = REQUIREMENTS.render(
+            other_requirements = ""
+        )
 
     # copy requirements into tmp
     with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
