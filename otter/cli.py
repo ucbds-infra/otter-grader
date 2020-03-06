@@ -42,7 +42,7 @@ def main():
 	# other settings and optional arguments
 	parser.add_argument("-f", "--files", nargs="+", help="Specify support files needed to execute code (e.g. utils, data files)")
 	parser.add_argument("-v", "--verbose", action="store_true", help="Flag for verbose output")
-	parser.add_argument("-r", "--requirements", type=str, help="Flag for Python requirements file path")
+	parser.add_argument("-r", "--requirements", default="requirements.txt", type=str, help="Flag for Python requirements file path; ./requirements.txt automatically checked")
 	parser.add_argument("--containers", dest="num-containers", type=int, help="Specify number of containers to run in parallel")
 	parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
 	parser.add_argument("--no-kill", dest="no-kill", action="store_true", default=False, help="Do not kill containers after grading")
@@ -81,9 +81,14 @@ def main():
 			print("Found YAML metadata...")
 
 	# check that reqs file is valid
-	if params["requirements"]:
-		assert os.path.exists(params["requirements"]) and \
-			os.path.isfile(params["requirements"]), "Requirements file '{}' does not exist.".format(params["requirements"])
+	if not (os.path.exists(params["requirements"]) and os.path.isfile(params["requirements"])):
+		
+		# if user-specified requirements not found, fail with AssertionError
+		if params["requirements"] != "requirements.txt":
+			assert False, "requirements file {} does not exist".format(params["requirements"])
+
+		# else just set to None and reqs are ignored
+		params["requirements"] = None
 
 	if verbose:
 		print("Launching docker containers...")
