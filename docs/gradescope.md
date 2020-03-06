@@ -71,19 +71,19 @@ otter gen data.csv
 If we needed the requirements in `requirements.txt`, we would add
 
 ```
-otter -r requirements.txt data.csv
+otter gen -r requirements.txt data.csv
 ```
 
 Now let's say that we maintained to different directories of tests: `tests` with public versions of tests and `hidden-tests` with hidden versions. Because I want to grade with the hidden tests, my call then becomes
 
 ```
-otter -t hidden-tests -r requirements.txt data.csv
+otter gen -t hidden-tests -r requirements.txt data.csv
 ```
 
 Now let's say that I need some functions defined in `utils.py`; then I would add this to the last part of my `otter gen` call:
 
 ```
-otter -t hidden-tests -r requirements.txt data.csv utils.py
+otter gen -t hidden-tests -r requirements.txt data.csv utils.py
 ```
 
 **An important note about relative imports:** Because of the way that the Gradescope autograder is structured and in what directories files are executed, Otter only supports imports from a file called `utils.py` and this import *must* be of the form `from utils import *` in the notebook, otherwise the import will fail in the Gradescope autograder.
@@ -95,7 +95,7 @@ The Gradescope generator supports providing a pass/fail threshold. A threshold i
 The threshold is specified with the `--threshold` flag:
 
 ```
-otter -t hidden-tests -r requirements.txt data.csv --threshold 0.75
+otter gen -t hidden-tests -r requirements.txt data.csv --threshold 0.75
 ```
 
 For example, if a student passes a 2- and 1- point test but fails a 4-point test (a 43%) on a 25% threshold, they will get all 7 points. If they only pass the 1-point test (a 14%), they will get 0 points.
@@ -109,7 +109,7 @@ For example, if a student passes a 2- and 1- point test but fails a 4-point test
 As an example, the command below scales the number of points to 3:
 
 ```
-otter -t hidden-tests -r requirements.txt data.csv --points 3
+otter gen -t hidden-tests -r requirements.txt data.csv --points 3
 ```
 
 #### Showing Autograder Results
@@ -119,7 +119,7 @@ The generator lastly allows intructors to specify whether or not the stdout of t
 This behavior is turned off by default and can be turned on by passing the `--show-results` flag to `otter gen`.
 
 ```
-otter -t hidden-tests -r requirements.txt data.csv --show-results
+otter gen -t hidden-tests -r requirements.txt data.csv --show-results
 ```
 
 If `--show-results` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
