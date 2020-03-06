@@ -12,8 +12,8 @@
 
 import re
 
-CURRENT_VERSION = "0.4.2"
-NEW_VERSION = "0.4.3"
+CURRENT_VERSION = "0.4.3"
+NEW_VERSION = "0.4.4"
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "docker/Dockerfile",

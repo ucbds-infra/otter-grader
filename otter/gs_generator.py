@@ -23,7 +23,7 @@ sklearn
 jinja2
 nb2pdf
 tornado==5.1.1
-otter-grader==0.4.3{% if other_requirements %}
+otter-grader==0.4.4{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
@@ -51,8 +51,8 @@ SCORE_THRESHOLD = {{ threshold }}
 POINTS_POSSIBLE = {{ points }}
 SHOW_ALL_ON_RELEASE = {{ show_all }}
 
-UTILS_IMPORT_REGEX = r"\\"from utils import [\w\*, ]+"
-NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
+UTILS_IMPORT_REGEX = r"\\"from utils import [\\w\\*, ]+"
+NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\\(.+\\)"
 
 if __name__ == "__main__":
     # put files into submission directory
