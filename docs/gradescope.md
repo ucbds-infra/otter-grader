@@ -132,13 +132,13 @@ This section details how results are displayed to students and instructors on Gr
 
 Once a student's submission has been autograder, the Autograder Results page will show the stdout of the grading process in the "Autograder Output" box and the student's score in the side bar to the right of the output. The stdout includes a DataFrame that contains the student's score breakdown by question:
 
-![Gradescope Autograder Output](images/gradescope_autograder_output.png)
+![](images/gradescope_autograder_output.png)
 
 Below the autograder output, each test case is broken down into boxes. If there is no output for the box, then that test was passed. If a test is failed, then the usual test failure output is displayed.
 
-![Instructor Test Breakdown](images/gradescope_instructor_test_breakdown.png)
+![](images/gradescope_instructor_test_breakdown.png)
 
-Instructors will be able to see _all_ tests. The visibility of a test to students is indicated to instructors by the ![Hidden Test Icon](images/gradescope_hidden_test_icon.png) icon (all tests with this icon are hidden to students).
+Instructors will be able to see _all_ tests. The visibility of a test to students is indicated to instructors by the ![](images/gradescope_hidden_test_icon.png) icon (all tests with this icon are hidden to students).
 
 ### Student View
 
