@@ -82,7 +82,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
@@ -239,15 +239,15 @@
 </pre></div>
 </div>
 <p>If we needed the requirements in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>, we would add</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">gen</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
 </pre></div>
 </div>
 <p>Now let’s say that we maintained to different directories of tests: <code class="docutils literal notranslate"><span class="pre">tests</span></code> with public versions of tests and <code class="docutils literal notranslate"><span class="pre">hidden-tests</span></code> with hidden versions. Because I want to grade with the hidden tests, my call then becomes</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">gen</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
 </pre></div>
 </div>
 <p>Now let’s say that I need some functions defined in <code class="docutils literal notranslate"><span class="pre">utils.py</span></code>; then I would add this to the last part of my <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">gen</span></code> call:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="n">utils</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">gen</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="n">utils</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p><strong>An important note about relative imports:</strong> Because of the way that the Gradescope autograder is structured and in what directories files are executed, Otter only supports imports from a file called <code class="docutils literal notranslate"><span class="pre">utils.py</span></code> and this import <em>must</em> be of the form <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">utils</span> <span class="pre">import</span> <span class="pre">*</span></code> in the notebook, otherwise the import will fail in the Gradescope autograder.</p>
@@ -255,7 +255,7 @@
 <h4>Pass/Fail Thresholds<a class="headerlink" href="#pass-fail-thresholds" title="Permalink to this headline">¶</a></h4>
 <p>The Gradescope generator supports providing a pass/fail threshold. A threshold is passed as a float between 0 and 1 such that if a student receives at least that percentage of points, they will receive full points as their grade and 0 points otherwise.</p>
 <p>The threshold is specified with the <code class="docutils literal notranslate"><span class="pre">--threshold</span></code> flag:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">threshold</span> <span class="mf">0.75</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">gen</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">threshold</span> <span class="mf">0.75</span>
 </pre></div>
 </div>
 <p>For example, if a student passes a 2- and 1- point test but fails a 4-point test (a 43%) on a 25% threshold, they will get all 7 points. If they only pass the 1-point test (a 14%), they will get 0 points.</p>
@@ -265,7 +265,7 @@
 <p>By default, the number of points possible on Gradescope is the sum of the point values of each test. This value can be overrided, however, to some other value using the <code class="docutils literal notranslate"><span class="pre">--points</span></code> flag, which accepts an integer. Then the number of points awarded will be the provided points value scaled by the percentage of points awarded by the autograder.</p>
 <p>For example, if a student passes a 2- and 1- point test but fails a 4-point test, they will receive (2 + 1) / (2 + 1 + 4) * 2 = 0.8571 points out of a possible 2.</p>
 <p>As an example, the command below scales the number of points to 3:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">points</span> <span class="mi">3</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">gen</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">points</span> <span class="mi">3</span>
 </pre></div>
 </div>
 </div>
@@ -273,7 +273,7 @@
 <h4>Showing Autograder Results<a class="headerlink" href="#showing-autograder-results" title="Permalink to this headline">¶</a></h4>
 <p>The generator lastly allows intructors to specify whether or not the stdout of the grading process (anything printed to the console by the grader or the notebook) is shown to students. <strong>The stdout includes a summary of the student’s test results, including the points earned and possible of public <em>and</em> hidden tests, as well as the visibility of tests as indicated by <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code>.</strong></p>
 <p>This behavior is turned off by default and can be turned on by passing the <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> flag to <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">gen</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">results</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">gen</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">results</span>
 </pre></div>
 </div>
 <p>If <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> is passed, the stdout will be made available to students <em>only after grades are published on Gradescope</em>. The <a class="reference external" href="#gradescope-results">next section</a> details more about what is included in the stdout.</p>
@@ -286,10 +286,10 @@
 <div class="section" id="instructor-view">
 <h3>Instructor View<a class="headerlink" href="#instructor-view" title="Permalink to this headline">¶</a></h3>
 <p>Once a student’s submission has been autograder, the Autograder Results page will show the stdout of the grading process in the “Autograder Output” box and the student’s score in the side bar to the right of the output. The stdout includes a DataFrame that contains the student’s score breakdown by question:</p>
-<p><img alt="Gradescope Autograder Output" src="_images/gradescope_autograder_output.png" /></p>
+<p><img alt="_images/gradescope_autograder_output.png" src="_images/gradescope_autograder_output.png" /></p>
 <p>Below the autograder output, each test case is broken down into boxes. If there is no output for the box, then that test was passed. If a test is failed, then the usual test failure output is displayed.</p>
-<p><img alt="Instructor Test Breakdown" src="_images/gradescope_instructor_test_breakdown.png" /></p>
-<p>Instructors will be able to see <em>all</em> tests. The visibility of a test to students is indicated to instructors by the <img alt="Hidden Test Icon" src="_images/gradescope_hidden_test_icon.png" /> icon (all tests with this icon are hidden to students).</p>
+<p><img alt="_images/gradescope_instructor_test_breakdown.png" src="_images/gradescope_instructor_test_breakdown.png" /></p>
+<p>Instructors will be able to see <em>all</em> tests. The visibility of a test to students is indicated to instructors by the <img alt="_images/gradescope_hidden_test_icon.png" src="_images/gradescope_hidden_test_icon.png" /> icon (all tests with this icon are hidden to students).</p>
 </div>
 <div class="section" id="student-view">
 <h3>Student View<a class="headerlink" href="#student-view" title="Permalink to this headline">¶</a></h3>

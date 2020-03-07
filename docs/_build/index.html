@@ -81,7 +81,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
 <li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
@@ -153,18 +153,29 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <!-- .. nbforms documentation master file, created by
-   sphinx-quickstart on Fri Jan 24 22:12:36 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive. --><div class="section" id="otter-grader-documentation">
+  <div class="section" id="otter-grader-documentation">
 <h1>Otter-Grader Documentation<a class="headerlink" href="#otter-grader-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p><a class="reference external" href="https://travis-ci.org/ucbds-infra/otter-grader"><img alt="https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master" src="https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master" /></a>
 <a class="reference external" href="https://codecov.io/gh/ucbds-infra/otter-grader"><img alt="https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg" src="https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg" /></a>
-<a class="reference external" href="https://mybinder.org/v2/gh/ucbds-infra/otter-grader/master?filepath=demo%2Fdemo.ipynb"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" /></a>
+<a class="reference external" href="https://otter-grader.readthedocs.io/en/latest/?badge=latest"><img alt="https://readthedocs.org/projects/otter-grader/badge/?version=latest" src="https://readthedocs.org/projects/otter-grader/badge/?version=latest" /></a>
 <a class="reference external" href="https://join.slack.com/t/otter-grader/shared_invite/enQtOTM5MTQ0MzkwMTk0LTBiNWIzZTYxNDA2NDZmM2JkMzcwZjA4YWViNDM4ZTgyNDVhNDgwOTQ0NjNlZjcwNmY5YzJiZjZhZGNhNzc5MjA"><img alt="https://img.shields.io/endpoint?logo=slack&amp;url=https%3A%2F%2Fraw.githubusercontent.com%2Fucbds-infra%2Fotter-grader%2Fmaster%2Fslack-shields.json" src="https://img.shields.io/endpoint?logo=slack&amp;url=https%3A%2F%2Fraw.githubusercontent.com%2Fucbds-infra%2Fotter-grader%2Fmaster%2Fslack-shields.json" /></a></p>
 <p>Otter-grader is a new, open-source, local grader from the Division of Data Science, External Pedagogy Infrastructure at UC Berkeley. It is designed to be a scalable grader that utilizes temporal docker containers in order to remove the traditional overhead requirement of a live server.</p>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>The documentation for Otter can be found <a class="reference external" href="https://otter-grader.rtfd.io">here</a>.</p>
+</div>
+<div class="section" id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h2>
+<p><strong>v0.4.3:</strong></p>
+<ul class="simple">
+<li>fixed dead link in <a class="reference external" href="docs/gradescope">docs/gradescope.md</a></li>
+<li>updated to Python 3.7 in setup.sh for Gradescope</li>
+<li>made <code class="docutils literal notranslate"><span class="pre">otter</span></code> and <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">gen</span></code> CLIs find <code class="docutils literal notranslate"><span class="pre">./requirements.txt</span></code> automatically if it exists</li>
+<li>fix bug where GS generator fails if no <code class="docutils literal notranslate"><span class="pre">-r</span></code> flag specified</li>
+</ul>
+</div>
 </div>
 
 

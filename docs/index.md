@@ -32,7 +32,7 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
 **v0.4.3:**
 
-* fixed dead link in [docs/gradescope.md](docs/gradescope.md)
+* fixed dead link in documentation
 * updated to Python 3.7 in setup.sh for Gradescope
 * made `otter` and `otter gen` CLIs find `./requirements.txt` automatically if it exists
 * fix bug where GS generator fails if no `-r` flag specified

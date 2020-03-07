@@ -25,7 +25,7 @@ grader.check("q1")
 
 will run the test `q1.py` in the tests directory. If a test passes, then the cell displays "All tests passed!" If the test fails, then the details of the first failing test are printed out, including the test code, expected output, and actual output:
 
-![Failed Test](images/student_usage_failed_test.png)
+![](images/student_usage_failed_test.png)
 
 Students can also run all tests in the tests directory at once using `Notebook.check_all`:
 
