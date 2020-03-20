@@ -8,6 +8,7 @@
 
    install
    tutorial
+   using_otter
    test_files
    metadata_files
    student_usage
