@@ -1,6 +1,6 @@
 # Tutorial
 
-This tutorial can help you to verify that you have installed Otter correctly and introduce you to the general Otter workflow. Once you have [installed](install.md) Otter, download [this zipfile](https://raw.githubusercontent.com/ucbds-infra/otter-grader/docs/tutorial/tutorial.zip) and unzip it into some directory on your machine; I'll unzip it into my home directory, so that I have the following structure:
+This tutorial can help you to verify that you have installed Otter correctly and introduce you to the general Otter workflow. Once you have [installed](install.md) Otter, download [this zipfile](https://github.com/ucbds-infra/otter-grader/raw/master/docs/tutorial/tutorial.zip) and unzip it into some directory on your machine; I'll unzip it into my home directory, so that I have the following structure:
 
 ```
 | ~
