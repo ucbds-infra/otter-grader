@@ -15,7 +15,7 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
 **v0.4.4:**
 
-* fixed bug template escape bug in [otter/gradescope.py](otter/gradescope.py)
+* fixed bug template escape bug in [otter/gs_generator.py](otter/gs_generator.py)
 
 **v0.4.3:**
 
