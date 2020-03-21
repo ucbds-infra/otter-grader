@@ -13,6 +13,10 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
 ## Changelog
 
+**v0.4.4:**
+
+* fixed bug template escape bug in [otter/gradescope.py](otter/gradescope.py)
+
 **v0.4.3:**
 
 * fixed dead link in [docs/gradescope.md](docs/gradescope.md)
