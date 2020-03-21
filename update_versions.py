@@ -49,5 +49,17 @@ def main():
     with open("setup.py", "w") as f:
         f.write(contents)
 
+    with open("otter/__init__.py") as f:
+        contents = f.read()
+
+    contents = re.sub(
+        "__version__ = \"{}\",".format(CURRENT_VERSION),
+        "__version__ = \"{}\",".format(NEW_VERSION),
+        contents
+    )
+
+    with open("otter/__init__.py", "w") as f:
+        f.write(contents)
+
 if __name__ == "__main__":
     main()
