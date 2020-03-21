@@ -260,7 +260,10 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         cleaned_source = compile(tree, filename="nb-ast", mode="exec")
         try:
             with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
-                exec(cleaned_source, global_env)
+                # patch otter.Notebook.export so that we don't create PDFs in notebooks
+                m = mock.mock_open()
+                with mock.patch('otter.Notebook.export', m):
+                    exec(cleaned_source, global_env)
         except:
             if not ignore_errors:
                 raise
