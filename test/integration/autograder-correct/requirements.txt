@@ -10,5 +10,5 @@ sklearn
 jinja2
 nb2pdf
 tornado==5.1.1
-otter-grader==0.4.4
+otter-grader==0.4.5
 tqdm
