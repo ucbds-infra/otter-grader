@@ -198,7 +198,10 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
             global_env = initial_env.copy()
         else:
             global_env = {}
+
         source = ""
+        if gradescope:
+            source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
 
         # Before rewriting AST, find cells of code that generate errors.
         # One round of execution is done beforehand to mimic the Jupyter notebook style of running
@@ -240,7 +243,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                     # patch otter.Notebook.export so that we don't create PDFs in notebooks
                     m = mock.mock_open()
                     with mock.patch('otter.Notebook.export', m):
-                        exec(cell_source, global_env)
+                        exec(source + cell_source, global_env)
                     source += cell_source
                 except:
                     if not ignore_errors:
