@@ -105,7 +105,7 @@ if __name__ == "__main__":
     for file in tests_glob:
         shutil.copy(file, "/autograder/submission/tests")
 
-    scores = grade_notebook(nb_path, tests_glob, name="submission", ignore_errors=True)
+    scores = grade_notebook(nb_path, tests_glob, name="submission", gradescope=True, ignore_errors=True)
     # del scores["TEST_HINTS"]
 
     failed_test_output = "Failed Tests:"
