@@ -16,6 +16,7 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 **v0.4.5:**
 
 * added missing patch of `otter.Notebook.export` in [otter/grade.py](otter/grade.py)
+* fixed relative import issue when running on Gradescope
 
 **v0.4.4:**
 
