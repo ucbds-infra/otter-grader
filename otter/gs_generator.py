@@ -23,7 +23,7 @@ sklearn
 jinja2
 nb2pdf
 tornado==5.1.1
-otter-grader==0.4.5{% if other_requirements %}
+otter-grader==0.4.6{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 

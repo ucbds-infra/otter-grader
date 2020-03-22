@@ -13,6 +13,8 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
 ## Changelog
 
+**v0.4.6:** re-release of v0.4.5
+
 **v0.4.5:**
 
 * added missing patch of `otter.Notebook.export` in [otter/grade.py](otter/grade.py)
