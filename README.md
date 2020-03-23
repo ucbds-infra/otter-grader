@@ -13,6 +13,10 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
 ## Changelog
 
+**v0.4.7:**
+
+* fix relative import issue on Gradescope (again, *sigh*)
+
 **v0.4.6:** re-release of v0.4.5
 
 **v0.4.5:**

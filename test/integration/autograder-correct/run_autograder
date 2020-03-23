@@ -48,7 +48,7 @@ if __name__ == "__main__":
         with open(nb_path, "r", encoding="utf-8") as f:
             contents = f.read()
 
-    contents = re.sub(UTILS_IMPORT_REGEX, "\"from .utils import *", contents)
+    # contents = re.sub(UTILS_IMPORT_REGEX, "\"from .utils import *", contents)
     contents = re.sub(NOTEBOOK_INSTANCE_REGEX, "otter.Notebook()", contents)
 
     try:
