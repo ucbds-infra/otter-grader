@@ -83,8 +83,6 @@ Now let's say that I need some functions defined in `utils.py`; then I would add
 otter gen -t hidden-tests data.csv utils.py
 ```
 
-**An important note about relative imports:** Because of the way that the Gradescope autograder is structured and in what directories files are executed, Otter only supports imports from a file called `utils.py` and this import *must* be of the form `from utils import *` in the notebook, otherwise the import will fail in the Gradescope autograder.
-
 #### Pass/Fail Thresholds
 
 The Gradescope generator supports providing a pass/fail threshold. A threshold is passed as a float between 0 and 1 such that if a student receives at least that percentage of points, they will receive full points as their grade and 0 points otherwise. 
