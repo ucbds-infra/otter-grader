@@ -5,10 +5,10 @@ matplotlib
 pandas
 ipywidgets
 scipy
-tqdm
-codecov
+seaborn
+sklearn
 jinja2
-docker
 nb2pdf
 tornado==5.1.1
 otter-grader==0.4.6
+tqdm

@@ -5,8 +5,26 @@ import subprocess
 from subprocess import PIPE
 from glob import glob
 from otter import Notebook
+import docker
+from io import BytesIO
+from jinja2 import Template
+
+GRADESCOPE_TEST_DOCKERFILE = Template("""
+FROM gradescope/auto-builds
+RUN apt-get update && apt-get install -y curl unzip dos2unix && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN mkdir -p /autograder/source
+ADD {{ abs_path }}/test/autograder.zip /tmp/autograder.zip
+RUN unzip -d /autograder/source /tmp/autograder.zip
+RUN cp /autograder/source/run_autograder /autograder/run_autograder
+RUN dos2unix /autograder/run_autograder /autograder/source/setup.sh
+RUN chmod +x /autograder/run_autograder
+RUN apt-get update && bash /autograder/source/setup.sh && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN mkdir /autograder/submission
+ADD {{ abs_path }}/test/integration/manual-test/test-nb-0.ipynb /autograder/submission/test-nb-0.ipynb
+""")
 
 class TestIntegration(unittest.TestCase):
+    
     @classmethod
     def setUpClass(cls):
         create_image_cmd = ["make", "docker-test"]
@@ -88,7 +106,7 @@ class TestIntegration(unittest.TestCase):
         # assert cleanup worked
         self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
 
-    def test_gs_generator(self):
+    def test_gs_generator(self, cleanup=True):
         """
         Check that the correct zipfile is created by gs_generator.py
         """
@@ -123,12 +141,49 @@ class TestIntegration(unittest.TestCase):
                         with open(correct_file_path) as g:
                             self.assertEqual(f.read(), g.read(), "{} does not match {}".format(subfile, correct_file_path))
 
+        if cleanup:
+            # cleanup files
+            cleanup_command = ["rm", "-rf", "test/autograder", "test/autograder.zip"]
+            cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
+
+            # assert cleanup worked
+            self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
+
+    def test_gradescope(self):
+        """
+        Checks that the Gradescope autograder works
+        """
+        # print("running")
+        self.test_gs_generator(cleanup=False)
+        client = docker.from_env()
+        client.images.build(path="./test", pull=True, tag="otter-gradescope-test")
+        
+        container = client.containers.create("otter-gradescope-test")
+        container.exec_run("/autograder/run_autograder")
+
+        copy = subprocess.run(["docker", "cp", "{}:/autograder/results/results.json".format(container.id), "test/results.json"], stdout=PIPE, stderr=PIPE)
+        self.assertEqual(len(copy.stderr), 0, copy.stderr.decode("utf-8"))
+
+        container.remove()
+
         # cleanup files
-        cleanup_command = ["rm", "-rf", "test/autograder", "test/autograder.zip"]
+        cleanup_command = ["rm", "-rf", "test/autograder", "test/autograder.zip"]#, "test/results.json"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
 
         # assert cleanup worked
         self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
+
+# build = subprocess.run(["docker", "build", "./test", "-t", "otter-gradescope-test"], stdout=PIPE, stderr=PIPE)
+#         self.assertEqual(len(build.stderr), 0, build.stderr.decode("utf-8"))
+        
+#         client = docker.from_env()
+#         container = client.containers.create("otter-gradescope-test")
+#         container.exec_run("/autograder/run_autograder")
+
+#         copy = subprocess.run(["docker", "cp", "{}:/autograder/results/results.json".format(container.id), "test/results.json"], stdout=PIPE, stderr=PIPE)
+#         self.assertEqual(len(copy.stderr), 0, copy.stderr.decode("utf-8"))
+
+#         container.remove()
 
     def test_script_checker(self):
         """
