@@ -60,10 +60,10 @@ At this point, we need to make a decision: do we want PDFs? If there are questio
 Now that we've made all of these decisions, let's put our command together. Our command is:
 
 ```
-otter -p submissions -y meta.yml --pdf -r requirements.txt -v
+otter -p submissions -y meta.yml --pdf -v
 ```
 
-Note that we pass the `-r` flag to tell otter that we have a requirements.txt file that needs to be installed in the container, and the `-v` flag so that it prints verbose output. Once this command finishes running, you will end up with a new file and a new folder in your working directory:
+Note that Otter automatically found our requirements file at `./requirements.txt`. If it had been in a different location, we would have needed to pass the path to it to the `-r` flag. Note also that we pass the `-v` flag so that it prints verbose output. Once this command finishes running, you will end up with a new file and a new folder in your working directory:
 
 ```
 | grading
@@ -106,10 +106,10 @@ To get started using otter with Gradescope, create some [test cases](test_files.
 To create the zipfile for Gradescope, use the `otter gen` command after `cd`ing into the directory you created. For the directory above, once I've `cd`ed into `gradescope`, I would run the following to generate the zipfile:
 
 ```
-otter gen -r requirements.txt data.csv utils.py
+otter gen data.csv utils.py
 ```
 
-The `-r` flag indicates that we have additional requirements in a requirements.txt file and all of the additional files required are placed at the end of the command. Notice that we didn't indicate the path to the tests directory; this is because the default argument of the `-t` flag is `./tests`, so otter found them automatically.
+As above, Otter automatically found our requirements file at `./requirements.txt`. Notice also that we didn't indicate the path to the tests directory; this is because the default argument of the `-t` flag is `./tests`, so otter found them automatically.
 
 After this command finishes running, you should have a file called `autograder.zip` in the current working directory:
 

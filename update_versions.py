@@ -12,8 +12,8 @@
 
 import re
 
-CURRENT_VERSION = "0.4.5"
-NEW_VERSION = "0.4.6"
+CURRENT_VERSION = "0.4.6"
+NEW_VERSION = "0.4.7"
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "docker/Dockerfile",
@@ -53,8 +53,8 @@ def main():
         contents = f.read()
 
     contents = re.sub(
-        "__version__ = \"{}\",".format(CURRENT_VERSION),
-        "__version__ = \"{}\",".format(NEW_VERSION),
+        "__version__ = \"{}\"".format(CURRENT_VERSION),
+        "__version__ = \"{}\"".format(NEW_VERSION),
         contents
     )
 

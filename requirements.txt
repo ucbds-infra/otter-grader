@@ -11,4 +11,4 @@ jinja2
 docker
 nb2pdf
 tornado==5.1.1
-otter-grader==0.4.6
+otter-grader==0.4.7
