@@ -17,9 +17,10 @@ To use Otter with Gradescope's autograder, you must first generate a zipfile tha
 ### Before Using `otter gen`
 
 Before using `otter gen`, you should already have
+
 * written [tests](test_files.md) for the assignment
 * created a Gradescope autograder assignment
-* have collected extra requirements into a requirements.txt file (see [here](command-line.md#requirements)).
+* have collected extra requirements into a requirements.txt file (see [here](command-line.html#requirements)).
 
 ### Directory Structure
 
@@ -52,9 +53,9 @@ The general usage of `otter gen` is to create a zipfile at some output path (`-o
 |-----|-----|-----|
 | `-t`, `--tests-path` | `./tests` | Path to directory of tests |
 | `-o`, `--output-path` | `./` | Path at which to write the zipfile |
-| `-r`, `--requirements` |  | Path to requirements.txt file |
+| `-r`, `--requirements` | `./requirements.txt` | Path to requirements.txt file |
 
-If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, then it is assumed that there are no extra requirements. There is also an optional positional argument that goes at the end of the command, `files1, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts).
+If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts).
 
 The simplest usage in our example would be
 
@@ -68,22 +69,18 @@ This would create a zipfile with the tests in `./tests` and no extra requirement
 otter gen data.csv
 ```
 
-If we needed the requirements in `requirements.txt`, we would add
-
-```
-otter gen -r requirements.txt data.csv
-```
+Note that if we needed the requirements in `requirements.txt`, our call wouldn't change, since Otter automatically found `./requirements.txt`.
 
 Now let's say that we maintained to different directories of tests: `tests` with public versions of tests and `hidden-tests` with hidden versions. Because I want to grade with the hidden tests, my call then becomes
 
 ```
-otter gen -t hidden-tests -r requirements.txt data.csv
+otter gen -t hidden-tests data.csv
 ```
 
 Now let's say that I need some functions defined in `utils.py`; then I would add this to the last part of my `otter gen` call:
 
 ```
-otter gen -t hidden-tests -r requirements.txt data.csv utils.py
+otter gen -t hidden-tests data.csv utils.py
 ```
 
 **An important note about relative imports:** Because of the way that the Gradescope autograder is structured and in what directories files are executed, Otter only supports imports from a file called `utils.py` and this import *must* be of the form `from utils import *` in the notebook, otherwise the import will fail in the Gradescope autograder.
@@ -95,7 +92,7 @@ The Gradescope generator supports providing a pass/fail threshold. A threshold i
 The threshold is specified with the `--threshold` flag:
 
 ```
-otter gen -t hidden-tests -r requirements.txt data.csv --threshold 0.75
+otter gen -t hidden-tests data.csv --threshold 0.75
 ```
 
 For example, if a student passes a 2- and 1- point test but fails a 4-point test (a 43%) on a 25% threshold, they will get all 7 points. If they only pass the 1-point test (a 14%), they will get 0 points.
@@ -109,7 +106,7 @@ For example, if a student passes a 2- and 1- point test but fails a 4-point test
 As an example, the command below scales the number of points to 3:
 
 ```
-otter gen -t hidden-tests -r requirements.txt data.csv --points 3
+otter gen -t hidden-tests data.csv --points 3
 ```
 
 #### Showing Autograder Results
@@ -119,7 +116,7 @@ The generator lastly allows intructors to specify whether or not the stdout of t
 This behavior is turned off by default and can be turned on by passing the `--show-results` flag to `otter gen`.
 
 ```
-otter gen -t hidden-tests -r requirements.txt data.csv --show-results
+otter gen -t hidden-tests data.csv --show-results
 ```
 
 If `--show-results` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
@@ -147,4 +144,3 @@ On submission, students will only be able to see the results of those tests for 
 If `--show-results` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout.
 
 Note that, because some tests are hidden, students will never see the autograder score in the right sidebar; instead, their score will only show as a dash `-` out of the points possible. Therefore, the only way for students to calculate their autograder score is to use the DataFrame printed to the stdout if `--show-results` is passed.
-

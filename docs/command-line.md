@@ -31,7 +31,7 @@ The CLI, encapsulated in the `otter` command, runs the local grading process and
 | `--html-filter` |  | Generate PDFs filtered by HTML comments for manual grading |
 | `-f`, `--files` |  | Path to any support files needed for execution (e.g. data files) |
 | `-v`, `--verbose` |  | Write verbose output to console |
-| `-r`, `--requirements` |  | Path to requirements.txt file |
+| `-r`, `--requirements` | `./requirements.txt` | Path to requirements.txt file |
 | `--containers` | 4 | Number of parallel containers to launch; submissions will be divided evenly among them |
 | `--image` | ucbdsinfra/otter-grader | Docker image on which to grade submissions |
 | `--no-kill` |  | Prevents containers from being killed after execution for debugging |
@@ -127,9 +127,9 @@ The `ucbdsinfra/otter-grader` Docker image comes preinstalled with the following
 * nb2pdf
 * otter-grader
 
-If you require any packages not listed above, or among the dependencies of any packages above, you should create a requirements.txt file _containing only those packages_ and pass the path to this file to the `-r` flag.
+If you require any packages not listed above, or among the dependencies of any packages above, you should create a requirements.txt file _containing only those packages_. If this file is created in the working directory (i.e. `./requirements.txt`), then Otter will automatically find this file and include it. If this file is not at `./requirements.txt`, pass its path to the `-r` flag.
 
-For example, continuining the example about with the package SymPy, I would create a requirements.txt
+For example, continuining the example above with the package SymPy, I would create a requirements.txt
 
 ```
 | grading
@@ -156,8 +156,10 @@ sympy
 Now my `otter` call, using HTML comment filtered PDF generation this time, would become 
 
 ```
-otter -y meta.yml --html-filter -r requirements.txt
+otter -y meta.yml --html-filter
 ```
+
+Note the lack of the `-r` flag; since I created my requirements file in the working directory, Otter found it automatically.
 
 ### Grading Python Scripts
 
@@ -181,7 +183,7 @@ If I wanted to grade Python scripts instead of IPython notebooks, my call to `ot
 My call to grade these submissions would be
 
 ```
-otter -sy meta.yml -r requirements.txt
+otter -sy meta.yml
 ```
 
 **Note the lack of a PDF flag,** as it doesn't make sense to convert Python files to PDFs. PDF flags only work when grading IPython Notebooks.
@@ -189,6 +191,7 @@ otter -sy meta.yml -r requirements.txt
 ### Support Files
 
 Some notebooks require support files to run (e.g. data files). If your notebooks require any such files, there are two ways to get them into the container so that they are available to notebooks:
+
 * specifying paths to the files with the `-f` flag
 * putting them into the notebook path
 
@@ -214,7 +217,7 @@ Suppose that my notebooks in `grading` required `data.csv` in my `../data` direc
 I could pass this data into the container using the `otter` call 
 
 ```
-otter -y meta.yml -r requirements.txt -f ../data/data.csv
+otter -y meta.yml -f ../data/data.csv
 ```
 
 Or I could move (or copy) `data.csv` into `grading`:
@@ -243,7 +246,7 @@ $ mv ../data/data.csv ./
 and then just run `otter` as normal:
 
 ```
-otter -y meta.yml -r requirements.txt
+otter -y meta.yml
 ```
 
 All non-notebook files in the notebooks path are copied into all of the containers, so `data.csv` will be made available to all notebooks.
