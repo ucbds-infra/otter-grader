@@ -16,6 +16,7 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 **v0.4.8:**
 
 * added import of `IPython.display.display` to [otter/grade.py](otter/grade.py)
+* patched Gradescope metadata parser for group submissions
 
 **v0.4.7:**
 
