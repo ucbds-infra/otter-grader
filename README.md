@@ -13,6 +13,10 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
 ## Changelog
 
+**v0.4.8:**
+
+* added import of `IPython.display.display` to [otter/grade.py](otter/grade.py)
+
 **v0.4.7:**
 
 * fix relative import issue on Gradescope (again, *sigh*)
