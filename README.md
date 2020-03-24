@@ -13,10 +13,13 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
 ## Changelog
 
+**v0.4.8:**
+
+* patched Gradescope metadata parser for group submissions
+
 **v0.4.7:**
 
 * fix relative import issue on Gradescope (again, *sigh*)
-* patched Gradescope metadata parser for group submissions
 
 **v0.4.6:** re-release of v0.4.5
 
