@@ -13,6 +13,7 @@ import re
 import json
 import itertools
 from unittest import mock
+from IPython.display import display
 
 try:
     from IPython.core.inputsplitter import IPythonInputSplitter
