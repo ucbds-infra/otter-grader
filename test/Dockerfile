@@ -9,3 +9,4 @@ RUN chmod +x /autograder/run_autograder
 RUN apt-get update && bash /autograder/source/setup.sh && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN mkdir -p /autograder/submission
 ADD integration/manual-test/test-nb-0.ipynb /autograder/submission/test-nb-0.ipynb
+RUN mkdir -p /autograder/results
