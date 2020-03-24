@@ -56,8 +56,7 @@ class GradescopeParser:
 					"filename": folder + ".ipynb"
 				}]
 
-		# TODO: handle group subs in _file_to_id because second sub will overwrite first
-		self._file_to_id = {file["filename"] : file["identifier"] for file in self._metadata}
+		self._file_to_id = {file["filename"] : [i for i in file["identifier"]] for file in self._metadata}
 		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
 
 	def get_metadata(self):
@@ -79,7 +78,7 @@ class GradescopeParser:
 			str: identifier corresponding to filename
 
 		"""
-		return self._file_to_id[file]
+		return " ".join(self._file_to_id[file])
 
 	def id_to_file(self, identifier):
 		"""Returns a filename given an identifier
