@@ -38,7 +38,7 @@ pip3 install -r /autograder/source/requirements.txt
 
 RUN_AUTOGRADER = Template("""#!/usr/bin/env python3
 
-from otter.grade import grade_notebook
+from otter.execute import grade_notebook
 from glob import glob
 import json
 import os
@@ -145,29 +145,19 @@ if __name__ == "__main__":
     print(df)
 """)
 
-def main():
+def main(args):
     """
     Main function for configuring a Gradescope based autograder.
     """
-    parser = argparse.ArgumentParser(description="Generates zipfile to configure Gradescope autograder")
-    parser.add_argument("-t", "--tests-path", nargs='?', dest="tests-path", type=str, default="./tests/", help="Path to test files")
-    parser.add_argument("-o", "--output-path", nargs='?', dest="output-path", type=str, default="./", help="Path to which to write zipfile")
-    parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
-    parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
-    parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
-    parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
-    parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
-    params = vars(parser.parse_args())
-
-    assert params["threshold"] is None or 0 <= params["threshold"] <= 1, "{} is not a valid threshold".format(
-        params["threshold"]
+    assert args.threshold is None or 0 <= args.threshold <= 1, "{} is not a valid threshold".format(
+        args.threshold
     )
 
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
-        threshold = str(params["threshold"]),
-        points = str(params["points"]),
-        show_all = str(params["show_results"])
+        threshold = str(args.threshold),
+        points = str(args.points),
+        show_all = str(args.show_results)
     )
 
     # create tmp directory to zip inside
@@ -175,16 +165,16 @@ def main():
 
     # copy tests into tmp
     os.mkdir(os.path.join("tmp", "tests"))
-    for file in glob(os.path.join(params["tests-path"], "*.py")):
+    for file in glob(os.path.join(args.tests_path, "*.py")):
         shutil.copy(file, os.path.join("tmp", "tests"))
 
-    if os.path.isfile(params["requirements"]):
-        with open(params["requirements"]) as f:
+    if os.path.isfile(args.requirements):
+        with open(args.requirements) as f:
             requirements = REQUIREMENTS.render(
                 other_requirements = f.read()
             )
-    elif params["requirements"] != "requirements.txt":
-        assert False, "requirements file {} not found".format(params["requirements"])
+    elif args.requirements != "requirements.txt":
+        assert False, "requirements file {} not found".format(args.requirements)
     else:
         requirements = REQUIREMENTS.render(
             other_requirements = ""
@@ -202,20 +192,20 @@ def main():
         f.write(run_autograder)
 
     # copy files into tmp
-    if len(params["files"]) > 0:
+    if len(args.files) > 0:
         os.mkdir(os.path.join("tmp", "files"))
 
-        for file in params["files"]:
+        for file in args.files:
             if file == "gen":
                 continue
             shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))
 
     os.chdir("./tmp")
 
-    zip_cmd = ["zip", "-r", os.path.join("..", params["output-path"], "autograder.zip"), "run_autograder",
+    zip_cmd = ["zip", "-r", os.path.join("..", args.output_put, "autograder.zip"), "run_autograder",
                "setup.sh", "requirements.txt", "tests"]
 
-    if params["files"]:
+    if args.files:
         zip_cmd += ["files"]
 
     zipped = subprocess.run(zip_cmd, stdout=PIPE, stderr=PIPE)

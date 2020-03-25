@@ -157,9 +157,9 @@ scripts=False, no_kill=False):
     
     # Now we have the notebooks in home/notebooks, we should tell the container 
     # to execute the grade command....
-    # grade_command = ["docker", "exec", "-t", container_id, "python3", "/home/grade.py", 
+    # grade_command = ["docker", "exec", "-t", container_id, "python3", "/home/execute.py", 
     # "/home/notebooks"]
-    grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", \
+    grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.execute", \
         "/home/notebooks"]
 
     # if we want PDF output, add the necessary flag

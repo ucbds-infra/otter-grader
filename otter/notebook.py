@@ -26,7 +26,7 @@ class Notebook:
 		Args:
 			question (str): Name of question being graded
 			global_env (dict): Global environment resulting from execution of a single 
-				notebook/script (see grade.execute_notebook for more on this)
+				notebook/script (see execute.execute_notebook for more on this)
 
 		Returns:
 			OKTestsResult: Result of running gofer.check which contains grade, failed tests, and

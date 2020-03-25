@@ -3,7 +3,20 @@
 ######################################
 
 import os
+import sys
 import pandas as pd
+
+def block_print():
+	"""
+	Disables printing to stdout.
+	"""
+	sys.stdout = open(os.devnull, 'w')
+
+def enable_print():
+	"""
+	Enables printing to stdout.
+	"""
+	sys.stdout = sys.__stdout__
 
 def list_files(path):
 	"""Returns a list of all non-hidden files in a directory
