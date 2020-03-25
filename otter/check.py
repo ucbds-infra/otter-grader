@@ -22,6 +22,8 @@ Tests failed:
 {% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
 """)
 
+# TODO: accept notebooks
+
 
 def main(args):
 
@@ -32,11 +34,14 @@ def main(args):
 	else:
 		qs = glob(os.path.join(args.tests_path, "*.py"))
 
+	assert os.path.isfile(args.file), "{} is not a file".format(args.file)
+	assert args.file[-6:] == ".ipynb" or args.file[-3:] == ".py", "{} is not a Jupyter Notebook or Python file".format(args.file)
+
 	block_print()
 	results = grade_notebook(
 		args.file,
 		tests_glob=qs,
-		script=True
+		script=args.file[-3:] == ".py"
 	)
 	enable_print()
 
