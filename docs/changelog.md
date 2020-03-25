@@ -9,7 +9,7 @@
 * Made several fixes to `otter check`
 * Added indentation to results.json dump in Gradescope container
 * Added notebook checker to `otter check`
-* `otter generate` now removes tmp directory on failure
+* `otter generate` and `otter grade` now remove tmp directories on failure
 
 **v0.4.8:**
 

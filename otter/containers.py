@@ -54,43 +54,51 @@ def launch_parallel_containers(
     # calculate number of notebooks per container
     num_per_group = int(len(notebooks) / num_containers)
 
-    # create tmp directories and add non-notebook files
-    for i in range(num_containers):
-        os.mkdir(os.path.join(dir_path, "tmp{}".format(i)))
+    try:
+        # create tmp directories and add non-notebook files
+        for i in range(num_containers):
+            os.mkdir(os.path.join(dir_path, "tmp{}".format(i)))
 
-        # copy all non-notebook files into each tmp directory
-        for file in os.listdir(dir_path):
-            if os.path.isfile(os.path.join(dir_path, file)) and not file.endswith(file_extension):
-                shutil.copy(os.path.join(dir_path, file), os.path.join(dir_path, "tmp{}".format(i)))
+            # copy all non-notebook files into each tmp directory
+            for file in os.listdir(dir_path):
+                if os.path.isfile(os.path.join(dir_path, file)) and not file.endswith(file_extension):
+                    shutil.copy(os.path.join(dir_path, file), os.path.join(dir_path, "tmp{}".format(i)))
 
-    # copy notebooks in tmp directories
-    for k, v in enumerate(notebooks):
-        shutil.copy(v, os.path.join(dir_path, "tmp{}".format(k % num_containers)))
+        # copy notebooks in tmp directories
+        for k, v in enumerate(notebooks):
+            shutil.copy(v, os.path.join(dir_path, "tmp{}".format(k % num_containers)))
 
-    # execute containers in parallel
-    pool = ThreadPoolExecutor(num_containers)
-    futures = []
-    for i in range(num_containers):
-        futures += [pool.submit(grade_assignments, 
-            tests_dir, 
-            os.path.join(dir_path, "tmp{}".format(i)), 
-            str(i), 
-            verbose=verbose, 
-            unfiltered_pdfs=unfiltered_pdfs, 
-            tag_filter=tag_filter,
-            html_filter=html_filter,
-            reqs=reqs,
-            image=image,
-            scripts=scripts,
-            no_kill=no_kill
-        )]
+        # execute containers in parallel
+        pool = ThreadPoolExecutor(num_containers)
+        futures = []
+        for i in range(num_containers):
+            futures += [pool.submit(grade_assignments, 
+                tests_dir, 
+                os.path.join(dir_path, "tmp{}".format(i)), 
+                str(i), 
+                verbose=verbose, 
+                unfiltered_pdfs=unfiltered_pdfs, 
+                tag_filter=tag_filter,
+                html_filter=html_filter,
+                reqs=reqs,
+                image=image,
+                scripts=scripts,
+                no_kill=no_kill
+            )]
 
-    # stop execution while containers are running
-    finished_futures = wait(futures)
-
-    # clean up tmp directories
-    for i in range(num_containers):
-        shutil.rmtree(os.path.join(dir_path, "tmp{}".format(i)))
+        # stop execution while containers are running
+        finished_futures = wait(futures)
+    
+    # cleanup tmp directories on failure
+    except:
+        for i in range(num_containers):
+            shutil.rmtree(os.path.join(dir_path, "tmp{}".format(i)), ignore_errors=True)
+        raise
+    
+    # cleanup tmp directories
+    else:
+        for i in range(num_containers):
+            shutil.rmtree(os.path.join(dir_path, "tmp{}".format(i)))
 
     # return list of dataframes
     return [df.result() for df in finished_futures[0]]
