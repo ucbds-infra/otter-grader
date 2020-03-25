@@ -20,6 +20,7 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 * Changed filenames inside the package so that names match commands (e.g. `otter/cli.py` is now `otter/grade.py`)
 * Moved all argparse calls into `bin/otter`
 * Made several fixes to `otter check`
+* Added indentation to results.json dump in Gradescope container
 
 **v0.4.8:**
 

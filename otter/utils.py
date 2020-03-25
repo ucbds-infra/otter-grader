@@ -4,7 +4,14 @@
 
 import os
 import sys
+import pathlib
 import pandas as pd
+
+class StrPath(pathlib.Path):
+	def __truediv__(self, o):
+		if not isinstance(o, str):
+			return super(StrPath, self).__truediv__(o)
+		return super(StrPath, self).__truediv__(0).as_posix()
 
 def block_print():
 	"""

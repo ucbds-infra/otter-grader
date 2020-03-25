@@ -135,7 +135,7 @@ if __name__ == "__main__":
             output["score"] = 0
 
     with open("/autograder/results/results.json", "w+") as f:
-        json.dump(output, f)
+        json.dump(output, f, indent=4)
 
     print("\\n\\n")
     df = pd.DataFrame(output["tests"])
