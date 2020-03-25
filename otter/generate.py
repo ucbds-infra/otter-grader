@@ -164,61 +164,70 @@ def main(args):
     # create tmp directory to zip inside
     os.mkdir("./tmp")
 
-    # copy tests into tmp
-    os.mkdir(os.path.join("tmp", "tests"))
-    for file in glob(os.path.join(args.tests_path, "*.py")):
-        shutil.copy(file, os.path.join("tmp", "tests"))
+    try:
+        # copy tests into tmp
+        os.mkdir(os.path.join("tmp", "tests"))
+        for file in glob(os.path.join(args.tests_path, "*.py")):
+            shutil.copy(file, os.path.join("tmp", "tests"))
 
-    if os.path.isfile(args.requirements):
-        with open(args.requirements) as f:
+        if os.path.isfile(args.requirements):
+            with open(args.requirements) as f:
+                requirements = REQUIREMENTS.render(
+                    other_requirements = f.read()
+                )
+        elif args.requirements != "requirements.txt":
+            assert False, "requirements file {} not found".format(args.requirements)
+        else:
             requirements = REQUIREMENTS.render(
-                other_requirements = f.read()
+                other_requirements = ""
             )
-    elif args.requirements != "requirements.txt":
-        assert False, "requirements file {} not found".format(args.requirements)
+
+        # copy requirements into tmp
+        with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
+            f.write(requirements)
+
+        # write setup.sh and run_autograder to tmp
+        with open(os.path.join(os.getcwd(), "tmp", "setup.sh"), "w+") as f:
+            f.write(SETUP_SH)
+
+        with open(os.path.join(os.getcwd(), "tmp", "run_autograder"), "w+") as f:
+            f.write(run_autograder)
+
+        # copy files into tmp
+        if len(args.files) > 0:
+            os.mkdir(os.path.join("tmp", "files"))
+
+            for file in args.files:
+                if file == "gen":
+                    continue
+                shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))
+
+        os.chdir("./tmp")
+
+        zip_cmd = ["zip", "-r", os.path.join("..", args.output_path, "autograder.zip"), "run_autograder",
+                "setup.sh", "requirements.txt", "tests"]
+
+        if args.files:
+            zip_cmd += ["files"]
+
+        zipped = subprocess.run(zip_cmd, stdout=PIPE, stderr=PIPE)
+
+        if zipped.stderr.decode("utf-8"):
+            raise Exception(zipped.stderr.decode("utf-8"))
+
+        # move back to tmp parent directory
+        os.chdir("..")
+    
+    except:
+        # delete tmp directory
+        shutil.rmtree("tmp")
+
+        # raise the exception
+        raise
+    
     else:
-        requirements = REQUIREMENTS.render(
-            other_requirements = ""
-        )
-
-    # copy requirements into tmp
-    with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
-        f.write(requirements)
-
-    # write setup.sh and run_autograder to tmp
-    with open(os.path.join(os.getcwd(), "tmp", "setup.sh"), "w+") as f:
-        f.write(SETUP_SH)
-
-    with open(os.path.join(os.getcwd(), "tmp", "run_autograder"), "w+") as f:
-        f.write(run_autograder)
-
-    # copy files into tmp
-    if len(args.files) > 0:
-        os.mkdir(os.path.join("tmp", "files"))
-
-        for file in args.files:
-            if file == "gen":
-                continue
-            shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))
-
-    os.chdir("./tmp")
-
-    zip_cmd = ["zip", "-r", os.path.join("..", args.output_path, "autograder.zip"), "run_autograder",
-               "setup.sh", "requirements.txt", "tests"]
-
-    if args.files:
-        zip_cmd += ["files"]
-
-    zipped = subprocess.run(zip_cmd, stdout=PIPE, stderr=PIPE)
-
-    if zipped.stderr.decode("utf-8"):
-        raise Exception(zipped.stderr.decode("utf-8"))
-
-    # move back to tmp parent directory
-    os.chdir("..")
-
-    # delete tmp directory
-    shutil.rmtree("tmp")
+        # delete tmp directory
+        shutil.rmtree("tmp")
 
 if __name__ == "__main__":
     main()
