@@ -20,7 +20,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
 	],
 	install_requires=[
-		"pyyaml", "nbformat", "ipython", "nbconvert", "tqdm", "setuptools", "pandas", "nb2pdf", "tornado==5.1.1"
+		"pyyaml", "nbformat", "ipython", "nbconvert", "tqdm", "setuptools", "pandas", "nb2pdf"
 	],
 	scripts=["bin/otter"]
 )
