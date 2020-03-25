@@ -27,8 +27,7 @@ def main(args):
 
 	if args.question:
 		test_path = os.path.join(args.tests_path, args.question + ".py")
-		assert os.path.exists(test_path) and \
-			os.path.isfile(test_path), "Test {} does not exist".format(args.question)
+		assert os.path.isfile(test_path), "Test {} does not exist".format(args.question)
 		qs = [test_path]
 	else:
 		qs = glob(os.path.join(args.tests_path, "*.py"))
@@ -45,11 +44,13 @@ def main(args):
 	# 	if "hint" in q:
 	# 		results[q]["hint"] = remove_html_in_hint(results[q]["hint"])
 
-	passed_tests = [test for test in results if test not in ["possible", "total"] and results[test] == 1 and "hint" not in results[test]]
+	# print(results)
+
+	passed_tests = [test for test in results if test not in ["possible", "total"] and "hint" not in results[test]]
 	failed_tests = [results[test]["hint"] for test in results if test not in ["possible", "total"] and "hint" in results[test]]
 
 	output = RESULT_TEMPLATE.render(
-		grade=results["total"],
+		grade=results["total"] / results["possible"],
 		passed_tests=passed_tests,
 		failed_tests=failed_tests,
 		scores=results

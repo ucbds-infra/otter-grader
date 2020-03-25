@@ -13,15 +13,15 @@ from otter import check
 from otter import assign
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description="""
+A Python-based autograder for Jupyter Notebooks and Python scripts that runs locally on the instructors machine.
+Also supports use of Gradescope's autograding service, assignment distribution with otter-assign, and public tests
+that students can run while working on assignments.
+""")
 subparsers = parser.add_subparsers()
 
 ##### PARSER FOR otter grade #####
-grade_parser = subparsers.add_parser("grade", description="""
-Local autograder for Jupyter Notebooks and Python scripts. Launches parallel Docker containers to grade notebooks/scripts and returns a CSV of grades.
-Requires a metadata file if not exported from Gradescope or Canvas. Add support files by putting them into the SUBMISSIONS-DIR folder or using the -f flag.
-Can optionally create PDFs of Jupyter Notebooks for manual grading.
-""")
+grade_parser = subparsers.add_parser("grade", description="Grade assignments locally using Docker containers")
 
 # necessary path arguments
 grade_parser.add_argument("-p", "--path", type=str, default="./", help="Path to directory of submissions")
@@ -69,10 +69,10 @@ generate_parser.set_defaults(func=generate.main)
 
 
 ##### PARSER FOR otter check #####
-check_parser = subparsers.add_parse("check", description="Checks Python file against tests")
+check_parser = subparsers.add_parser("check", description="Checks Python file against tests")
 check_parser.add_argument("file", help="Python file to grade")
-check_parser.add_argument("-q", help="Grade a specific test")
-check_parser.add_argument("-t", default="tests", help="Path to test files")
+check_parser.add_argument("-q", "--question", help="Grade a specific test")
+check_parser.add_argument("-t", "--tests-path", default="tests", help="Path to test files")
 
 check_parser.set_defaults(func=check.main)
 
@@ -95,4 +95,7 @@ assign_parser.set_defaults(func=assign.main)
 
 if __name__ == "__main__":
 	args = parser.parse_args()
-	args.func(args)
+	if hasattr(args, 'func'):
+		args.func(args)
+	else:
+		print("You must specify a command:\n    assign\n    check\n    generate\n    grade")

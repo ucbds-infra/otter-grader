@@ -202,7 +202,7 @@ def main(args):
 
     os.chdir("./tmp")
 
-    zip_cmd = ["zip", "-r", os.path.join("..", args.output_put, "autograder.zip"), "run_autograder",
+    zip_cmd = ["zip", "-r", os.path.join("..", args.output_path, "autograder.zip"), "run_autograder",
                "setup.sh", "requirements.txt", "tests"]
 
     if args.files:

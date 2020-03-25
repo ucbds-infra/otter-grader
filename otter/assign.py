@@ -24,32 +24,32 @@ from glob import glob
 from .execute import grade_notebook
 from .utils import *
 
-try:
-    from .to_ok import gen_views
-except ImportError:
-    from to_ok import gen_views
+# try:
+#     from .to_ok import gen_views
+# except ImportError:
+#     from to_ok import gen_views
 
-def parse_args(args=None):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("master", help="Notebook with solutions and tests.")
-    parser.add_argument("result", help="Directory containing the result.")
-    # parser.add_argument("endpoint", help="OK endpoint; e.g., cal/data8/sp19")
-    parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook",
-                        default=False, action="store_true")
-    parser.add_argument("--no-run-tests", help="Don't run tests.",
-                        default=False, action="store_true")
-    parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell",
-                        default=False, action="store_true")
-    parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell",
-                        default=False, action="store_true")
-    parser.add_argument("--no-filter", help="Don't filter the PDF.",
-                        default=False, action="store_true")
-    parser.add_argument("--instructions", help="Additional submission instructions for students")
-    parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
-    if args is None:
-        return parser.parse_args()
-    else:
-        return parser.parse_args(args)
+# def parse_args(args=None):
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("master", help="Notebook with solutions and tests.")
+#     parser.add_argument("result", help="Directory containing the result.")
+#     # parser.add_argument("endpoint", help="OK endpoint; e.g., cal/data8/sp19")
+#     parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook",
+#                         default=False, action="store_true")
+#     parser.add_argument("--no-run-tests", help="Don't run tests.",
+#                         default=False, action="store_true")
+#     parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell",
+#                         default=False, action="store_true")
+#     parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell",
+#                         default=False, action="store_true")
+#     parser.add_argument("--no-filter", help="Don't filter the PDF.",
+#                         default=False, action="store_true")
+#     parser.add_argument("--instructions", help="Additional submission instructions for students")
+#     parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
+#     if args is None:
+#         return parser.parse_args()
+#     else:
+#         return parser.parse_args(args)
 
 
 def run_tests(nb_path):
@@ -58,16 +58,16 @@ def run_tests(nb_path):
     assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
 
 
-def main(args=None):
-    args = parse_args(args=args)
+def main(args):
+    # args = parse_args(args=args)
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
     gen_views(master, result, args)
     if not args.no_run_tests:
         print("Running tests...")
-        blockPrint()
+        block_print()
         run_tests(result / 'autograder'  / master.name )
-        enablePrint()
+        enable_print()
         print("All tests passed!")
 
 

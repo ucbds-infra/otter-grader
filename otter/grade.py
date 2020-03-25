@@ -29,11 +29,11 @@ def main(args):
 
     # Hand off metadata to parser
     if args.gradescope:
-        meta_parser = GradescopeParser(args.notebooks_path)
+        meta_parser = GradescopeParser(args.path)
         if verbose:
             print("Found Gradescope metadata...")
     elif args.canvas:
-        meta_parser = CanvasParser(args.notebooks_path)
+        meta_parser = CanvasParser(args.path)
         if verbose:
             print("Found Canvas metadata...")
     elif args.json:
@@ -60,13 +60,13 @@ def main(args):
 
     # Docker
     grades_dfs = launch_parallel_containers(args.tests_path, 
-        args.notebooks_path, 
+        args.path, 
         verbose=verbose, 
         unfiltered_pdfs=args.pdf, 
         tag_filter=args.tag_filter,
         html_filter=args.html_filter,
         reqs=args.requirements,
-        num_containers=args.num_containers,
+        num_containers=args.containers,
         image=args.image,
         scripts=args.scripts,
         no_kill=args.no_kill
