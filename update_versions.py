@@ -18,9 +18,9 @@ NEW_VERSION = "0.4.7"
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "docker/Dockerfile",
     "otter/gs_generator.py",
-    "test/integration/autograder-correct/requirements.txt",
-    "requirements.txt",
-    "Makefile"
+    "test/test-generate/autograder-correct/requirements.txt",
+    # "requirements.txt",
+    # "Makefile"
 ]
 
 def main():

@@ -8,6 +8,7 @@
 * Moved all argparse calls into `bin/otter`
 * Made several fixes to `otter check`
 * Added indentation to results.json dump in Gradescope container
+* Added notebook checker to `otter check`
 
 **v0.4.8:**
 

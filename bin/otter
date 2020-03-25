@@ -81,7 +81,7 @@ check_parser.set_defaults(func=check.main)
 
 
 ##### PARSER FOR otter assign #####
-assign_parser = subparsers.add_parser("assign", description="Create distribution versions of otter-assign formatted notebook")
+assign_parser = subparsers.add_parser("assign", description="Create distribution versions of Otter Assign-formatted notebook")
 assign_parser.add_argument("master", help="Notebook with solutions and tests.")
 assign_parser.add_argument("result", help="Directory containing the result.")
 assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
