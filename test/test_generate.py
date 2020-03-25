@@ -41,7 +41,7 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
    
 
-    def test_gs_generator(self, cleanup=True, output_path=None):
+    def test_gs_generator(self):
         """
         Check that the correct zipfile is created by gs_generator.py
         """
@@ -79,10 +79,9 @@ class TestIntegration(unittest.TestCase):
                             self.assertEqual(f.read(), g.read(), "{} does not match {}".format(subfile, correct_file_path))
 
         # cleanup files
-        if cleanup:
-            cleanup_command = ["rm", "-rf", "test/autograder", "test/autograder.zip"]
-            cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
-            self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
+        cleanup_command = ["rm", "-rf", "test/autograder", "test/autograder.zip"]
+        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
+        self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
 
 
     def test_gradescope(self):
@@ -137,7 +136,7 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(results, correct_results, "Incorrect results when grading in Gradescope container")
 
         # cleanup files and container
-        cleanup = subprocess.run(["rm", "-rf", "test/autograder", "test/autograder.zip", "test/results.json"], stdout=PIPE, stderr=PIPE)
+        cleanup = subprocess.run(["rm", "-rf", TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder.zip", "test/results.json"], stdout=PIPE, stderr=PIPE)
         remove_container = subprocess.run(["docker", "rm", container_id], stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
         self.assertEqual(len(remove_container.stderr), 0, remove_container.stderr.decode("utf-8"))
