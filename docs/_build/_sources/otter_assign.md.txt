@@ -69,6 +69,8 @@ Manually-graded solution cells have two formats:
 
 The latter means that as long as one of the lines in the cell starts with `SOLUTION` (case insensitive, with or without a colon `:`) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, Otter Assign automatically adds a Markdown cell with the contents `_Type your answer here, replacing this test._`
 
+Manually graded questions are automatically enclosed in `<!-- BEGIN QUESTION -->` and `<!-- END QUESTION -->` tags by Otter Assign so that only these questions are exported to the PDF when filtering is turned on (the default). In the autograder notebook, this includes the question cell, prompt cell, and solution cell. In the student notebook, this includes only the question and prompt cells. The `<!-- END QUESTION -->` tag is automatically inserted at the top of the next cell if it is a Markdown cell or in a new Markdown cell before the next cell if it is not.
+
 An example of a manually-graded code question:
 
 ![](images/assign_sample_code_manual.png)
