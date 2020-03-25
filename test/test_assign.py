@@ -6,22 +6,24 @@ import argparse
 from subprocess import PIPE
 
 from otter.assign import main
+from otter.utils import block_print, enable_print
+
+# read in argument parser
+with open("bin/otter") as f:
+    exec(f.read())
 
 class TestAssign(unittest.TestCase):
     
     def test_convert_example(self):
-        assign_parser = argparse.ArgumentParser()
-        assign_parser.add_argument("master", help="Notebook with solutions and tests.")
-        assign_parser.add_argument("result", help="Directory containing the result.")
-        assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
-        assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
-        assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")
-        assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
-        assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
-        assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
-        assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
-        run_oassign_args = ["--no-run-tests", "test/example.ipynb", "test/output", "test/data.csv"]
-        main(assign_parser.parse_args(run_oassign_args))
+        """
+        Checks that otter assign filters and outputs correctly
+        """
+        run_assign_args = ["assign", "--no-run-tests", "test/example.ipynb", "test/output", "test/data.csv"]
+        args = parser.parse_args(run_assign_args)
+
+        block_print()
+        args.func(args)
+        enable_print()
 
         self.assertTrue(os.path.isdir("test/output"))
         self.assertEqual(os.listdir("test/output"), ["autograder", "student"])

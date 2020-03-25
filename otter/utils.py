@@ -16,6 +16,10 @@ def enable_print():
 	"""
 	Enables printing to stdout.
 	"""
+	try:
+		sys.stdout.close()
+	except:
+		pass
 	sys.stdout = sys.__stdout__
 
 def list_files(path):

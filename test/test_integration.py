@@ -1,11 +1,23 @@
 import os
-import pandas as pd
+import sys
 import unittest
 import subprocess
+import contextlib
+import json
+import shutil
+import pandas as pd
+
+from textwrap import dedent
 from subprocess import PIPE
 from glob import glob
+from io import StringIO
+from unittest import mock
+
 from otter import Notebook
-import json
+
+# read in argument parser
+with open("bin/otter") as f:
+    exec(f.read())
 
 class TestIntegration(unittest.TestCase):
     
@@ -30,7 +42,7 @@ class TestIntegration(unittest.TestCase):
         Check that the example of 100 notebooks runs correctely locally.
         """
         # grade the 100 notebooks
-        grade_command = ["python3", "-m", "otter.cli",
+        grade_command = ["grade",
             "-y", "test/integration/manual-test/meta.yml", 
             "-p", "test/integration/manual-test/", 
             "-t", "test/integration/tests/", 
@@ -38,10 +50,12 @@ class TestIntegration(unittest.TestCase):
             "-o", "test/",
             "--image", "otter-test"
         ]
-        grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
+        args = parser.parse_args(grade_command)
+        args.func(args)
+        # grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
 
         # assert that otter-grader succesfully ran
-        self.assertEqual(len(grade.stderr), 0, grade.stderr)
+        # self.assertEqual(len(grade.stderr), 0, grade.stderr)
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)
@@ -62,7 +76,7 @@ class TestIntegration(unittest.TestCase):
         Check that the example of 100 scripts runs correctely locally.
         """
         # grade the 100 scripts
-        grade_command = ["python3", "-m", "otter.cli",
+        grade_command = ["grade",
             "-sy", "test/integration/py-tests/meta.yml", 
             "-p", "test/integration/py-tests/", 
             "-t", "test/integration/tests/", 
@@ -70,10 +84,12 @@ class TestIntegration(unittest.TestCase):
             "-o", "test/",
             "--image", "otter-test"
         ]
-        grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
+        args = parser.parse_args(grade_command)
+        args.func(args)
+        # grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
 
         # assert that otter-grader succesfully ran
-        self.assertEqual(len(grade.stderr), 0, grade.stderr)
+        # self.assertEqual(len(grade.stderr), 0, grade.stderr)
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)
@@ -94,16 +110,18 @@ class TestIntegration(unittest.TestCase):
         Check that the correct zipfile is created by gs_generator.py
         """
         # create the zipfile
-        gen_command = ["python3", "-m", "otter.gs_generator",
+        generate_command = ["generate",
             "-t", "test/integration/tests",
             "-o", "test/",
             "-r", "test/integration/requirements.txt",
             "test/integration/test-df.csv"
         ]
-        gen = subprocess.run(gen_command, stdout=PIPE, stderr=PIPE)
+        args = parser.parse_args(generate_command)
+        args.func(args)
+        # gen = subprocess.run(gen_command, stdout=PIPE, stderr=PIPE)
 
         # assert that otter-grader succesfully ran
-        self.assertEqual(len(gen.stderr), 0, gen.stderr)
+        # self.assertEqual(len(gen.stderr), 0, gen.stderr)
 
         # unzip the zipfile
         unzip_command = ["unzip", "-o", "test/autograder.zip", "-d", "test/autograder"]
@@ -134,14 +152,19 @@ class TestIntegration(unittest.TestCase):
         """
         Checks that the Gradescope autograder works
         """
-        # print("running")
-
         # create the autograder zip file
         self.test_gs_generator(cleanup=False)
 
-        # # build the docker image
+        # copy otter-grader dir into test
+        shutil.copytree(".", "test/otter-grader")
+        shutil.rmtree("test/otter-grader/test")
+
+        # build the docker image
         build = subprocess.run(["docker", "build", "test", "-t", "otter-gradescope-test"], stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(build.stderr), 0, build.stderr.decode("utf-8"))
+
+        # remove the copy of otter-grader
+        shutil.rmtree("test/otter-grader")
 
         # launch the container and return its container ID
         launch = subprocess.run(["docker", "run", "-dt", "otter-gradescope-test", "/autograder/run_autograder"], stdout=PIPE, stderr=PIPE)
@@ -177,32 +200,71 @@ class TestIntegration(unittest.TestCase):
         """
         # run for each individual test
         for file in glob("test/integration/tests/*.py"):
-            check_command = ["python3", "-m", "otter.script", 
+            check_command = ["check",
                 "test/integration/py-tests/file0.py", 
                 "-q", os.path.split(file)[1][:-3],
                 "-t", os.path.split(file)[0]
             ]
-            check = subprocess.run(check_command, stdout=PIPE, stderr=PIPE)
+            args = parser.parse_args(check_command)
 
-            # make sure there is no error
-            self.assertEqual(len(check.stderr), 0, check.stderr)
+            # capture stdout
+            output = StringIO()
+            with contextlib.redirect_stdout(output):
 
-            # make sure all tests except q2 pass
-            if os.path.split(file)[1] != "q2.py":
-                self.assertEqual(check.stdout.decode("utf-8"), "All tests passed!\n", check.stdout)
+                # mock block_print and enable_print otherwise they interfere with capture of stdout
+                with mock.patch("otter.check.block_print"):
+                    with mock.patch("otter.check.enable_print"):
+                        args.func(args)
+                        if os.path.split(file)[1] != "q2.py":
+                            self.assertEqual(
+                                output.getvalue().strip().split("\n")[-1].strip(), 
+                                "All tests passed!", 
+                                "Did not pass test at {}".format(file)
+                            )
 
         # run checker command
-        check_command = check_command = ["python3", "-m", "otter.script", 
-                "test/integration/py-tests/file0.py", 
-                "-t", "test/integration/tests"
-            ]
-        check = subprocess.run(check_command, stdout=PIPE, stderr=PIPE)
+        check_command = check_command = ["check",
+            "test/integration/py-tests/file0.py", 
+            "-t", "test/integration/tests"
+        ]
+        args = parser.parse_args(check_command)
 
-        # make sure there is no error
-        self.assertEqual(len(check.stderr), 0, check.stderr)
+        # capture stdout
+        output = StringIO()
+        with contextlib.redirect_stdout(output):
 
-        # make sure there is a failed test
-        self.assertNotEqual(check.stdout.decode("utf-8"), "All tests passed!", check.stdout)
+            # mock block_print and enable_print otherwise they interfere with capture of stdout
+            with mock.patch("otter.check.block_print"):
+                with mock.patch("otter.check.enable_print"):
+                    args.func(args)
+                    self.assertEqual(
+                        output.getvalue().strip(), 
+                        dedent("""\
+                            [0.         0.02002002 0.04004004 0.06006006 0.08008008]
+                            4 of 5 tests passed
+
+                            Tests passed:
+                             q1  q3  q4  q5 
+
+
+                            Tests failed: 
+                               test/integration/tests/q2.py
+
+                            Test result:
+                            Trying:
+                                1 == 1
+                            Expecting:
+                                False
+                            **********************************************************************
+                            Line 2, in test/integration/tests/q2.py 0
+                            Failed example:
+                                1 == 1
+                            Expected:
+                                False
+                            Got:
+                                True"""), 
+                        "Did not pass correct tests"
+                    )
 
     def test_notebook_class(self):
         """
