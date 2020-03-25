@@ -9,6 +9,7 @@ from .metadata import *
 from .containers import *
 from .utils import *
 
+
 def main(args):
     """
     Main function for running otter from the command line.
@@ -91,6 +92,7 @@ def main(args):
 
     # write to CSV file
     output_df.to_csv(os.path.join(args.output_path, "final_grades.csv"), index=False)
+
 
 if __name__ == "__main__":
     main()

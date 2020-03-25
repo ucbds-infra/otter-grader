@@ -1,11 +1,11 @@
+#################################
+##### Tests for otter check #####
+#################################
+
 import os
-import sys
 import unittest
 import subprocess
 import contextlib
-import json
-import shutil
-import pandas as pd
 
 from textwrap import dedent
 from subprocess import PIPE

@@ -1,12 +1,11 @@
+##################################
+##### Tests for otter assign #####
+##################################
+
 import unittest
-import subprocess
 import os
-import argparse
-import pathlib
+import shutil
 
-from subprocess import PIPE
-
-from otter.assign import main
 from otter.utils import block_print, enable_print
 
 # read in argument parser
@@ -21,15 +20,18 @@ class TestAssign(unittest.TestCase):
         """
         Checks that otter assign filters and outputs correctly
         """
+        # run otter assign
         run_assign_args = [
             "assign", "--no-run-tests", TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", TEST_FILES_PATH + "data.csv"
         ]
         args = parser.parse_args(run_assign_args)
 
+        # block stdout while running
         block_print()
         args.func(args)
         enable_print()
 
+        # check that we have the correct output contents
         self.assertTrue(os.path.isdir(TEST_FILES_PATH + "output"))
         self.assertEqual(os.listdir(TEST_FILES_PATH + "output"), ["autograder", "student"])
 
@@ -60,4 +62,7 @@ class TestAssign(unittest.TestCase):
             with open(os.path.join(TEST_FILES_PATH + "output/student", file)) as f:
                 contents = f.read()
             self.assertEqual(correct_contents, contents, "Student file {} incorrect".format(file))
+        
+        # cleanup the output
+        shutil.rmtree(TEST_FILES_PATH + "output")
         

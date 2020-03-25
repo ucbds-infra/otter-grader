@@ -5,10 +5,11 @@
 import os
 import shutil
 import argparse
-from glob import glob
-from subprocess import PIPE
 import subprocess
 import sys
+
+from glob import glob
+from subprocess import PIPE
 from jinja2 import Template
 
 REQUIREMENTS = Template("""datascience

@@ -7,68 +7,19 @@
 
 import copy
 import json
-import nbformat
 import pprint
 import os
 import re
 import shutil
-import subprocess
 import yaml
-import argparse
 import pathlib
+import nbformat
 
 from collections import namedtuple
 from glob import glob
-# import sys
 
 from .execute import grade_notebook
-from .utils import *
-
-# try:
-#     from .to_ok import gen_views
-# except ImportError:
-#     from to_ok import gen_views
-
-# def parse_args(args=None):
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("master", help="Notebook with solutions and tests.")
-#     parser.add_argument("result", help="Directory containing the result.")
-#     # parser.add_argument("endpoint", help="OK endpoint; e.g., cal/data8/sp19")
-#     parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook",
-#                         default=False, action="store_true")
-#     parser.add_argument("--no-run-tests", help="Don't run tests.",
-#                         default=False, action="store_true")
-#     parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell",
-#                         default=False, action="store_true")
-#     parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell",
-#                         default=False, action="store_true")
-#     parser.add_argument("--no-filter", help="Don't filter the PDF.",
-#                         default=False, action="store_true")
-#     parser.add_argument("--instructions", help="Additional submission instructions for students")
-#     parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
-#     if args is None:
-#         return parser.parse_args()
-#     else:
-#         return parser.parse_args(args)
-
-
-def run_tests(nb_path):
-    """Run tests in the autograder version of the notebook."""
-    results = grade_notebook(nb_path, glob(str(nb_path.parent / "tests" / "*.py")))
-    assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
-
-
-def main(args):
-    # args = parse_args(args=args)
-    master, result = pathlib.Path(args.master), pathlib.Path(args.result)
-    print("Generating views...")
-    gen_views(master, result, args)
-    if not args.no_run_tests:
-        print("Running tests...")
-        block_print()
-        run_tests(result / 'autograder'  / master.name )
-        enable_print()
-        print("All tests passed!")
+from .utils import block_print, enable_print
 
 
 NB_VERSION = 4
@@ -85,6 +36,24 @@ MD_SOLUTION_REGEX = r"(<strong>|\*{2})solution:?(<\/strong>|\*{2})"
 MD_ANSWER_CELL_TEMPLATE = "_Type your answer here, replacing this text._"
 
 
+def run_tests(nb_path):
+    """Run tests in the autograder version of the notebook."""
+    results = grade_notebook(nb_path, glob(str(nb_path.parent / "tests" / "*.py")))
+    assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
+
+
+def main(args):
+    master, result = pathlib.Path(args.master), pathlib.Path(args.result)
+    print("Generating views...")
+    gen_views(master, result, args)
+    if not args.no_run_tests:
+        print("Running tests...")
+        block_print()
+        run_tests(result / 'autograder'  / master.name )
+        enable_print()
+        print("All tests passed!")
+
+
 def convert_to_ok(nb_path, dir, args):
     """Convert a master notebook to an ok notebook, tests dir, and .ok file.
 
@@ -95,7 +64,6 @@ def convert_to_ok(nb_path, dir, args):
     ok_nb_path = dir / nb_path.name
     tests_dir = dir / 'tests'
     os.makedirs(tests_dir, exist_ok=True)
-    # open(tests_dir / '__init__.py', 'a').close()
 
     # copy files
     for file in args.files:
@@ -105,46 +73,22 @@ def convert_to_ok(nb_path, dir, args):
         nb = nbformat.read(f, NB_VERSION)
     ok_cells, manual_questions = gen_ok_cells(nb['cells'], tests_dir)
 
-    # dot_ok_name = gen_dot_ok(ok_nb_path, args.endpoint)
     if not args.no_init_cell:
         init = gen_init_cell()
         nb['cells'] = [init] + ok_cells
     else:
-        nb['cells'] = ok_cells #[init] + ok_cells
+        nb['cells'] = ok_cells
 
     if not args.no_check_all:
         nb['cells'] += gen_check_all_cell()
     if not args.no_export_cell:
-        nb['cells'] += gen_export_cells(nb_path, manual_questions, args.instructions, filtering = not args.no_filter)
+        nb['cells'] += gen_export_cells(nb_path, args.instructions, filtering = not args.no_filter)
         
     remove_output(nb)
 
     with open(ok_nb_path, 'w') as f:
         nbformat.write(nb, f, NB_VERSION)
     return ok_nb_path
-
-
-# def gen_dot_ok(notebook_path, endpoint):
-#     """Generate .ok file and return its name."""
-#     assert notebook_path.suffix == '.ipynb', notebook_path
-#     ok_path = notebook_path.with_suffix('.ok')
-#     name = notebook_path.stem
-#     src = [notebook_path.name]
-#     with open(ok_path, 'w') as out:
-#         json.dump({
-#             "name": name,
-#             "endpoint": endpoint,
-#             "src": src,
-#             "tests": {
-#                 "tests/q*.py": "ok_test"
-#             },
-#             "protocols": [
-#                 "file_contents",
-#                 "grading",
-#                 "backup"
-#             ]
-#             }, out)
-#     return ok_path.name
 
 
 def gen_init_cell():
@@ -154,7 +98,7 @@ def gen_init_cell():
     return cell
 
 
-def gen_export_cells(nb_path, manual_questions, instruction_text, filtering=True):
+def gen_export_cells(nb_path, instruction_text, filtering=True):
     """Generate submit cells."""
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before \
@@ -162,10 +106,6 @@ def gen_export_cells(nb_path, manual_questions, instruction_text, filtering=True
     
     if instruction_text:
         instructions.source += '\n\n' + instruction_text
-    
-    # if manual_questions:
-    #     n = len(manual_questions)
-    #     instructions.source += f'\n\n<!-- EXPECT {n} EXPORTED QUESTIONS -->'
 
     export = nbformat.v4.new_code_cell()
     source_lines = ["# Save your notebook first, then run this cell to export."]
@@ -173,11 +113,6 @@ def gen_export_cells(nb_path, manual_questions, instruction_text, filtering=True
         source_lines.append(f"grader.export(\"{ nb_path.name }\")")
     else:
         source_lines.append(f"grader.export(\"{ nb_path.name }\", filtering=False)")
-    # if manual_questions:
-    #     source_lines.append("import jassign.to_pdf")
-    #     source_lines.append("jassign.to_pdf.generate_pdf('{}', '{}')".format(
-    #         nb_path.name, nb_path.with_suffix('.pdf').name))
-    # source_lines.append("ok.submit()")
     export.source = "\n".join(source_lines)
 
     lock(instructions)
@@ -215,17 +150,24 @@ def gen_ok_cells(cells, tests_dir):
 
     for cell in cells:
 
+        # this is the prompt cell or if a manual question then the solution cell
         if question and not processed_response:
             assert not is_question_cell(cell), cell
             assert not is_test_cell(cell), cell
             assert not is_solution_cell(cell) or is_markdown_solution_cell(cell), cell
+
+            # if this isn't a MD solution cell but in a manual question, it has a prompt
             if not is_solution_cell(cell) and question.get('manual', False):
                 md_has_prompt = True
+            
+            # if there is no prompt, add a prompt cell
             elif is_markdown_solution_cell(cell) and not md_has_prompt:
                 ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
+
             ok_cells.append(cell)
             processed_response = True
 
+        # if this is a test cell, parse and add to correct group
         elif question and processed_response and is_test_cell(cell):
             test = read_test(cell)
             if test.hidden:
@@ -233,14 +175,15 @@ def gen_ok_cells(cells, tests_dir):
             else:
                 tests.append(test)
 
+        # if this is a solution cell, append. if manual question and no prompt, also append prompt cell
         elif question and processed_response and is_solution_cell(cell):
             if is_markdown_solution_cell(cell) and not md_has_prompt:
                 ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
             ok_cells.append(cell)
 
         else:
+            # the question is over
             if question and processed_response:
-                # The question is over
                 if tests:
                     ok_cells.append(gen_test_cell(question, tests, tests_dir))
                 if hidden_tests:
@@ -296,11 +239,13 @@ def is_question_cell(cell):
 
 
 def is_markdown_solution_cell(cell):
+    """Whether the cell matches MD_SOLUTION_REGEX"""
     source = get_source(cell)
     return is_solution_cell and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
 
 
 def is_solution_cell(cell):
+    """Whther the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX"""
     source = get_source(cell)
     if cell['cell_type'] == 'markdown':
         return source and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
@@ -334,10 +279,6 @@ def gen_question_cell(cell, manual, format):
         end += 1
     source[start] = "<!--"
     source[end] = "-->"
-    # if manual and format:
-    #     source.append(f'<!-- EXPORT TO PDF format:{format} -->')
-    # elif manual:
-    #     source.append('<!-- EXPORT TO PDF -->')
     cell['source'] = '\n'.join(source)
     lock(cell)
     return cell
@@ -368,7 +309,6 @@ def is_test_cell(cell):
     if cell['cell_type'] != 'code':
         return False
     source = get_source(cell)
-    # delimiters = COMMENT_PREFIX + ' \n'
     return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
 
 
@@ -476,62 +416,6 @@ def gen_case(test):
     }
 
 
-# solution_assignment_re = re.compile('(\\s*[a-zA-Z0-9_ ]*=)(.*) #[ ]?SOLUTION')
-# def solution_assignment_sub(match):
-#     prefix = match.group(1)
-#     sol = match.group(2)
-#     return prefix + ' ...'
-
-
-# solution_line_re = re.compile('(\\s*)([^#\n]+) #[ ]?SOLUTION')
-# def solution_line_sub(match):
-#     prefix = match.group(1)
-#     return prefix + '...'
-
-
-# text_solution_line_re = re.compile(r'\s*\*\*SOLUTION:?\*\*:?.*')
-# begin_solution_re = re.compile(r'(\s*)# BEGIN SOLUTION( NO PROMPT)?')
-# skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT']
-
-
-# SUBSTITUTIONS = [
-#     (solution_assignment_re, solution_assignment_sub),
-#     (solution_line_re, solution_line_sub),
-# ]
-
-
-# def replace_solutions(lines):
-#     """Replace solutions in lines, a list of strings."""
-#     if text_solution_line_re.match(lines[0]):
-#         return ['*Write your answer here, replacing this text.*']
-#     stripped = []
-#     solution = False
-#     for line in lines:
-#         if any(line.endswith(s) for s in skip_suffixes):
-#             continue
-#         if solution and not line.endswith('# END SOLUTION'):
-#             continue
-#         if line.endswith('# END SOLUTION'):
-#             assert solution, 'END SOLUTION without BEGIN SOLUTION in ' + str(lines)
-#             solution = False
-#             continue
-#         begin_solution = begin_solution_re.match(line)
-#         if begin_solution:
-#             assert not solution, 'Nested BEGIN SOLUTION in ' + str(lines)
-#             solution = True
-#             if not begin_solution.group(2):
-#                 line = begin_solution.group(1) + '...'
-#             else:
-#                 continue
-#         for exp, sub in SUBSTITUTIONS:
-#             m = exp.match(line)
-#             if m:
-#                 line = sub(m)
-#         stripped.append(line)
-#     assert not solution, 'BEGIN SOLUTION without END SOLUTION in ' + str(lines)
-#     return stripped
-
-
 def strip_solutions(original_nb_path, stripped_nb_path):
     """Write a notebook with solutions stripped."""
     with open(original_nb_path) as f:
@@ -571,11 +455,6 @@ def remove_hidden_tests(test_dir):
         test = locals['test']
         if test['hidden']:
             os.remove(f)
-        # for suite in test['suites']:
-        #     for i, case in list(enumerate(suite['cases']))[::-1]:
-        #         if case['hidden']:
-        #             suite['cases'].pop(i)
-        # write_test(f, test)
 
 
 def gen_views(master_nb, result_dir, args):

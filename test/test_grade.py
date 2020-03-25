@@ -1,19 +1,14 @@
+#################################
+##### Tests for otter grade #####
+#################################
+
 import os
-import sys
 import unittest
 import subprocess
-import contextlib
 import json
-import shutil
 import pandas as pd
 
-from textwrap import dedent
 from subprocess import PIPE
-from glob import glob
-from io import StringIO
-from unittest import mock
-
-from otter import Notebook
 
 # read in argument parser
 with open("bin/otter") as f:
@@ -27,7 +22,7 @@ class TestIntegration(unittest.TestCase):
     def setUpClass(cls):
         create_image_cmd = ["make", "docker-test"]
         create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
-        # TestIntegration.assertEqual(len(create_image.stderr), 0, create_image.stderr.decode("utf-8"))
+
 
     def test_docker(self):
         """
@@ -38,6 +33,7 @@ class TestIntegration(unittest.TestCase):
 
         # assert that it didn't fail, it will fail if it is not installed
         self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
+
 
     def test_hundred_notebooks(self):
         """
@@ -54,10 +50,6 @@ class TestIntegration(unittest.TestCase):
         ]
         args = parser.parse_args(grade_command)
         args.func(args)
-        # grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
-
-        # assert that otter-grader succesfully ran
-        # self.assertEqual(len(grade.stderr), 0, grade.stderr)
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)
@@ -72,6 +64,7 @@ class TestIntegration(unittest.TestCase):
 
         # assert cleanup worked
         self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
+
 
     def test_hundred_scripts(self):
         """
@@ -88,10 +81,6 @@ class TestIntegration(unittest.TestCase):
         ]
         args = parser.parse_args(grade_command)
         args.func(args)
-        # grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
-
-        # assert that otter-grader succesfully ran
-        # self.assertEqual(len(grade.stderr), 0, grade.stderr)
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)

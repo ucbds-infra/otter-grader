@@ -2,16 +2,15 @@
 ##### Command Line Script Checker for Otter-Grader #####
 ########################################################
 
-# from .utils import remove_html_in_hint
+import os
+
+from glob import glob
+from jinja2 import Template
+
 from .execute import grade_notebook
 from .gofer import check
 from .utils import block_print, enable_print
-import argparse
-import os
-from glob import glob
-from jinja2 import Template
-import re
-import sys
+
 
 RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ scores|length - 2 }} tests passed
 {% if passed_tests %}
@@ -22,6 +21,7 @@ Tests passed:
 Tests failed: 
 {% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
 """)
+
 
 def main(args):
 
@@ -40,12 +40,6 @@ def main(args):
 	)
 	enable_print()
 
-	# for q in results:
-	# 	if "hint" in q:
-	# 		results[q]["hint"] = remove_html_in_hint(results[q]["hint"])
-
-	# print(results)
-
 	passed_tests = [test for test in results if test not in ["possible", "total"] and "hint" not in results[test]]
 	failed_tests = [results[test]["hint"] for test in results if test not in ["possible", "total"] and "hint" in results[test]]
 
@@ -57,6 +51,7 @@ def main(args):
 	)
 
 	print(output)
+
 
 if __name__ == "__main__":
 	main()

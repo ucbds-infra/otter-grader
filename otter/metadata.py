@@ -11,7 +11,9 @@ import shutil
 
 from .utils import *
 
+
 FILENAME_REGEX = r"^.+\."
+
 
 class GradescopeParser:
 	"""Metadata parser for Gradescope exports
@@ -109,6 +111,7 @@ class GradescopeParser:
 
 		"""
 		return [file["filename"] for file in self._metadata]
+
 
 class CanvasParser:
 	"""Metadata parser for Canvas exports
@@ -269,6 +272,7 @@ class JSONParser:
 		
 		"""
 		return [file["filename"] for file in self._metadata]
+
 
 class YAMLParser:
 	"""Metadata parser for YAML format

@@ -5,12 +5,12 @@
 ###############################
 
 import argparse
-import sys
 
 from otter import grade
 from otter import generate
 from otter import check
 from otter import assign
+
 
 
 parser = argparse.ArgumentParser(description="""
@@ -19,6 +19,8 @@ Also supports use of Gradescope's autograding service, assignment distribution w
 that students can run while working on assignments.
 """)
 subparsers = parser.add_subparsers()
+
+
 
 ##### PARSER FOR otter grade #####
 grade_parser = subparsers.add_parser("grade", description="Grade assignments locally using Docker containers")
@@ -91,6 +93,7 @@ assign_parser.add_argument("--instructions", help="Additional submission instruc
 assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
 
 assign_parser.set_defaults(func=assign.main)
+
 
 
 if __name__ == "__main__":

@@ -2,14 +2,15 @@
 ##### Docker Container Management for Otter-Grader #####
 ########################################################
 
-import pandas as pd
 import subprocess
-from subprocess import PIPE
-import json
 import re
-from concurrent.futures import ThreadPoolExecutor, wait
 import os
 import shutil
+import pandas as pd
+
+from subprocess import PIPE
+from concurrent.futures import ThreadPoolExecutor, wait
+
 
 def launch_parallel_containers(
     tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, tag_filter=False, 

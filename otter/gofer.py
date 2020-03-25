@@ -2,23 +2,23 @@
 ##### Functions from Gofer-Grader #####
 #######################################
 
-from contextlib import redirect_stderr, redirect_stdout, contextmanager
+
 import inspect
 import ast
 import os
 import sys
-from IPython import get_ipython
-
 import doctest
 import io
 import itertools
 import json
-from glob import glob
 import random
 import string
-from jinja2 import Template
-from textwrap import dedent
 
+from glob import glob
+from contextlib import redirect_stderr, redirect_stdout, contextmanager
+from textwrap import dedent
+from jinja2 import Template
+from IPython import get_ipython
 from pygments import highlight
 from pygments.lexers import PythonConsoleLexer
 from pygments.formatters import HtmlFormatter

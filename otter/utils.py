@@ -7,17 +7,13 @@ import sys
 import pathlib
 import pandas as pd
 
-class StrPath(pathlib.Path):
-	def __truediv__(self, o):
-		if not isinstance(o, str):
-			return super(StrPath, self).__truediv__(o)
-		return super(StrPath, self).__truediv__(0).as_posix()
 
 def block_print():
 	"""
 	Disables printing to stdout.
 	"""
 	sys.stdout = open(os.devnull, 'w')
+
 
 def enable_print():
 	"""
@@ -28,6 +24,7 @@ def enable_print():
 	except:
 		pass
 	sys.stdout = sys.__stdout__
+
 
 def list_files(path):
 	"""Returns a list of all non-hidden files in a directory
@@ -40,6 +37,7 @@ def list_files(path):
 
 	"""
 	return [file for file in os.listdir(path) if os.path.isfile(os.path.join(path, file)) and file[0] != "."]
+
 
 def merge_csv(dataframes):
 	"""Merges dataframes returned by Docker containers

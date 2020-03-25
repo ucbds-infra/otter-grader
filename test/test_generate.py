@@ -1,19 +1,15 @@
+####################################
+##### Tests for otter generate #####
+####################################
+
 import os
-import sys
 import unittest
 import subprocess
-import contextlib
 import json
-import shutil
-import pandas as pd
 
-from textwrap import dedent
 from subprocess import PIPE
 from glob import glob
-from io import StringIO
 from unittest import mock
-
-from otter import Notebook
 
 # read in argument parser
 with open("bin/otter") as f:
@@ -27,7 +23,6 @@ class TestIntegration(unittest.TestCase):
     def setUpClass(cls):
         create_image_cmd = ["make", "docker-test"]
         create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
-        # TestIntegration.assertEqual(len(create_image.stderr), 0, create_image.stderr.decode("utf-8"))
 
 
     def test_docker(self):
@@ -54,10 +49,6 @@ class TestIntegration(unittest.TestCase):
         ]
         args = parser.parse_args(generate_command)
         args.func(args)
-        # gen = subprocess.run(gen_command, stdout=PIPE, stderr=PIPE)
-
-        # assert that otter-grader succesfully ran
-        # self.assertEqual(len(gen.stderr), 0, gen.stderr)
 
         # unzip the zipfile
         unzip_command = ["unzip", "-o", "test/autograder.zip", "-d", "test/autograder"]
@@ -88,11 +79,7 @@ class TestIntegration(unittest.TestCase):
         """
         Checks that the Gradescope autograder works
         """
-        # # create the autograder zip file
-        # self.test_gs_generator(cleanup=False)
-
         # generate the zipfile
-        # create the zipfile
         generate_command = ["generate",
             "-t", TEST_FILES_PATH + "tests",
             "-o", TEST_FILES_PATH,
@@ -102,16 +89,9 @@ class TestIntegration(unittest.TestCase):
         args = parser.parse_args(generate_command)
         args.func(args)
 
-        # copy otter-grader dir into test
-        # shutil.copytree(".", "test/otter-grader")
-        # shutil.rmtree("test/otter-grader/test")
-
         # build the docker image
         build = subprocess.run(["docker", "build", TEST_FILES_PATH, "-t", "otter-gradescope-test"], stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(build.stderr), 0, build.stderr.decode("utf-8"))
-
-        # # remove the copy of otter-grader
-        # shutil.rmtree("test/otter-grader")
 
         # launch the container and return its container ID
         launch = subprocess.run(["docker", "run", "-dt", "otter-gradescope-test", "/autograder/run_autograder"], stdout=PIPE, stderr=PIPE)

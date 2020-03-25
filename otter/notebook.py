@@ -2,12 +2,15 @@
 ##### In-Notebook Checks for Otter-Grader #####
 ###############################################
 
-from .gofer import check
 import inspect
 import os
+
 from nb2pdf import convert
 from IPython.display import display, HTML
 from glob import glob
+
+from .gofer import check
+
 
 class Notebook:
 	"""Notebook class for in-notebook autograding

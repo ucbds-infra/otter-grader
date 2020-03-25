@@ -4,16 +4,17 @@
 
 import argparse
 import os
-from os.path import isfile, join
-from glob import glob
-from otter.gofer import *
-import pandas as pd
 import nb2pdf
 import re
 import json
 import itertools
+import pandas as pd
+
+from glob import glob
 from unittest import mock
 from IPython.display import display
+
+from .gofer import *
 
 try:
     from IPython.core.inputsplitter import IPythonInputSplitter
@@ -341,7 +342,7 @@ def main():
     dir_path = os.path.abspath(args.notebook_directory)
     os.chdir(dir_path)
     file_extension = (".py", ".ipynb")[not args.scripts]
-    all_ipynb = [(f, join(dir_path, f)) for f in os.listdir(dir_path) if isfile(join(dir_path, f)) and f.endswith(file_extension)]
+    all_ipynb = [(f, os.path.join(dir_path, f)) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f.endswith(file_extension)]
 
     all_results = {"file": [], "score": [], "manual": []}
 
