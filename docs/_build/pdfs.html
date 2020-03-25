@@ -30,7 +30,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="otter package" href="otter.html" />
-    <link rel="prev" title="Gradescope" href="gradescope.html" /> 
+    <link rel="prev" title="Grading on Gradescope: otter generate" href="otter_generate.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -85,15 +85,17 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using_otter.html">Using Otter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_assign.html">Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_check.html">Student Usage: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_grade.html">Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_generate.html">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">PDF Generation and Filtering</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#cell-filtering">Cell Filtering</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -161,7 +163,7 @@
   <div class="section" id="pdf-generation-and-filtering">
 <h1>PDF Generation and Filtering<a class="headerlink" href="#pdf-generation-and-filtering" title="Permalink to this headline">¶</a></h1>
 <p>When exporting IPython notebooks as PDFs, Otter uses the library nb2pdf that relies on nbpdfexport and chromium to export notebooks without pandoc or LaTeX. This requires that chromium be installed both in the Docker container being used for grading and on the JupyterHub distribution on which students export their notebooks from the <code class="docutils literal notranslate"><span class="pre">Notebook</span></code> API.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code> function encapsulates PDF generation on the student end, and by default filtering is turned on. To generate unfiltered PDFs with <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code>, set <code class="docutils literal notranslate"><span class="pre">filtering=False</span></code> in your call. To generate unfiltered PDFs from the command line, use the <code class="docutils literal notranslate"><span class="pre">--pdf</span></code> flag when calling <code class="docutils literal notranslate"><span class="pre">otter</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code> function encapsulates PDF generation on the student end, and by default filtering is turned on. To generate unfiltered PDFs with <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code>, set <code class="docutils literal notranslate"><span class="pre">filtering=False</span></code> in your call. To generate unfiltered PDFs from the command line, use the <code class="docutils literal notranslate"><span class="pre">--pdf</span></code> flag when calling <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code>.</p>
 <div class="section" id="cell-filtering">
 <h2>Cell Filtering<a class="headerlink" href="#cell-filtering" title="Permalink to this headline">¶</a></h2>
 <p>nb2pdf supports two different formats for filtering cells when exporting notebooks: using cell tags and using HTML comments.</p>
@@ -194,7 +196,7 @@
         <a href="otter.html" class="btn btn-neutral float-right" title="otter package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="gradescope.html" class="btn btn-neutral" title="Gradescope" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="otter_generate.html" class="btn btn-neutral" title="Grading on Gradescope: otter generate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

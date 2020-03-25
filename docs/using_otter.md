@@ -4,11 +4,11 @@ Otter has two major use cases: grading on the instructor's machine (local gradin
 
 ## Local Grading
 
-Once you've [installed otter](install.md), get started by creating some [test cases](test_files.md) and creating a requirements.txt file (if necessary).
+Once you've [installed Otter](install.md), get started by creating some [test cases](test_files.md) and creating a requirements.txt file (if necessary).
 
 ### Collecting Student Submissions
 
-The first major decision is how you'll collect student submissions. You can collect these however you want, although otter has builtin compatibility with Gradescope and Canvas. If you choose either Gradescope or Canvas, just export the submissions and unzip that into some directory. If you are collecting another way, you'll need to create a metadata file. You can use either JSON or YAML format, and the structure is pretty simple: each element needs to have a filename and a student identifier. A sample YAML metadata file would be:
+The first major decision is how you'll collect student submissions. You can collect these however you want, although Otter has builtin compatibility with Gradescope and Canvas. If you choose either Gradescope or Canvas, just export the submissions and unzip that into some directory. If you are collecting another way, you'll need to create a metadata file. You can use either JSON or YAML format, and the structure is pretty simple: each element needs to have a filename and a student identifier. A sample YAML metadata file would be:
 
 ```yaml
 - identifier: 0
@@ -51,16 +51,16 @@ If you have any files that are needed by the notebooks (e.g. data files), put th
 
 ### Grading
 
-Now that you've set up the directory, let's get down to grading. Go to the terminal, `cd` into your grading directory (`grading` in the example above), and let's build the `otter` command. The first thing we need is our notebooks path or `-p` argument. Otter assumes this is `./`, but our notebooks are located in `./submissions`, so we'll need `-p submissions` in our command. We also need a tests directory, which otter assumes is at `./tests`; because this is where our tests are, we're alright on this front, and don't need a `-t` argument.
+Now that you've set up the directory, let's get down to grading. Go to the terminal, `cd` into your grading directory (`grading` in the example above), and let's build the `otter grade` command. The first thing we need is our notebooks path or `-p` argument. Otter assumes this is `./`, but our notebooks are located in `./submissions`, so we'll need `-p submissions` in our command. We also need a tests directory, which Otter assumes is at `./tests`; because this is where our tests are, we're alright on this front, and don't need a `-t` argument.
 
-Now we need to tell otter how we've structured our metadata. If you're using a Gradescope or Canvas export, just pass the `-g` or `-c` flag, respectively, with no arguments. If you're using a custom metadata file, as in our example, pass the `-j` or `-y` flag with the path to the metadata file as its argument; in our case, we will pass `-y submissions/meta.yml`.
+Now we need to tell Otter how we've structured our metadata. If you're using a Gradescope or Canvas export, just pass the `-g` or `-c` flag, respectively, with no arguments. If you're using a custom metadata file, as in our example, pass the `-j` or `-y` flag with the path to the metadata file as its argument; in our case, we will pass `-y submissions/meta.yml`.
 
 At this point, we need to make a decision: do we want PDFs? If there are questions that need to be manually graded, it might be nice to generate a PDF of each submission so that it can be easily read; if you want to generate PDFs, pass one of the `--pdf`, `--tag-filter`, or `--html-filter` flags (cf. [PDFs](pdfs.md)). For our example, let's say that we *do* want PDFs.
 
 Now that we've made all of these decisions, let's put our command together. Our command is:
 
 ```
-otter -p submissions -y meta.yml --pdf -v
+otter grade -p submissions -y meta.yml --pdf -v
 ```
 
 Note that Otter automatically found our requirements file at `./requirements.txt`. If it had been in a different location, we would have needed to pass the path to it to the `-r` flag. Note also that we pass the `-v` flag so that it prints verbose output. Once this command finishes running, you will end up with a new file and a new folder in your working directory:
@@ -86,11 +86,11 @@ Otter created the `final_grades.csv` file with the grades for each student, brok
 
 **Congrats, you're done!** You can use the grades in the CSV file and the PDFs to complete grading however you want.
 
-You can find more information about the command line utility [here](command-line.md)
+You can find more information about `otter grade` [here](otter_grade.md).
 
 ## Gradescope
 
-To get started using otter with Gradescope, create some [test cases](test_files.md) and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:
+To get started using Otter with Gradescope, create some [test cases](test_files.md) and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:
 
 ```
 | gradescope
@@ -103,13 +103,13 @@ To get started using otter with Gradescope, create some [test cases](test_files.
     ...
 ```
 
-To create the zipfile for Gradescope, use the `otter gen` command after `cd`ing into the directory you created. For the directory above, once I've `cd`ed into `gradescope`, I would run the following to generate the zipfile:
+To create the zipfile for Gradescope, use the `otter generate` command after `cd`ing into the directory you created. For the directory above, once I've `cd`ed into `gradescope`, I would run the following to generate the zipfile:
 
 ```
-otter gen data.csv utils.py
+otter generate data.csv utils.py
 ```
 
-As above, Otter automatically found our requirements file at `./requirements.txt`. Notice also that we didn't indicate the path to the tests directory; this is because the default argument of the `-t` flag is `./tests`, so otter found them automatically.
+As above, Otter automatically found our requirements file at `./requirements.txt`. Notice also that we didn't indicate the path to the tests directory; this is because the default argument of the `-t` flag is `./tests`, so Otter found them automatically.
 
 After this command finishes running, you should have a file called `autograder.zip` in the current working directory:
 
@@ -127,4 +127,4 @@ After this command finishes running, you should have a file called `autograder.z
 
 To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
 
-You can find more information about Gradescope usage [here](gradescope.md).
+You can find more information about Gradescope usage [here](otter_generate.md).
