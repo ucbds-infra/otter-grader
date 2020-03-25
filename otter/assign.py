@@ -147,6 +147,7 @@ def gen_ok_cells(cells, tests_dir):
     hidden_tests = []
     manual_questions = []
     md_has_prompt = False
+    need_close_export = False
 
     for cell in cells:
 
@@ -192,7 +193,8 @@ def gen_ok_cells(cells, tests_dir):
                 # add a cell with <!-- END QUESTION --> if a manually graded question
                 manual = question.get('manual', False)
                 if manual:
-                    ok_cells.append(gen_close_export_cell())
+                    # ok_cells.append(gen_close_export_cell())
+                    need_close_export = True
                 
                 question, processed_response, tests, hidden_tests, md_has_prompt = {}, False, [], [], False
 
@@ -200,9 +202,14 @@ def gen_ok_cells(cells, tests_dir):
                 question = read_question_metadata(cell)
                 manual = question.get('manual', False)
                 format = question.get('format', '')
-                if manual:
+                in_manual_block = False
+                if manual and need_close_export:
                     manual_questions.append(question['name'])
-                ok_cells.append(gen_question_cell(cell, manual, format))
+                    in_manual_block = True
+                elif need_close_export:
+                    add_close_export_to_cell(cell)
+                    need_close_export = False
+                ok_cells.append(gen_question_cell(cell, manual, format, in_manual_block))
 
             elif is_solution_cell(cell):
                 if is_markdown_solution_cell(cell):
@@ -211,6 +218,14 @@ def gen_ok_cells(cells, tests_dir):
 
             else:
                 assert not is_test_cell(cell), 'Test outside of a question: ' + str(cell)
+
+                if need_close_export:
+                    if cell['cell_type'] == 'code':
+                        ok_cells.append(gen_close_export_cell())
+                    else:
+                        add_close_export_to_cell(cell)
+                    need_close_export = False
+
                 ok_cells.append(cell)
 
     if tests:
@@ -265,11 +280,11 @@ def find_question_spec(source):
     return begins[0] if begins else None
 
 
-def gen_question_cell(cell, manual, format):
+def gen_question_cell(cell, manual, format, in_manual_block):
     """Return the cell with metadata hidden in an HTML comment."""
     cell = copy.deepcopy(cell)
     source = get_source(cell)
-    if manual:
+    if manual and not in_manual_block:
         source = ["<!-- BEGIN QUESTION -->", ""] + source
     begin_question_line = find_question_spec(source)
     start = begin_question_line - 1
@@ -289,6 +304,13 @@ def gen_close_export_cell():
     cell = nbformat.v4.new_markdown_cell("<!-- END QUESTION -->")
     lock(cell)
     return cell
+
+
+def add_close_export_to_cell(cell):
+    """Adds an export close to the top of the cell"""
+    source = get_source(cell)
+    source = ["<!-- END QUESTION -->\n", "\n"] + source
+    cell['source'] = source
 
 
 def read_question_metadata(cell):
