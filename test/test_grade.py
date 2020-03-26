@@ -6,8 +6,10 @@ import os
 import unittest
 import subprocess
 import json
+import contextlib
 import pandas as pd
 
+from io import StringIO
 from unittest import mock
 from subprocess import PIPE
 from glob import glob
@@ -186,12 +188,15 @@ class TestGrade(unittest.TestCase):
             "-r", TEST_FILES_PATH + "requirements.txt",
             "-o", "test/",
             "--tag-filter",
-            "--containers", "10",
+            "--containers", "5",
             "--image", "otter-test",
             "-v"
         ]
         args = parser.parse_args(grade_command)
-        args.func(args)
+
+        # redirect stdout so we don't print -v flag messages
+        with contextlib.redirect_stdout(StringIO()):
+            args.func(args)
 
         # check that we have PDFs
         self.assertTrue(os.path.isdir("test/submission_pdfs"))
