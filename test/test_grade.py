@@ -8,10 +8,12 @@ import subprocess
 import json
 import pandas as pd
 
+from unittest import mock
 from subprocess import PIPE
 from glob import glob
 
 from otter.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
+from otter.execute import main
 
 # read in argument parser
 with open("bin/otter") as f:
@@ -170,6 +172,37 @@ class TestGrade(unittest.TestCase):
 
         # assert cleanup worked
         self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
+
+
+    def test_hundred_notebooks_with_pdfs(self):
+        """
+        Check that the example of 100 notebooks runs correctely locally.
+        """
+        # grade the 100 notebooks
+        grade_command = ["grade",
+            "-y", TEST_FILES_PATH + "notebooks/meta.yml", 
+            "-p", TEST_FILES_PATH + "notebooks/", 
+            "-t", TEST_FILES_PATH + "tests/", 
+            "-r", TEST_FILES_PATH + "requirements.txt",
+            "-o", "test/",
+            "--tag-filter",
+            "--containers", "10",
+            "--image", "otter-test",
+            "-v"
+        ]
+        args = parser.parse_args(grade_command)
+        args.func(args)
+
+        # check that we have PDFs
+        self.assertTrue(os.path.isdir("test/submission_pdfs"))
+        for file in glob(TEST_FILES_PATH + "notebooks/*.ipynb"):
+            pdf = "test/submission_pdfs/" + os.path.split(file)[1][:-5] + "pdf"
+            self.assertTrue(os.path.isfile(pdf))
+
+        # remove the extra output
+        cleanup_command = ["rm", "-rf", "test/final_grades.csv", "test/submission_pdfs"]
+        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
+        self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
 
 
     def test_hundred_scripts(self):

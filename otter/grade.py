@@ -70,7 +70,8 @@ def main(args):
         num_containers=args.containers,
         image=args.image,
         scripts=args.scripts,
-        no_kill=args.no_kill
+        no_kill=args.no_kill,
+        output_path=args.output_path
     )
 
     if verbose:

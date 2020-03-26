@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 def launch_parallel_containers(
     tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, tag_filter=False, 
     html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
-    scripts=False, no_kill=False):
+    scripts=False, no_kill=False, output_path="./"):
     """Grades notebooks in parallel docker containers
 
     This function runs NUM_CONTAINERS docker containers in parallel to grade the student submissions
@@ -83,7 +83,8 @@ def launch_parallel_containers(
                 reqs=reqs,
                 image=image,
                 scripts=scripts,
-                no_kill=no_kill
+                no_kill=no_kill,
+                output_path=output_path
             )]
 
         # stop execution while containers are running
@@ -106,7 +107,7 @@ def launch_parallel_containers(
 
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
 unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, 
-scripts=False, no_kill=False):
+scripts=False, no_kill=False, output_path="./"):
     """
     Grades multiple assignments in a directory using a single docker container. 
 
@@ -209,20 +210,21 @@ scripts=False, no_kill=False):
         df = pd.read_csv("./grades"+id+".csv")
 
         if unfiltered_pdfs or tag_filter or html_filter:
-            mkdir_pdf_command = ["mkdir", "manual_submissions"]
+            pdf_folder = os.path.join(output_path, "submission_pdfs")
+            mkdir_pdf_command = ["mkdir", pdf_folder]
             mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
             
             # copy out manual submissions
             for pdf in df["manual"]:
-                copy_cmd = ["docker", "cp", container_id + ":" + pdf, "./manual_submissions/" \
-                    + re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1]]
+                copy_cmd = ["docker", "cp", container_id + ":" + pdf, os.path.join(pdf_folder, 
+                    re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1])]
                 copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
 
             def clean_pdf_filepaths(row):
                 """
                 Generates a clean filepath for a PDF
 
-                Replaces occurrences of '/home/notebooks' with 'manual_submission' in the
+                Replaces occurrences of '/home/notebooks' with 'submission_pdfs' in the
                 path. 
                 
                 Arguments:
@@ -232,7 +234,7 @@ scripts=False, no_kill=False):
                     str: cleaned PDF filepath
                 """
                 path = row["manual"]
-                return re.sub(r"\/home\/notebooks", "manual_submissions", path)
+                return re.sub(r"\/home\/notebooks", "submission_pdfs", path)
 
             df["manual"] = df.apply(clean_pdf_filepaths, axis=1)
         
@@ -250,7 +252,16 @@ scripts=False, no_kill=False):
             remove_command = ["docker", "rm", container_id]
             remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
 
-    except BaseException as e:
+    except:
+        # delete the file we just read
+        csv_cleanup_command = ["rm", "./grades"+id+".csv"]
+        csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
+
+        # delete the submission PDFs on failure
+        if unfiltered_pdfs or tag_filter or html_filter:
+            csv_cleanup_command = ["rm", "-rf", os.path.join(output_path, "submission_pdfs")]
+            csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
+
         if not no_kill:
             if verbose:
                 print("Stopping container {}...".format(container_id[:12]))
@@ -261,7 +272,7 @@ scripts=False, no_kill=False):
             remove_command = ["docker", "rm", container_id]
             remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
         
-        raise e
+        raise
     
     # check that no commands errored, if they did rais an informative exception
     all_commands = [launch, copy, tests, grade, csv, csv_cleanup, stop, remove]

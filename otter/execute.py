@@ -323,7 +323,7 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
                 raise
         return global_env
 
-def main():
+def main(args=None):
     """
     When executing this file from the command line, this function will be run.
     """
@@ -336,7 +336,10 @@ def main():
     argparser.add_argument("--html-filter", action="store_true", default=False)
     argparser.add_argument("--scripts", action="store_true", default=False)
 
-    args = argparser.parse_args()
+    if args is None:
+        args = argparser.parse_args()
+    else:
+        args = argparse.parse_args(args)
 
     # get all ipynb files
     dir_path = os.path.abspath(args.notebook_directory)
