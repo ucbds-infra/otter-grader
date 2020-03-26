@@ -21,7 +21,7 @@ with open("bin/otter") as f:
 
 TEST_FILES_PATH = "test/test-check/"
 
-class TestIntegration(unittest.TestCase):
+class TestCheck(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):

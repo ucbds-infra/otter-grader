@@ -17,7 +17,7 @@ with open("bin/otter") as f:
 
 TEST_FILES_PATH = "test/test-generate/"
 
-class TestIntegration(unittest.TestCase):
+class TestGenerate(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
