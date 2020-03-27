@@ -12,15 +12,15 @@
 
 import re
 
-CURRENT_VERSION = "0.4.3"
-NEW_VERSION = "0.4.4"
+CURRENT_VERSION = "0.4.6"
+NEW_VERSION = "0.4.7"
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "docker/Dockerfile",
     "otter/gs_generator.py",
-    "test/integration/autograder-correct/requirements.txt",
-    "requirements.txt",
-    "Makefile"
+    "test/test-generate/autograder-correct/requirements.txt",
+    # "requirements.txt",
+    # "Makefile"
 ]
 
 def main():
@@ -47,6 +47,18 @@ def main():
     )
 
     with open("setup.py", "w") as f:
+        f.write(contents)
+
+    with open("otter/__init__.py") as f:
+        contents = f.read()
+
+    contents = re.sub(
+        "__version__ = \"{}\"".format(CURRENT_VERSION),
+        "__version__ = \"{}\"".format(NEW_VERSION),
+        contents
+    )
+
+    with open("otter/__init__.py", "w") as f:
         f.write(contents)
 
 if __name__ == "__main__":

@@ -10,30 +10,16 @@
    tutorial
    using_otter
    test_files
+   otter_assign
    metadata_files
-   student_usage
-   command-line
-   gradescope
+   otter_check
+   otter_grade
+   otter_generate
    pdfs
    The Otter API <otter>
+   changelog
 ```
 
-[![](https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master)](https://travis-ci.org/ucbds-infra/otter-grader)
-[![](https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg)](https://codecov.io/gh/ucbds-infra/otter-grader)
-[![](https://readthedocs.org/projects/otter-grader/badge/?version=latest)](https://otter-grader.readthedocs.io/en/latest/?badge=latest)
-[![](https://img.shields.io/endpoint?logo=slack&url=https%3A%2F%2Fraw.githubusercontent.com%2Fucbds-infra%2Fotter-grader%2Fmaster%2Fslack-shields.json)](https://join.slack.com/t/otter-grader/shared_invite/enQtOTM5MTQ0MzkwMTk0LTBiNWIzZTYxNDA2NDZmM2JkMzcwZjA4YWViNDM4ZTgyNDVhNDgwOTQ0NjNlZjcwNmY5YzJiZjZhZGNhNzc5MjA)
+Otter-Grader is an open-source local grader from the Division of Computing, Data Science, and Society at the University of California, Berkeley. It is designed to be a scalable grader that utilizes parallel Docker containers on the instructor's machine in order to remove the traditional overhead requirement of a live server. It also supports student-run tests in Jupyter Notebooks and from the command line, and is compatible with Gradescope's proprietary autograding service.
 
-Otter-grader is a new, open-source, local grader from the Division of Data Science, External Pedagogy Infrastructure at UC Berkeley. It is designed to be a scalable grader that utilizes temporal docker containers in order to remove the traditional overhead requirement of a live server. 
-
-## Documentation
-
-The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
-
-## Changelog
-
-**v0.4.3:**
-
-* fixed dead link in documentation
-* updated to Python 3.7 in setup.sh for Gradescope
-* made `otter` and `otter gen` CLIs find `./requirements.txt` automatically if it exists
-* fix bug where GS generator fails if no `-r` flag specified
+Otter is a command-line tool organized into four basic commands: `assign`, `check`, `generate`, and `grade`. These commands provide functionality that allows instructors to create, distribute, and grade assignments locally or using a variety of learning management system (LMS) integrations. Otter also allows students to run publically distributed tests while working through assignments.

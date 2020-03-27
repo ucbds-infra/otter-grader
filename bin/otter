@@ -1,16 +1,104 @@
 #!/usr/bin/env python3
 
-from otter import cli
-from otter import gs_generator
-from otter import script
-import sys
+###############################
+##### Otter-Grader Binary #####
+###############################
+
+import argparse
+
+from otter import grade
+from otter import generate
+from otter import check
+from otter import assign
+
+
+
+parser = argparse.ArgumentParser(description="""
+A Python-based autograder for Jupyter Notebooks and Python scripts that runs locally on the instructors machine.
+Also supports use of Gradescope's autograding service, assignment distribution with otter-assign, and public tests
+that students can run while working on assignments.
+""")
+subparsers = parser.add_subparsers()
+
+
+
+##### PARSER FOR otter grade #####
+grade_parser = subparsers.add_parser("grade", description="Grade assignments locally using Docker containers")
+
+# necessary path arguments
+grade_parser.add_argument("-p", "--path", type=str, default="./", help="Path to directory of submissions")
+grade_parser.add_argument("-t", "--tests-path", type=str, default="./tests/", help="Path to directory of tests")
+grade_parser.add_argument("-o", "--output-path", type=str, default="./", help="Path to which to write output")
+
+# metadata parser arguments
+grade_parser.add_argument("-g", "--gradescope", action="store_true", default=False, help="Flag for Gradescope export")
+grade_parser.add_argument("-c", "--canvas", action="store_true", default=False, help="Flag for Canvas export")
+grade_parser.add_argument("-j", "--json", default=False, help="Flag for path to JSON metadata")
+grade_parser.add_argument("-y", "--yaml", default=False, help="Flag for path to YAML metadata")
+
+# script grading argument
+grade_parser.add_argument("-s", "--scripts", action="store_true", default=False, help="Flag to incidicate grading Python scripts")
+
+# PDF export options
+grade_parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
+grade_parser.add_argument("--tag-filter", action="store_true", default=False, help="Create a tag-filtered PDF for manual grading")
+grade_parser.add_argument("--html-filter", action="store_true", default=False, help="Create an HTML comment-filtered PDF for manual grading")
+
+# other settings and optional arguments
+grade_parser.add_argument("-f", "--files", nargs="+", help="Specify support files needed to execute code (e.g. utils, data files)")
+grade_parser.add_argument("-v", "--verbose", action="store_true", help="Flag for verbose output")
+grade_parser.add_argument("-r", "--requirements", default="requirements.txt", type=str, help="Flag for Python requirements file path; ./requirements.txt automatically checked")
+grade_parser.add_argument("--containers", type=int, help="Specify number of containers to run in parallel")
+grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
+grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
+
+grade_parser.set_defaults(func=grade.main)
+	
+
+
+##### PARSER FOR otter generate #####
+generate_parser = subparsers.add_parser("generate", description="Generates zipfile to configure Gradescope autograder")
+generate_parser.add_argument("-t", "--tests-path", nargs='?', type=str, default="./tests/", help="Path to test files")
+generate_parser.add_argument("-o", "--output-path", nargs='?', type=str, default="./", help="Path to which to write zipfile")
+generate_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
+generate_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
+generate_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
+generate_parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
+generate_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
+
+generate_parser.set_defaults(func=generate.main)
+
+
+
+##### PARSER FOR otter check #####
+check_parser = subparsers.add_parser("check", description="Checks Python file against tests")
+check_parser.add_argument("file", help="Python file to grade")
+check_parser.add_argument("-q", "--question", help="Grade a specific test")
+check_parser.add_argument("-t", "--tests-path", default="tests", help="Path to test files")
+
+check_parser.set_defaults(func=check.main)
+
+
+
+##### PARSER FOR otter assign #####
+assign_parser = subparsers.add_parser("assign", description="Create distribution versions of Otter Assign-formatted notebook")
+assign_parser.add_argument("master", help="Notebook with solutions and tests.")
+assign_parser.add_argument("result", help="Directory containing the result.")
+assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
+assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
+assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")
+assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
+assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
+assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
+assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
+
+assign_parser.set_defaults(func=assign.main)
+
+
 
 if __name__ == "__main__":
-	if sys.argv[1] == "gen":
-		del sys.argv[1]
-		gs_generator.main()
-	elif sys.argv[1] == "check":
-		del sys.argv[1]
-		script.main()
+	args = parser.parse_args()
+	if hasattr(args, 'func'):
+		args.func(args)
 	else:
-		cli.main()
+		print("You must specify a command:\n    assign\n    check\n    generate\n    grade")

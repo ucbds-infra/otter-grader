@@ -2,7 +2,7 @@
 
 When exporting IPython notebooks as PDFs, Otter uses the library nb2pdf that relies on nbpdfexport and chromium to export notebooks without pandoc or LaTeX. This requires that chromium be installed both in the Docker container being used for grading and on the JupyterHub distribution on which students export their notebooks from the `Notebook` API. 
 
-The `Notebook.export` function encapsulates PDF generation on the student end, and by default filtering is turned on. To generate unfiltered PDFs with `Notebook.export`, set `filtering=False` in your call. To generate unfiltered PDFs from the command line, use the `--pdf` flag when calling `otter`.
+The `Notebook.export` function encapsulates PDF generation on the student end, and by default filtering is turned on. To generate unfiltered PDFs with `Notebook.export`, set `filtering=False` in your call. To generate unfiltered PDFs from the command line, use the `--pdf` flag when calling `otter grade`.
 
 ## Cell Filtering
 

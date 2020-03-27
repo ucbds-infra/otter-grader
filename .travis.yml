@@ -9,7 +9,8 @@ services:
   - docker
 
 before_install:
-  - docker pull ucbdsinfra/otter-grader
+  - docker pull ucbdsinfra/otter-grader:latest
+  - docker pull gradescope/auto-builds:latest
 
 install:
   - pip install -r requirements.txt

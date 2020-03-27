@@ -2,15 +2,18 @@
 ##### In-Notebook Checks for Otter-Grader #####
 ###############################################
 
-from .gofer import check
 import inspect
 import requests
 import json
 import os
+
 from getpass import getpass
+from glob import glob
 from nb2pdf import convert
 from IPython.display import display, HTML
-from glob import glob
+
+from .execute import check
+
 
 class Notebook:
 	"""Notebook class for in-notebook autograding
@@ -47,7 +50,7 @@ class Notebook:
 		Args:
 			question (str): Name of question being graded
 			global_env (dict): Global environment resulting from execution of a single 
-				notebook/script (see grade.execute_notebook for more on this)
+				notebook/script (see execute.execute_notebook for more on this)
 
 		Returns:
 			OKTestsResult: Result of running gofer.check which contains grade, failed tests, and
