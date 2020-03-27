@@ -9,7 +9,7 @@ from nb2pdf import convert
 from IPython.display import display, HTML
 from glob import glob
 
-from .gofer import check
+from .execute import check
 
 
 class Notebook:
