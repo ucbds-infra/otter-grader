@@ -16,8 +16,12 @@ from unittest import mock
 from otter import Notebook
 
 # read in argument parser
+bin_globals = {}
+
 with open("bin/otter") as f:
-    exec(f.read())
+    exec(f.read(), bin_globals)
+
+parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test-check/"
 

@@ -7,21 +7,55 @@ import os
 import nb2pdf
 import re
 import json
+import ast
 import itertools
+import inspect
 import pandas as pd
 
 from glob import glob
 from unittest import mock
+from contextlib import redirect_stdout, redirect_stderr
+from IPython import get_ipython
 from IPython.display import display
 
-from .gofer import *
+from .ok_parser import OKTests, CheckCallWrapper
+from .utils import hide_outputs, id_generator
 
 try:
     from IPython.core.inputsplitter import IPythonInputSplitter
 except ImportError:
     raise ImportError('IPython needs to be installed for notebook grading')
 
-# copied from https://github.com/data-8/Gofer-Grader/blob/master/gofer/ok.py#L210
+
+def check(test_file_path, global_env=None):
+    """
+    check global_env against given test_file in oktest format
+    If global_env is none, the global environment of the calling
+    function is used. The following two calls are equivalent:
+    check('tests/q1.py')
+    check('tests/q1.py', globals())
+    
+    Args:
+        test_file_path (str): Path to ok test file
+        global_env (dict of str: str, optional): A global environment resulting from the execution 
+            of a python script or notebook.
+
+    Returns:
+        OKTestsResult: result of running the tests in the given global environment.
+
+    """
+    tests = OKTests([test_file_path])
+
+    if global_env is None:
+        # Get the global env of our callers - one level below us in the stack
+        # The grade method should only be called directly from user / notebook
+        # code. If some other method is calling it, it should also use the
+        # inspect trick to pass in its parents' global env.
+        global_env = inspect.currentframe().f_back.f_globals
+
+    return tests.run(global_env, include_grade=False)
+
+
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, gradescope=False):
     """
     Grade a notebook file & return grade
@@ -41,11 +75,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         dict: a score mapping with values for each test, student score, and total points possible 
     """
     # ensure this is not being executed inside a notebook
-    try:
-        __IPYTHON__
-        assert False, "Cannot execute inside Jupyter Notebook"
-    except NameError:
-        pass
+    assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"
 
     if not script:
         try:

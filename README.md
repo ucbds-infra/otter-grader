@@ -11,6 +11,10 @@ Otter-Grader is an open-source local grader from the Division of Computing, Data
 
 The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
+## Contributing
+
+PRs are welcome! Please submit a PR to the master branch with any updates. Make sure to update the changelog in the docs with any information about the contribution.
+
 ## Changelog
 
-The changelog can be found in Otter's [documentation](https://otter-grader.rtfd.io).
+The changelog can be found in the [documentation](https://otter-grader.rtfd.io).

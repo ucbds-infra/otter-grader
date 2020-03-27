@@ -7,7 +7,7 @@ import pandas as pd
 
 from .metadata import *
 from .containers import *
-from .utils import *
+from .utils import merge_csv
 
 
 def main(args):

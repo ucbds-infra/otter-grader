@@ -7,8 +7,7 @@ import os
 from glob import glob
 from jinja2 import Template
 
-from .execute import grade_notebook
-from .gofer import check
+from .execute import grade_notebook, check
 from .utils import block_print, enable_print
 
 

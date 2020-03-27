@@ -10,6 +10,7 @@ codecov
 jinja2
 docker
 nb2pdf
+requests
 psycopg2
 queries
 pyyaml

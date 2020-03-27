@@ -18,8 +18,12 @@ from otter.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParse
 from otter.execute import main
 
 # read in argument parser
+bin_globals = {}
+
 with open("bin/otter") as f:
-    exec(f.read())
+    exec(f.read(), bin_globals)
+
+parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test-grade/"
 
@@ -28,7 +32,7 @@ class TestGrade(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         create_image_cmd = ["make", "docker-test"]
-        create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
+        subprocess.run(create_image_cmd)#, stdout=PIPE, stderr=PIPE)
 
 
     def test_docker(self):

@@ -9,7 +9,7 @@ import os
 import re
 import shutil
 
-from .utils import *
+from .utils import list_files
 
 
 FILENAME_REGEX = r"^.+\."

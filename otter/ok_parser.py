@@ -1,72 +1,23 @@
-#######################################
-##### Functions from Gofer-Grader #####
-#######################################
+############################################
+##### OK Test Parser from Gofer-Grader #####
+############################################
 
-
-import inspect
 import ast
 import os
-import sys
 import doctest
 import io
-import itertools
-import json
-import random
 import string
 
 from glob import glob
-from contextlib import redirect_stderr, redirect_stdout, contextmanager
+from contextlib import redirect_stderr, redirect_stdout
 from textwrap import dedent
 from jinja2 import Template
-from IPython import get_ipython
 from pygments import highlight
 from pygments.lexers import PythonConsoleLexer
 from pygments.formatters import HtmlFormatter
 
-def flush_inline_matplotlib_plots():
-    """
-    Flush matplotlib plots immediately, rather than asynchronously.
-    Basically, the inline backend only shows the plot after the entire
-    cell executes, which means we can't easily use a contextmanager to
-    suppress displaying it. See https://github.com/jupyter-widgets/ipywidgets/issues/1181/
-    and https://github.com/ipython/ipython/issues/10376 for more details. This
-    function displays flushes any pending matplotlib plots if we are using
-    the inline backend.
-    Stolen from https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35
-    """
-    if 'matplotlib' not in sys.modules:
-        # matplotlib hasn't been imported, nothing to do.
-        return
+from .utils import hide_outputs
 
-    try:
-        import matplotlib as mpl
-        from ipykernel.pylab.backend_inline import flush_figures
-    except ImportError:
-        return
-    # except KeyError:
-    #     return
-
-    if mpl.get_backend() == 'module://ipykernel.pylab.backend_inline':
-        flush_figures()
-
-@contextmanager
-def hide_outputs():
-    """
-    Context manager for hiding outputs from display() calls.
-    IPython handles matplotlib outputs specially, so those are supressed too.
-    """
-    ipy = get_ipython()
-    if ipy is None:
-        # Not running inside ipython!
-        yield
-        return
-    old_formatters = ipy.display_formatter.formatters
-    ipy.display_formatter.formatters = {}
-    try:
-        yield
-    finally:
-        # flush_inline_matplotlib_plots()
-        ipy.display_formatter.formatters = old_formatters
 
 class CheckCallWrapper(ast.NodeTransformer):
     """NodeTransformer visits and replaces nodes in place.
@@ -124,6 +75,7 @@ class CheckCallWrapper(ast.NodeTransformer):
         else:
             return node
 
+
 def run_doctest(name, doctest_string, global_environment):
     """
     Run a single test with given global_environment.
@@ -165,6 +117,7 @@ def run_doctest(name, doctest_string, global_environment):
         return (True, '')
     else:
         return False, runresults.getvalue()
+
 
 class OKTest:
     """
@@ -305,6 +258,7 @@ Test result:
 
         return cls(path, tests, test_spec.get('points', 1), test_spec.get('hidden', True))
 
+
 class OKTests:
     """Test Class for Ok-style tests used to grade assignments.
     
@@ -353,6 +307,7 @@ class OKTests:
 
         return OKTestsResult(grade, self.paths, self.tests, passed_tests,
                              failed_tests, include_grade)
+
 
 class OKTestsResult:
     """
@@ -415,7 +370,6 @@ class OKTestsResult:
     {% endif %}
     """)
 
-
     def __init__(self, grade, paths, tests, passed_tests, failed_tests, include_grade=True):
         self.grade = grade
         self.paths = paths
@@ -441,45 +395,3 @@ class OKTestsResult:
             tests=self.tests,
             include_grade=self.include_grade
         )
-
-def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    """Used to generate a dynamic variable name for grading functions
-
-    This function generates a random name using the given length and character set.
-    
-    Args:
-        size (int): Length of output name
-        chars (str): Set of characters used to create function name
-    
-    Returns:
-        str: Randomized string name for grading function
-
-    """
-    return ''.join(random.choice(chars) for _ in range(size))
-
-def check(test_file_path, global_env=None):
-    """
-    check global_env against given test_file in oktest format
-    If global_env is none, the global environment of the calling
-    function is used. The following two calls are equivalent:
-    check('tests/q1.py')
-    check('tests/q1.py', globals())
-    
-    Args:
-        test_file_path (str): Path to ok test file
-        global_env (dict of str: str, optional): A global environment resulting from the execution 
-            of a python script or notebook.
-
-    Returns:
-        OKTestsResult: result of running the tests in the given global environment.
-
-    """
-    tests = OKTests([test_file_path])
-
-    if global_env is None:
-        # Get the global env of our callers - one level below us in the stack
-        # The grade method should only be called directly from user / notebook
-        # code. If some other method is calling it, it should also use the
-        # inspect trick to pass in its parents' global env.
-        global_env = inspect.currentframe().f_back.f_globals
-    return tests.run(global_env, include_grade=False)
