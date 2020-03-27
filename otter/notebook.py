@@ -24,27 +24,30 @@ class Notebook:
 
 	def __init__(self, test_dir="./tests")#, config_path="config.json", otter_service_enabled=False):
 		self._path = test_dir
+		self._service_enabled = False
 		# self._otter_service = otter_service_enabled
 
 		# if self._otter_service == True:
 		
 		# assume using otter service if there is a .otter file
-		if glob("*.otter"):
+		otter_configs = glob("*.otter")
+		if otter_configs:
+			self._service_enabled = True
+
 			# check that config_path exists
-			assert os.path.exists(config_path) and os.path.isfile(config_path), \
-			"{} is not a valid config path".format(config_path)
+			assert assert len(otter_configs) == 1, "More than 1 otter config file found"
 
 			# load in config file
-			with open(config_path) as f:
+			with open(otter_configs) as f:
 				self._config = json.load(f)
 
 			# check that config file has required info
-			assert all([i in self._config for i in ["server_url", "auth", "notebook"]]), \
-			"config file missing required information"
-			assert self._config["auth"] in ["google", "none"], "invalid auth provider"
+			assert all([key in self._config for key in ["server_url", "auth", "notebook"]]), "config file missing required information"
+			assert self._config["auth"] in ["google", "default"], "invalid auth provider"
 
 			self._google_auth_url = os.path.join(self._config["server_url"], "google_auth")
 			self._submit_url = os.path.join(self._config["server_url"], "submit")
+
 
 	def check(self, question, global_env=None):
 		"""Checks question using gofer

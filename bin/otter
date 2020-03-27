@@ -101,6 +101,15 @@ server_parser = subparsers.add_parser("service", description="Create and manage 
 server_subparsers = server_parser.add_subparsers()
 
 
+
+##### PARSER FOR otter service build #####
+server_build_parser = server_subparsers.add_parser("build", description="Build images for an otter-service instance")
+# TODO: add arguments
+
+server_build_parser.set_defaults(func=service.build)
+
+
+
 ##### PARSER FOR otter service create #####
 server_create_parser = server_subparsers.add_parser("create", description="Create database for otter-service")
 # TODO: add arguments
@@ -113,13 +122,6 @@ server_start_parser = server_subparsers.add_parser("start", description="Start a
 server_start_parser.add_argument("--port", type=int, default=8888, help="Port for server to listen on")
 
 server_start_parser.set_defaults(func=service.start)
-
-
-##### PARSER FOR otter service update #####
-server_update_parser = server_subparsers.add_parser("update", description="Update images for an otter-service instance")
-# TODO: add arguments
-
-server_update_parser.set_defaults(func=service.update)
 
 
 
