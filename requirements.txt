@@ -10,4 +10,5 @@ codecov
 jinja2
 docker
 nb2pdf
+requests
 tornado==5.1.1
