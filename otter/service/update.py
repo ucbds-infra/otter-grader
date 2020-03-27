@@ -25,7 +25,8 @@ ADD {{ global_requirements }} /home
 RUN pip3 install /home/{{ global_requirements_filename }}{% endif %}
 """)
 
-def main():
+def main(args):
+
     repo_path = input("What is the absolute path of your assignments repo? [/home/assignments] ")
     if not repo_path:
         repo_path = "/home/assignments"

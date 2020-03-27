@@ -2,9 +2,22 @@
 ##### otter server create Script #####
 ######################################
 
-from psycopg2 import connect, extensions, sql
+MISSING_PACKAGES = False
 
-def main():
+try:
+    from psycopg2 import connect, extensions, sql
+except ImportError:
+    # don't need requirements to use otter without otter service
+    MISSING_PACKAGES = True
+
+def main(args):
+    if MISSING_PACKAGES:
+        raise ImportError(
+            "Missing some packages required for otter service. "
+            "Please install all requirements at "
+            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+        )
+
     conn = connect(dbname='postgres',
                 user='admin',
                 host='',
