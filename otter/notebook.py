@@ -128,7 +128,11 @@ class Notebook:
 			username = input("Username: ")
 			password = getpass("Password: ")
 
-			#TODO: in-notebook auth
+			#in-notebook auth
+			response = requests.get(url=os.path.join(self._config["server_url"], "personal_auth"), params={"username":username, "password":password})
+			print("Your API Key is {}\n".format(response.content.decode("utf-8")))
+			print("Paste this in and hit enter")
+			self._api_key = input()
 
 	def _submit(self):
 		assert self._otter_service == True, 'notebook not configured for otter service'
@@ -142,7 +146,7 @@ class Notebook:
 
 		with open(notebook_path) as f:
 			notebook_data = json.load(f)
-	
+		print("Submitting notebook to server")
 		response = requests.post(self._submit_url, json.dumps({
 			"api_key": self._api_key,
 			"nb": notebook_data,
