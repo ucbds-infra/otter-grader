@@ -10,6 +10,9 @@ from otter import grade
 from otter import generate
 from otter import check
 from otter import assign
+from otter.server import create
+from otter.server import start
+from otter.server import update
 
 
 
@@ -19,6 +22,46 @@ Also supports use of Gradescope's autograding service, assignment distribution w
 that students can run while working on assignments.
 """)
 subparsers = parser.add_subparsers()
+
+
+
+##### PARSER FOR otter assign #####
+assign_parser = subparsers.add_parser("assign", description="Create distribution versions of Otter Assign-formatted notebook")
+assign_parser.add_argument("master", help="Notebook with solutions and tests.")
+assign_parser.add_argument("result", help="Directory containing the result.")
+assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
+assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
+assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")
+assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
+assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
+assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
+assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
+
+assign_parser.set_defaults(func=assign.main)
+
+
+
+##### PARSER FOR otter check #####
+check_parser = subparsers.add_parser("check", description="Checks Python file against tests")
+check_parser.add_argument("file", help="Python file to grade")
+check_parser.add_argument("-q", "--question", help="Grade a specific test")
+check_parser.add_argument("-t", "--tests-path", default="tests", help="Path to test files")
+
+check_parser.set_defaults(func=check.main)
+
+
+
+##### PARSER FOR otter generate #####
+generate_parser = subparsers.add_parser("generate", description="Generates zipfile to configure Gradescope autograder")
+generate_parser.add_argument("-t", "--tests-path", nargs='?', type=str, default="./tests/", help="Path to test files")
+generate_parser.add_argument("-o", "--output-path", nargs='?', type=str, default="./", help="Path to which to write zipfile")
+generate_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
+generate_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
+generate_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
+generate_parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
+generate_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
+
+generate_parser.set_defaults(func=generate.main)
 
 
 
@@ -53,46 +96,33 @@ grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Cu
 grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
 
 grade_parser.set_defaults(func=grade.main)
-	
-
-
-##### PARSER FOR otter generate #####
-generate_parser = subparsers.add_parser("generate", description="Generates zipfile to configure Gradescope autograder")
-generate_parser.add_argument("-t", "--tests-path", nargs='?', type=str, default="./tests/", help="Path to test files")
-generate_parser.add_argument("-o", "--output-path", nargs='?', type=str, default="./", help="Path to which to write zipfile")
-generate_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
-generate_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
-generate_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
-generate_parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
-generate_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
-
-generate_parser.set_defaults(func=generate.main)
 
 
 
-##### PARSER FOR otter check #####
-check_parser = subparsers.add_parser("check", description="Checks Python file against tests")
-check_parser.add_argument("file", help="Python file to grade")
-check_parser.add_argument("-q", "--question", help="Grade a specific test")
-check_parser.add_argument("-t", "--tests-path", default="tests", help="Path to test files")
-
-check_parser.set_defaults(func=check.main)
+###### PARSER FOR otter server #####
+server_parser = subparsers.add_parser("server", description="Create and manage an Otter Service server")
+server_subparsers = server_parser.add_subparsers()
 
 
+##### PARSER FOR otter server create #####
+server_create_parser = server_subparsers.add_parser("create", description="Create database for Otter Service")
+# TODO: add arguments
 
-##### PARSER FOR otter assign #####
-assign_parser = subparsers.add_parser("assign", description="Create distribution versions of Otter Assign-formatted notebook")
-assign_parser.add_argument("master", help="Notebook with solutions and tests.")
-assign_parser.add_argument("result", help="Directory containing the result.")
-assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
-assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
-assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")
-assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
-assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
-assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
-assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
+server_create_parser.set_defaults(func=create.main)
 
-assign_parser.set_defaults(func=assign.main)
+
+##### PARSER FOR otter server start #####
+server_start_parser = server_subparsers.add_parser("start", description="Start an Otter Service server")
+server_start_parser.add_argument("--port", type=int, default=8888, help="Port for server to listen on")
+
+server_start_parser.set_defaults(func=start.main)
+
+
+##### PARSER FOR otter server update #####
+server_update_parser = server_subparsers.add_parser("update", description="Update images for Otter Service server")
+# TODO: add arguments
+
+server_update_parser.set_defaults(func=update.main)
 
 
 

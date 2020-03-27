@@ -107,7 +107,7 @@ def launch_parallel_containers(
 
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
 unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, 
-scripts=False, no_kill=False, output_path="./"):
+scripts=False, no_kill=False, output_path="./", logging=False):
     """
     Grades multiple assignments in a directory using a single docker container. 
 
@@ -187,6 +187,21 @@ scripts=False, no_kill=False, output_path="./"):
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
     # print(grade.stdout.decode("utf-8"))
     # print(grade.stderr.decode("utf-8"))
+
+    # TODO: move this to serve with contextlib???
+    # if logging:
+    #     # TODO: are the print statements necessary?
+    #     # # Logging stdout/stderr with print statements
+    #     # print(grade.stdout.decode('utf-8'))
+    #     # print(grade.stderr.decode('utf-8'))
+
+    #     # Logging stdout/stderr to file
+    #     log_file = open("log_file_container_ {}.txt".format(id), "a+")
+    #     log_file.write(grade.stdout.decode('utf-8'))
+    #     log_file.write("\n")
+    #     log_file.write(grade.stderr.decode('utf-8'))
+    #     log_file.write("\n")
+    #     log_file.close()
 
     all_commands = [launch, copy, tests, grade]
     try:
