@@ -32,7 +32,7 @@ class TestGrade(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         create_image_cmd = ["make", "docker-test"]
-        create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
+        subprocess.run(create_image_cmd)#, stdout=PIPE, stderr=PIPE)
 
 
     def test_docker(self):
