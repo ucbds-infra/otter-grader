@@ -18,8 +18,12 @@ from otter.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParse
 from otter.execute import main
 
 # read in argument parser
+bin_globals = {}
+
 with open("bin/otter") as f:
-    exec(f.read())
+    exec(f.read(), bin_globals)
+
+parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test-grade/"
 
