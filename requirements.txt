@@ -10,4 +10,8 @@ codecov
 jinja2
 docker
 nb2pdf
-tornado==5.1.1
+psycopg2
+queries
+pyyaml
+docker
+tornado
