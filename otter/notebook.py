@@ -14,7 +14,6 @@ from IPython.display import display, HTML
 
 from .execute import check
 
-
 class Notebook:
 	"""Notebook class for in-notebook autograding
 	
@@ -23,11 +22,14 @@ class Notebook:
 
 	"""
 
-	def __init__(self, test_dir="./tests", config_path="config.json", otter_service_enabled=False):
+	def __init__(self, test_dir="./tests")#, config_path="config.json", otter_service_enabled=False):
 		self._path = test_dir
-		self._otter_service = otter_service_enabled
+		# self._otter_service = otter_service_enabled
 
-		if self._otter_service == True:
+		# if self._otter_service == True:
+		
+		# assume using otter service if there is a .otter file
+		if glob("*.otter"):
 			# check that config_path exists
 			assert os.path.exists(config_path) and os.path.isfile(config_path), \
 			"{} is not a valid config path".format(config_path)
