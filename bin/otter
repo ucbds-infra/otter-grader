@@ -10,10 +10,7 @@ from otter import grade
 from otter import generate
 from otter import check
 from otter import assign
-from otter.server import create
-from otter.server import start
-from otter.server import update
-
+from otter import service
 
 
 parser = argparse.ArgumentParser(description="""
@@ -26,7 +23,7 @@ subparsers = parser.add_subparsers()
 
 
 ##### PARSER FOR otter assign #####
-assign_parser = subparsers.add_parser("assign", description="Create distribution versions of Otter Assign-formatted notebook")
+assign_parser = subparsers.add_parser("assign", description="Create distribution versions of otter-assign-formatted notebook")
 assign_parser.add_argument("master", help="Notebook with solutions and tests.")
 assign_parser.add_argument("result", help="Directory containing the result.")
 assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
@@ -99,30 +96,30 @@ grade_parser.set_defaults(func=grade.main)
 
 
 
-###### PARSER FOR otter server #####
-server_parser = subparsers.add_parser("server", description="Create and manage an Otter Service server")
+###### PARSER FOR otter service #####
+server_parser = subparsers.add_parser("service", description="Create and manage an otter-service")
 server_subparsers = server_parser.add_subparsers()
 
 
-##### PARSER FOR otter server create #####
-server_create_parser = server_subparsers.add_parser("create", description="Create database for Otter Service")
+##### PARSER FOR otter service create #####
+server_create_parser = server_subparsers.add_parser("create", description="Create database for otter-service")
 # TODO: add arguments
 
-server_create_parser.set_defaults(func=create.main)
+server_create_parser.set_defaults(func=service.create)
 
 
-##### PARSER FOR otter server start #####
-server_start_parser = server_subparsers.add_parser("start", description="Start an Otter Service server")
+##### PARSER FOR otter service start #####
+server_start_parser = server_subparsers.add_parser("start", description="Start an otter-service instance")
 server_start_parser.add_argument("--port", type=int, default=8888, help="Port for server to listen on")
 
-server_start_parser.set_defaults(func=start.main)
+server_start_parser.set_defaults(func=service.start)
 
 
-##### PARSER FOR otter server update #####
-server_update_parser = server_subparsers.add_parser("update", description="Update images for Otter Service server")
+##### PARSER FOR otter service update #####
+server_update_parser = server_subparsers.add_parser("update", description="Update images for an otter-service instance")
 # TODO: add arguments
 
-server_update_parser.set_defaults(func=update.main)
+server_update_parser.set_defaults(func=service.update)
 
 
 
