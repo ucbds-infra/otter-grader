@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
     <link rel="prev" title="PDF Generation and Filtering" href="pdfs.html" /> 
 
   
@@ -84,25 +85,28 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using_otter.html">Using Otter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_assign.html">Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_check.html">Student Usage: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_grade.html">Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_generate.html">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The Otter API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-otter.cli">otter.cli module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-otter.assign">otter.assign module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-otter.check">otter.check module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.containers">otter.containers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-otter.execute">otter.execute module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-otter.generate">otter.generate module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.gofer">otter.gofer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.grade">otter.grade module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-otter.gs_generator">otter.gs_generator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.metadata">otter.metadata module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.notebook">otter.notebook module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-otter.script">otter.script module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.utils">otter.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -172,13 +176,213 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-otter.cli">
-<span id="otter-cli-module"></span><h2>otter.cli module<a class="headerlink" href="#module-otter.cli" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="otter.cli.main">
-<code class="descclassname">otter.cli.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.cli.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function for running otter from the command line.</p>
+<div class="section" id="module-otter.assign">
+<span id="otter-assign-module"></span><h2>otter.assign module<a class="headerlink" href="#module-otter.assign" title="Permalink to this headline">¶</a></h2>
+<p>Generate student &amp; autograder views of a notebook in Otter format.</p>
+<dl class="class">
+<dt id="otter.assign.Test">
+<em class="property">class </em><code class="descclassname">otter.assign.</code><code class="descname">Test</code><span class="sig-paren">(</span><em>input</em>, <em>output</em>, <em>hidden</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.Test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="otter.assign.Test.hidden">
+<code class="descname">hidden</code><a class="headerlink" href="#otter.assign.Test.hidden" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="otter.assign.Test.input">
+<code class="descname">input</code><a class="headerlink" href="#otter.assign.Test.input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.assign.Test.output">
+<code class="descname">output</code><a class="headerlink" href="#otter.assign.Test.output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.add_close_export_to_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">add_close_export_to_cell</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.add_close_export_to_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an export close to the top of the cell</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.convert_to_ok">
+<code class="descclassname">otter.assign.</code><code class="descname">convert_to_ok</code><span class="sig-paren">(</span><em>nb_path</em>, <em>dir</em>, <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.convert_to_ok" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a master notebook to an ok notebook, tests dir, and .ok file.</p>
+<p>nb – Path
+endpoint – OK endpoint for notebook submission (e.g., cal/data100/sp19)
+dir – Path</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.find_question_spec">
+<code class="descclassname">otter.assign.</code><code class="descname">find_question_spec</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.find_question_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return line number of the BEGIN QUESTION line or None.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_case">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_case</code><span class="sig-paren">(</span><em>test</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_case" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an ok test case for a test.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_check_all_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_check_all_cell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_check_all_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate submit cells.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_close_export_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_close_export_cell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_close_export_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new cell to end question export</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_export_cells">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_export_cells</code><span class="sig-paren">(</span><em>nb_path</em>, <em>instruction_text</em>, <em>filtering=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_export_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate submit cells.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_init_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_init_cell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_init_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a cell to initialize ok object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_ok_cells">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_ok_cells</code><span class="sig-paren">(</span><em>cells</em>, <em>tests_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_ok_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate notebook cells for the OK version of a master notebook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(ok_cells, list of manual question names)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_question_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_question_cell</code><span class="sig-paren">(</span><em>cell</em>, <em>manual</em>, <em>format</em>, <em>in_manual_block</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_question_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cell with metadata hidden in an HTML comment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_suite">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_suite</code><span class="sig-paren">(</span><em>tests</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_suite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an ok test suite for a test.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_test_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_test_cell</code><span class="sig-paren">(</span><em>question</em>, <em>tests</em>, <em>tests_dir</em>, <em>hidden=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_test_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a test cell.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.gen_views">
+<code class="descclassname">otter.assign.</code><code class="descname">gen_views</code><span class="sig-paren">(</span><em>master_nb</em>, <em>result_dir</em>, <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_views" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate student and autograder views.</p>
+<p>master_nb – Dict of master notebook JSON
+result_dir – Path to the result directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.get_source">
+<code class="descclassname">otter.assign.</code><code class="descname">get_source</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.get_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the source code of a cell in a way that works for both nbformat and json.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.is_markdown_solution_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">is_markdown_solution_cell</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.is_markdown_solution_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the cell matches MD_SOLUTION_REGEX</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.is_question_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">is_question_cell</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.is_question_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether cell contains BEGIN QUESTION in a block quote.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.is_solution_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">is_solution_cell</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.is_solution_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whther the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.is_test_cell">
+<code class="descclassname">otter.assign.</code><code class="descname">is_test_cell</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.is_test_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether it’s a code cell containing a test.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.lock">
+<code class="descclassname">otter.assign.</code><code class="descname">lock</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.main">
+<code class="descclassname">otter.assign.</code><code class="descname">main</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.read_question_metadata">
+<code class="descclassname">otter.assign.</code><code class="descname">read_question_metadata</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.read_question_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return question metadata from a question cell.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.read_test">
+<code class="descclassname">otter.assign.</code><code class="descname">read_test</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.read_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the contents of a test as an (input, output, hidden) tuple.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.remove_hidden_tests">
+<code class="descclassname">otter.assign.</code><code class="descname">remove_hidden_tests</code><span class="sig-paren">(</span><em>test_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.remove_hidden_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rewrite test files to remove hidden tests.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.remove_output">
+<code class="descclassname">otter.assign.</code><code class="descname">remove_output</code><span class="sig-paren">(</span><em>nb</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.remove_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all outputs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.run_tests">
+<code class="descclassname">otter.assign.</code><code class="descname">run_tests</code><span class="sig-paren">(</span><em>nb_path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.run_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run tests in the autograder version of the notebook.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.strip_solutions">
+<code class="descclassname">otter.assign.</code><code class="descname">strip_solutions</code><span class="sig-paren">(</span><em>original_nb_path</em>, <em>stripped_nb_path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.strip_solutions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a notebook with solutions stripped.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.write_test">
+<code class="descclassname">otter.assign.</code><code class="descname">write_test</code><span class="sig-paren">(</span><em>path</em>, <em>test</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.write_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an OK test file.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.check">
+<span id="otter-check-module"></span><h2>otter.check module<a class="headerlink" href="#module-otter.check" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.check.main">
+<code class="descclassname">otter.check.</code><code class="descname">main</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.check.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-otter.containers">
@@ -253,6 +457,140 @@ of the assignment needing manual grading.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.execute">
+<span id="otter-execute-module"></span><h2>otter.execute module<a class="headerlink" href="#module-otter.execute" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.execute.execute_notebook">
+<code class="descclassname">otter.execute.</code><code class="descname">execute_notebook</code><span class="sig-paren">(</span><em>nb</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em>, <em>gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_notebook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes an ipython notebook and return the global environment that results from execution.</p>
+<p>Execute notebook &amp; return the global environment that results from execution.
+TODO: write a note about the injection of check_results
+If ignore_errors is True, exceptions are swallowed.
+secret contains random digits so check_results and check are not easily modifiable
+nb is passed in as a dictionary that’s a parsed ipynb file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>(</strong><strong>dict of str</strong> (<em>nb</em>) – str): json representation of ipython notebook</li>
+<li><strong>secret</strong> (<em>str</em><em>, </em><em>optional</em>) – randomly generated integer used to rebind check function</li>
+<li><strong>initial_env</strong> (<em>str</em><em>, </em><em>optional</em>) – name of initial environment</li>
+<li><strong>ignore_errors</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether exceptions should be ignored</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Results:</dt>
+<dd>dict of str: object: global environment resulting from executing all code of the input notebook</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.execute.execute_script">
+<code class="descclassname">otter.execute.</code><code class="descname">execute_script</code><span class="sig-paren">(</span><em>script</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes code of a python (.py) script and returns the resulting global environment</p>
+<p>Execute script &amp; return the global environment that results from execution.
+If ignore_errors is True, exceptions are swallowed.
+secret contains random digits so check_results and check are not easily modifiable
+script is passed in as a string</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>script</strong> (<em>str</em>) – string representation of python script code</li>
+<li><strong>secret</strong> (<em>str</em><em>, </em><em>optional</em>) – secret string for naming check function</li>
+<li><strong>initial_env</strong> (<em>str</em><em>, </em><em>optional</em>) – name of initial environment</li>
+<li><strong>ignore_errors</strong> (<em>bool</em>) – whether exceptions should be ignored</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Results:</dt>
+<dd>dict: global environment resulting from executing all code of the input script</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.execute.grade">
+<code class="descclassname">otter.execute.</code><code class="descname">grade</code><span class="sig-paren">(</span><em>ipynb_path</em>, <em>pdf</em>, <em>tag_filter</em>, <em>html_filter</em>, <em>script</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.grade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grades a single ipython notebook and returns the score</p>
+<p>If no PDF is needed, set the pdf, tag_filter, and html_filter parameters to false. For .py
+files, set script to true.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ipynb_path</strong> (<em>str</em>) – path to the ipython notebook</li>
+<li><strong>pdf</strong> (<em>bool</em>) – set true if no filtering needed to generate pdf</li>
+<li><strong>tag_filter</strong> (<em>bool</em>) – whether cells should be filtered by tag</li>
+<li><strong>html_filter</strong> (<em>bool</em>) – whether cells should be filtered by comments</li>
+<li><strong>script</strong> (<em>bool</em>) – whether the input file is a python script</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a score mapping with values for each test, student score, and total points possible</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.execute.grade_notebook">
+<code class="descclassname">otter.execute.</code><code class="descname">grade_notebook</code><span class="sig-paren">(</span><em>notebook_path</em>, <em>tests_glob=None</em>, <em>name=None</em>, <em>ignore_errors=True</em>, <em>script=False</em>, <em>gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.grade_notebook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grade a notebook file &amp; return grade</p>
+<p>This function grades a single ipython notebook using the provided tests. If grading a .py file,
+set script to true.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>notebook_path</strong> (<em>str</em>) – path to a single notebook</li>
+<li><strong>tests_glob</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – names of test files</li>
+<li><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – initial environment name</li>
+<li><strong>ignore_errors</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether errors should be ignored, passed as an arg to
+execute functions</li>
+<li><strong>script</strong> (<em>bool</em><em>, </em><em>optional</em>) – true if the notebook_path is a python script, false if notebook</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a score mapping with values for each test, student score, and total points possible</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.execute.main">
+<code class="descclassname">otter.execute.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>When executing this file from the command line, this function will be run.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.generate">
+<span id="otter-generate-module"></span><h2>otter.generate module<a class="headerlink" href="#module-otter.generate" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.generate.main">
+<code class="descclassname">otter.generate.</code><code class="descname">main</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.generate.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function for configuring a Gradescope based autograder.</p>
 </dd></dl>
 
 </div>
@@ -406,22 +744,22 @@ doctest, so we roll with it.</p>
 
 <dl class="attribute">
 <dt id="otter.gofer.OKTest.html_result_fail_template">
-<code class="descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:10f2795c0&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:10fdacb38&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.gofer.OKTest.html_result_pass_template">
-<code class="descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:10e8a9390&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:10fdbe748&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.gofer.OKTest.plain_result_fail_template">
-<code class="descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:10f2794a8&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:10fdaca58&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.gofer.OKTest.plain_result_pass_template">
-<code class="descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:10e8c8198&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:10fdbe208&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -562,12 +900,12 @@ OKTest objects</p>
 
 <dl class="attribute">
 <dt id="otter.gofer.OKTestsResult.html_result_template">
-<code class="descname">html_result_template</code><em class="property"> = &lt;Template memory:10f264eb8&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="descname">html_result_template</code><em class="property"> = &lt;Template memory:10fdacb70&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.gofer.OKTestsResult.plain_result_template">
-<code class="descname">plain_result_template</code><em class="property"> = &lt;Template memory:10f264080&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plain_result_template</code><em class="property"> = &lt;Template memory:10fdac828&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -678,134 +1016,9 @@ of a python script/notebook</li>
 <div class="section" id="module-otter.grade">
 <span id="otter-grade-module"></span><h2>otter.grade module<a class="headerlink" href="#module-otter.grade" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="otter.grade.execute_notebook">
-<code class="descclassname">otter.grade.</code><code class="descname">execute_notebook</code><span class="sig-paren">(</span><em>nb</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em>, <em>gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.execute_notebook" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executes an ipython notebook and return the global environment that results from execution.</p>
-<p>Execute notebook &amp; return the global environment that results from execution.
-TODO: write a note about the injection of check_results
-If ignore_errors is True, exceptions are swallowed.
-secret contains random digits so check_results and check are not easily modifiable
-nb is passed in as a dictionary that’s a parsed ipynb file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>(</strong><strong>dict of str</strong> (<em>nb</em>) – str): json representation of ipython notebook</li>
-<li><strong>secret</strong> (<em>str</em><em>, </em><em>optional</em>) – randomly generated integer used to rebind check function</li>
-<li><strong>initial_env</strong> (<em>str</em><em>, </em><em>optional</em>) – name of initial environment</li>
-<li><strong>ignore_errors</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether exceptions should be ignored</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Results:</dt>
-<dd>dict of str: object: global environment resulting from executing all code of the input notebook</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="otter.grade.execute_script">
-<code class="descclassname">otter.grade.</code><code class="descname">execute_script</code><span class="sig-paren">(</span><em>script</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.execute_script" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executes code of a python (.py) script and returns the resulting global environment</p>
-<p>Execute script &amp; return the global environment that results from execution.
-If ignore_errors is True, exceptions are swallowed.
-secret contains random digits so check_results and check are not easily modifiable
-script is passed in as a string</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>script</strong> (<em>str</em>) – string representation of python script code</li>
-<li><strong>secret</strong> (<em>str</em><em>, </em><em>optional</em>) – secret string for naming check function</li>
-<li><strong>initial_env</strong> (<em>str</em><em>, </em><em>optional</em>) – name of initial environment</li>
-<li><strong>ignore_errors</strong> (<em>bool</em>) – whether exceptions should be ignored</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Results:</dt>
-<dd>dict: global environment resulting from executing all code of the input script</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="otter.grade.grade">
-<code class="descclassname">otter.grade.</code><code class="descname">grade</code><span class="sig-paren">(</span><em>ipynb_path</em>, <em>pdf</em>, <em>tag_filter</em>, <em>html_filter</em>, <em>script</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.grade" title="Permalink to this definition">¶</a></dt>
-<dd><p>Grades a single ipython notebook and returns the score</p>
-<p>If no PDF is needed, set the pdf, tag_filter, and html_filter parameters to false. For .py
-files, set script to true.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>ipynb_path</strong> (<em>str</em>) – path to the ipython notebook</li>
-<li><strong>pdf</strong> (<em>bool</em>) – set true if no filtering needed to generate pdf</li>
-<li><strong>tag_filter</strong> (<em>bool</em>) – whether cells should be filtered by tag</li>
-<li><strong>html_filter</strong> (<em>bool</em>) – whether cells should be filtered by comments</li>
-<li><strong>script</strong> (<em>bool</em>) – whether the input file is a python script</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a score mapping with values for each test, student score, and total points possible</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="otter.grade.grade_notebook">
-<code class="descclassname">otter.grade.</code><code class="descname">grade_notebook</code><span class="sig-paren">(</span><em>notebook_path</em>, <em>tests_glob=None</em>, <em>name=None</em>, <em>ignore_errors=True</em>, <em>script=False</em>, <em>gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.grade_notebook" title="Permalink to this definition">¶</a></dt>
-<dd><p>Grade a notebook file &amp; return grade</p>
-<p>This function grades a single ipython notebook using the provided tests. If grading a .py file,
-set script to true.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>notebook_path</strong> (<em>str</em>) – path to a single notebook</li>
-<li><strong>tests_glob</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – names of test files</li>
-<li><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – initial environment name</li>
-<li><strong>ignore_errors</strong> (<em>bool</em><em>, </em><em>optional</em>) – whether errors should be ignored, passed as an arg to
-execute functions</li>
-<li><strong>script</strong> (<em>bool</em><em>, </em><em>optional</em>) – true if the notebook_path is a python script, false if notebook</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a score mapping with values for each test, student score, and total points possible</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="otter.grade.main">
-<code class="descclassname">otter.grade.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>When executing this file from the command line, this function will be run.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-otter.gs_generator">
-<span id="otter-gs-generator-module"></span><h2>otter.gs_generator module<a class="headerlink" href="#module-otter.gs_generator" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="otter.gs_generator.main">
-<code class="descclassname">otter.gs_generator.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.gs_generator.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function for configuring a Gradescope based autograder.</p>
+<code class="descclassname">otter.grade.</code><code class="descname">main</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function for running otter from the command line.</p>
 </dd></dl>
 
 </div>
@@ -1217,7 +1430,7 @@ submissions_dir (str): Path to directory with student submission files</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>question</strong> (<em>str</em>) – Name of question being graded</li>
 <li><strong>global_env</strong> (<em>dict</em>) – Global environment resulting from execution of a single
-notebook/script (see grade.execute_notebook for more on this)</li>
+notebook/script (see execute.execute_notebook for more on this)</li>
 </ul>
 </td>
 </tr>
@@ -1267,28 +1480,20 @@ tags, respectively.</li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-otter.script">
-<span id="otter-script-module"></span><h2>otter.script module<a class="headerlink" href="#module-otter.script" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-otter.utils">
+<span id="otter-utils-module"></span><h2>otter.utils module<a class="headerlink" href="#module-otter.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="otter.script.blockPrint">
-<code class="descclassname">otter.script.</code><code class="descname">blockPrint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.script.blockPrint" title="Permalink to this definition">¶</a></dt>
+<dt id="otter.utils.block_print">
+<code class="descclassname">otter.utils.</code><code class="descname">block_print</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.block_print" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disables printing to stdout.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="otter.script.enablePrint">
-<code class="descclassname">otter.script.</code><code class="descname">enablePrint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.script.enablePrint" title="Permalink to this definition">¶</a></dt>
+<dt id="otter.utils.enable_print">
+<code class="descclassname">otter.utils.</code><code class="descname">enable_print</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.enable_print" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enables printing to stdout.</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="otter.script.main">
-<code class="descclassname">otter.script.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.script.main" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</div>
-<div class="section" id="module-otter.utils">
-<span id="otter-utils-module"></span><h2>otter.utils module<a class="headerlink" href="#module-otter.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="otter.utils.list_files">
 <code class="descclassname">otter.utils.</code><code class="descname">list_files</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.list_files" title="Permalink to this definition">¶</a></dt>
@@ -1338,6 +1543,8 @@ tags, respectively.</li>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="pdfs.html" class="btn btn-neutral" title="PDF Generation and Filtering" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

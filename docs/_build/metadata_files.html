@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Student Usage" href="student_usage.html" />
-    <link rel="prev" title="Test Files" href="test_files.html" /> 
+    <link rel="next" title="Student Usage: otter check and otter.Notebook" href="otter_check.html" />
+    <link rel="prev" title="Distributing Assignments: otter assign" href="otter_assign.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -85,16 +85,18 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using_otter.html">Using Otter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_assign.html">Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Metadata</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#rd-party-exports">3rd Party Exports</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metadata-files">Metadata Files</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_check.html">Student Usage: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_grade.html">Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_generate.html">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
 <li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -169,9 +171,9 @@
 <p>These two categories are broken down and described below.</p>
 <div class="section" id="rd-party-exports">
 <h2>3rd Party Exports<a class="headerlink" href="#rd-party-exports" title="Permalink to this headline">¶</a></h2>
-<p>If you are using a grading service like Gradescope or an LMS like Canvas to collect submissions, Otter can interpret the export format of these 3rd party services in place of a metadata file. To use a service like Gradescope or Canvas, download the submissions for an assignment, unzip the provided file, and then proceed as described in <a class="reference internal" href="command-line.html"><span class="doc">the command line usage</span></a> using the metadata flag corresponding to your chosen service.</p>
+<p>If you are using a grading service like Gradescope or an LMS like Canvas to collect submissions, Otter can interpret the export format of these 3rd party services in place of a metadata file. To use a service like Gradescope or Canvas, download the submissions for an assignment, unzip the provided file, and then proceed as described in <a class="reference internal" href="otter_grade.html"><span class="doc">Grading Locally</span></a> using the metadata flag corresponding to your chosen service.</p>
 <p>For example, if I had a Canvas export, I would unzip it, <code class="docutils literal notranslate"><span class="pre">cd</span></code> into the unzipped directory, copy my tests to <code class="docutils literal notranslate"><span class="pre">./tests</span></code>, and run</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="o">-</span><span class="n">c</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">grade</span> <span class="o">-</span><span class="n">c</span>
 </pre></div>
 </div>
 <p>to grade the submissions (assuming no extra requirements, no PDF generation, and no support files required).</p>
@@ -218,7 +220,7 @@
 <span class="p">]</span>
 </pre></div>
 </div>
-<p>A JSON- or YAML-formatted metadata file is specified to Otter using the <code class="docutils literal notranslate"><span class="pre">-j</span></code> or <code class="docutils literal notranslate"><span class="pre">-y</span></code> flag, respectively. Each flag requires a  single argument that corresponds to the path to the metadata file. See the “Basic Usage” section of the <a class="reference internal" href="command-line.html"><span class="doc">CLI documentation</span></a> for more information.</p>
+<p>A JSON- or YAML-formatted metadata file is specified to Otter using the <code class="docutils literal notranslate"><span class="pre">-j</span></code> or <code class="docutils literal notranslate"><span class="pre">-y</span></code> flag, respectively. Each flag requires a  single argument that corresponds to the path to the metadata file. See the “Basic Usage” section of <a class="reference internal" href="otter_grade.html"><span class="doc">Grading Locally</span></a> for more information.</p>
 </div>
 </div>
 
@@ -230,10 +232,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="student_usage.html" class="btn btn-neutral float-right" title="Student Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="otter_check.html" class="btn btn-neutral float-right" title="Student Usage: otter check and otter.Notebook" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="test_files.html" class="btn btn-neutral" title="Test Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="otter_assign.html" class="btn btn-neutral" title="Distributing Assignments: otter assign" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

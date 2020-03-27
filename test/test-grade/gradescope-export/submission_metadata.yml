@@ -1,0 +1,46 @@
+---
+12345_empty_file:
+  :submitters:
+  - :name: '12345'
+    :email: '12345'
+    :sid: '12345'
+    section_name: some-class-sem-001
+  :created_at: 2020-02-27 06:58:05.746365000 Z
+  :score: 17.5
+  :original_filename: HW_04.pdf
+23456_empty_file:
+  :submitters:
+  - :name: '23456'
+    :email: '23456'
+    :sid: '23456'
+    section_name: some-class-sem-001
+  :created_at: 2020-02-27 07:17:49.412963000 Z
+  :score: 19.5
+  :original_filename: HW04__1_.pdf
+34567_empty_file:
+  :submitters:
+  - :name: '34567'
+    :email: '34567'
+    :sid: '34567'
+    section_name: some-class-sem-001
+  :created_at: 2020-02-27 21:43:04.180678000 Z
+  :score: 17.0
+  :original_filename: hw04.pdf
+45678_empty_file:
+  :submitters:
+  - :name: '45678'
+    :email: '45678'
+    :sid: '45678'
+    section_name: some-class-sem-001
+  :created_at: 2020-02-29 01:02:52.211687000 Z
+  :score: 20.0
+  :original_filename: HW04.pdf
+56789_empty_file:
+  :submitters:
+  - :name: '56789'
+    :email: '56789'
+    :sid: '56789'
+    section_name: some-class-sem-001
+  :created_at: 2020-02-29 01:02:52.211687000 Z
+  :score: 20.0
+  :original_filename: HW04.pdf

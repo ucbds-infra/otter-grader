@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Grading on Gradescope: otter generate &mdash; Otter-Grader  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="PDF Generation and Filtering" href="pdfs.html" />
+    <link rel="prev" title="Grading Locally: otter grade" href="otter_grade.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Otter-Grader
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_otter.html">Using Otter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_assign.html">Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_check.html">Student Usage: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_grade.html">Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#writing-tests-for-gradescope">Writing Tests for Gradescope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-command-line-generator">Using the Command Line Generator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gradescope-results">Gradescope Results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Otter-Grader</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/otter_generate.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="grading-on-gradescope-otter-generate">
+<h1>Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code><a class="headerlink" href="#grading-on-gradescope-otter-generate" title="Permalink to this headline">¶</a></h1>
+<p>Otter-Grader also allows instructors to use Gradescope’s autograding system to collect and grade students’ submissions. This section assumes that instructors are familiar with Gradescope’s interface and know how to set up assignments on Gradescope; for more information on using Gradescope, see their <a class="reference external" href="https://www.gradescope.com/help#help-center-item-programming-assignments">help pages</a>.</p>
+<div class="section" id="writing-tests-for-gradescope">
+<h2>Writing Tests for Gradescope<a class="headerlink" href="#writing-tests-for-gradescope" title="Permalink to this headline">¶</a></h2>
+<p>The tests that are used by the Gradescope autograder are the same as those used in other uses of Otter, but there is one important field that is relevant to Gradescope that is not pertinent to any other uses.</p>
+<p>As noted in the second bullet <a class="reference external" href="test_files.html#ok-format-caveats">here</a>, the <code class="docutils literal notranslate"><span class="pre">test</span></code> variable has a <code class="docutils literal notranslate"><span class="pre">&quot;hidden&quot;</span></code> key which maps to a boolean value that indicates the visibility of the test on Gradescope. For any test, if <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the test result will be shown to students when they submit to Gradescope. If they pass, the test name will show in a green box; if they fail, then the usual failed test output will show.</p>
+<p>For more information on how tests are displayed to students, see <a class="reference external" href="#gradescope-results">below</a>.</p>
+</div>
+<div class="section" id="using-the-command-line-generator">
+<h2>Using the Command Line Generator<a class="headerlink" href="#using-the-command-line-generator" title="Permalink to this headline">¶</a></h2>
+<p>To use Otter with Gradescope’s autograder, you must first generate a zipfile that you will upload to Gradescope so that they can create a Docker image with which to grade submissions. Otter’s command line utility <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> allows instructors to create this zipfile from their machines.</p>
+<div class="section" id="before-using-otter-generate">
+<h3>Before Using <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code><a class="headerlink" href="#before-using-otter-generate" title="Permalink to this headline">¶</a></h3>
+<p>Before using <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code>, you should already have</p>
+<ul class="simple">
+<li>written <a class="reference internal" href="test_files.html"><span class="doc">tests</span></a> for the assignment</li>
+<li>created a Gradescope autograder assignment</li>
+<li>have collected extra requirements into a requirements.txt file (see <a class="reference external" href="grade.html#requirements">here</a>).</li>
+</ul>
+</div>
+<div class="section" id="directory-structure">
+<h3>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this headline">¶</a></h3>
+<p>For the rest of this page, assume that we have the following directory structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">hw00</span><span class="o">-</span><span class="n">dev</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">hw00</span><span class="o">-</span><span class="n">sol</span><span class="o">.</span><span class="n">ipynb</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">hw00</span><span class="o">.</span><span class="n">ipynb</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+  <span class="o">|</span> <span class="o">-</span> <span class="n">utils</span><span class="o">.</span><span class="n">py</span>
+  <span class="o">|</span> <span class="n">tests</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">q1</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">q2</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">...</span>
+  <span class="o">|</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">q1</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">q2</span><span class="o">.</span><span class="n">py</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>Also assume that we have <code class="docutils literal notranslate"><span class="pre">cd</span></code>ed into <code class="docutils literal notranslate"><span class="pre">hw00-dev</span></code>.</p>
+</div>
+<div class="section" id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
+<p>The general usage of <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> is to create a zipfile at some output path (<code class="docutils literal notranslate"><span class="pre">-o</span></code> flag, default <code class="docutils literal notranslate"><span class="pre">./</span></code>) which you will then upload to Gradescope. <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> has six optional flags:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Flag</th>
+<th>Default Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-t</code>, <code>--tests-path</code></td>
+<td><code>./tests</code></td>
+<td>Path to directory of tests</td>
+</tr>
+<tr>
+<td><code>-o</code>, <code>--output-path</code></td>
+<td><code>./</code></td>
+<td>Path at which to write the zipfile</td>
+</tr>
+<tr>
+<td><code>-r</code>, <code>--requirements</code></td>
+<td><code>./requirements.txt</code></td>
+<td>Path to requirements.txt file</td>
+</tr>
+<tr>
+<td><code>--threshold</code></td>
+<td></td>
+<td>Percentage of pass/fail threshold (as decimal)</td>
+</tr>
+<tr>
+<td><code>--points</code></td>
+<td></td>
+<td>Number of points to scale assignment to</td>
+</tr>
+<tr>
+<td><code>--show-results</code></td>
+<td></td>
+<td>Show autograder resutls (score breakdown) to students after grades published</td>
+</tr>
+</tbody>
+</table><p>If you do not specify <code class="docutils literal notranslate"><span class="pre">-t</span></code> or <code class="docutils literal notranslate"><span class="pre">-o</span></code>, then the defaults will be used. If you do not specify <code class="docutils literal notranslate"><span class="pre">-r</span></code>, Otter looks in the working directory for <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, <code class="docutils literal notranslate"><span class="pre">files</span></code>, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts).</p>
+<p>The simplest usage in our example would be</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span>
+</pre></div>
+</div>
+<p>This would create a zipfile with the tests in <code class="docutils literal notranslate"><span class="pre">./tests</span></code> and no extra requirements or files. If we needed <code class="docutils literal notranslate"><span class="pre">data.csv</span></code> in the notebook, our call would instead become</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<p>Note that if we needed the requirements in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code>, our call wouldn’t change, since Otter automatically found <code class="docutils literal notranslate"><span class="pre">./requirements.txt</span></code>.</p>
+<p>Now let’s say that we maintained to different directories of tests: <code class="docutils literal notranslate"><span class="pre">tests</span></code> with public versions of tests and <code class="docutils literal notranslate"><span class="pre">hidden-tests</span></code> with hidden versions. Because I want to grade with the hidden tests, my call then becomes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<p>Now let’s say that I need some functions defined in <code class="docutils literal notranslate"><span class="pre">utils.py</span></code>; then I would add this to the last part of my <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> call:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="n">utils</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="section" id="pass-fail-thresholds">
+<h4>Pass/Fail Thresholds<a class="headerlink" href="#pass-fail-thresholds" title="Permalink to this headline">¶</a></h4>
+<p>The Gradescope generator supports providing a pass/fail threshold. A threshold is passed as a float between 0 and 1 such that if a student receives at least that percentage of points, they will receive full points as their grade and 0 points otherwise.</p>
+<p>The threshold is specified with the <code class="docutils literal notranslate"><span class="pre">--threshold</span></code> flag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">threshold</span> <span class="mf">0.75</span>
+</pre></div>
+</div>
+<p>For example, if a student passes a 2- and 1- point test but fails a 4-point test (a 43%) on a 25% threshold, they will get all 7 points. If they only pass the 1-point test (a 14%), they will get 0 points.</p>
+</div>
+<div class="section" id="overriding-points-possible">
+<h4>Overriding Points Possible<a class="headerlink" href="#overriding-points-possible" title="Permalink to this headline">¶</a></h4>
+<p>By default, the number of points possible on Gradescope is the sum of the point values of each test. This value can be overrided, however, to some other value using the <code class="docutils literal notranslate"><span class="pre">--points</span></code> flag, which accepts an integer. Then the number of points awarded will be the provided points value scaled by the percentage of points awarded by the autograder.</p>
+<p>For example, if a student passes a 2- and 1- point test but fails a 4-point test, they will receive (2 + 1) / (2 + 1 + 4) * 2 = 0.8571 points out of a possible 2 when <code class="docutils literal notranslate"><span class="pre">--points</span></code> is set to 2.</p>
+<p>As an example, the command below scales the number of points to 3:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">points</span> <span class="mi">3</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="showing-autograder-results">
+<h4>Showing Autograder Results<a class="headerlink" href="#showing-autograder-results" title="Permalink to this headline">¶</a></h4>
+<p>The generator lastly allows intructors to specify whether or not the stdout of the grading process (anything printed to the console by the grader or the notebook) is shown to students. <strong>The stdout includes a summary of the student’s test results, including the points earned and possible of public <em>and</em> hidden tests, as well as the visibility of tests as indicated by <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code>.</strong></p>
+<p>This behavior is turned off by default and can be turned on by passing the <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> flag to <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">results</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> is passed, the stdout will be made available to students <em>only after grades are published on Gradescope</em>. The <a class="reference external" href="#gradescope-results">next section</a> details more about what is included in the stdout.</p>
+</div>
+</div>
+</div>
+<div class="section" id="gradescope-results">
+<h2>Gradescope Results<a class="headerlink" href="#gradescope-results" title="Permalink to this headline">¶</a></h2>
+<p>This section details how results are displayed to students and instructors on Gradescope.</p>
+<div class="section" id="instructor-view">
+<h3>Instructor View<a class="headerlink" href="#instructor-view" title="Permalink to this headline">¶</a></h3>
+<p>Once a student’s submission has been autograder, the Autograder Results page will show the stdout of the grading process in the “Autograder Output” box and the student’s score in the side bar to the right of the output. The stdout includes a DataFrame that contains the student’s score breakdown by question:</p>
+<p><img alt="_images/gradescope_autograder_output.png" src="_images/gradescope_autograder_output.png" /></p>
+<p>Below the autograder output, each test case is broken down into boxes. If there is no output for the box, then that test was passed. If a test is failed, then the usual test failure output is displayed.</p>
+<p><img alt="_images/gradescope_instructor_test_breakdown.png" src="_images/gradescope_instructor_test_breakdown.png" /></p>
+<p>Instructors will be able to see <em>all</em> tests. The visibility of a test to students is indicated to instructors by the <img src="_images/gradescope_hidden_test_icon.png" width="24px"/> icon (all tests with this icon are hidden to students).</p>
+</div>
+<div class="section" id="student-view">
+<h3>Student View<a class="headerlink" href="#student-view" title="Permalink to this headline">¶</a></h3>
+<p>On submission, students will only be able to see the results of those tests for which <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code> (see <a class="reference internal" href="test_files.html"><span class="doc">Test Files</span></a> for more info). If <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> or not specified, then <code class="docutils literal notranslate"><span class="pre">test</span></code> is hidden.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students <em>after grades are published on Gradescope</em>. Students will <strong>not</strong> be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout.</p>
+<p>Note that, because some tests are hidden, students will never see the autograder score in the right sidebar; instead, their score will only show as a dash <code class="docutils literal notranslate"><span class="pre">-</span></code> out of the points possible. Therefore, the only way for students to calculate their autograder score is to use the DataFrame printed to the stdout if <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> is passed.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="pdfs.html" class="btn btn-neutral float-right" title="PDF Generation and Filtering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="otter_grade.html" class="btn btn-neutral" title="Grading Locally: otter grade" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'en',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

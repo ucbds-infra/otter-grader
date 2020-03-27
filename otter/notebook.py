@@ -2,15 +2,17 @@
 ##### In-Notebook Checks for Otter-Grader #####
 ###############################################
 
-from .gofer import check
 import inspect
 import requests
 import json
 import os
+
 from getpass import getpass
+from glob import glob
 from nb2pdf import convert
 from IPython.display import display, HTML
-from glob import glob
+
+from .execute import check
 
 class Notebook:
 	"""Notebook class for in-notebook autograding
@@ -20,11 +22,14 @@ class Notebook:
 
 	"""
 
-	def __init__(self, test_dir="./tests", config_path="config.json", otter_service_enabled=False):
+	def __init__(self, test_dir="./tests")#, config_path="config.json", otter_service_enabled=False):
 		self._path = test_dir
-		self._otter_service = otter_service_enabled
+		# self._otter_service = otter_service_enabled
 
-		if self._otter_service == True:
+		# if self._otter_service == True:
+		
+		# assume using otter service if there is a .otter file
+		if glob("*.otter"):
 			# check that config_path exists
 			assert os.path.exists(config_path) and os.path.isfile(config_path), \
 			"{} is not a valid config path".format(config_path)
@@ -36,7 +41,7 @@ class Notebook:
 			# check that config file has required info
 			assert all([i in self._config for i in ["server_url", "auth", "notebook"]]), \
 			"config file missing required information"
-			assert self._config["auth"] in ["google", "default", "none"], "invalid auth provider {}".format(self._config["auth"])
+			assert self._config["auth"] in ["google", "none"], "invalid auth provider"
 
 			self._google_auth_url = os.path.join(self._config["server_url"], "google_auth")
 			self._submit_url = os.path.join(self._config["server_url"], "submit")
@@ -47,7 +52,7 @@ class Notebook:
 		Args:
 			question (str): Name of question being graded
 			global_env (dict): Global environment resulting from execution of a single 
-				notebook/script (see grade.execute_notebook for more on this)
+				notebook/script (see execute.execute_notebook for more on this)
 
 		Returns:
 			OKTestsResult: Result of running gofer.check which contains grade, failed tests, and

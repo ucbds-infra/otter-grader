@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Metadata" href="metadata_files.html" />
+    <link rel="next" title="Distributing Assignments: otter assign" href="otter_assign.html" />
     <link rel="prev" title="Using Otter" href="using_otter.html" /> 
 
   
@@ -86,16 +86,18 @@
 <li class="toctree-l1"><a class="reference internal" href="using_otter.html">Using Otter</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Test Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ok-format-caveats">OK Format Caveats</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sample-test">Sample Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#writing-ok-tests">Writing OK Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sample-test">Sample Test</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="otter_assign.html">Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="student_usage.html">Student Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Utility</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gradescope.html">Gradescope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_check.html">Student Usage: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_grade.html">Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="otter_generate.html">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
 <li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -165,11 +167,15 @@
 <p>Otter requires OK-formatted tests to check students’ work against. These have a very specific format, described in detail in the <a class="reference external" href="https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests">OK documentation</a>.</p>
 <div class="section" id="ok-format-caveats">
 <h2>OK Format Caveats<a class="headerlink" href="#ok-format-caveats" title="Permalink to this headline">¶</a></h2>
-<p>While otter uses OK format, there are a few caveats to the tests when using them with otter.</p>
+<p>While Otter uses OK format, there are a few caveats to the tests when using them with Otter.</p>
 <ul class="simple">
 <li>Otter only allows a single suite in each test, although the suite can have any number of cases. This means that <code class="docutils literal notranslate"><span class="pre">test[&quot;suite&quot;]</span></code> should be a list of length 1, whose only element is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>.</li>
-<li>Otter has an additional key in the <code class="docutils literal notranslate"><span class="pre">test</span></code> dict, called <code class="docutils literal notranslate"><span class="pre">hidden</span></code>. <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> should evaluate to a boolean. This is used to indicate whether or not the test should be shown on Gradescope when students submit their work. If <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then all cases will be shown to students on Gradescope. <strong>This is not to be confused with the <code class="docutils literal notranslate"><span class="pre">hidden</span></code> key of each case, which are ignored by otter.</strong></li>
+<li>Otter has an additional key in the <code class="docutils literal notranslate"><span class="pre">test</span></code> dict, called <code class="docutils literal notranslate"><span class="pre">hidden</span></code>. <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> should evaluate to a boolean. This is used to indicate whether or not the test should be shown on Gradescope when students submit their work. If <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, then all cases will be shown to students on Gradescope. <strong>This is not to be confused with the <code class="docutils literal notranslate"><span class="pre">hidden</span></code> key of each case, which are ignored by Otter.</strong></li>
 </ul>
+</div>
+<div class="section" id="writing-ok-tests">
+<h2>Writing OK Tests<a class="headerlink" href="#writing-ok-tests" title="Permalink to this headline">¶</a></h2>
+<p>We recommend that you develop assignments using <a class="reference internal" href="otter_assign.html"><span class="doc">Otter Assign</span></a>, a tool which will generate these test files for you. If you already have assignments or would prefer to write them yourself, you can find an online <a class="reference external" href="https://oktests.chrispyles.io">OK test generator</a> that will assist you in generating these test files without using Otter Assign.</p>
 </div>
 <div class="section" id="sample-test">
 <h2>Sample Test<a class="headerlink" href="#sample-test" title="Permalink to this headline">¶</a></h2>
@@ -186,8 +192,8 @@
 <span class="s2">                    &gt;&gt;&gt; 1 == 1          # note that in any subsequence line of a multiline</span>
 <span class="s2">                    True                # statement, the prompt becomes ... (see below)</span>
 <span class="s2">                    &quot;&quot;&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># ignored by otter</span>
-                    <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># ignored by otter</span>
+                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># ignored by Otter</span>
+                    <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># ignored by Otter</span>
                 <span class="p">},</span> 
                 <span class="p">{</span>
                     <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
@@ -202,19 +208,15 @@
                     <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
                 <span class="p">},</span> 
             <span class="p">],</span>
-            <span class="s2">&quot;scored&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>            <span class="c1"># ignored by otter</span>
-            <span class="s2">&quot;setup&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                <span class="c1"># ignored by otter</span>
-            <span class="s2">&quot;teardown&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="c1"># ignored by otter</span>
+            <span class="s2">&quot;scored&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>            <span class="c1"># ignored by Otter</span>
+            <span class="s2">&quot;setup&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>                <span class="c1"># ignored by Otter</span>
+            <span class="s2">&quot;teardown&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>             <span class="c1"># ignored by Otter</span>
             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;doctest&quot;</span>           <span class="c1"># the type of test; only &quot;doctest&quot; allowed</span>
         <span class="p">},</span>
     <span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="writing-ok-tests">
-<h2>Writing OK Tests<a class="headerlink" href="#writing-ok-tests" title="Permalink to this headline">¶</a></h2>
-<p>You can find an online <a class="reference external" href="https://oktests.herokuapp.com">OK test generator</a> that will assist you in generating these test files.</p>
 </div>
 </div>
 
@@ -226,7 +228,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="metadata_files.html" class="btn btn-neutral float-right" title="Metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="otter_assign.html" class="btn btn-neutral float-right" title="Distributing Assignments: otter assign" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="using_otter.html" class="btn btn-neutral" title="Using Otter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

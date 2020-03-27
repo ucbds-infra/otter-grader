@@ -4,10 +4,18 @@ otter package
 Submodules
 ----------
 
-otter.cli module
-----------------
+otter.assign module
+-------------------
 
-.. automodule:: otter.cli
+.. automodule:: otter.assign
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+otter.check module
+------------------
+
+.. automodule:: otter.check
     :members:
     :undoc-members:
     :show-inheritance:
@@ -16,6 +24,22 @@ otter.containers module
 -----------------------
 
 .. automodule:: otter.containers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+otter.execute module
+--------------------
+
+.. automodule:: otter.execute
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+otter.generate module
+---------------------
+
+.. automodule:: otter.generate
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,14 +60,6 @@ otter.grade module
     :undoc-members:
     :show-inheritance:
 
-otter.gs\_generator module
---------------------------
-
-.. automodule:: otter.gs_generator
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 otter.metadata module
 ---------------------
 
@@ -56,14 +72,6 @@ otter.notebook module
 ---------------------
 
 .. automodule:: otter.notebook
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-otter.script module
--------------------
-
-.. automodule:: otter.script
     :members:
     :undoc-members:
     :show-inheritance:
