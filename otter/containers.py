@@ -51,8 +51,8 @@ def launch_parallel_containers(
     if len(notebooks) < num_containers:
         num_containers = len(notebooks)
 
-    # calculate number of notebooks per container
-    num_per_group = int(len(notebooks) / num_containers)
+    # # calculate number of notebooks per container
+    # num_per_group = int(len(notebooks) / num_containers)
 
     try:
         # create tmp directories and add non-notebook files
@@ -226,8 +226,10 @@ scripts=False, no_kill=False, output_path="./", logging=False):
 
         if unfiltered_pdfs or tag_filter or html_filter:
             pdf_folder = os.path.join(output_path, "submission_pdfs")
-            mkdir_pdf_command = ["mkdir", pdf_folder]
-            mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
+            if not os.path.isdir(pdf_folder):
+                mkdir_pdf_command = ["mkdir", pdf_folder]
+                mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
+                assert not mkdir_pdf.stderr, mkdir_pdf.stderr.decode("utf-8")
             
             # copy out manual submissions
             for pdf in df["manual"]:

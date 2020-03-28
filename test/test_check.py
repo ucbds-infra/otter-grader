@@ -26,23 +26,6 @@ parser = bin_globals["parser"]
 TEST_FILES_PATH = "test/test-check/"
 
 class TestCheck(unittest.TestCase):
-    
-    @classmethod
-    def setUpClass(cls):
-        create_image_cmd = ["make", "docker-test"]
-        create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
-        # TestIntegration.assertEqual(len(create_image.stderr), 0, create_image.stderr.decode("utf-8"))
-
-    def test_docker(self):
-        """
-        Check that we have the right container installed and that docker is running
-        """
-        # use docker image inspect to see that the image is installed and tagged as otter-grader
-        inspect = subprocess.run(["docker", "image", "inspect", "otter-test"], stdout=PIPE, stderr=PIPE)
-
-        # assert that it didn't fail, it will fail if it is not installed
-        self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
-
 
     def test_otter_check_script(self):
         """

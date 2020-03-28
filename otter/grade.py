@@ -5,8 +5,8 @@
 import os
 import pandas as pd
 
-from .metadata import *
-from .containers import *
+from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
+from .containers import launch_parallel_containers
 from .utils import merge_csv
 
 

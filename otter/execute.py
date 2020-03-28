@@ -187,8 +187,8 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script):
     Returns:
         dict: a score mapping with values for each test, student score, and total points possible 
     """
-    # get path of notebook file
-    base_path = os.path.dirname(ipynb_path)
+    # # get path of notebook file
+    # base_path = os.path.dirname(ipynb_path)
 
     # glob tests
     test_files = glob('/home/tests/*.py')
