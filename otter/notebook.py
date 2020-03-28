@@ -24,7 +24,7 @@ class Notebook:
 
 	"""
 
-	def __init__(self, test_dir="./tests")#, config_path="config.json", otter_service_enabled=False):
+	def __init__(self, test_dir="./tests"): #, config_path="config.json", otter_service_enabled=False):
 		self._path = test_dir
 		self._service_enabled = False
 		# self._otter_service = otter_service_enabled
@@ -37,7 +37,7 @@ class Notebook:
 			self._service_enabled = True
 
 			# check that config_path exists
-			assert assert len(otter_configs) == 1, "More than 1 otter config file found"
+			assert len(otter_configs) == 1, "More than 1 otter config file found"
 
 			# load in config file
 			with open(otter_configs) as f:
@@ -113,7 +113,7 @@ class Notebook:
 
 
 	# @staticmethod
-	def export(nb_path=None, filtering=True, filter_type="html"):
+	def export(self, nb_path=None, filtering=True, filter_type="html"):
 		"""Exports notebook to PDF
 
 		FILTER_TYPE can be "html" or "tags" if filtering by HTML comments or cell tags,

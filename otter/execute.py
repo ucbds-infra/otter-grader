@@ -353,23 +353,23 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
                 raise
         return global_env
 
+
 def main(args=None):
     """
     When executing this file from the command line, this function will be run.
     """
     # implement argparser
-
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument('notebook_directory', help='Path to directory with ipynb\'s to grade')
-    argparser.add_argument("--pdf", action="store_true", default=False)
-    argparser.add_argument("--tag-filter", action="store_true", default=False)
-    argparser.add_argument("--html-filter", action="store_true", default=False)
-    argparser.add_argument("--scripts", action="store_true", default=False)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('notebook_directory', help='Path to directory with ipynb\'s to grade')
+    parser.add_argument("--pdf", action="store_true", default=False)
+    parser.add_argument("--tag-filter", action="store_true", default=False)
+    parser.add_argument("--html-filter", action="store_true", default=False)
+    parser.add_argument("--scripts", action="store_true", default=False)
 
     if args is None:
-        args = argparser.parse_args()
+        args = parser.parse_args()
     else:
-        args = argparse.parse_args(args)
+        args = parser.parse_args(args)
 
     # get all ipynb files
     dir_path = os.path.abspath(args.notebook_directory)
@@ -407,6 +407,7 @@ def main(args=None):
 
     final_results = pd.DataFrame(all_results)
     final_results.to_csv("grades.csv", index=False)
+
 
 if __name__ == "__main__":
     main()
