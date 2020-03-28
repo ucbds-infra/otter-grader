@@ -37,7 +37,7 @@ def main(args):
 
     # get commit hash
     commit_hash_cmd = subprocess.run(["git", "rev-parse", "HEAD"], stdout=PIPE, stderr=PIPE)
-    assert commit_hash_cmd, commit_hash_cmd.decode("utf-8")
+    assert not commit_hash_cmd.stderr, commit_hash_cmd.stderr.decode("utf-8")
 
     # TODO: fix this so it's not abs path -- where is a good place for this?
     # get last known commit hash

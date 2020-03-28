@@ -14,6 +14,8 @@ from IPython.display import display, HTML
 
 from .execute import check
 
+_API_KEY = None
+
 class Notebook:
 	"""Notebook class for in-notebook autograding
 	
@@ -42,11 +44,45 @@ class Notebook:
 				self._config = json.load(f)
 
 			# check that config file has required info
-			assert all([key in self._config for key in ["server_url", "auth", "notebook"]]), "config file missing required information"
-			assert self._config["auth"] in ["google", "default"], "invalid auth provider"
+			assert all([key in self._config for key in ["endpoint", "auth", "assignment", "notebook"]]), "config file missing required information"
 
-			self._google_auth_url = os.path.join(self._config["server_url"], "google_auth")
-			self._submit_url = os.path.join(self._config["server_url"], "submit")
+			self._google_auth_url = os.path.join(self._config["endpoint"], "google_auth")
+			self._default_auth_url = os.path.join(self._config["server_url"], "personal_auth")
+			self._submit_url = os.path.join(self._config["endpoint"], "submit")
+
+			if _API_KEY is None:
+				self._auth()
+
+	
+	def _auth(self):
+		assert self._service_enabled == True, 'notebook not configured for otter service'
+		assert self._config["auth"] in ["google", "default"], "invalid auth provider"
+
+		# have users authenticate with OAuth
+		if self._config["auth"] == "google":
+				# send them to google login page
+				display(HTML(f"""
+				<p>Please <a href="{self._google_auth_url}" target="_blank">log in</a> to Otter Service 
+				and enter your API key below.</p>
+				"""))
+
+				self._api_key = input()
+
+		# else have them auth with default auth
+		else:
+			print("Please enter a username and password.")
+			username = input("Username: ")
+			password = getpass("Password: ")
+
+			# in-notebook auth
+			response = requests.get(url=self._default_auth_url, params={"username":username, "password":password})
+			self._api_key = response.content.decode("utf-8")
+			# print("Your API Key is {}\n".format())
+			# print("Paste this in and hit enter")
+			# self._api_key = input()
+		
+		# store API key so we don't re-auth every time
+		_API_KEY = self._api_key
 
 
 	def check(self, question, global_env=None):
@@ -75,8 +111,9 @@ class Notebook:
 		# pass the check to gofer
 		return check(test_path, global_env)
 
-	@staticmethod
-	def export(nb_path, filtering=True, filter_type="html"):
+
+	# @staticmethod
+	def export(nb_path=None, filtering=True, filter_type="html"):
 		"""Exports notebook to PDF
 
 		FILTER_TYPE can be "html" or "tags" if filtering by HTML comments or cell tags,
@@ -89,6 +126,12 @@ class Notebook:
 				tags, respectively.
 		
 		"""
+		if nb_path is None and self._service_enabled:
+			nb_path = self._config["notebook"]
+
+		elif nb_path is None:
+			raise ValueError("nb_path is None and no otter-service config is available")
+
 		convert(nb_path, filtering=filtering, filter_type=filter_type)
 
 		# create and display output HTML
@@ -98,6 +141,7 @@ class Notebook:
 		""".format(nb_path[:-5] + "pdf")
 		
 		display(HTML(out_html))
+
 
 	def check_all(self):
 		"""
@@ -110,46 +154,24 @@ class Notebook:
 			check_html = self.check(test_name, global_env)._repr_html_()
 			check_html = "<p><strong>{}</strong></p>".format(test_name) + check_html
 			display(HTML(check_html))
-	
-	def _auth(self):
-		assert self._otter_service == True, 'notebook not configured for otter service'
 
-		# have users authenticate with OAuth
-		if "auth" in self._config and self._config["auth"] != "default":
-			if self._config["auth"] == "google":
-				# send them to google login page
-				display(HTML(f"""
-				<p>Please <a href="{self._google_auth_url}" target="_blank">log in</a> to the 
-				otter grader server and enter your API key below.</p>
-				"""))
 
-				self._api_key = input()
-
-		# else have them auth with default auth
-		else:
-			print("Please enter a username and password.")
-			username = input("Username: ")
-			password = getpass("Password: ")
-
-			#in-notebook auth
-			response = requests.get(url=os.path.join(self._config["server_url"], "personal_auth"), params={"username":username, "password":password})
-			print("Your API Key is {}\n".format(response.content.decode("utf-8")))
-			print("Paste this in and hit enter")
-			self._api_key = input()
-
-	def _submit(self):
-		assert self._otter_service == True, 'notebook not configured for otter service'
+	def submit(self):
+		assert self._service_enabled == True, 'notebook not configured for otter service'
 		
-		if not hasattr(self, '_api_key'):
+		if not hasattr(self, '_api_key') and _API_KEY is None:
 			self._auth()
 
 		notebook_path = os.path.join(os.getcwd(), self._config["notebook"])
+
 		assert os.path.exists(notebook_path) and os.path.isfile(notebook_path), \
-    "Could not find notebook: {}".format(self._config["notebook"])
+    	"Could not find notebook: {}".format(self._config["notebook"])
 
 		with open(notebook_path) as f:
 			notebook_data = json.load(f)
-		print("Submitting notebook to server")
+		
+		print("Submitting notebook to server...")
+
 		response = requests.post(self._submit_url, json.dumps({
 			"api_key": self._api_key,
 			"nb": notebook_data,
