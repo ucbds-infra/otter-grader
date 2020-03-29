@@ -6,11 +6,12 @@ MISSING_PACKAGES = False
 
 try:
     from psycopg2 import connect, extensions, sql
+    import yaml
 except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
 
-def main(args):
+def main(*args):
     if MISSING_PACKAGES:
         raise ImportError(
             "Missing some packages required for otter service. "
@@ -18,10 +19,14 @@ def main(args):
             "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
         )
 
+    with open("conf.yml") as f:
+        config = yaml.safe_load(f)
+    
     conn = connect(dbname='postgres',
-                user='admin',
-                host='',
-                password='')
+                   host=config['db_host'],
+                   port=config['db_port'],
+                   user=config['db_user'],
+                   password=config['db_pass'])
 
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()
@@ -30,9 +35,10 @@ def main(args):
     conn.close()
 
     conn = connect(dbname='otter_db',
-                user='admin',
-                host='',
-                password='')
+                   host=config['db_host'],
+                   port=config['db_port'],
+                   user=config['db_user'],
+                   password=config['db_pass'])
 
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()

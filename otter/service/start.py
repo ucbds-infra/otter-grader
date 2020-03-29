@@ -26,7 +26,7 @@ except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
 
-def main(args):
+def main(*args):
     if MISSING_PACKAGES:
         raise ImportError(
             "Missing some packages required for otter service. "
@@ -35,7 +35,6 @@ def main(args):
         )
 
     NB_QUEUE = Queue()
-    NB_DIR = os.environ.get('NOTEBOOK_DIR')
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
@@ -61,8 +60,7 @@ def main(args):
                                             [[api_key], email, api_key])
                 results.free()
 
-                self.write(api_key)
-                self.finish()
+                self.render("templates/api_key.html", key=api_key)
 
         @property
         def db(self):
@@ -157,7 +155,7 @@ def main(args):
             await NB_QUEUE.put(user_id)
             print('queued user {}'.format(user_id))
 
-            self.write('Submission {} received.'.format(submission_id))
+            self.write('Submission received. (#{})'.format(submission_id))
 
         @property
         def db(self):
@@ -191,7 +189,7 @@ def main(args):
                     'secret': config['google_auth_secret'],
                 },
                 notebook_dir = config['notebook_dir'],
-                auth_redirect_uri = config['auth_redirect_uri']
+                auth_redirect_uri = os.path.join(config['server_url'], 'google_auth')
             )
             tornado.web.Application.__init__(self, handlers, **settings)
             # Initialize database session
