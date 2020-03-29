@@ -26,7 +26,7 @@ except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
 
-def main(*args):
+def main(args):
     if MISSING_PACKAGES:
         raise ImportError(
             "Missing some packages required for otter service. "
