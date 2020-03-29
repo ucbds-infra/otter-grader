@@ -10,7 +10,8 @@ import os
 from getpass import getpass
 from glob import glob
 from nb2pdf import convert
-from IPython.display import display, HTML
+from IPython import get_ipython
+from IPython.display import display, HTML, Javascript
 
 from .execute import check
 
@@ -25,6 +26,8 @@ class Notebook:
 	"""
 
 	def __init__(self, test_dir="./tests"): #, config_path="config.json", otter_service_enabled=False):
+		assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
+		
 		self._path = test_dir
 		self._service_enabled = False
 		# self._otter_service = otter_service_enabled
@@ -36,7 +39,7 @@ class Notebook:
 		if otter_configs:
 			self._service_enabled = True
 
-			# check that config_path exists
+			# check that there is only 1 config
 			assert len(otter_configs) == 1, "More than 1 otter config file found"
 
 			# load in config file
@@ -55,7 +58,7 @@ class Notebook:
 
 	
 	def _auth(self):
-		assert self._service_enabled == True, 'notebook not configured for otter service'
+		assert self._service_enabled, 'notebook not configured for otter service'
 		assert self._config["auth"] in ["google", "default"], "invalid auth provider"
 
 		# have users authenticate with OAuth
@@ -84,6 +87,32 @@ class Notebook:
 		# store API key so we don't re-auth every time
 		_API_KEY = self._api_key
 
+	
+	# # @classmethod
+	# def _get_notebook_name(self):
+	# 	"""
+	# 	Sets notebook name as global variable in notebook and retrieves it
+	# 	"""		
+	# 	# get_ipython().run_cell_magic("javascript", "", '''
+	# 	# 	require(["base/js/namespace"], function() {
+	# 	# 		Jupyter.notebook.kernel.execute('NOTEBOOK_NAME = "' + Jupyter.notebook.notebook_name + '"');
+	# 	# 	});
+	# 	# ''')
+
+	# 	# curr_frame = inspect.currentframe()
+	# 	# while 'NOTEBOOK_NAME' not in curr_frame.f_globals:
+	# 	# 	print("checking")
+	# 	# 	curr_frame = curr_frame.f_back
+
+	# 	# print(curr_frame)
+	# 	display(Javascript('''
+	# 	 	require(["base/js/namespace"], function() {
+	# 	 		Jupyter.notebook.kernel.execute('NOTEBOOK_NAME = "' + Jupyter.notebook.notebook_name + '"');
+	# 	 	});
+	# 	 '''))
+
+	# 	# return inspect.currentframe()
+
 
 	def check(self, question, global_env=None):
 		"""Checks question using gofer
@@ -101,8 +130,7 @@ class Notebook:
 		test_path = os.path.join(self._path, question + ".py")
 
 		# ensure that desired test exists
-		assert os.path.exists(test_path) and \
-			os.path.isfile(test_path), "Test {} does not exist".format(question)
+		assert os.path.isfile(test_path), "Test {} does not exist".format(question)
 		
 		# pass the correct global environment
 		if global_env is None:
@@ -126,6 +154,15 @@ class Notebook:
 				tags, respectively.
 		
 		"""
+		# if nb_path is None and get_ipython() is not None:
+		# 	display(Javascript('''
+		# 		require(["base/js/namespace"], function() {
+		# 			console.log(Jupyter.notebook.notebook_name);
+		# 			Jupyter.notebook.kernel.execute('__NOTEBOOK_NAME__ = "' + Jupyter.notebook.notebook_name + '"');
+		# 		});
+		# 	'''))
+		# 	nb_path = inspect.currentframe().f_back.f_globals['__NOTEBOOK_NAME__']#self._get_notebook_name()
+		
 		if nb_path is None and self._service_enabled:
 			nb_path = self._config["notebook"]
 
@@ -157,7 +194,7 @@ class Notebook:
 
 
 	def submit(self):
-		assert self._service_enabled == True, 'notebook not configured for otter service'
+		assert self._service_enabled, 'notebook not configured for otter service'
 		
 		if not hasattr(self, '_api_key') and _API_KEY is None:
 			self._auth()
