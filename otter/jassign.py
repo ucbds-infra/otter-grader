@@ -110,7 +110,7 @@ def gen_ok_cells(cells, tests_dir):
     question = {}
     processed_response = False
     tests = []
-    hidden_tests = []
+    # hidden_tests = []
     manual_questions = []
     need_close_export = False
 
@@ -136,10 +136,10 @@ def gen_ok_cells(cells, tests_dir):
         # if this is a test cell, parse and add to correct group
         elif question and processed_response and is_test_cell(cell):
             test = read_test(cell)
-            if test.hidden:
-                hidden_tests.append(test)
-            else:
-                tests.append(test)
+            # if test.hidden:
+            #     hidden_tests.append(test)
+            # else:
+            tests.append(test)
 
         # # if this is a solution cell, append. if manual question and no prompt, also append prompt cell
         # elif question and processed_response and is_solution_cell(cell):
@@ -152,8 +152,8 @@ def gen_ok_cells(cells, tests_dir):
             if question and processed_response:
                 if tests:
                     ok_cells.append(gen_test_cell(question, tests, tests_dir))
-                if hidden_tests:
-                    gen_test_cell(question, hidden_tests, tests_dir, hidden=True)
+                # if hidden_tests:
+                #     gen_test_cell(question, hidden_tests, tests_dir, hidden=True)
 
                 # add a cell with <!-- END QUESTION --> if a manually graded question
                 manual = question.get('manual', False)
@@ -195,8 +195,8 @@ def gen_ok_cells(cells, tests_dir):
 
     if tests:
         ok_cells.append(gen_test_cell(question, tests, tests_dir))
-    if hidden_tests:
-        gen_test_cell(question, hidden_tests, tests_dir, hidden=True)
+    # if hidden_tests:
+    #     gen_test_cell(question, hidden_tests, tests_dir, hidden=True)
 
     return ok_cells
 
@@ -308,47 +308,47 @@ def write_test(path, test):
         pprint.pprint(test, f, indent=4, width=200, depth=None)
 
 
-def gen_test_cell(question, tests, tests_dir, hidden=False):
+def gen_test_cell(question, tests, tests_dir):
     """Return a test cell."""
     cell = nbformat.v4.new_code_cell()
-    if hidden:
-        cell.source = ['grader.check("{}")'.format(question['name'] + "H")]
-    else:
-        cell.source = ['grader.check("{}")'.format(question['name'])]
+    # if hidden:
+    #     cell.source = ['grader.check("{}")'.format(question['name'] + "H")]
+    # else:
+    cell.source = ['grader.check("{}")'.format(question['name'])]
     suites = [gen_suite(tests)]
 
-    # if both keys, use those values
-    if 'public_points' in question and 'private_points' in question:
-        if hidden:
-            points = question['private_points']
-        else:
-            points = question['public_points']
+    # # if both keys, use those values
+    # if 'public_points' in question and 'private_points' in question:
+    #     if hidden:
+    #         points = question['private_points']
+    #     else:
+    #         points = question['public_points']
 
-    # if only public points, assume public & private worth same
-    elif 'public_points' in question:
-        points = question['public_points']
+    # # if only public points, assume public & private worth same
+    # elif 'public_points' in question:
+    #     points = question['public_points']
 
-    # if only private, assume public worth 0 points
-    elif 'private_points' in question:
-        if hidden:
-            points = question['private_points']
-        else:
-            points = 0
+    # # if only private, assume public worth 0 points
+    # elif 'private_points' in question:
+    #     if hidden:
+    #         points = question['private_points']
+    #     else:
+    #         points = 0
 
-    # else get points and default to 1 if not presnet
-    else:
-        points = question.get('points', 1)
+    # # else get points and default to 1 if not presnet
+    # else:
+    points = question.get('points', 1)
     
     test = {
         'name': question['name'],
         'points': points,
-        'hidden': hidden,
+        # 'hidden': hidden,
         'suites': suites,
     }
-    if hidden:
-        write_test(tests_dir / (question['name'] + "H" + '.py'), test)
-    else:
-        write_test(tests_dir / (question['name'] + '.py'), test)
+    # if hidden:
+    #     write_test(tests_dir / (question['name'] + "H" + '.py'), test)
+    # else:
+    write_test(tests_dir / (question['name'] + '.py'), test)
     lock(cell)
     return cell
 
@@ -476,8 +476,11 @@ def remove_hidden_tests(test_dir):
         with open(f) as f2:
             exec(f2.read(), globals(), locals)
         test = locals['test']
-        if test['hidden']:
-            os.remove(f)
+        for suite in test['suites']:
+            for i, case in list(enumerate(suite['cases']))[::-1]:
+                if case['hidden']:
+                    suite['cases'].pop(i)
+        write_test(f, test)
 
 
 def gen_views(master_nb, result_dir, args):
@@ -496,5 +499,3 @@ def gen_views(master_nb, result_dir, args):
     os.remove(student_nb_path)
     strip_solutions(ok_nb_path, student_nb_path)
     remove_hidden_tests(student_dir / 'tests')
-
-

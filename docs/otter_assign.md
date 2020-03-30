@@ -23,24 +23,14 @@ The rest of the code block within the description cell must be YAML-formatted wi
 * `name` (required) - a string identifier that is a legal file name (without an extension)
 * `manual` (optional) - a boolean (default `False`); whether to include the response cell in a PDF for manual grading
 * `points` (optional) - a number (default `1`); how many points the question is worth
-* `public_points` (optional) - a number; how many points public tests are worth
-* `private_points` (optional) - a number; how many points private tests are worth
 
-Note the three possible point specifications. Each set of point specifications has its own behaviors:
-
-* If you specify both `public_points` and `private_points`, the values provided are used as the point values in public and hidden tests, respectively.
-* If you specify only `public_points`, `private_points` is assumed to have the same value.
-* If you specify only `private_points`, `public_points` is assumed to be `0`.
-* Otherwise, the value of `points` (default `1`) is used for both public and hidden tests.
-
-As an example, the question metadata below indicates an autograded question `q1` with public tests worth 0 points and hidden tests worth 2 points.
+As an example, the question metadata below indicates an autograded question `q1` worth 1 point.
 
 ````
 ```
 BEGIN QUESTION
 name: q1
 manual: false
-private_points: 2
 ```
 ````
 
@@ -202,7 +192,6 @@ This will create a new folder called `dist` with `autograder` and `student` as s
       | - hw00.ipynb
       | tests
         | - q1.py
-        | - q1H.py
         | - q2.py
         ...
     | student
