@@ -32,6 +32,7 @@ assign_parser.add_argument("--no-init-cell", help="Don't automatically generate 
 assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
 assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
 assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
+assign_parser.add_argument("--jassign", default=False, action="store_true", help="Use jassign notebook format")
 assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
 
 assign_parser.set_defaults(func=assign.main)

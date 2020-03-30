@@ -1,27 +1,16 @@
-#######################################################
-#####              Otter-Assign Tool              #####
-##### forked from https://github.com/okpy/jassign #####
-#######################################################
-
-"""Generate student & autograder views of a notebook in Otter format."""
+"""Generate student & autograder views of a notebook in okpy format."""
 
 import copy
 import json
+import nbformat
 import pprint
 import os
 import re
 import shutil
+import subprocess
 import yaml
-import pathlib
-import nbformat
 
 from collections import namedtuple
-from glob import glob
-
-from .execute import grade_notebook
-from .jassign import gen_views as jassign_views
-from .utils import block_print, enable_print
-
 
 NB_VERSION = 4
 BLOCK_QUOTE = "```"
@@ -29,33 +18,6 @@ COMMENT_PREFIX = "#"
 TEST_HEADERS = ["TEST", "HIDDEN TEST"]
 ALLOWED_NAME = re.compile(r'[A-Za-z][A-Za-z0-9_]*')
 NB_VERSION = 4
-
-TEST_REGEX = r"##\s*(hidden\s*)?test\s*##"
-SOLUTION_REGEX = r"##\s*solution\s*##"
-MD_SOLUTION_REGEX = r"(<strong>|\*{2})solution:?(<\/strong>|\*{2})"
-
-MD_ANSWER_CELL_TEMPLATE = "_Type your answer here, replacing this text._"
-
-
-def run_tests(nb_path):
-    """Run tests in the autograder version of the notebook."""
-    results = grade_notebook(nb_path, glob(str(nb_path.parent / "tests" / "*.py")))
-    assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
-
-
-def main(args):
-    master, result = pathlib.Path(args.master), pathlib.Path(args.result)
-    print("Generating views...")
-    if args.jassign:
-        jassign_views(master, result, args)
-    else:
-        gen_views(master, result, args)
-    if not args.no_run_tests:
-        print("Running tests...")
-        block_print()
-        run_tests(result / 'autograder'  / master.name )
-        enable_print()
-        print("All tests passed!")
 
 
 def convert_to_ok(nb_path, dir, args):
@@ -159,15 +121,15 @@ def gen_ok_cells(cells, tests_dir):
         if question and not processed_response:
             assert not is_question_cell(cell), cell
             assert not is_test_cell(cell), cell
-            assert not is_solution_cell(cell) or is_markdown_solution_cell(cell), cell
+            # assert not is_solution_cell(cell) or is_markdown_solution_cell(cell), cell
 
-            # if this isn't a MD solution cell but in a manual question, it has a prompt
-            if not is_solution_cell(cell) and question.get('manual', False):
-                md_has_prompt = True
+            # # if this isn't a MD solution cell but in a manual question, it has a prompt
+            # if not is_solution_cell(cell) and question.get('manual', False):
+            #     md_has_prompt = True
             
-            # if there is no prompt, add a prompt cell
-            elif is_markdown_solution_cell(cell) and not md_has_prompt:
-                ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
+            # # if there is no prompt, add a prompt cell
+            # elif is_markdown_solution_cell(cell) and not md_has_prompt:
+            #     ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
 
             ok_cells.append(cell)
             processed_response = True
@@ -180,11 +142,11 @@ def gen_ok_cells(cells, tests_dir):
             else:
                 tests.append(test)
 
-        # if this is a solution cell, append. if manual question and no prompt, also append prompt cell
-        elif question and processed_response and is_solution_cell(cell):
-            if is_markdown_solution_cell(cell) and not md_has_prompt:
-                ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
-            ok_cells.append(cell)
+        # # if this is a solution cell, append. if manual question and no prompt, also append prompt cell
+        # elif question and processed_response and is_solution_cell(cell):
+        #     if is_markdown_solution_cell(cell) and not md_has_prompt:
+        #         ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
+        #     ok_cells.append(cell)
 
         else:
             # the question is over
@@ -215,10 +177,10 @@ def gen_ok_cells(cells, tests_dir):
                     need_close_export = False
                 ok_cells.append(gen_question_cell(cell, manual, format, in_manual_block))
 
-            elif is_solution_cell(cell):
-                if is_markdown_solution_cell(cell):
-                    ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
-                ok_cells.append(cell)
+            # elif is_solution_cell(cell):
+            #     if is_markdown_solution_cell(cell):
+            #         ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
+            #     ok_cells.append(cell)
 
             else:
                 assert not is_test_cell(cell), 'Test outside of a question: ' + str(cell)
@@ -255,22 +217,6 @@ def is_question_cell(cell):
     if cell['cell_type'] != 'markdown':
         return False
     return find_question_spec(get_source(cell)) is not None
-
-
-def is_markdown_solution_cell(cell):
-    """Whether the cell matches MD_SOLUTION_REGEX"""
-    source = get_source(cell)
-    return is_solution_cell and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
-
-
-def is_solution_cell(cell):
-    """Whther the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX"""
-    source = get_source(cell)
-    if cell['cell_type'] == 'markdown':
-        return source and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
-    elif cell['cell_type'] == 'code':
-        return source and re.match(SOLUTION_REGEX, source[0], flags=re.IGNORECASE)
-    return False
 
 
 def find_question_spec(source):
@@ -335,7 +281,8 @@ def is_test_cell(cell):
     if cell['cell_type'] != 'code':
         return False
     source = get_source(cell)
-    return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
+    delimiters = COMMENT_PREFIX + ' \n'
+    return source and source[0].strip(delimiters) in TEST_HEADERS
 
 
 Test = namedtuple('Test', ['input', 'output', 'hidden'])
@@ -343,7 +290,7 @@ Test = namedtuple('Test', ['input', 'output', 'hidden'])
 
 def read_test(cell):
     """Return the contents of a test as an (input, output, hidden) tuple."""
-    hidden = bool(re.search("hidden", get_source(cell)[0], flags=re.IGNORECASE))
+    hidden = 'HIDDEN' in get_source(cell)[0]
     output = ''
     for o in cell['outputs']:
         output += ''.join(o.get('text', ''))
@@ -442,17 +389,68 @@ def gen_case(test):
     }
 
 
+solution_assignment_re = re.compile('(\\s*[a-zA-Z0-9_ ]*=)(.*) #[ ]?SOLUTION')
+def solution_assignment_sub(match):
+    prefix = match.group(1)
+    sol = match.group(2)
+    return prefix + ' ...'
+
+
+solution_line_re = re.compile('(\\s*)([^#\n]+) #[ ]?SOLUTION')
+def solution_line_sub(match):
+    prefix = match.group(1)
+    return prefix + '...'
+
+
+text_solution_line_re = re.compile(r'\s*\*\*SOLUTION:?\*\*:?.*')
+begin_solution_re = re.compile(r'(\s*)# BEGIN SOLUTION( NO PROMPT)?')
+skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT']
+
+
+SUBSTITUTIONS = [
+    (solution_assignment_re, solution_assignment_sub),
+    (solution_line_re, solution_line_sub),
+]
+
+
+def replace_solutions(lines):
+    """Replace solutions in lines, a list of strings."""
+    if text_solution_line_re.match(lines[0]):
+        return ['*Write your answer here, replacing this text.*']
+    stripped = []
+    solution = False
+    for line in lines:
+        if any(line.endswith(s) for s in skip_suffixes):
+            continue
+        if solution and not line.endswith('# END SOLUTION'):
+            continue
+        if line.endswith('# END SOLUTION'):
+            assert solution, 'END SOLUTION without BEGIN SOLUTION in ' + str(lines)
+            solution = False
+            continue
+        begin_solution = begin_solution_re.match(line)
+        if begin_solution:
+            assert not solution, 'Nested BEGIN SOLUTION in ' + str(lines)
+            solution = True
+            if not begin_solution.group(2):
+                line = begin_solution.group(1) + '...'
+            else:
+                continue
+        for exp, sub in SUBSTITUTIONS:
+            m = exp.match(line)
+            if m:
+                line = sub(m)
+        stripped.append(line)
+    assert not solution, 'BEGIN SOLUTION without END SOLUTION in ' + str(lines)
+    return stripped
+
+
 def strip_solutions(original_nb_path, stripped_nb_path):
     """Write a notebook with solutions stripped."""
     with open(original_nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
-    deletion_indices = []
-    for i in range(len(nb['cells'])):
-        if is_solution_cell(nb['cells'][i]):
-            deletion_indices.append(i)
-    deletion_indices.reverse()
-    for i in deletion_indices:
-        del nb['cells'][i]
+    for cell in nb['cells']:
+        cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
     with open(stripped_nb_path, 'w') as f:
         nbformat.write(nb, f, NB_VERSION)
 
@@ -499,3 +497,5 @@ def gen_views(master_nb, result_dir, args):
     os.remove(student_nb_path)
     strip_solutions(ok_nb_path, student_nb_path)
     remove_hidden_tests(student_dir / 'tests')
+
+

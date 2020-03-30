@@ -22,7 +22,7 @@ class Notebook:
 
 	"""
 
-	def __init__(self, test_dir="./tests")#, config_path="config.json", otter_service_enabled=False):
+	def __init__(self, test_dir="./tests"):#, config_path="config.json", otter_service_enabled=False):
 		self._path = test_dir
 		# self._otter_service = otter_service_enabled
 
