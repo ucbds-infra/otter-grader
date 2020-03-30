@@ -89,7 +89,7 @@ class TestCheck(unittest.TestCase):
                             Expecting:
                                 False
                             **********************************************************************
-                            Line 2, in test/test-check/tests/q2.py 0
+                            Line 2, in test/test-check/tests/q2.py 1
                             Failed example:
                                 1 == 1
                             Expected:
@@ -162,7 +162,7 @@ class TestCheck(unittest.TestCase):
                             Expecting:
                                 False
                             **********************************************************************
-                            Line 2, in test/test-check/tests/q2.py 0
+                            Line 2, in test/test-check/tests/q2.py 1
                             Failed example:
                                 1 == 1
                             Expected:
