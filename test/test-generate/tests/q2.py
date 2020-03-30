@@ -1,28 +1,47 @@
 test = {
 	"name": "q2",
-	"points": 1,
+	"points": 2,
+	"hidden": False,
 	"suites": [ 
 		{
 			"cases": [ 
 				{
 					"code": r"""
-					>>> 1 == 1
+					>>> negate(True)
 					False
 					""",
 					"hidden": False,
 					"locked": False,
-				}, {
+				}, 
+				{
 					"code": r"""
-					>>> import tqdm
-					>>> print(tqdm.__name__)
-					tqdm
-					"""
-				}
+					>>> negate(False)
+					True
+					""",
+					"hidden": False,
+					"locked": False,
+				}, 
+				{
+					"code": r"""
+					>>> negate("")
+					True
+					""",
+					"hidden": True,
+					"locked": False,
+				}, 
+				{
+					"code": r"""
+					>>> negate(1)
+					False
+					""",
+					"hidden": True,
+					"locked": False,
+				}, 
 			],
 			"scored": False,
 			"setup": "",
 			"teardown": "",
 			"type": "doctest"
-		}, 
+		}
 	]
 }

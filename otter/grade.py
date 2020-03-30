@@ -71,7 +71,8 @@ def main(args):
         image=args.image,
         scripts=args.scripts,
         no_kill=args.no_kill,
-        output_path=args.output_path
+        output_path=args.output_path,
+        debug=args.debug
     )
 
     if verbose:

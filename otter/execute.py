@@ -4,12 +4,12 @@
 
 import argparse
 import os
-import nb2pdf
 import re
 import json
 import ast
 import itertools
 import inspect
+import nb2pdf
 import pandas as pd
 
 from glob import glob
@@ -98,7 +98,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         initial_env["__name__"] = name
 
     if script:
-        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors)
+        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope)
     else:
         global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope)
 
@@ -129,7 +129,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 score_mapping[test_name] = {
                     "score": r.grade * test.value,
                     "possible": test.value,
-                    "hidden": test.hidden
+                    # "hidden": test.hidden
                 }
                 total_score += r.grade * test.value
                 points_possible += test.value
@@ -137,9 +137,11 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 test_name = os.path.split(tup[0].name)[1][:-3]
                 if test_name in score_mapping:
                     score_mapping[test_name]["hint"] = tup[1]#.__repr__()
+                    score_mapping[test_name]["hidden"] = tup[1].failed_test_hidden
                 else:
                     score_mapping[test_name] = {
-                        "hint": tup[1]#.__repr__()
+                        "hint": tup[1],#.__repr__()
+                        "hidden": tup[1].failed_test_hidden
                     }
         except IndexError:
             pass
@@ -263,6 +265,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                                 if source_is_str_bool:
                                     code_lines.append('\n')
                             elif re.search(r"otter\.Notebook\(.*?\)", line):
+                                # TODO: move this check into CheckCallWrapper
                                 if gradescope:
                                     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
                                 else:
@@ -273,6 +276,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                     cell_source = isp.transform_cell(''.join(code_lines))
 
                     # patch otter.Notebook.export so that we don't create PDFs in notebooks
+                    # TODO: move this patch into CheckCallWrapper
                     m = mock.mock_open()
                     with mock.patch('otter.Notebook.export', m):
                         exec(source + cell_source, global_env)
@@ -304,7 +308,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                 raise
         return global_env
 
-def execute_script(script, secret='secret', initial_env=None, ignore_errors=False):
+def execute_script(script, secret='secret', initial_env=None, ignore_errors=False, gradescope=False):
     """
     Executes code of a python (.py) script and returns the resulting global environment
 
@@ -328,9 +332,21 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
         else:
             global_env = {}
         source = ""
+        if gradescope:
+            source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
+
+        lines = script.split("\n")
+        for i, line in enumerate(lines):
+            # TODO: move this check into CheckCallWrapper
+            if re.search(r"otter\.Notebook\(.*?\)", line):
+                if gradescope:
+                    line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
+                else:
+                    line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
+            lines[i] = line
         try:
-            exec(script, global_env)
-            source += script
+            exec("\n".join(lines), global_env)
+            source += "\n".join(lines)
         except:
             if not ignore_errors:
                 raise

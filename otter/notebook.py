@@ -173,8 +173,8 @@ class Notebook:
 
 		# create and display output HTML
 		out_html = """
-		<p>Your file has been exported. Download it 
-		<a href="{}" target="_blank">here</a>!
+		<p>Your file has been exported. Download it by right-clicking 
+		<a href="{}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
 		""".format(nb_path[:-5] + "pdf")
 		
 		display(HTML(out_html))

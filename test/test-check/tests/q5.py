@@ -12,7 +12,9 @@ test = {
 					False
 					>>> negate(True ^ True)
 					True
-					"""
+					""",
+					"hidden": False,
+					"locked": False,
 				},
 			],
 			"scored": False,

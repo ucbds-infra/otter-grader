@@ -37,7 +37,7 @@ def convert_to_ok(nb_path, dir, args):
 
     with open(nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
-    ok_cells, manual_questions = gen_ok_cells(nb['cells'], tests_dir)
+    ok_cells = gen_ok_cells(nb['cells'], tests_dir)
 
     if not args.no_init_cell:
         init = gen_init_cell()
@@ -112,7 +112,6 @@ def gen_ok_cells(cells, tests_dir):
     tests = []
     hidden_tests = []
     manual_questions = []
-    md_has_prompt = False
     need_close_export = False
 
     for cell in cells:
@@ -162,7 +161,7 @@ def gen_ok_cells(cells, tests_dir):
                     # ok_cells.append(gen_close_export_cell())
                     need_close_export = True
                 
-                question, processed_response, tests, hidden_tests, md_has_prompt = {}, False, [], [], False
+                question, processed_response, tests, hidden_tests = {}, False, [], []
 
             if is_question_cell(cell):
                 question = read_question_metadata(cell)
@@ -199,7 +198,7 @@ def gen_ok_cells(cells, tests_dir):
     if hidden_tests:
         gen_test_cell(question, hidden_tests, tests_dir, hidden=True)
 
-    return ok_cells, manual_questions
+    return ok_cells
 
 
 def get_source(cell):
@@ -392,7 +391,7 @@ def gen_case(test):
 solution_assignment_re = re.compile('(\\s*[a-zA-Z0-9_ ]*=)(.*) #[ ]?SOLUTION')
 def solution_assignment_sub(match):
     prefix = match.group(1)
-    sol = match.group(2)
+    # sol = match.group(2)
     return prefix + ' ...'
 
 

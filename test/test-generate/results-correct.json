@@ -2,36 +2,47 @@
     "tests": [
         {
             "name": "q1",
-            "score": 1.0,
-            "possible": 1,
-            "visibility": "hidden"
+            "score": 0,
+            "possible": 0,
+            "visibility": "visible"
         },
         {
             "name": "q2",
             "score": 0.0,
-            "possible": 1,
-            "visibility": "hidden",
-            "output": "   /autograder/source/tests/q2.py\n\nTest result:\nTrying:\n    1 == 1\nExpecting:\n    False\n**********************************************************************\nLine 2, in /autograder/source/tests/q2.py 0\nFailed example:\n    1 == 1\nExpected:\n    False\nGot:\n    True\n"
+            "possible": 2,
+            "visibility": "visible",
+            "output": "   /autograder/submission/tests/q2.py\n\nTest result:\nTrying:\n    negate(True)\nExpecting:\n    False\n**********************************************************************\nLine 2, in /autograder/submission/tests/q2.py 0\nFailed example:\n    negate(True)\nExpected:\n    False\nGot:\n    True\n"
         },
         {
             "name": "q3",
-            "score": 1.0,
-            "possible": 1,
-            "visibility": "hidden"
+            "score": 2.0,
+            "possible": 2,
+            "visibility": "visible"
         },
         {
             "name": "q4",
-            "score": 0.0,
+            "score": 1.0,
             "possible": 1,
-            "visibility": "hidden",
-            "output": "   /autograder/source/tests/q4.py\n\nTest result:\nTrying:\n    square(5)\nExpecting:\n    25\n**********************************************************************\nLine 2, in /autograder/source/tests/q4.py 0\nFailed example:\n    square(5)\nException raised:\n    Traceback (most recent call last):\n      File \"/usr/local/lib/python3.6/doctest.py\", line 1330, in __run\n        compileflags, 1), test.globs)\n      File \"<doctest /autograder/source/tests/q4.py 0[0]>\", line 1, in <module>\n        square(5)\n    NameError: name 'square' is not defined\nTrying:\n    square(2.5)\nExpecting:\n    6.25\n**********************************************************************\nLine 4, in /autograder/source/tests/q4.py 0\nFailed example:\n    square(2.5)\nException raised:\n    Traceback (most recent call last):\n      File \"/usr/local/lib/python3.6/doctest.py\", line 1330, in __run\n        compileflags, 1), test.globs)\n      File \"<doctest /autograder/source/tests/q4.py 0[1]>\", line 1, in <module>\n        square(2.5)\n    NameError: name 'square' is not defined\n"
+            "visibility": "visible"
         },
         {
-            "name": "q5",
+            "name": "q6",
+            "score": 0,
+            "possible": 0,
+            "visibility": "visible"
+        },
+        {
+            "name": "q6 HIDDEN",
             "score": 0.0,
-            "possible": 1,
+            "possible": 5,
             "visibility": "hidden",
-            "output": "   /autograder/source/tests/q5.py\n\nTest result:\nTrying:\n    negate(1 == 1)\nExpecting:\n    False\n**********************************************************************\nLine 2, in /autograder/source/tests/q5.py 0\nFailed example:\n    negate(1 == 1)\nException raised:\n    Traceback (most recent call last):\n      File \"/usr/local/lib/python3.6/doctest.py\", line 1330, in __run\n        compileflags, 1), test.globs)\n      File \"<doctest /autograder/source/tests/q5.py 0[0]>\", line 1, in <module>\n        negate(1 == 1)\n    NameError: name 'negate' is not defined\nTrying:\n    negate(True ^ False)\nExpecting:\n    False\n**********************************************************************\nLine 4, in /autograder/source/tests/q5.py 0\nFailed example:\n    negate(True ^ False)\nException raised:\n    Traceback (most recent call last):\n      File \"/usr/local/lib/python3.6/doctest.py\", line 1330, in __run\n        compileflags, 1), test.globs)\n      File \"<doctest /autograder/source/tests/q5.py 0[1]>\", line 1, in <module>\n        negate(True ^ False)\n    NameError: name 'negate' is not defined\nTrying:\n    negate(True ^ True)\nExpecting:\n    True\n**********************************************************************\nLine 6, in /autograder/source/tests/q5.py 0\nFailed example:\n    negate(True ^ True)\nException raised:\n    Traceback (most recent call last):\n      File \"/usr/local/lib/python3.6/doctest.py\", line 1330, in __run\n        compileflags, 1), test.globs)\n      File \"<doctest /autograder/source/tests/q5.py 0[2]>\", line 1, in <module>\n        negate(True ^ True)\n    NameError: name 'negate' is not defined\n"
+            "output": "   /autograder/submission/tests/q6.py\n\nTest result:\nTrying:\n    fib = fiberator()\nExpecting nothing\nok\nTrying:\n    for _ in range(10):\n        print(next(fib))\nExpecting:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\n**********************************************************************\nLine 3, in /autograder/submission/tests/q6.py 1\nFailed example:\n    for _ in range(10):\n        print(next(fib))\nExpected:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\nGot:\n    0\n    1\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n"
+        },
+        {
+            "name": "q7",
+            "score": 1.0,
+            "possible": 1,
+            "visibility": "visible"
         }
     ]
 }

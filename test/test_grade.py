@@ -6,6 +6,7 @@ import os
 import unittest
 import subprocess
 import json
+import re
 import contextlib
 import pandas as pd
 
@@ -34,6 +35,18 @@ class TestGrade(unittest.TestCase):
         create_image_cmd = ["make", "docker-test"]
         create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
         assert not create_image.stderr, create_image.stderr.decode("utf-8")
+
+    
+    def setUp(self):
+        """
+        Load in point values
+        """
+        self.test_points = {}
+        for test_file in glob(TEST_FILES_PATH + "tests/*.py"):
+            env = {}
+            with open(test_file) as f:
+                exec(f.read(), env)
+            self.test_points[env['test']['name']] = env['test']['points']
 
 
     def test_docker(self):
@@ -150,7 +163,7 @@ class TestGrade(unittest.TestCase):
             raise
 
 
-    def test_hundred_notebooks(self):
+    def test_notebooks(self):
         """
         Check that the example of 100 notebooks runs correctely locally.
         """
@@ -161,17 +174,29 @@ class TestGrade(unittest.TestCase):
             "-t", TEST_FILES_PATH + "tests/", 
             "-r", TEST_FILES_PATH + "requirements.txt",
             "-o", "test/",
-            "--image", "otter-test"
+            "--image", "otter-test",
+            "-v"
         ]
         args = parser.parse_args(grade_command)
-        args.func(args)
+        with contextlib.redirect_stdout(StringIO()):
+            args.func(args)
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)
-        df_correct = pd.read_csv(TEST_FILES_PATH + "final_grades_correct_notebooks.csv").sort_values("identifier").reset_index(drop=True)
+        df_test["failures"] = df_test["identifier"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
 
-        # assert the dataframes are as expected
-        self.assertTrue(df_test.equals(df_correct), "Dataframes not equal")
+        # check point values
+        for _, row in df_test.iterrows():
+            for test in self.test_points:
+                if int(re.sub(r"\D", "", test)) in row["failures"]:
+                    self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["identifier"], test))
+                else:
+                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["identifier"], test))
+
+        # df_correct = pd.read_csv(TEST_FILES_PATH + "final_grades_correct_notebooks.csv").sort_values("identifier").reset_index(drop=True)
+
+        # # assert the dataframes are as expected
+        # self.assertTrue(df_test.equals(df_correct), "Dataframes not equal")
 
         # remove the extra output
         cleanup_command = ["rm", "test/final_grades.csv"]
@@ -181,7 +206,7 @@ class TestGrade(unittest.TestCase):
         self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
 
 
-    def test_hundred_notebooks_with_pdfs(self):
+    def test_notebooks_with_pdfs(self):
         """
         Check that the example of 100 notebooks runs correctely locally.
         """
@@ -195,13 +220,9 @@ class TestGrade(unittest.TestCase):
             "--tag-filter",
             "--containers", "5",
             "--image", "otter-test",
-            "-v"
         ]
         args = parser.parse_args(grade_command)
-
-        # redirect stdout so we don't print -v flag messages
-        with contextlib.redirect_stdout(StringIO()):
-            args.func(args)
+        args.func(args)
 
         # check that we have PDFs
         self.assertTrue(os.path.isdir("test/submission_pdfs"))
@@ -215,11 +236,10 @@ class TestGrade(unittest.TestCase):
         self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
 
 
-    def test_hundred_scripts(self):
+    def test_scripts(self):
         """
         Check that the example of 100 scripts runs correctely locally.
         """
-        # grade the 100 scripts
         grade_command = ["grade",
             "-sy", TEST_FILES_PATH + "scripts/meta.yml", 
             "-p", TEST_FILES_PATH + "scripts/", 
@@ -233,10 +253,27 @@ class TestGrade(unittest.TestCase):
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)
-        df_correct = pd.read_csv(TEST_FILES_PATH + "final_grades_correct_script.csv").sort_values("identifier").reset_index(drop=True)
+        df_test["failures"] = df_test["identifier"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
 
-        # assert the dataframes are as expected
-        self.assertTrue(df_test.equals(df_correct), "Dataframes not equal")
+        # check point values
+        for _, row in df_test.iterrows():
+            for test in self.test_points:
+                if int(re.sub(r"\D", "", test)) in row["failures"]:
+                    self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["identifier"], test))
+                else:
+                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["identifier"], test))
+        
+        # grade the 100 scripts
+        
+        # args = parser.parse_args(grade_command)
+        # args.func(args)
+
+        # # read the output and expected output
+        # df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)
+        # df_correct = pd.read_csv(TEST_FILES_PATH + "final_grades_correct_script.csv").sort_values("identifier").reset_index(drop=True)
+
+        # # assert the dataframes are as expected
+        # self.assertTrue(df_test.equals(df_correct), "Dataframes not equal")
 
         # remove the extra output
         cleanup_command = ["rm", "test/final_grades.csv"]

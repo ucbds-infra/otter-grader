@@ -31,9 +31,15 @@ class CheckCallWrapper(ast.NodeTransformer):
         secret (str): Random digits string that prevents check function from being modified
 
     """
+    OTTER_IMPORT_SYNTAX = "import"
+    OTTER_IMPORT_NAME = "otter"
+    OTTER_CLASS_NAME = "Notebook"
+    OTTER_INSTANCE_NAME = "grader"
+
 
     def __init__(self, secret):
         self.secret = secret
+
 
     def node_constructor(self, expression):
         """Creates node that wraps expression in a list (check_results_XX) append call
@@ -53,6 +59,45 @@ class CheckCallWrapper(ast.NodeTransformer):
                              keywords=[])
         return ast.Call(func=func, args=args, keywords=[])
 
+
+    def visit_ImportFrom(self, node):
+        """
+        """
+        if node.module == "otter" and "Notebook" in [n.name for n in node.names]:
+            CheckCallWrapper.OTTER_IMPORT_SYNTAX = "from"
+            nb_asname = [n.asname for n in node.names if n.name == "Notebook"][0]
+            if nb_asname is not None:
+                CheckCallWrapper.OTTER_CLASS_NAME = nb_asname
+        return node
+
+            
+    def visit_Import(self, node):
+        """
+        """
+        if "otter" in [n.name for n in node.names]:
+            CheckCallWrapper.OTTER_IMPORT_SYNTAX = "import"
+            otter_asname = [n.asname for n in node.names if n.name == "otter"][0]
+            if otter_asname is not None:
+                CheckCallWrapper.OTTER_IMPORT_NAME = otter_asname
+        return node
+
+
+    def visit_Assign(self, node):
+        """
+        """
+        if isinstance(node.value, ast.Call):
+            if isinstance(node.value.func, ast.Attribute) and CheckCallWrapper.OTTER_IMPORT_SYNTAX == "import":
+                if node.value.func.attr == "Notebook" and isinstance(node.value.func.value, ast.Name):
+                    if node.value.func.value.id == CheckCallWrapper.OTTER_IMPORT_NAME:
+                        assert len(node.targets) == 1, "error parsing otter.Notebook instance in ast"
+                        CheckCallWrapper.OTTER_INSTANCE_NAME = node.targets[0].id
+            elif isinstance(node.value.func, ast.Name) and CheckCallWrapper.OTTER_IMPORT_SYNTAX == "from":
+                if node.value.func.id == CheckCallWrapper.OTTER_CLASS_NAME:
+                    assert len(node.targets) == 1, "error parsing otter.Notebook instance in ast"
+                    CheckCallWrapper.OTTER_INSTANCE_NAME = node.targets[0].id
+        return node
+
+
     def visit_Call(self, node):
         """Function that handles whether a given function call is a 'check' call
         and transforms the node accordingly.
@@ -64,16 +109,25 @@ class CheckCallWrapper(ast.NodeTransformer):
             ast.Call: Transformed version of input node
 
         """
-        # test case is if check is .check
         if isinstance(node.func, ast.Attribute):
-            return node
-        elif isinstance(node.func, ast.Name):
-            if node.func.id == 'check':
-                return self.node_constructor(node)
-            else:
-                return node
-        else:
-            return node
+            if isinstance(node.func.value, ast.Name) and node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
+                if node.func.attr == "check":
+                    return self.node_constructor(node)
+        return node
+
+
+
+
+        # # test case is if check is .check
+        # if isinstance(node.func, ast.Attribute):
+        #     return node
+        # elif isinstance(node.func, ast.Name):
+        #     if node.func.id == 'check':
+        #         return self.node_constructor(node)
+        #     else:
+        #         return node
+        # else:
+        #     return node
 
 
 def run_doctest(name, doctest_string, global_environment):
@@ -119,6 +173,12 @@ def run_doctest(name, doctest_string, global_environment):
         return False, runresults.getvalue()
 
 
+# class OKTestCase:
+#     def __init__(self, test, hidden):
+#         self.test = test
+#         self.hidden = hidden
+
+
 class OKTest:
     """
     A single DocTest defined by OKPy.
@@ -158,10 +218,11 @@ class OKTest:
     <p><strong>Test result:</strong><pre>{{test_result}}</pre></p>
     """)
 
-    plain_result_fail_template = Template("""   {{ name }}
+    plain_result_fail_template = Template(dedent("""\
+       {{ name }}
 
-Test result:
-{{test_result}}""")
+    Test result:
+    {{test_result}}"""))
 
     def _repr_html_(self):
         if self.passed:
@@ -183,16 +244,18 @@ Test result:
                 test_result=self.result
             )
 
-    def __init__(self, name, tests, value=1, hidden=True):
+    def __init__(self, name, tests, hiddens, value=1, hidden=True):
         """
         tests is list of doctests that should be run.
         """
         self.name = name
-        self.tests = tests
+        self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
+        self.hidden_tests = [t for t, h in zip(tests, hiddens) if h]
         self.value = value
         self.hidden = hidden
         self.passed = None
         self.failed_test = None
+        self.failed_test_hidden = None
 
     def run(self, global_environment):
         """Runs tests on a given global_environment.
@@ -204,11 +267,12 @@ Test result:
             (bool, OKTest): Whether the test passed and a pointer to the current OKTest object
 
         """
-        for i, t in enumerate(self.tests):
+        for i, t in enumerate(self.public_tests + self.hidden_tests):
             passed, result = run_doctest(self.name + ' ' + str(i), t, global_environment)
             if not passed:
                 self.passed = False
                 self.failed_test = t
+                self.failed_test_hidden = i >= len(self.public_tests)
                 self.result = result
                 return False, self
         self.passed = True
@@ -252,11 +316,13 @@ Test result:
         assert not bool(test_suite.get('teardown'))
 
         tests = []
+        hiddens = []
 
-        for i, test_case in enumerate(test_spec['suites'][0]['cases']):
+        for _, test_case in enumerate(test_spec['suites'][0]['cases']):
             tests.append(dedent(test_case['code']))
+            hiddens.append(test_case.get('hidden', True))
 
-        return cls(path, tests, test_spec.get('points', 1), test_spec.get('hidden', True))
+        return cls(path, tests, hiddens, test_spec.get('points', 1), test_spec.get('hidden', True))
 
 
 class OKTests:
@@ -332,6 +398,7 @@ class OKTestsResult:
         include_grade (boolean, optional): Set true if grade should be included in result
 
     """
+
     html_result_template = Template("""
     {% if include_grade %}
     <strong>Grade: {{ grade }}</strong>
@@ -380,6 +447,15 @@ class OKTestsResult:
 
     def _repr_html_(self):
         return OKTestsResult.html_result_template.render(
+            grade=self.grade,
+            passed_tests=self.passed_tests,
+            failed_tests=self.failed_tests,
+            tests=self.tests,
+            include_grade=self.include_grade
+        )
+
+    def _repr_gradescope_(self):
+        return OKTestsResult.plain_result_template.render(
             grade=self.grade,
             passed_tests=self.passed_tests,
             failed_tests=self.failed_tests,

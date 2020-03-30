@@ -92,6 +92,7 @@ grade_parser.add_argument("-r", "--requirements", default="requirements.txt", ty
 grade_parser.add_argument("--containers", type=int, help="Specify number of containers to run in parallel")
 grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
 grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
+grade_parser.add_argument("--debug", action="store_true", default=False, help="Print stdout/stderr from grading for debugging")
 
 grade_parser.set_defaults(func=grade.main)
 

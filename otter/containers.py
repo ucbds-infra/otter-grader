@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 def launch_parallel_containers(
     tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, tag_filter=False, 
     html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
-    scripts=False, no_kill=False, output_path="./"):
+    scripts=False, no_kill=False, output_path="./", debug=False):
     """Grades notebooks in parallel docker containers
 
     This function runs NUM_CONTAINERS docker containers in parallel to grade the student submissions
@@ -84,7 +84,8 @@ def launch_parallel_containers(
                 image=image,
                 scripts=scripts,
                 no_kill=no_kill,
-                output_path=output_path
+                output_path=output_path,
+                debug=debug
             )]
 
         # stop execution while containers are running
@@ -107,7 +108,7 @@ def launch_parallel_containers(
 
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
 unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, 
-scripts=False, no_kill=False, output_path="./", logging=False):
+scripts=False, no_kill=False, output_path="./", debug=False):
     """
     Grades multiple assignments in a directory using a single docker container. 
 
@@ -185,8 +186,10 @@ scripts=False, no_kill=False, output_path="./", logging=False):
         grade_command += ["--scripts"]
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
-    # print(grade.stdout.decode("utf-8"))
-    # print(grade.stderr.decode("utf-8"))
+    
+    if debug:
+        print(grade.stdout.decode("utf-8"))
+        print(grade.stderr.decode("utf-8"))
 
     # TODO: move this to serve with contextlib???
     # if logging:
