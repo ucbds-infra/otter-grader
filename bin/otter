@@ -109,7 +109,6 @@ server_build_parser = server_subparsers.add_parser("build", description="Build i
 server_build_parser.set_defaults(func=service.build)
 
 
-
 ##### PARSER FOR otter service create #####
 server_create_parser = server_subparsers.add_parser("create", description="Create database for otter-service")
 # TODO: add arguments
