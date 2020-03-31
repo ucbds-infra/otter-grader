@@ -11,7 +11,8 @@ test = {
 					tqdm
 					>>> 1 == 1
 					True
-					"""
+					""",
+					"hidden": False,
 				}, {
 					"code": r"""
 					>>> import tqdm
@@ -19,7 +20,8 @@ test = {
 					tqdm
 					>>> 1 == 1
 					True
-					"""
+					""",
+										"locked": False,
 				}
 			],
 			"scored": False,

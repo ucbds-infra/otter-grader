@@ -1,31 +1,35 @@
 test = {
 	"name": "q3",
-	"points": 1,
+	"points": 2,
+	"hidden": False,
 	"suites": [ 
 		{
 			"cases": [ 
 				{
 					"code": r"""
-					>>> import tqdm
-					>>> print(tqdm.__name__)
-					tqdm
-					>>> 1 == 1
+					>>> x
 					True
-					"""
-				}, {
+					""",
+					"hidden": False,
+					"locked": False,
+				}, 
+				{
 					"code": r"""
-					>>> import tqdm
-					>>> print(tqdm.__name__)
-					tqdm
-					>>> 1 == 1
-					True
-					"""
-				}
+					>>> if x:
+					... 	print("yep")
+					... else:
+					... 	print("nope")
+					... 
+					yep
+					""",
+					"hidden": True,
+					"locked": False,
+				}, 
 			],
 			"scored": False,
 			"setup": "",
 			"teardown": "",
 			"type": "doctest"
-		}, 
+		}
 	]
 }

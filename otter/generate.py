@@ -4,9 +4,9 @@
 
 import os
 import shutil
-import argparse
+# import argparse
 import subprocess
-import sys
+# import sys
 
 from glob import glob
 from subprocess import PIPE
@@ -39,14 +39,16 @@ pip3 install -r /autograder/source/requirements.txt
 
 RUN_AUTOGRADER = Template("""#!/usr/bin/env python3
 
-from otter.execute import grade_notebook
-from glob import glob
 import json
 import os
 import shutil
 import subprocess
 import re
 import pandas as pd
+
+from glob import glob
+from textwrap import dedent
+from otter.execute import grade_notebook
 
 SCORE_THRESHOLD = {{ threshold }}
 POINTS_POSSIBLE = {{ points }}
@@ -106,22 +108,27 @@ if __name__ == "__main__":
     for file in tests_glob:
         shutil.copy(file, "/autograder/submission/tests")
 
-    scores = grade_notebook(nb_path, tests_glob, name="submission", gradescope=True, ignore_errors=True)
+    scores = grade_notebook(nb_path, glob("/autograder/submission/tests/*.py"), name="submission", gradescope=True, ignore_errors=True)
     # del scores["TEST_HINTS"]
 
-    failed_test_output = "Failed Tests:"
     output = {"tests" : []}
     for key in scores:
         if key != "total" and key != "possible":
+            if scores[key].get("hidden", False):
+                output["tests"] += [{
+                    "name" : key,
+                    "score" : 0,
+                    "possible": 0,
+                    "visibility": "visible"
+                }]
             output["tests"] += [{
-                "name" : key,
+                "name" : (key, key + " HIDDEN")[scores[key].get("hidden", False)],
                 "score" : scores[key]["score"],
                 "possible": scores[key]["possible"],
-                "visibility": ("visible", "hidden")[scores[key]["hidden"]]
+                "visibility": ("visible", "hidden")[scores[key].get("hidden", False)]
             }]
             if "hint" in scores[key]:
                 output["tests"][-1]["output"] = repr(scores[key]["hint"])
-    # output["visibility"] = "hidden"
     
     if SHOW_ALL_ON_RELEASE:
         output["stdout_visibility"] = "after_published"
@@ -139,6 +146,12 @@ if __name__ == "__main__":
         json.dump(output, f, indent=4)
 
     print("\\n\\n")
+    print(dedent(\"\"\"\\
+    Test scores are summarized in the table below. If a student fails a hidden tests, a second 
+    output cell is shown that is hidden from students with the output of the failed test. If 
+    a student fails a public test, they are shown the failed test. If a student passes both tests,
+    a single output cell is shown.
+    \"\"\"))
     df = pd.DataFrame(output["tests"])
     if "output" in df.columns:
         df.drop(columns=["output"], inplace=True)
@@ -228,6 +241,3 @@ def main(args):
     else:
         # delete tmp directory
         shutil.rmtree("tmp")
-
-if __name__ == "__main__":
-    main()

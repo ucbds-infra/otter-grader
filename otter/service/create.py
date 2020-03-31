@@ -6,9 +6,36 @@ MISSING_PACKAGES = False
 
 try:
     from psycopg2 import connect, extensions, sql
+    import yaml
+    import csv
 except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
+
+def connect_db(host="localhost", username="otterservice", password="mypass"):
+    conn = connect(dbname='otter_db',
+               user=username,
+               host=host,
+               password=password)
+    conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+    return conn
+
+def create_users(filepath):
+    with open(filepath, newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        conn = connect_db()
+        cursor = conn.cursor()
+        for row in spamreader:
+            username, password = row[:2]
+            if username.lower() == "username":
+                # skip heading
+                continue
+            insert_command = """
+                INSERT INTO users (username, password) VALUES (\'{}\', \'{}\')
+                ON CONFLICT (username)
+                DO UPDATE SET password = \'{}\'
+                """.format(username, password, password)
+            cursor.execute(insert_command)
 
 def main(args):
     if MISSING_PACKAGES:
@@ -18,10 +45,14 @@ def main(args):
             "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
         )
 
+    with open("conf.yml") as f:
+        config = yaml.safe_load(f)
+    
     conn = connect(dbname='postgres',
-                user='admin',
-                host='',
-                password='')
+                   host=config['db_host'],
+                   port=config['db_port'],
+                   user=config['db_user'],
+                   password=config['db_pass'])
 
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()
@@ -30,9 +61,10 @@ def main(args):
     conn.close()
 
     conn = connect(dbname='otter_db',
-                user='admin',
-                host='',
-                password='')
+                   host=config['db_host'],
+                   port=config['db_port'],
+                   user=config['db_user'],
+                   password=config['db_pass'])
 
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()

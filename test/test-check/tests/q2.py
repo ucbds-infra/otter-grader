@@ -8,15 +8,15 @@ test = {
 					"code": r"""
 					>>> 1 == 1
 					False
-					""",
-					"hidden": False,
-					"locked": False,
+					"""
 				}, {
 					"code": r"""
 					>>> import tqdm
 					>>> print(tqdm.__name__)
 					tqdm
-					"""
+					""",
+					"hidden": False,
+					"locked": False,
 				}
 			],
 			"scored": False,

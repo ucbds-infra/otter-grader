@@ -1,23 +1,40 @@
 test = {
 	"name": "q1",
-	"points": 1,
+	"points": 0,
+	"hidden": False,
 	"suites": [ 
 		{
 			"cases": [ 
 				{
 					"code": r"""
-					>>> 1 == 1
-					True
+					>>> square(3)
+					9
 					""",
 					"hidden": False,
 					"locked": False,
 				}, 
 				{
 					"code": r"""
-					>>> 1 == 2
-					False
+					>>> square(2.5)
+					6.25
 					""",
 					"hidden": False,
+					"locked": False,
+				}, 
+				{
+					"code": r"""
+					>>> square(6)
+					36
+					""",
+					"hidden": True,
+					"locked": False,
+				}, 
+				{
+					"code": r"""
+					>>> square(1.5)
+					2.25
+					""",
+					"hidden": True,
 					"locked": False,
 				}, 
 			],
@@ -25,6 +42,6 @@ test = {
 			"setup": "",
 			"teardown": "",
 			"type": "doctest"
-		}, 
+		}
 	]
 }

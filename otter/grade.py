@@ -5,8 +5,8 @@
 import os
 import pandas as pd
 
-from .metadata import *
-from .containers import *
+from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
+from .containers import launch_parallel_containers
 from .utils import merge_csv
 
 
@@ -71,7 +71,8 @@ def main(args):
         image=args.image,
         scripts=args.scripts,
         no_kill=args.no_kill,
-        output_path=args.output_path
+        output_path=args.output_path,
+        debug=args.debug
     )
 
     if verbose:
@@ -93,7 +94,3 @@ def main(args):
 
     # write to CSV file
     output_df.to_csv(os.path.join(args.output_path, "final_grades.csv"), index=False)
-
-
-if __name__ == "__main__":
-    main()

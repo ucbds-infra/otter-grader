@@ -43,10 +43,10 @@ class TestAssign(unittest.TestCase):
         self.assertEqual(len(os.listdir(TEST_FILES_PATH + "output/autograder")), 3)
         for f in ["tests", "data.csv", "example.ipynb"]:
             self.assertIn(f, os.listdir(TEST_FILES_PATH + "output/autograder"))
-        for f in ["q1H.py", "q1.py", "q3.py"]:
+        for f in ["q1.py", "q3.py"]:
             self.assertIn(f, os.listdir(TEST_FILES_PATH + "output/autograder/tests"))
 
-        for file in ["example.ipynb", "data.csv", "tests/q1.py", "tests/q1H.py", "tests/q3.py"]:
+        for file in ["example.ipynb", "data.csv", "tests/q1.py", "tests/q3.py"]:
             with open(os.path.join(TEST_FILES_PATH + "output-correct/autograder", file)) as f:
                 correct_contents = f.read()
             with open(os.path.join(TEST_FILES_PATH + "output/autograder", file)) as f:
@@ -69,4 +69,55 @@ class TestAssign(unittest.TestCase):
         
         # cleanup the output
         shutil.rmtree(TEST_FILES_PATH + "output")
+
+        
+    def test_jassign_format_convert_example(self):
+        """
+        Checks that otter assign --jassign filters and outputs correctly
+        """
+        # run otter assign
+        run_assign_args = [
+            "assign", "--no-run-tests", "--jassign", TEST_FILES_PATH + "jassign-example.ipynb", TEST_FILES_PATH + "output-jassign", TEST_FILES_PATH + "data.csv"
+        ]
+        args = parser.parse_args(run_assign_args)
+
+        # block stdout while running
+        block_print()
+        args.func(args)
+        enable_print()
+
+        # check that we have the correct output contents
+        self.assertTrue(os.path.isdir(TEST_FILES_PATH + "output-jassign"))
+        self.assertEqual(os.listdir(TEST_FILES_PATH + "output-jassign"), ["autograder", "student"])
+
+        # check contents of autograder directory
+        self.assertEqual(len(os.listdir(TEST_FILES_PATH + "output-jassign/autograder")), 3)
+        for f in ["tests", "data.csv", "jassign-example.ipynb"]:
+            self.assertIn(f, os.listdir(TEST_FILES_PATH + "output-jassign/autograder"))
+        for f in ["q1.py", "q3.py"]:
+            self.assertIn(f, os.listdir(TEST_FILES_PATH + "output-jassign/autograder/tests"))
+
+        for file in ["jassign-example.ipynb", "data.csv", "tests/q1.py", "tests/q3.py"]:
+            with open(os.path.join(TEST_FILES_PATH + "output-jassign-correct/autograder", file)) as f:
+                correct_contents = f.read()
+            with open(os.path.join(TEST_FILES_PATH + "output-jassign/autograder", file)) as f:
+                contents = f.read()
+            self.assertEqual(correct_contents, contents, "Autograder file {} incorrect".format(file))
+        
+        # check contents of student directory
+        self.assertEqual(len(os.listdir(TEST_FILES_PATH + "output-jassign/student")), 3)
+        for f in ["tests", "data.csv", "jassign-example.ipynb"]:
+            self.assertIn(f, os.listdir(TEST_FILES_PATH + "output-jassign/student"))
+        for f in ["q1.py", "q3.py"]:
+            self.assertIn(f, os.listdir(TEST_FILES_PATH + "output-jassign/student/tests"))
+
+        for file in ["jassign-example.ipynb", "data.csv", "tests/q1.py", "tests/q3.py"]:
+            with open(os.path.join(TEST_FILES_PATH + "output-jassign-correct/student", file)) as f:
+                correct_contents = f.read()
+            with open(os.path.join(TEST_FILES_PATH + "output-jassign/student", file)) as f:
+                contents = f.read()
+            self.assertEqual(correct_contents, contents, "Student file {} incorrect".format(file))
+        
+        # cleanup the output
+        shutil.rmtree(TEST_FILES_PATH + "output-jassign")
         

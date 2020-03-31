@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="next" title="otter.service package" href="otter.service.html" />
     <link rel="prev" title="PDF Generation and Filtering" href="pdfs.html" /> 
 
   
@@ -92,16 +92,18 @@
 <li class="toctree-l1"><a class="reference internal" href="otter_generate.html">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">The Otter API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.assign">otter.assign module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.check">otter.check module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.containers">otter.containers module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.execute">otter.execute module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.generate">otter.generate module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-otter.gofer">otter.gofer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.grade">otter.grade module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-otter.jassign">otter.jassign module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.metadata">otter.metadata module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.notebook">otter.notebook module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-otter.ok_parser">otter.ok_parser module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter.utils">otter.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-otter">Module contents</a></li>
 </ul>
@@ -173,6 +175,21 @@
             
   <div class="section" id="otter-package">
 <h1>otter package<a class="headerlink" href="#otter-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="otter.service.html">otter.service package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="otter.service.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otter.service.html#module-otter.service.build">otter.service.build module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otter.service.html#module-otter.service.create">otter.service.create module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otter.service.html#module-otter.service.start">otter.service.start module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otter.service.html#module-otter.service">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -282,7 +299,7 @@ dir – Path</p>
 
 <dl class="function">
 <dt id="otter.assign.gen_test_cell">
-<code class="descclassname">otter.assign.</code><code class="descname">gen_test_cell</code><span class="sig-paren">(</span><em>question</em>, <em>tests</em>, <em>tests_dir</em>, <em>hidden=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_test_cell" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">otter.assign.</code><code class="descname">gen_test_cell</code><span class="sig-paren">(</span><em>question</em>, <em>tests</em>, <em>tests_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_test_cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a test cell.</p>
 </dd></dl>
 
@@ -389,7 +406,7 @@ result_dir – Path to the result directory</p>
 <span id="otter-containers-module"></span><h2>otter.containers module<a class="headerlink" href="#module-otter.containers" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="otter.containers.grade_assignments">
-<code class="descclassname">otter.containers.</code><code class="descname">grade_assignments</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>id</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>scripts=False</em>, <em>no_kill=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.grade_assignments" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">otter.containers.</code><code class="descname">grade_assignments</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>id</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>scripts=False</em>, <em>no_kill=False</em>, <em>output_path='./'</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.grade_assignments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grades multiple assignments in a directory using a single docker container.</p>
 <p>If no PDF assignment is wanted, set all three PDF params (unfiltered_pdfs, tag_filter,
 html_filter) to false. Also, list any non-standard package requirements in a requirements.txt
@@ -425,7 +442,7 @@ file. This function can grade files with .py or .ipynb extensions (use scripts=T
 
 <dl class="function">
 <dt id="otter.containers.launch_parallel_containers">
-<code class="descclassname">otter.containers.</code><code class="descname">launch_parallel_containers</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>num_containers=None</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>scripts=False</em>, <em>no_kill=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.launch_parallel_containers" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">otter.containers.</code><code class="descname">launch_parallel_containers</code><span class="sig-paren">(</span><em>tests_dir</em>, <em>notebooks_dir</em>, <em>verbose=False</em>, <em>unfiltered_pdfs=False</em>, <em>tag_filter=False</em>, <em>html_filter=False</em>, <em>reqs=None</em>, <em>num_containers=None</em>, <em>image='ucbdsinfra/otter-grader'</em>, <em>scripts=False</em>, <em>no_kill=False</em>, <em>output_path='./'</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.launch_parallel_containers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grades notebooks in parallel docker containers</p>
 <p>This function runs NUM_CONTAINERS docker containers in parallel to grade the student submissions
 in NOTEBOOKS_DIR using the tests in TESTS_DIR. It can additionally generate PDFs for the parts
@@ -463,6 +480,35 @@ of the assignment needing manual grading.</p>
 <div class="section" id="module-otter.execute">
 <span id="otter-execute-module"></span><h2>otter.execute module<a class="headerlink" href="#module-otter.execute" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="otter.execute.check">
+<code class="descclassname">otter.execute.</code><code class="descname">check</code><span class="sig-paren">(</span><em>test_file_path</em>, <em>global_env=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>check global_env against given test_file in oktest format
+If global_env is none, the global environment of the calling
+function is used. The following two calls are equivalent:
+check(‘tests/q1.py’)
+check(‘tests/q1.py’, globals())</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>test_file_path</strong> (<em>str</em>) – Path to ok test file</li>
+<li><strong>(</strong><strong>dict of str</strong> (<em>global_env</em>) – str, optional): A global environment resulting from the execution
+of a python script or notebook.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">result of running the tests in the given global environment.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#otter.ok_parser.OKTestsResult" title="otter.ok_parser.OKTestsResult">OKTestsResult</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="otter.execute.execute_notebook">
 <code class="descclassname">otter.execute.</code><code class="descname">execute_notebook</code><span class="sig-paren">(</span><em>nb</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em>, <em>gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_notebook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes an ipython notebook and return the global environment that results from execution.</p>
@@ -493,7 +539,7 @@ nb is passed in as a dictionary that’s a parsed ipynb file</p>
 
 <dl class="function">
 <dt id="otter.execute.execute_script">
-<code class="descclassname">otter.execute.</code><code class="descname">execute_script</code><span class="sig-paren">(</span><em>script</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_script" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">otter.execute.</code><code class="descname">execute_script</code><span class="sig-paren">(</span><em>script</em>, <em>secret='secret'</em>, <em>initial_env=None</em>, <em>ignore_errors=False</em>, <em>gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_script" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes code of a python (.py) script and returns the resulting global environment</p>
 <p>Execute script &amp; return the global environment that results from execution.
 If ignore_errors is True, exceptions are swallowed.
@@ -580,7 +626,7 @@ execute functions</li>
 
 <dl class="function">
 <dt id="otter.execute.main">
-<code class="descclassname">otter.execute.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.main" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">otter.execute.</code><code class="descname">main</code><span class="sig-paren">(</span><em>args=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>When executing this file from the command line, this function will be run.</p>
 </dd></dl>
 
@@ -594,431 +640,206 @@ execute functions</li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-otter.gofer">
-<span id="otter-gofer-module"></span><h2>otter.gofer module<a class="headerlink" href="#module-otter.gofer" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="otter.gofer.CheckCallWrapper">
-<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">CheckCallWrapper</code><span class="sig-paren">(</span><em>secret</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.CheckCallWrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ast.NodeTransformer</span></code></p>
-<p>NodeTransformer visits and replaces nodes in place.
-CheckCallWrapper finds nodes with check(..) and replaces it with
-check_results_&lt;secret&gt;(check(…))</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>secret</strong> (<em>str</em>) – Random digits string that prevents check function from being modified</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="otter.gofer.CheckCallWrapper.secret">
-<code class="descname">secret</code><a class="headerlink" href="#otter.gofer.CheckCallWrapper.secret" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Random digits string that prevents check function from being modified</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="otter.gofer.CheckCallWrapper.node_constructor">
-<code class="descname">node_constructor</code><span class="sig-paren">(</span><em>expression</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.CheckCallWrapper.node_constructor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates node that wraps expression in a list (check_results_XX) append call</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expression</strong> (<em>ast.Name</em>) – Name for check function</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Function call object from calling check</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ast.Call</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="otter.gofer.CheckCallWrapper.visit_Call">
-<code class="descname">visit_Call</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.CheckCallWrapper.visit_Call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that handles whether a given function call is a ‘check’ call
-and transforms the node accordingly.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> (<em>ast.Call</em>) – Function call object, calling the check function</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Transformed version of input node</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ast.Call</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="otter.gofer.OKTest">
-<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">OKTest</code><span class="sig-paren">(</span><em>name</em>, <em>tests</em>, <em>value=1</em>, <em>hidden=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTest" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A single DocTest defined by OKPy.
-Instances of this class are callable. When called, it takes
-a global_environment dict, and returns a TestResult object.
-We only take a global_environment, <em>not</em> a local_environment.
-This makes tests not useful inside functions, methods or
-other scopes with local variables. This is a limitation of
-doctest, so we roll with it.</p>
-<p>The last 2 attributes (passed, failed_test) are set after calling run().</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<em>str</em>) – Name of test</li>
-<li><strong>tests</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – List of docstring tests to be run</li>
-<li><strong>value</strong> (<em>int</em><em>, </em><em>optional</em>) – Point value of this test, defaults to 1</li>
-<li><strong>hidden</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set true if this test should be hidden</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.name">
-<code class="descname">name</code><a class="headerlink" href="#otter.gofer.OKTest.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Name of test</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.tests">
-<code class="descname">tests</code><a class="headerlink" href="#otter.gofer.OKTest.tests" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> – List of docstring tests to be run</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.value">
-<code class="descname">value</code><a class="headerlink" href="#otter.gofer.OKTest.value" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – Point value of this test object, defaults to 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.hidden">
-<code class="descname">hidden</code><a class="headerlink" href="#otter.gofer.OKTest.hidden" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if this test should be hidden</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.passed">
-<code class="descname">passed</code><a class="headerlink" href="#otter.gofer.OKTest.passed" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if all tests passed</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.failed_test">
-<code class="descname">failed_test</code><a class="headerlink" href="#otter.gofer.OKTest.failed_test" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Docstring of first failed test, if any</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="otter.gofer.OKTest.from_file">
-<em class="property">classmethod </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTest.from_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse an ok test file &amp; return an OKTest</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>cls</strong> (<a class="reference internal" href="#otter.gofer.OKTest" title="otter.gofer.OKTest"><em>OKTest</em></a>) – Uses this to create a new OKTest object from the given file</li>
-<li><strong>path</strong> (<em>str</em>) – Path to ok test file</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">new OKTest object created from the given file</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#otter.gofer.OKTest" title="otter.gofer.OKTest">OKTest</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.html_result_fail_template">
-<code class="descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:10fdacb38&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.html_result_pass_template">
-<code class="descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:10fdbe748&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.plain_result_fail_template">
-<code class="descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:10fdaca58&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTest.plain_result_pass_template">
-<code class="descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:10fdbe208&gt;</em><a class="headerlink" href="#otter.gofer.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="otter.gofer.OKTest.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>global_environment</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTest.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs tests on a given global_environment.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>(</strong><strong>dict of str</strong> (<em>global_environment</em>) – str): Result of executing a python notebook/script</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Whether the test passed and a pointer to the current OKTest object</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(bool, <a class="reference internal" href="#otter.gofer.OKTest" title="otter.gofer.OKTest">OKTest</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="otter.gofer.OKTests">
-<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">OKTests</code><span class="sig-paren">(</span><em>test_paths</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTests" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Test Class for Ok-style tests used to grade assignments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>test_paths</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – List of paths to ok tests</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="otter.gofer.OKTests.paths">
-<code class="descname">paths</code><a class="headerlink" href="#otter.gofer.OKTests.paths" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> – List of paths to ok tests</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTests.tests">
-<code class="descname">tests</code><a class="headerlink" href="#otter.gofer.OKTests.tests" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#otter.gofer.OKTest" title="otter.gofer.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a> – List of OKTest objects for each path</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="otter.gofer.OKTests.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>global_environment</em>, <em>include_grade=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTests.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run this object’s tests on a given global environment (from running a notebook/script)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>(</strong><strong>dict of str</strong> (<em>global_environment</em>) – str): Result of executing a python notebook/script
-see grade.execute_notebook for more</li>
-<li><strong>include_grade</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Set true if grade should be included in result</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>Object resulting from running tests on GLOBAL_ENVIRONMENT, with grade,</dt>
-<dd><p class="first last">tests passed, and more information.</p>
-</dd>
-</dl>
-</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#otter.gofer.OKTestsResult" title="otter.gofer.OKTestsResult">OKTestsResult</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="otter.gofer.OKTestsResult">
-<em class="property">class </em><code class="descclassname">otter.gofer.</code><code class="descname">OKTestsResult</code><span class="sig-paren">(</span><em>grade</em>, <em>paths</em>, <em>tests</em>, <em>passed_tests</em>, <em>failed_tests</em>, <em>include_grade=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.OKTestsResult" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Displayable result from running OKTests</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>grade</strong> (<em>float</em>) – Grade as a decimal in the range [0, 1]</li>
-<li><strong>paths</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – List of paths to ok tests</li>
-<li><strong>tests</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#otter.gofer.OKTest" title="otter.gofer.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a>) – List of OKTest objects for each path</li>
-<li><strong>passed_tests</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – List of passed test docstrings</li>
-<li><strong>failed_tests</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#otter.gofer.OKTest" title="otter.gofer.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a>) – List of failed test docstrings and
-OKTest objects</li>
-<li><strong>include_grade</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Set true if grade should be included in result</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.grade">
-<code class="descname">grade</code><a class="headerlink" href="#otter.gofer.OKTestsResult.grade" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Grade as a decimal in the range [0, 1]</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.paths">
-<code class="descname">paths</code><a class="headerlink" href="#otter.gofer.OKTestsResult.paths" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> – List of paths to ok tests</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.tests">
-<code class="descname">tests</code><a class="headerlink" href="#otter.gofer.OKTestsResult.tests" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#otter.gofer.OKTest" title="otter.gofer.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a> – List of OKTest objects for each path</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.passed_tests">
-<code class="descname">passed_tests</code><a class="headerlink" href="#otter.gofer.OKTestsResult.passed_tests" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> – List of passed test docstrings</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.failed_tests">
-<code class="descname">failed_tests</code><a class="headerlink" href="#otter.gofer.OKTestsResult.failed_tests" title="Permalink to this definition">¶</a></dt>
-<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#otter.gofer.OKTest" title="otter.gofer.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a> – List of failed test docstrings and
-OKTest objects</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.include_grade">
-<code class="descname">include_grade</code><a class="headerlink" href="#otter.gofer.OKTestsResult.include_grade" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>boolean, optional</em> – Set true if grade should be included in result</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.html_result_template">
-<code class="descname">html_result_template</code><em class="property"> = &lt;Template memory:10fdacb70&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="otter.gofer.OKTestsResult.plain_result_template">
-<code class="descname">plain_result_template</code><em class="property"> = &lt;Template memory:10fdac828&gt;</em><a class="headerlink" href="#otter.gofer.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="otter.gofer.check">
-<code class="descclassname">otter.gofer.</code><code class="descname">check</code><span class="sig-paren">(</span><em>test_file_path</em>, <em>global_env=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.check" title="Permalink to this definition">¶</a></dt>
-<dd><p>check global_env against given test_file in oktest format
-If global_env is none, the global environment of the calling
-function is used. The following two calls are equivalent:
-check(‘tests/q1.py’)
-check(‘tests/q1.py’, globals())</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>test_file_path</strong> (<em>str</em>) – Path to ok test file</li>
-<li><strong>(</strong><strong>dict of str</strong> (<em>global_env</em>) – str, optional): A global environment resulting from the execution
-of a python script or notebook.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">result of running the tests in the given global environment.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#otter.gofer.OKTestsResult" title="otter.gofer.OKTestsResult">OKTestsResult</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="otter.gofer.flush_inline_matplotlib_plots">
-<code class="descclassname">otter.gofer.</code><code class="descname">flush_inline_matplotlib_plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.flush_inline_matplotlib_plots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flush matplotlib plots immediately, rather than asynchronously.
-Basically, the inline backend only shows the plot after the entire
-cell executes, which means we can’t easily use a contextmanager to
-suppress displaying it. See <a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets/issues/1181/">https://github.com/jupyter-widgets/ipywidgets/issues/1181/</a>
-and <a class="reference external" href="https://github.com/ipython/ipython/issues/10376">https://github.com/ipython/ipython/issues/10376</a> for more details. This
-function displays flushes any pending matplotlib plots if we are using
-the inline backend.
-Stolen from <a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35">https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35</a></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="otter.gofer.hide_outputs">
-<code class="descclassname">otter.gofer.</code><code class="descname">hide_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.hide_outputs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Context manager for hiding outputs from display() calls.
-IPython handles matplotlib outputs specially, so those are supressed too.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="otter.gofer.id_generator">
-<code class="descclassname">otter.gofer.</code><code class="descname">id_generator</code><span class="sig-paren">(</span><em>size=6</em>, <em>chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.id_generator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Used to generate a dynamic variable name for grading functions</p>
-<p>This function generates a random name using the given length and character set.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>size</strong> (<em>int</em>) – Length of output name</li>
-<li><strong>chars</strong> (<em>str</em>) – Set of characters used to create function name</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Randomized string name for grading function</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="otter.gofer.run_doctest">
-<code class="descclassname">otter.gofer.</code><code class="descname">run_doctest</code><span class="sig-paren">(</span><em>name</em>, <em>doctest_string</em>, <em>global_environment</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.gofer.run_doctest" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run a single test with given global_environment.
-Returns (True, ‘’) if the doctest passes.
-Returns (False, failure_message) if the doctest fails.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<em>str</em>) – Name of doctest</li>
-<li><strong>doctest_string</strong> (<em>str</em>) – Doctest in string form</li>
-<li><strong>(</strong><strong>dict of str</strong> (<em>global_environment</em>) – str): Global environment resulting from the execution
-of a python script/notebook</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Results from running the test</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(bool, str)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
 <div class="section" id="module-otter.grade">
 <span id="otter-grade-module"></span><h2>otter.grade module<a class="headerlink" href="#module-otter.grade" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="otter.grade.main">
 <code class="descclassname">otter.grade.</code><code class="descname">main</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.grade.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>Main function for running otter from the command line.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.jassign">
+<span id="otter-jassign-module"></span><h2>otter.jassign module<a class="headerlink" href="#module-otter.jassign" title="Permalink to this headline">¶</a></h2>
+<p>Generate student &amp; autograder views of a notebook in okpy format.</p>
+<dl class="class">
+<dt id="otter.jassign.Test">
+<em class="property">class </em><code class="descclassname">otter.jassign.</code><code class="descname">Test</code><span class="sig-paren">(</span><em>input</em>, <em>output</em>, <em>hidden</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.Test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="otter.jassign.Test.hidden">
+<code class="descname">hidden</code><a class="headerlink" href="#otter.jassign.Test.hidden" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.jassign.Test.input">
+<code class="descname">input</code><a class="headerlink" href="#otter.jassign.Test.input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.jassign.Test.output">
+<code class="descname">output</code><a class="headerlink" href="#otter.jassign.Test.output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.add_close_export_to_cell">
+<code class="descclassname">otter.jassign.</code><code class="descname">add_close_export_to_cell</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.add_close_export_to_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an export close to the top of the cell</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.convert_to_ok">
+<code class="descclassname">otter.jassign.</code><code class="descname">convert_to_ok</code><span class="sig-paren">(</span><em>nb_path</em>, <em>dir</em>, <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.convert_to_ok" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a master notebook to an ok notebook, tests dir, and .ok file.</p>
+<p>nb – Path
+endpoint – OK endpoint for notebook submission (e.g., cal/data100/sp19)
+dir – Path</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.find_question_spec">
+<code class="descclassname">otter.jassign.</code><code class="descname">find_question_spec</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.find_question_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return line number of the BEGIN QUESTION line or None.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_case">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_case</code><span class="sig-paren">(</span><em>test</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_case" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an ok test case for a test.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_check_all_cell">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_check_all_cell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_check_all_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate submit cells.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_close_export_cell">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_close_export_cell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_close_export_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new cell to end question export</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_export_cells">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_export_cells</code><span class="sig-paren">(</span><em>nb_path</em>, <em>instruction_text</em>, <em>filtering=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_export_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate submit cells.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_init_cell">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_init_cell</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_init_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a cell to initialize ok object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_ok_cells">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_ok_cells</code><span class="sig-paren">(</span><em>cells</em>, <em>tests_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_ok_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate notebook cells for the OK version of a master notebook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(ok_cells, list of manual question names)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_question_cell">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_question_cell</code><span class="sig-paren">(</span><em>cell</em>, <em>manual</em>, <em>format</em>, <em>in_manual_block</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_question_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cell with metadata hidden in an HTML comment.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_suite">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_suite</code><span class="sig-paren">(</span><em>tests</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_suite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an ok test suite for a test.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_test_cell">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_test_cell</code><span class="sig-paren">(</span><em>question</em>, <em>tests</em>, <em>tests_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_test_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a test cell.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.gen_views">
+<code class="descclassname">otter.jassign.</code><code class="descname">gen_views</code><span class="sig-paren">(</span><em>master_nb</em>, <em>result_dir</em>, <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.gen_views" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate student and autograder views.</p>
+<p>master_nb – Dict of master notebook JSON
+result_dir – Path to the result directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.get_source">
+<code class="descclassname">otter.jassign.</code><code class="descname">get_source</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.get_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the source code of a cell in a way that works for both nbformat and json.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.is_question_cell">
+<code class="descclassname">otter.jassign.</code><code class="descname">is_question_cell</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.is_question_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether cell contains BEGIN QUESTION in a block quote.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.is_test_cell">
+<code class="descclassname">otter.jassign.</code><code class="descname">is_test_cell</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.is_test_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether it’s a code cell containing a test.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.lock">
+<code class="descclassname">otter.jassign.</code><code class="descname">lock</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.lock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.read_question_metadata">
+<code class="descclassname">otter.jassign.</code><code class="descname">read_question_metadata</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.read_question_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return question metadata from a question cell.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.read_test">
+<code class="descclassname">otter.jassign.</code><code class="descname">read_test</code><span class="sig-paren">(</span><em>cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.read_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the contents of a test as an (input, output, hidden) tuple.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.remove_hidden_tests">
+<code class="descclassname">otter.jassign.</code><code class="descname">remove_hidden_tests</code><span class="sig-paren">(</span><em>test_dir</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.remove_hidden_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rewrite test files to remove hidden tests.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.remove_output">
+<code class="descclassname">otter.jassign.</code><code class="descname">remove_output</code><span class="sig-paren">(</span><em>nb</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.remove_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all outputs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.replace_solutions">
+<code class="descclassname">otter.jassign.</code><code class="descname">replace_solutions</code><span class="sig-paren">(</span><em>lines</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.replace_solutions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace solutions in lines, a list of strings.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.solution_assignment_sub">
+<code class="descclassname">otter.jassign.</code><code class="descname">solution_assignment_sub</code><span class="sig-paren">(</span><em>match</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.solution_assignment_sub" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.solution_line_sub">
+<code class="descclassname">otter.jassign.</code><code class="descname">solution_line_sub</code><span class="sig-paren">(</span><em>match</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.solution_line_sub" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.strip_solutions">
+<code class="descclassname">otter.jassign.</code><code class="descname">strip_solutions</code><span class="sig-paren">(</span><em>original_nb_path</em>, <em>stripped_nb_path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.strip_solutions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a notebook with solutions stripped.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.jassign.write_test">
+<code class="descclassname">otter.jassign.</code><code class="descname">write_test</code><span class="sig-paren">(</span><em>path</em>, <em>test</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.jassign.write_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an OK test file.</p>
 </dd></dl>
 
 </div>
@@ -1442,7 +1263,7 @@ notebook/script (see execute.execute_notebook for more on this)</li>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#otter.gofer.OKTestsResult" title="otter.gofer.OKTestsResult">OKTestsResult</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#otter.ok_parser.OKTestsResult" title="otter.ok_parser.OKTestsResult">OKTestsResult</a></p>
 </td>
 </tr>
 </tbody>
@@ -1455,9 +1276,9 @@ notebook/script (see execute.execute_notebook for more on this)</li>
 <dd><p>Runs all tests on this notebook.</p>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="otter.notebook.Notebook.export">
-<em class="property">static </em><code class="descname">export</code><span class="sig-paren">(</span><em>nb_path</em>, <em>filtering=True</em>, <em>filter_type='html'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.export" title="Permalink to this definition">¶</a></dt>
+<code class="descname">export</code><span class="sig-paren">(</span><em>nb_path=None</em>, <em>filtering=True</em>, <em>filter_type='html'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.export" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports notebook to PDF</p>
 <p>FILTER_TYPE can be “html” or “tags” if filtering by HTML comments or cell tags,
 respectively.</p>
@@ -1477,6 +1298,391 @@ tags, respectively.</li>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="otter.notebook.Notebook.submit">
+<code class="descname">submit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.submit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.ok_parser">
+<span id="otter-ok-parser-module"></span><h2>otter.ok_parser module<a class="headerlink" href="#module-otter.ok_parser" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="otter.ok_parser.CheckCallWrapper">
+<em class="property">class </em><code class="descclassname">otter.ok_parser.</code><code class="descname">CheckCallWrapper</code><span class="sig-paren">(</span><em>secret</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ast.NodeTransformer</span></code></p>
+<p>NodeTransformer visits and replaces nodes in place.
+CheckCallWrapper finds nodes with check(..) and replaces it with
+check_results_&lt;secret&gt;(check(…))</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>secret</strong> (<em>str</em>) – Random digits string that prevents check function from being modified</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="otter.ok_parser.CheckCallWrapper.secret">
+<code class="descname">secret</code><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.secret" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Random digits string that prevents check function from being modified</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.CheckCallWrapper.OTTER_CLASS_NAME">
+<code class="descname">OTTER_CLASS_NAME</code><em class="property"> = 'Notebook'</em><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.OTTER_CLASS_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.CheckCallWrapper.OTTER_IMPORT_NAME">
+<code class="descname">OTTER_IMPORT_NAME</code><em class="property"> = 'otter'</em><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.OTTER_IMPORT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.CheckCallWrapper.OTTER_IMPORT_SYNTAX">
+<code class="descname">OTTER_IMPORT_SYNTAX</code><em class="property"> = 'import'</em><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.OTTER_IMPORT_SYNTAX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.CheckCallWrapper.OTTER_INSTANCE_NAME">
+<code class="descname">OTTER_INSTANCE_NAME</code><em class="property"> = 'grader'</em><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.OTTER_INSTANCE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.ok_parser.CheckCallWrapper.node_constructor">
+<code class="descname">node_constructor</code><span class="sig-paren">(</span><em>expression</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.node_constructor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates node that wraps expression in a list (check_results_XX) append call</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>expression</strong> (<em>ast.Name</em>) – Name for check function</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Function call object from calling check</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ast.Call</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.ok_parser.CheckCallWrapper.visit_Assign">
+<code class="descname">visit_Assign</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.visit_Assign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.ok_parser.CheckCallWrapper.visit_Call">
+<code class="descname">visit_Call</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.visit_Call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that handles whether a given function call is a ‘check’ call
+and transforms the node accordingly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node</strong> (<em>ast.Call</em>) – Function call object, calling the check function</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Transformed version of input node</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">ast.Call</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.ok_parser.CheckCallWrapper.visit_Import">
+<code class="descname">visit_Import</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.visit_Import" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.ok_parser.CheckCallWrapper.visit_ImportFrom">
+<code class="descname">visit_ImportFrom</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.visit_ImportFrom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.ok_parser.OKTest">
+<em class="property">class </em><code class="descclassname">otter.ok_parser.</code><code class="descname">OKTest</code><span class="sig-paren">(</span><em>name</em>, <em>tests</em>, <em>hiddens</em>, <em>value=1</em>, <em>hidden=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.OKTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A single DocTest defined by OKPy.
+Instances of this class are callable. When called, it takes
+a global_environment dict, and returns a TestResult object.
+We only take a global_environment, <em>not</em> a local_environment.
+This makes tests not useful inside functions, methods or
+other scopes with local variables. This is a limitation of
+doctest, so we roll with it.</p>
+<p>The last 2 attributes (passed, failed_test) are set after calling run().</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) – Name of test</li>
+<li><strong>tests</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – List of docstring tests to be run</li>
+<li><strong>value</strong> (<em>int</em><em>, </em><em>optional</em>) – Point value of this test, defaults to 1</li>
+<li><strong>hidden</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set true if this test should be hidden</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.name">
+<code class="descname">name</code><a class="headerlink" href="#otter.ok_parser.OKTest.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Name of test</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.tests">
+<code class="descname">tests</code><a class="headerlink" href="#otter.ok_parser.OKTest.tests" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> – List of docstring tests to be run</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.value">
+<code class="descname">value</code><a class="headerlink" href="#otter.ok_parser.OKTest.value" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Point value of this test object, defaults to 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.hidden">
+<code class="descname">hidden</code><a class="headerlink" href="#otter.ok_parser.OKTest.hidden" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True if this test should be hidden</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.passed">
+<code class="descname">passed</code><a class="headerlink" href="#otter.ok_parser.OKTest.passed" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True if all tests passed</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.failed_test">
+<code class="descname">failed_test</code><a class="headerlink" href="#otter.ok_parser.OKTest.failed_test" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Docstring of first failed test, if any</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="otter.ok_parser.OKTest.from_file">
+<em class="property">classmethod </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.OKTest.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an ok test file &amp; return an OKTest</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cls</strong> (<a class="reference internal" href="#otter.ok_parser.OKTest" title="otter.ok_parser.OKTest"><em>OKTest</em></a>) – Uses this to create a new OKTest object from the given file</li>
+<li><strong>path</strong> (<em>str</em>) – Path to ok test file</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">new OKTest object created from the given file</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#otter.ok_parser.OKTest" title="otter.ok_parser.OKTest">OKTest</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.html_result_fail_template">
+<code class="descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11c213710&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.html_result_pass_template">
+<code class="descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11c1b4a20&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.plain_result_fail_template">
+<code class="descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11c213860&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTest.plain_result_pass_template">
+<code class="descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11c2138d0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.ok_parser.OKTest.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>global_environment</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.OKTest.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs tests on a given global_environment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>(</strong><strong>dict of str</strong> (<em>global_environment</em>) – str): Result of executing a python notebook/script</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Whether the test passed and a pointer to the current OKTest object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(bool, <a class="reference internal" href="#otter.ok_parser.OKTest" title="otter.ok_parser.OKTest">OKTest</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.ok_parser.OKTests">
+<em class="property">class </em><code class="descclassname">otter.ok_parser.</code><code class="descname">OKTests</code><span class="sig-paren">(</span><em>test_paths</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.OKTests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Test Class for Ok-style tests used to grade assignments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>test_paths</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – List of paths to ok tests</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTests.paths">
+<code class="descname">paths</code><a class="headerlink" href="#otter.ok_parser.OKTests.paths" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> – List of paths to ok tests</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTests.tests">
+<code class="descname">tests</code><a class="headerlink" href="#otter.ok_parser.OKTests.tests" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#otter.ok_parser.OKTest" title="otter.ok_parser.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a> – List of OKTest objects for each path</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.ok_parser.OKTests.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>global_environment</em>, <em>include_grade=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.OKTests.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run this object’s tests on a given global environment (from running a notebook/script)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>(</strong><strong>dict of str</strong> (<em>global_environment</em>) – str): Result of executing a python notebook/script
+see grade.execute_notebook for more</li>
+<li><strong>include_grade</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Set true if grade should be included in result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Object resulting from running tests on GLOBAL_ENVIRONMENT, with grade,</dt>
+<dd><p class="first last">tests passed, and more information.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#otter.ok_parser.OKTestsResult" title="otter.ok_parser.OKTestsResult">OKTestsResult</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.ok_parser.OKTestsResult">
+<em class="property">class </em><code class="descclassname">otter.ok_parser.</code><code class="descname">OKTestsResult</code><span class="sig-paren">(</span><em>grade</em>, <em>paths</em>, <em>tests</em>, <em>passed_tests</em>, <em>failed_tests</em>, <em>include_grade=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.OKTestsResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Displayable result from running OKTests</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>grade</strong> (<em>float</em>) – Grade as a decimal in the range [0, 1]</li>
+<li><strong>paths</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – List of paths to ok tests</li>
+<li><strong>tests</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#otter.ok_parser.OKTest" title="otter.ok_parser.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a>) – List of OKTest objects for each path</li>
+<li><strong>passed_tests</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – List of passed test docstrings</li>
+<li><strong>failed_tests</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#otter.ok_parser.OKTest" title="otter.ok_parser.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a>) – List of failed test docstrings and
+OKTest objects</li>
+<li><strong>include_grade</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Set true if grade should be included in result</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTestsResult.grade">
+<code class="descname">grade</code><a class="headerlink" href="#otter.ok_parser.OKTestsResult.grade" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – Grade as a decimal in the range [0, 1]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTestsResult.paths">
+<code class="descname">paths</code><a class="headerlink" href="#otter.ok_parser.OKTestsResult.paths" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> – List of paths to ok tests</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTestsResult.tests">
+<code class="descname">tests</code><a class="headerlink" href="#otter.ok_parser.OKTestsResult.tests" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <a class="reference internal" href="#otter.ok_parser.OKTest" title="otter.ok_parser.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a> – List of OKTest objects for each path</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTestsResult.passed_tests">
+<code class="descname">passed_tests</code><a class="headerlink" href="#otter.ok_parser.OKTestsResult.passed_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code> – List of passed test docstrings</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTestsResult.failed_tests">
+<code class="descname">failed_tests</code><a class="headerlink" href="#otter.ok_parser.OKTestsResult.failed_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, <a class="reference internal" href="#otter.ok_parser.OKTest" title="otter.ok_parser.OKTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OKTest</span></code></a> – List of failed test docstrings and
+OKTest objects</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTestsResult.include_grade">
+<code class="descname">include_grade</code><a class="headerlink" href="#otter.ok_parser.OKTestsResult.include_grade" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>boolean, optional</em> – Set true if grade should be included in result</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTestsResult.html_result_template">
+<code class="descname">html_result_template</code><em class="property"> = &lt;Template memory:11c212b00&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="otter.ok_parser.OKTestsResult.plain_result_template">
+<code class="descname">plain_result_template</code><em class="property"> = &lt;Template memory:11c212c18&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.ok_parser.run_doctest">
+<code class="descclassname">otter.ok_parser.</code><code class="descname">run_doctest</code><span class="sig-paren">(</span><em>name</em>, <em>doctest_string</em>, <em>global_environment</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.run_doctest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a single test with given global_environment.
+Returns (True, ‘’) if the doctest passes.
+Returns (False, failure_message) if the doctest fails.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) – Name of doctest</li>
+<li><strong>doctest_string</strong> (<em>str</em>) – Doctest in string form</li>
+<li><strong>(</strong><strong>dict of str</strong> (<em>global_environment</em>) – str): Global environment resulting from the execution
+of a python script/notebook</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Results from running the test</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(bool, str)</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -1492,6 +1698,51 @@ tags, respectively.</li>
 <dt id="otter.utils.enable_print">
 <code class="descclassname">otter.utils.</code><code class="descname">enable_print</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.enable_print" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enables printing to stdout.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.utils.flush_inline_matplotlib_plots">
+<code class="descclassname">otter.utils.</code><code class="descname">flush_inline_matplotlib_plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.flush_inline_matplotlib_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flush matplotlib plots immediately, rather than asynchronously.
+Basically, the inline backend only shows the plot after the entire
+cell executes, which means we can’t easily use a contextmanager to
+suppress displaying it. See <a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets/issues/1181/">https://github.com/jupyter-widgets/ipywidgets/issues/1181/</a>
+and <a class="reference external" href="https://github.com/ipython/ipython/issues/10376">https://github.com/ipython/ipython/issues/10376</a> for more details. This
+function displays flushes any pending matplotlib plots if we are using
+the inline backend.
+Stolen from <a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35">https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.utils.hide_outputs">
+<code class="descclassname">otter.utils.</code><code class="descname">hide_outputs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.hide_outputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Context manager for hiding outputs from display() calls.
+IPython handles matplotlib outputs specially, so those are supressed too.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.utils.id_generator">
+<code class="descclassname">otter.utils.</code><code class="descname">id_generator</code><span class="sig-paren">(</span><em>size=6</em>, <em>chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.id_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to generate a dynamic variable name for grading functions</p>
+<p>This function generates a random name using the given length and character set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>size</strong> (<em>int</em>) – Length of output name</li>
+<li><strong>chars</strong> (<em>str</em>) – Set of characters used to create function name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Randomized string name for grading function</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -1544,7 +1795,7 @@ tags, respectively.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="otter.service.html" class="btn btn-neutral float-right" title="otter.service package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="pdfs.html" class="btn btn-neutral" title="PDF Generation and Filtering" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

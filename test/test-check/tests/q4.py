@@ -10,7 +10,9 @@ test = {
 					25
 					>>> square(2.5)
 					6.25
-					"""
+					""",
+					"hidden": False,
+					"locked": False,
 				},
 			],
 			"scored": False,

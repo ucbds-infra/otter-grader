@@ -32,6 +32,7 @@ assign_parser.add_argument("--no-init-cell", help="Don't automatically generate 
 assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
 assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
 assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
+assign_parser.add_argument("--jassign", default=False, action="store_true", help="Use jassign notebook format")
 assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
 
 assign_parser.set_defaults(func=assign.main)
@@ -91,6 +92,7 @@ grade_parser.add_argument("-r", "--requirements", default="requirements.txt", ty
 grade_parser.add_argument("--containers", type=int, help="Specify number of containers to run in parallel")
 grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
 grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
+grade_parser.add_argument("--debug", action="store_true", default=False, help="Print stdout/stderr from grading for debugging")
 
 grade_parser.set_defaults(func=grade.main)
 
@@ -99,6 +101,14 @@ grade_parser.set_defaults(func=grade.main)
 ###### PARSER FOR otter service #####
 server_parser = subparsers.add_parser("service", description="Create and manage an otter-service")
 server_subparsers = server_parser.add_subparsers()
+
+
+
+##### PARSER FOR otter service build #####
+server_build_parser = server_subparsers.add_parser("build", description="Build images for an otter-service instance")
+# TODO: add arguments
+
+server_build_parser.set_defaults(func=service.build)
 
 
 ##### PARSER FOR otter service create #####
@@ -113,13 +123,6 @@ server_start_parser = server_subparsers.add_parser("start", description="Start a
 server_start_parser.add_argument("--port", type=int, default=8888, help="Port for server to listen on")
 
 server_start_parser.set_defaults(func=service.start)
-
-
-##### PARSER FOR otter service update #####
-server_update_parser = server_subparsers.add_parser("update", description="Update images for an otter-service instance")
-# TODO: add arguments
-
-server_update_parser.set_defaults(func=service.update)
 
 
 
