@@ -6,8 +6,8 @@ Otter requires OK-formatted tests to check students' work against. These have a 
 
 While Otter uses OK format, there are a few caveats to the tests when using them with Otter.
 
-* Otter only allows a single suite in each test, although the suite can have any number of cases. This means that `test["suite"]` should be a list of length 1, whose only element is a `dict`.
-* Otter has an additional key in the `test` dict, called `hidden`. `test["hidden"]` should evaluate to a boolean. This is used to indicate whether or not the test should be shown on Gradescope when students submit their work. If `test["hidden"]` is `True`, then all cases will be shown to students on Gradescope. **This is not to be confused with the `hidden` key of each case, which are ignored by Otter.**
+* Otter only allows a single suite in each test, although the suite can have any number of cases. This means that `test["suite"]` should be a `list` of length 1, whose only element is a `dict`.
+* Otter uses the `"hidden"` key of each test case only on Gradescope. When displaying results on Gradescope, the `test["suite"][<int>]["hidden"]` should evaluate to a boolean that indicates whether or not the test is hidden. The behavior of showing and hiding tests is described in [Grading on Gradescope](otter_generate.md).
 
 ## Writing OK Tests
 

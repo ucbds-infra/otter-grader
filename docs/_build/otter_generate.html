@@ -168,7 +168,7 @@
 <div class="section" id="writing-tests-for-gradescope">
 <h2>Writing Tests for Gradescope<a class="headerlink" href="#writing-tests-for-gradescope" title="Permalink to this headline">¶</a></h2>
 <p>The tests that are used by the Gradescope autograder are the same as those used in other uses of Otter, but there is one important field that is relevant to Gradescope that is not pertinent to any other uses.</p>
-<p>As noted in the second bullet <a class="reference external" href="test_files.html#ok-format-caveats">here</a>, the <code class="docutils literal notranslate"><span class="pre">test</span></code> variable has a <code class="docutils literal notranslate"><span class="pre">&quot;hidden&quot;</span></code> key which maps to a boolean value that indicates the visibility of the test on Gradescope. For any test, if <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code>, then the test result will be shown to students when they submit to Gradescope. If they pass, the test name will show in a green box; if they fail, then the usual failed test output will show.</p>
+<p>As noted in the second bullet <a class="reference external" href="test_files.html#ok-format-caveats">here</a>, the <code class="docutils literal notranslate"><span class="pre">&quot;hidden&quot;</span></code> key of each test case indicates the visibility of that specific test case. If a student passes all tests, they are shown a successful check. If they pass all public tests but fail hidden tests, they are shown a successful check but a second output is shown below that for instructors only, showing the output of the failed test. If students fail a public test, students are shown the output of the failed test and there is no second box.</p>
 <p>For more information on how tests are displayed to students, see <a class="reference external" href="#gradescope-results">below</a>.</p>
 </div>
 <div class="section" id="using-the-command-line-generator">
@@ -299,11 +299,12 @@
 <p>This section details how results are displayed to students and instructors on Gradescope.</p>
 <div class="section" id="instructor-view">
 <h3>Instructor View<a class="headerlink" href="#instructor-view" title="Permalink to this headline">¶</a></h3>
-<p>Once a student’s submission has been autograder, the Autograder Results page will show the stdout of the grading process in the “Autograder Output” box and the student’s score in the side bar to the right of the output. The stdout includes a DataFrame that contains the student’s score breakdown by question:</p>
+<p>Once a student’s submission has been autograder, the Autograder Results page will show the stdout of the grading process in the “Autograder Output” box and the student’s score in the side bar to the right of the output. The stdout includes a DataFrame that contains the student’s score breakdown by question and a summary of the information about test output visibility at the top of this page:</p>
 <p><img alt="_images/gradescope_autograder_output.png" src="_images/gradescope_autograder_output.png" /></p>
 <p>Below the autograder output, each test case is broken down into boxes. If there is no output for the box, then that test was passed. If a test is failed, then the usual test failure output is displayed.</p>
 <p><img alt="_images/gradescope_instructor_test_breakdown.png" src="_images/gradescope_instructor_test_breakdown.png" /></p>
-<p>Instructors will be able to see <em>all</em> tests. The visibility of a test to students is indicated to instructors by the <img src="_images/gradescope_hidden_test_icon.png" width="24px"/> icon (all tests with this icon are hidden to students).</p>
+<p>Instructors will be able to see <em>all</em> tests. The visibility of a test to students is indicated to instructors by the <img src="_images/gradescope_hidden_test_icon.png" width="24px"/> icon (all tests with this icon are hidden to students). As noted earlier, if a student passes all public tests for a question but fails a hidden test, two boxes are shown to the instructor, of which only the first is visibile to the student:</p>
+<p><img alt="_images/gradescope_failed_hidden_test.png" src="_images/gradescope_failed_hidden_test.png" /></p>
 </div>
 <div class="section" id="student-view">
 <h3>Student View<a class="headerlink" href="#student-view" title="Permalink to this headline">¶</a></h3>
