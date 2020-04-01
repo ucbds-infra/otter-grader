@@ -12,6 +12,7 @@ assignments:
       assignment_id: hw02
       points: 4
       tests_path: tests2
+auth_type: google # either default or google
 server_url: server url
 db_user: admin
 db_pass: pass
