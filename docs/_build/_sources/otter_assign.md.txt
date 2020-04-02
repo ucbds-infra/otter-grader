@@ -1,4 +1,4 @@
-# Distributing Assignments: `otter assign`
+# Distributing Assignments
 
 <!-- The documentation for otter-assign is forked from the docs for jassign: https://github.com/okpy/jassign/blob/master/docs/notebook-format.md -->
 
@@ -136,7 +136,7 @@ To prevent this behavior, add the `--no-init-cell` flag.
 
 otter-assign also automatically adds a check-all cell and an export cell to the end of the notebook. The check-all cells consist of a Markdown cell:
 
-```markdown
+```
 To double-check your work, the cell below will rerun all of the autograder tests.
 ```
 
@@ -148,7 +148,7 @@ grader.check_all()
 
 The export cells consist of a Markdown cell:
 
-```markdown
+```
 ## Submission
 
 Make sure you have run all cells in your notebook in order before running the cell below, so that all images/graphs appear in the output. **Please save before submitting!**

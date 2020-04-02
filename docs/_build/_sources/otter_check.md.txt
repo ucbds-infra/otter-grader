@@ -1,4 +1,4 @@
-# Student Usage: `otter check` and `otter.Notebook`
+# Student Usage
 
 Otter provides an IPython API and a command line tool that allow students to run checks and export notebooks within the assignment environment.
 
