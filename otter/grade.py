@@ -20,7 +20,7 @@ def main(args):
         args.canvas, 
         args.json, 
         args.yaml
-    ]]) == 1, "You must supply exactly one metadata flag (-g, -j, -y, -c)"
+    ]]) <= 1, "You can specify at most one metadata flag (-g, -j, -y, -c)"
 
     # Asserts that either --pdf, --tag-filter, or --html-filter but not both provided
     assert sum([args.pdf, args.tag_filter, args.html_filter]) <= 1, "Cannot provide more than 1 PDF flag"
@@ -41,10 +41,12 @@ def main(args):
         meta_parser = JSONParser(os.path.join(args.json))
         if verbose:
             print("Found JSON metadata...")
-    else:
+    elif args.yaml:
         meta_parser = YAMLParser(os.path.join(args.yaml))
         if verbose:
             print("Found YAML metadata...")
+    else:
+        meta_parser = None
 
     # check that reqs file is valid
     if not (os.path.exists(args.requirements) and os.path.isfile(args.requirements)):
@@ -86,11 +88,13 @@ def main(args):
         return meta_parser.file_to_id(row["file"])
 
     # add in identifier column
-    output_df["identifier"] = output_df.apply(map_files_to_ids, axis=1)
+    if meta_parser is not None:
+        output_df["identifier"] = output_df.apply(map_files_to_ids, axis=1)
+        output_df.drop("file", axis=1, inplace=True)
 
-    # reorder cols in output_df
-    cols = output_df.columns.tolist()
-    output_df = output_df[cols[-1:] + cols[:-1]]
+        # reorder cols in output_df
+        cols = output_df.columns.tolist()
+        output_df = output_df[cols[-1:] + cols[:-1]]
 
     # write to CSV file
     output_df.to_csv(os.path.join(args.output_path, "final_grades.csv"), index=False)

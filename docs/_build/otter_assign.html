@@ -1,172 +1,190 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Distributing Assignments: otter assign &mdash; Otter-Grader  documentation</title>
-  
 
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Distributing Assignments &#8212; Otter-Grader  documentation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link href="_static/css/index.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Metadata" href="metadata_files.html" />
-    <link rel="prev" title="Test Files" href="test_files.html" /> 
+    <link rel="next" title="Student Usage" href="otter_check.html" />
+    <link rel="prev" title="Test Files" href="test_files.html" />
 
-  
-  <script src="_static/js/modernizr.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
 
-          
-            <a href="index.html" class="icon icon-home"> Otter-Grader
-          
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
 
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="using_otter.html">Using Otter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#notebook-format">Notebook Format</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#usage-and-output">Usage and Output</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_check.html">Student Usage: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_grade.html">Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_generate.html">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Otter-Grader</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></li>
+<div id="navbar-menu" class="collapse navbar-collapse">
+  <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="index.html">Home</a>
+    </li>
     
     
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/otter_assign.md.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="tutorial.html">Tutorial</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="test_files.html">Test Files</a>
+    </li>
+    
+    <li class="nav-item active">
+        <a class="nav-link" href="">Distributing Assignments</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_check.html">Student Usage</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_grade.html">Grading Locally</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_generate.html">Grading on Gradescope</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="pdfs.html">PDF Generation and Filtering</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter.html">The Otter API</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="changelog.html">Changelog</a>
+    </li>
+    
     
   </ul>
-
-  
-  <hr/>
+  <ul class="navbar-nav ml-auto">
+    
+    
+  </ul>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  <div class="section" id="distributing-assignments-otter-assign">
-<h1>Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code><a class="headerlink" href="#distributing-assignments-otter-assign" title="Permalink to this headline">¶</a></h1>
+    </nav>
+    
+
+    <div class="container-fluid">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+  <div class="bd-toc-item active">
+  
+
+  <ul class="nav bd-sidenav">
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+
+</nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+
+<div class="tocsection onthispage"><i class="fas fa-list"></i> On this page</div>
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#notebook-format" class="nav-link">Notebook Format</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#autograded-questions" class="nav-link">Autograded Questions</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#manually-graded-questions" class="nav-link">Manually Graded Questions</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#usage-and-output" class="nav-link">Usage and Output</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#export-formats-and-flags" class="nav-link">Export Formats and Flags</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#otter-assign-example" class="nav-link">otter-assign Example</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="distributing-assignments">
+<h1>Distributing Assignments<a class="headerlink" href="#distributing-assignments" title="Permalink to this headline">¶</a></h1>
 <!-- The documentation for otter-assign is forked from the docs for jassign: https://github.com/okpy/jassign/blob/master/docs/notebook-format.md --><p>Otter ships with an assignment development and distribution tool called otter-assign, an Otter-compliant fork of <a class="reference external" href="https://github.com/okpy/jassign">jassign</a> that was designed for OkPy. otter-assign allows instructors to create assignments by writing questions, prompts, solutions, and public and private tests all in a single notebook, which is then parsed and broken down into student and autograder versions.</p>
 <div class="section" id="notebook-format">
 <h2>Notebook Format<a class="headerlink" href="#notebook-format" title="Permalink to this headline">¶</a></h2>
-<p>Otter’s notebook format groups prompts, solutions, and tests together into prompts. Autograder tests are specified as cells in the notebook and their output is used as the expected output of the autograder when genreating tests. Each question has metadata</p>
+<p>Otter’s notebook format groups prompts, solutions, and tests together into prompts. Autograder tests are specified as cells in the notebook and their output is used as the expected output of the autograder when genreating tests. Each question has metadata, expressed in a code block in YAML format when the question is declared. Tests generated by otter-assign follow the <a class="reference internal" href="test_files.html"><span class="doc">Otter-compliant OK format</span></a>.</p>
 <p><strong>Note:</strong> otter-assign is also backwards-compatible with jassign-formatted notebooks. To use jassign format with otter-assign, specify the <code class="docutils literal notranslate"><span class="pre">--jassign</span></code> flag in your call to <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code>. While the formats are very similar, jassign’s format has some key differences to the otter-assign format. For more information about frmatting notebooks for jassign, see <a class="reference external" href="https://github.com/okpy/jassign/blob/master/docs/notebook-format">its documentation</a>.</p>
 <div class="section" id="autograded-questions">
 <h3>Autograded Questions<a class="headerlink" href="#autograded-questions" title="Permalink to this headline">¶</a></h3>
@@ -175,9 +193,9 @@
 <p>For code questions, a question is a description <em>Markdown</em> cell, followed by a prompt <em>code</em> cell, a solution <em>code</em> cell, and zero or more test <em>code</em> cells. The description cell must contain a code block (enclosed in triple backticks <code>```</code>) that begins with <code class="docutils literal notranslate"><span class="pre">BEGIN</span> <span class="pre">QUESTION</span></code> on its own line, followed by YAML that defines metadata associated with the question.</p>
 <p>The rest of the code block within the description cell must be YAML-formatted with the following fields (in any order):</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code> (required) - a string identifier that is a legal file name (without an extension)</li>
-<li><code class="docutils literal notranslate"><span class="pre">manual</span></code> (optional) - a boolean (default <code class="docutils literal notranslate"><span class="pre">False</span></code>); whether to include the response cell in a PDF for manual grading</li>
-<li><code class="docutils literal notranslate"><span class="pre">points</span></code> (optional) - a number (default <code class="docutils literal notranslate"><span class="pre">1</span></code>); how many points the question is worth</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (required) - a string identifier that is a legal file name (without an extension)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">manual</span></code> (optional) - a boolean (default <code class="docutils literal notranslate"><span class="pre">False</span></code>); whether to include the response cell in a PDF for manual grading</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">points</span></code> (optional) - a number (default <code class="docutils literal notranslate"><span class="pre">1</span></code>); how many points the question is worth</p></li>
 </ul>
 <p>As an example, the question metadata below indicates an autograded question <code class="docutils literal notranslate"><span class="pre">q1</span></code> worth 1 point.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>```
@@ -200,14 +218,14 @@ twice, make two separate test cells instead of a single cell with:</p>
 <h3>Manually Graded Questions<a class="headerlink" href="#manually-graded-questions" title="Permalink to this headline">¶</a></h3>
 <p>otter-assign also supports manually-graded questions using a similar specification to the one described above. To indicate a manually-graded question, set <code class="docutils literal notranslate"><span class="pre">manual:</span> <span class="pre">true</span></code> in the question metadata. A manually-graded question is defined by three parts:</p>
 <ul class="simple">
-<li>A question cell with metadata</li>
-<li>(Optional:) A prompt cell</li>
-<li>A solution cell</li>
+<li><p>A question cell with metadata</p></li>
+<li><p>(Optional:) A prompt cell</p></li>
+<li><p>A solution cell</p></li>
 </ul>
 <p>Manually-graded solution cells have two formats:</p>
 <ul class="simple">
-<li>If a code cell, they can be delimited by the <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">Solution</span> <span class="pre">##</span></code> comment as above.</li>
-<li>If a Markdown cell, the start of any line must match the regex <code class="docutils literal notranslate"><span class="pre">(&lt;strong&gt;|\*{2})solution:?(&lt;\/strong&gt;|\*{2})</span></code>.</li>
+<li><p>If a code cell, they can be delimited by the <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">Solution</span> <span class="pre">##</span></code> comment as above.</p></li>
+<li><p>If a Markdown cell, the start of any line must match the regex <code class="docutils literal notranslate"><span class="pre">(&lt;strong&gt;|\*{2})solution:?(&lt;\/strong&gt;|\*{2})</span></code>.</p></li>
 </ul>
 <p>The latter means that as long as one of the lines in the cell starts with <code class="docutils literal notranslate"><span class="pre">SOLUTION</span></code> (case insensitive, with or without a colon <code class="docutils literal notranslate"><span class="pre">:</span></code>) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, otter-assign automatically adds a Markdown cell with the contents <code class="docutils literal notranslate"><span class="pre">_Type</span> <span class="pre">your</span> <span class="pre">answer</span> <span class="pre">here,</span> <span class="pre">replacing</span> <span class="pre">this</span> <span class="pre">test._</span></code></p>
 <p>Manually graded questions are automatically enclosed in <code class="docutils literal notranslate"><span class="pre">&lt;!--</span> <span class="pre">BEGIN</span> <span class="pre">QUESTION</span> <span class="pre">--&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;!--</span> <span class="pre">END</span> <span class="pre">QUESTION</span> <span class="pre">--&gt;</span></code> tags by otter-assign so that only these questions are exported to the PDF when filtering is turned on (the default). In the autograder notebook, this includes the question cell, prompt cell, and solution cell. In the student notebook, this includes only the question and prompt cells. The <code class="docutils literal notranslate"><span class="pre">&lt;!--</span> <span class="pre">END</span> <span class="pre">QUESTION</span> <span class="pre">--&gt;</span></code> tag is automatically inserted at the top of the next cell if it is a Markdown cell or in a new Markdown cell before the next cell if it is not.</p>
@@ -250,14 +268,14 @@ optional arguments:
 <p>The first is <code class="docutils literal notranslate"><span class="pre">master</span></code>, the path to the master notebook (the one formatted as described above), and the second is <code class="docutils literal notranslate"><span class="pre">result</span></code>, the path at which output shoud be written. The optional <code class="docutils literal notranslate"><span class="pre">files</span></code> argument takes an arbitrary number of paths to files that should be shipped with notebooks (e.g. data files, images, Python executables).</p>
 <p>The default behavior of otter-assign is to do the following:</p>
 <ol class="simple">
-<li>Filter test cells from the master notebook and write these to test files</li>
-<li>Add Otter initialization, export, and <code class="docutils literal notranslate"><span class="pre">Notebook.check_all</span></code> cells</li>
-<li>Clear outputs and write questions (with metadata hidden), prompts, and solutions to a notebook in a new <code class="docutils literal notranslate"><span class="pre">autograder</span></code> directory</li>
-<li>Write <em>all</em> tests to <code class="docutils literal notranslate"><span class="pre">autograder/tests</span></code></li>
-<li>Copy autograder notebook with solutions removed into a new <code class="docutils literal notranslate"><span class="pre">student</span></code> directory</li>
-<li>Write <em>public</em> tests to <code class="docutils literal notranslate"><span class="pre">student/tests</span></code></li>
-<li>Copy <code class="docutils literal notranslate"><span class="pre">files</span></code> into <code class="docutils literal notranslate"><span class="pre">autograder</span></code> and <code class="docutils literal notranslate"><span class="pre">student</span></code> directories</li>
-<li>Run all tests in <code class="docutils literal notranslate"><span class="pre">autograder/tests</span></code> on the solutions notebook to ensure they pass</li>
+<li><p>Filter test cells from the master notebook and write these to test files</p></li>
+<li><p>Add Otter initialization, export, and <code class="docutils literal notranslate"><span class="pre">Notebook.check_all</span></code> cells</p></li>
+<li><p>Clear outputs and write questions (with metadata hidden), prompts, and solutions to a notebook in a new <code class="docutils literal notranslate"><span class="pre">autograder</span></code> directory</p></li>
+<li><p>Write <em>all</em> tests to <code class="docutils literal notranslate"><span class="pre">autograder/tests</span></code></p></li>
+<li><p>Copy autograder notebook with solutions removed into a new <code class="docutils literal notranslate"><span class="pre">student</span></code> directory</p></li>
+<li><p>Write <em>public</em> tests to <code class="docutils literal notranslate"><span class="pre">student/tests</span></code></p></li>
+<li><p>Copy <code class="docutils literal notranslate"><span class="pre">files</span></code> into <code class="docutils literal notranslate"><span class="pre">autograder</span></code> and <code class="docutils literal notranslate"><span class="pre">student</span></code> directories</p></li>
+<li><p>Run all tests in <code class="docutils literal notranslate"><span class="pre">autograder/tests</span></code> on the solutions notebook to ensure they pass</p></li>
 </ol>
 <p>The behaviors described in step 2 can be overridden using the optional arguments described in the help specification.</p>
 <p><strong>An important note:</strong> make sure that you <em>run all cells</em> in the master notebook and save it <em>with the outputs</em> so that otter-assign can generate the test files based on these outputs. The outputs will be cleared in the copies generated by otter-assign.</p>
@@ -271,7 +289,7 @@ optional arguments:
 </div>
 <p>To prevent this behavior, add the <code class="docutils literal notranslate"><span class="pre">--no-init-cell</span></code> flag.</p>
 <p>otter-assign also automatically adds a check-all cell and an export cell to the end of the notebook. The check-all cells consist of a Markdown cell:</p>
-<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>To double-check your work, the cell below will rerun all of the autograder tests.
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">To</span> <span class="n">double</span><span class="o">-</span><span class="n">check</span> <span class="n">your</span> <span class="n">work</span><span class="p">,</span> <span class="n">the</span> <span class="n">cell</span> <span class="n">below</span> <span class="n">will</span> <span class="n">rerun</span> <span class="nb">all</span> <span class="n">of</span> <span class="n">the</span> <span class="n">autograder</span> <span class="n">tests</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>and a code cell that calls <code class="docutils literal notranslate"><span class="pre">otter.Notebook.check_all</span></code>:</p>
@@ -279,7 +297,7 @@ optional arguments:
 </pre></div>
 </div>
 <p>The export cells consist of a Markdown cell:</p>
-<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>## Submission
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>## Submission
 
 Make sure you have run all cells in your notebook in order before running the cell below, so that all images/graphs appear in the output. **Please save before submitting!**
 </pre></div>
@@ -355,71 +373,30 @@ Make sure you have run all cells in your notebook in order before running the ce
 </div>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="metadata_files.html" class="btn btn-neutral float-right" title="Metadata" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="test_files.html" class="btn btn-neutral" title="Test Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="test_files.html" title="previous page">Test Files</a>
+    <a class='right-next' id="next-link" href="otter_check.html" title="next page">Student Usage</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
     </div>
-  
 
-  <hr/>
-
-  <div role="contentinfo">
+    <script src="_static/js/index.js"></script>
+    <footer class="footer">
+  <div class="container">
     <p>
-        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.
-
+          &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
 </footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+  </body>
 </html>

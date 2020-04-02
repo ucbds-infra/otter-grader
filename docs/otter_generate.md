@@ -1,4 +1,4 @@
-# Grading on Gradescope: `otter generate`
+# Grading on Gradescope
 
 Otter-Grader also allows instructors to use Gradescope's autograding system to collect and grade students' submissions. This section assumes that instructors are familiar with Gradescope's interface and know how to set up assignments on Gradescope; for more information on using Gradescope, see their [help pages](https://www.gradescope.com/help#help-center-item-programming-assignments).
 

@@ -1,165 +1,166 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Installation &mdash; Otter-Grader  documentation</title>
-  
 
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Installation &#8212; Otter-Grader  documentation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link href="_static/css/index.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tutorial" href="tutorial.html" />
-    <link rel="prev" title="Otter-Grader Documentation" href="index.html" /> 
 
-  
-  <script src="_static/js/modernizr.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
 
-          
-            <a href="index.html" class="icon icon-home"> Otter-Grader
-          
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
 
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#docker">Docker</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="using_otter.html">Using Otter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_assign.html">Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_check.html">Student Usage: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_grade.html">Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_generate.html">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Otter-Grader</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Installation</li>
+<div id="navbar-menu" class="collapse navbar-collapse">
+  <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="index.html">Home</a>
+    </li>
     
     
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/install.md.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="tutorial.html">Tutorial</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="test_files.html">Test Files</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_assign.html">Distributing Assignments</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_check.html">Student Usage</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_grade.html">Grading Locally</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_generate.html">Grading on Gradescope</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="pdfs.html">PDF Generation and Filtering</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter.html">The Otter API</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="changelog.html">Changelog</a>
+    </li>
+    
     
   </ul>
-
-  
-  <hr/>
+  <ul class="navbar-nav ml-auto">
+    
+    
+  </ul>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
+    </nav>
+    
+
+    <div class="container-fluid">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+  <div class="bd-toc-item active">
+  
+
+  <ul class="nav bd-sidenav">
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+
+</nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+
+<div class="tocsection onthispage"><i class="fas fa-list"></i> On this page</div>
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#docker" class="nav-link">Docker</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#pull-from-dockerhub" class="nav-link">Pull from DockerHub</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#download-the-dockerfile-from-github" class="nav-link">Download the Dockerfile from GitHub</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+              
+              <div>
+                
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>Otter is a Python package that can be installed using pip:</p>
@@ -177,9 +178,9 @@
 <h3>Download the Dockerfile from GitHub<a class="headerlink" href="#download-the-dockerfile-from-github" title="Permalink to this headline">¶</a></h3>
 <p>To install from the GitHub repo, follow the steps below:</p>
 <ol class="simple">
-<li>Clone the GitHub repo</li>
-<li><code class="docutils literal notranslate"><span class="pre">cd</span></code> into the <code class="docutils literal notranslate"><span class="pre">otter-grader/docker</span></code> directory</li>
-<li>Build the Docker image with this command: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">build</span> <span class="pre">.</span> <span class="pre">-t</span> <span class="pre">YOUR_DESIRED_IMAGE_NAME</span></code></li>
+<li><p>Clone the GitHub repo</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span></code> into the <code class="docutils literal notranslate"><span class="pre">otter-grader/docker</span></code> directory</p></li>
+<li><p>Build the Docker image with this command: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">build</span> <span class="pre">.</span> <span class="pre">-t</span> <span class="pre">YOUR_DESIRED_IMAGE_NAME</span></code></p></li>
 </ol>
 <p><em>Note:</em> With this setup, you will need to pass in a custom docker image name when using the CLI with the <code class="docutils literal notranslate"><span class="pre">--image</span></code> flag.</p>
 </div>
@@ -187,71 +188,28 @@
 </div>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="tutorial.html" class="btn btn-neutral float-right" title="Tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral" title="Otter-Grader Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
+          
+
+      </div>
     </div>
-  
 
-  <hr/>
-
-  <div role="contentinfo">
+    <script src="_static/js/index.js"></script>
+    <footer class="footer">
+  <div class="container">
     <p>
-        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.
-
+          &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
 </footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+  </body>
 </html>

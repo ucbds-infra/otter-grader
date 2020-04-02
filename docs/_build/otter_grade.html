@@ -1,181 +1,269 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Grading Locally: otter grade &mdash; Otter-Grader  documentation</title>
-  
 
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Grading Locally &#8212; Otter-Grader  documentation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link href="_static/css/index.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Grading on Gradescope: otter generate" href="otter_generate.html" />
-    <link rel="prev" title="Student Usage: otter check and otter.Notebook" href="otter_check.html" /> 
+    <link rel="next" title="Grading on Gradescope" href="otter_generate.html" />
+    <link rel="prev" title="Student Usage" href="otter_check.html" />
 
-  
-  <script src="_static/js/modernizr.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
 
-</head>
-
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
 
-          
-            <a href="index.html" class="icon icon-home"> Otter-Grader
-          
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
 
-          
-          </a>
-
-          
-            
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="using_otter.html">Using Otter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="test_files.html">Test Files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_assign.html">Distributing Assignments: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="metadata_files.html">Metadata</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter_check.html">Student Usage: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code> and <code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#using-the-cli">Using the CLI</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="otter_generate.html">Grading on Gradescope: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="pdfs.html">PDF Generation and Filtering</a></li>
-<li class="toctree-l1"><a class="reference internal" href="otter.html">The Otter API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">Otter-Grader</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code></li>
+<div id="navbar-menu" class="collapse navbar-collapse">
+  <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="index.html">Home</a>
+    </li>
     
     
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="_sources/otter_grade.md.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="tutorial.html">Tutorial</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="test_files.html">Test Files</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_assign.html">Distributing Assignments</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_check.html">Student Usage</a>
+    </li>
+    
+    <li class="nav-item active">
+        <a class="nav-link" href="">Grading Locally</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_generate.html">Grading on Gradescope</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="pdfs.html">PDF Generation and Filtering</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter.html">The Otter API</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="changelog.html">Changelog</a>
+    </li>
+    
     
   </ul>
-
-  
-  <hr/>
+  <ul class="navbar-nav ml-auto">
+    
+    
+  </ul>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  <div class="section" id="grading-locally-otter-grade">
-<h1>Grading Locally: <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code><a class="headerlink" href="#grading-locally-otter-grade" title="Permalink to this headline">¶</a></h1>
+    </nav>
+    
+
+    <div class="container-fluid">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+  <div class="bd-toc-item active">
+  
+
+  <ul class="nav bd-sidenav">
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+
+</nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+
+<div class="tocsection onthispage"><i class="fas fa-list"></i> On this page</div>
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#metadata" class="nav-link">Metadata</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#rd-party-exports" class="nav-link">3rd Party Exports</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#metadata-files" class="nav-link">Metadata Files</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#using-the-cli" class="nav-link">Using the CLI</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#basic-usage" class="nav-link">Basic Usage</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#metadata-flags" class="nav-link">Metadata Flags</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#requirements" class="nav-link">Requirements</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#grading-python-scripts" class="nav-link">Grading Python Scripts</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#support-files" class="nav-link">Support Files</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="grading-locally">
+<h1>Grading Locally<a class="headerlink" href="#grading-locally" title="Permalink to this headline">¶</a></h1>
 <p>The command line interface allows instructors to grade notebooks locally by launching Docker containers on the instructor’s machine that grade notebooks and return a CSV of grades and (optionally) PDF versions of student submissions for manually graded questions.</p>
-<div class="section" id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>Before using the command line utility, you should have</p>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<p>Metadata files and flags are optional, but can be helpful when using the CSVs generated by Otter for grading. When organizing submissions for grading, Otter supports two major categories of exports:</p>
 <ul class="simple">
-<li>written tests for the assignment</li>
-<li>downloaded submissions into a directory</li>
-<li>written a <a class="reference internal" href="metadata_files.html"><span class="doc">metadata file</span></a> if not using a Gradescope or Canvas export</li>
+<li><p>3rd party collection exports, or</p></li>
+<li><p>instructor-made metadata files</p></li>
 </ul>
+<p>These two categories are broken down and described below.</p>
+<div class="section" id="rd-party-exports">
+<h3>3rd Party Exports<a class="headerlink" href="#rd-party-exports" title="Permalink to this headline">¶</a></h3>
+<p>If you are using a grading service like Gradescope or an LMS like Canvas to collect submissions, Otter can interpret the export format of these 3rd party services in place of a metadata file. To use a service like Gradescope or Canvas, download the submissions for an assignment, unzip the provided file, and then proceed as described in <a class="reference internal" href="#"><span class="doc">Grading Locally</span></a> using the metadata flag corresponding to your chosen service.</p>
+<p>For example, if I had a Canvas export, I would unzip it, <code class="docutils literal notranslate"><span class="pre">cd</span></code> into the unzipped directory, copy my tests to <code class="docutils literal notranslate"><span class="pre">./tests</span></code>, and run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">grade</span> <span class="o">-</span><span class="n">c</span>
+</pre></div>
+</div>
+<p>to grade the submissions (assuming no extra requirements, no PDF generation, and no support files required).</p>
+</div>
+<div class="section" id="metadata-files">
+<h3>Metadata Files<a class="headerlink" href="#metadata-files" title="Permalink to this headline">¶</a></h3>
+<p>If you are not using a service like Gradescope or Canvas to collect submissions, instructors can also create a simple JSON- or YAML-formatted metadata file for their students’ submissions and provide this to Otter.</p>
+<p>The strucure of the metadata is quite simple: it is a list of 2-item dictionaries, where each dictionary has a student identifier stored as the <code class="docutils literal notranslate"><span class="pre">identifier</span></code> key and the filename of the student’s submission as <code class="docutils literal notranslate"><span class="pre">filename</span></code>. An example of each is provided below.</p>
+<p>YAML format:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">identifier</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+  <span class="nt">filename</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test-nb-0.ipynb</span>
+<span class="p p-Indicator">-</span> <span class="nt">identifier</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+  <span class="nt">filename</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test-nb-1.ipynb</span>
+<span class="p p-Indicator">-</span> <span class="nt">identifier</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+  <span class="nt">filename</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test-nb-2.ipynb</span>
+<span class="p p-Indicator">-</span> <span class="nt">identifier</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+  <span class="nt">filename</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test-nb-3.ipynb</span>
+<span class="p p-Indicator">-</span> <span class="nt">identifier</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">4</span>
+  <span class="nt">filename</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test-nb-4.ipynb</span>
+</pre></div>
+</div>
+<p>JSON format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;identifier&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="nt">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;test-nb-0.ipynb&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;identifier&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nt">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;test-nb-1.ipynb&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;identifier&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="nt">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;test-nb-2.ipynb&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;identifier&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="nt">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;test-nb-3.ipynb&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;identifier&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="nt">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;test-nb-4.ipynb&quot;</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>A JSON- or YAML-formatted metadata file is specified to Otter using the <code class="docutils literal notranslate"><span class="pre">-j</span></code> or <code class="docutils literal notranslate"><span class="pre">-y</span></code> flag, respectively. Each flag requires a  single argument that corresponds to the path to the metadata file. See the “Basic Usage” section of <a class="reference internal" href="#"><span class="doc">Grading Locally</span></a> for more information.</p>
+</div>
 </div>
 <div class="section" id="using-the-cli">
 <h2>Using the CLI<a class="headerlink" href="#using-the-cli" title="Permalink to this headline">¶</a></h2>
-<!-- ### The `otter` Command --><p>The grading interface, encapsulated in the <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code> command, runs the local grading process and defines the options that instructors can set when grading. A comprehensive list of flags is provided below.</p>
+<p>Before using the command line utility, you should have</p>
+<ul class="simple">
+<li><p>written tests for the assignment</p></li>
+<li><p>downloaded submissions into a directory</p></li>
+</ul>
+<p>The grading interface, encapsulated in the <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code> command, runs the local grading process and defines the options that instructors can set when grading. A comprehensive list of flags is provided below.</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -340,22 +428,22 @@
 </div>
 <div class="section" id="metadata-flags">
 <h3>Metadata Flags<a class="headerlink" href="#metadata-flags" title="Permalink to this headline">¶</a></h3>
-<p>The four metadata flags, <code class="docutils literal notranslate"><span class="pre">-g</span></code>, <code class="docutils literal notranslate"><span class="pre">-c</span></code>, <code class="docutils literal notranslate"><span class="pre">-j</span></code>, and <code class="docutils literal notranslate"><span class="pre">-y</span></code>, correspond to different export/metadata file formats. Also note that the latter two require you to specify a path to the metadata file. You must specify a metadata flag every time you run <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code>, and you may not specify more than one. For more information about metadata and export formats, see <a class="reference internal" href="metadata_files.html"><span class="doc">this page</span></a>.</p>
+<p>The four metadata flags, <code class="docutils literal notranslate"><span class="pre">-g</span></code>, <code class="docutils literal notranslate"><span class="pre">-c</span></code>, <code class="docutils literal notranslate"><span class="pre">-j</span></code>, and <code class="docutils literal notranslate"><span class="pre">-y</span></code>, correspond to different export/metadata file formats, and are optional. Also note that the latter two require you to specify a path to the metadata file. You must specify a metadata flag every time you run <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">grade</span></code>, and you may not specify more than one. For more information about metadata and export formats, see <a class="reference external" href="#metadata">above</a>. If you don’t specify a metadata flag, the CSV file that Otter returns will be primary keyed on the filename of the submission.</p>
 </div>
 <div class="section" id="requirements">
 <h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">ucbdsinfra/otter-grader</span></code> Docker image comes preinstalled with the following Python packages and their dependencies:</p>
 <ul class="simple">
-<li>datascience</li>
-<li>jupyter_client</li>
-<li>ipykernel</li>
-<li>matplotlib</li>
-<li>pandas</li>
-<li>ipywidgets</li>
-<li>scipy</li>
-<li>tornado</li>
-<li>nb2pdf</li>
-<li>otter-grader</li>
+<li><p>datascience</p></li>
+<li><p>jupyter_client</p></li>
+<li><p>ipykernel</p></li>
+<li><p>matplotlib</p></li>
+<li><p>pandas</p></li>
+<li><p>ipywidgets</p></li>
+<li><p>scipy</p></li>
+<li><p>tornado</p></li>
+<li><p>nb2pdf</p></li>
+<li><p>otter-grader</p></li>
 </ul>
 <p>If you require any packages not listed above, or among the dependencies of any packages above, you should create a requirements.txt file <em>containing only those packages</em>. If this file is created in the working directory (i.e. <code class="docutils literal notranslate"><span class="pre">./requirements.txt</span></code>), then Otter will automatically find this file and include it. If this file is not at <code class="docutils literal notranslate"><span class="pre">./requirements.txt</span></code>, pass its path to the <code class="docutils literal notranslate"><span class="pre">-r</span></code> flag.</p>
 <p>For example, continuining the example above with the package SymPy, I would create a requirements.txt</p>
@@ -379,10 +467,10 @@ sympy
 </pre></div>
 </div>
 <p>Now my call, using HTML comment filtered PDF generation this time, would become</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">grade</span> <span class="o">-</span><span class="n">y</span> <span class="n">meta</span><span class="o">.</span><span class="n">yml</span> <span class="o">--</span><span class="n">html</span><span class="o">-</span><span class="nb">filter</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">grade</span> <span class="o">--</span><span class="n">html</span><span class="o">-</span><span class="nb">filter</span>
 </pre></div>
 </div>
-<p>Note the lack of the <code class="docutils literal notranslate"><span class="pre">-r</span></code> flag; since I created my requirements file in the working directory, Otter found it automatically.</p>
+<p>Note the lack of the <code class="docutils literal notranslate"><span class="pre">-r</span></code> flag; since I created my requirements file in the working directory, Otter found it automatically. Also note that I am no longer including a metadata flag; the CSV file will have a <code class="docutils literal notranslate"><span class="pre">file</span></code> column instead of an <code class="docutils literal notranslate"><span class="pre">identifier</span></code> column, primary keying each submission on the filename rather than a provided identifier.</p>
 </div>
 <div class="section" id="grading-python-scripts">
 <h3>Grading Python Scripts<a class="headerlink" href="#grading-python-scripts" title="Permalink to this headline">¶</a></h3>
@@ -411,8 +499,8 @@ sympy
 <h3>Support Files<a class="headerlink" href="#support-files" title="Permalink to this headline">¶</a></h3>
 <p>Some notebooks require support files to run (e.g. data files). If your notebooks require any such files, there are two ways to get them into the container so that they are available to notebooks:</p>
 <ul class="simple">
-<li>specifying paths to the files with the <code class="docutils literal notranslate"><span class="pre">-f</span></code> flag</li>
-<li>putting them into the notebook path</li>
+<li><p>specifying paths to the files with the <code class="docutils literal notranslate"><span class="pre">-f</span></code> flag</p></li>
+<li><p>putting them into the notebook path</p></li>
 </ul>
 <p>Suppose that my notebooks in <code class="docutils literal notranslate"><span class="pre">grading</span></code> required <code class="docutils literal notranslate"><span class="pre">data.csv</span></code> in my <code class="docutils literal notranslate"><span class="pre">../data</span></code> directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">data</span>
@@ -456,7 +544,7 @@ sympy
 </pre></div>
 </div>
 <p>and then just run Otter as normal:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">grade</span> <span class="o">-</span><span class="n">y</span> <span class="n">meta</span><span class="o">.</span><span class="n">yml</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">grade</span>
 </pre></div>
 </div>
 <p>All non-notebook files in the notebooks path are copied into all of the containers, so <code class="docutils literal notranslate"><span class="pre">data.csv</span></code> will be made available to all notebooks.</p>
@@ -465,71 +553,30 @@ sympy
 </div>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="otter_generate.html" class="btn btn-neutral float-right" title="Grading on Gradescope: otter generate" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="otter_check.html" class="btn btn-neutral" title="Student Usage: otter check and otter.Notebook" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="otter_check.html" title="previous page">Student Usage</a>
+    <a class='right-next' id="next-link" href="otter_generate.html" title="next page">Grading on Gradescope</a>
+
+              </div>
+              
+          </main>
+          
+
+      </div>
     </div>
-  
 
-  <hr/>
-
-  <div role="contentinfo">
+    <script src="_static/js/index.js"></script>
+    <footer class="footer">
+  <div class="container">
     <p>
-        &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.
-
+          &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
 </footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'en',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+  </body>
 </html>
