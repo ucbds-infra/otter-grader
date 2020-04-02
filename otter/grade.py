@@ -90,6 +90,7 @@ def main(args):
     # add in identifier column
     if meta_parser is not None:
         output_df["identifier"] = output_df.apply(map_files_to_ids, axis=1)
+        output_df.drop("file", axis=1, inplace=True)
 
         # reorder cols in output_df
         cols = output_df.columns.tolist()
