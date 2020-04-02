@@ -31,7 +31,7 @@ Once you have [installed](index.md) Otter, download [this zipfile](https://githu
 
 `cd` into `tutorial` and let's get started.
 
-The first thing to note is that we have provided a [metadata file](otter_grade.html#metadata) that maps student identifiers to filenames in `tutorial/meta.json`:
+The first thing to note is that we have provided a [metadata file](otter_grade.html#metadata) that maps student identifiers to filenames in `tutorial/meta.json`. Note that metadata files are optional when using Otter, but we have provided one here to demonstrate their use.
 
 ```json
 [
@@ -109,7 +109,7 @@ Get started by creating some [test cases](test_files.md) and creating a requirem
 
 #### Collecting Student Submissions
 
-The first major decision is how you'll collect student submissions. You can collect these however you want, although Otter has builtin compatibility with Gradescope and Canvas. If you choose either Gradescope or Canvas, just export the submissions and unzip that into some directory. If you are collecting another way, you'll need to create a metadata file. You can use either JSON or YAML format, and the structure is pretty simple: each element needs to have a filename and a student identifier. A sample YAML metadata file would be:
+The first major decision is how you'll collect student submissions. You can collect these however you want, although Otter has builtin compatibility with Gradescope and Canvas. If you choose either Gradescope or Canvas, just export the submissions and unzip that into some directory. If you are collecting another way, you may want to create a metadata file. You can use either JSON or YAML format, and the structure is pretty simple: each element needs to have a filename and a student identifier. Metadata files are optional, and if not provided, grades will be primary keyed on the submission filename. A sample YAML metadata file would be:
 
 ```yaml
 - identifier: 0

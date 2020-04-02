@@ -214,7 +214,7 @@
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">cd</span></code> into <code class="docutils literal notranslate"><span class="pre">tutorial</span></code> and let’s get started.</p>
-<p>The first thing to note is that we have provided a <a class="reference external" href="otter_grade.html#metadata">metadata file</a> that maps student identifiers to filenames in <code class="docutils literal notranslate"><span class="pre">tutorial/meta.json</span></code>:</p>
+<p>The first thing to note is that we have provided a <a class="reference external" href="otter_grade.html#metadata">metadata file</a> that maps student identifiers to filenames in <code class="docutils literal notranslate"><span class="pre">tutorial/meta.json</span></code>. Note that metadata files are optional when using Otter, but we have provided one here to demonstrate their use.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
     <span class="p">{</span>
         <span class="nt">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">&quot;passesAll&quot;</span><span class="p">,</span>
@@ -367,7 +367,7 @@
 <p>Get started by creating some <a class="reference internal" href="test_files.html"><span class="doc">test cases</span></a> and creating a requirements.txt file (if necessary).</p>
 <div class="section" id="collecting-student-submissions">
 <h4>Collecting Student Submissions<a class="headerlink" href="#collecting-student-submissions" title="Permalink to this headline">¶</a></h4>
-<p>The first major decision is how you’ll collect student submissions. You can collect these however you want, although Otter has builtin compatibility with Gradescope and Canvas. If you choose either Gradescope or Canvas, just export the submissions and unzip that into some directory. If you are collecting another way, you’ll need to create a metadata file. You can use either JSON or YAML format, and the structure is pretty simple: each element needs to have a filename and a student identifier. A sample YAML metadata file would be:</p>
+<p>The first major decision is how you’ll collect student submissions. You can collect these however you want, although Otter has builtin compatibility with Gradescope and Canvas. If you choose either Gradescope or Canvas, just export the submissions and unzip that into some directory. If you are collecting another way, you may want to create a metadata file. You can use either JSON or YAML format, and the structure is pretty simple: each element needs to have a filename and a student identifier. Metadata files are optional, and if not provided, grades will be primary keyed on the submission filename. A sample YAML metadata file would be:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">identifier</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
   <span class="nt">filename</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test-nb-0.ipynb</span>
 <span class="p p-Indicator">-</span> <span class="nt">identifier</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
