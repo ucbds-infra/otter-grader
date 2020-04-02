@@ -8,6 +8,7 @@ try:
     import os
     import json
     import yaml
+    import hashlib
     import jwt
     import logging
     import traceback
@@ -22,8 +23,10 @@ try:
     from tornado.ioloop import IOLoop
     from tornado.queues import Queue
     from tornado.gen import sleep
+    # from psycopg2 import connect, extensions
 
     from ..containers import grade_assignments
+    from ..utils import connect_db
 
 except ImportError:
     # don't need requirements to use otter without otter service
@@ -40,11 +43,7 @@ def main(args):
 
     user_queue = Queue()
     #NB_DIR = os.environ.get('NOTEBOOK_DIR')
-
-    users = {
-        "user1" : "pass1",
-        "abhi" : "sharma"
-    }
+    conn = None
 
     class BaseHandler(tornado.web.RequestHandler):
         def get_current_user(self):
@@ -54,19 +53,25 @@ def main(args):
         async def get(self):
             username = self.get_argument('username', True)
             password = self.get_argument('password', True)
-            # TODO: Change user/pass check to check db
-            if username in users and users[username] == password:
-                api_key = hexlify(os.urandom(10)).decode("utf-8")
+            pw_hash = hashlib.sha256(password.encode()).hexdigest()
+            account_check = await self.db.query("""
+                                SELECT * FROM users 
+                                WHERE username = %s AND password = %s
+                                """,
+                                [username, pw_hash])
+            if len(account_check) > 0:
+                account_check.free()
+                api_key = hexlify(os.urandom(32)).decode("utf-8")
                 self.write(api_key)
-                # TODO: Write api key to db
                 results = await self.db.query("""
                                             INSERT INTO users (api_keys, username, password) VALUES (%s, %s, %s)
                                             ON CONFLICT (username)
                                             DO UPDATE SET api_keys = array_append(users.api_keys, %s)
                                             """,
-                                            [[api_key], username, password, api_key])
+                                            [[api_key], username, pw_hash, api_key])
                 results.free()
             else:
+                account_check.free()
                 self.clear()
                 self.set_status(401)
                 self.finish()
@@ -181,15 +186,11 @@ def main(args):
             print("Successfully queries submission id")
 
             # save notebook to disk
-
-            # TODO: Fix error - function isn't executing path join for some reason
             dir_path = os.path.join(self.settings['notebook_dir'],\
                                     'submissions',\
                                     'class-{}'.format(class_id),\
                                     'assignment-{}'.format(assignment_id),\
                                     'submission-{}'.format(submission_id))
-            # dir_path = "./submissions" # temp fix
-            print("marker")
             file_path = os.path.join(dir_path, '{}.ipynb'.format(assignment_name))
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
@@ -222,19 +223,59 @@ def main(args):
             else:
                 self.write('Submission failed.')
 
+    # def connect_db(host="localhost", username="otterservice", password="mypass"):
+    #     global conn
+    #     conn = connect(dbname='otter_db',
+    #             user=username,
+    #             host=host,
+    #             password=password)
+    #     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+    #     return conn
 
     async def grade():
+        cursor = conn.cursor()
+        
+        # This can be moved to global
+        with open("conf.yml") as f:
+            config = yaml.safe_load(f)
+        
         async for user in user_queue:
-            print('Grading user {}'.format(user))
-            # TODO: fix this call to grade_assignment
-            df = grade_assignments("./lab02/tests", "./lab02/lab02.ipynb", "tmp", "a69eb952c9bd")
-            print(df)
-            # TODO: insertion into db
-            user_queue.task_done()  
-        # async for nb in nb_queue:
-        #     print('Grading', nb)
-        #     await sleep(2)
-        #     nb_queue.task_done()
+            # Get current user's latest submission
+            cursor.execute("SELECT user_id, submission_id, assignment_id, file_path \
+                                FROM submissions \
+                                WHERE user_id = \'{}\' \
+                                ORDER BY timestamp \
+                                LIMIT 1".format(user))
+            user_record = cursor.fetchall()      
+            for row in user_record:
+                user_id = int(row[0])
+                submission_id = float(row[1])
+                assignment_id = str(row[2])
+                file_path = str(row[3])
+
+            # Get tests directory for assignment
+            tests_path = None
+            for assignment in config["assignments"]:
+                if assignment[assignment_id] == submission_id:
+                    tests_path = assignment["tests_path"]
+
+            # Run grading function in a docker container
+            # TODO: fix arguments below, redirect stdout/stderr
+            df = grade_assignments(tests_path, file_path, assignment_id)
+            df_json_str = df.to_json()
+
+            # Insert score into submissions table
+            cursor.execute("INSERT INTO submissions \
+                (submission_id, assignment_id, user_id, file_path, timestamp, score) \
+                VALUES (%s, %s, %s, %s, %s, %s) \
+                ON CONFLICT (submission_id) \
+                DO UPDATE SET timestamp = %s, score = %s",
+                [submission_id, assignment_id, user_id, file_path, datetime.utcnow(), df_json_str,
+                datetime.utcnow(), df_json_str])
+            
+            # Set task done in queue
+            user_queue.task_done()
+        cursor.close()
 
 
     class Application(tornado.web.Application):
@@ -274,13 +315,6 @@ def main(args):
             #     tornado.web.Application.__init__(self, handlers)
             
             # Initialize database session
-            # TODO: Remove hardcoded config
-            config = {
-                "db_host" : "localhost",
-                "db_port" : "5432",
-                "db_user" : "otterservice",
-                "db_pass" : "mypass"
-            }
             self.db = queries.TornadoSession(queries.uri(
                 host=config['db_host'],
                 port=config['db_port'],
@@ -289,6 +323,8 @@ def main(args):
                 password=config['db_pass'])
             )
 
+    # TODO: add arguments below
+    conn = connect_db("", "", "")
     port = 5000
     tornado.options.parse_command_line()
     server = HTTPServer(Application(google_auth=True))

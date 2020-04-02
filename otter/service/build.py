@@ -2,8 +2,6 @@
 ##### otter server update Script #####
 ######################################
 
-# Uses subprocess instead of docker python SDK
-
 import subprocess
 import shutil
 import os
@@ -15,6 +13,9 @@ from io import BytesIO
 from jinja2 import Template
 from psycopg2 import connect, extensions, sql
 
+from ..utils import connect_db
+
+
 DOCKERFILE_TEMPLATE = Template("""
 FROM ucbdsinfra/otter-grader
 RUN mkdir /home/notebooks
@@ -25,14 +26,6 @@ RUN pip3 install /home/{{ requirements_filename }}{% endif %}{% if global_requir
 ADD {{ global_requirements }} /home
 RUN pip3 install /home/{{ global_requirements_filename }}{% endif %}
 """)
-
-def connect_db(host="localhost", username="otterservice", password="mypass"):
-    conn = connect(dbname='otter_db',
-               user=username,
-               host=host,
-               password=password)
-    conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-    return conn
 
 def check_assignment_id(assignment_ids, conn):
     cursor = conn.cursor()
@@ -65,8 +58,11 @@ def write_class_info(class_name, conn):
 
 def write_assignment_info(assignment_id, class_id, assignment_name, conn):
     cursor = conn.cursor()
-    sql_command = "INSERT INTO assignments (assignment_id, class_id, assignment_name) \
-        VALUES(\'{}\', {}, \'{}\')".format(assignment_id, 1.0, assignment_name)
+    sql_command = """INSERT INTO assignments (assignment_id, class_id, assignment_name)
+                    VALUES(\'{}\', {}, \'{}\')
+                    ON CONFLICT (assignment_id, class_id)
+                    DO UPDATE SET assignment_name = \'{}\'
+                    """.format(assignment_id, class_id, assignment_name, assignment_name)
     cursor.execute(sql_command)
     conn.commit()
     cursor.close()
@@ -106,11 +102,16 @@ def main(args):
     name_id_pairs = [(a["name"], a["assignment_id"]) for a in assignments]
     ids = [a["assignment_id"] for a in assignments]
     assert len(ids) == len(set(ids)), "Found non-unique assignment IDs in conf.yml"
-    conn = connect_db() # Use one global connection for all db-related commands
+    
+    # Use one global connection for all db-related commands
+    # TODO: fill in the arguments
+    conn = connect_db("", "", "") 
     class_id = write_class_info(config["course"], conn)
-    # check for no assignment id conflicts in db (Not a problem w/ unique key generation)
-    # found_match, duplicate_ids = check_assignment_id(ids, conn)
-    # assert found_match, "Ids: {} are already in the database".format(duplicate_ids)
+    
+    # check for no assignment id conflicts in db
+    found_match, duplicate_ids = check_assignment_id(ids, conn)
+    assert found_match, "Ids: {} are already in the database".format(duplicate_ids)
+    
     # write to the database
     for name, assignment_id in name_id_pairs:
         write_assignment_info(assignment_id, class_id, name, conn)

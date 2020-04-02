@@ -11,6 +11,7 @@ import pandas as pd
 
 from contextlib import contextmanager
 from IPython import get_ipython
+from psycopg2 import connect, extensions
 
 
 def block_print():
@@ -56,6 +57,15 @@ def merge_csv(dataframes):
 	"""
 	final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
 	return final_dataframe
+
+
+def connect_db(host, username, password):
+    conn = connect(dbname='otter_db',
+               user=username,
+               host=host,
+               password=password)
+    conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+    return conn
 
 
 def flush_inline_matplotlib_plots():

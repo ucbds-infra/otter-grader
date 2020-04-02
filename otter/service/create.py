@@ -5,27 +5,24 @@
 MISSING_PACKAGES = False
 
 try:
-    from psycopg2 import connect, extensions, sql
     import yaml
     import csv
+
+    from psycopg2 import connect, extensions, sql
+
+    from ..utils import connect_db
+
 except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
 
-def connect_db(host="localhost", username="otterservice", password="mypass"):
-    conn = connect(dbname='otter_db',
-               user=username,
-               host=host,
-               password=password)
-    conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-    return conn
-
 def create_users(filepath):
     with open(filepath, newline='') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        conn = connect_db()
+        filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        # TODO: fill in the arguments below
+        conn = connect_db("", "", "")
         cursor = conn.cursor()
-        for row in spamreader:
+        for row in filereader:
             username, password = row[:2]
             if username.lower() == "username":
                 # skip heading
@@ -45,8 +42,10 @@ def main(args):
             "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
         )
 
-    with open("conf.yml") as f:
-        config = yaml.safe_load(f)
+    # # TODO: can't assume we're in directory with conf.yml
+    # with open("conf.yml") as f:
+    #     config = yaml.safe_load(f)
+    config = {}
     
     conn = connect(dbname='postgres',
                    host=config['db_host'],
@@ -88,7 +87,7 @@ def main(args):
         ''',
         '''
         CREATE TABLE assignments (
-            assignment_id SERIAL PRIMARY KEY,
+            assignment_id TEXT PRIMARY KEY,
             class_id INTEGER REFERENCES classes (class_id) NOT NULL,
             assignment_name TEXT NOT NULL
         )
@@ -96,7 +95,7 @@ def main(args):
         '''
         CREATE TABLE submissions (
             submission_id SERIAL PRIMARY KEY,
-            assignment_id INTEGER REFERENCES assignments(assignment_id) NOT NULL,
+            assignment_id TEXT REFERENCES assignments(assignment_id) NOT NULL,
             user_id INTEGER REFERENCES users(user_id) NOT NULL,
             file_path TEXT NOT NULL,
             timestamp TIMESTAMP NOT NULL,
