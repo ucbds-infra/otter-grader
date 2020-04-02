@@ -2,6 +2,8 @@
 ##### Utilities for Otter-Grader #####
 ######################################
 
+MISSING_PACKAGES = False
+
 import os
 import sys
 import pathlib
@@ -11,7 +13,11 @@ import pandas as pd
 
 from contextlib import contextmanager
 from IPython import get_ipython
-from psycopg2 import connect, extensions
+
+try:
+    from psycopg2 import connect, extensions
+except ImportError:
+    MISSING_PACKAGES = True
 
 
 def block_print():
@@ -60,6 +66,13 @@ def merge_csv(dataframes):
 
 
 def connect_db(host, username, password):
+    if MISSING_PACKAGES:
+        raise ImportError(
+            "Missing some packages required for otter service. "
+            "Please install all requirements at "
+            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+        )
+        
     conn = connect(dbname='otter_db',
                user=username,
                host=host,

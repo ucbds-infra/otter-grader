@@ -169,7 +169,8 @@ class TestGrade(unittest.TestCase):
         """
         # grade the 100 notebooks
         grade_command = ["grade",
-            "-y", TEST_FILES_PATH + "notebooks/meta.yml", 
+            # NO METADATA PASSED, test case when no metadata provided
+            # "-y", TEST_FILES_PATH + "notebooks/meta.yml", 
             "-p", TEST_FILES_PATH + "notebooks/", 
             "-t", TEST_FILES_PATH + "tests/", 
             "-r", TEST_FILES_PATH + "requirements.txt",
@@ -182,16 +183,20 @@ class TestGrade(unittest.TestCase):
             args.func(args)
 
         # read the output and expected output
-        df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)
-        df_test["failures"] = df_test["identifier"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
+        df_test = pd.read_csv("test/final_grades.csv")
+        self.assertTrue("identifier" not in df_test.columns, "did not drop identifier column when no metadata passed")
+
+        # sort by filename
+        df_test = df_test.sort_values("file").reset_index(drop=True)
+        df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
 
         # check point values
         for _, row in df_test.iterrows():
             for test in self.test_points:
                 if int(re.sub(r"\D", "", test)) in row["failures"]:
-                    self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["identifier"], test))
+                    self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["file"], test))
                 else:
-                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["identifier"], test))
+                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["file"], test))
 
         # df_correct = pd.read_csv(TEST_FILES_PATH + "final_grades_correct_notebooks.csv").sort_values("identifier").reset_index(drop=True)
 
