@@ -23,11 +23,12 @@ try:
     from tornado.queues import Queue
     from tornado.gen import sleep
 
-    from ..execute import grade_assignment
+    from ..containers import grade_assignments
 
 except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
+
 
 def main(args):
     if MISSING_PACKAGES:
@@ -76,12 +77,12 @@ def main(args):
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
-            if False:#not self.get_argument('code', False):
+            if not self.get_argument('code', False):
                 print("not found")
                 return self.authorize_redirect(
                     redirect_uri=self.settings['auth_redirect_uri'],
-                    client_id=self.settings['google_oauth']['key'],
-                    client_secret=self.settings['google_oauth']['secret'],
+                    client_id = args.google_key if args.google_key else self.settings['google_oauth']['key'],
+                    client_secret = args.google_secret if args.google_secret else self.settings['google_oauth']['secret'],
                     scope=['email', 'profile'],
                     response_type='code',
                     extra_params={'approval_prompt': 'auto'}
@@ -94,12 +95,14 @@ def main(args):
                 )
                 api_key = resp['access_token']
                 email = jwt.decode(resp['id_token'], verify=False)['email']
-                results = await self.db.query("""
-                                            INSERT INTO users (api_keys, email) VALUES (%s, %s)
-                                            ON CONFLICT (email) 
-                                            DO UPDATE SET api_keys = array_append(users.api_keys, %s)
-                                            """,
-                                            [[api_key], email, api_key])
+                results = await self.db.query(
+                    """
+                    INSERT INTO users (api_keys, email) VALUES (%s, %s)
+                    ON CONFLICT (email) 
+                    DO UPDATE SET api_keys = array_append(users.api_keys, %s)
+                    """,
+                    [[api_key], email, api_key]
+                )
                 results.free()
 
                 self.render("templates/api_key.html", key=api_key)
@@ -180,12 +183,12 @@ def main(args):
             # save notebook to disk
 
             # TODO: Fix error - function isn't executing path join for some reason
-            # dir_path = os.path.join(self.settings['notebook_dir'],\
-            #                         'submissions',\
-            #                         'class-{}'.format(class_id),\
-            #                         'assignment-{}'.format(assignment_id),\
-            #                         'submission-{}'.format(submission_id))
-            dir_path = "./submissions" # temp fix
+            dir_path = os.path.join(self.settings['notebook_dir'],\
+                                    'submissions',\
+                                    'class-{}'.format(class_id),\
+                                    'assignment-{}'.format(assignment_id),\
+                                    'submission-{}'.format(submission_id))
+            # dir_path = "./submissions" # temp fix
             print("marker")
             file_path = os.path.join(dir_path, '{}.ipynb'.format(assignment_name))
             if not os.path.exists(dir_path):
@@ -223,7 +226,8 @@ def main(args):
     async def grade():
         async for user in user_queue:
             print('Grading user {}'.format(user))
-            df = grade_assignment("./lab02/tests", "./lab02/lab02.ipynb", "tmp", "a69eb952c9bd")
+            # TODO: fix this call to grade_assignment
+            df = grade_assignments("./lab02/tests", "./lab02/lab02.ipynb", "tmp", "a69eb952c9bd")
             print(df)
             # TODO: insertion into db
             user_queue.task_done()  
@@ -235,36 +239,39 @@ def main(args):
 
     class Application(tornado.web.Application):
         def __init__(self, google_auth=True):
-            if google_auth:
-                # TODO: Add config file
-                # with open("conf.yml") as f:
-                #     config = yaml.safe_load(f)
-                config = {
-                    "google_auth_key" : "hello",
-                    "google_auth_secret" : "world",
-                    "notebook_dir" : "./submissions",
-                    "auth_redirect_uri" : "http://localhost:5000/google_auth",
-                }
-                settings = dict(
-                    google_oauth={
-                        'key': config['google_auth_key'],
-                        'secret': config['google_auth_secret'],
-                    },
-                    notebook_dir = config['notebook_dir'],
-                    auth_redirect_uri = config['auth_redirect_uri']
-                )
-                handlers = [
-                    (r"/submit", SubmissionHandler),
-                    (r"/google_auth", GoogleOAuth2LoginHandler)
-                ]
-                tornado.web.Application.__init__(self, handlers, **settings)
-            else:
-                # TODO: add personal auth
-                handlers = [
-                    (r"/submit", SubmissionHandler),
-                    (r"/personal_auth", LoginHandler)
-                ]
-                tornado.web.Application.__init__(self, handlers)
+            # TODO: these shouldn't be separate can just assume both are configured
+            # if google_auth:
+            # TODO: Add config file
+            # with open("conf.yml") as f:
+            #     config = yaml.safe_load(f)
+            config = {
+                "google_auth_key" : "hello",
+                "google_auth_secret" : "world",
+                "notebook_dir" : "./submissions",
+                "auth_redirect_uri" : "http://localhost:5000/auth/callback",
+            }
+            settings = dict(
+                google_oauth={
+                    'key': config['google_auth_key'],
+                    'secret': config['google_auth_secret'],
+                },
+                notebook_dir = config['notebook_dir'],
+                auth_redirect_uri = config['auth_redirect_uri']
+            )
+            handlers = [
+                (r"/submit", SubmissionHandler),
+                (r"/auth/google", GoogleOAuth2LoginHandler),
+                (r"/auth/callback", GoogleOAuth2LoginHandler),
+                (r"/auth", LoginHandler)
+            ]
+            tornado.web.Application.__init__(self, handlers, **settings)
+            # else:
+            #     # TODO: add personal auth
+            #     handlers = [
+            #         (r"/submit", SubmissionHandler),
+            #         (r"/personal_auth", LoginHandler)
+            #     ]
+            #     tornado.web.Application.__init__(self, handlers)
             
             # Initialize database session
             # TODO: Remove hardcoded config
@@ -282,14 +289,10 @@ def main(args):
                 password=config['db_pass'])
             )
 
-
-    if __name__ == "__main__":
-        port = 5000
-        tornado.options.parse_command_line()
-        server = HTTPServer(Application(google_auth=False))
-        server.listen(port)
-        print("Listening on port {}".format(port))
-        IOLoop.current().spawn_callback(grade)
-        IOLoop.current().start()
-
-
+    port = 5000
+    tornado.options.parse_command_line()
+    server = HTTPServer(Application(google_auth=True))
+    server.listen(port)
+    print("Listening on port {}".format(port))
+    IOLoop.current().spawn_callback(grade)
+    IOLoop.current().start()
