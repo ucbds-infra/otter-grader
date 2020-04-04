@@ -7,6 +7,7 @@ MISSING_PACKAGES = False
 try:
     import yaml
     import csv
+    import psycopg2
 
     from psycopg2 import connect, extensions, sql
 
@@ -47,23 +48,26 @@ def main(args):
     #     config = yaml.safe_load(f)
     config = {}
     
-    conn = connect(dbname='postgres',
-                   host=config['db_host'],
-                   port=config['db_port'],
-                   user=config['db_user'],
-                   password=config['db_pass'])
+    try:
+        conn = connect(dbname='postgres',
+                    host='localhost',
+                    port=5432,
+                    user='root',
+                    password='root')
 
-    conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-    cursor = conn.cursor()
-    cursor.execute('CREATE DATABASE otter_db')
-    cursor.close()
-    conn.close()
+        conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        cursor = conn.cursor()
+        cursor.execute('CREATE DATABASE otter_db')
+        cursor.close()
+        conn.close()
+    except psycopg2.errors.DuplicateDatabase:
+        pass
 
     conn = connect(dbname='otter_db',
-                   host=config['db_host'],
-                   port=config['db_port'],
-                   user=config['db_user'],
-                   password=config['db_pass'])
+                   host='localhost',
+                   port=5432,
+                   user='root',
+                   password='root')
 
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()

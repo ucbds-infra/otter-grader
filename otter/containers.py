@@ -147,8 +147,9 @@ scripts=False, no_kill=False, output_path="./", debug=False):
     copy = subprocess.run(copy_command, stdout=PIPE, stderr=PIPE)
     
     # copy the test files to the container
-    tests_command = ["docker", "cp", tests_dir, container_id+ ":/home/tests/"]
-    tests = subprocess.run(tests_command, stdout=PIPE, stderr=PIPE)
+    if tests_dir is not None:
+        tests_command = ["docker", "cp", tests_dir, container_id+ ":/home/tests/"]
+        tests = subprocess.run(tests_command, stdout=PIPE, stderr=PIPE)
 
     # copy the requirements file to the container
     if reqs:

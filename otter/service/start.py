@@ -11,10 +11,12 @@ try:
     import hashlib
     import jwt
     import logging
+    import contextlib
     import traceback
     import tornado.options
     import queries
 
+    from io import StringIO
     from datetime import datetime
     from binascii import hexlify
     from tornado.httpserver import HTTPServer
@@ -45,6 +47,10 @@ def main(args):
     #NB_DIR = os.environ.get('NOTEBOOK_DIR')
     conn = None
 
+    # assert args.config is not None, "no config provided"
+    # with open(args.config) as f:
+    #     config = yaml.load(f)
+
     class BaseHandler(tornado.web.RequestHandler):
         def get_current_user(self):
             return self.get_secure_cookie("user")
@@ -54,21 +60,25 @@ def main(args):
             username = self.get_argument('username', True)
             password = self.get_argument('password', True)
             pw_hash = hashlib.sha256(password.encode()).hexdigest()
-            account_check = await self.db.query("""
-                                SELECT * FROM users 
-                                WHERE username = %s AND password = %s
-                                """,
-                                [username, pw_hash])
+            account_check = await self.db.query(
+                """
+                SELECT * FROM users 
+                WHERE username = %s AND password = %s
+                """,
+                [username, pw_hash]
+            )
             if len(account_check) > 0:
                 account_check.free()
                 api_key = hexlify(os.urandom(32)).decode("utf-8")
                 self.write(api_key)
-                results = await self.db.query("""
-                                            INSERT INTO users (api_keys, username, password) VALUES (%s, %s, %s)
-                                            ON CONFLICT (username)
-                                            DO UPDATE SET api_keys = array_append(users.api_keys, %s)
-                                            """,
-                                            [[api_key], username, pw_hash, api_key])
+                results = await self.db.query(
+                    """
+                    INSERT INTO users (api_keys, username, password) VALUES (%s, %s, %s)
+                    ON CONFLICT (username)
+                    DO UPDATE SET api_keys = array_append(users.api_keys, %s)
+                    """,
+                    [[api_key], username, pw_hash, api_key]
+                )
                 results.free()
             else:
                 account_check.free()
@@ -82,6 +92,9 @@ def main(args):
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
+            self.settings["google_oauth"] = {
+                "key": args.google_key, "secret": args.google_secret
+            }
             if not self.get_argument('code', False):
                 print("not found")
                 return self.authorize_redirect(
@@ -96,7 +109,7 @@ def main(args):
                 print("found")
                 resp = await self.get_authenticated_user(
                     redirect_uri=self.settings['auth_redirect_uri'],
-                    code="world"#self.get_argument('code')
+                    code=self.get_argument('code')
                 )
                 api_key = resp['access_token']
                 email = jwt.decode(resp['id_token'], verify=False)['email']
@@ -186,11 +199,13 @@ def main(args):
             print("Successfully queries submission id")
 
             # save notebook to disk
-            dir_path = os.path.join(self.settings['notebook_dir'],\
-                                    'submissions',\
-                                    'class-{}'.format(class_id),\
-                                    'assignment-{}'.format(assignment_id),\
-                                    'submission-{}'.format(submission_id))
+            dir_path = os.path.join(
+                self.settings['notebook_dir'],
+                'submissions',
+                'class-{}'.format(class_id),
+                'assignment-{}'.format(assignment_id),
+                'submission-{}'.format(submission_id)
+            )
             file_path = os.path.join(dir_path, '{}.ipynb'.format(assignment_name))
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
@@ -235,17 +250,21 @@ def main(args):
     async def grade():
         cursor = conn.cursor()
         
-        # This can be moved to global
-        with open("conf.yml") as f:
-            config = yaml.safe_load(f)
+        # # This can be moved to global
+        # with open("conf.yml") as f:
+        #     config = yaml.safe_load(f)
         
         async for user in user_queue:
             # Get current user's latest submission
-            cursor.execute("SELECT user_id, submission_id, assignment_id, file_path \
-                                FROM submissions \
-                                WHERE user_id = \'{}\' \
-                                ORDER BY timestamp \
-                                LIMIT 1".format(user))
+            cursor.execute(
+                """
+                SELECT user_id, submission_id, assignment_id, file_path 
+                FROM submissions 
+                WHERE user_id = '{}' 
+                ORDER BY timestamp 
+                LIMIT 1
+                """.format(user)
+            )
             user_record = cursor.fetchall()      
             for row in user_record:
                 user_id = int(row[0])
@@ -253,15 +272,24 @@ def main(args):
                 assignment_id = str(row[2])
                 file_path = str(row[3])
 
-            # Get tests directory for assignment
-            tests_path = None
-            for assignment in config["assignments"]:
-                if assignment[assignment_id] == submission_id:
-                    tests_path = assignment["tests_path"]
+            # # Get tests directory for assignment
+            # tests_path = None
+            # for assignment in config["assignments"]:
+            #     if assignment[assignment_id] == submission_id:
+            #         tests_path = assignment["tests_path"]
 
             # Run grading function in a docker container
             # TODO: fix arguments below, redirect stdout/stderr
-            df = grade_assignments(tests_path, file_path, assignment_id)
+            stdout = StringIO()
+            with contextlib.redirect_stdout(stdout):
+                df = grade_assignments(
+                    tests_dir=None, 
+                    notebooks_dir=file_path, 
+                    id=assignment_id, 
+                    image=assignment_id,
+                    debug=True
+                )
+            stdout = stdout.getvalue()
             df_json_str = df.to_json()
 
             # Insert score into submissions table
@@ -272,6 +300,9 @@ def main(args):
                 DO UPDATE SET timestamp = %s, score = %s",
                 [submission_id, assignment_id, user_id, file_path, datetime.utcnow(), df_json_str,
                 datetime.utcnow(), df_json_str])
+
+            with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
+                f.write(stdout)
             
             # Set task done in queue
             user_queue.task_done()
@@ -316,15 +347,15 @@ def main(args):
             
             # Initialize database session
             self.db = queries.TornadoSession(queries.uri(
-                host=config['db_host'],
-                port=config['db_port'],
+                host='localhost',
+                port=5432,
                 dbname='otter_db',
-                user=config['db_user'],
-                password=config['db_pass'])
-            )
+                user='root',
+                password='root'
+            ))
 
     # TODO: add arguments below
-    conn = connect_db("", "", "")
+    conn = connect_db("localhost", "root", "root")
     port = 5000
     tornado.options.parse_command_line()
     server = HTTPServer(Application(google_auth=True))
