@@ -106,7 +106,7 @@ def gen_export_cells(nb_path, instruction_text, filtering=True):
     """Generate submit cells."""
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before \
-    running the cell below, so that all images/graphs appear in the output. **Please save before submitting!**"
+    running the cell below, so that all images/graphs appear in the output. **Please save before exporting!**"
     
     if instruction_text:
         instructions.source += '\n\n' + instruction_text
@@ -314,7 +314,7 @@ def add_close_export_to_cell(cell):
     """Adds an export close to the top of the cell"""
     source = get_source(cell)
     source = ["<!-- END QUESTION -->\n", "\n"] + source
-    cell['source'] = source
+    cell['source'] = "\n".join(source)
 
 
 def read_question_metadata(cell):
