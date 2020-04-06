@@ -56,7 +56,8 @@ def check(test_file_path, global_env=None):
     return tests.run(global_env, include_grade=False)
 
 
-def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, gradescope=False):
+def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
+    gradescope=False, cwd=None, test_dir=None):
     """
     Grade a notebook file & return grade
 
@@ -98,9 +99,9 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         initial_env["__name__"] = name
 
     if script:
-        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope)
+        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd)
     else:
-        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope)
+        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, test_dir=test_dir)
 
     test_results = global_env[results_array]
 
@@ -208,7 +209,7 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script):
 
     return result
 
-def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, gradescope=False):
+def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None, test_dir=None):
     """
     Executes an ipython notebook and return the global environment that results from execution.
 
@@ -236,6 +237,8 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         source = ""
         if gradescope:
             source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
+        elif cwd:
+            source =  f"import sys\nsys.path.append(\"{cwd}\")\n"
 
         # Before rewriting AST, find cells of code that generate errors.
         # One round of execution is done beforehand to mimic the Jupyter notebook style of running
@@ -268,6 +271,8 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                                 # TODO: move this check into CheckCallWrapper
                                 if gradescope:
                                     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
+                                elif test_dir:
+                                    line = re.sub(r"otter\.Notebook\(.*?\)", f"otter.Notebook(\"{test_dir}\")", line)
                                 else:
                                     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
                                 code_lines.append(line)
@@ -308,7 +313,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                 raise
         return global_env
 
-def execute_script(script, secret='secret', initial_env=None, ignore_errors=False, gradescope=False):
+def execute_script(script, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None):
     """
     Executes code of a python (.py) script and returns the resulting global environment
 
@@ -334,6 +339,8 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
         source = ""
         if gradescope:
             source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
+        elif cwd:
+            source =  f"import sys\nsys.path.append(\"{cwd}\")\n"
 
         lines = script.split("\n")
         for i, line in enumerate(lines):

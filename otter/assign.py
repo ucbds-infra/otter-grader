@@ -39,8 +39,12 @@ MD_ANSWER_CELL_TEMPLATE = "_Type your answer here, replacing this text._"
 
 def run_tests(nb_path):
     """Run tests in the autograder version of the notebook."""
-    results = grade_notebook(nb_path, glob(str(nb_path.parent / "tests" / "*.py")))
+    curr_dir = os.getcwd()
+    os.chdir(nb_path.parent)
+    results = grade_notebook(nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
+    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors=True)
     assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
+    os.chdir(curr_dir)
 
 
 def main(args):
@@ -494,6 +498,8 @@ def gen_views(master_nb, result_dir, args):
     """
     autograder_dir = result_dir / 'autograder'
     student_dir = result_dir / 'student'
+    shutil.rmtree(autograder_dir, ignore_errors=True)
+    shutil.rmtree(student_dir, ignore_errors=True)
     os.makedirs(autograder_dir, exist_ok=True)
     ok_nb_path = convert_to_ok(master_nb, autograder_dir, args)
     shutil.rmtree(student_dir, ignore_errors=True)
