@@ -206,6 +206,8 @@ class Notebook:
 
 		with open(notebook_path) as f:
 			notebook_data = json.load(f)
+
+		notebook_data["metadata"]["assignment_id"] = self._config["assignment"]
 		
 		print("Submitting notebook to server...")
 
