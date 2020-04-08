@@ -355,7 +355,7 @@ def main(args):
             ))
 
     # TODO: add arguments below
-    conn = connect_db("localhost", "root", "root")
+    conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
     port = 5000
     tornado.options.parse_command_line()
     server = HTTPServer(Application(google_auth=True))
