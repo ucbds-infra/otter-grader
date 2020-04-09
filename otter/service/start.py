@@ -93,7 +93,8 @@ def main(args):
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
             self.settings["google_oauth"] = {
-                "key": args.google_key, "secret": args.google_secret
+                "key": args.google_key or os.environ.get("GOOGLE_CLIENT_KEY", None), 
+                "secret": args.google_secret or os.environ.get("GOOGLE_CLIENT_SECRET", None)
             }
             if not self.get_argument('code', False):
                 print("not found")
@@ -238,14 +239,6 @@ def main(args):
             else:
                 self.write('Submission failed.')
 
-    # def connect_db(host="localhost", username="otterservice", password="mypass"):
-    #     global conn
-    #     conn = connect(dbname='otter_db',
-    #             user=username,
-    #             host=host,
-    #             password=password)
-    #     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-    #     return conn
 
     async def grade():
         cursor = conn.cursor()
@@ -317,10 +310,8 @@ def main(args):
             # with open("conf.yml") as f:
             #     config = yaml.safe_load(f)
             config = {
-                "google_auth_key" : "hello",
-                "google_auth_secret" : "world",
                 "notebook_dir" : "./submissions",
-                "auth_redirect_uri" : "http://localhost:5000/auth/callback",
+                "auth_redirect_uri" : args.endpoint or os.environ.get("OTTER_ENDPOINT", None) # "http://localhost:5000/auth/callback",
             }
             settings = dict(
                 google_oauth={

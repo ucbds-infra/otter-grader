@@ -129,6 +129,7 @@ service_create_parser.set_defaults(func=service.create)
 ##### PARSER FOR otter service start #####
 service_start_parser = service_subparsers.add_parser("start", description="Start an otter-service instance")
 service_start_parser.add_argument("-c", "--config", help="Path to config file")
+service_start_parser.add_argument("-e", "--endpoint", help="Address of this VM including port")
 service_start_parser.add_argument("--port", type=int, default=8888, help="Port for server to listen on")
 service_start_parser.add_argument("-k", "--google-key", help="Google OAuth key; use environment variable if not specified")
 service_start_parser.add_argument("-s", "--google-secret", help="Google OAuth secret; use environment variable if not specified")
