@@ -34,6 +34,7 @@ except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
 
+OTTER_SERVICE_DIR = "/otter-service"
 
 def main(args):
     if MISSING_PACKAGES:
@@ -92,10 +93,6 @@ def main(args):
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
-            self.settings["google_oauth"] = {
-                "key": args.google_key or os.environ.get("GOOGLE_CLIENT_KEY", None), 
-                "secret": args.google_secret or os.environ.get("GOOGLE_CLIENT_SECRET", None)
-            }
             if not self.get_argument('code', False):
                 print("not found")
                 return self.authorize_redirect(
@@ -309,17 +306,16 @@ def main(args):
             # TODO: Add config file
             # with open("conf.yml") as f:
             #     config = yaml.safe_load(f)
-            config = {
-                "notebook_dir" : "./submissions",
-                "auth_redirect_uri" : args.endpoint or os.environ.get("OTTER_ENDPOINT", None) # "http://localhost:5000/auth/callback",
-            }
+            endpoint = args.endpoint or os.environ.get("OTTER_ENDPOINT", None)
+            assert endpoint is not None, "no endpoint address provided"
+            assert os.path.isdir(OTTER_SERVICE_DIR), "{} does not exist".format(OTTER_SERVICE_DIR)
             settings = dict(
                 google_oauth={
-                    'key': config['google_auth_key'],
-                    'secret': config['google_auth_secret'],
+                    "key": args.google_key or os.environ.get("GOOGLE_CLIENT_KEY", None), 
+                    "secret": args.google_secret or os.environ.get("GOOGLE_CLIENT_SECRET", None)
                 },
-                notebook_dir = config['notebook_dir'],
-                auth_redirect_uri = config['auth_redirect_uri']
+                notebook_dir = os.path.join(OTTER_SERVICE_DIR, "submissions"),
+                auth_redirect_uri = os.path.join(endpoint, "auth/callback")
             )
             handlers = [
                 (r"/submit", SubmissionHandler),
@@ -349,6 +345,11 @@ def main(args):
     conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
     port = 5000
     tornado.options.parse_command_line()
+
+    # make submissions forlder
+    if not os.path.isdir(OTTER_SERVICE_DIR):
+        os.makedirs(os.path.join(OTTER_SERVICE_DIR, "submissions"))
+    
     server = HTTPServer(Application(google_auth=True))
     server.listen(port)
     print("Listening on port {}".format(port))
