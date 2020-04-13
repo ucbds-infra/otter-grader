@@ -119,7 +119,7 @@ otter-assign also supports manually-graded questions using a similar specificati
 
 Manually-graded solution cells have two formats:
 
-* If a code cell, they can be delimited by the `## Solution ##` comment as above.
+* If a code cell, they can be delimited by solution removal syntax as above.
 * If a Markdown cell, the start of any line must match the regex `(<strong>|\*{2})solution:?(<\/strong>|\*{2})`.
 
 The latter means that as long as one of the lines in the cell starts with `SOLUTION` (case insensitive, with or without a colon `:`) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, otter-assign automatically adds a Markdown cell with the contents `_Type your answer here, replacing this test._`

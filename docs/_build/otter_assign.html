@@ -292,7 +292,7 @@ twice, make two separate test cells instead of a single cell with:</p>
 </ul>
 <p>Manually-graded solution cells have two formats:</p>
 <ul class="simple">
-<li><p>If a code cell, they can be delimited by the <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">Solution</span> <span class="pre">##</span></code> comment as above.</p></li>
+<li><p>If a code cell, they can be delimited by solution removal syntax as above.</p></li>
 <li><p>If a Markdown cell, the start of any line must match the regex <code class="docutils literal notranslate"><span class="pre">(&lt;strong&gt;|\*{2})solution:?(&lt;\/strong&gt;|\*{2})</span></code>.</p></li>
 </ul>
 <p>The latter means that as long as one of the lines in the cell starts with <code class="docutils literal notranslate"><span class="pre">SOLUTION</span></code> (case insensitive, with or without a colon <code class="docutils literal notranslate"><span class="pre">:</span></code>) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, otter-assign automatically adds a Markdown cell with the contents <code class="docutils literal notranslate"><span class="pre">_Type</span> <span class="pre">your</span> <span class="pre">answer</span> <span class="pre">here,</span> <span class="pre">replacing</span> <span class="pre">this</span> <span class="pre">test._</span></code></p>
