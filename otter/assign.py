@@ -12,6 +12,7 @@ import os
 import re
 import shutil
 import yaml
+import subprocess
 import pathlib
 import nbformat
 
@@ -37,12 +38,12 @@ MD_SOLUTION_REGEX = r"(<strong>|\*{2})solution:?(<\/strong>|\*{2})"
 MD_ANSWER_CELL_TEMPLATE = "_Type your answer here, replacing this text._"
 
 
-def run_tests(nb_path):
+def run_tests(nb_path, debug=False):
     """Run tests in the autograder version of the notebook."""
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
     results = grade_notebook(nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
-    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors=True)
+    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug)
     assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
     os.chdir(curr_dir)
 
@@ -57,9 +58,22 @@ def main(args):
     if not args.no_run_tests:
         print("Running tests...")
         block_print()
-        run_tests(result / 'autograder'  / master.name )
+        run_tests(result / 'autograder'  / master.name, debug=args.debug)
         enable_print()
         print("All tests passed!")
+    if args.generate:
+        print("Generating autograder zipfile...")
+        os.chdir(str(result / 'autograder'))
+        generate_cmd = ["otter", "generate"]
+        if args.points is not None:
+            generate_cmd += ["--points", args.points]
+        if args.threshold is not None:
+            generate_cmd += ["--threshold", args.threshold]
+        if args.show_results:
+            generate_cmd += ["--show-results"]
+        if args.files:
+            generate_cmd += args.files
+        subprocess.run(generate_cmd)
 
 
 def convert_to_ok(nb_path, dir, args):
@@ -76,6 +90,9 @@ def convert_to_ok(nb_path, dir, args):
     # copy files
     for file in args.files:
         shutil.copy(file, str(dir))
+
+    if os.path.isfile(args.requirements):
+        shutil.copy(args.requirements, str(dir / 'requirements.txt'))
 
     with open(nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
@@ -156,14 +173,15 @@ def gen_ok_cells(cells, tests_dir):
     manual_questions = []
     md_has_prompt = False
     need_close_export = False
+    no_solution = False
 
     for cell in cells:
 
         # this is the prompt cell or if a manual question then the solution cell
         if question and not processed_response:
             assert not is_question_cell(cell), cell
-            assert not is_test_cell(cell), cell
-            assert not is_solution_cell(cell) or is_markdown_solution_cell(cell), cell
+            # assert not is_test_cell(cell), cell
+            # assert not is_solution_cell(cell) or is_markdown_solution_cell(cell), cell
 
             # if this isn't a MD solution cell but in a manual question, it has a prompt
             if not is_solution_cell(cell) and question.get('manual', False):
@@ -173,7 +191,13 @@ def gen_ok_cells(cells, tests_dir):
             elif is_markdown_solution_cell(cell) and not md_has_prompt:
                 ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
 
-            ok_cells.append(cell)
+            elif is_test_cell(cell):
+                no_solution = True
+                gen_test_cell(question, tests, tests_dir)
+
+            if not no_solution:
+                ok_cells.append(cell)
+            
             processed_response = True
 
         # if this is a test cell, parse and add to correct group
@@ -194,7 +218,9 @@ def gen_ok_cells(cells, tests_dir):
             # the question is over
             if question and processed_response:
                 if tests:
-                    ok_cells.append(gen_test_cell(question, tests, tests_dir))
+                    check_cell = gen_test_cell(question, tests, tests_dir)
+                    if not no_solution:
+                        ok_cells.append(check_cell)
                 # if hidden_tests:
                 #     gen_test_cell(question, hidden_tests, tests_dir, hidden=True)
 
@@ -204,7 +230,7 @@ def gen_ok_cells(cells, tests_dir):
                     # ok_cells.append(gen_close_export_cell())
                     need_close_export = True
                 
-                question, processed_response, tests, md_has_prompt = {}, False, [], False
+                question, processed_response, tests, md_has_prompt, no_solution = {}, False, [], False, False
 
             if is_question_cell(cell):
                 question = read_question_metadata(cell)
@@ -237,7 +263,9 @@ def gen_ok_cells(cells, tests_dir):
                 ok_cells.append(cell)
 
     if tests:
-        ok_cells.append(gen_test_cell(question, tests, tests_dir))
+        check_cell = gen_test_cell(question, tests, tests_dir)
+        if not no_solution:
+            ok_cells.append(check_cell)
     # if hidden_tests:
     #     gen_test_cell(question, hidden_tests, tests_dir, hidden=True)
 
@@ -280,7 +308,7 @@ def is_solution_cell(cell):
 def find_question_spec(source):
     """Return line number of the BEGIN QUESTION line or None."""
     block_quotes = [i for i, line in enumerate(source) if
-                    line == BLOCK_QUOTE]
+                    line[:3] == BLOCK_QUOTE]
     assert len(block_quotes) % 2 == 0, 'cannot parse ' + str(source)
     begins = [block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) if
               source[block_quotes[i]+1].strip(' ') == 'BEGIN QUESTION']
@@ -446,17 +474,83 @@ def gen_case(test):
     }
 
 
+# def strip_solutions(original_nb_path, stripped_nb_path):
+#     """Write a notebook with solutions stripped."""
+#     with open(original_nb_path) as f:
+#         nb = nbformat.read(f, NB_VERSION)
+#     deletion_indices = []
+#     for i in range(len(nb['cells'])):
+#         if is_solution_cell(nb['cells'][i]):
+#             deletion_indices.append(i)
+#     deletion_indices.reverse()
+#     for i in deletion_indices:
+#         del nb['cells'][i]
+#     with open(stripped_nb_path, 'w') as f:
+#         nbformat.write(nb, f, NB_VERSION)
+
+
+solution_assignment_re = re.compile('(\\s*[a-zA-Z0-9_ ]*=)(.*) #[ ]?SOLUTION')
+def solution_assignment_sub(match):
+    prefix = match.group(1)
+    # sol = match.group(2)
+    return prefix + ' ...'
+
+
+solution_line_re = re.compile('(\\s*)([^#\n]+) #[ ]?SOLUTION')
+def solution_line_sub(match):
+    prefix = match.group(1)
+    return prefix + '...'
+
+
+# text_solution_line_re = re.compile(r'\s*\*\*SOLUTION:?\*\*:?.*')
+begin_solution_re = re.compile(r'(\s*)# BEGIN SOLUTION( NO PROMPT)?')
+skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT']
+
+
+SUBSTITUTIONS = [
+    (solution_assignment_re, solution_assignment_sub),
+    (solution_line_re, solution_line_sub),
+]
+
+
+def replace_solutions(lines):
+    """Replace solutions in lines, a list of strings."""
+    # if text_solution_line_re.match(lines[0]):
+    #     return ['*Write your answer here, replacing this text.*']
+    stripped = []
+    solution = False
+    for line in lines:
+        if any(line.endswith(s) for s in skip_suffixes):
+            continue
+        if solution and not line.endswith('# END SOLUTION'):
+            continue
+        if line.endswith('# END SOLUTION'):
+            assert solution, 'END SOLUTION without BEGIN SOLUTION in ' + str(lines)
+            solution = False
+            continue
+        begin_solution = begin_solution_re.match(line)
+        if begin_solution:
+            assert not solution, 'Nested BEGIN SOLUTION in ' + str(lines)
+            solution = True
+            if not begin_solution.group(2):
+                line = begin_solution.group(1) + '...'
+            else:
+                continue
+        for exp, sub in SUBSTITUTIONS:
+            m = exp.match(line)
+            if m:
+                line = sub(m)
+        stripped.append(line)
+    assert not solution, 'BEGIN SOLUTION without END SOLUTION in ' + str(lines)
+    return stripped
+
+
 def strip_solutions(original_nb_path, stripped_nb_path):
     """Write a notebook with solutions stripped."""
     with open(original_nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
-    deletion_indices = []
-    for i in range(len(nb['cells'])):
-        if is_solution_cell(nb['cells'][i]):
-            deletion_indices.append(i)
-    deletion_indices.reverse()
-    for i in deletion_indices:
-        del nb['cells'][i]
+    for cell in nb['cells']:
+        cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
     with open(stripped_nb_path, 'w') as f:
         nbformat.write(nb, f, NB_VERSION)
 
@@ -504,6 +598,8 @@ def gen_views(master_nb, result_dir, args):
     ok_nb_path = convert_to_ok(master_nb, autograder_dir, args)
     shutil.rmtree(student_dir, ignore_errors=True)
     shutil.copytree(autograder_dir, student_dir)
+    if os.path.isfile(str(student_dir / os.path.split(args.requirements)[1])):
+        os.remove(str(student_dir / os.path.split(args.requirements)[1]))
     student_nb_path = student_dir / ok_nb_path.name
     os.remove(student_nb_path)
     strip_solutions(ok_nb_path, student_nb_path)

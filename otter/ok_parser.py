@@ -41,7 +41,7 @@ class CheckCallWrapper(ast.NodeTransformer):
         self.secret = secret
 
 
-    def node_constructor(self, expression):
+    def check_node_constructor(self, expression):
         """Creates node that wraps expression in a list (check_results_XX) append call
         
         Args:
@@ -112,7 +112,19 @@ class CheckCallWrapper(ast.NodeTransformer):
         if isinstance(node.func, ast.Attribute):
             if isinstance(node.func.value, ast.Name) and node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
                 if node.func.attr == "check":
-                    return self.node_constructor(node)
+                    return self.check_node_constructor(node)
+        return node
+    
+
+    def visit_Expr(self, node):
+        """
+        """
+        if isinstance(node.value, ast.Call):
+            call_node = node.value
+            if isinstance(call_node.func, ast.Attribute):
+                if isinstance(call_node.func.value, ast.Name) and call_node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
+                    if call_node.func.attr == "check_all":
+                        return None
         return node
 
 
