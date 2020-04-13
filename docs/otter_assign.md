@@ -16,7 +16,7 @@ Here is an example question in an otter-assign-formatted notebook:
 
 ![](images/assign_sample_question.png)
 
-For code questions, a question is a description *Markdown* cell, followed by a prompt *code* cell, a solution *code* cell, and zero or more test *code* cells. The description cell must contain a code block (enclosed in triple backticks <code>\`\`\`</code>) that begins with `BEGIN QUESTION` on its own line, followed by YAML that defines metadata associated with the question.
+For code questions, a question is a description *Markdown* cell, followed by a solution *code* cell and zero or more test *code* cells. The description cell must contain a code block (enclosed in triple backticks <code>\`\`\`</code>) that begins with `BEGIN QUESTION` on its own line, followed by YAML that defines metadata associated with the question.
 
 The rest of the code block within the description cell must be YAML-formatted with the following fields (in any order):
 
@@ -34,7 +34,70 @@ manual: false
 ```
 ````
 
-The prompt cell must always appear directly below the description cell (where the question metadata is defined), and below that should be a solution cell. Solution cells are indicated by putting `## Solution ##` on the first line of the cell (case insensitive).
+Solution cells contain code formatted in such a way that the assign parser replaces lines or portions of lines with prespecified prompts. Otter uses the same solution replacement rules as jassign. From the [jassign docs](https://github.com/okpy/jassign/blob/master/docs/notebook-format.md):
+
+* A line ending in `# SOLUTION` will be replaced by `...`, properly indented. If
+  that line is an assignment statement, then only the expression(s) after the
+  `=` symbol will be replaced.
+* A line ending in `# SOLUTION NO PROMPT` will be removed.
+* A line `# BEGIN SOLUTION` or `# BEGIN SOLUTION NO PROMPT` must be paired with
+  a later line `# END SOLUTION`. All lines in between are replaced with `...` or
+  removed completely in the case of `NO PROMPT`.
+* A line `""" # BEGIN PROMPT` must be paired with a later line `""" # END
+  PROMPT`. The contents of this multiline string (excluding the `# BEGIN
+  PROMPT`) appears in the student cell. Single or double quotes are allowed.
+  Optionally, a semicolon can be used to suppress output: `"""; # END PROMPT`
+
+#### Solution Removal Examples
+
+```python
+def square(x):
+    y = x * x # SOLUTION NO PROMPT
+    return y # SOLUTION
+
+nine = square(3) # SOLUTION
+```
+
+would be presented to students as
+
+```python
+def square(x):
+    ...
+
+nine = ...
+```
+
+And
+
+```python
+pi = 3.14
+if True:
+    # BEGIN SOLUTION
+    radius = 3
+    area = radius * pi * pi
+    # END SOLUTION
+    print('A circle with radius', radius, 'has area', area)
+def circumference(r):
+    # BEGIN SOLUTION NO PROMPT
+    return 2 * pi * r
+    # END SOLUTION
+    """ # BEGIN PROMPT
+    # Next, define a circumference function.
+    pass
+    """; # END PROMPT
+```
+
+would be presented to students as
+
+```python
+pi = 3.14
+if True:
+    ...
+    print('A circle with radius', radius, 'has area', area)
+def circumference(r):
+    # Next, define a circumference function.
+    pass
+```
 
 The test cells are any code cells following the solution cell that begin with the comment `## Test ##` or `## Hidden Test ##` (case insensitive). A `Test` is distributed to students so that they can validate their work. A `Hidden Test` is not distributed to students, but is used for scoring their work.
 
@@ -56,7 +119,7 @@ otter-assign also supports manually-graded questions using a similar specificati
 
 Manually-graded solution cells have two formats:
 
-* If a code cell, they can be delimited by the `## Solution ##` comment as above.
+* If a code cell, they can be delimited by solution removal syntax as above.
 * If a Markdown cell, the start of any line must match the regex `(<strong>|\*{2})solution:?(<\/strong>|\*{2})`.
 
 The latter means that as long as one of the lines in the cell starts with `SOLUTION` (case insensitive, with or without a colon `:`) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, otter-assign automatically adds a Markdown cell with the contents `_Type your answer here, replacing this test._`

@@ -149,7 +149,13 @@
             <a href="#notebook-format" class="nav-link">Notebook Format</a><ul class="nav section-nav flex-column">
                 
         <li class="nav-item toc-entry toc-h3">
-            <a href="#autograded-questions" class="nav-link">Autograded Questions</a>
+            <a href="#autograded-questions" class="nav-link">Autograded Questions</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h4">
+            <a href="#solution-removal-examples" class="nav-link">Solution Removal Examples</a>
+        </li>
+    
+            </ul>
         </li>
     
         <li class="nav-item toc-entry toc-h3">
@@ -196,7 +202,7 @@
 <h3>Autograded Questions<a class="headerlink" href="#autograded-questions" title="Permalink to this headline">¶</a></h3>
 <p>Here is an example question in an otter-assign-formatted notebook:</p>
 <p><img alt="_images/assign_sample_question.png" src="_images/assign_sample_question.png" /></p>
-<p>For code questions, a question is a description <em>Markdown</em> cell, followed by a prompt <em>code</em> cell, a solution <em>code</em> cell, and zero or more test <em>code</em> cells. The description cell must contain a code block (enclosed in triple backticks <code>```</code>) that begins with <code class="docutils literal notranslate"><span class="pre">BEGIN</span> <span class="pre">QUESTION</span></code> on its own line, followed by YAML that defines metadata associated with the question.</p>
+<p>For code questions, a question is a description <em>Markdown</em> cell, followed by a solution <em>code</em> cell and zero or more test <em>code</em> cells. The description cell must contain a code block (enclosed in triple backticks <code>```</code>) that begins with <code class="docutils literal notranslate"><span class="pre">BEGIN</span> <span class="pre">QUESTION</span></code> on its own line, followed by YAML that defines metadata associated with the question.</p>
 <p>The rest of the code block within the description cell must be YAML-formatted with the following fields (in any order):</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (required) - a string identifier that is a legal file name (without an extension)</p></li>
@@ -211,13 +217,69 @@ manual: false
 ```
 </pre></div>
 </div>
-<p>The prompt cell must always appear directly below the description cell (where the question metadata is defined), and below that should be a solution cell. Solution cells are indicated by putting <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">Solution</span> <span class="pre">##</span></code> on the first line of the cell (case insensitive).</p>
+<p>Solution cells contain code formatted in such a way that the assign parser replaces lines or portions of lines with prespecified prompts. Otter uses the same solution replacement rules as jassign. From the <a class="reference external" href="https://github.com/okpy/jassign/blob/master/docs/notebook-format">jassign docs</a>:</p>
+<ul class="simple">
+<li><p>A line ending in <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">SOLUTION</span></code> will be replaced by <code class="docutils literal notranslate"><span class="pre">...</span></code>, properly indented. If
+that line is an assignment statement, then only the expression(s) after the
+<code class="docutils literal notranslate"><span class="pre">=</span></code> symbol will be replaced.</p></li>
+<li><p>A line ending in <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">SOLUTION</span> <span class="pre">NO</span> <span class="pre">PROMPT</span></code> will be removed.</p></li>
+<li><p>A line <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">BEGIN</span> <span class="pre">SOLUTION</span></code> or <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">BEGIN</span> <span class="pre">SOLUTION</span> <span class="pre">NO</span> <span class="pre">PROMPT</span></code> must be paired with
+a later line <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">END</span> <span class="pre">SOLUTION</span></code>. All lines in between are replaced with <code class="docutils literal notranslate"><span class="pre">...</span></code> or
+removed completely in the case of <code class="docutils literal notranslate"><span class="pre">NO</span> <span class="pre">PROMPT</span></code>.</p></li>
+<li><p>A line <code class="docutils literal notranslate"><span class="pre">&quot;&quot;&quot;</span> <span class="pre">#</span> <span class="pre">BEGIN</span> <span class="pre">PROMPT</span></code> must be paired with a later line <code class="docutils literal notranslate"><span class="pre">&quot;&quot;&quot;</span> <span class="pre">#</span> <span class="pre">END</span> <span class="pre">PROMPT</span></code>. The contents of this multiline string (excluding the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">BEGIN</span> <span class="pre">PROMPT</span></code>) appears in the student cell. Single or double quotes are allowed.
+Optionally, a semicolon can be used to suppress output: <code class="docutils literal notranslate"><span class="pre">&quot;&quot;&quot;;</span> <span class="pre">#</span> <span class="pre">END</span> <span class="pre">PROMPT</span></code></p></li>
+</ul>
+<div class="section" id="solution-removal-examples">
+<h4>Solution Removal Examples<a class="headerlink" href="#solution-removal-examples" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="c1"># SOLUTION NO PROMPT</span>
+    <span class="k">return</span> <span class="n">y</span> <span class="c1"># SOLUTION</span>
+
+<span class="n">nine</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># SOLUTION</span>
+</pre></div>
+</div>
+<p>would be presented to students as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="o">...</span>
+
+<span class="n">nine</span> <span class="o">=</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>And</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pi</span> <span class="o">=</span> <span class="mf">3.14</span>
+<span class="k">if</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="c1"># BEGIN SOLUTION</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="n">radius</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">pi</span>
+    <span class="c1"># END SOLUTION</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;A circle with radius&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="s1">&#39;has area&#39;</span><span class="p">,</span> <span class="n">area</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">circumference</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+    <span class="c1"># BEGIN SOLUTION NO PROMPT</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">r</span>
+    <span class="c1"># END SOLUTION</span>
+    <span class="sd">&quot;&quot;&quot; # BEGIN PROMPT</span>
+<span class="sd">    # Next, define a circumference function.</span>
+<span class="sd">    pass</span>
+<span class="sd">    &quot;&quot;&quot;</span><span class="p">;</span> <span class="c1"># END PROMPT</span>
+</pre></div>
+</div>
+<p>would be presented to students as</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pi</span> <span class="o">=</span> <span class="mf">3.14</span>
+<span class="k">if</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="o">...</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;A circle with radius&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="s1">&#39;has area&#39;</span><span class="p">,</span> <span class="n">area</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">circumference</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+    <span class="c1"># Next, define a circumference function.</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
 <p>The test cells are any code cells following the solution cell that begin with the comment <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">Test</span> <span class="pre">##</span></code> or <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">Hidden</span> <span class="pre">Test</span> <span class="pre">##</span></code> (case insensitive). A <code class="docutils literal notranslate"><span class="pre">Test</span></code> is distributed to students so that they can validate their work. A <code class="docutils literal notranslate"><span class="pre">Hidden</span> <span class="pre">Test</span></code> is not distributed to students, but is used for scoring their work.</p>
 <p><strong>Note:</strong> Currently, the conversion to OK format does not handle multi-line tests if any line but the last one generates output. So, if you want to print
 twice, make two separate test cells instead of a single cell with:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="manually-graded-questions">

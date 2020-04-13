@@ -549,10 +549,29 @@ def strip_solutions(original_nb_path, stripped_nb_path):
     """Write a notebook with solutions stripped."""
     with open(original_nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
-    for cell in nb['cells']:
+    md_solutions = []
+    for i, cell in enumerate(nb['cells']):
         cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
+        if is_markdown_solution_cell(cell):
+            md_solutions.append(i)
+    md_solutions.reverse()
+    for i in md_solutions:
+        del nb['cells'][i]
     with open(stripped_nb_path, 'w') as f:
         nbformat.write(nb, f, NB_VERSION)
+
+    # """Write a notebook with solutions stripped."""
+    # with open(original_nb_path) as f:
+    #     nb = nbformat.read(f, NB_VERSION)
+    # deletion_indices = []
+    # for i in range(len(nb['cells'])):
+    #     if is_solution_cell(nb['cells'][i]):
+    #         deletion_indices.append(i)
+    # deletion_indices.reverse()
+    # for i in deletion_indices:
+    #     del nb['cells'][i]
+    # with open(stripped_nb_path, 'w') as f:
+    #     nbformat.write(nb, f, NB_VERSION)
 
 
 def remove_output(nb):
