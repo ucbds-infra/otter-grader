@@ -30,23 +30,13 @@ try:
     from ..containers import grade_assignments
     from ..utils import connect_db
 
-except ImportError:
-    # don't need requirements to use otter without otter service
-    MISSING_PACKAGES = True
+    OTTER_SERVICE_DIR = "/otter-service"
 
-OTTER_SERVICE_DIR = "/otter-service"
+    args = None
 
-def main(args):
-    if MISSING_PACKAGES:
-        raise ImportError(
-            "Missing some packages required for otter service. "
-            "Please install all requirements at "
-            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
-        )
+    conn = None
 
     user_queue = Queue()
-    #NB_DIR = os.environ.get('NOTEBOOK_DIR')
-    conn = None
 
     # assert args.config is not None, "no config provided"
     # with open(args.config) as f:
@@ -340,6 +330,26 @@ def main(args):
                 user='root',
                 password='root'
             ))
+
+except ImportError:
+    # don't need requirements to use otter without otter service
+    MISSING_PACKAGES = True
+
+def main(cli_args):
+    if MISSING_PACKAGES:
+        raise ImportError(
+            "Missing some packages required for otter service. "
+            "Please install all requirements at "
+            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+        )
+
+    
+    #NB_DIR = os.environ.get('NOTEBOOK_DIR')
+    global conn
+    global args
+    global user_queue
+
+    args = cli_args
 
     # TODO: add arguments below
     conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
