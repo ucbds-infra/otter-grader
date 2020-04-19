@@ -240,7 +240,11 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         elif cwd:
             source =  f"import sys\nsys.path.append(\"{cwd}\")\n"
         if seed is not None:
-            source += "import numpy as np\nimport random\n"
+            # source += "import numpy as np\nimport random\n"
+            import numpy as np
+            import random
+            global_env["np"] = np
+            global_env["random"] = random
 
         # Before rewriting AST, find cells of code that generate errors.
         # One round of execution is done beforehand to mimic the Jupyter notebook style of running
@@ -284,6 +288,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                         cell_source = "np.random.seed({})\nrandom.seed({})\n".format(seed, seed) + isp.transform_cell(''.join(code_lines))
                     else:
                         cell_source = isp.transform_cell(''.join(code_lines))
+                    print(cell_source)
 
                     # patch otter.Notebook.export so that we don't create PDFs in notebooks
                     # TODO: move this patch into CheckCallWrapper

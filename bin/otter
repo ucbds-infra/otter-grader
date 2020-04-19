@@ -40,7 +40,7 @@ assign_parser.add_argument("--generate", default=False, action="store_true", hel
 assign_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked; use with --generate only")
 assign_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold; use with --generate only")
 assign_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points; use with --generate only")
-assign_parser.add_argument("--seed", type=float, default=None, help="A random seed to be executed before each cell")
+assign_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell; use with --generate only")
 assign_parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests); use with --generate only")
 
 assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
@@ -67,6 +67,7 @@ generate_parser.add_argument("-r", "--requirements", nargs='?', default="require
 generate_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
 generate_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
 generate_parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
+generate_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
 generate_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
 generate_parser.set_defaults(func=generate.main)
