@@ -288,7 +288,6 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                         cell_source = "np.random.seed({})\nrandom.seed({})\n".format(seed, seed) + isp.transform_cell(''.join(code_lines))
                     else:
                         cell_source = isp.transform_cell(''.join(code_lines))
-                    print(cell_source)
 
                     # patch otter.Notebook.export so that we don't create PDFs in notebooks
                     # TODO: move this patch into CheckCallWrapper
