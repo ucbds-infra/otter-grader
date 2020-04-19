@@ -99,7 +99,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         initial_env["__name__"] = name
 
     if script:
-        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd)
+        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, seed=seed)
     else:
         global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, test_dir=test_dir, seed=seed)
 
@@ -173,7 +173,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
 
     return score_mapping
 
-def grade(ipynb_path, pdf, tag_filter, html_filter, script):
+def grade(ipynb_path, pdf, tag_filter, html_filter, script, seed=None):
     """
     Grades a single ipython notebook and returns the score
 
@@ -197,7 +197,7 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script):
     test_files = glob('/home/tests/*.py')
 
     # get score
-    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=True)
+    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=True, seed=seed)
 
     # output PDF
     if pdf:
@@ -323,7 +323,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                 raise
         return global_env
 
-def execute_script(script, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None):
+def execute_script(script, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None, seed=None):
     """
     Executes code of a python (.py) script and returns the resulting global environment
 
@@ -351,6 +351,13 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
             source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
         elif cwd:
             source =  f"import sys\nsys.path.append(\"{cwd}\")\n"
+        if seed is not None:
+            # source += "import numpy as np\nimport random\n"
+            import numpy as np
+            import random
+            global_env["np"] = np
+            global_env["random"] = random
+            source += "np.random.seed({})\nrandom.seed({})\n".format(seed, seed)
 
         lines = script.split("\n")
         for i, line in enumerate(lines):
@@ -367,6 +374,7 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
         except:
             if not ignore_errors:
                 raise
+        
         tree = ast.parse(source)
         # # CODE BELOW COMMENTED OUT BECAUSE the only check function is within the Notebook class
         # if find_check_assignment(tree) or find_check_definition(tree):
@@ -398,6 +406,7 @@ def main(args=None):
     parser.add_argument("--tag-filter", action="store_true", default=False)
     parser.add_argument("--html-filter", action="store_true", default=False)
     parser.add_argument("--scripts", action="store_true", default=False)
+    parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
 
     if args is None:
         args = parser.parse_args()
@@ -417,7 +426,7 @@ def main(args=None):
 
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
-        score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts)
+        score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts, seed=args.seed)
         # del score["TEST_HINTS"]
         all_results["score"].append({t : score[t]["score"] if type(score[t]) == dict else score[t] for t in score})
         if args.pdf or args.html_filter or args.tag_filter:
