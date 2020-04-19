@@ -115,7 +115,7 @@ Otter assign maintains support for [intercell seeding](seeding.md) by allowing s
 
 ![](images/assign_intercell_seeding.png)
 
-Note that seed cells are removed in student and autograder outputs, so any results in those notebooks may be different from the provided tests. However, when grading, seeds are executed between each cell, so if you are using seeds, make sure to use **the same seed** every time and that you have a seed cell before **each** code cell, to ensure that seeding before every cell won't affect your tests.
+Note that seed cells are removed in student and autograder outputs, so any results in those notebooks may be different from the provided tests. The intent of removing the seed from the autograder notebook is to keep the value of the seed secure, so that if this notebook is released as assignment solutions, the security of the hidden tests is maintained. However, when grading, seeds are executed between each cell, so if you are using seeds, make sure to use **the same seed** every time and that you have a seed cell before **each** code cell, to ensure that seeding before every cell won't affect your tests.
 
 ### Manually Graded Questions
 
