@@ -57,7 +57,7 @@ def check(test_file_path, global_env=None):
 
 
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    gradescope=False, cwd=None, test_dir=None):
+    gradescope=False, cwd=None, test_dir=None, seed=None):
     """
     Grade a notebook file & return grade
 
@@ -101,7 +101,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     if script:
         global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd)
     else:
-        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, test_dir=test_dir)
+        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, test_dir=test_dir, seed=seed)
 
     test_results = global_env[results_array]
 
@@ -209,7 +209,7 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script):
 
     return result
 
-def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None, test_dir=None):
+def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None, test_dir=None, seed=None):
     """
     Executes an ipython notebook and return the global environment that results from execution.
 
@@ -239,6 +239,8 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
             source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
         elif cwd:
             source =  f"import sys\nsys.path.append(\"{cwd}\")\n"
+        if seed is not None:
+            source += "import numpy as np\nimport random\n"
 
         # Before rewriting AST, find cells of code that generate errors.
         # One round of execution is done beforehand to mimic the Jupyter notebook style of running
@@ -278,7 +280,10 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                                 code_lines.append(line)
                                 if source_is_str_bool:
                                     code_lines.append('\n')
-                    cell_source = isp.transform_cell(''.join(code_lines))
+                    if seed is not None:
+                        cell_source = "np.random.seed({})\nrandom.seed({})\n".format(seed, seed) + isp.transform_cell(''.join(code_lines))
+                    else:
+                        cell_source = isp.transform_cell(''.join(code_lines))
 
                     # patch otter.Notebook.export so that we don't create PDFs in notebooks
                     # TODO: move this patch into CheckCallWrapper
