@@ -98,6 +98,7 @@ The grading interface, encapsulated in the `otter grade` command, runs the local
 | `--html-filter` |  | Generate PDFs filtered by HTML comments for manual grading |
 | `-f`, `--files` |  | Path to any support files needed for execution (e.g. data files) |
 | `-v`, `--verbose` |  | Write verbose output to console |
+| `--seed` |  | A random seed for intercell seeding |
 | `-r`, `--requirements` | `./requirements.txt` | Path to requirements.txt file |
 | `--containers` | 4 | Number of parallel containers to launch; submissions will be divided evenly among them |
 | `--image` | ucbdsinfra/otter-grader | Docker image on which to grade submissions |
@@ -318,3 +319,11 @@ otter grade
 ```
 
 All non-notebook files in the notebooks path are copied into all of the containers, so `data.csv` will be made available to all notebooks.
+
+### Intercell Seeding
+
+Otter Grader also supports [intercell seeding](seeding.md) via the `--seed` flag. In notebooks, NumPy and Python's `random` library are both seeded between *every* pair of code cells, so that the deterministic output can be used in writing hidden tests. In scripts, NumPy and `random` are seeded before the script's execution. As an example, I can pass a seed to Otter with the above directory structure with
+
+```
+otter grade --seed 42
+```

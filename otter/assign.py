@@ -59,7 +59,7 @@ def main(args):
     else:
         gen_views(master, result, args)
     if SEED_REQUIRED:
-        assert args.seed is not None and args.generate, "Seeding cell found but no seed provided"
+        assert not args.generate or args.seed is not None, "Seeding cell found but no seed provided"
     if not args.no_run_tests:
         print("Running tests...")
         block_print()
@@ -172,6 +172,7 @@ def gen_ok_cells(cells, tests_dir):
     Returns:
         (ok_cells, list of manual question names)
     """
+    global SEED_REQUIRED
     ok_cells = []
     question = {}
     processed_response = False

@@ -71,6 +71,10 @@
     </li>
     
     <li class="nav-item ">
+        <a class="nav-link" href="seeding.html">Intercell Seeding</a>
+    </li>
+    
+    <li class="nav-item ">
         <a class="nav-link" href="otter.html">The Otter API</a>
     </li>
     
@@ -120,6 +124,8 @@
       
       
         
+      
+      
       
       
       
@@ -180,6 +186,10 @@
     
         <li class="nav-item toc-entry toc-h3">
             <a href="#support-files" class="nav-link">Support Files</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#intercell-seeding" class="nav-link">Intercell Seeding</a>
         </li>
     
             </ul>
@@ -348,6 +358,11 @@
 <td><code>-v</code>, <code>--verbose</code></td>
 <td></td>
 <td>Write verbose output to console</td>
+</tr>
+<tr>
+<td><code>--seed</code></td>
+<td></td>
+<td>A random seed for intercell seeding</td>
 </tr>
 <tr>
 <td><code>-r</code>, <code>--requirements</code></td>
@@ -554,6 +569,13 @@ sympy
 </pre></div>
 </div>
 <p>All non-notebook files in the notebooks path are copied into all of the containers, so <code class="docutils literal notranslate"><span class="pre">data.csv</span></code> will be made available to all notebooks.</p>
+</div>
+<div class="section" id="intercell-seeding">
+<h3>Intercell Seeding<a class="headerlink" href="#intercell-seeding" title="Permalink to this headline">¶</a></h3>
+<p>Otter Grader also supports <a class="reference internal" href="seeding.html"><span class="doc">intercell seeding</span></a> via the <code class="docutils literal notranslate"><span class="pre">--seed</span></code> flag. In notebooks, NumPy and Python’s <code class="docutils literal notranslate"><span class="pre">random</span></code> library are both seeded between <em>every</em> pair of code cells, so that the deterministic output can be used in writing hidden tests. In scripts, NumPy and <code class="docutils literal notranslate"><span class="pre">random</span></code> are seeded before the script’s execution. As an example, I can pass a seed to Otter with the above directory structure with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">grade</span> <span class="o">--</span><span class="n">seed</span> <span class="mi">42</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>
