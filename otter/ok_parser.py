@@ -98,22 +98,22 @@ class CheckCallWrapper(ast.NodeTransformer):
         return node
 
 
-    def visit_Call(self, node):
-        """Function that handles whether a given function call is a 'check' call
-        and transforms the node accordingly.
+    # def visit_Call(self, node):
+    #     """Function that handles whether a given function call is a 'check' call
+    #     and transforms the node accordingly.
         
-        Args:
-            node (ast.Call): Function call object, calling the check function
+    #     Args:
+    #         node (ast.Call): Function call object, calling the check function
 
-        Returns:
-            ast.Call: Transformed version of input node
+    #     Returns:
+    #         ast.Call: Transformed version of input node
 
-        """
-        if isinstance(node.func, ast.Attribute):
-            if isinstance(node.func.value, ast.Name) and node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
-                if node.func.attr == "check":
-                    return self.check_node_constructor(node)
-        return node
+    #     """
+    #     if isinstance(node.func, ast.Attribute):
+    #         if isinstance(node.func.value, ast.Name) and node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
+    #             if node.func.attr == "check":
+    #                 return self.check_node_constructor(node)
+    #     return node
     
 
     def visit_Expr(self, node):
@@ -125,6 +125,8 @@ class CheckCallWrapper(ast.NodeTransformer):
                 if isinstance(call_node.func.value, ast.Name) and call_node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
                     if call_node.func.attr == "check_all":
                         return None
+                    elif call_node.func.attr == "check":
+                        node.value = self.check_node_constructor(call_node)
         return node
 
 
