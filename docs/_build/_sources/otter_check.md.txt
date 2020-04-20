@@ -61,10 +61,11 @@ We don't need to specify a `filter_type` argument here because it would be ignor
 
 ## Command Line Script Checker
 
-Otter also features a command line tool that allows students to run checks on Python files from the command line. `otter check` takes one required argument, the path to the file that is being checked, and two optional flags:
+Otter also features a command line tool that allows students to run checks on Python files from the command line. `otter check` takes one required argument, the path to the file that is being checked, and three optional flags:
 
 * `-t` is the path to the directory of tests. If left unspecified, it is assumed to be `./tests`
 * `-q` is the identifier of a specific question to check (the file name without the `.py` extension). If left unspecified, all tests in the tests directory are run.
+* `--seed` is an optional random seed for [execution seeding](seeding.md)
 
 The recommended file structure for using the checker is something like the one below:
 

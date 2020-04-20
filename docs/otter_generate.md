@@ -56,6 +56,7 @@ The general usage of `otter generate` is to create a zipfile at some output path
 | `-r`, `--requirements` | `./requirements.txt` | Path to requirements.txt file |
 | `--threshold` |  | Percentage of pass/fail threshold (as decimal) |
 | `--points` |  | Number of points to scale assignment to |
+| `--seed` |  | A random seed for intercell seeding |
 | `--show-results` |  | Show autograder resutls (score breakdown) to students after grades published |
 
 If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts).
@@ -108,6 +109,14 @@ As an example, the command below scales the number of points to 3:
 
 ```
 otter generate -t hidden-tests data.csv --points 3
+```
+
+#### Intercell Seeding
+
+The Gradescope autograder supports intercell seeding with the use of the `--seed` flag. Passing it an integer will cause the autograder to seed NumPy and Python's `random` library between *every* pair of code cells. This is useful for writing deterministic hidden tests. More information about Otter seeding [here](seeding.md). As an example, I can set an intercell seed of 42 with
+
+```
+otter generate -t hidden-tests data.csv --seed 42
 ```
 
 #### Showing Autograder Results

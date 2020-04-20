@@ -34,16 +34,19 @@ NB_VERSION = 4
 TEST_REGEX = r"##\s*(hidden\s*)?test\s*##"
 SOLUTION_REGEX = r"##\s*solution\s*##"
 MD_SOLUTION_REGEX = r"(<strong>|\*{2})solution:?(<\/strong>|\*{2})"
+SEED_REGEX = r"##\s*seed\s*##"
 
 MD_ANSWER_CELL_TEMPLATE = "_Type your answer here, replacing this text._"
 
+SEED_REQUIRED = False
 
-def run_tests(nb_path, debug=False):
+
+def run_tests(nb_path, debug=False, seed=None):
     """Run tests in the autograder version of the notebook."""
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
     results = grade_notebook(nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
-    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug)
+    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed)
     assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
     os.chdir(curr_dir)
 
@@ -55,10 +58,12 @@ def main(args):
         jassign_views(master, result, args)
     else:
         gen_views(master, result, args)
+    if SEED_REQUIRED:
+        assert not args.generate or args.seed is not None, "Seeding cell found but no seed provided"
     if not args.no_run_tests:
         print("Running tests...")
         block_print()
-        run_tests(result / 'autograder'  / master.name, debug=args.debug)
+        run_tests(result / 'autograder'  / master.name, debug=args.debug, seed=args.seed)
         enable_print()
         print("All tests passed!")
     if args.generate:
@@ -71,6 +76,8 @@ def main(args):
             generate_cmd += ["--threshold", args.threshold]
         if args.show_results:
             generate_cmd += ["--show-results"]
+        if args.seed is not None:
+            generate_cmd += ["--seed", str(args.seed)]
         if args.files:
             generate_cmd += args.files
         subprocess.run(generate_cmd)
@@ -165,6 +172,7 @@ def gen_ok_cells(cells, tests_dir):
     Returns:
         (ok_cells, list of manual question names)
     """
+    global SEED_REQUIRED
     ok_cells = []
     question = {}
     processed_response = False
@@ -194,6 +202,10 @@ def gen_ok_cells(cells, tests_dir):
             elif is_test_cell(cell):
                 no_solution = True
                 gen_test_cell(question, tests, tests_dir)
+
+            elif is_seed_cell(cell):
+                SEED_REQUIRED = True
+                continue
 
             if not no_solution:
                 ok_cells.append(cell)
@@ -287,6 +299,14 @@ def is_question_cell(cell):
     if cell['cell_type'] != 'markdown':
         return False
     return find_question_spec(get_source(cell)) is not None
+
+
+def is_seed_cell(cell):
+    """Whether cell contains BEGIN QUESTION in a block quote."""
+    if cell['cell_type'] != 'code':
+        return False
+    source = get_source(cell)
+    return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
 
 
 def is_markdown_solution_cell(cell):

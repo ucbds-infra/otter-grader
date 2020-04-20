@@ -40,7 +40,8 @@ def main(args):
 	results = grade_notebook(
 		args.file,
 		tests_glob=qs,
-		script=args.file[-3:] == ".py"
+		script=args.file[-3:] == ".py",
+		seed=args.seed
 	)
 	enable_print()
 
