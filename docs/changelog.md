@@ -5,6 +5,7 @@
 * Changed structure of CLI into four main commands: `otter assign`, `otter check`, `otter generate`, and `otter grade`
 * Added `otter assign` command, a forked version of [jassign](https://github.com/okpy/jassign) that works with Otter
 * Changed filenames inside the package so that names match commands (e.g. `otter/cli.py` is now `otter/grade.py`)
+* Added intercell seeding
 * Moved all argparse calls into `bin/otter`
 * Made several fixes to `otter check`
 * Added indentation to results.json dump in Gradescope container
