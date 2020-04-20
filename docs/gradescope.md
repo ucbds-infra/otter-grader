@@ -6,7 +6,7 @@ Otter-Grader also allows instructors to use Gradescope's autograding system to c
 
 The tests that are used by the Gradescope autograder are the same as those used in other uses of Otter, but there is one important field that is relevant to Gradescope that is not pertinent to any other uses.
 
-As noted in the second bullet [here](test_files.html#ok-format-caveats), the `test` variable has a `"hidden"` key which maps to a boolean value that indicates the visibility of the test on Gradescope. For any test, if `test["hidden"]` evaluates to `True`, then the test result will be shown to students when they submit to Gradescope. If they pass, the test name will show in a green box; if they fail, then the usual failed test output will show.
+As noted in the second bullet [here](test_files.html#ok-format-caveats), the `test` variable has a `"hidden"` key which maps to a boolean value that indicates the visibility of the test on Gradescope. For any test, if `test["hidden"]` evaluates to `False`, then the test result will be shown to students when they submit to Gradescope. If they pass, the test name will show in a green box; if they fail, then the usual failed test output will show.
 
 For more information on how tests are displayed to students, see [below](#gradescope-results).
 
