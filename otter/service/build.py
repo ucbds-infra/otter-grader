@@ -11,7 +11,6 @@ import docker
 from subprocess import PIPE
 from io import BytesIO
 from jinja2 import Template
-from psycopg2 import connect, extensions, sql
 
 from ..utils import connect_db
 
@@ -105,7 +104,7 @@ def main(args):
     
     # Use one global connection for all db-related commands
     # TODO: fill in the arguments
-    conn = connect_db("", "", "") 
+    conn = conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
     class_id = write_class_info(config["course"], conn)
     
     # check for no assignment id conflicts in db

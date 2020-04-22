@@ -70,6 +70,10 @@
         <a class="nav-link" href="pdfs.html">PDF Generation and Filtering</a>
     </li>
     
+    <li class="nav-item ">
+        <a class="nav-link" href="seeding.html">Intercell Seeding</a>
+    </li>
+    
     <li class="nav-item active">
         <a class="nav-link" href="otter.html">The Otter API</a>
     </li>
@@ -109,6 +113,8 @@
   
 
   <ul class="nav bd-sidenav">
+      
+      
       
       
       
@@ -208,11 +214,6 @@
 <div class="section" id="module-otter.service.create">
 <span id="otter-service-create-module"></span><h2>otter.service.create module<a class="headerlink" href="#module-otter.service.create" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="otter.service.create.create_users">
-<code class="sig-prename descclassname">otter.service.create.</code><code class="sig-name descname">create_users</code><span class="sig-paren">(</span><em class="sig-param">filepath</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.create.create_users" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="otter.service.create.main">
 <code class="sig-prename descclassname">otter.service.create.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.create.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -220,9 +221,104 @@
 </div>
 <div class="section" id="module-otter.service.start">
 <span id="otter-service-start-module"></span><h2>otter.service.start module<a class="headerlink" href="#module-otter.service.start" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="otter.service.start.Application">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">Application</code><span class="sig-paren">(</span><em class="sig-param">google_auth=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.Application" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.Application</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.service.start.BaseHandler">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">BaseHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.BaseHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code></p>
+<dl class="method">
+<dt id="otter.service.start.BaseHandler.get_current_user">
+<code class="sig-name descname">get_current_user</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.BaseHandler.get_current_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to determine the current user from, e.g., a cookie.</p>
+<p>This method may not be a coroutine.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.service.start.GoogleOAuth2LoginHandler">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">GoogleOAuth2LoginHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.GoogleOAuth2LoginHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.auth.GoogleOAuth2Mixin</span></code></p>
+<dl class="method">
+<dt id="otter.service.start.GoogleOAuth2LoginHandler.db">
+<em class="property">property </em><code class="sig-name descname">db</code><a class="headerlink" href="#otter.service.start.GoogleOAuth2LoginHandler.db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.GoogleOAuth2LoginHandler.get">
+<em class="property">async </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.GoogleOAuth2LoginHandler.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.service.start.LoginHandler">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">LoginHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.LoginHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#otter.service.start.BaseHandler" title="otter.service.start.BaseHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">otter.service.start.BaseHandler</span></code></a></p>
+<dl class="method">
+<dt id="otter.service.start.LoginHandler.db">
+<em class="property">property </em><code class="sig-name descname">db</code><a class="headerlink" href="#otter.service.start.LoginHandler.db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.LoginHandler.get">
+<em class="property">async </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.LoginHandler.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.service.start.SubmissionHandler">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">SubmissionHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code></p>
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.db">
+<em class="property">property </em><code class="sig-name descname">db</code><a class="headerlink" href="#otter.service.start.SubmissionHandler.db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.post">
+<em class="property">async </em><code class="sig-name descname">post</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.post" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.submit">
+<em class="property">async </em><code class="sig-name descname">submit</code><span class="sig-paren">(</span><em class="sig-param">notebook</em>, <em class="sig-param">api_key</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.submit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.validate">
+<em class="property">async </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param">notebook</em>, <em class="sig-param">api_key</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.write_error">
+<code class="sig-name descname">write_error</code><span class="sig-paren">(</span><em class="sig-param">status_code</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.write_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to implement custom error pages.</p>
+<p><code class="docutils literal notranslate"><span class="pre">write_error</span></code> may call <cite>write</cite>, <cite>render</cite>, <cite>set_header</cite>, etc
+to produce output as usual.</p>
+<p>If this error was caused by an uncaught exception (including
+HTTPError), an <code class="docutils literal notranslate"><span class="pre">exc_info</span></code> triple will be available as
+<code class="docutils literal notranslate"><span class="pre">kwargs[&quot;exc_info&quot;]</span></code>.  Note that this exception may not be
+the “current” exception for purposes of methods like
+<code class="docutils literal notranslate"><span class="pre">sys.exc_info()</span></code> or <code class="docutils literal notranslate"><span class="pre">traceback.format_exc</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.service.start.grade">
+<em class="property">async </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">grade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.grade" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="function">
 <dt id="otter.service.start.main">
-<code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.main" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cli_args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

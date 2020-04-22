@@ -71,6 +71,10 @@
     </li>
     
     <li class="nav-item ">
+        <a class="nav-link" href="seeding.html">Intercell Seeding</a>
+    </li>
+    
+    <li class="nav-item ">
         <a class="nav-link" href="otter.html">The Otter API</a>
     </li>
     
@@ -130,6 +134,8 @@
       
       
       
+      
+      
     </ul>
 
 </nav>
@@ -169,6 +175,10 @@
     
         <li class="nav-item toc-entry toc-h4">
             <a href="#overriding-points-possible" class="nav-link">Overriding Points Possible</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h4">
+            <a href="#intercell-seeding" class="nav-link">Intercell Seeding</a>
         </li>
     
         <li class="nav-item toc-entry toc-h4">
@@ -287,6 +297,11 @@
 <td>Number of points to scale assignment to</td>
 </tr>
 <tr>
+<td><code>--seed</code></td>
+<td></td>
+<td>A random seed for intercell seeding</td>
+</tr>
+<tr>
 <td><code>--show-results</code></td>
 <td></td>
 <td>Show autograder resutls (score breakdown) to students after grades published</td>
@@ -325,6 +340,13 @@
 <p>For example, if a student passes a 2- and 1- point test but fails a 4-point test, they will receive (2 + 1) / (2 + 1 + 4) * 2 = 0.8571 points out of a possible 2 when <code class="docutils literal notranslate"><span class="pre">--points</span></code> is set to 2.</p>
 <p>As an example, the command below scales the number of points to 3:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">points</span> <span class="mi">3</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="intercell-seeding">
+<h4>Intercell Seeding<a class="headerlink" href="#intercell-seeding" title="Permalink to this headline">¶</a></h4>
+<p>The Gradescope autograder supports intercell seeding with the use of the <code class="docutils literal notranslate"><span class="pre">--seed</span></code> flag. Passing it an integer will cause the autograder to seed NumPy and Python’s <code class="docutils literal notranslate"><span class="pre">random</span></code> library between <em>every</em> pair of code cells. This is useful for writing deterministic hidden tests. More information about Otter seeding <a class="reference internal" href="seeding.html"><span class="doc">here</span></a>. As an example, I can set an intercell seed of 42 with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="o">--</span><span class="n">seed</span> <span class="mi">42</span>
 </pre></div>
 </div>
 </div>

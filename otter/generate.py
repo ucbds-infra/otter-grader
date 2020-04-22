@@ -53,6 +53,7 @@ from otter.execute import grade_notebook
 SCORE_THRESHOLD = {{ threshold }}
 POINTS_POSSIBLE = {{ points }}
 SHOW_ALL_ON_RELEASE = {{ show_all }}
+SEED = {{ seed }}
 
 UTILS_IMPORT_REGEX = r"\\"from utils import [\\w\\*, ]+"
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\\(.+\\)"
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     for file in tests_glob:
         shutil.copy(file, "/autograder/submission/tests")
 
-    scores = grade_notebook(nb_path, glob("/autograder/submission/tests/*.py"), name="submission", gradescope=True, ignore_errors=True)
+    scores = grade_notebook(nb_path, glob("/autograder/submission/tests/*.py"), name="submission", gradescope=True, ignore_errors=True, seed=SEED)
     # del scores["TEST_HINTS"]
 
     output = {"tests" : []}
@@ -171,7 +172,8 @@ def main(args):
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
         points = str(args.points),
-        show_all = str(args.show_results)
+        show_all = str(args.show_results),
+        seed = str(args.seed)
     )
 
     # create tmp directory to zip inside

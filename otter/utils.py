@@ -65,7 +65,7 @@ def merge_csv(dataframes):
 	return final_dataframe
 
 
-def connect_db(host, username, password):
+def connect_db(host, port, username, password, db='otter_db'):
     if MISSING_PACKAGES:
         raise ImportError(
             "Missing some packages required for otter service. "
@@ -73,10 +73,13 @@ def connect_db(host, username, password):
             "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
         )
         
-    conn = connect(dbname='otter_db',
-               user=username,
-               host=host,
-               password=password)
+    conn = connect(
+            dbname=db,
+            host=host,
+            port=port,
+            user=username,
+            password=password
+        )
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     return conn
 

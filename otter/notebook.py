@@ -56,7 +56,7 @@ class Notebook:
 			if _API_KEY is None:
 				self._auth()
 
-	
+	# TODO: cut out personal auth?
 	def _auth(self):
 		assert self._service_enabled, 'notebook not configured for otter service'
 		assert self._config["auth"] in ["google", "default"], "invalid auth provider"

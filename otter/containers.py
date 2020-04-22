@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 def launch_parallel_containers(
     tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, tag_filter=False, 
     html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
-    scripts=False, no_kill=False, output_path="./", debug=False):
+    scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     """Grades notebooks in parallel docker containers
 
     This function runs NUM_CONTAINERS docker containers in parallel to grade the student submissions
@@ -108,7 +108,7 @@ def launch_parallel_containers(
 
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
 unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, 
-scripts=False, no_kill=False, output_path="./", debug=False):
+scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     """
     Grades multiple assignments in a directory using a single docker container. 
 
@@ -181,6 +181,10 @@ scripts=False, no_kill=False, output_path="./", debug=False):
         grade_command += ["--tag-filter"]
     if html_filter:
         grade_command += ["--html-filter"]
+    
+    # seed
+    if seed is not None:
+        grade_command += ["--seed", str(seed)]
 
     # if we are grading scripts, add the --script flag
     if scripts:

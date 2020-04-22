@@ -40,13 +40,13 @@ class TestAssign(unittest.TestCase):
         self.assertEqual(os.listdir(TEST_FILES_PATH + "output"), ["autograder", "student"])
 
         # check contents of autograder directory
-        self.assertEqual(len(os.listdir(TEST_FILES_PATH + "output/autograder")), 3)
-        for f in ["tests", "data.csv", "example.ipynb"]:
+        self.assertEqual(len(os.listdir(TEST_FILES_PATH + "output/autograder")), 4)
+        for f in ["tests", "data.csv", "example.ipynb", "requirements.txt"]:
             self.assertIn(f, os.listdir(TEST_FILES_PATH + "output/autograder"))
-        for f in ["q1.py", "q3.py"]:
+        for f in ["q1.py", "q3.py", "q8.py"]:
             self.assertIn(f, os.listdir(TEST_FILES_PATH + "output/autograder/tests"))
 
-        for file in ["example.ipynb", "data.csv", "tests/q1.py", "tests/q3.py"]:
+        for file in ["example.ipynb", "data.csv", "requirements.txt", "tests/q1.py", "tests/q3.py", "tests/q8.py"]:
             with open(os.path.join(TEST_FILES_PATH + "output-correct/autograder", file)) as f:
                 correct_contents = f.read()
             with open(os.path.join(TEST_FILES_PATH + "output/autograder", file)) as f:
@@ -57,10 +57,10 @@ class TestAssign(unittest.TestCase):
         self.assertEqual(len(os.listdir(TEST_FILES_PATH + "output/student")), 3)
         for f in ["tests", "data.csv", "example.ipynb"]:
             self.assertIn(f, os.listdir(TEST_FILES_PATH + "output/student"))
-        for f in ["q1.py", "q3.py"]:
+        for f in ["q1.py", "q3.py", "q8.py"]:
             self.assertIn(f, os.listdir(TEST_FILES_PATH + "output/student/tests"))
 
-        for file in ["example.ipynb", "data.csv", "tests/q1.py", "tests/q3.py"]:
+        for file in ["example.ipynb", "data.csv", "tests/q1.py", "tests/q3.py", "tests/q8.py"]:
             with open(os.path.join(TEST_FILES_PATH + "output-correct/student", file)) as f:
                 correct_contents = f.read()
             with open(os.path.join(TEST_FILES_PATH + "output/student", file)) as f:

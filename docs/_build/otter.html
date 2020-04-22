@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="otter.service package" href="otter.service.html" />
-    <link rel="prev" title="PDF Generation and Filtering" href="pdfs.html" />
+    <link rel="prev" title="Intercell Seeding" href="seeding.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="docsearch:language" content="en">
@@ -70,6 +70,10 @@
         <a class="nav-link" href="pdfs.html">PDF Generation and Filtering</a>
     </li>
     
+    <li class="nav-item ">
+        <a class="nav-link" href="seeding.html">Intercell Seeding</a>
+    </li>
+    
     <li class="nav-item active">
         <a class="nav-link" href="">The Otter API</a>
     </li>
@@ -109,6 +113,8 @@
   
 
   <ul class="nav bd-sidenav">
+      
+      
       
       
       
@@ -367,6 +373,12 @@ result_dir – Path to the result directory</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="otter.assign.is_seed_cell">
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">is_seed_cell</code><span class="sig-paren">(</span><em class="sig-param">cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.is_seed_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether cell contains BEGIN QUESTION in a block quote.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="otter.assign.is_solution_cell">
 <code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">is_solution_cell</code><span class="sig-paren">(</span><em class="sig-param">cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.is_solution_cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whther the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX</p>
@@ -413,10 +425,26 @@ result_dir – Path to the result directory</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="otter.assign.replace_solutions">
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">replace_solutions</code><span class="sig-paren">(</span><em class="sig-param">lines</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.replace_solutions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace solutions in lines, a list of strings.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="otter.assign.run_tests">
-<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">run_tests</code><span class="sig-paren">(</span><em class="sig-param">nb_path</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.run_tests" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">run_tests</code><span class="sig-paren">(</span><em class="sig-param">nb_path</em>, <em class="sig-param">debug=False</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.run_tests" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run tests in the autograder version of the notebook.</p>
 </dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.solution_assignment_sub">
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">solution_assignment_sub</code><span class="sig-paren">(</span><em class="sig-param">match</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.solution_assignment_sub" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.solution_line_sub">
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">solution_line_sub</code><span class="sig-paren">(</span><em class="sig-param">match</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.solution_line_sub" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="otter.assign.strip_solutions">
@@ -443,7 +471,7 @@ result_dir – Path to the result directory</p>
 <span id="otter-containers-module"></span><h2>otter.containers module<a class="headerlink" href="#module-otter.containers" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="otter.containers.grade_assignments">
-<code class="sig-prename descclassname">otter.containers.</code><code class="sig-name descname">grade_assignments</code><span class="sig-paren">(</span><em class="sig-param">tests_dir</em>, <em class="sig-param">notebooks_dir</em>, <em class="sig-param">id</em>, <em class="sig-param">image='ucbdsinfra/otter-grader'</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">unfiltered_pdfs=False</em>, <em class="sig-param">tag_filter=False</em>, <em class="sig-param">html_filter=False</em>, <em class="sig-param">reqs=None</em>, <em class="sig-param">scripts=False</em>, <em class="sig-param">no_kill=False</em>, <em class="sig-param">output_path='./'</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.grade_assignments" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.containers.</code><code class="sig-name descname">grade_assignments</code><span class="sig-paren">(</span><em class="sig-param">tests_dir</em>, <em class="sig-param">notebooks_dir</em>, <em class="sig-param">id</em>, <em class="sig-param">image='ucbdsinfra/otter-grader'</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">unfiltered_pdfs=False</em>, <em class="sig-param">tag_filter=False</em>, <em class="sig-param">html_filter=False</em>, <em class="sig-param">reqs=None</em>, <em class="sig-param">scripts=False</em>, <em class="sig-param">no_kill=False</em>, <em class="sig-param">output_path='./'</em>, <em class="sig-param">debug=False</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.grade_assignments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grades multiple assignments in a directory using a single docker container.</p>
 <p>If no PDF assignment is wanted, set all three PDF params (unfiltered_pdfs, tag_filter,
 html_filter) to false. Also, list any non-standard package requirements in a requirements.txt
@@ -475,7 +503,7 @@ file. This function can grade files with .py or .ipynb extensions (use scripts=T
 
 <dl class="function">
 <dt id="otter.containers.launch_parallel_containers">
-<code class="sig-prename descclassname">otter.containers.</code><code class="sig-name descname">launch_parallel_containers</code><span class="sig-paren">(</span><em class="sig-param">tests_dir</em>, <em class="sig-param">notebooks_dir</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">unfiltered_pdfs=False</em>, <em class="sig-param">tag_filter=False</em>, <em class="sig-param">html_filter=False</em>, <em class="sig-param">reqs=None</em>, <em class="sig-param">num_containers=None</em>, <em class="sig-param">image='ucbdsinfra/otter-grader'</em>, <em class="sig-param">scripts=False</em>, <em class="sig-param">no_kill=False</em>, <em class="sig-param">output_path='./'</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.launch_parallel_containers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.containers.</code><code class="sig-name descname">launch_parallel_containers</code><span class="sig-paren">(</span><em class="sig-param">tests_dir</em>, <em class="sig-param">notebooks_dir</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">unfiltered_pdfs=False</em>, <em class="sig-param">tag_filter=False</em>, <em class="sig-param">html_filter=False</em>, <em class="sig-param">reqs=None</em>, <em class="sig-param">num_containers=None</em>, <em class="sig-param">image='ucbdsinfra/otter-grader'</em>, <em class="sig-param">scripts=False</em>, <em class="sig-param">no_kill=False</em>, <em class="sig-param">output_path='./'</em>, <em class="sig-param">debug=False</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.containers.launch_parallel_containers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grades notebooks in parallel docker containers</p>
 <p>This function runs NUM_CONTAINERS docker containers in parallel to grade the student submissions
 in NOTEBOOKS_DIR using the tests in TESTS_DIR. It can additionally generate PDFs for the parts
@@ -535,7 +563,7 @@ of a python script or notebook.</p></li>
 
 <dl class="function">
 <dt id="otter.execute.execute_notebook">
-<code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">execute_notebook</code><span class="sig-paren">(</span><em class="sig-param">nb</em>, <em class="sig-param">secret='secret'</em>, <em class="sig-param">initial_env=None</em>, <em class="sig-param">ignore_errors=False</em>, <em class="sig-param">gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_notebook" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">execute_notebook</code><span class="sig-paren">(</span><em class="sig-param">nb</em>, <em class="sig-param">secret='secret'</em>, <em class="sig-param">initial_env=None</em>, <em class="sig-param">ignore_errors=False</em>, <em class="sig-param">gradescope=False</em>, <em class="sig-param">cwd=None</em>, <em class="sig-param">test_dir=None</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_notebook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes an ipython notebook and return the global environment that results from execution.</p>
 <p>Execute notebook &amp; return the global environment that results from execution.
 TODO: write a note about the injection of check_results
@@ -560,7 +588,7 @@ nb is passed in as a dictionary that’s a parsed ipynb file</p>
 
 <dl class="function">
 <dt id="otter.execute.execute_script">
-<code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">execute_script</code><span class="sig-paren">(</span><em class="sig-param">script</em>, <em class="sig-param">secret='secret'</em>, <em class="sig-param">initial_env=None</em>, <em class="sig-param">ignore_errors=False</em>, <em class="sig-param">gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_script" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">execute_script</code><span class="sig-paren">(</span><em class="sig-param">script</em>, <em class="sig-param">secret='secret'</em>, <em class="sig-param">initial_env=None</em>, <em class="sig-param">ignore_errors=False</em>, <em class="sig-param">gradescope=False</em>, <em class="sig-param">cwd=None</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.execute_script" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes code of a python (.py) script and returns the resulting global environment</p>
 <p>Execute script &amp; return the global environment that results from execution.
 If ignore_errors is True, exceptions are swallowed.
@@ -584,7 +612,7 @@ script is passed in as a string</p>
 
 <dl class="function">
 <dt id="otter.execute.grade">
-<code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">grade</code><span class="sig-paren">(</span><em class="sig-param">ipynb_path</em>, <em class="sig-param">pdf</em>, <em class="sig-param">tag_filter</em>, <em class="sig-param">html_filter</em>, <em class="sig-param">script</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.grade" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">grade</code><span class="sig-paren">(</span><em class="sig-param">ipynb_path</em>, <em class="sig-param">pdf</em>, <em class="sig-param">tag_filter</em>, <em class="sig-param">html_filter</em>, <em class="sig-param">script</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.grade" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grades a single ipython notebook and returns the score</p>
 <p>If no PDF is needed, set the pdf, tag_filter, and html_filter parameters to false. For .py
 files, set script to true.</p>
@@ -609,7 +637,7 @@ files, set script to true.</p>
 
 <dl class="function">
 <dt id="otter.execute.grade_notebook">
-<code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">grade_notebook</code><span class="sig-paren">(</span><em class="sig-param">notebook_path</em>, <em class="sig-param">tests_glob=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">ignore_errors=True</em>, <em class="sig-param">script=False</em>, <em class="sig-param">gradescope=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.grade_notebook" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">grade_notebook</code><span class="sig-paren">(</span><em class="sig-param">notebook_path</em>, <em class="sig-param">tests_glob=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">ignore_errors=True</em>, <em class="sig-param">script=False</em>, <em class="sig-param">gradescope=False</em>, <em class="sig-param">cwd=None</em>, <em class="sig-param">test_dir=None</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.grade_notebook" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grade a notebook file &amp; return grade</p>
 <p>This function grades a single ipython notebook using the provided tests. If grading a .py file,
 set script to true.</p>
@@ -1311,8 +1339,8 @@ check_results_&lt;secret&gt;(check(…))</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="otter.ok_parser.CheckCallWrapper.node_constructor">
-<code class="sig-name descname">node_constructor</code><span class="sig-paren">(</span><em class="sig-param">expression</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.node_constructor" title="Permalink to this definition">¶</a></dt>
+<dt id="otter.ok_parser.CheckCallWrapper.check_node_constructor">
+<code class="sig-name descname">check_node_constructor</code><span class="sig-paren">(</span><em class="sig-param">expression</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.check_node_constructor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates node that wraps expression in a list (check_results_XX) append call</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1349,6 +1377,11 @@ and transforms the node accordingly.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="otter.ok_parser.CheckCallWrapper.visit_Expr">
+<code class="sig-name descname">visit_Expr</code><span class="sig-paren">(</span><em class="sig-param">node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.visit_Expr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="otter.ok_parser.CheckCallWrapper.visit_Import">
@@ -1472,22 +1505,22 @@ doctest, so we roll with it.</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_fail_template">
-<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11c85ca20&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11ca9bb70&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_pass_template">
-<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11c8627f0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11d46fda0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_fail_template">
-<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11d122908&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11d45d710&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_pass_template">
-<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11d122940&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11ca8edd8&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1655,12 +1688,12 @@ OKTest objects</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.html_result_template">
-<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11d1304a8&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11d47c828&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.plain_result_template">
-<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11d130208&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11ca9bb38&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1700,7 +1733,7 @@ of a python script/notebook</p></li>
 
 <dl class="function">
 <dt id="otter.utils.connect_db">
-<code class="sig-prename descclassname">otter.utils.</code><code class="sig-name descname">connect_db</code><span class="sig-paren">(</span><em class="sig-param">host</em>, <em class="sig-param">username</em>, <em class="sig-param">password</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.connect_db" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">otter.utils.</code><code class="sig-name descname">connect_db</code><span class="sig-paren">(</span><em class="sig-param">host</em>, <em class="sig-param">port</em>, <em class="sig-param">username</em>, <em class="sig-param">password</em>, <em class="sig-param">db='otter_db'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.connect_db" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -1796,7 +1829,7 @@ IPython handles matplotlib outputs specially, so those are supressed too.</p>
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="pdfs.html" title="previous page">PDF Generation and Filtering</a>
+    <a class='left-prev' id="prev-link" href="seeding.html" title="previous page">Intercell Seeding</a>
     <a class='right-next' id="next-link" href="otter.service.html" title="next page">otter.service package</a>
 
               </div>

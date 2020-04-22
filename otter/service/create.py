@@ -17,23 +17,23 @@ except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
 
-def create_users(filepath):
-    with open(filepath, newline='') as csvfile:
-        filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        # TODO: fill in the arguments below
-        conn = connect_db("", "", "")
-        cursor = conn.cursor()
-        for row in filereader:
-            username, password = row[:2]
-            if username.lower() == "username":
-                # skip heading
-                continue
-            insert_command = """
-                INSERT INTO users (username, password) VALUES (\'{}\', \'{}\')
-                ON CONFLICT (username)
-                DO UPDATE SET password = \'{}\'
-                """.format(username, password, password)
-            cursor.execute(insert_command)
+# def create_users(args, filepath):
+#     with open(filepath, newline='') as csvfile:
+#         filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
+#         # TODO: fill in the arguments below
+#         conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
+#         cursor = conn.cursor()
+#         for row in filereader:
+#             username, password = row[:2]
+#             if username.lower() == "username":
+#                 # skip heading
+#                 continue
+#             insert_command = """
+#                 INSERT INTO users (username, password) VALUES (\'{}\', \'{}\')
+#                 ON CONFLICT (username)
+#                 DO UPDATE SET password = \'{}\'
+#                 """.format(username, password, password)
+#             cursor.execute(insert_command)
 
 def main(args):
     if MISSING_PACKAGES:
@@ -49,11 +49,7 @@ def main(args):
     config = {}
     
     try:
-        conn = connect(dbname='postgres',
-                    host='localhost',
-                    port=5432,
-                    user='root',
-                    password='root')
+        conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass, db='postgres')
 
         conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = conn.cursor()
@@ -63,11 +59,7 @@ def main(args):
     except psycopg2.errors.DuplicateDatabase:
         pass
 
-    conn = connect(dbname='otter_db',
-                   host='localhost',
-                   port=5432,
-                   user='root',
-                   password='root')
+    conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
 
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()

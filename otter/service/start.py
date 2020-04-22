@@ -30,22 +30,13 @@ try:
     from ..containers import grade_assignments
     from ..utils import connect_db
 
-except ImportError:
-    # don't need requirements to use otter without otter service
-    MISSING_PACKAGES = True
+    OTTER_SERVICE_DIR = "/otter-service"
 
+    args = None
 
-def main(args):
-    if MISSING_PACKAGES:
-        raise ImportError(
-            "Missing some packages required for otter service. "
-            "Please install all requirements at "
-            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
-        )
+    conn = None
 
     user_queue = Queue()
-    #NB_DIR = os.environ.get('NOTEBOOK_DIR')
-    conn = None
 
     # assert args.config is not None, "no config provided"
     # with open(args.config) as f:
@@ -92,9 +83,6 @@ def main(args):
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
-            self.settings["google_oauth"] = {
-                "key": args.google_key, "secret": args.google_secret
-            }
             if not self.get_argument('code', False):
                 print("not found")
                 return self.authorize_redirect(
@@ -238,14 +226,6 @@ def main(args):
             else:
                 self.write('Submission failed.')
 
-    # def connect_db(host="localhost", username="otterservice", password="mypass"):
-    #     global conn
-    #     conn = connect(dbname='otter_db',
-    #             user=username,
-    #             host=host,
-    #             password=password)
-    #     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-    #     return conn
 
     async def grade():
         cursor = conn.cursor()
@@ -316,19 +296,16 @@ def main(args):
             # TODO: Add config file
             # with open("conf.yml") as f:
             #     config = yaml.safe_load(f)
-            config = {
-                "google_auth_key" : "hello",
-                "google_auth_secret" : "world",
-                "notebook_dir" : "./submissions",
-                "auth_redirect_uri" : "http://localhost:5000/auth/callback",
-            }
+            endpoint = args.endpoint or os.environ.get("OTTER_ENDPOINT", None)
+            assert endpoint is not None, "no endpoint address provided"
+            assert os.path.isdir(OTTER_SERVICE_DIR), "{} does not exist".format(OTTER_SERVICE_DIR)
             settings = dict(
                 google_oauth={
-                    'key': config['google_auth_key'],
-                    'secret': config['google_auth_secret'],
+                    "key": args.google_key or os.environ.get("GOOGLE_CLIENT_KEY", None), 
+                    "secret": args.google_secret or os.environ.get("GOOGLE_CLIENT_SECRET", None)
                 },
-                notebook_dir = config['notebook_dir'],
-                auth_redirect_uri = config['auth_redirect_uri']
+                notebook_dir = os.path.join(OTTER_SERVICE_DIR, "submissions"),
+                auth_redirect_uri = os.path.join(endpoint, "auth/callback")
             )
             handlers = [
                 (r"/submit", SubmissionHandler),
@@ -354,10 +331,35 @@ def main(args):
                 password='root'
             ))
 
+except ImportError:
+    # don't need requirements to use otter without otter service
+    MISSING_PACKAGES = True
+
+def main(cli_args):
+    if MISSING_PACKAGES:
+        raise ImportError(
+            "Missing some packages required for otter service. "
+            "Please install all requirements at "
+            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+        )
+
+    
+    #NB_DIR = os.environ.get('NOTEBOOK_DIR')
+    global conn
+    global args
+    global user_queue
+
+    args = cli_args
+
     # TODO: add arguments below
-    conn = connect_db("localhost", "root", "root")
+    conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
     port = 5000
     tornado.options.parse_command_line()
+
+    # make submissions forlder
+    if not os.path.isdir(OTTER_SERVICE_DIR):
+        os.makedirs(os.path.join(OTTER_SERVICE_DIR, "submissions"))
+    
     server = HTTPServer(Application(google_auth=True))
     server.listen(port)
     print("Listening on port {}".format(port))
