@@ -145,3 +145,20 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 
     """
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def str_to_doctest(code_lines, lines):
+    """
+    Converts a list of lines of Python code CODE_LINES to a list of doctest-formatted lines LINES
+    """
+    if len(code_lines) == 0:
+        return lines
+    line = code_lines.pop()
+    if line.startswith(" ") or line.startswith("\t"):
+        return str_to_doctest(code_lines, lines + ["... " + line])
+    elif line.startswith("except:") or line.startswith("elif ") or line.startswith("else:"):
+        return str_to_doctest(code_lines, lines + ["... " + line])
+    elif len(lines) > 0 and lines[-1].strip().endswith("\\"):
+        return str_to_doctest(code_lines, lines + ["... " + line])
+    else:
+        return str_to_doctest(code_lines, lines + [">>> " + line])

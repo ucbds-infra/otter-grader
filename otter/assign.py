@@ -21,7 +21,7 @@ from glob import glob
 
 from .execute import grade_notebook
 from .jassign import gen_views as jassign_views
-from .utils import block_print, enable_print
+from .utils import block_print, enable_print, str_to_doctest
 
 
 NB_VERSION = 4
@@ -473,18 +473,10 @@ def gen_suite(tests):
 
 def gen_case(test):
     """Generate an ok test case for a test."""
-    # TODO(denero) This should involve a Python parser, but it doesn't...
-    code_lines = []
-    last_end_escape = False
-    for line in test.input.split('\n'):
-        if re.match(r"\s", line) or last_end_escape:
-            code_lines.append('... ' + line)
-        else:
-            code_lines.append('>>> ' + line)
-        last_end_escape = line.endswith("\\")
+    code_lines = str_to_doctest(test.input.split('\n'), [])
     # Suppress intermediate output from evaluation
     for i in range(len(code_lines) - 1):
-        if code_lines[i+1].startswith('>>>') and len(code_lines[i].strip()) > 3 and not code_lines[i].endswith("\\"):
+        if code_lines[i+1].startswith('>>>') and len(code_lines[i].strip()) > 3 and not code_lines[i].strip().endswith("\\"):
             code_lines[i] += ';'
     code_lines.append(test.output)
     return {
