@@ -1361,24 +1361,6 @@ check_results_&lt;secret&gt;(check(…))</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="otter.ok_parser.CheckCallWrapper.visit_Call">
-<code class="sig-name descname">visit_Call</code><span class="sig-paren">(</span><em class="sig-param">node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.visit_Call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function that handles whether a given function call is a ‘check’ call
-and transforms the node accordingly.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>node</strong> (<em>ast.Call</em>) – Function call object, calling the check function</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Transformed version of input node</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>ast.Call</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
 <dt id="otter.ok_parser.CheckCallWrapper.visit_Expr">
 <code class="sig-name descname">visit_Expr</code><span class="sig-paren">(</span><em class="sig-param">node</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.ok_parser.CheckCallWrapper.visit_Expr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1505,22 +1487,22 @@ doctest, so we roll with it.</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_fail_template">
-<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11ca9bb70&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11c9a0b70&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_pass_template">
-<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11d46fda0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11d268fd0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_fail_template">
-<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11d45d710&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11c9a0e80&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_pass_template">
-<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11ca8edd8&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11c995f28&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1688,12 +1670,12 @@ OKTest objects</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.html_result_template">
-<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11d47c828&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11d273ba8&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.plain_result_template">
-<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11ca9bb38&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11d273b70&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1815,6 +1797,12 @@ IPython handles matplotlib outputs specially, so those are supressed too.</p>
 <dd class="field-odd"><p>pandas.core.frame.DataFrame</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.utils.str_to_doctest">
+<code class="sig-prename descclassname">otter.utils.</code><code class="sig-name descname">str_to_doctest</code><span class="sig-paren">(</span><em class="sig-param">code_lines</em>, <em class="sig-param">lines</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.utils.str_to_doctest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a list of lines of Python code CODE_LINES to a list of doctest-formatted lines LINES</p>
 </dd></dl>
 
 </div>
