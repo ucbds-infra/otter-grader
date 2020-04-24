@@ -2,4 +2,4 @@ recommonmark
 # napoleon
 sphinx_markdown_tables
 # sphinx-rtd-theme==0.3.1
-git+https://github.com/pandas-dev/pydata-sphinx-theme.git@71a64ba8d90e57c58afe9c5ba13a5eac00755d02`
+git+https://github.com/pandas-dev/pydata-sphinx-theme.git@71a64ba
