@@ -14,13 +14,9 @@ For more information on how tests are displayed to students, see [below](#grades
 
 To use Otter with Gradescope's autograder, you must first generate a zipfile that you will upload to Gradescope so that they can create a Docker image with which to grade submissions. Otter's command line utility `otter generate` allows instructors to create this zipfile from their machines.
 
-### Before Using `otter generate`
+### Before Using Otter Generate
 
-Before using `otter generate`, you should already have
-
-* written [tests](test_files.md) for the assignment
-* created a Gradescope autograder assignment
-* have collected extra requirements into a requirements.txt file (see [here](grade.html#requirements)).
+Before using Otter Generate, you should already have written [tests](test_files.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](otter_grade.html#requirements)).
 
 ### Directory Structure
 
@@ -47,7 +43,7 @@ Also assume that we have `cd`ed into `hw00-dev`.
 
 ### Usage
 
-The general usage of `otter generate` is to create a zipfile at some output path (`-o` flag, default `./`) which you will then upload to Gradescope. `otter generate` has six optional flags:
+The general usage of Otter Generate is to create a zipfile at some output path (`-o` flag, default `./`) which you will then upload to Gradescope. Otter Generate has a few optional flags:
 
 | Flag | Default Value | Description |
 |-----|-----|-----|
@@ -81,7 +77,7 @@ Now let's say that we maintained to different directories of tests: `tests` with
 otter generate -t hidden-tests data.csv
 ```
 
-Now let's say that I need some functions defined in `utils.py`; then I would add this to the last part of my `otter generate` call:
+Now let's say that I need some functions defined in `utils.py`; then I would add this to the last part of my Otter Generate call:
 
 ```
 otter generate -t hidden-tests data.csv utils.py

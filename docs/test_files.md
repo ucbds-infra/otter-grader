@@ -1,6 +1,6 @@
 # Test Files
 
-Otter requires OK-formatted tests to check students' work against. These have a very specific format, described in detail in the [OK documentation](https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests).
+Otter requires OK-formatted tests to check students' work against. These have a very specific format, described in detail in the [OkPy documentation](https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests).
 
 ## OK Format Caveats
 
@@ -21,7 +21,6 @@ Here is an annotated sample OK test:
 test = {
     "name": "q1",       # name of the test
     "points": 1,        # number of points for the entire suite
-    "hidden": False,    # whether the test is hidden on Gradescope
     "suites": [         # list of suites, only 1 suite allowed!
         {
             "cases": [                  # list of test cases
@@ -30,7 +29,7 @@ test = {
                     >>> 1 == 1          # note that in any subsequence line of a multiline
                     True                # statement, the prompt becomes ... (see below)
                     """,
-                    "hidden": False,    # ignored by Otter
+                    "hidden": False,    # used to determine case visibility on Gradescope
                     "locked": False,    # ignored by Otter
                 }, 
                 {

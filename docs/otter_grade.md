@@ -106,7 +106,7 @@ The grading interface, encapsulated in the `otter grade` command, runs the local
 
 ### Basic Usage
 
-The simplest usage of the `otter grade` command is when we have a directory structure as below (and we have `cd`ed into `grading` in the command line) and we don't require PDFs or additional requirements.
+The simplest usage of the Otter Grade is when we have a directory structure as below (and we have `cd`ed into `grading` in the command line) and we don't require PDFs or additional requirements.
 
 ```
 | grading
@@ -165,7 +165,7 @@ and at the end of grading we would have
   | - nb1.ipynb
   | - nb2.ipynb
   ...
-  | manual_submissions
+  | submission_pdfs
     | - nb0.pdf
     | - nb1.pdf
     | - nb2.pdf
@@ -179,7 +179,7 @@ and at the end of grading we would have
 
 ### Metadata Flags
 
-The four metadata flags, `-g`, `-c`, `-j`, and `-y`, correspond to different export/metadata file formats, and are optional. Also note that the latter two require you to specify a path to the metadata file. You must specify a metadata flag every time you run `otter grade`, and you may not specify more than one. For more information about metadata and export formats, see [above](#metadata). If you don't specify a metadata flag, the CSV file that Otter returns will be primary keyed on the filename of the submission.
+The four metadata flags, `-g`, `-c`, `-j`, and `-y`, correspond to different export/metadata file formats, and are optional. Also note that the latter two require you to specify a path to the metadata file. You must specify a metadata flag every time you run Otter Grade, and you may not specify more than one. For more information about metadata and export formats, see [above](#metadata). If you don't specify a metadata flag, the CSV file that Otter returns will be primary keyed on the filename of the submission.
 
 ### Requirements
 

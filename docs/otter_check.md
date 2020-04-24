@@ -17,7 +17,7 @@ If my tests were in `./hw00-tests`, then I would instantiate with
 grader = otter.Notebook("hw00-tests")
 ```
 
-Students can run tests in the test directory using `Notebook.check` which takes in a questio identifier (the file name without the `.py` extension) For example,
+Students can run tests in the test directory using `Notebook.check` which takes in a question identifier (the file name without the `.py` extension) For example,
 
 ```python
 grader.check("q1")
@@ -37,7 +37,7 @@ This will rerun all tests against the current global environment and display the
 
 Students can also use the `Notebook` class to generate their own PDFs for manual grading using the static method `Notebook.export`. `Notebook.export` has a required positional argument of the path to the notebook to be exported (usually the notebook that students are working through). There are also two optional arguments related to filtering cells: `filtering` indicates whether or not to filter notebooks and defaults to `True`, and `filter_type` indicates the filter type (`"tags"` or `"html"`) to use and defaults to `"html"`. You can find more information about PDF generation [here](pdfs.md).
 
-Because `Notebook.export` is a static method, it can be called either from the class as `otter.Notebook.export()` or from the grader instance as `grader.export()`. We use the latter convetion in the examples below.
+<!-- Because `Notebook.export` is a static method, it can be called either from the class as `otter.Notebook.export()` or from the grader instance as `grader.export()`. We use the latter convetion in the examples below. -->
 
 As an example, if I wanted to export `hw01.ipynb` with HTML comment filtering, my call would be
 

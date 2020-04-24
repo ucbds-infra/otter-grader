@@ -184,6 +184,8 @@ class Notebook:
 		"""
 		Runs all tests on this notebook.
 		"""
+		# TODO: this should use functions in execute.py to run tests in-sequence so that variable
+		# name collisions are accounted for
 		tests = glob(os.path.join(self._path, "*.py"))
 		global_env = inspect.currentframe().f_back.f_globals
 		for file in sorted(tests):

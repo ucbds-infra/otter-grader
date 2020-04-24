@@ -76,24 +76,24 @@ $ otter grade -j meta.json -t hidden-tests --html-filter -v
 
 ```
 identifier,file,manual,q1,q1H,q2,q2H,q3,q3H,total,possible
-fails2Hidden,demo-fails2Hidden.ipynb,manual_submissions/demo-fails2Hidden.pdf,1.0,2.0,1.0,0.0,1.0,0.0,5.0,8
-fails1,demo-fails1.ipynb,manual_submissions/demo-fails1.pdf,1.0,0.0,1.0,1.0,1.0,0.0,4.0,8
-fails2,demo-fails2.ipynb,manual_submissions/demo-fails2.pdf,1.0,2.0,0.0,0.0,1.0,0.0,4.0,8
-fails3,demo-fails3.ipynb,manual_submissions/demo-fails3.pdf,1.0,2.0,1.0,1.0,0.0,0.0,5.0,8
-passesAll,demo-passesAll.ipynb,manual_submissions/demo-passesAll.pdf,1.0,2.0,1.0,1.0,1.0,0.0,6.0,8
-fails3Hidden,demo-fails3Hidden.ipynb,manual_submissions/demo-fails3Hidden.pdf,1.0,2.0,1.0,1.0,1.0,0.0,6.0,8
+fails2Hidden,demo-fails2Hidden.ipynb,submission_pdfs/demo-fails2Hidden.pdf,1.0,2.0,1.0,0.0,1.0,0.0,5.0,8
+fails1,demo-fails1.ipynb,submission_pdfs/demo-fails1.pdf,1.0,0.0,1.0,1.0,1.0,0.0,4.0,8
+fails2,demo-fails2.ipynb,submission_pdfs/demo-fails2.pdf,1.0,2.0,0.0,0.0,1.0,0.0,4.0,8
+fails3,demo-fails3.ipynb,submission_pdfs/demo-fails3.pdf,1.0,2.0,1.0,1.0,0.0,0.0,5.0,8
+passesAll,demo-passesAll.ipynb,submission_pdfs/demo-passesAll.pdf,1.0,2.0,1.0,1.0,1.0,0.0,6.0,8
+fails3Hidden,demo-fails3Hidden.ipynb,submission_pdfs/demo-fails3Hidden.pdf,1.0,2.0,1.0,1.0,1.0,0.0,6.0,8
 ```
 
 Let's make that a bit prettier:
 
 | identifier   | file                    | manual                                   | q1  | q1H | q2  | q2H | q3  | q3H | total | possible | 
 |--------------|-------------------------|------------------------------------------|-----|-----|-----|-----|-----|-----|-------|----------| 
-| fails2Hidden | demo-fails2Hidden.ipynb | manual_submissions/demo-fails2Hidden.pdf | 1.0 | 2.0 | 1.0 | 0.0 | 1.0 | 0.0 | 5.0   | 8        | 
-| fails1       | demo-fails1.ipynb       | manual_submissions/demo-fails1.pdf       | 1.0 | 0.0 | 1.0 | 1.0 | 1.0 | 0.0 | 4.0   | 8        | 
-| fails2       | demo-fails2.ipynb       | manual_submissions/demo-fails2.pdf       | 1.0 | 2.0 | 0.0 | 0.0 | 1.0 | 0.0 | 4.0   | 8        | 
-| fails3       | demo-fails3.ipynb       | manual_submissions/demo-fails3.pdf       | 1.0 | 2.0 | 1.0 | 1.0 | 0.0 | 0.0 | 5.0   | 8        | 
-| passesAll    | demo-passesAll.ipynb    | manual_submissions/demo-passesAll.pdf    | 1.0 | 2.0 | 1.0 | 1.0 | 1.0 | 0.0 | 6.0   | 8        | 
-| fails3Hidden | demo-fails3Hidden.ipynb | manual_submissions/demo-fails3Hidden.pdf | 1.0 | 2.0 | 1.0 | 1.0 | 1.0 | 0.0 | 6.0   | 8        | 
+| fails2Hidden | demo-fails2Hidden.ipynb | submission_pdfs/demo-fails2Hidden.pdf | 1.0 | 2.0 | 1.0 | 0.0 | 1.0 | 0.0 | 5.0   | 8        | 
+| fails1       | demo-fails1.ipynb       | submission_pdfs/demo-fails1.pdf       | 1.0 | 0.0 | 1.0 | 1.0 | 1.0 | 0.0 | 4.0   | 8        | 
+| fails2       | demo-fails2.ipynb       | submission_pdfs/demo-fails2.pdf       | 1.0 | 2.0 | 0.0 | 0.0 | 1.0 | 0.0 | 4.0   | 8        | 
+| fails3       | demo-fails3.ipynb       | submission_pdfs/demo-fails3.pdf       | 1.0 | 2.0 | 1.0 | 1.0 | 0.0 | 0.0 | 5.0   | 8        | 
+| passesAll    | demo-passesAll.ipynb    | submission_pdfs/demo-passesAll.pdf    | 1.0 | 2.0 | 1.0 | 1.0 | 1.0 | 0.0 | 6.0   | 8        | 
+| fails3Hidden | demo-fails3Hidden.ipynb | submission_pdfs/demo-fails3Hidden.pdf | 1.0 | 2.0 | 1.0 | 1.0 | 1.0 | 0.0 | 6.0   | 8        | 
 
 Note that public tests are worth 1 point in the above example and `q1H`, `q2H`, and `q3H` are worth 2, 1, and 2 points, respectively, for a total of 8 points (the `possible` column). In practice, you would probably have 0-point public tests, as hidden tests are meant to determine correctness. You should not that `fails2Hidden` failed `q2H` but not `q2`, and similarly for all other notebooks.
 
@@ -170,7 +170,7 @@ Note that Otter automatically found our requirements file at `./requirements.txt
 | grading
   | - final_grades.csv
   | - requirements.txt
-  | manual_submissions
+  | submission_pdfs
     | - nb0.pdf
     | - nb1.pdf
     | - nb2.pdf
@@ -183,7 +183,7 @@ Note that Otter automatically found our requirements file at `./requirements.txt
     ...
 ```
 
-Otter created the `final_grades.csv` file with the grades for each student, broken down by test, and the `manual_submissions` directory to house the PDF that was generated of each notebook.
+Otter created the `final_grades.csv` file with the grades for each student, broken down by test, and the `submission_pdfs` directory to house the PDF that was generated of each notebook.
 
 **Congrats, you're done!** You can use the grades in the CSV file and the PDFs to complete grading however you want.
 
