@@ -1,5 +1,9 @@
 # Student Usage
 
+```eval_rst
+.. currentmodule:: otter.notebook
+```
+
 Otter provides an IPython API and a command line tool that allow students to run checks and export notebooks within the assignment environment.
 
 ## The `Notebook` API
@@ -155,4 +159,11 @@ Expected:
     False
 Got:
     True
+```
+
+## `otter.Notebook` Reference
+
+```eval_rst
+.. autoclass:: Notebook
+    :members:
 ```

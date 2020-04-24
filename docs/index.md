@@ -14,7 +14,6 @@
    otter_generate
    pdfs
    seeding
-   The Otter API <otter>
    changelog
 ```
 

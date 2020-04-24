@@ -127,6 +127,10 @@ otter generate -t hidden-tests data.csv --show-results
 
 If `--show-results` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
 
+#### Generating with Otter Assign
+
+Otter Assign also comes with an option to generate this zipfile automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](otter_assign.md) for more details.
+
 ## Gradescope Results
 
 This section details how results are displayed to students and instructors on Gradescope.
@@ -147,7 +151,7 @@ Instructors will be able to see _all_ tests. The visibility of a test to student
 
 ### Student View
 
-On submission, students will only be able to see the results of those tests for which `test["hidden"]` evaluates to `True` (see [Test Files](test_files.md) for more info). If `test["hidden"]` is `False` or not specified, then `test` is hidden.
+On submission, students will only be able to see the results of those test cases for which `test["suites"][0]["cases"][<int>]["hidden"]` evaluates to `True` (see [Test Files](test_files.md) for more info). If `test["suites"][0]["cases"][<int>]["hidden"]` is `False` or not specified, then that test case is hidden.
 
 If `--show-results` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout.
 

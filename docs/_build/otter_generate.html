@@ -75,10 +75,6 @@
     </li>
     
     <li class="nav-item ">
-        <a class="nav-link" href="otter.html">The Otter API</a>
-    </li>
-    
-    <li class="nav-item ">
         <a class="nav-link" href="changelog.html">Changelog</a>
     </li>
     
@@ -134,8 +130,6 @@
       
       
       
-      
-      
     </ul>
 
 </nav>
@@ -159,7 +153,7 @@
             <a href="#using-the-command-line-generator" class="nav-link">Using the Command Line Generator</a><ul class="nav section-nav flex-column">
                 
         <li class="nav-item toc-entry toc-h3">
-            <a href="#before-using-otter-generate" class="nav-link">Before Using otter generate</a>
+            <a href="#before-using-otter-generate" class="nav-link">Before Using Otter Generate</a>
         </li>
     
         <li class="nav-item toc-entry toc-h3">
@@ -183,6 +177,10 @@
     
         <li class="nav-item toc-entry toc-h4">
             <a href="#showing-autograder-results" class="nav-link">Showing Autograder Results</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h4">
+            <a href="#generating-with-otter-assign" class="nav-link">Generating with Otter Assign</a>
         </li>
     
             </ul>
@@ -230,13 +228,8 @@
 <h2>Using the Command Line Generator<a class="headerlink" href="#using-the-command-line-generator" title="Permalink to this headline">¶</a></h2>
 <p>To use Otter with Gradescope’s autograder, you must first generate a zipfile that you will upload to Gradescope so that they can create a Docker image with which to grade submissions. Otter’s command line utility <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> allows instructors to create this zipfile from their machines.</p>
 <div class="section" id="before-using-otter-generate">
-<h3>Before Using <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code><a class="headerlink" href="#before-using-otter-generate" title="Permalink to this headline">¶</a></h3>
-<p>Before using <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code>, you should already have</p>
-<ul class="simple">
-<li><p>written <a class="reference internal" href="test_files.html"><span class="doc">tests</span></a> for the assignment</p></li>
-<li><p>created a Gradescope autograder assignment</p></li>
-<li><p>have collected extra requirements into a requirements.txt file (see <a class="reference external" href="grade.html#requirements">here</a>).</p></li>
-</ul>
+<h3>Before Using Otter Generate<a class="headerlink" href="#before-using-otter-generate" title="Permalink to this headline">¶</a></h3>
+<p>Before using Otter Generate, you should already have written <a class="reference internal" href="test_files.html"><span class="doc">tests</span></a> for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see <a class="reference external" href="otter_grade.html#requirements">here</a>).</p>
 </div>
 <div class="section" id="directory-structure">
 <h3>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this headline">¶</a></h3>
@@ -261,7 +254,7 @@
 </div>
 <div class="section" id="usage">
 <h3>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h3>
-<p>The general usage of <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> is to create a zipfile at some output path (<code class="docutils literal notranslate"><span class="pre">-o</span></code> flag, default <code class="docutils literal notranslate"><span class="pre">./</span></code>) which you will then upload to Gradescope. <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> has six optional flags:</p>
+<p>The general usage of Otter Generate is to create a zipfile at some output path (<code class="docutils literal notranslate"><span class="pre">-o</span></code> flag, default <code class="docutils literal notranslate"><span class="pre">./</span></code>) which you will then upload to Gradescope. Otter Generate has a few optional flags:</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -321,7 +314,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
 </pre></div>
 </div>
-<p>Now let’s say that I need some functions defined in <code class="docutils literal notranslate"><span class="pre">utils.py</span></code>; then I would add this to the last part of my <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> call:</p>
+<p>Now let’s say that I need some functions defined in <code class="docutils literal notranslate"><span class="pre">utils.py</span></code>; then I would add this to the last part of my Otter Generate call:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">generate</span> <span class="o">-</span><span class="n">t</span> <span class="n">hidden</span><span class="o">-</span><span class="n">tests</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span> <span class="n">utils</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
@@ -359,6 +352,10 @@
 </div>
 <p>If <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> is passed, the stdout will be made available to students <em>only after grades are published on Gradescope</em>. The <a class="reference external" href="#gradescope-results">next section</a> details more about what is included in the stdout.</p>
 </div>
+<div class="section" id="generating-with-otter-assign">
+<h4>Generating with Otter Assign<a class="headerlink" href="#generating-with-otter-assign" title="Permalink to this headline">¶</a></h4>
+<p>Otter Assign also comes with an option to generate this zipfile automatically when the distribution notebooks are created via the <code class="docutils literal notranslate"><span class="pre">--generate</span></code> flag. See <a class="reference internal" href="otter_assign.html"><span class="doc">Distributing Assignments</span></a> for more details.</p>
+</div>
 </div>
 </div>
 <div class="section" id="gradescope-results">
@@ -375,7 +372,7 @@
 </div>
 <div class="section" id="student-view">
 <h3>Student View<a class="headerlink" href="#student-view" title="Permalink to this headline">¶</a></h3>
-<p>On submission, students will only be able to see the results of those tests for which <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code> (see <a class="reference internal" href="test_files.html"><span class="doc">Test Files</span></a> for more info). If <code class="docutils literal notranslate"><span class="pre">test[&quot;hidden&quot;]</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> or not specified, then <code class="docutils literal notranslate"><span class="pre">test</span></code> is hidden.</p>
+<p>On submission, students will only be able to see the results of those test cases for which <code class="docutils literal notranslate"><span class="pre">test[&quot;suites&quot;][0][&quot;cases&quot;][&lt;int&gt;][&quot;hidden&quot;]</span></code> evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code> (see <a class="reference internal" href="test_files.html"><span class="doc">Test Files</span></a> for more info). If <code class="docutils literal notranslate"><span class="pre">test[&quot;suites&quot;][0][&quot;cases&quot;][&lt;int&gt;][&quot;hidden&quot;]</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> or not specified, then that test case is hidden.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students <em>after grades are published on Gradescope</em>. Students will <strong>not</strong> be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout.</p>
 <p>Note that, because some tests are hidden, students will never see the autograder score in the right sidebar; instead, their score will only show as a dash <code class="docutils literal notranslate"><span class="pre">-</span></code> out of the points possible. Therefore, the only way for students to calculate their autograder score is to use the DataFrame printed to the stdout if <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> is passed.</p>
 </div>

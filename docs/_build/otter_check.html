@@ -75,10 +75,6 @@
     </li>
     
     <li class="nav-item ">
-        <a class="nav-link" href="otter.html">The Otter API</a>
-    </li>
-    
-    <li class="nav-item ">
         <a class="nav-link" href="changelog.html">Changelog</a>
     </li>
     
@@ -134,8 +130,6 @@
       
       
       
-      
-      
     </ul>
 
 </nav>
@@ -157,6 +151,10 @@
     
         <li class="nav-item toc-entry toc-h2">
             <a href="#command-line-script-checker" class="nav-link">Command Line Script Checker</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#otter-notebook-reference" class="nav-link">otter.Notebook Reference</a>
         </li>
     
     </ul>
@@ -185,7 +183,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span> <span class="o">=</span> <span class="n">otter</span><span class="o">.</span><span class="n">Notebook</span><span class="p">(</span><span class="s2">&quot;hw00-tests&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Students can run tests in the test directory using <code class="docutils literal notranslate"><span class="pre">Notebook.check</span></code> which takes in a questio identifier (the file name without the <code class="docutils literal notranslate"><span class="pre">.py</span></code> extension) For example,</p>
+<p>Students can run tests in the test directory using <code class="docutils literal notranslate"><span class="pre">Notebook.check</span></code> which takes in a question identifier (the file name without the <code class="docutils literal notranslate"><span class="pre">.py</span></code> extension) For example,</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="s2">&quot;q1&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -197,8 +195,7 @@
 </div>
 <p>This will rerun all tests against the current global environment and display the results for each tests concatenated into a single HTML output. It is recommended that this cell is put at the end of a notebook for students to run before they submit so that students can ensure that there are no variable name collisions, propagating errors, or other things that would cause the autograder to fail a test they should be passing.</p>
 <p>Students can also use the <code class="docutils literal notranslate"><span class="pre">Notebook</span></code> class to generate their own PDFs for manual grading using the static method <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code>. <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code> has a required positional argument of the path to the notebook to be exported (usually the notebook that students are working through). There are also two optional arguments related to filtering cells: <code class="docutils literal notranslate"><span class="pre">filtering</span></code> indicates whether or not to filter notebooks and defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>, and <code class="docutils literal notranslate"><span class="pre">filter_type</span></code> indicates the filter type (<code class="docutils literal notranslate"><span class="pre">&quot;tags&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;html&quot;</span></code>) to use and defaults to <code class="docutils literal notranslate"><span class="pre">&quot;html&quot;</span></code>. You can find more information about PDF generation <a class="reference internal" href="pdfs.html"><span class="doc">here</span></a>.</p>
-<p>Because <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code> is a static method, it can be called either from the class as <code class="docutils literal notranslate"><span class="pre">otter.Notebook.export()</span></code> or from the grader instance as <code class="docutils literal notranslate"><span class="pre">grader.export()</span></code>. We use the latter convetion in the examples below.</p>
-<p>As an example, if I wanted to export <code class="docutils literal notranslate"><span class="pre">hw01.ipynb</span></code> with HTML comment filtering, my call would be</p>
+<!-- Because `Notebook.export` is a static method, it can be called either from the class as `otter.Notebook.export()` or from the grader instance as `grader.export()`. We use the latter convetion in the examples below. --><p>As an example, if I wanted to export <code class="docutils literal notranslate"><span class="pre">hw01.ipynb</span></code> with HTML comment filtering, my call would be</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;hw01.ipynb&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -294,6 +291,69 @@ Got:
     True
 </pre></div>
 </div>
+</div>
+<div class="section" id="otter-notebook-reference">
+<h2><code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code> Reference<a class="headerlink" href="#otter-notebook-reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="otter.notebook.Notebook">
+<em class="property">class </em><code class="sig-prename descclassname">otter.notebook.</code><code class="sig-name descname">Notebook</code><span class="sig-paren">(</span><em class="sig-param">test_dir='./tests'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Notebook class for in-notebook autograding</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>test_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to tests directory</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="otter.notebook.Notebook.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param">question</em>, <em class="sig-param">global_env=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks question using gofer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> (<em>str</em>) – Name of question being graded</p></li>
+<li><p><strong>global_env</strong> (<em>dict</em>) – Global environment resulting from execution of a single
+notebook/script (see execute.execute_notebook for more on this)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Result of running gofer.check which contains grade, failed tests, and</dt><dd><p>more related information (see gofer.OKTestsResult for more)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="otter.html#otter.ok_parser.OKTestsResult" title="otter.ok_parser.OKTestsResult">OKTestsResult</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.notebook.Notebook.check_all">
+<code class="sig-name descname">check_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.check_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs all tests on this notebook.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.notebook.Notebook.export">
+<code class="sig-name descname">export</code><span class="sig-paren">(</span><em class="sig-param">nb_path=None</em>, <em class="sig-param">filtering=True</em>, <em class="sig-param">filter_type='html'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports notebook to PDF</p>
+<p>FILTER_TYPE can be “html” or “tags” if filtering by HTML comments or cell tags,
+respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_path</strong> (<em>str</em>) – Path to iPython notebook we want to export</p></li>
+<li><p><strong>filtering</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set true if only exporting a subset of nb cells to PDF</p></li>
+<li><p><strong>filter_type</strong> (<em>str</em><em>, </em><em>optional</em>) – “html” or “tags” if filtering by HTML comments or cell
+tags, respectively.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 

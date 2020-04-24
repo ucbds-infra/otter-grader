@@ -75,10 +75,6 @@
     </li>
     
     <li class="nav-item ">
-        <a class="nav-link" href="otter.html">The Otter API</a>
-    </li>
-    
-    <li class="nav-item ">
         <a class="nav-link" href="changelog.html">Changelog</a>
     </li>
     
@@ -118,8 +114,6 @@
       
       
         
-      
-      
       
       
       
@@ -177,13 +171,13 @@
                 
   <div class="section" id="test-files">
 <h1>Test Files<a class="headerlink" href="#test-files" title="Permalink to this headline">¶</a></h1>
-<p>Otter requires OK-formatted tests to check students’ work against. These have a very specific format, described in detail in the <a class="reference external" href="https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests">OK documentation</a>.</p>
+<p>Otter requires OK-formatted tests to check students’ work against. These have a very specific format, described in detail in the <a class="reference external" href="https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests">OkPy documentation</a>.</p>
 <div class="section" id="ok-format-caveats">
 <h2>OK Format Caveats<a class="headerlink" href="#ok-format-caveats" title="Permalink to this headline">¶</a></h2>
 <p>While Otter uses OK format, there are a few caveats to the tests when using them with Otter.</p>
 <ul class="simple">
-<li><p>Otter only allows a single suite in each test, although the suite can have any number of cases. This means that <code class="docutils literal notranslate"><span class="pre">test[&quot;suite&quot;]</span></code> should be a <code class="docutils literal notranslate"><span class="pre">list</span></code> of length 1, whose only element is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>.</p></li>
-<li><p>Otter uses the <code class="docutils literal notranslate"><span class="pre">&quot;hidden&quot;</span></code> key of each test case only on Gradescope. When displaying results on Gradescope, the <code class="docutils literal notranslate"><span class="pre">test[&quot;suite&quot;][&lt;int&gt;][&quot;hidden&quot;]</span></code> should evaluate to a boolean that indicates whether or not the test is hidden. The behavior of showing and hiding tests is described in <a class="reference internal" href="otter_generate.html"><span class="doc">Grading on Gradescope</span></a>.</p></li>
+<li><p>Otter only allows a single suite in each test, although the suite can have any number of cases. This means that <code class="docutils literal notranslate"><span class="pre">test[&quot;suites&quot;]</span></code> should be a <code class="docutils literal notranslate"><span class="pre">list</span></code> of length 1, whose only element is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>.</p></li>
+<li><p>Otter uses the <code class="docutils literal notranslate"><span class="pre">&quot;hidden&quot;</span></code> key of each test case only on Gradescope. When displaying results on Gradescope, the <code class="docutils literal notranslate"><span class="pre">test[&quot;suites&quot;][0][&quot;cases&quot;][&lt;int&gt;][&quot;hidden&quot;]</span></code> should evaluate to a boolean that indicates whether or not the test is hidden. The behavior of showing and hiding tests is described in <a class="reference internal" href="otter_generate.html"><span class="doc">Grading on Gradescope</span></a>.</p></li>
 </ul>
 </div>
 <div class="section" id="writing-ok-tests">
@@ -196,7 +190,6 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;q1&quot;</span><span class="p">,</span>       <span class="c1"># name of the test</span>
     <span class="s2">&quot;points&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>        <span class="c1"># number of points for the entire suite</span>
-    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># whether the test is hidden on Gradescope</span>
     <span class="s2">&quot;suites&quot;</span><span class="p">:</span> <span class="p">[</span>         <span class="c1"># list of suites, only 1 suite allowed!</span>
         <span class="p">{</span>
             <span class="s2">&quot;cases&quot;</span><span class="p">:</span> <span class="p">[</span>                  <span class="c1"># list of test cases</span>
@@ -205,7 +198,7 @@
 <span class="s2">                    &gt;&gt;&gt; 1 == 1          # note that in any subsequence line of a multiline</span>
 <span class="s2">                    True                # statement, the prompt becomes ... (see below)</span>
 <span class="s2">                    &quot;&quot;&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># ignored by Otter</span>
+                    <span class="s2">&quot;hidden&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># used to determine case visibility on Gradescope</span>
                     <span class="s2">&quot;locked&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># ignored by Otter</span>
                 <span class="p">},</span> 
                 <span class="p">{</span>
