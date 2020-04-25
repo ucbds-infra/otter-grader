@@ -87,8 +87,8 @@ def main(args):
         if generate_args.get('seed', None) is not None or args.seed is not None:
             generate_cmd += ["--seed", str(args.seed or generate_args.get('seed', None))]
         
-        if generate_args.get('files', []) or args.files:
-            generate_cmd += args.files or generate_args.get('files', [])
+        if ASSIGNMENT_METADATA.get('files', []) or args.files:
+            generate_cmd += args.files or ASSIGNMENT_METADATA.get('files', [])
         
         subprocess.run(generate_cmd)
 
@@ -104,16 +104,16 @@ def convert_to_ok(nb_path, dir, args):
     tests_dir = dir / 'tests'
     os.makedirs(tests_dir, exist_ok=True)
 
-    # copy files
-    for file in args.files:
-        shutil.copy(file, str(dir))
-
     if os.path.isfile(args.requirements):
         shutil.copy(args.requirements, str(dir / 'requirements.txt'))
 
     with open(nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
     ok_cells = gen_ok_cells(nb['cells'], tests_dir)
+
+    # copy files
+    for file in ASSIGNMENT_METADATA.get('files', []) or args.files:
+        shutil.copy(file, str(dir))
 
     if ASSIGNMENT_METADATA.get('init_cell', True) and not args.no_init_cell:
         init = gen_init_cell()
@@ -127,7 +127,7 @@ def convert_to_ok(nb_path, dir, args):
     if ASSIGNMENT_METADATA.get('export_cell', True) and not args.no_export_cell:
         nb['cells'] += gen_export_cells(
             nb_path, 
-            ASSIGNMENT_METADATA.get('export_cell', '') or args.instructions, 
+            ASSIGNMENT_METADATA.get('instructions', '') or args.instructions, 
             filtering = ASSIGNMENT_METADATA.get('export_cell', True) and not args.no_filter
         )
         
@@ -422,8 +422,8 @@ def read_question_metadata(cell):
 def read_assignment_metadata(cell):
     """Return assignment metadata from an assignment cell."""
     source = get_source(cell)
-    begin_question_line = find_question_spec(source)
-    i, lines = begin_question_line + 1, []
+    begin_assignment_line = find_assignment_spec(source)
+    i, lines = begin_assignment_line + 1, []
     while source[i].strip() != BLOCK_QUOTE:
         lines.append(source[i])
         i = i + 1
