@@ -40,6 +40,8 @@ MD_ANSWER_CELL_TEMPLATE = "_Type your answer here, replacing this text._"
 
 SEED_REQUIRED = False
 
+ASSIGNMENT_METADATA = {}
+
 
 def run_tests(nb_path, debug=False, seed=None):
     """Run tests in the autograder version of the notebook."""
@@ -59,27 +61,35 @@ def main(args):
     else:
         gen_views(master, result, args)
     if SEED_REQUIRED:
-        assert not args.generate or args.seed is not None, "Seeding cell found but no seed provided"
-    if not args.no_run_tests:
+        assert (not ASSIGNMENT_METADATA.get('generate', {}) and not args.generate) or \
+            (ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) is not None or args.seed is not None), "Seeding cell found but no seed provided"
+    if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         block_print()
         run_tests(result / 'autograder'  / master.name, debug=args.debug, seed=args.seed)
         enable_print()
         print("All tests passed!")
-    if args.generate:
+    if ASSIGNMENT_METADATA.get('generate', {}) or args.generate:
+        generate_args = ASSIGNMENT_METADATA.get('generate', {})
         print("Generating autograder zipfile...")
         os.chdir(str(result / 'autograder'))
         generate_cmd = ["otter", "generate"]
-        if args.points is not None:
-            generate_cmd += ["--points", args.points]
-        if args.threshold is not None:
-            generate_cmd += ["--threshold", args.threshold]
-        if args.show_results:
+
+        if generate_args.get('points', None) is not None or args.points is not None:
+            generate_cmd += ["--points", args.points or generate_args.get('points', None)]
+        
+        if generate_args.get('threshold', None) is not None or args.threshold is not None:
+            generate_cmd += ["--threshold", args.threshold or generate_args.get('threshold', None)]
+        
+        if generate_args.get('show_results', False) or args.show_results:
             generate_cmd += ["--show-results"]
-        if args.seed is not None:
-            generate_cmd += ["--seed", str(args.seed)]
-        if args.files:
-            generate_cmd += args.files
+        
+        if generate_args.get('seed', None) is not None or args.seed is not None:
+            generate_cmd += ["--seed", str(args.seed or generate_args.get('seed', None))]
+        
+        if generate_args.get('files', []) or args.files:
+            generate_cmd += args.files or generate_args.get('files', [])
+        
         subprocess.run(generate_cmd)
 
 
@@ -105,16 +115,21 @@ def convert_to_ok(nb_path, dir, args):
         nb = nbformat.read(f, NB_VERSION)
     ok_cells = gen_ok_cells(nb['cells'], tests_dir)
 
-    if not args.no_init_cell:
+    if ASSIGNMENT_METADATA.get('init_cell', True) and not args.no_init_cell:
         init = gen_init_cell()
         nb['cells'] = [init] + ok_cells
     else:
         nb['cells'] = ok_cells
 
-    if not args.no_check_all:
+    if ASSIGNMENT_METADATA.get('check_all_cell', True) and not args.no_check_all:
         nb['cells'] += gen_check_all_cell()
-    if not args.no_export_cell:
-        nb['cells'] += gen_export_cells(nb_path, args.instructions, filtering = not args.no_filter)
+    
+    if ASSIGNMENT_METADATA.get('export_cell', True) and not args.no_export_cell:
+        nb['cells'] += gen_export_cells(
+            nb_path, 
+            ASSIGNMENT_METADATA.get('export_cell', '') or args.instructions, 
+            filtering = ASSIGNMENT_METADATA.get('export_cell', True) and not args.no_filter
+        )
         
     remove_output(nb)
 
@@ -172,7 +187,7 @@ def gen_ok_cells(cells, tests_dir):
     Returns:
         (ok_cells, list of manual question names)
     """
-    global SEED_REQUIRED
+    global SEED_REQUIRED, ASSIGNMENT_METADATA
     ok_cells = []
     question = {}
     processed_response = False
@@ -244,7 +259,11 @@ def gen_ok_cells(cells, tests_dir):
                 
                 question, processed_response, tests, md_has_prompt, no_solution = {}, False, [], False, False
 
-            if is_question_cell(cell):
+            if is_assignment_cell(cell):
+                assert not ASSIGNMENT_METADATA, "Two assignment metadata cells found"
+                ASSIGNMENT_METADATA = read_assignment_metadata(cell)
+
+            elif is_question_cell(cell):
                 question = read_question_metadata(cell)
                 manual = question.get('manual', False)
                 format = question.get('format', '')
@@ -301,6 +320,13 @@ def is_question_cell(cell):
     return find_question_spec(get_source(cell)) is not None
 
 
+def is_assignment_cell(cell):
+    """Whether cell contains BEGIN QUESTION in a block quote."""
+    if cell['cell_type'] != 'markdown':
+        return False
+    return find_assignment_spec(get_source(cell)) is not None
+
+
 def is_seed_cell(cell):
     """Whether cell contains BEGIN QUESTION in a block quote."""
     if cell['cell_type'] != 'code':
@@ -333,6 +359,17 @@ def find_question_spec(source):
     begins = [block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) if
               source[block_quotes[i]+1].strip(' ') == 'BEGIN QUESTION']
     assert len(begins) <= 1, 'multiple questions defined in ' + str(source)
+    return begins[0] if begins else None
+
+
+def find_assignment_spec(source):
+    """Return line number of the BEGIN ASSIGNMENT line or None."""
+    block_quotes = [i for i, line in enumerate(source) if
+                    line[:3] == BLOCK_QUOTE]
+    assert len(block_quotes) % 2 == 0, 'cannot parse ' + str(source)
+    begins = [block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) if
+              source[block_quotes[i]+1].strip(' ') == 'BEGIN ASSIGNMENT']
+    assert len(begins) <= 1, 'multiple assignments defined in ' + str(source)
     return begins[0] if begins else None
 
 
@@ -379,6 +416,18 @@ def read_question_metadata(cell):
         i = i + 1
     metadata = yaml.load('\n'.join(lines))
     assert ALLOWED_NAME.match(metadata.get('name', '')), metadata
+    return metadata
+
+
+def read_assignment_metadata(cell):
+    """Return assignment metadata from an assignment cell."""
+    source = get_source(cell)
+    begin_question_line = find_question_spec(source)
+    i, lines = begin_question_line + 1, []
+    while source[i].strip() != BLOCK_QUOTE:
+        lines.append(source[i])
+        i = i + 1
+    metadata = yaml.load('\n'.join(lines))
     return metadata
 
 

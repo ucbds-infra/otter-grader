@@ -153,7 +153,7 @@ def str_to_doctest(code_lines, lines):
     """
     if len(code_lines) == 0:
         return lines
-    line = code_lines.pop()
+    line = code_lines.pop(0)
     if line.startswith(" ") or line.startswith("\t"):
         return str_to_doctest(code_lines, lines + ["... " + line])
     elif line.startswith("except:") or line.startswith("elif ") or line.startswith("else:"):
