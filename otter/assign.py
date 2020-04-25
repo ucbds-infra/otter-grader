@@ -128,7 +128,7 @@ def convert_to_ok(nb_path, dir, args):
         nb['cells'] += gen_export_cells(
             nb_path, 
             ASSIGNMENT_METADATA.get('instructions', '') or args.instructions, 
-            filtering = ASSIGNMENT_METADATA.get('export_cell', True) and not args.no_filter
+            filtering = ASSIGNMENT_METADATA.get('filtering', True) and not args.no_filter
         )
         
     remove_output(nb)

@@ -10,6 +10,55 @@ Otter's notebook format groups prompts, solutions, and tests together into promp
 
 **Note:** Otter Assign is also backwards-compatible with jassign-formatted notebooks. To use jassign format with Otter Assign, specify the `--jassign` flag in your call to `otter assign`. While the formats are very similar, jassign's format has some key differences to the Otter Assign format, and many of the behaviors described below, e.g. intercell seeding, are not compatible with jassign format. For more information about formatting notebooks for jassign, see [its documentation](https://github.com/okpy/jassign/blob/master/docs/notebook-format.md).
 
+### Assignment Metadata
+
+In addition to various command line arugments discussed below, Otter Assign also allows you to specify various assignment generation arguments in an assignment metadata cell. These are very similar to the question metadata cells described in the next section. Assignment metadata, included by convention as the first cell of the notebook, place YAML-formatted configurations inside a code block that begins with `BEGIN ASSIGNMENT`:
+
+````
+```
+BEGIN ASSIGNMENT
+init_cell: false
+export_cell: true
+...
+```
+````
+
+This cell is removed from both output notebooks. These configurations, listed in the table below, can be **overwritten** by their command line counterparts (e.g. `init_cell: true` is overwritten by the `--no-init-cell` flag). The options, their defaults (converted to Python data types), and descriptions are listed in the following table. For more information about many of these arguments, see the [Usage and Output section](#usage-and-output).
+
+| Key | Default Value | Description |
+|-----|---------------|-------------|
+| `init_cell` | `True` | Whether or not to include an Otter initialization cell |
+| `export_cell` | `True` | Whether or not to include a PDF generation cell |
+| `filtering` | `True` | Whether or not the output PDF should be filtered |
+| `instructions` | `''` | Additional submission instructions to be placed just before the PDF export cell |
+| `check_all_cell` | `True` | Whether or not to include an `otter.Notebook.check_all` cell |
+| `run_tests` | `True` | Whether or not to run tests on the autograder notebook |
+| `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
+| `files` | `[]` | A list of support files required either for students or Otter Generate |
+
+A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`). If you require additional arguments, e.g. `points` or `show_results`, then set `generate` to a nested dictionary of these parameters and their values:
+
+```
+generate:
+    seed: 42
+    show_results: true
+```
+
+These values, if left unspecified, take on the default values of their flags as described below and in [Otter Generate](otter_generate.md).
+
+As an example, the following assignment metadata includes an export cell but no filtering, not init cell, and calls Otter Generate with the flags `--points 3 --seed 0`.
+
+````
+```
+BEGIN ASSIGNMENT
+filtering: false
+init_cell: false
+generate:
+    points: 3
+    seed: 0
+```
+````
+
 ### Autograded Questions
 
 Here is an example question in an Otter Assign-formatted notebook:

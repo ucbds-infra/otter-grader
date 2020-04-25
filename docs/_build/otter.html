@@ -272,6 +272,12 @@ dir – Path</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="otter.assign.find_assignment_spec">
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">find_assignment_spec</code><span class="sig-paren">(</span><em class="sig-param">source</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.find_assignment_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return line number of the BEGIN ASSIGNMENT line or None.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="otter.assign.find_question_spec">
 <code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">find_question_spec</code><span class="sig-paren">(</span><em class="sig-param">source</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.find_question_spec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return line number of the BEGIN QUESTION line or None.</p>
@@ -351,6 +357,12 @@ result_dir – Path to the result directory</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="otter.assign.is_assignment_cell">
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">is_assignment_cell</code><span class="sig-paren">(</span><em class="sig-param">cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.is_assignment_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether cell contains BEGIN QUESTION in a block quote.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="otter.assign.is_markdown_solution_cell">
 <code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">is_markdown_solution_cell</code><span class="sig-paren">(</span><em class="sig-param">cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.is_markdown_solution_cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether the cell matches MD_SOLUTION_REGEX</p>
@@ -389,6 +401,12 @@ result_dir – Path to the result directory</p>
 <dt id="otter.assign.main">
 <code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.main" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.assign.read_assignment_metadata">
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">read_assignment_metadata</code><span class="sig-paren">(</span><em class="sig-param">cell</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.read_assignment_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return assignment metadata from an assignment cell.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="otter.assign.read_question_metadata">
@@ -1487,7 +1505,7 @@ doctest, so we roll with it.</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_fail_template">
-<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11d38cf98&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11d38df98&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1665,7 +1683,7 @@ OKTest objects</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.plain_result_template">
-<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11d38c5c0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11d38d5c0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
