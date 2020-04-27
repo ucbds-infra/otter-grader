@@ -23,7 +23,7 @@ export_cell: true
 ```
 ````
 
-This cell is removed from both output notebooks. These configurations, listed in the table below, can be **overwritten** by their command line counterparts (e.g. `init_cell: true` is overwritten by the `--no-init-cell` flag). The options, their defaults (converted to Python data types), and descriptions are listed in the following table. For more information about many of these arguments, see the [Usage and Output section](#usage-and-output).
+This cell is removed from both output notebooks. These configurations, listed in the table below, can be **overwritten** by their command line counterparts (e.g. `init_cell: true` is overwritten by the `--no-init-cell` flag). The options, their defaults (converted to Python data types), and descriptions are listed in the following table. Any unspecified keys will keep their default values. For more information about many of these arguments, see the [Usage and Output section](#usage-and-output).
 
 | Key | Default Value | Description |
 |-----|---------------|-------------|
@@ -33,6 +33,7 @@ This cell is removed from both output notebooks. These configurations, listed in
 | `instructions` | `''` | Additional submission instructions to be placed just before the PDF export cell |
 | `check_all_cell` | `True` | Whether or not to include an `otter.Notebook.check_all` cell |
 | `run_tests` | `True` | Whether or not to run tests on the autograder notebook |
+| `solutions_pdf` | `False` | Whether to generate a solutions PDF from notebook; either `true`, `false`, or `filtered`; defaults to unfiltered PDF |
 | `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
 | `files` | `[]` | A list of support files required either for students or Otter Generate |
 

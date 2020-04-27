@@ -17,6 +17,7 @@ import yaml
 import subprocess
 import pathlib
 import nbformat
+import nb2pdf
 
 from collections import namedtuple
 from glob import glob
@@ -65,6 +66,9 @@ def main(args):
     if SEED_REQUIRED:
         assert (not ASSIGNMENT_METADATA.get('generate', {}) and not args.generate) or \
             (ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) is not None or args.seed is not None), "Seeding cell found but no seed provided"
+    if ASSIGNMENT_METADATA.get('solutions_pdf', False):
+        filtering = ASSIGNMENT_METADATA.get('solutions_pdf') == 'filtered'
+        nb2pdf.convert(str(result / 'autograder' / master.name), filtering=filtering)
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         block_print()
