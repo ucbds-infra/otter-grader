@@ -5,6 +5,8 @@
 
 """Generate student & autograder views of a notebook in Otter format."""
 
+# TODO: move seed to inside solution cell
+
 import copy
 import json
 import pprint
@@ -66,7 +68,7 @@ def main(args):
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         block_print()
-        run_tests(result / 'autograder'  / master.name, debug=args.debug, seed=args.seed)
+        run_tests(result / 'autograder'  / master.name, debug=args.debug, seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) or args.seed)
         enable_print()
         print("All tests passed!")
     if ASSIGNMENT_METADATA.get('generate', {}) or args.generate:
