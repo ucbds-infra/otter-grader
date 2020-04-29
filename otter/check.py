@@ -21,9 +21,6 @@ Tests failed:
 {% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
 """)
 
-# TODO: accept notebooks
-
-
 def main(args):
 
 	if args.question:
