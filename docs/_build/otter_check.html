@@ -194,9 +194,9 @@
 </pre></div>
 </div>
 <p>This will rerun all tests against the current global environment and display the results for each tests concatenated into a single HTML output. It is recommended that this cell is put at the end of a notebook for students to run before they submit so that students can ensure that there are no variable name collisions, propagating errors, or other things that would cause the autograder to fail a test they should be passing.</p>
-<p>Students can also use the <code class="docutils literal notranslate"><span class="pre">Notebook</span></code> class to generate their own PDFs for manual grading using the static method <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code>. <code class="docutils literal notranslate"><span class="pre">Notebook.export</span></code> has a required positional argument of the path to the notebook to be exported (usually the notebook that students are working through). There are also two optional arguments related to filtering cells: <code class="docutils literal notranslate"><span class="pre">filtering</span></code> indicates whether or not to filter notebooks and defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>, and <code class="docutils literal notranslate"><span class="pre">filter_type</span></code> indicates the filter type (<code class="docutils literal notranslate"><span class="pre">&quot;tags&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;html&quot;</span></code>) to use and defaults to <code class="docutils literal notranslate"><span class="pre">&quot;html&quot;</span></code>. You can find more information about PDF generation <a class="reference internal" href="pdfs.html"><span class="doc">here</span></a>.</p>
+<p>Students can also use the <code class="docutils literal notranslate"><span class="pre">Notebook</span></code> class to generate their own PDFs for manual grading using the static method <code class="docutils literal notranslate"><span class="pre">Notebook.to_pdf</span></code>. <code class="docutils literal notranslate"><span class="pre">Notebook.to_pdf</span></code> has a required positional argument of the path to the notebook to be exported (usually the notebook that students are working through). There are also two optional arguments related to filtering cells: <code class="docutils literal notranslate"><span class="pre">filtering</span></code> indicates whether or not to filter notebooks and defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>, and <code class="docutils literal notranslate"><span class="pre">filter_type</span></code> indicates the filter type (<code class="docutils literal notranslate"><span class="pre">&quot;tags&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;html&quot;</span></code>) to use and defaults to <code class="docutils literal notranslate"><span class="pre">&quot;html&quot;</span></code>. You can find more information about PDF generation <a class="reference internal" href="pdfs.html"><span class="doc">here</span></a>.</p>
 <!-- Because `Notebook.export` is a static method, it can be called either from the class as `otter.Notebook.export()` or from the grader instance as `grader.export()`. We use the latter convetion in the examples below. --><p>As an example, if I wanted to export <code class="docutils literal notranslate"><span class="pre">hw01.ipynb</span></code> with HTML comment filtering, my call would be</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="s2">&quot;hw01.ipynb&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">grader</span><span class="o">.</span><span class="n">to_pdf</span><span class="p">(</span><span class="s2">&quot;hw01.ipynb&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>as filtering is by defult on and the default filtering behavior is HTML comments. If I instead wanted to filter with cell tags, I would call</p>
@@ -336,7 +336,29 @@ notebook/script (see execute.execute_notebook for more on this)</p></li>
 
 <dl class="method">
 <dt id="otter.notebook.Notebook.export">
-<code class="sig-name descname">export</code><span class="sig-paren">(</span><em class="sig-param">nb_path=None</em>, <em class="sig-param">filtering=True</em>, <em class="sig-param">filter_type='html'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.export" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export</code><span class="sig-paren">(</span><em class="sig-param">nb_path=None</em>, <em class="sig-param">export_path=None</em>, <em class="sig-param">pdf=True</em>, <em class="sig-param">filtering=True</em>, <em class="sig-param">filter_type='html'</em>, <em class="sig-param">files=[]</em>, <em class="sig-param">display_link=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports a submission to a zipfile</p>
+<p>Creates a submission zipfile from a notebook at NB_PATH, optionally including a PDF export
+of the notebook and any files in FILES.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_path</strong> (<em>str</em>) – Path to iPython notebook we want to export</p></li>
+<li><p><strong>export_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path at which to write zipfile</p></li>
+<li><p><strong>pdf</strong> (<em>bool</em><em>, </em><em>optional</em>) – True if PDF should be included</p></li>
+<li><p><strong>filtering</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set true if only exporting a subset of nb cells to PDF</p></li>
+<li><p><strong>filter_type</strong> (<em>str</em><em>, </em><em>optional</em>) – “html” or “tags” if filtering by HTML comments or cell
+tags, respectively.</p></li>
+<li><p><strong>files</strong> (<em>list</em><em>, </em><em>optional</em>) – Other files to include in the zipfile</p></li>
+<li><p><strong>display_link</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to display a download link</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.notebook.Notebook.to_pdf">
+<code class="sig-name descname">to_pdf</code><span class="sig-paren">(</span><em class="sig-param">nb_path=None</em>, <em class="sig-param">filtering=True</em>, <em class="sig-param">filter_type='html'</em>, <em class="sig-param">display_link=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.to_pdf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports notebook to PDF</p>
 <p>FILTER_TYPE can be “html” or “tags” if filtering by HTML comments or cell tags,
 respectively.</p>
@@ -347,6 +369,7 @@ respectively.</p>
 <li><p><strong>filtering</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set true if only exporting a subset of nb cells to PDF</p></li>
 <li><p><strong>filter_type</strong> (<em>str</em><em>, </em><em>optional</em>) – “html” or “tags” if filtering by HTML comments or cell
 tags, respectively.</p></li>
+<li><p><strong>display_link</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to display a download link</p></li>
 </ul>
 </dd>
 </dl>
