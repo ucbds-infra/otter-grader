@@ -6,6 +6,7 @@ import inspect
 import requests
 import json
 import os
+import zipfile
 
 from getpass import getpass
 from glob import glob
@@ -87,32 +88,6 @@ class Notebook:
 		# store API key so we don't re-auth every time
 		_API_KEY = self._api_key
 
-	
-	# # @classmethod
-	# def _get_notebook_name(self):
-	# 	"""
-	# 	Sets notebook name as global variable in notebook and retrieves it
-	# 	"""		
-	# 	# get_ipython().run_cell_magic("javascript", "", '''
-	# 	# 	require(["base/js/namespace"], function() {
-	# 	# 		Jupyter.notebook.kernel.execute('NOTEBOOK_NAME = "' + Jupyter.notebook.notebook_name + '"');
-	# 	# 	});
-	# 	# ''')
-
-	# 	# curr_frame = inspect.currentframe()
-	# 	# while 'NOTEBOOK_NAME' not in curr_frame.f_globals:
-	# 	# 	print("checking")
-	# 	# 	curr_frame = curr_frame.f_back
-
-	# 	# print(curr_frame)
-	# 	display(Javascript('''
-	# 	 	require(["base/js/namespace"], function() {
-	# 	 		Jupyter.notebook.kernel.execute('NOTEBOOK_NAME = "' + Jupyter.notebook.notebook_name + '"');
-	# 	 	});
-	# 	 '''))
-
-	# 	# return inspect.currentframe()
-
 
 	def check(self, question, global_env=None):
 		"""Checks question using gofer
@@ -141,7 +116,7 @@ class Notebook:
 
 
 	# @staticmethod
-	def export(self, nb_path=None, filtering=True, filter_type="html"):
+	def to_pdf(self, nb_path=None, filtering=True, filter_type="html", display_link=True):
 		"""Exports notebook to PDF
 
 		FILTER_TYPE can be "html" or "tags" if filtering by HTML comments or cell tags,
@@ -152,32 +127,86 @@ class Notebook:
 			filtering (bool, optional): Set true if only exporting a subset of nb cells to PDF
 			filter_type (str, optional): "html" or "tags" if filtering by HTML comments or cell
 				tags, respectively.
+			display_link (bool, optional): Whether or not to display a download link
 		
 		"""
-		# if nb_path is None and get_ipython() is not None:
-		# 	display(Javascript('''
-		# 		require(["base/js/namespace"], function() {
-		# 			console.log(Jupyter.notebook.notebook_name);
-		# 			Jupyter.notebook.kernel.execute('__NOTEBOOK_NAME__ = "' + Jupyter.notebook.notebook_name + '"');
-		# 		});
-		# 	'''))
-		# 	nb_path = inspect.currentframe().f_back.f_globals['__NOTEBOOK_NAME__']#self._get_notebook_name()
-		
 		if nb_path is None and self._service_enabled:
 			nb_path = self._config["notebook"]
+
+		elif nb_path is None and glob("*.ipynb"):
+			notebooks = glob("*.ipynb")
+			assert len(notebooks) == 1, "nb_path not specified and > 1 notebook in working directory"
+			nb_path = notebooks[0]
 
 		elif nb_path is None:
 			raise ValueError("nb_path is None and no otter-service config is available")
 
 		convert(nb_path, filtering=filtering, filter_type=filter_type)
 
-		# create and display output HTML
-		out_html = """
-		<p>Your file has been exported. Download it by right-clicking 
-		<a href="{}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
-		""".format(nb_path[:-5] + "pdf")
+		if display_link:
+			# create and display output HTML
+			out_html = """
+			<p>Your file has been exported. Download it by right-clicking 
+			<a href="{}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
+			""".format(nb_path[:-5] + "pdf")
+			
+			display(HTML(out_html))
+
+
+	def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, filter_type="html", files=[], display_link=True):
+		"""Exports a submission to a zipfile
+
+		Creates a submission zipfile from a notebook at NB_PATH, optionally including a PDF export
+		of the notebook and any files in FILES.
 		
-		display(HTML(out_html))
+		Args:
+			nb_path (str): Path to iPython notebook we want to export
+			export_path (str, optional): Path at which to write zipfile
+			pdf (bool, optional): True if PDF should be included
+			filtering (bool, optional): Set true if only exporting a subset of nb cells to PDF
+			filter_type (str, optional): "html" or "tags" if filtering by HTML comments or cell
+				tags, respectively.
+			files (list, optional): Other files to include in the zipfile
+			display_link (bool, optional): Whether or not to display a download link
+		
+		"""		
+		if nb_path is None and self._service_enabled:
+			nb_path = self._config["notebook"]
+
+		elif nb_path is None and glob("*.ipynb"):
+			notebooks = glob("*.ipynb")
+			assert len(notebooks) == 1, "nb_path not specified and > 1 notebook in working directory"
+			nb_path = notebooks[0]
+
+		elif nb_path is None:
+			raise ValueError("nb_path is None and no otter-service config is available")
+
+		if export_path is None:
+			zip_path = ".".join(nb_path.split(".")[:-1]) + ".zip"
+		else:
+			zip_path = export_path
+
+		zf = zipfile.ZipFile(zip_path, mode="w")
+		zf.write(nb_path)
+
+		if pdf:
+			pdf_path = ".".join(nb_path.split(".")[:-1]) + ".pdf"
+			convert(nb_path, filtering=filtering, filter_type=filter_type)
+			zf.write(pdf_path)
+
+		for file in files:
+			zf.write(file)
+
+		zf.close()
+
+		if display_link:
+			# create and display output HTML
+			out_html = """
+			<p>Your file has been exported. Download it by right-clicking 
+			<a href="{}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
+			""".format(zip_path)
+			
+			display(HTML(out_html))
 
 
 	def check_all(self):

@@ -155,13 +155,14 @@ def gen_export_cells(nb_path, instruction_text, filtering=True):
     """Generate submit cells."""
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before \
-    running the cell below, so that all images/graphs appear in the output. **Please save before exporting!**"
+    running the cell below, so that all images/graphs appear in the output. The cell below will generate \
+    a zipfile for you to submit. **Please save before exporting!**"
     
     if instruction_text:
         instructions.source += '\n\n' + instruction_text
 
     export = nbformat.v4.new_code_cell()
-    source_lines = ["# Save your notebook first, then run this cell to export."]
+    source_lines = ["# Save your notebook first, then run this cell to export your submission."]
     if filtering:
         source_lines.append(f"grader.export(\"{ nb_path.name }\")")
     else:
