@@ -45,6 +45,10 @@ SEED_REQUIRED = False
 
 ASSIGNMENT_METADATA = {}
 
+class EmptyCellException(Exception):
+    """Error to raise for empty cells to indicate deletion"""
+    pass
+
 
 def run_tests(nb_path, debug=False, seed=None):
     """Run tests in the autograder version of the notebook."""
@@ -281,7 +285,10 @@ def gen_ok_cells(cells, tests_dir):
                 elif need_close_export:
                     add_close_export_to_cell(cell)
                     need_close_export = False
-                ok_cells.append(gen_question_cell(cell, manual, format, in_manual_block))
+                try:
+                    ok_cells.append(gen_question_cell(cell, manual, format, in_manual_block))
+                except EmptyCellException:
+                    pass
 
             elif is_solution_cell(cell):
                 if is_markdown_solution_cell(cell):
@@ -395,6 +402,16 @@ def gen_question_cell(cell, manual, format, in_manual_block):
     source[start] = "<!--"
     source[end] = "-->"
     cell['source'] = '\n'.join(source)
+
+    # checkf or empty cell
+    cell_text = source[:start]
+    try:
+        cell_text += source[end+1:]
+    except IndexError:
+        pass
+    if not "".join(cell_text).strip():
+        raise EmptyCellException()
+
     lock(cell)
     return cell
 
