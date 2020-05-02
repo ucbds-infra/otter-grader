@@ -46,7 +46,13 @@ ASSIGNMENT_METADATA = {}
 
 
 def run_tests(nb_path, debug=False, seed=None):
-    """Run tests in the autograder version of the notebook."""
+    """Run tests in the autograder version of the notebook.
+    
+    Args:
+        nb_path (str): Path to iPython notebooks
+        debug (bool, optional): True if errors should not be ignored
+        seed (int, optional): Random seed for numpy
+    """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
     results = grade_notebook(nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
@@ -101,6 +107,16 @@ def convert_to_ok(nb_path, dir, args):
     nb -- Path
     endpoint -- OK endpoint for notebook submission (e.g., cal/data100/sp19)
     dir -- Path
+
+
+    Args:
+        nb_path (str): Path to iPython master notebook
+        dir (bool, optional): ???
+        args (int, optional): Random seed for numpy
+
+    Returns:
+        str: ok_nb_path, which is the path with the notebook, tests dir, and .ok file
+
     """
     ok_nb_path = dir / nb_path.name
     tests_dir = dir / 'tests'
@@ -141,14 +157,28 @@ def convert_to_ok(nb_path, dir, args):
 
 
 def gen_init_cell():
-    """Generate a cell to initialize ok object."""
+    """Generate a cell to initialize ok object.
+    
+    Returns:
+        cell: new code cell
+    """
     cell = nbformat.v4.new_code_cell("# Initialize Otter\nimport otter\ngrader = otter.Notebook()")
     lock(cell)
     return cell
 
 
 def gen_export_cells(nb_path, instruction_text, filtering=True):
-    """Generate submit cells."""
+    """Generate submit cells.
+    
+    Args:
+        nb_path (str): Path with iPython notebook
+        instruction_text (str, optional): Extra instructions for students when exporting
+        filtering (bool, optional): Whether PDF filtering is needed
+    
+    Returns:
+        list: List with instructions, export code cell, buffer cell
+
+    """
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before \
     running the cell below, so that all images/graphs appear in the output. **Please save before exporting!**"
@@ -171,7 +201,11 @@ def gen_export_cells(nb_path, instruction_text, filtering=True):
 
 
 def gen_check_all_cell():
-    """Generate submit cells."""
+    """Generate submit cells.
+    
+    Returns:
+        list: List with instructions, check all code cell
+    """
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "To double-check your work, the cell below will rerun all of the autograder tests."
 
@@ -186,8 +220,15 @@ def gen_check_all_cell():
 def gen_ok_cells(cells, tests_dir):
     """Generate notebook cells for the OK version of a master notebook.
 
+    Args:
+        cells (list): List of original code cells
+        tests_dir (str): Path to ok tests
+    
     Returns:
-        (ok_cells, list of manual question names)
+        list: ok cells and list of question names which neeed manual grading
+
+    Returns:
+        ok_cells, list of manual question names)
     """
     global SEED_REQUIRED, ASSIGNMENT_METADATA
     ok_cells = []
@@ -306,7 +347,14 @@ def gen_ok_cells(cells, tests_dir):
 
 
 def get_source(cell):
-    """Get the source code of a cell in a way that works for both nbformat and json."""
+    """Get the source code of a cell in a way that works for both nbformat and json.
+    
+    Args:
+        cell (cell): original code cell
+    
+    Returns:
+        list: Reformatted code to be used in nbformat/json
+    """
     source = cell['source']
     if isinstance(source, str):
         return cell['source'].split('\n')
@@ -316,21 +364,44 @@ def get_source(cell):
 
 
 def is_question_cell(cell):
-    """Whether cell contains BEGIN QUESTION in a block quote."""
+    """Whether cell contains BEGIN QUESTION in a block quote.
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        ???
+
+    """
     if cell['cell_type'] != 'markdown':
         return False
     return find_question_spec(get_source(cell)) is not None
 
 
 def is_assignment_cell(cell):
-    """Whether cell contains BEGIN QUESTION in a block quote."""
+    """Whether cell contains BEGIN QUESTION in a block quote.
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        boolean: True if cell contains BEGIN QUESTION, else false
+
+    """
     if cell['cell_type'] != 'markdown':
         return False
     return find_assignment_spec(get_source(cell)) is not None
 
 
 def is_seed_cell(cell):
-    """Whether cell contains BEGIN QUESTION in a block quote."""
+    """Whether cell is seed cell.
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        boolean: True if cell contains seed, else false
+    """
     if cell['cell_type'] != 'code':
         return False
     source = get_source(cell)
@@ -338,13 +409,27 @@ def is_seed_cell(cell):
 
 
 def is_markdown_solution_cell(cell):
-    """Whether the cell matches MD_SOLUTION_REGEX"""
+    """Whether the cell matches MD_SOLUTION_REGEX
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        boolean: True if cell matches MD_SOLUTION_REGEX, else false
+    """
     source = get_source(cell)
     return is_solution_cell and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
 
 
 def is_solution_cell(cell):
-    """Whther the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX"""
+    """Whether the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        boolean: True if cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX, else false
+    """
     source = get_source(cell)
     if cell['cell_type'] == 'markdown':
         return source and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
@@ -354,7 +439,15 @@ def is_solution_cell(cell):
 
 
 def find_question_spec(source):
-    """Return line number of the BEGIN QUESTION line or None."""
+    """Return line number of the BEGIN QUESTION line or None.
+    
+    Args:
+        source (list): List of lines of Python code
+    
+    Returns:
+        int: Line number of BEGIN QUESTION, if present
+        None: if BEGIN QUESTION not present in code
+    """
     block_quotes = [i for i, line in enumerate(source) if
                     line[:3] == BLOCK_QUOTE]
     assert len(block_quotes) % 2 == 0, 'cannot parse ' + str(source)
@@ -365,7 +458,15 @@ def find_question_spec(source):
 
 
 def find_assignment_spec(source):
-    """Return line number of the BEGIN ASSIGNMENT line or None."""
+    """Return line number of the BEGIN ASSIGNMENT line or None.
+    
+    Args:
+        source (list): List of lines of Python code
+    
+    Returns:
+        int: Line number of BEGIN ASSIGNMENT, if present
+        None: if BEGIN ASSIGNMENT not present in code
+    """
     block_quotes = [i for i, line in enumerate(source) if
                     line[:3] == BLOCK_QUOTE]
     assert len(block_quotes) % 2 == 0, 'cannot parse ' + str(source)
@@ -376,7 +477,15 @@ def find_assignment_spec(source):
 
 
 def gen_question_cell(cell, manual, format, in_manual_block):
-    """Return the cell with metadata hidden in an HTML comment."""
+    """Return the cell with metadata hidden in an HTML comment.
+    
+    Args:
+        cell (list): List of lines of Python code
+    
+    Returns:
+        int: Line number of BEGIN ASSIGNMENT, if present
+        None: if BEGIN ASSIGNMENT not present in code
+    """
     cell = copy.deepcopy(cell)
     source = get_source(cell)
     if manual and not in_manual_block:
@@ -395,21 +504,32 @@ def gen_question_cell(cell, manual, format, in_manual_block):
 
 
 def gen_close_export_cell():
-    """Returns a new cell to end question export"""
+    """Returns a new cell to end question export
+    
+    Returns:
+        cell: new code cell with <!-- END QUESTION -->
+    """
     cell = nbformat.v4.new_markdown_cell("<!-- END QUESTION -->")
     lock(cell)
     return cell
 
 
 def add_close_export_to_cell(cell):
-    """Adds an export close to the top of the cell"""
+    """Adds an export close to the top of the cell
+    
+    Args:
+        cell (cell): code cell which this function adds <!-- END QUESTION --> to the top of
+    """
     source = get_source(cell)
     source = ["<!-- END QUESTION -->\n", "\n"] + source
     cell['source'] = "\n".join(source)
 
 
 def read_question_metadata(cell):
-    """Return question metadata from a question cell."""
+    """Return question metadata from a question cell.
+    
+    
+    """
     source = get_source(cell)
     begin_question_line = find_question_spec(source)
     i, lines = begin_question_line + 1, []

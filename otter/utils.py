@@ -65,7 +65,20 @@ def merge_csv(dataframes):
 	return final_dataframe
 
 
-def connect_db(host, port, username, password, db='otter_db'):
+def connect_db(host="localhost", username="admin", password="", port="5432"):
+    """Connects to a specific postgres database with provided parameters/credentials
+
+    Keyword Arguments:
+        host (str, optional): Hostname for database (default localhost)
+        username (str, optional): Username with proper read/write permissions for postgres
+        password (str, optional): Password for provided username
+        port (str, optional): Port on which Postgres is running
+    Raises:
+        ImportError: if psycopg2 is missing
+
+    Returns:
+        connection: Connection object for executing sql commands on postgres database
+    """
     if MISSING_PACKAGES:
         raise ImportError(
             "Missing some packages required for otter service. "
@@ -73,13 +86,11 @@ def connect_db(host, port, username, password, db='otter_db'):
             "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
         )
         
-    conn = connect(
-            dbname=db,
-            host=host,
-            port=port,
-            user=username,
-            password=password
-        )
+    conn = connect(dbname='otter_db',
+               user=username,
+               host=host,
+               password=password,
+               port=port)
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     return conn
 
@@ -150,6 +161,13 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 def str_to_doctest(code_lines, lines):
     """
     Converts a list of lines of Python code CODE_LINES to a list of doctest-formatted lines LINES
+
+    Args:
+        code_lines (list): List of lines of python code
+        lines (list): Set of characters used to create function name
+    
+    Returns:
+        list: doc-test formatted list of lines
     """
     if len(code_lines) == 0:
         return lines

@@ -8,6 +8,8 @@ try:
     import yaml
     import csv
     import psycopg2
+    import hashlib
+    import os
 
     from psycopg2 import connect, extensions, sql
 
@@ -17,23 +19,61 @@ except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
 
-# def create_users(args, filepath):
-#     with open(filepath, newline='') as csvfile:
-#         filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
-#         # TODO: fill in the arguments below
-#         conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
-#         cursor = conn.cursor()
-#         for row in filereader:
-#             username, password = row[:2]
-#             if username.lower() == "username":
-#                 # skip heading
-#                 continue
-#             insert_command = """
-#                 INSERT INTO users (username, password) VALUES (\'{}\', \'{}\')
-#                 ON CONFLICT (username)
-#                 DO UPDATE SET password = \'{}\'
-#                 """.format(username, password, password)
-#             cursor.execute(insert_command)
+def create_users(filepath, host=None, username=None, password=None):
+    """
+    Inserts usernames from filepath into db
+
+    Args:
+        filepath (str): Path to CSV files with usernames in first column, 
+            passwords in second
+        host (str, optional): Hostname where postgresql is running
+        username (str, optional): Username for writing to postgres database
+        password (str, optional): Password corresponding to provided username
+    """
+    with open(filepath, newline='') as csvfile:
+        filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        # TODO: fill in the arguments below
+        conn = connect_db(host, username, fpassword)
+        cursor = conn.cursor()
+        for row in filereader:
+            username, password = row[:2]
+            password = hashlib.sha256(password.encode()).hexdigest()
+            if username.lower() == "username":
+                # skip heading
+                continue
+            insert_command = """
+                INSERT INTO users (username, password) VALUES (\'{}\', \'{}\')
+                ON CONFLICT (username)
+                DO UPDATE SET password = \'{}\'
+                """.format(username, password, password)
+            cursor.execute(insert_command)
+
+def remove_users(filepath, host=None, username=None, password=None):
+    """Removes users specified in file FILEPATH
+    
+    Args:
+        filepath (str): Path to CSV files with usernames in first column, 
+            passwords in second
+        host (str, optional): Hostname where postgresql is running
+        username (str, optional): Username for writing to postgres database
+        password (str, optional): Password corresponding to provided username
+    """
+    with open(filepath, newline='') as csvfile:
+        filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        # TODO: fill in the arguments below
+        conn = connect_db(host, username, password)
+        cursor = conn.cursor()
+        remove_count = 0
+        for row in filereader:
+            username, password = row[:2]
+            password = hashlib.sha256(password.encode()).hexdigest()
+            if username.lower() == "username":
+                # skip heading
+                continue
+            insert_command = """
+                DELETE FROM users WHERE username = \'{}\'
+                """.format(username)
+            cursor.execute(insert_command)
 
 def main(args):
     if MISSING_PACKAGES:
@@ -46,7 +86,14 @@ def main(args):
     # # TODO: can't assume we're in directory with conf.yml
     # with open("conf.yml") as f:
     #     config = yaml.safe_load(f)
-    config = {}
+    try:
+        assert os.path.isfile("conf.yml"), "conf.yml does not exist"
+        with open("conf.yml") as f:
+            config = yaml.safe_load(f)
+    except AssertionError:
+        conf_path = input("What is the path of your config file?")
+        with open(conf_path) as f:
+            config = yaml.safe_load(f)
     
     try:
         conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass, db='postgres')
