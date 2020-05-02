@@ -24,7 +24,7 @@ sklearn
 jinja2
 nb2pdf
 tornado==5.1.1
-otter-grader==0.4.7{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@beta{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
