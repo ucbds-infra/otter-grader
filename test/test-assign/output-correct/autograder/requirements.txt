@@ -17,3 +17,9 @@ pyyaml
 docker
 jwt
 tornado
+
+# documentation requirements
+recommonmark
+sphinx_markdown_tables
+git+https://github.com/pandas-dev/pydata-sphinx-theme.git@71a64ba
+sphinxcontrib-apidoc
