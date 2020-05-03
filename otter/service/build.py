@@ -131,6 +131,8 @@ def main(args, conn=None, close_conn=True):
             global_requirements_filename = os.path.split(global_requirements)[1],
             files = a.get("files", [])
         )
+
+        print("Building Docker image {}".format(a["assignment_id"]))
         
         # Build the docker image
         echo_dockerfile = subprocess.Popen(["echo", dockerfile], stdout=PIPE)
@@ -143,7 +145,6 @@ def main(args, conn=None, close_conn=True):
         build_out.wait()
         
         echo_dockerfile.stdout.close()
-        build_out.stdout.close()
 
         print("Built Docker image {}".format(a["assignment_id"]))
     
