@@ -382,7 +382,7 @@ def main(cli_args):
     args = cli_args
 
     # TODO: add arguments below
-    conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
+    conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
     port = 5000
     tornado.options.parse_command_line()
 
