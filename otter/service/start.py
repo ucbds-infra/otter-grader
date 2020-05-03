@@ -13,6 +13,7 @@ try:
     import logging
     import contextlib
     import traceback
+    import asyncio
     import tornado.options
     import queries
 
@@ -151,7 +152,7 @@ try:
             self.finish()
 
             if self.submission_id is not None:
-                self.grade_submission()
+                asyncio.get_event_loop().run_until_complete(grade_submission(self.submission_id))
 
 
 
@@ -254,10 +255,10 @@ try:
 
             self.write('Submission {} received.'.format(submission_id))
 
-        @gen.coroutine
-        def grade_submission(self):
-            future = grade_submission(self.submission_id)
-            yield future
+        # @gen.coroutine
+        # def grade_submission(self):
+        #     future = grade_submission(self.submission_id)
+        #     yield future
         
 
         # async def on_finish_async(self):
