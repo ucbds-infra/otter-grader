@@ -304,11 +304,18 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
         raise
     
     # check that no commands errored, if they did rais an informative exception
-    all_commands = [launch, copy, tests, grade, csv, csv_cleanup, stop, remove]
+    all_commands = [launch, copy, grade, csv, csv_cleanup, stop, remove]
+    
+    try:
+        all_commands += [tests]
+    except UnboundLocalError:
+        pass
+
     try:
         all_commands += [requirements, install]
     except UnboundLocalError:
         pass
+
     for command in all_commands:
         if command.stderr.decode('utf-8') != '':
             raise Exception("Error running ", command, " failed with error: ", \
