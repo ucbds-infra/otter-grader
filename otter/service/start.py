@@ -337,8 +337,7 @@ try:
                     seed=seed
                 )
                 
-            print("Graded submission {} from user {}".format(submission_id, username))
-            print(df)
+            message = "Graded submission {} from user {}".format(submission_id, username)
 
             df_json_str = df.to_json()
         
@@ -363,6 +362,7 @@ try:
                 f.write(stderr)
         
         cursor.close()
+        return message, df
 
     async def start_grading_queue():
         global SUBMISSION_QUEUE
@@ -372,7 +372,7 @@ try:
                 grade_submission,
                 submission_id
             )
-            future.result()
+            future.add_done_callback(lambda f: print(f.result()[0], "\n", f.result()[1]))
 
             # Set task done in queue
             SUBMISSION_QUEUE.task_done()
