@@ -48,7 +48,7 @@ class Notebook:
 				self._config = json.load(f)
 
 			# check that config file has required info
-			assert all([key in self._config for key in ["endpoint", "auth", "assignment", "notebook"]]), "config file missing required information"
+			assert all([key in self._config for key in ["endpoint", "auth", "assignment_id", "class_id", "notebook"]]), "config file missing required information"
 
 			self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
 			self._default_auth_url = os.path.join(self._config["endpoint"], "auth")

@@ -107,7 +107,7 @@ try:
                     redirect_uri=self.settings['auth_redirect_uri'],
                     code=self.get_argument('code')
                 )
-                api_key = resp['access_token']
+                api_key = hexlify(os.urandom(32)).decode("utf-8")
                 email = jwt.decode(resp['id_token'], verify=False)['email']
                 print("Generating API key for user {} from Google OAuth".format(email))
                 results = await self.db.query(
@@ -368,10 +368,11 @@ try:
         global SUBMISSION_QUEUE
 
         async for submission_id in SUBMISSION_QUEUE:
-            EXECUTOR.submit(
+            future = EXECUTOR.submit(
                 grade_submission,
                 submission_id
             )
+            future.result()
 
             # Set task done in queue
             SUBMISSION_QUEUE.task_done()
