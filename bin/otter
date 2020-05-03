@@ -121,7 +121,7 @@ service_subparsers = service_parser.add_subparsers()
 
 ##### PARSER FOR otter service build #####
 service_build_parser = service_subparsers.add_parser("build", description="Build images for an otter-service instance")
-service_build_parser.add_argument("repo-path", default=".", help="Path to assignments repo root")
+service_build_parser.add_argument("repo_path", default=".", help="Path to assignments repo root")
 service_build_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
 service_build_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
 service_build_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
