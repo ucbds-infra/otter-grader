@@ -310,10 +310,11 @@ try:
                         image=assignment_id,
                         debug=True
                     )
-                    print("Graded submission {} from user {}".format(submission_id, username))
-                    print(df)
+                    
+                print("Graded submission {} from user {}".format(submission_id, username))
+                print(df)
 
-                    df_json_str = df.to_json()
+                df_json_str = df.to_json()
             
                 # Insert score into submissions table
                 cursor.execute("INSERT INTO submissions \
@@ -326,9 +327,6 @@ try:
                 
                 print("Wrote score for submission {} from user {} to database".format(submission_id, username))
 
-                # Set task done in queue
-                user_queue.task_done()
-
             finally:
                 stdout = stdout.getvalue()
                 stderr = stderr.getvalue()
@@ -336,6 +334,9 @@ try:
                     f.write(stdout)
                 with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDERR"), "w+") as f:
                     f.write(stderr)
+
+                # Set task done in queue
+                user_queue.task_done()
             
         cursor.close()
 
@@ -424,5 +425,5 @@ def main(cli_args):
     async def grader():
         await grade_submission(conn)
 
-    IOLoop.current().spawn_callback(grader)
+    IOLoop.current().add_future(grader)
     IOLoop.current().start()
