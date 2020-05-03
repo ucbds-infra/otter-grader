@@ -51,7 +51,13 @@ class EmptyCellException(Exception):
 
 
 def run_tests(nb_path, debug=False, seed=None):
-    """Run tests in the autograder version of the notebook."""
+    """Run tests in the autograder version of the notebook.
+    
+    Args:
+        nb_path (str): Path to iPython notebooks
+        debug (bool, optional): True if errors should not be ignored
+        seed (int, optional): Random seed for numpy
+    """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
     results = grade_notebook(nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
@@ -109,6 +115,15 @@ def convert_to_ok(nb_path, dir, args):
     nb -- Path
     endpoint -- OK endpoint for notebook submission (e.g., cal/data100/sp19)
     dir -- Path
+
+    Args:
+        nb_path (Path): pathlib Path object to iPython master notebook
+        dir (Path): pathlib Path object for directory
+        args (???): ???
+
+    Returns:
+        str: ok_nb_path, which is the path with the notebook, tests dir, and .ok file
+
     """
     ok_nb_path = dir / nb_path.name
     tests_dir = dir / 'tests'
@@ -149,14 +164,28 @@ def convert_to_ok(nb_path, dir, args):
 
 
 def gen_init_cell():
-    """Generate a cell to initialize ok object."""
+    """Generate a cell to initialize ok object.
+    
+    Returns:
+        cell (cell): new code cell
+    """
     cell = nbformat.v4.new_code_cell("# Initialize Otter\nimport otter\ngrader = otter.Notebook()")
     lock(cell)
     return cell
 
 
 def gen_export_cells(nb_path, instruction_text, filtering=True):
-    """Generate submit cells."""
+    """Generate submit cells.
+    
+    Args:
+        nb_path (str): Path with iPython notebook
+        instruction_text (str): Extra instructions for students when exporting
+        filtering (bool, optional): Whether PDF filtering is needed
+    
+    Returns:
+        list: List with instructions, export code cell, buffer cell
+
+    """
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before \
     running the cell below, so that all images/graphs appear in the output. The cell below will generate \
@@ -180,7 +209,11 @@ def gen_export_cells(nb_path, instruction_text, filtering=True):
 
 
 def gen_check_all_cell():
-    """Generate submit cells."""
+    """Generate submit cells.
+    
+    Returns:
+        list: List with instructions, check all code cell
+    """
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "To double-check your work, the cell below will rerun all of the autograder tests."
 
@@ -195,8 +228,12 @@ def gen_check_all_cell():
 def gen_ok_cells(cells, tests_dir):
     """Generate notebook cells for the OK version of a master notebook.
 
+    Args:
+        cells (list): List of original code cells
+        tests_dir (str): Path to ok tests
+    
     Returns:
-        (ok_cells, list of manual question names)
+        list: ok cells and list of question names which neeed manual grading
     """
     global SEED_REQUIRED, ASSIGNMENT_METADATA
     ok_cells = []
@@ -318,7 +355,14 @@ def gen_ok_cells(cells, tests_dir):
 
 
 def get_source(cell):
-    """Get the source code of a cell in a way that works for both nbformat and json."""
+    """Get the source code of a cell in a way that works for both nbformat and json.
+    
+    Args:
+        cell (cell): original code cell
+    
+    Returns:
+        list: Reformatted code to be used in nbformat/json
+    """
     source = cell['source']
     if isinstance(source, str):
         return cell['source'].split('\n')
@@ -328,21 +372,43 @@ def get_source(cell):
 
 
 def is_question_cell(cell):
-    """Whether cell contains BEGIN QUESTION in a block quote."""
+    """Whether cell contains BEGIN QUESTION in a block quote.
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        ???
+
+    """
     if cell['cell_type'] != 'markdown':
         return False
     return find_question_spec(get_source(cell)) is not None
 
 
 def is_assignment_cell(cell):
-    """Whether cell contains BEGIN QUESTION in a block quote."""
+    """Whether cell contains BEGIN QUESTION in a block quote.
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        boolean: True if cell contains BEGIN QUESTION, else false
+    """
     if cell['cell_type'] != 'markdown':
         return False
     return find_assignment_spec(get_source(cell)) is not None
 
 
 def is_seed_cell(cell):
-    """Whether cell contains BEGIN QUESTION in a block quote."""
+    """Whether cell is seed cell.
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        boolean: True if cell contains seed, else false
+    """
     if cell['cell_type'] != 'code':
         return False
     source = get_source(cell)
@@ -350,13 +416,27 @@ def is_seed_cell(cell):
 
 
 def is_markdown_solution_cell(cell):
-    """Whether the cell matches MD_SOLUTION_REGEX"""
+    """Whether the cell matches MD_SOLUTION_REGEX
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        boolean: True if cell matches MD_SOLUTION_REGEX, else false
+    """
     source = get_source(cell)
     return is_solution_cell and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
 
 
 def is_solution_cell(cell):
-    """Whther the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX"""
+    """Whether the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX
+    
+    Args:
+        cell (cell): Python code cell
+    
+    Returns:
+        boolean: True if cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX, else false
+    """
     source = get_source(cell)
     if cell['cell_type'] == 'markdown':
         return source and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
@@ -366,7 +446,15 @@ def is_solution_cell(cell):
 
 
 def find_question_spec(source):
-    """Return line number of the BEGIN QUESTION line or None."""
+    """Return line number of the BEGIN QUESTION line or None.
+    
+    Args:
+        source (list): List of lines of Python code
+    
+    Returns:
+        int: Line number of BEGIN QUESTION, if present
+        None: if BEGIN QUESTION not present in code
+    """
     block_quotes = [i for i, line in enumerate(source) if
                     line[:3] == BLOCK_QUOTE]
     assert len(block_quotes) % 2 == 0, 'cannot parse ' + str(source)
@@ -377,7 +465,15 @@ def find_question_spec(source):
 
 
 def find_assignment_spec(source):
-    """Return line number of the BEGIN ASSIGNMENT line or None."""
+    """Return line number of the BEGIN ASSIGNMENT line or None.
+    
+    Args:
+        source (list): List of lines of Python code
+    
+    Returns:
+        int: Line number of BEGIN ASSIGNMENT, if present
+        None: if BEGIN ASSIGNMENT not present in code
+    """
     block_quotes = [i for i, line in enumerate(source) if
                     line[:3] == BLOCK_QUOTE]
     assert len(block_quotes) % 2 == 0, 'cannot parse ' + str(source)
@@ -388,7 +484,15 @@ def find_assignment_spec(source):
 
 
 def gen_question_cell(cell, manual, format, in_manual_block):
-    """Return the cell with metadata hidden in an HTML comment."""
+    """Return the cell with metadata hidden in an HTML comment.
+    
+    Args:
+        cell (list): List of lines of Python code
+    
+    Returns:
+        int: Line number of BEGIN ASSIGNMENT, if present
+        None: if BEGIN ASSIGNMENT not present in code
+    """
     cell = copy.deepcopy(cell)
     source = get_source(cell)
     if manual and not in_manual_block:
@@ -417,21 +521,36 @@ def gen_question_cell(cell, manual, format, in_manual_block):
 
 
 def gen_close_export_cell():
-    """Returns a new cell to end question export"""
+    """Returns a new cell to end question export
+    
+    Returns:
+        cell: new code cell with <!-- END QUESTION -->
+    """
     cell = nbformat.v4.new_markdown_cell("<!-- END QUESTION -->")
     lock(cell)
     return cell
 
 
 def add_close_export_to_cell(cell):
-    """Adds an export close to the top of the cell"""
+    """Adds an export close to the top of the cell
+    
+    Args:
+        cell (cell): code cell which this function adds <!-- END QUESTION --> to the top of
+    """
     source = get_source(cell)
     source = ["<!-- END QUESTION -->\n", "\n"] + source
     cell['source'] = "\n".join(source)
 
 
 def read_question_metadata(cell):
-    """Return question metadata from a question cell."""
+    """Return question metadata from a question cell.
+    
+    Args:
+        cell (cell): An nb.cell object for a question cell
+    
+    Returns:
+        json: metadata information for a question cell
+    """
     source = get_source(cell)
     begin_question_line = find_question_spec(source)
     i, lines = begin_question_line + 1, []
@@ -444,7 +563,14 @@ def read_question_metadata(cell):
 
 
 def read_assignment_metadata(cell):
-    """Return assignment metadata from an assignment cell."""
+    """Return assignment metadata from an assignment cell.
+    
+    Args:
+        cell (cell): An nb.cell object for an assignment cell
+    
+    Returns:
+        dict: metadata information for a question cell
+    """
     source = get_source(cell)
     begin_assignment_line = find_assignment_spec(source)
     i, lines = begin_assignment_line + 1, []
@@ -456,7 +582,14 @@ def read_assignment_metadata(cell):
 
 
 def is_test_cell(cell):
-    """Return whether it's a code cell containing a test."""
+    """Return whether it's a code cell containing a test.
+    
+    Args:
+        cell (cell): An nb.cell object for an assignment cell
+
+    Returns:
+        boolean: true if the cell contains a test, false if not
+    """
     if cell['cell_type'] != 'code':
         return False
     source = get_source(cell)
@@ -467,7 +600,14 @@ Test = namedtuple('Test', ['input', 'output', 'hidden'])
 
 
 def read_test(cell):
-    """Return the contents of a test as an (input, output, hidden) tuple."""
+    """Return the contents of a test as an (input, output, hidden) tuple.
+    
+    Args:
+        cell (cell): An nb.cell object for an assignment cell
+
+    Returns:
+        Test: test object with (input code, cell outputs, hidden cell boolean)
+    """
     hidden = bool(re.search("hidden", get_source(cell)[0], flags=re.IGNORECASE))
     output = ''
     for o in cell['outputs']:
@@ -481,14 +621,28 @@ def read_test(cell):
 
 
 def write_test(path, test):
-    """Write an OK test file."""
+    """Write an OK test file.
+    
+    Args:
+        path (str): String path of file to be written
+        test (Test): Test object to be written
+    """
     with open(path, 'w') as f:
         f.write('test = ')
         pprint.pprint(test, f, indent=4, width=200, depth=None)
 
 
 def gen_test_cell(question, tests, tests_dir):
-    """Return a test cell."""
+    """Return a test cell.
+    
+    Args:
+        question (dict): Question metadata
+        tests (list): List of OK Test objects
+        tests_dir (str): Path to tests directory
+
+    Returns:
+        cell: code cell object with test
+    """
     cell = nbformat.v4.new_code_cell()
     # if hidden:
     #     cell.source = ['grader.check("{}")'.format(question['name'] + "H")]
@@ -533,7 +687,14 @@ def gen_test_cell(question, tests, tests_dir):
 
 
 def gen_suite(tests):
-    """Generate an ok test suite for a test."""
+    """Generate an ok test suite for a test.
+    
+    Args:
+        tests (list): List of OK Test objects
+
+    Returns:
+        dict: OK Test Suite for the given tests
+    """
     cases = [gen_case(test) for test in tests]
     return  {
       'cases': cases,
@@ -545,7 +706,14 @@ def gen_suite(tests):
 
 
 def gen_case(test):
-    """Generate an ok test case for a test."""
+    """Generate an ok test case for a test.
+    
+    Args:
+        test: OK Test object
+
+    Returns:
+        dict: code, hidden boolean, and locked attribute for OK Test
+    """
     code_lines = str_to_doctest(test.input.split('\n'), [])
     # Suppress intermediate output from evaluation
     for i in range(len(code_lines) - 1):
@@ -599,7 +767,14 @@ SUBSTITUTIONS = [
 
 
 def replace_solutions(lines):
-    """Replace solutions in lines, a list of strings."""
+    """Replace solutions in lines, a list of strings.
+    
+    Args:
+        lines (list): List of code strings including solutions
+
+    Returns:
+        list: stripped version of lines without solutions
+    """
     # if text_solution_line_re.match(lines[0]):
     #     return ['*Write your answer here, replacing this text.*']
     stripped = []
@@ -631,7 +806,13 @@ def replace_solutions(lines):
 
 
 def strip_solutions(original_nb_path, stripped_nb_path):
-    """Write a notebook with solutions stripped."""
+    """Write a notebook with solutions stripped.
+    
+    Args:
+        original_nb_path (str): Filepath for original notebook
+        stripped_nb_path (str): Path for new stripped notebook
+    
+    """
     with open(original_nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
     md_solutions = []
@@ -660,20 +841,32 @@ def strip_solutions(original_nb_path, stripped_nb_path):
 
 
 def remove_output(nb):
-    """Remove all outputs."""
+    """Remove all outputs.
+    
+    nb (json): notebook in json format
+    """
     for cell in nb['cells']:
         if 'outputs' in cell:
             cell['outputs'] = []
 
 
 def lock(cell):
+    """Makes a cell non-editable and non-deletable
+
+    Arguments:
+        cell (cell): code cell to be locked
+    """
     m = cell['metadata']
     m["editable"] = False
     m["deletable"] = False
 
 
 def remove_hidden_tests(test_dir):
-    """Rewrite test files to remove hidden tests."""
+    """Rewrite test files to remove hidden tests.
+    
+    Args:
+        test_dir (Path): pathlib Path object for test files directory
+    """
     for f in test_dir.iterdir():
         if f.name == '__init__.py' or f.suffix != '.py':
             continue
@@ -691,8 +884,8 @@ def remove_hidden_tests(test_dir):
 def gen_views(master_nb, result_dir, args):
     """Generate student and autograder views.
 
-    master_nb -- Dict of master notebook JSON
-    result_dir -- Path to the result directory
+    master_nb (dict): Dict of master notebook JSON
+    result_dir (Path): pathlib Path object for the result directory
     """
     autograder_dir = result_dir / 'autograder'
     student_dir = result_dir / 'student'
