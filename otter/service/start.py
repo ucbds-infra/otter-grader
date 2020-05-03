@@ -25,6 +25,7 @@ try:
     from tornado.ioloop import IOLoop
     from tornado.queues import Queue
     from tornado.gen import sleep
+    from tornado import gen
     # from psycopg2 import connect, extensions
 
     from ..containers import grade_assignments
@@ -150,7 +151,7 @@ try:
             self.finish()
 
             if self.submission_id is not None:
-                await grade_submission(self.submission_id)
+                self.grade_submission()
 
 
 
@@ -252,6 +253,11 @@ try:
             self.submission_id = submission_id
 
             self.write('Submission {} received.'.format(submission_id))
+
+        @gen.coroutine
+        def grade_submission(self):
+            future grade_submission(self.submission_id)
+            yield future
         
 
         # async def on_finish_async(self):
