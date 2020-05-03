@@ -36,6 +36,8 @@ try:
 
     user_queue = Queue()
 
+    conn = None
+
     # assert args.config is not None, "no config provided"
     # with open(args.config) as f:
     #     config = yaml.load(f)
