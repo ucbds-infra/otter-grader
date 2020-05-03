@@ -278,7 +278,7 @@ try:
             assert len(user_record) == 1, "No submission found for user {}".format(user)
             row = user_record[0]
             user_id = int(row[0])
-            submission_id = float(row[1])
+            submission_id = int(row[1])
             assignment_id = str(row[2])
             class_id = str(row[3])
             file_path = str(row[4])
@@ -310,6 +310,8 @@ try:
                         image=assignment_id,
                         debug=True
                     )
+                    print("Graded submission {} from user {}".format(submission_id, username))
+                    print(df)
             finally:
                 stdout = stdout.getvalue()
                 stderr = stderr.getvalue()
