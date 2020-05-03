@@ -297,6 +297,8 @@ try:
                         debug=True
                     )
             finally:
+                print("executing")
+                print(os.path.split(file_path)[0])
                 stdout = stdout.getvalue()
                 stderr = stderr.getvalue()
                 with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
