@@ -100,7 +100,7 @@ def main(args, conn=None, close_conn=True):
     #     conf_path = input("What is the path of your config file?")
     #     with open(conf_path) as f:
     #         config = yaml.safe_load(f)
-    pgconn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
+    pgconn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port, db='postgres')
 
     try:
         pgconn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
