@@ -429,7 +429,7 @@ def main(args=None):
         score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts, seed=args.seed, cwd=dir_path)
         if args.verbose:
             print("Score details for {}".format(ipynb_name))
-            print(json.dumps(score))
+            print(json.dumps(score, default=lambda o: repr(o)))
         # del score["TEST_HINTS"]
         all_results["score"].append({t : score[t]["score"] if type(score[t]) == dict else score[t] for t in score})
         if args.pdf or args.html_filter or args.tag_filter:
