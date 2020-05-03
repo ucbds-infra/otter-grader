@@ -15,7 +15,7 @@ from psycopg2.errors import UniqueViolation
 from ..utils import connect_db
 
 DOCKERFILE_TEMPLATE = Template("""
-FROM ucbdsinfra/otter-grader
+FROM {{ image }}
 RUN mkdir /home/notebooks
 ADD {{ test_folder_path }} /home{% if test_folder_name != "tests" %}
 RUN mv /home/{{ test_folder_name }} /home/tests{% endif %}{% if requirements %}
@@ -123,6 +123,7 @@ def main(args, conn=None, close_conn=True):
         global_requirements = config["requirements"] if "requirements" in config else ""
 
         dockerfile = DOCKERFILE_TEMPLATE.render(
+            image = args.image,
             test_folder_path = a["tests_path"],
             test_folder_name = os.path.split(a["tests_path"])[1],
             requirements = requirements,
