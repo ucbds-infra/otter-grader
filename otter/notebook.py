@@ -238,7 +238,8 @@ class Notebook:
 		with open(notebook_path) as f:
 			notebook_data = json.load(f)
 
-		notebook_data["metadata"]["assignment_id"] = self._config["assignment"]
+		notebook_data["metadata"]["assignment_id"] = self._config["assignment_id"]
+		notebook_data["metadata"]["class_id"] = self._config["class_id"]
 		
 		print("Submitting notebook to server...")
 

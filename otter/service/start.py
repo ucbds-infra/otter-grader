@@ -34,25 +34,17 @@ try:
     from ..utils import connect_db
 
     OTTER_SERVICE_DIR = "/otter-service"
-
-    args = None
-
-    # user_queue = Queue()
-    submission_queue = Queue()
-
-    conn = None
-    
+    ARGS = None
+    SUBMISSION_QUEUE = Queue()
+    CONN = None
     EXECUTOR = ThreadPoolExecutor()
-
-    # assert args.config is not None, "no config provided"
-    # with open(args.config) as f:
-    #     config = yaml.load(f)
 
     class BaseHandler(tornado.web.RequestHandler):
         def get_current_user(self):
             """Gets secure user cookie for personal authentication
             """
             return self.get_secure_cookie("user")
+    
 
     class LoginHandler(BaseHandler):
         async def get(self):
@@ -93,6 +85,7 @@ try:
         @property
         def db(self):
             return self.application.db
+    
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
@@ -103,8 +96,8 @@ try:
                 print("Redirecting user to Google OAuth")
                 return self.authorize_redirect(
                     redirect_uri=self.settings['auth_redirect_uri'],
-                    client_id = args.google_key if args.google_key else self.settings['google_oauth']['key'],
-                    client_secret = args.google_secret if args.google_secret else self.settings['google_oauth']['secret'],
+                    client_id = ARGS.google_key if ARGS.google_key else self.settings['google_oauth']['key'],
+                    client_secret = ARGS.google_secret if ARGS.google_secret else self.settings['google_oauth']['secret'],
                     scope=['email', 'profile'],
                     response_type='code',
                     extra_params={'approval_prompt': 'auto'}
@@ -132,6 +125,7 @@ try:
         @property
         def db(self):
             return self.application.db
+    
 
     class SubmissionHandler(RequestHandler):
         async def get(self):
@@ -156,15 +150,7 @@ try:
             self.finish()
 
             if self.submission_id is not None:
-            #     asyncio.get_event_loop().run_until_complete(grade_submission(self.submission_id))
-                # @gen.coroutine
-                # async def grader():
-                #     await grade_submission(self.submission_id)
-                # IOLoop.current().spawn_callback(grader)
-                submission_queue.put(self.submission_id)
-                
-
-
+                SUBMISSION_QUEUE.put(self.submission_id)
 
         async def validate(self, notebook, api_key):
             """Ensures a submision is valid by checking user credentials, submission frequency, and
@@ -184,8 +170,24 @@ try:
             results.free()
             assert user_id, 'invalid API key: {}'.format(api_key)
 
+            # get assignment and class id from notebook metadata
+            assert all(key in notebook for key in ['metadata', 'nbformat', 'cells']), 'invalid Jupyter notebook'
+            assert 'assignment_id' in notebook['metadata'], 'missing required metadata attribute: assignment_id'
+            assert 'class_id' in notebook['metadata'], 'missing required metadata attribute: class_id'
+            assignment_id = notebook['metadata']['assignment_id']
+            class_id = notebook['metadata']['class_id']
+
             # rate limit one submission every 2 minutes
-            results = await self.db.query("SELECT timestamp FROM submissions WHERE user_id=%s ORDER BY timestamp DESC LIMIT 1", [user_id])
+            results = await self.db.query(
+                """
+                SELECT timestamp 
+                FROM submissions 
+                WHERE user_id = %s AND assignment_id = %s AND class_id = %s
+                ORDER BY timestamp DESC 
+                LIMIT 1
+                """, 
+                (user_id, assignment_id, class_id)
+            )
             last_submitted = results.as_dict()['timestamp'] if len(results) > 0 else None
             results.free()
 
@@ -193,10 +195,9 @@ try:
             if last_submitted:
                 delta = datetime.utcnow() - last_submitted
                 # rate_limit = 120
-                if delta.seconds < args.rate_limit:
-                    self.write_error(429, message='Please wait {} second(s) before re-submitting.'.format(args.rate_limit - delta.seconds))
+                if delta.seconds < ARGS.rate_limit:
+                    self.write_error(429, message='Please wait {} second(s) before re-submitting.'.format(ARGS.rate_limit - delta.seconds))
                     return
-
 
             # check valid Jupyter notebook
             assert all(key in notebook for key in ['metadata', 'nbformat', 'nbformat_minor', 'cells']), 'invalid Jupyter notebook'
@@ -209,7 +210,6 @@ try:
             results.free()
 
             return (user_id, username, assignment['class_id'], assignment_id, assignment['assignment_name'])
-
 
         async def submit(self, notebook, api_key):
             """If valid submission, inserts notebook into submissions table in database and queues 
@@ -257,28 +257,9 @@ try:
             assert results, 'submission failed'
             results.free()
 
-            # # queue user for grading
-            # await user_queue.put(user_id)
-            # print('Queued user {}'.format(username))
-
             self.submission_id = submission_id
 
             self.write('Submission {} received.'.format(submission_id))
-
-        # @gen.coroutine
-        # def grade_submission(self):
-        #     future = grade_submission(self.submission_id)
-        #     yield future
-        
-
-        # async def on_finish_async(self):
-                
-        
-
-        # def on_finish(self):
-        #     IOLoop.current().add_callback(self.on_finish_async)
-        #     return super().on_finish()
-
 
         @property
         def db(self):
@@ -292,8 +273,8 @@ try:
 
 
     def grade_submission(submission_id):
-        global conn
-        cursor = conn.cursor()
+        global CONN
+        cursor = CONN.cursor()
 
         cursor.execute(
             """
@@ -341,7 +322,6 @@ try:
         username = str(row[0] or row[1])
 
         # Run grading function in a docker container
-        # TODO: fix arguments below, redirect stdout/stderr
         print("Grading submission {} from user {}".format(submission_id, username))
         stdout = StringIO()
         stderr = StringIO()
@@ -371,14 +351,6 @@ try:
                 """,
                 (df_json_str, submission_id)
             )
-
-            # cursor.execute("INSERT INTO submissions \
-            #     (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
-            #     VALUES (%s, %s, %s, %s, %s, %s, %s) \
-            #     ON CONFLICT (submission_id) \
-            #     DO UPDATE SET timestamp = %s, score = %s",
-            #     [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
-            #     datetime.utcnow(), df_json_str])
             
             print("Wrote score for submission {} from user {} to database".format(submission_id, username))
 
@@ -393,45 +365,28 @@ try:
         cursor.close()
 
     async def start_grading_queue():
-        global submission_queue
-        
-        # # This can be moved to global
-        # with open("conf.yml") as f:
-        #     config = yaml.safe_load(f)
-        # async for user in user_queue:
-        # Get current user's latest submission
-        async for submission_id in submission_queue:
+        global SUBMISSION_QUEUE
+
+        async for submission_id in SUBMISSION_QUEUE:
             EXECUTOR.submit(
                 grade_submission,
                 submission_id
             )
 
             # Set task done in queue
-            submission_queue.task_done()
-            
-        # cursor.close()
+            SUBMISSION_QUEUE.task_done()
 
 
     class Application(tornado.web.Application):
-        def __init__(self, google_auth=True):
-            """Initialize tornado server for receiving/grading submissions
-
-            Args:
-                google_auth (boolean, optional): True if google authentication is preferred. False
-                    if default/personal authentication is preferred.
-            """
-            # TODO: these shouldn't be separate can just assume both are configured
-            # if google_auth:
-            # TODO: Add config file
-            # with open("conf.yml") as f:
-            #     config = yaml.safe_load(f)
-            endpoint = args.endpoint or os.environ.get("OTTER_ENDPOINT", None)
+        def __init__(self):
+            """Initialize tornado server for receiving/grading submissions"""
+            endpoint = ARGS.endpoint or os.environ.get("OTTER_ENDPOINT", None)
             assert endpoint is not None, "no endpoint address provided"
             assert os.path.isdir(OTTER_SERVICE_DIR), "{} does not exist".format(OTTER_SERVICE_DIR)
             settings = dict(
                 google_oauth={
-                    "key": args.google_key or os.environ.get("GOOGLE_CLIENT_KEY", None), 
-                    "secret": args.google_secret or os.environ.get("GOOGLE_CLIENT_SECRET", None)
+                    "key": ARGS.google_key or os.environ.get("GOOGLE_CLIENT_KEY", None), 
+                    "secret": ARGS.google_secret or os.environ.get("GOOGLE_CLIENT_SECRET", None)
                 },
                 notebook_dir = os.path.join(OTTER_SERVICE_DIR, "submissions"),
                 auth_redirect_uri = os.path.join(endpoint, "auth/callback")
@@ -443,13 +398,6 @@ try:
                 (r"/auth", LoginHandler)
             ]
             tornado.web.Application.__init__(self, handlers, **settings)
-            # else:
-            #     # TODO: add personal auth
-            #     handlers = [
-            #         (r"/submit", SubmissionHandler),
-            #         (r"/personal_auth", LoginHandler)
-            #     ]
-            #     tornado.web.Application.__init__(self, handlers)
             
             # Initialize database session
             self.db = queries.TornadoSession(queries.uri(
@@ -472,16 +420,12 @@ def main(cli_args):
             "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
         )
 
-    
-    #NB_DIR = os.environ.get('NOTEBOOK_DIR')
-    global conn
-    global args
-    # global user_queue
+    global CONN
+    global ARGS
 
-    args = cli_args
+    ARGS = cli_args
+    CONN = connect_db(ARGS.db_host, ARGS.db_user, ARGS.db_pass, ARGS.db_port)
 
-    # TODO: add arguments below
-    conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
     port = 5000
     tornado.options.parse_command_line()
 
@@ -489,12 +433,9 @@ def main(cli_args):
     if not os.path.isdir(OTTER_SERVICE_DIR):
         os.makedirs(os.path.join(OTTER_SERVICE_DIR))
     
-    server = HTTPServer(Application(google_auth=True))
+    server = HTTPServer(Application())
     server.listen(port)
     print("Listening on port {}".format(port))
-
-    # async def grader():
-    #     await grade_submission(conn)
 
     IOLoop.current().add_callback(start_grading_queue)
     IOLoop.current().start()
