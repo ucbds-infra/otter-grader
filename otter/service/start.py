@@ -34,8 +34,6 @@ try:
 
     args = None
 
-    conn = None
-
     user_queue = Queue()
 
     # assert args.config is not None, "no config provided"
@@ -254,16 +252,12 @@ try:
                 self.write('Submission failed.')
 
 
-    async def grade():
-        """
-        Grades latest submission for each user in the user queue. 
-        """
+    async def grade(conn):
         cursor = conn.cursor()
         
         # # This can be moved to global
         # with open("conf.yml") as f:
         #     config = yaml.safe_load(f)
-        
         async for user in user_queue:
             # Get current user's latest submission
             cursor.execute(
@@ -281,7 +275,6 @@ try:
                 submission_id = float(row[1])
                 assignment_id = str(row[2])
                 file_path = str(row[3])
-
             # # Get tests directory for assignment
             # tests_path = None
             # for assignment in config["assignments"]:
@@ -399,5 +392,5 @@ def main(cli_args):
     server = HTTPServer(Application(google_auth=True))
     server.listen(port)
     print("Listening on port {}".format(port))
-    IOLoop.current().spawn_callback(grade)
+    IOLoop.current().spawn_callback(grade(conn))
     IOLoop.current().start()
