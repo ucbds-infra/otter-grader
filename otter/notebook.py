@@ -50,8 +50,8 @@ class Notebook:
 			# check that config file has required info
 			assert all([key in self._config for key in ["endpoint", "auth", "assignment", "notebook"]]), "config file missing required information"
 
-			self._google_auth_url = os.path.join(self._config["endpoint"], "google_auth")
-			self._default_auth_url = os.path.join(self._config["endpoint"], "personal_auth")
+			self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
+			self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
 			self._submit_url = os.path.join(self._config["endpoint"], "submit")
 
 			if _API_KEY is None:
