@@ -125,7 +125,7 @@ service_build_parser.add_argument("--db-host", default="localhost", help="Postgr
 service_build_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
 service_build_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
 service_build_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
-service_build_parser.add_argument("-r", "--repo-path", default="/home/assignments", help="Path to assignments repo root")
+service_build_parser.add_argument("-r", "--repo-path", default=".", help="Path to assignments repo root")
 # TODO: add arguments
 
 service_build_parser.set_defaults(func=build.main)

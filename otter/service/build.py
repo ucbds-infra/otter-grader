@@ -6,7 +6,6 @@ import subprocess
 import shutil
 import os
 import yaml
-import docker
 
 from subprocess import PIPE
 from io import BytesIO
@@ -24,7 +23,7 @@ ADD {{ requirements }} /home
 RUN pip3 install -r /home/{{ requirements_filename }}{% endif %}{% if global_requirements %}
 ADD {{ global_requirements }} /home
 RUN pip3 install -r /home/{{ global_requirements_filename }}{% endif %}{% for file in files %}
-ADD file /home/notebooks{% endfor %}
+ADD {{ file }} /home/notebooks{% endfor %}
 """)
 
 def write_class_info(class_name, conn):
