@@ -18,7 +18,7 @@ try:
     import queries
     import stdio_proxy
 
-    from io import StringIO
+    from io import BytesIO
     from datetime import datetime
     from binascii import hexlify
     from tornado.httpserver import HTTPServer
@@ -322,8 +322,8 @@ try:
         username = str(row[0] or row[1])
 
         # Run grading function in a docker container
-        stdout = StringIO()
-        stderr = StringIO()
+        stdout = BytesIO()
+        stderr = BytesIO()
         try:
             with stdio_proxy.redirect_stdout(stdout), stdio_proxy.redirect_stderr(stderr):
                 df = grade_assignments(
