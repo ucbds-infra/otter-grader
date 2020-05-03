@@ -287,15 +287,20 @@ try:
             # Run grading function in a docker container
             # TODO: fix arguments below, redirect stdout/stderr
             stdout = StringIO()
-            with contextlib.redirect_stdout(stdout):
-                df = grade_assignments(
-                    tests_dir=None, 
-                    notebooks_dir=file_path, 
-                    id=assignment_id, 
-                    image=assignment_id,
-                    debug=True
-                )
-            stdout = stdout.getvalue()
+            try:
+                with contextlib.redirect_stdout(stdout):
+                    df = grade_assignments(
+                        tests_dir=None, 
+                        notebooks_dir=file_path, 
+                        id=assignment_id, 
+                        image=assignment_id,
+                        debug=True
+                    )
+            finally:
+                stdout = stdout.getvalue()
+                with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
+                    f.write(stdout)
+            
             df_json_str = df.to_json()
 
             # Insert score into submissions table
@@ -306,9 +311,6 @@ try:
                 DO UPDATE SET timestamp = %s, score = %s",
                 [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
                 datetime.utcnow(), df_json_str])
-
-            with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
-                f.write(stdout)
             
             # Set task done in queue
             user_queue.task_done()
