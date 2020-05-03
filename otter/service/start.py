@@ -422,8 +422,8 @@ def main(cli_args):
     server.listen(port)
     print("Listening on port {}".format(port))
 
-    # async def grader():
-    #     await grade_submission(conn)
+    async def grader():
+        grade_submission(conn)
 
-    IOLoop.current().spawn_callback(await grade_submission(conn))
+    IOLoop.current().spawn_callback(grader)
     IOLoop.current().start()
