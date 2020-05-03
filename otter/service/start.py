@@ -251,9 +251,13 @@ try:
             self.write('Submission {} received.'.format(submission_id))
         
 
-        async def on_finish(self):
+        async def on_finish_async(self):
                 await grade_submission(self.submission_id)
-                return super().on_finish()
+        
+
+        def on_finish(self):
+            IOLoop.current().add_callback(self.on_finish_async)
+            return super().on_finish()
 
 
         @property
