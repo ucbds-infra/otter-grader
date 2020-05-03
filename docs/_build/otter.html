@@ -1277,7 +1277,34 @@ notebook/script (see execute.execute_notebook for more on this)</p></li>
 
 <dl class="method">
 <dt id="otter.notebook.Notebook.export">
-<code class="sig-name descname">export</code><span class="sig-paren">(</span><em class="sig-param">nb_path=None</em>, <em class="sig-param">filtering=True</em>, <em class="sig-param">filter_type='html'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.export" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export</code><span class="sig-paren">(</span><em class="sig-param">nb_path=None</em>, <em class="sig-param">export_path=None</em>, <em class="sig-param">pdf=True</em>, <em class="sig-param">filtering=True</em>, <em class="sig-param">filter_type='html'</em>, <em class="sig-param">files=[]</em>, <em class="sig-param">display_link=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exports a submission to a zipfile</p>
+<p>Creates a submission zipfile from a notebook at NB_PATH, optionally including a PDF export
+of the notebook and any files in FILES.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_path</strong> (<em>str</em>) – Path to iPython notebook we want to export</p></li>
+<li><p><strong>export_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path at which to write zipfile</p></li>
+<li><p><strong>pdf</strong> (<em>bool</em><em>, </em><em>optional</em>) – True if PDF should be included</p></li>
+<li><p><strong>filtering</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set true if only exporting a subset of nb cells to PDF</p></li>
+<li><p><strong>filter_type</strong> (<em>str</em><em>, </em><em>optional</em>) – “html” or “tags” if filtering by HTML comments or cell
+tags, respectively.</p></li>
+<li><p><strong>files</strong> (<em>list</em><em>, </em><em>optional</em>) – Other files to include in the zipfile</p></li>
+<li><p><strong>display_link</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to display a download link</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.notebook.Notebook.submit">
+<code class="sig-name descname">submit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.submit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.notebook.Notebook.to_pdf">
+<code class="sig-name descname">to_pdf</code><span class="sig-paren">(</span><em class="sig-param">nb_path=None</em>, <em class="sig-param">filtering=True</em>, <em class="sig-param">filter_type='html'</em>, <em class="sig-param">display_link=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.to_pdf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports notebook to PDF</p>
 <p>FILTER_TYPE can be “html” or “tags” if filtering by HTML comments or cell tags,
 respectively.</p>
@@ -1288,15 +1315,11 @@ respectively.</p>
 <li><p><strong>filtering</strong> (<em>bool</em><em>, </em><em>optional</em>) – Set true if only exporting a subset of nb cells to PDF</p></li>
 <li><p><strong>filter_type</strong> (<em>str</em><em>, </em><em>optional</em>) – “html” or “tags” if filtering by HTML comments or cell
 tags, respectively.</p></li>
+<li><p><strong>display_link</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to display a download link</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="method">
-<dt id="otter.notebook.Notebook.submit">
-<code class="sig-name descname">submit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook.submit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -1495,22 +1518,22 @@ doctest, so we roll with it.</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_fail_template">
-<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11caab390&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11d526cf8&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_pass_template">
-<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11caa95f8&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11cc64fd0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_fail_template">
-<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11d38df98&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11cc6ef28&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_pass_template">
-<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11caa94a8&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11d51da58&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1678,12 +1701,12 @@ OKTest objects</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.html_result_template">
-<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11caab438&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11cc6e630&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.plain_result_template">
-<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11d38d5c0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11d51db38&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

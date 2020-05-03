@@ -208,7 +208,7 @@
 <p><strong>Note:</strong> Otter Assign is also backwards-compatible with jassign-formatted notebooks. To use jassign format with Otter Assign, specify the <code class="docutils literal notranslate"><span class="pre">--jassign</span></code> flag in your call to <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code>. While the formats are very similar, jassign’s format has some key differences to the Otter Assign format, and many of the behaviors described below, e.g. intercell seeding, are not compatible with jassign format. For more information about formatting notebooks for jassign, see <a class="reference external" href="https://github.com/okpy/jassign/blob/master/docs/notebook-format">its documentation</a>.</p>
 <div class="section" id="assignment-metadata">
 <h3>Assignment Metadata<a class="headerlink" href="#assignment-metadata" title="Permalink to this headline">¶</a></h3>
-<p>In addition to various command line arugments discussed below, Otter Assign also allows you to specify various assignment generation arguments in an assignment metadata cell. These are very similar to the question metadata cells described in the next section. Assignment metadata, included by convention as the first cell of the notebook, place YAML-formatted configurations inside a code block that begins with <code class="docutils literal notranslate"><span class="pre">BEGIN</span> <span class="pre">ASSIGNMENT</span></code>:</p>
+<p>In addition to various command line arugments discussed below, Otter Assign also allows you to specify various assignment generation arguments in an assignment metadata cell. These are very similar to the question metadata cells described in the next section. Assignment metadata, included by convention as the first cell of the notebook, places YAML-formatted configurations inside a code block that begins with <code class="docutils literal notranslate"><span class="pre">BEGIN</span> <span class="pre">ASSIGNMENT</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>```
 BEGIN ASSIGNMENT
 init_cell: false
@@ -217,7 +217,7 @@ export_cell: true
 ```
 </pre></div>
 </div>
-<p>This cell is removed from both output notebooks. These configurations, listed in the table below, can be <strong>overwritten</strong> by their command line counterparts (e.g. <code class="docutils literal notranslate"><span class="pre">init_cell:</span> <span class="pre">true</span></code> is overwritten by the <code class="docutils literal notranslate"><span class="pre">--no-init-cell</span></code> flag). The options, their defaults (converted to Python data types), and descriptions are listed in the following table. For more information about many of these arguments, see the <a class="reference external" href="#usage-and-output">Usage and Output section</a>.</p>
+<p>This cell is removed from both output notebooks. These configurations, listed in the table below, can be <strong>overwritten</strong> by their command line counterparts (e.g. <code class="docutils literal notranslate"><span class="pre">init_cell:</span> <span class="pre">true</span></code> is overwritten by the <code class="docutils literal notranslate"><span class="pre">--no-init-cell</span></code> flag). The options, their defaults (converted to Python data types), and descriptions are listed in the following table. Any unspecified keys will keep their default values. For more information about many of these arguments, see the <a class="reference external" href="#usage-and-output">Usage and Output section</a>.</p>
 <table border="1" class="docutils">
 <thead>
 <tr>
@@ -256,6 +256,11 @@ export_cell: true
 <td><code>run_tests</code></td>
 <td><code>True</code></td>
 <td>Whether or not to run tests on the autograder notebook</td>
+</tr>
+<tr>
+<td><code>solutions_pdf</code></td>
+<td><code>False</code></td>
+<td>Whether to generate a solutions PDF from notebook; either <code>true</code>, <code>false</code>, or <code>filtered</code>; defaults to unfiltered PDF</td>
 </tr>
 <tr>
 <td><code>generate</code></td>

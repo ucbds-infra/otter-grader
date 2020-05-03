@@ -28,10 +28,16 @@ Otter is a command-line tool organized into four basic commands: `assign`, `chec
 
 ## Installation
 
-Otter is a Python package that can be installed using pip:
+Otter is a Python package that can be installed using pip. To install the current stable version, install with
 
 ```
 pip install otter-grader
+```
+
+To install the **beta** version, install from git:
+
+```
+pip install git+https://github.com/ucbds-infra/otter-grader.git@beta
 ```
 
 ### Docker

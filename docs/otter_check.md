@@ -39,14 +39,14 @@ grader.check_all()
 
 This will rerun all tests against the current global environment and display the results for each tests concatenated into a single HTML output. It is recommended that this cell is put at the end of a notebook for students to run before they submit so that students can ensure that there are no variable name collisions, propagating errors, or other things that would cause the autograder to fail a test they should be passing.
 
-Students can also use the `Notebook` class to generate their own PDFs for manual grading using the static method `Notebook.export`. `Notebook.export` has a required positional argument of the path to the notebook to be exported (usually the notebook that students are working through). There are also two optional arguments related to filtering cells: `filtering` indicates whether or not to filter notebooks and defaults to `True`, and `filter_type` indicates the filter type (`"tags"` or `"html"`) to use and defaults to `"html"`. You can find more information about PDF generation [here](pdfs.md).
+Students can also use the `Notebook` class to generate their own PDFs for manual grading using the static method `Notebook.to_pdf`. `Notebook.to_pdf` has a required positional argument of the path to the notebook to be exported (usually the notebook that students are working through). There are also two optional arguments related to filtering cells: `filtering` indicates whether or not to filter notebooks and defaults to `True`, and `filter_type` indicates the filter type (`"tags"` or `"html"`) to use and defaults to `"html"`. You can find more information about PDF generation [here](pdfs.md).
 
 <!-- Because `Notebook.export` is a static method, it can be called either from the class as `otter.Notebook.export()` or from the grader instance as `grader.export()`. We use the latter convetion in the examples below. -->
 
 As an example, if I wanted to export `hw01.ipynb` with HTML comment filtering, my call would be
 
 ```python
-grader.export("hw01.ipynb")
+grader.to_pdf("hw01.ipynb")
 ```
 
 as filtering is by defult on and the default filtering behavior is HTML comments. If I instead wanted to filter with cell tags, I would call
