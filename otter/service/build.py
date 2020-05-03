@@ -17,7 +17,7 @@ from ..utils import connect_db
 DOCKERFILE_TEMPLATE = Template("""
 FROM {{ image }}
 RUN mkdir /home/notebooks
-ADD {{ test_folder_path }} /home{% if test_folder_name != "tests" %}
+COPY {{ test_folder_path }} /home{% if test_folder_name != "tests" %}
 RUN mv /home/{{ test_folder_name }} /home/tests{% endif %}{% if requirements %}
 ADD {{ requirements }} /home
 RUN pip3 install -r /home/{{ requirements_filename }}{% endif %}{% if global_requirements %}
