@@ -131,15 +131,19 @@ def main(args, conn=None, close_conn=True):
             global_requirements_filename = os.path.split(global_requirements)[1],
             files = a.get("files", [])
         )
-
+        
         # Build the docker image
         echo_dockerfile = subprocess.Popen(["echo", dockerfile], stdout=PIPE)
         echo_dockerfile.wait()
-        build_out = subprocess.run(
+        
+        build_out = subprocess.Popen(
             ["docker", "build", "-f", "-", ".", "-t", a["assignment_id"]],
-            stdin=echo_dockerfile.stdout, stdout=PIPE
+            stdin=echo_dockerfile.stdout
         )
+        build_out.wait()
+        
         echo_dockerfile.stdout.close()
+        build_out.stdout.close()
 
         print("Built Docker image {}".format(a["assignment_id"]))
     
