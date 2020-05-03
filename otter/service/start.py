@@ -334,7 +334,7 @@ try:
                 cursor.execute(
                     """
                     UPDATE submissions
-                    SET score = %s,
+                    SET score = %s
                     WHERE submission_id = %s
                     """,
                     (df_json_str, submission_id)
