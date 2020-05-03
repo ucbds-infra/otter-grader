@@ -293,7 +293,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                     # TODO: move this patch into CheckCallWrapper
                     m = mock.mock_open()
                     with mock.patch('otter.Notebook.export', m):
-                        exec(source + cell_source, global_env)
+                        exec(cell_source, global_env)
                     source += cell_source
                 except:
                     if not ignore_errors:
