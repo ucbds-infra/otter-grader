@@ -149,6 +149,9 @@ try:
                 print(e)
             self.finish()
 
+            if self.submission_id is not None:
+                await grade_submission(self.submission_id)
+
 
 
         async def validate(self, notebook, api_key):
@@ -251,13 +254,13 @@ try:
             self.write('Submission {} received.'.format(submission_id))
         
 
-        async def on_finish_async(self):
-                await grade_submission(self.submission_id)
+        # async def on_finish_async(self):
+                
         
 
-        def on_finish(self):
-            IOLoop.current().add_callback(self.on_finish_async)
-            return super().on_finish()
+        # def on_finish(self):
+        #     IOLoop.current().add_callback(self.on_finish_async)
+        #     return super().on_finish()
 
 
         @property
