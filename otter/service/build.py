@@ -17,11 +17,11 @@ from ..utils import connect_db
 DOCKERFILE_TEMPLATE = Template("""
 FROM {{ image }}
 RUN mkdir /home/notebooks
-ADD {{ test_folder_path }} /home/tests{% if requirements %}
-ADD {{ requirements }} /home
-RUN pip3 install -r /home/{{ requirements_filename }}{% endif %}{% if global_requirements %}
+ADD {{ test_folder_path }} /home/tests{% if global_requirements %}
 ADD {{ global_requirements }} /home
-RUN pip3 install -r /home/{{ global_requirements_filename }}{% endif %}{% for file in files %}
+RUN pip3 install -r /home/{{ global_requirements_filename }}{% endif %}{% if requirements %}
+ADD {{ requirements }} /home
+RUN pip3 install -r /home/{{ requirements_filename }}{% endif %}{% for file in files %}
 ADD {{ file }} /home/notebooks{% endfor %}
 """)
 
