@@ -256,7 +256,7 @@ try:
 
         @gen.coroutine
         def grade_submission(self):
-            future grade_submission(self.submission_id)
+            future = grade_submission(self.submission_id)
             yield future
         
 
