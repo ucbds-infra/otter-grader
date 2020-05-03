@@ -287,8 +287,9 @@ try:
             # Run grading function in a docker container
             # TODO: fix arguments below, redirect stdout/stderr
             stdout = StringIO()
+            stderr = StringIO()
             try:
-                with contextlib.redirect_stdout(stdout):
+                with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
                     df = grade_assignments(
                         tests_dir=None, 
                         notebooks_dir=file_path, 
@@ -298,8 +299,11 @@ try:
                     )
             finally:
                 stdout = stdout.getvalue()
+                stderr = stderr.getvalue()
                 with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
                     f.write(stdout)
+                with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDERR"), "w+") as f:
+                    f.write(stderr)
             
             df_json_str = df.to_json()
 
