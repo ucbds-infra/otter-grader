@@ -76,15 +76,14 @@ def write_assignment_info(assignment_id, class_id, assignment_name, seed, conn):
                         SET assignment_name = %s, seed = %s
                         WHERE assignment_id = %s AND class_id = %s
                         """#.format(assignment_id, class_id, assignment_name, assignment_name)
-        cursor.execute(find_sql_command, (assignment_name, seed, assignment_id, class_id))
+        cursor.execute(sql_command, (assignment_name, seed, assignment_id, class_id))
     # Else, just insert
     else:
         sql_command = """INSERT INTO assignments (assignment_id, class_id, assignment_name, seed)
                         VALUES (%s, %s, %s, %s)
                         """#.format(assignment_id, class_id, assignment_name, assignment_name)
-        cursor.execute(find_sql_command, (assignment_id, class_id, assignment_name, seed))
+        cursor.execute(sql_command, (assignment_id, class_id, assignment_name, seed))
 
-    cursor.execute(sql_command)
     conn.commit()
     cursor.close()
 
