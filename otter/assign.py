@@ -3,8 +3,6 @@
 ##### forked from https://github.com/okpy/jassign #####
 #######################################################
 
-"""Generate student & autograder views of a notebook in Otter format."""
-
 # TODO: move seed to inside solution cell
 
 import copy
