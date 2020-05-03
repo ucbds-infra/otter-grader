@@ -295,6 +295,8 @@ try:
             assert len(assignment_record) == 1, "Assignment {} for class {} not found".format(assignment_id, class_id)
             seed = int(assignment_record[0][0]) if assignment_record[0][0] else None
 
+            print("Seed: ", seed)
+
             cursor.execute(
                 """
                 SELECT username, email 
