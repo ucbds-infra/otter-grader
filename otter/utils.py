@@ -65,7 +65,7 @@ def merge_csv(dataframes):
 	return final_dataframe
 
 
-def connect_db(host="localhost", username="admin", password="", port="5432"):
+def connect_db(host="localhost", username="admin", password="", port="5432", db="otter_db"):
     """Connects to a specific postgres database with provided parameters/credentials
 
     Keyword Arguments:
@@ -86,7 +86,7 @@ def connect_db(host="localhost", username="admin", password="", port="5432"):
             "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
         )
         
-    conn = connect(dbname='otter_db',
+    conn = connect(dbname=db,
                user=username,
                host=host,
                password=password,
