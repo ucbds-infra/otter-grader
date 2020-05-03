@@ -162,7 +162,7 @@ try:
                 #     await grade_submission(self.submission_id)
                 # IOLoop.current().spawn_callback(grader)
                 submission_queue.put(self.submission_id)
-                IOLoop.current().add_callback(grade_submission)
+                
 
 
 
@@ -306,7 +306,7 @@ try:
             (submission_id, )
         )
         user_record = cursor.fetchall()
-        assert len(user_record) == 1, "No submission found for user {}".format(user)
+        assert len(user_record) == 1, "Submission {} not found".format(submission_id)
         row = user_record[0]
         user_id = int(row[0])
         submission_id = int(row[1])
@@ -496,4 +496,5 @@ def main(cli_args):
     # async def grader():
     #     await grade_submission(conn)
 
+    IOLoop.current().add_callback(start_grading_queue)
     IOLoop.current().start()
