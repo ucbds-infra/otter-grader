@@ -25,7 +25,7 @@ RUN pip3 install -r /home/{{ global_requirements_filename }}{% endif %}{% for fi
 ADD {{ file }} /home/notebooks{% endfor %}
 """)
 
-def write_class_info(class_name, conn):
+def write_class_info(class_id, class_name, conn):
     """Writes the given class_name to the database, auto-generating a class_id
 
     Args:
@@ -36,16 +36,16 @@ def write_class_info(class_name, conn):
         class_id: Class ID for newly added class.
     """
     cursor = conn.cursor()
-    insert_command = "INSERT INTO classes (class_name) \
-        VALUES(\'{}\')".format(class_name)
-    cursor.execute(insert_command)
-    select_command = "SELECT class_id FROM classes \
-        WHERE class_name = \'{}\'".format(class_name)
-    cursor.execute(select_command)
-    select_result = cursor.fetchall()
-    class_id = None
-    for row in select_result:
-        class_id = row[0]
+    insert_command = "INSERT INTO classes (class_id, class_name) \
+        VALUES(%s, %s)"#.format(class_name)
+    cursor.execute(insert_command, (class_id, class_name))
+    # select_command = "SELECT class_id FROM classes \
+    #     WHERE class_name = \'{}\'".format(class_name)
+    # cursor.execute(select_command)
+    # select_result = cursor.fetchall()
+    # class_id = None
+    # for row in select_result:
+    #     class_id = row[0]
     conn.commit()
     cursor.close()
     return class_id
@@ -111,7 +111,7 @@ def main(args, conn=None, close_conn=True):
     # Use one global connection for all db-related commands
     if conn is None:
         conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
-    class_id = write_class_info(config["course"], conn)
+    class_id = write_class_info(config["class_id"], config["class_name"], conn)
 
     # write to the database
     for name, assignment_id, seed in assignment_cfs:
