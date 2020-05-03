@@ -66,6 +66,9 @@ def write_assignment_info(assignment_id, class_id, assignment_name, seed, conn):
     """.format(assignment_id, class_id)
     cursor.execute(find_sql_command)
 
+    if seed is None:
+        seed = "NULL"
+
     # If conflict on assignment_id, class_id
     # Update assignment_name
     if cursor.rowcount == 1:
