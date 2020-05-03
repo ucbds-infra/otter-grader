@@ -145,8 +145,6 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     # copy the notebook files to the container
     copy_command = ["docker", "cp", notebooks_dir, container_id+ ":/home/notebooks/"]
     copy = subprocess.run(copy_command, stdout=PIPE, stderr=PIPE)
-
-    print(subprocess.run(["docker", "exec", "-t", container_id, "ls", "/home/notebooks"], stdout=PIPE).stdout)
     
     # copy the test files to the container
     if tests_dir is not None:
