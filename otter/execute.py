@@ -173,7 +173,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
 
     return score_mapping
 
-def grade(ipynb_path, pdf, tag_filter, html_filter, script, seed=None):
+def grade(ipynb_path, pdf, tag_filter, html_filter, script, seed=None, cwd=None):
     """
     Grades a single ipython notebook and returns the score
 
@@ -197,7 +197,7 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, seed=None):
     test_files = glob('/home/tests/*.py')
 
     # get score
-    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=True, seed=seed)
+    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=True, seed=seed, cwd=cwd)
 
     # output PDF
     if pdf:
@@ -425,7 +425,7 @@ def main(args=None):
 
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
-        score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts, seed=args.seed)
+        score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts, seed=args.seed, cwd=dir_path)
         # del score["TEST_HINTS"]
         all_results["score"].append({t : score[t]["score"] if type(score[t]) == dict else score[t] for t in score})
         if args.pdf or args.html_filter or args.tag_filter:
