@@ -291,7 +291,7 @@ try:
                 self.write('Submission failed.')
 
 
-    async def grade_submission(submission_id):
+    def grade_submission(submission_id):
         global conn
         cursor = conn.cursor()
 
