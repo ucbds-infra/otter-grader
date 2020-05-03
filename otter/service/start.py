@@ -308,7 +308,8 @@ try:
                         notebooks_dir=os.path.split(file_path)[0], 
                         id=assignment_id, 
                         image=assignment_id,
-                        debug=True
+                        debug=True,
+                        verbose=True
                     )
                     
                 print("Graded submission {} from user {}".format(submission_id, username))
