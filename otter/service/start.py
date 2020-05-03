@@ -204,8 +204,8 @@ try:
             """
             try:
                 user_id, username, class_id, assignment_id, assignment_name = await self.validate(notebook, api_key)
-            except TypeError:
-                print("Submission failed for user with API key {}".format(api_key))
+            except TypeError as e:
+                print("Submission failed for user with API key {}: ".format(api_key, e))
                 return
             except AssertionError as e:
                 print("Submission failed for user with API key {} due to due to client error: {}".format(api_key, e))
@@ -312,6 +312,23 @@ try:
                     )
                     print("Graded submission {} from user {}".format(submission_id, username))
                     print(df)
+
+                    df_json_str = df.to_json()
+            
+                # Insert score into submissions table
+                cursor.execute("INSERT INTO submissions \
+                    (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
+                    VALUES (%s, %s, %s, %s, %s, %s, %s) \
+                    ON CONFLICT (submission_id) \
+                    DO UPDATE SET timestamp = %s, score = %s",
+                    [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
+                    datetime.utcnow(), df_json_str])
+                
+                print("Wrote score for submission {} from user {} to database".format(submission_id, username))
+
+                # Set task done in queue
+                user_queue.task_done()
+
             finally:
                 stdout = stdout.getvalue()
                 stderr = stderr.getvalue()
@@ -320,21 +337,6 @@ try:
                 with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDERR"), "w+") as f:
                     f.write(stderr)
             
-            df_json_str = df.to_json()
-            
-            # Insert score into submissions table
-            cursor.execute("INSERT INTO submissions \
-                (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s) \
-                ON CONFLICT (submission_id) \
-                DO UPDATE SET timestamp = %s, score = %s",
-                [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
-                datetime.utcnow(), df_json_str])
-            
-            print("Wrote score for submission {} from user {} to database".format(submission_id, username))
-
-            # Set task done in queue
-            user_queue.task_done()
         cursor.close()
 
 
