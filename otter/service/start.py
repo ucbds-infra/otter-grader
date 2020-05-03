@@ -395,5 +395,9 @@ def main(cli_args):
     server = HTTPServer(Application(google_auth=True))
     server.listen(port)
     print("Listening on port {}".format(port))
-    IOLoop.current().spawn_callback(grade_submission(conn))
+
+    async def grader():
+        grade_submission(conn)
+
+    IOLoop.current().spawn_callback(grader)
     IOLoop.current().start()
