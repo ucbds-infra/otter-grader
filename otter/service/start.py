@@ -156,7 +156,7 @@ try:
                 @gen.coroutine
                 def grader():
                     yield grade_submission(self.submission_id)
-                IOLoop.current().spawn_callback(grader())
+                IOLoop.current().spawn_callback(grader)
 
 
 
@@ -186,8 +186,8 @@ try:
             # TODO: doesn't account for different assignments
             if last_submitted:
                 delta = datetime.utcnow() - last_submitted
-                rate_limit = 120
-                if delta.seconds < rate_limit:
+                # rate_limit = 120
+                if delta.seconds < args.rate_limit:
                     self.write_error(429, message='Please wait {} second(s) before re-submitting.'.format(rate_limit - delta.seconds))
                     return
 

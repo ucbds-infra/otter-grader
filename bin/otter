@@ -154,6 +154,7 @@ service_start_parser.add_argument("--db-host", default="localhost", help="Postgr
 service_start_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
 service_start_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
 service_start_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
+service_start_parser.add_argument("-l", "--rate-limit", default=120, type=int, help="Rate limit for submissions in seconds")
 
 service_start_parser.set_defaults(func=start.main)
 
