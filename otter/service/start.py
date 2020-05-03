@@ -173,6 +173,7 @@ try:
             last_submitted = results.as_dict()['timestamp'] if len(results) > 0 else None
             results.free()
 
+            # TODO: doesn't account for different assignments
             if last_submitted:
                 delta = datetime.utcnow() - last_submitted
                 rate_limit = 120
