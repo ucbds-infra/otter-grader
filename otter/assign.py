@@ -86,6 +86,7 @@ def main(args):
     if ASSIGNMENT_METADATA.get('generate', {}) or args.generate:
         generate_args = ASSIGNMENT_METADATA.get('generate', {})
         print("Generating autograder zipfile...")
+        curr_dir = os.getcwd()
         os.chdir(str(result / 'autograder'))
         generate_cmd = ["otter", "generate"]
 
@@ -105,6 +106,8 @@ def main(args):
             generate_cmd += args.files or ASSIGNMENT_METADATA.get('files', [])
         
         subprocess.run(generate_cmd)
+
+        os.chdir(curr_dir)
 
 
 def convert_to_ok(nb_path, dir, args):

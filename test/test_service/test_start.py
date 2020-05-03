@@ -18,9 +18,13 @@ from asyncio import CancelledError
 from datetime import datetime, timedelta
 from psycopg2 import connect, extensions
 
-from otter.service.start import GoogleOAuth2LoginHandler, LoginHandler, SubmissionHandler, grade, user_queue
+from otter.service.start import GoogleOAuth2LoginHandler, LoginHandler, SubmissionHandler, grade_submission, user_queue
 
 TEST_FILES_PATH = "test/test_service/test-start/"
+
+parser = None
+with open("bin/otter") as f:
+    exec(f.read())
 
 class TestServiceAuthHandlers(AsyncHTTPTestCase):
 
@@ -30,19 +34,13 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
         cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+
+        args = parser.parse_args(["service", "create"])
+        args.func(args, conn=cls.conn, close_conn=False)
+
         cls.cursor = cls.conn.cursor()
+
         queries = [
-            '''
-            CREATE TABLE users (
-                user_id SERIAL PRIMARY KEY,
-                api_keys VARCHAR[] CHECK (cardinality(api_keys) > 0),
-                username TEXT UNIQUE,
-                password VARCHAR,
-                email TEXT UNIQUE,
-                CONSTRAINT has_username_or_email
-                CHECK (username IS NOT NULL or email IS NOT NULL)
-            )
-            ''',
             '''
             INSERT INTO users (username, password)
             VALUES ('user1', 'pass1'), ('user2', 'pass2')
@@ -176,41 +174,13 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
         cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+
+        args = parser.parse_args(["service", "create"])
+        args.func(args, conn=cls.conn, close_conn=False)
+
         cls.cursor = cls.conn.cursor()
+
         queries = [
-            '''
-            CREATE TABLE users (
-                user_id SERIAL PRIMARY KEY,
-                api_keys VARCHAR[] CHECK (cardinality(api_keys) > 0),
-                username TEXT UNIQUE,
-                password VARCHAR,
-                email TEXT UNIQUE,
-                CONSTRAINT has_username_or_email CHECK (username IS NOT NULL or email IS NOT NULL)
-            )
-            ''',
-            '''
-            CREATE TABLE classes (
-                class_id SERIAL PRIMARY KEY,
-                class_name TEXT NOT NULL
-            )
-            ''',
-            '''
-            CREATE TABLE assignments (
-                assignment_id TEXT PRIMARY KEY,
-                class_id INTEGER REFERENCES classes (class_id) NOT NULL,
-                assignment_name TEXT NOT NULL
-            )
-            ''',
-            '''
-            CREATE TABLE submissions (
-                submission_id SERIAL PRIMARY KEY,
-                assignment_id TEXT REFERENCES assignments(assignment_id) NOT NULL,
-                user_id INTEGER REFERENCES users(user_id) NOT NULL,
-                file_path TEXT NOT NULL,
-                timestamp TIMESTAMP NOT NULL,
-                score JSONB
-            )
-            ''',
             '''
             INSERT INTO users (user_id, username, password, api_keys)
             VALUES (1, 'user1', 'pass1', ARRAY['key1']),
@@ -290,7 +260,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
 
         # check submission saved to database and disk
         self.assertEqual(len(results), 1)
-        submission_path = results[0][3]
+        submission_path = results[0][4]
         self.assertTrue(os.path.isfile(submission_path))
 
     def test_multiple_submissions(self):
@@ -333,16 +303,16 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         results = self.cursor.fetchall()
         
         # check submissions table contains expected entries (assignment_id, user_id)
-        submissions = [row[1:3] for row in results]
-        expected = [('1', 1), ('1', 2), ('1', 2), ('1', 3), ('1', 3)]
+        submissions = [row[1:4] for row in results]
+        expected = [('1', 1, 1), ('1', 1, 2), ('1', 1, 2), ('1', 1, 3), ('1', 1, 3)]
         self.assertEqual(sorted(submissions), sorted(expected))
 
         # check notebooks written to disk
         for row in results:
-            self.assertTrue(os.path.isfile(row[3]))
+            self.assertTrue(os.path.isfile(row[4]))
             with open(TEST_FILES_PATH + 'notebooks/valid/passesAll.ipynb') as f:
                 expected_nb = json.load(f)
-            with open(row[3]) as f:
+            with open(row[4]) as f:
                 saved_nb = json.load(f)
             self.assertEqual(expected_nb, saved_nb)
 
@@ -363,7 +333,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
             """
         )
 
-    @mock.patch('otter.service.server.grade_assignments', autospec=True)
+    @mock.patch('otter.service.start.grade_assignments', autospec=True)
     @mock.patch('io.StringIO', return_value='', autospec=True)
     @gen_test(timeout=1)
     async def test_grade(self, mock_io, mock_grade):
@@ -382,19 +352,19 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
 
         self.cursor.execute(
             """
-            INSERT INTO submissions (submission_id, assignment_id, user_id, file_path, timestamp)
-            VALUES (5, '1', 2, ' ', %s),
-                   (4, '1', 1, ' ', %s),
-                   (3, '1', 3, ' ', %s),
-                   (2, '1', 2, ' ', %s),
-                   (1, '1', 1, ' ', %s)
+            INSERT INTO submissions (submission_id, assignment_id, class_id, user_id, file_path, timestamp)
+            VALUES (5, '1', 1, 2, ' ', %s),
+                   (4, '1', 1, 1, ' ', %s),
+                   (3, '1', 1, 3, ' ', %s),
+                   (2, '1', 1, 2, ' ', %s),
+                   (1, '1', 1, 1, ' ', %s)
             """,
             timestamps
         )
 
         # tornado test will timeout grade() once user_queue is depleted
         try:
-            await grade(self.conn)
+            await grade_submission(self.conn)
         except CancelledError:
             pass
 
@@ -408,7 +378,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         results = self.cursor.fetchall()
 
         # check scores are updated in submissions table
-        scores = [re.search('score.', str(row[5])).group(0) for row in results]
+        scores = [re.search('score.', str(row[6])).group(0) for row in results]
         expected_scores = [re.search('score.', score.to_json()).group(0) for score in mock_scores]
         self.assertEqual(expected_scores, scores)
 

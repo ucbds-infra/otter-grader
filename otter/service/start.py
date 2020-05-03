@@ -228,8 +228,8 @@ try:
             print("Successfully saved nb to disk")
             
             # store submission to database
-            results = await self.db.query("INSERT INTO submissions (submission_id, assignment_id, user_id, file_path, timestamp) VALUES (%s, %s, %s, %s, %s)",
-                                                [submission_id, assignment_id, user_id, file_path, datetime.utcnow()])
+            results = await self.db.query("INSERT INTO submissions (submission_id, assignment_id, class_id, user_id, file_path, timestamp) VALUES (%s, %s, %s, %s, %s, %s)",
+                                                [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow()])
             assert results, 'submission failed'
             results.free()
 
@@ -252,7 +252,7 @@ try:
                 self.write('Submission failed.')
 
 
-    async def grade(conn):
+    async def grade_submission(conn):
         cursor = conn.cursor()
         
         # # This can be moved to global
@@ -262,7 +262,7 @@ try:
             # Get current user's latest submission
             cursor.execute(
                 """
-                SELECT user_id, submission_id, assignment_id, file_path 
+                SELECT user_id, submission_id, assignment_id, class_id, file_path 
                 FROM submissions 
                 WHERE user_id = '{}' 
                 ORDER BY timestamp 
@@ -274,7 +274,8 @@ try:
                 user_id = int(row[0])
                 submission_id = float(row[1])
                 assignment_id = str(row[2])
-                file_path = str(row[3])
+                class_id = str(row[3])
+                file_path = str(row[4])
             # # Get tests directory for assignment
             # tests_path = None
             # for assignment in config["assignments"]:
@@ -297,11 +298,11 @@ try:
 
             # Insert score into submissions table
             cursor.execute("INSERT INTO submissions \
-                (submission_id, assignment_id, user_id, file_path, timestamp, score) \
-                VALUES (%s, %s, %s, %s, %s, %s) \
+                (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s) \
                 ON CONFLICT (submission_id) \
                 DO UPDATE SET timestamp = %s, score = %s",
-                [submission_id, assignment_id, user_id, file_path, datetime.utcnow(), df_json_str,
+                [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
                 datetime.utcnow(), df_json_str])
 
             with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
@@ -392,5 +393,5 @@ def main(cli_args):
     server = HTTPServer(Application(google_auth=True))
     server.listen(port)
     print("Listening on port {}".format(port))
-    IOLoop.current().spawn_callback(grade(conn))
+    IOLoop.current().spawn_callback(grade_submission(conn))
     IOLoop.current().start()

@@ -94,6 +94,7 @@ def main(args, conn=None, close_conn=True):
     repo_path = args.repo_path
     assert os.path.exists(repo_path) and os.path.isdir(repo_path), "{} does not exist or is not a directory".format(repo_path)
 
+    current_dir = os.getcwd()
     os.chdir(repo_path)
 
     # parse conf.yml
@@ -143,3 +144,5 @@ def main(args, conn=None, close_conn=True):
     
     if close_conn:
         conn.close()
+    
+    os.chdir(current_dir)

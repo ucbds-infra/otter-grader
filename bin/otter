@@ -10,7 +10,9 @@ from otter import grade
 from otter import generate
 from otter import check
 from otter import assign
-from otter import service
+from otter.service import build
+from otter.service import create
+from otter.service import start
 
 
 parser = argparse.ArgumentParser(description="""
@@ -126,7 +128,7 @@ service_build_parser.add_argument("-p", "--db-pass", default="root", help="Postg
 service_build_parser.add_argument("-r", "--repo-path", default="/home/assignments", help="Path to assignments repo root")
 # TODO: add arguments
 
-service_build_parser.set_defaults(func=service.build)
+service_build_parser.set_defaults(func=build.main)
 
 
 ##### PARSER FOR otter service create #####
@@ -137,7 +139,7 @@ service_create_parser.add_argument("-u", "--db-user", default="root", help="Post
 service_create_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
 # TODO: add arguments
 
-service_create_parser.set_defaults(func=service.create)
+service_create_parser.set_defaults(func=create.main)
 
 
 ##### PARSER FOR otter service start #####
@@ -152,7 +154,7 @@ service_start_parser.add_argument("--db-port", default=5432, type=int, help="Pos
 service_start_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
 service_start_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
 
-service_start_parser.set_defaults(func=service.start)
+service_start_parser.set_defaults(func=start.main)
 
 
 

@@ -11,12 +11,18 @@ jinja2
 docker
 nb2pdf
 requests
+
+# otter service requirements
 psycopg2
 queries
 pyyaml
 docker
 jwt
 tornado
+
+# testing requirements
+testing.postgresql
+pyembedpg
 
 # documentation requirements
 recommonmark
