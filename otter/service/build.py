@@ -38,14 +38,10 @@ def write_class_info(class_id, class_name, conn):
     cursor = conn.cursor()
     insert_command = "INSERT INTO classes (class_id, class_name) \
         VALUES(%s, %s)"#.format(class_name)
-    cursor.execute(insert_command, (class_id, class_name))
-    # select_command = "SELECT class_id FROM classes \
-    #     WHERE class_name = \'{}\'".format(class_name)
-    # cursor.execute(select_command)
-    # select_result = cursor.fetchall()
-    # class_id = None
-    # for row in select_result:
-    #     class_id = row[0]
+    try:
+        cursor.execute(insert_command, (class_id, class_name))
+    except UniqueViolation:
+        pass
     conn.commit()
     cursor.close()
     return class_id
