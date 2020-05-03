@@ -64,6 +64,7 @@ try:
                 [username, pw_hash]
             )
             if len(account_check) > 0:
+                print("Logged in user {} and generating API key".format(username))
                 account_check.free()
                 api_key = hexlify(os.urandom(32)).decode("utf-8")
                 self.write(api_key)
@@ -77,6 +78,7 @@ try:
                 )
                 results.free()
             else:
+                print("Failed login attempt for user {}".format(username))
                 account_check.free()
                 self.clear()
                 self.set_status(401)
@@ -92,7 +94,7 @@ try:
             Get request for Google authentication login
             """
             if not self.get_argument('code', False):
-                print("not found")
+                print("Redirecting user to Google OAuth")
                 return self.authorize_redirect(
                     redirect_uri=self.settings['auth_redirect_uri'],
                     client_id = args.google_key if args.google_key else self.settings['google_oauth']['key'],
@@ -102,13 +104,13 @@ try:
                     extra_params={'approval_prompt': 'auto'}
                 )
             else:
-                print("found")
                 resp = await self.get_authenticated_user(
                     redirect_uri=self.settings['auth_redirect_uri'],
                     code=self.get_argument('code')
                 )
                 api_key = resp['access_token']
                 email = jwt.decode(resp['id_token'], verify=False)['email']
+                print("Generating API key for user {} from Google OAuth".format(email))
                 results = await self.db.query(
                     """
                     INSERT INTO users (api_keys, email) VALUES (%s, %s)
@@ -126,6 +128,10 @@ try:
             return self.application.db
 
     class SubmissionHandler(RequestHandler):
+        async def get(self):
+            self.write("This is a POST-only route; you probably shouldn't be here.")
+            self.finish()
+
         async def post(self):
             """Post request function for handling python notebook submissions
             """
@@ -156,10 +162,11 @@ try:
                 [type] -- [description]
             """
             # authenticate user with api_key
-            results = await self.db.query("SELECT user_id FROM users WHERE %s=ANY(api_keys) LIMIT 1", [api_key])
+            results = await self.db.query("SELECT user_id, username, email FROM users WHERE %s=ANY(api_keys) LIMIT 1", [api_key])
             user_id = results.as_dict()['user_id'] if len(results) > 0 else None
+            username = results.as_dict()['username'] or results.as_dict()['email'] if len(results) > 0 else None
             results.free()
-            assert user_id, 'invalid api key'
+            assert user_id, 'invalid API key'
 
             # rate limit one submission every 2 minutes
             results = await self.db.query("SELECT timestamp FROM submissions WHERE user_id=%s ORDER BY timestamp DESC LIMIT 1", [user_id])
@@ -184,7 +191,7 @@ try:
             assignment = results.as_dict()
             results.free()
 
-            return (user_id, assignment['class_id'], assignment_id, assignment['assignment_name'])
+            return (user_id, username, assignment['class_id'], assignment_id, assignment['assignment_name'])
 
 
         async def submit(self, notebook, api_key):
@@ -196,22 +203,21 @@ try:
                 api_key (str): API Key generated during submission
             """
             try:
-                user_id, class_id, assignment_id, assignment_name = await self.validate(notebook, api_key)
+                user_id, username, class_id, assignment_id, assignment_name = await self.validate(notebook, api_key)
             except TypeError:
-                print('failed validation')
+                print("Submission failed for user with API key {}".format(api_key))
                 return
             except AssertionError as e:
-                print(e)
+                print("Submission failed for user with API key {} due to due to client error: {}".format(api_key, e))
                 self.write_error(400, message=e)
                 return
-
-            print("Successfully received notebook data")
 
             # fetch next submission id
             results = await self.db.query("SELECT nextval(pg_get_serial_sequence('submissions', 'submission_id')) as id")
             submission_id = results.as_dict()['id']
             results.free()
-            print("Successfully queries submission id")
+
+            print("Successfully received submission {} from user {}".format(submission_id, username))
 
             # save notebook to disk
             dir_path = os.path.join(
@@ -226,7 +232,7 @@ try:
             with open(file_path, 'w') as f:
                 json.dump(notebook, f)
 
-            print("Successfully saved nb to disk")
+            print("Successfully saved submission {} at {}".format(submission_id, file_path))
             
             # store submission to database
             results = await self.db.query("INSERT INTO submissions (submission_id, assignment_id, class_id, user_id, file_path, timestamp) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -234,11 +240,9 @@ try:
             assert results, 'submission failed'
             results.free()
 
-            print("Successfully stored to db")
-
             # queue user for grading
             await user_queue.put(user_id)
-            print('queued user {}'.format(user_id))
+            print('Queued user {}'.format(username))
 
             self.write('Submission {} received.'.format(submission_id))
 
@@ -270,21 +274,31 @@ try:
                 LIMIT 1
                 """.format(user)
             )
-            user_record = cursor.fetchall()      
-            for row in user_record:
-                user_id = int(row[0])
-                submission_id = float(row[1])
-                assignment_id = str(row[2])
-                class_id = str(row[3])
-                file_path = str(row[4])
-            # # Get tests directory for assignment
-            # tests_path = None
-            # for assignment in config["assignments"]:
-            #     if assignment[assignment_id] == submission_id:
-            #         tests_path = assignment["tests_path"]
+            user_record = cursor.fetchall()
+            assert len(user_record) == 1, "No submission found for user {}".format(user)
+            row = user_record[0]
+            user_id = int(row[0])
+            submission_id = float(row[1])
+            assignment_id = str(row[2])
+            class_id = str(row[3])
+            file_path = str(row[4])
+
+            cursor.execute(
+                """
+                SELECT username, email 
+                FROM users 
+                WHERE user_id = '{}'
+                LIMIT 1
+                """.format(user)
+            )
+            user_record = cursor.fetchall()
+            assert len(user_record) == 1, "No submission found for user {}".format(user)
+            row = user_record[0]
+            username = str(row[0] or row[1])
 
             # Run grading function in a docker container
             # TODO: fix arguments below, redirect stdout/stderr
+            print("Grading submission {} from user {}".format(submission_id, username))
             stdout = StringIO()
             stderr = StringIO()
             try:
@@ -305,7 +319,7 @@ try:
                     f.write(stderr)
             
             df_json_str = df.to_json()
-
+            
             # Insert score into submissions table
             cursor.execute("INSERT INTO submissions \
                 (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
@@ -315,6 +329,8 @@ try:
                 [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
                 datetime.utcnow(), df_json_str])
             
+            print("Wrote score for submission {} from user {} to database".format(submission_id, username))
+
             # Set task done in queue
             user_queue.task_done()
         cursor.close()
