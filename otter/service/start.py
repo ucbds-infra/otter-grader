@@ -34,7 +34,7 @@ try:
 
     args = None
 
-    user_queue = Queue()
+    # user_queue = Queue()
 
     conn = None
 
@@ -135,6 +135,7 @@ try:
         async def post(self):
             """Post request function for handling python notebook submissions
             """
+            self.submission_id = None
             try:
                 request = tornado.escape.json_decode(self.request.body)
                 assert 'nb' in request.keys(), 'submission contains no notebook'
@@ -241,11 +242,19 @@ try:
             assert results, 'submission failed'
             results.free()
 
-            # queue user for grading
-            await user_queue.put(user_id)
-            print('Queued user {}'.format(username))
+            # # queue user for grading
+            # await user_queue.put(user_id)
+            # print('Queued user {}'.format(username))
+
+            self.submission_id = submission_id
 
             self.write('Submission {} received.'.format(submission_id))
+        
+
+        async def on_finish(self):
+                await grade_submission(self.submission_id)
+                return super().on_finish()
+
 
         @property
         def db(self):
@@ -258,109 +267,112 @@ try:
                 self.write('Submission failed.')
 
 
-    async def grade_submission(conn):
+    async def grade_submission(submission_id):
+        global conn
         cursor = conn.cursor()
         
         # # This can be moved to global
         # with open("conf.yml") as f:
         #     config = yaml.safe_load(f)
-        async for user in user_queue:
-            # Get current user's latest submission
-            cursor.execute(
-                """
-                SELECT user_id, submission_id, assignment_id, class_id, file_path 
-                FROM submissions 
-                WHERE user_id = '{}' 
-                ORDER BY timestamp DESC
-                LIMIT 1
-                """.format(user)
-            )
-            user_record = cursor.fetchall()
-            assert len(user_record) == 1, "No submission found for user {}".format(user)
-            row = user_record[0]
-            user_id = int(row[0])
-            submission_id = int(row[1])
-            assignment_id = str(row[2])
-            class_id = str(row[3])
-            file_path = str(row[4])
+        # async for user in user_queue:
+        # Get current user's latest submission
+        cursor.execute(
+            """
+            SELECT user_id, submission_id, assignment_id, class_id, file_path 
+            FROM submissions 
+            WHERE submission_id = %s 
+            ORDER BY timestamp DESC
+            LIMIT 1
+            """,
+            (submission_id, )
+        )
+        user_record = cursor.fetchall()
+        assert len(user_record) == 1, "No submission found for user {}".format(user)
+        row = user_record[0]
+        user_id = int(row[0])
+        submission_id = int(row[1])
+        assignment_id = str(row[2])
+        class_id = str(row[3])
+        file_path = str(row[4])
 
-            cursor.execute(
-                """
-                SELECT seed
-                FROM assignments
-                WHERE assignment_id = %s AND class_id = %s
-                """,
-                (assignment_id, class_id)
-            )
-            assignment_record = cursor.fetchall()
-            assert len(assignment_record) == 1, "Assignment {} for class {} not found".format(assignment_id, class_id)
-            seed = int(assignment_record[0][0]) if assignment_record[0][0] else None
+        cursor.execute(
+            """
+            SELECT seed
+            FROM assignments
+            WHERE assignment_id = %s AND class_id = %s
+            """,
+            (assignment_id, class_id)
+        )
+        assignment_record = cursor.fetchall()
+        assert len(assignment_record) == 1, "Assignment {} for class {} not found".format(assignment_id, class_id)
+        seed = int(assignment_record[0][0]) if assignment_record[0][0] else None
 
-            cursor.execute(
-                """
-                SELECT username, email 
-                FROM users 
-                WHERE user_id = '{}'
-                LIMIT 1
-                """.format(user)
-            )
-            user_record = cursor.fetchall()
-            assert len(user_record) == 1, "No submission found for user {}".format(user)
-            row = user_record[0]
-            username = str(row[0] or row[1])
+        cursor.execute(
+            """
+            SELECT username, email 
+            FROM users 
+            WHERE user_id = %s
+            LIMIT 1
+            """,
+            (user_id, )
+        )
+        user_record = cursor.fetchall()
+        assert len(user_record) == 1, "No submission found for user {}".format(user)
+        row = user_record[0]
+        username = str(row[0] or row[1])
 
-            # Run grading function in a docker container
-            # TODO: fix arguments below, redirect stdout/stderr
-            print("Grading submission {} from user {}".format(submission_id, username))
-            stdout = StringIO()
-            stderr = StringIO()
-            try:
-                with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-                    df = grade_assignments(
-                        tests_dir=None, 
-                        notebooks_dir=file_path, 
-                        id=assignment_id, 
-                        image=assignment_id,
-                        debug=True,
-                        verbose=True,
-                        seed=seed
-                    )
-                    
-                print("Graded submission {} from user {}".format(submission_id, username))
-                print(df)
-
-                df_json_str = df.to_json()
-            
-                # Insert score into submissions table
-                cursor.execute(
-                    """
-                    UPDATE submissions
-                    SET score = %s
-                    WHERE submission_id = %s
-                    """,
-                    (df_json_str, submission_id)
+        # Run grading function in a docker container
+        # TODO: fix arguments below, redirect stdout/stderr
+        print("Grading submission {} from user {}".format(submission_id, username))
+        stdout = StringIO()
+        stderr = StringIO()
+        try:
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                df = grade_assignments(
+                    tests_dir=None, 
+                    notebooks_dir=file_path, 
+                    id=assignment_id, 
+                    image=assignment_id,
+                    debug=True,
+                    verbose=True,
+                    seed=seed
                 )
-
-                # cursor.execute("INSERT INTO submissions \
-                #     (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
-                #     VALUES (%s, %s, %s, %s, %s, %s, %s) \
-                #     ON CONFLICT (submission_id) \
-                #     DO UPDATE SET timestamp = %s, score = %s",
-                #     [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
-                #     datetime.utcnow(), df_json_str])
                 
-                print("Wrote score for submission {} from user {} to database".format(submission_id, username))
+            print("Graded submission {} from user {}".format(submission_id, username))
+            print(df)
 
-            finally:
-                stdout = stdout.getvalue()
-                stderr = stderr.getvalue()
-                with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
-                    f.write(stdout)
-                with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDERR"), "w+") as f:
-                    f.write(stderr)
+            df_json_str = df.to_json()
+        
+            # Insert score into submissions table
+            cursor.execute(
+                """
+                UPDATE submissions
+                SET score = %s
+                WHERE submission_id = %s
+                """,
+                (df_json_str, submission_id)
+            )
 
-                # Set task done in queue
-                user_queue.task_done()
+            # cursor.execute("INSERT INTO submissions \
+            #     (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
+            #     VALUES (%s, %s, %s, %s, %s, %s, %s) \
+            #     ON CONFLICT (submission_id) \
+            #     DO UPDATE SET timestamp = %s, score = %s",
+            #     [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
+            #     datetime.utcnow(), df_json_str])
+            
+            print("Wrote score for submission {} from user {} to database".format(submission_id, username))
+
+        finally:
+            stdout = stdout.getvalue()
+            stderr = stderr.getvalue()
+            with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
+                f.write(stdout)
+            with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDERR"), "w+") as f:
+                f.write(stderr)
+
+            # Set task done in queue
+            # user_queue.task_done()
             
         cursor.close()
 
@@ -429,7 +441,7 @@ def main(cli_args):
     #NB_DIR = os.environ.get('NOTEBOOK_DIR')
     global conn
     global args
-    global user_queue
+    # global user_queue
 
     args = cli_args
 
@@ -446,8 +458,8 @@ def main(cli_args):
     server.listen(port)
     print("Listening on port {}".format(port))
 
-    async def grader():
-        await grade_submission(conn)
+    # async def grader():
+    #     await grade_submission(conn)
 
-    IOLoop.current().spawn_callback(grader)
+    # IOLoop.current().spawn_callback(grader)
     IOLoop.current().start()
