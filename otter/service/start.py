@@ -188,7 +188,7 @@ try:
                 delta = datetime.utcnow() - last_submitted
                 # rate_limit = 120
                 if delta.seconds < args.rate_limit:
-                    self.write_error(429, message='Please wait {} second(s) before re-submitting.'.format(rate_limit - delta.seconds))
+                    self.write_error(429, message='Please wait {} second(s) before re-submitting.'.format(args.rate_limit - delta.seconds))
                     return
 
 
