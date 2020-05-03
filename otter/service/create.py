@@ -100,18 +100,20 @@ def main(args, conn=None, close_conn=True):
     #     conf_path = input("What is the path of your config file?")
     #     with open(conf_path) as f:
     #         config = yaml.safe_load(f)
-    
-    if conn is None:
-        conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
-    
+    pgconn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
+
     try:
-        conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-        cursor = conn.cursor()
+        pgconn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        cursor = pgconn.cursor()
         cursor.execute('CREATE DATABASE otter_db')
-        cursor.close()
-        # conn.close()
     except psycopg2.errors.DuplicateDatabase:
         pass
+    finally: 
+        cursor.close()
+        pgconn.close()
+
+    if conn is None:
+        conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
 
     # conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
 
