@@ -211,7 +211,11 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     #     log_file.write("\n")
     #     log_file.close()
 
-    all_commands = [launch, copy, tests, grade]
+    all_commands = [launch, copy, grade]
+    try: 
+        all_commands += [tests]
+    except UnboundLocalError:
+        pass
     try:
         all_commands += [requirements, install]
     except UnboundLocalError:
