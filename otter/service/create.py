@@ -12,6 +12,7 @@ try:
     import os
 
     from psycopg2 import connect, extensions, sql
+    from psycopg2.errors import DuplicateTable
 
     from ..utils import connect_db
 
@@ -19,7 +20,7 @@ except ImportError:
     # don't need requirements to use otter without otter service
     MISSING_PACKAGES = True
 
-def create_users(filepath, host=None, username=None, password=None):
+def create_users(filepath, host=None, username=None, password=None, conn=None):
     """
     Inserts usernames from filepath into db
 
@@ -33,7 +34,8 @@ def create_users(filepath, host=None, username=None, password=None):
     with open(filepath, newline='') as csvfile:
         filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
         # TODO: fill in the arguments below
-        conn = connect_db(host, username, fpassword)
+        if conn is None:
+            conn = connect_db(host, username, password)
         cursor = conn.cursor()
         for row in filereader:
             username, password = row[:2]
@@ -48,7 +50,7 @@ def create_users(filepath, host=None, username=None, password=None):
                 """.format(username, password, password)
             cursor.execute(insert_command)
 
-def remove_users(filepath, host=None, username=None, password=None):
+def remove_users(filepath, host=None, username=None, password=None, conn=None):
     """Removes users specified in file FILEPATH
     
     Args:
@@ -61,7 +63,8 @@ def remove_users(filepath, host=None, username=None, password=None):
     with open(filepath, newline='') as csvfile:
         filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
         # TODO: fill in the arguments below
-        conn = connect_db(host, username, password)
+        if conn is None:
+            conn = connect_db(host, username, password)
         cursor = conn.cursor()
         remove_count = 0
         for row in filereader:
@@ -75,7 +78,10 @@ def remove_users(filepath, host=None, username=None, password=None):
                 """.format(username)
             cursor.execute(insert_command)
 
-def main(args):
+def main(args, conn=None, close_conn=True):
+    """
+    conn is arg to pre-made db connection
+    """
     if MISSING_PACKAGES:
         raise ImportError(
             "Missing some packages required for otter service. "
@@ -83,30 +89,31 @@ def main(args):
             "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
         )
 
-    # # TODO: can't assume we're in directory with conf.yml
-    # with open("conf.yml") as f:
-    #     config = yaml.safe_load(f)
-    try:
-        assert os.path.isfile("conf.yml"), "conf.yml does not exist"
-        with open("conf.yml") as f:
-            config = yaml.safe_load(f)
-    except AssertionError:
-        conf_path = input("What is the path of your config file?")
-        with open(conf_path) as f:
-            config = yaml.safe_load(f)
+    # # # TODO: can't assume we're in directory with conf.yml
+    # # with open("conf.yml") as f:
+    # #     config = yaml.safe_load(f)
+    # try:
+    #     assert os.path.isfile("conf.yml"), "conf.yml does not exist"
+    #     with open("conf.yml") as f:
+    #         config = yaml.safe_load(f)
+    # except AssertionError:
+    #     conf_path = input("What is the path of your config file?")
+    #     with open(conf_path) as f:
+    #         config = yaml.safe_load(f)
+    
+    if conn is None:
+        conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
     
     try:
-        conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass, db='postgres')
-
         conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = conn.cursor()
         cursor.execute('CREATE DATABASE otter_db')
         cursor.close()
-        conn.close()
+        # conn.close()
     except psycopg2.errors.DuplicateDatabase:
         pass
 
-    conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
+    # conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
 
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()
@@ -130,25 +137,32 @@ def main(args):
         ''',
         '''
         CREATE TABLE assignments (
-            assignment_id TEXT PRIMARY KEY,
+            assignment_id TEXT NOT NULL,
             class_id INTEGER REFERENCES classes (class_id) NOT NULL,
-            assignment_name TEXT NOT NULL
+            assignment_name TEXT NOT NULL,
+            PRIMARY KEY (assignment_id, class_id)
         )
         ''',
         '''
         CREATE TABLE submissions (
             submission_id SERIAL PRIMARY KEY,
-            assignment_id TEXT REFERENCES assignments(assignment_id) NOT NULL,
+            assignment_id TEXT NOT NULL,
+            class_id INTEGER NOT NULL,
             user_id INTEGER REFERENCES users(user_id) NOT NULL,
             file_path TEXT NOT NULL,
             timestamp TIMESTAMP NOT NULL,
-            score JSONB
+            score JSONB,
+            FOREIGN KEY (assignment_id, class_id) REFERENCES assignments (assignment_id, class_id)
         )
         '''
     ]
 
     for query in queries:
-        cursor.execute(query)
+        try:
+            cursor.execute(query)
+        except DuplicateTable:
+            pass
         
     cursor.close()
-    conn.close()
+    if close_conn:
+        conn.close()

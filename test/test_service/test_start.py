@@ -8,24 +8,29 @@ import otter.service.create
 import queries
 import json
 
+from contextlib import redirect_stdout, redirect_stderr
+from io import StringIO
 from unittest import mock
 from tornado.testing import AsyncHTTPTestCase, AsyncTestCase, gen_test
 from tornado.web import Application
 from tornado.ioloop import IOLoop
 from asyncio import CancelledError
-from otter.service.start import GoogleOAuth2LoginHandler, LoginHandler, SubmissionHandler, grade, user_queue
 from datetime import datetime, timedelta
 from psycopg2 import connect, extensions
+
+from otter.service.start import GoogleOAuth2LoginHandler, LoginHandler, SubmissionHandler, grade, user_queue
+
+TEST_FILES_PATH = "test/test_service/test-start/"
 
 class TestServiceAuthHandlers(AsyncHTTPTestCase):
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         # setup test database
-        self.postgresql = testing.postgresql.Postgresql()
-        self.conn = connect(**self.postgresql.dsn())
-        self.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-        self.cursor = self.conn.cursor()
+        cls.postgresql = testing.postgresql.Postgresql()
+        cls.conn = connect(**cls.postgresql.dsn())
+        cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        cls.cursor = cls.conn.cursor()
         queries = [
             '''
             CREATE TABLE users (
@@ -44,7 +49,7 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
             '''
         ]
         for query in queries:
-            self.cursor.execute(query)
+            cls.cursor.execute(query)
 
     def get_app(self):
         dsn = self.postgresql.dsn()
@@ -88,8 +93,9 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
     @mock.patch.object(GoogleOAuth2LoginHandler, 'get_argument', return_value=True, autospec=True)
     @mock.patch('jwt.decode', return_value={'email': 'user3@example.com'}, autospec=True)
     def test_google_auth(self, mock_getarg, mock_get_user, mock_jwt_decode):
-        resp1 = self.fetch('/auth/google')
-        resp2 = self.fetch('/auth/google')
+        with redirect_stdout(StringIO()):
+            resp1 = self.fetch('/auth/google')
+            resp2 = self.fetch('/auth/google')
         self.assertEqual(resp1.code, 200)
         self.assertEqual(resp2.code, 200)
 
@@ -110,9 +116,10 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
         mock_hash.side_effect = self.hash_side_effect
         mock_urandom.side_effect = [str(i).encode() for i in range(4)]
 
-        resp1 = self.fetch('/auth?username={}&password={}'.format('user1', 'invalid_pass'))
-        resp2 = self.fetch('/auth?username={}&password={}'.format('user2', 'invalid_pass'))
-        resp3 = self.fetch('/auth?username={}&password={}'.format('invalid_user', 'pass1'))
+        with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
+            resp1 = self.fetch('/auth?username={}&password={}'.format('user1', 'invalid_pass'))
+            resp2 = self.fetch('/auth?username={}&password={}'.format('user2', 'invalid_pass'))
+            resp3 = self.fetch('/auth?username={}&password={}'.format('invalid_user', 'pass1'))
         self.assertEqual(resp1.code, 401)
         self.assertEqual(resp2.code, 401)
         self.assertEqual(resp3.code, 401)
@@ -156,20 +163,20 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
         self.assertEqual(results[1][1], ['31', '33'])
 
     @classmethod
-    def tearDownClass(self):
-        self.conn.close()
-        self.postgresql.stop()
+    def tearDownClass(cls):
+        cls.conn.close()
+        cls.postgresql.stop()
 
 
 class TestServiceSubmissionHandler(AsyncHTTPTestCase):
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         # set up test database
-        self.postgresql = testing.postgresql.Postgresql()
-        self.conn = connect(**self.postgresql.dsn())
-        self.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-        self.cursor = self.conn.cursor()
+        cls.postgresql = testing.postgresql.Postgresql()
+        cls.conn = connect(**cls.postgresql.dsn())
+        cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+        cls.cursor = cls.conn.cursor()
         queries = [
             '''
             CREATE TABLE users (
@@ -220,7 +227,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
             '''
         ]
         for query in queries:
-            self.cursor.execute(query)
+            cls.cursor.execute(query)
 
     def get_app(self):
         dsn = self.postgresql.dsn()
@@ -236,21 +243,22 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         return SubmissionApplication()
 
     def test_submission_fail(self):
-        self.reset_timestamps()
-        with open('test/test-service/notebooks/invalid/passesAll.ipynb') as f:
-            data = json.load(f)
-        request = {'api_key': 'key1', 'nb': data}
-        resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
+        with redirect_stdout(StringIO()):
+            self.reset_timestamps()
+            with open(TEST_FILES_PATH + 'notebooks/invalid/passesAll.ipynb') as f:
+                data = json.load(f)
+            request = {'api_key': 'key1', 'nb': data}
+            resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
 
-        self.reset_timestamps()
-        with open('test/test-service/notebooks/valid/passesAll.ipynb') as f:
-            data = json.load(f)
-        request = {'api_key': 'invalid_key', 'nb': data}
-        resp2 = self.fetch('/submit', method='POST', body=json.dumps(request))
+            self.reset_timestamps()
+            with open(TEST_FILES_PATH + 'notebooks/valid/passesAll.ipynb') as f:
+                data = json.load(f)
+            request = {'api_key': 'invalid_key', 'nb': data}
+            resp2 = self.fetch('/submit', method='POST', body=json.dumps(request))
 
-        self.reset_timestamps()
-        request = {'api_key': 'key1', 'nb': {}}
-        resp3 = self.fetch('/submit', method='POST', body=json.dumps(request))
+            self.reset_timestamps()
+            request = {'api_key': 'key1', 'nb': {}}
+            resp3 = self.fetch('/submit', method='POST', body=json.dumps(request))
 
         self.assertEqual(resp1.code, 200)
         self.assertEqual(resp2.code, 200)
@@ -262,11 +270,11 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
     def test_one_submission(self):
         self.reset_timestamps()
         self.clear_submissions()
-
-        with open('test/test-service/notebooks/valid/passesAll.ipynb') as f:
-            data = json.load(f)
-        request = {'api_key': 'key1', 'nb': data}
-        resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
+        with redirect_stdout(StringIO()):
+            with open(TEST_FILES_PATH + 'notebooks/valid/passesAll.ipynb') as f:
+                data = json.load(f)
+            request = {'api_key': 'key1', 'nb': data}
+            resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
         self.assertEqual(resp1.code, 200)
         
         # check user queue
@@ -289,19 +297,20 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         self.reset_timestamps()
         self.clear_submissions()
 
-        with open('test/test-service/notebooks/valid/passesAll.ipynb') as f:
+        with open(TEST_FILES_PATH + 'notebooks/valid/passesAll.ipynb') as f:
             data = json.load(f)
         
-        user1_request = {'api_key': 'key1', 'nb': data}
-        resp1 = self.fetch('/submit', method='POST', body=json.dumps(user1_request))
-        user3_request = {'api_key': 'key4', 'nb': data}
-        resp2 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
-        user2_request = {'api_key': 'key2', 'nb': data}
-        resp4 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
-        self.reset_timestamps()
-        resp3 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
-        user2_request = {'api_key': 'key3', 'nb': data}
-        resp5 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
+        with redirect_stdout(StringIO()):
+            user1_request = {'api_key': 'key1', 'nb': data}
+            resp1 = self.fetch('/submit', method='POST', body=json.dumps(user1_request))
+            user3_request = {'api_key': 'key4', 'nb': data}
+            resp2 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
+            user2_request = {'api_key': 'key2', 'nb': data}
+            resp4 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
+            self.reset_timestamps()
+            resp3 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
+            user2_request = {'api_key': 'key3', 'nb': data}
+            resp5 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
 
         self.assertEqual(resp1.code, 200)
         self.assertEqual(resp2.code, 200)
@@ -331,7 +340,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         # check notebooks written to disk
         for row in results:
             self.assertTrue(os.path.isfile(row[3]))
-            with open('test/test-service/notebooks/valid/passesAll.ipynb') as f:
+            with open(TEST_FILES_PATH + 'notebooks/valid/passesAll.ipynb') as f:
                 expected_nb = json.load(f)
             with open(row[3]) as f:
                 saved_nb = json.load(f)
@@ -404,9 +413,11 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         self.assertEqual(expected_scores, scores)
 
     @classmethod
-    def tearDownClass(self):
-        self.cursor.close()
-        self.conn.close()
-        self.postgresql.stop()
+    def tearDownClass(cls):
+        cls.cursor.close()
+        cls.conn.close()
+        cls.postgresql.stop()
         if os.path.exists('test_submissions'):
             os.system("rm -r test_submissions")
+        if os.path.exists("GRADING_STDOUT"):
+            os.system("rm GRADING_STDOUT")
