@@ -166,7 +166,7 @@ try:
             user_id = results.as_dict()['user_id'] if len(results) > 0 else None
             username = results.as_dict()['username'] or results.as_dict()['email'] if len(results) > 0 else None
             results.free()
-            assert user_id, 'invalid API key'
+            assert user_id, 'invalid API key: {}'.format(api_key)
 
             # rate limit one submission every 2 minutes
             results = await self.db.query("SELECT timestamp FROM submissions WHERE user_id=%s ORDER BY timestamp DESC LIMIT 1", [user_id])

@@ -142,6 +142,7 @@ def main(args, conn=None, close_conn=True):
             assignment_id TEXT NOT NULL,
             class_id INTEGER REFERENCES classes (class_id) NOT NULL,
             assignment_name TEXT NOT NULL,
+            seed INTEGER,
             PRIMARY KEY (assignment_id, class_id)
         )
         ''',
