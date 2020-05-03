@@ -216,7 +216,6 @@ try:
             # save notebook to disk
             dir_path = os.path.join(
                 self.settings['notebook_dir'],
-                'submissions',
                 'class-{}'.format(class_id),
                 'assignment-{}'.format(assignment_id),
                 'submission-{}'.format(submission_id)
@@ -396,7 +395,7 @@ def main(cli_args):
 
     # make submissions forlder
     if not os.path.isdir(OTTER_SERVICE_DIR):
-        os.makedirs(os.path.join(OTTER_SERVICE_DIR, "submissions"))
+        os.makedirs(os.path.join(OTTER_SERVICE_DIR))
     
     server = HTTPServer(Application(google_auth=True))
     server.listen(port)
