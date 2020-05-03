@@ -351,8 +351,8 @@ try:
             )
 
         finally:
-            stdout = stdout.getvalue()
-            stderr = stderr.getvalue()
+            stdout = stdout.getvalue().decode("utf-8")
+            stderr = stderr.getvalue().decode("utf-8")
             with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDOUT"), "w+") as f:
                 f.write(stdout)
             with open(os.path.join(os.path.split(file_path)[0], "GRADING_STDERR"), "w+") as f:
