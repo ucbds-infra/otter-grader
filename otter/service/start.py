@@ -425,5 +425,5 @@ def main(cli_args):
     # async def grader():
     #     await grade_submission(conn)
 
-    IOLoop.current().spawn_callback(grade_submission(conn))
+    IOLoop.current().spawn_callback(await grade_submission(conn))
     IOLoop.current().start()
