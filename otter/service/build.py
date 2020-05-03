@@ -82,7 +82,7 @@ def write_assignment_info(assignment_id, class_id, assignment_name, seed, conn):
         sql_command = """INSERT INTO assignments (assignment_id, class_id, assignment_name, seed)
                         VALUES (%s, %s, %s, %s)
                         """#.format(assignment_id, class_id, assignment_name, assignment_name)
-        cursor.execute(find_sql_command, (assignment_id, class_id, assignment_name, assignment_name, seed))
+        cursor.execute(find_sql_command, (assignment_id, class_id, assignment_name, seed))
 
     cursor.execute(sql_command)
     conn.commit()
