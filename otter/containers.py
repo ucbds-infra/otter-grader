@@ -117,8 +117,8 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     file. This function can grade files with .py or .ipynb extensions (use scripts=True for .py). 
 
     Args:
-        tests_dir (str, optional): Directory of test files
-        notebooks_dir (str, optional): Directory of notebooks to grade
+        tests_dir (str): Directory of test files
+        notebooks_dir (str): Directory of notebooks to grade
         id (str, optional): Id of this function for mc use
         image (str, optional): Docker image to do grading in
         verbose (bool, optional): Whether function should print information about various steps

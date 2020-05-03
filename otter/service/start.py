@@ -291,7 +291,7 @@ try:
                 with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
                     df = grade_assignments(
                         tests_dir=None, 
-                        notebooks_dir=file_path, 
+                        notebooks_dir=os.path.split(file_path)[0], 
                         id=assignment_id, 
                         image=assignment_id,
                         debug=True
