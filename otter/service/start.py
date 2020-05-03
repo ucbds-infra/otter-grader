@@ -331,13 +331,22 @@ try:
                 df_json_str = df.to_json()
             
                 # Insert score into submissions table
-                cursor.execute("INSERT INTO submissions \
-                    (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
-                    VALUES (%s, %s, %s, %s, %s, %s, %s) \
-                    ON CONFLICT (submission_id) \
-                    DO UPDATE SET timestamp = %s, score = %s",
-                    [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
-                    datetime.utcnow(), df_json_str])
+                cursor.execute(
+                    """
+                    UPDATE submissions
+                    SET score = %s,
+                    WHERE submission_id = %s
+                    """,
+                    (df_json_str, submission_id)
+                )
+
+                # cursor.execute("INSERT INTO submissions \
+                #     (submission_id, assignment_id, class_id, user_id, file_path, timestamp, score) \
+                #     VALUES (%s, %s, %s, %s, %s, %s, %s) \
+                #     ON CONFLICT (submission_id) \
+                #     DO UPDATE SET timestamp = %s, score = %s",
+                #     [submission_id, assignment_id, class_id, user_id, file_path, datetime.utcnow(), df_json_str,
+                #     datetime.utcnow(), df_json_str])
                 
                 print("Wrote score for submission {} from user {} to database".format(submission_id, username))
 
