@@ -34,8 +34,6 @@ try:
 
     args = None
 
-    conn = None
-
     user_queue = Queue()
 
     # assert args.config is not None, "no config provided"
@@ -44,10 +42,15 @@ try:
 
     class BaseHandler(tornado.web.RequestHandler):
         def get_current_user(self):
+            """Gets secure user cookie for personal authentication
+            """
             return self.get_secure_cookie("user")
 
     class LoginHandler(BaseHandler):
         async def get(self):
+            """
+            Get request for personal/default authentication login
+            """
             username = self.get_argument('username', True)
             password = self.get_argument('password', True)
             pw_hash = hashlib.sha256(password.encode()).hexdigest()
@@ -83,6 +86,9 @@ try:
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
+            """
+            Get request for Google authentication login
+            """
             if not self.get_argument('code', False):
                 print("not found")
                 return self.authorize_redirect(
@@ -119,6 +125,8 @@ try:
 
     class SubmissionHandler(RequestHandler):
         async def post(self):
+            """Post request function for handling python notebook submissions
+            """
             try:
                 request = tornado.escape.json_decode(self.request.body)
                 assert 'nb' in request.keys(), 'submission contains no notebook'
@@ -135,6 +143,16 @@ try:
 
 
         async def validate(self, notebook, api_key):
+            """Ensures a submision is valid by checking user credentials, submission frequency, and
+            validity of notebook file.
+
+            Arguments:
+                notebook (json): notebook in json form
+                api_key (str): API Key generated during submission
+
+            Returns:
+                [type] -- [description]
+            """
             # authenticate user with api_key
             results = await self.db.query("SELECT user_id FROM users WHERE %s=ANY(api_keys) LIMIT 1", [api_key])
             user_id = results.as_dict()['user_id'] if len(results) > 0 else None
@@ -168,6 +186,13 @@ try:
 
 
         async def submit(self, notebook, api_key):
+            """If valid submission, inserts notebook into submissions table in database and queues 
+                it for grading.
+
+            Arguments:
+                notebook (json): notebook in json form
+                api_key (str): API Key generated during submission
+            """
             try:
                 user_id, class_id, assignment_id, assignment_name = await self.validate(notebook, api_key)
             except TypeError:
@@ -227,13 +252,12 @@ try:
                 self.write('Submission failed.')
 
 
-    async def grade():
+    async def grade(conn):
         cursor = conn.cursor()
         
         # # This can be moved to global
         # with open("conf.yml") as f:
         #     config = yaml.safe_load(f)
-        
         async for user in user_queue:
             # Get current user's latest submission
             cursor.execute(
@@ -251,7 +275,6 @@ try:
                 submission_id = float(row[1])
                 assignment_id = str(row[2])
                 file_path = str(row[3])
-
             # # Get tests directory for assignment
             # tests_path = None
             # for assignment in config["assignments"]:
@@ -291,6 +314,12 @@ try:
 
     class Application(tornado.web.Application):
         def __init__(self, google_auth=True):
+            """Initialize tornado server for receiving/grading submissions
+
+            Args:
+                google_auth (boolean, optional): True if google authentication is preferred. False
+                    if default/personal authentication is preferred.
+            """
             # TODO: these shouldn't be separate can just assume both are configured
             # if google_auth:
             # TODO: Add config file
@@ -363,5 +392,5 @@ def main(cli_args):
     server = HTTPServer(Application(google_auth=True))
     server.listen(port)
     print("Listening on port {}".format(port))
-    IOLoop.current().spawn_callback(grade)
+    IOLoop.current().spawn_callback(grade(conn))
     IOLoop.current().start()
