@@ -159,6 +159,7 @@ try:
                 #     await grade_submission(self.submission_id)
                 # IOLoop.current().spawn_callback(grader)
                 submission_queue.put(self.submission_id)
+                IOLoop.current().add_callback(grade_submission)
 
 
 
@@ -482,5 +483,4 @@ def main(cli_args):
     # async def grader():
     #     await grade_submission(conn)
 
-    IOLoop.current().spawn_callback(grade_submission)
     IOLoop.current().start()
