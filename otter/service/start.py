@@ -11,9 +11,7 @@ try:
     import hashlib
     import jwt
     import logging
-    import contextlib
     import traceback
-    import asyncio
     import tornado.options
     import queries
     import stdio_proxy
@@ -26,10 +24,7 @@ try:
     from tornado.auth import GoogleOAuth2Mixin
     from tornado.ioloop import IOLoop
     from tornado.queues import Queue
-    from tornado.gen import sleep
-    from tornado import gen
     from concurrent.futures import ThreadPoolExecutor
-    # from psycopg2 import connect, extensions
 
     from ..containers import grade_assignments
     from ..utils import connect_db
@@ -41,6 +36,7 @@ try:
     EXECUTOR = ThreadPoolExecutor()
 
     class BaseHandler(tornado.web.RequestHandler):
+        """Base login handler"""
         def get_current_user(self):
             """Gets secure user cookie for personal authentication
             """
@@ -48,6 +44,11 @@ try:
     
 
     class LoginHandler(BaseHandler):
+        """Default auth handler
+        
+        A login handler that requires instructors to setup users and passwords in database
+        beforehand, allowing students to auth within the notebook.
+        """
         async def get(self):
             """
             Get request for personal/default authentication login
@@ -90,8 +91,11 @@ try:
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
-            """
-            Get request for Google authentication login
+            """Google OAuth login handler
+
+            Handler for authenticating users with Google OAuth. Requires that user sets environment
+            variables containing their client key and secret. Provides users with an API key that they
+            can enter in the notebook by way of authenticating.
             """
             if not self.get_argument('code', False):
                 print("Redirecting user to Google OAuth")
@@ -129,15 +133,22 @@ try:
     
 
     class SubmissionHandler(RequestHandler):
+        """Processes and validations student submission
+
+        Handler for processing and validating a student's submission. Ensure that notebook is present
+        and valid, checks API key, and implements rate limiting to prevent spamming the autograder.
+        Queues submission for grading by EXECUTOR.
+        """
         async def get(self):
+            """Route to warn users that this is a POST-only route"""
             self.write("This is a POST-only route; you probably shouldn't be here.")
             self.finish()
 
         async def post(self):
-            """Post request function for handling python notebook submissions
-            """
+            """Post request function for handling python notebook submissions"""
             self.submission_id = None
             try:
+                # check request params
                 request = tornado.escape.json_decode(self.request.body)
                 assert 'nb' in request.keys(), 'submission contains no notebook'
                 assert 'api_key' in request.keys(), 'missing api key'
@@ -145,11 +156,13 @@ try:
                 notebook = request['nb']
                 api_key = request['api_key']
                 
+                # run through submission
                 await self.submit(notebook, api_key)
             except Exception as e:
                 print(e)
             self.finish()
 
+            # if submission successful, queue notebook for grading
             if self.submission_id is not None:
                 SUBMISSION_QUEUE.put(self.submission_id)
 
@@ -162,7 +175,7 @@ try:
                 api_key (str): API Key generated during submission
 
             Returns:
-                [type] -- [description]
+                tuple: submission information
             """
             # authenticate user with api_key
             results = await self.db.query("SELECT user_id, username, email FROM users WHERE %s=ANY(api_keys) LIMIT 1", [api_key])
@@ -178,7 +191,7 @@ try:
             assignment_id = notebook['metadata']['assignment_id']
             class_id = notebook['metadata']['class_id']
 
-            # rate limit one submission every 2 minutes
+            # rate limiting
             results = await self.db.query(
                 """
                 SELECT timestamp 
@@ -192,19 +205,14 @@ try:
             last_submitted = results.as_dict()['timestamp'] if len(results) > 0 else None
             results.free()
 
-            # TODO: doesn't account for different assignments
             if last_submitted:
                 delta = datetime.utcnow() - last_submitted
                 # rate_limit = 120
                 if delta.seconds < ARGS.rate_limit:
                     self.write_error(429, message='Please wait {} second(s) before re-submitting.'.format(ARGS.rate_limit - delta.seconds))
                     return
-
-            # check valid Jupyter notebook
-            assert all(key in notebook for key in ['metadata', 'nbformat', 'nbformat_minor', 'cells']), 'invalid Jupyter notebook'
-            assert 'assignment_id' in notebook['metadata'], 'missing required metadata attribute: assignment_id'
-            assignment_id = notebook['metadata']['assignment_id']
             
+            # check that assignment exists
             results = await self.db.query("SELECT * FROM assignments WHERE assignment_id=%s LIMIT 1", [assignment_id])
             assert results, 'assignment_id {} not found on server'.format(assignment_id)
             assignment = results.as_dict()
@@ -274,6 +282,14 @@ try:
 
 
     def grade_submission(submission_id):
+        """Grades a single submission with id SUBMISSION_ID
+
+        Args:
+            submission_id (str): the id of the submission to grade
+
+        Returns:
+            tuple: grading message and results dataframe for printing
+        """
         global CONN
         cursor = CONN.cursor()
 
@@ -363,6 +379,7 @@ try:
 
 
     async def start_grading_queue():
+        """Pops submission ids off SUBMISSION_QUEUE and sending them into EXECUTOR to be graded"""
         global SUBMISSION_QUEUE
 
         async for submission_id in SUBMISSION_QUEUE:
