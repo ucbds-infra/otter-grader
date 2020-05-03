@@ -132,7 +132,6 @@ def main(args, conn=None, close_conn=True):
             files = a.get("files", [])
         )
 
-        print(dockerfile)
         print("Building Docker image {}".format(a["assignment_id"]))
         
         # Build the docker image
