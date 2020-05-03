@@ -153,8 +153,9 @@ try:
 
             if self.submission_id is not None:
             #     asyncio.get_event_loop().run_until_complete(grade_submission(self.submission_id))
-                async def grader():
-                    await grade_submission(self.submission_id)
+                @gen.coroutine
+                def grader():
+                    yield grade_submission(self.submission_id)
                 IOLoop.current().spawn_callback(grader())
 
 
