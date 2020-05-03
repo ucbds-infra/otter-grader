@@ -23,7 +23,8 @@ RUN mv /home/{{ test_folder_name }} /home/tests{% endif %}{% if requirements %}
 ADD {{ requirements }} /home
 RUN pip3 install -r /home/{{ requirements_filename }}{% endif %}{% if global_requirements %}
 ADD {{ global_requirements }} /home
-RUN pip3 install -r /home/{{ global_requirements_filename }}{% endif %}
+RUN pip3 install -r /home/{{ global_requirements_filename }}{% endif %}{% for file in files %}
+ADD file /home/notebooks{% endfor %}
 """)
 
 def write_class_info(class_name, conn):
@@ -128,7 +129,8 @@ def main(args, conn=None, close_conn=True):
             requirements = requirements,
             requirements_filename = os.path.split(requirements)[1],
             global_requirements = global_requirements,
-            global_requirements_filename = os.path.split(global_requirements)[1]
+            global_requirements_filename = os.path.split(global_requirements)[1],
+            files = a.get("files", [])
         )
 
         # Build the docker image
