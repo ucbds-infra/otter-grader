@@ -50,7 +50,7 @@ def write_class_info(class_name, conn):
     cursor.close()
     return class_id
 
-def write_assignment_info(assignment_id, class_id, assignment_name, conn):
+def write_assignment_info(assignment_id, class_id, assignment_name, seed, conn):
     """Inserts/Updates assignment class_id and assignment_name in database. Inserts if assignment_id
         is not present. Updates if assignment_id is present.
 
@@ -70,16 +70,16 @@ def write_assignment_info(assignment_id, class_id, assignment_name, conn):
     # Update assignment_name
     if cursor.rowcount == 1:
         sql_command = """UPDATE assignments
-                        SET assignment_name = '{}'
-                        WHERE assignment_id = '{}' AND class_id = '{}'
-                        """.format(assignment_id, class_id, assignment_name, assignment_name)
-        cursor.execute(find_sql_command)
+                        SET assignment_name = %s, seed = %s
+                        WHERE assignment_id = %s AND class_id = %s
+                        """#.format(assignment_id, class_id, assignment_name, assignment_name)
+        cursor.execute(find_sql_command, (assignment_name, seed, assignment_id, class_id))
     # Else, just insert
     else:
-        sql_command = """INSERT INTO assignments (assignment_id, class_id, assignment_name)
-                        VALUES('{}', {}, '{}')
-                        """.format(assignment_id, class_id, assignment_name, assignment_name)
-        cursor.execute(find_sql_command)
+        sql_command = """INSERT INTO assignments (assignment_id, class_id, assignment_name, seed)
+                        VALUES (%s, %s, %s, %s)
+                        """#.format(assignment_id, class_id, assignment_name, assignment_name)
+        cursor.execute(find_sql_command, (assignment_id, class_id, assignment_name, assignment_name, seed))
 
     cursor.execute(sql_command)
     conn.commit()
@@ -102,19 +102,18 @@ def main(args, conn=None, close_conn=True):
         config = yaml.safe_load(f)
 
     assignments = config["assignments"]
-    name_id_pairs = [(a["name"], a["assignment_id"]) for a in assignments]
+    assignment_cfs = [(a["name"], a["assignment_id"], a.get("seed", None)) for a in assignments]
     ids = [a["assignment_id"] for a in assignments]
     assert len(ids) == len(set(ids)), "Found non-unique assignment IDs in conf.yml"
 
     # Use one global connection for all db-related commands
-    # TODO: fill in the arguments
     if conn is None:
-        conn = connect_db("", "", "")
+        conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
     class_id = write_class_info(config["course"], conn)
 
     # write to the database
-    for name, assignment_id in name_id_pairs:
-        write_assignment_info(assignment_id, class_id, name, conn)
+    for name, assignment_id, seed in assignment_cfs:
+        write_assignment_info(assignment_id, class_id, name, seed, conn)
 
     # TODO: start building docker images
     for a in assignments:

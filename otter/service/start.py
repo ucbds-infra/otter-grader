@@ -285,6 +285,18 @@ try:
 
             cursor.execute(
                 """
+                SELECT seed
+                FROM assignments
+                WHERE assignment_id = %s AND class_id = %s
+                """,
+                (assignment_id, class_id)
+            )
+            assignment_record = cursor.fetchall()
+            assert len(assignment_record) == 1, "Assignment {} for class {} not found".format(assignment_id, class_id)
+            seed = int(assignment_record[0][0]) if assignment_record[0][0] else None
+
+            cursor.execute(
+                """
                 SELECT username, email 
                 FROM users 
                 WHERE user_id = '{}'
@@ -309,7 +321,8 @@ try:
                         id=assignment_id, 
                         image=assignment_id,
                         debug=True,
-                        verbose=True
+                        verbose=True,
+                        seed=seed
                     )
                     
                 print("Graded submission {} from user {}".format(submission_id, username))
