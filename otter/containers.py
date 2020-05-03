@@ -189,6 +189,9 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     # if we are grading scripts, add the --script flag
     if scripts:
         grade_command += ["--scripts"]
+    
+    if debug:
+        grade_command += ["--verbose"]
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
     
@@ -305,7 +308,7 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     
     # check that no commands errored, if they did rais an informative exception
     all_commands = [launch, copy, grade, csv, csv_cleanup, stop, remove]
-    
+
     try:
         all_commands += [tests]
     except UnboundLocalError:

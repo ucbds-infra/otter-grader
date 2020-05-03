@@ -406,6 +406,7 @@ def main(args=None):
     parser.add_argument("--html-filter", action="store_true", default=False)
     parser.add_argument("--scripts", action="store_true", default=False)
     parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
+    parser.add_argument("--verbose", default=False, action="store_true", help="If present prints scores and hints to stdout")
 
     if args is None:
         args = parser.parse_args()
@@ -426,6 +427,9 @@ def main(args=None):
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
         score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts, seed=args.seed, cwd=dir_path)
+        if args.verbose:
+            print("Score details for {}".format(ipynb_name))
+            print(json.dumps(score))
         # del score["TEST_HINTS"]
         all_results["score"].append({t : score[t]["score"] if type(score[t]) == dict else score[t] for t in score})
         if args.pdf or args.html_filter or args.tag_filter:
