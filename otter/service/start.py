@@ -16,6 +16,7 @@ try:
     import asyncio
     import tornado.options
     import queries
+    import stdio_proxy
 
     from io import StringIO
     from datetime import datetime
@@ -317,16 +318,14 @@ try:
             (user_id, )
         )
         user_record = cursor.fetchall()
-        assert len(user_record) == 1, "No submission found for user {}".format(user)
         row = user_record[0]
         username = str(row[0] or row[1])
 
         # Run grading function in a docker container
-        print("Grading submission {} from user {}".format(submission_id, username))
         stdout = StringIO()
         stderr = StringIO()
         try:
-            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            with stdio_proxy.redirect_stdout(stdout), stdio_proxy.redirect_stderr(stderr):
                 df = grade_assignments(
                     tests_dir=None, 
                     notebooks_dir=file_path, 
@@ -350,8 +349,6 @@ try:
                 """,
                 (df_json_str, submission_id)
             )
-            
-            print("Wrote score for submission {} from user {} to database".format(submission_id, username))
 
         finally:
             stdout = stdout.getvalue()

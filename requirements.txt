@@ -19,6 +19,7 @@ pyyaml
 docker
 jwt
 tornado
+stdio-proxy
 
 # testing requirements
 testing.postgresql
