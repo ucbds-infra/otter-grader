@@ -425,5 +425,5 @@ def main(cli_args):
     async def grader():
         await grade_submission(conn)
 
-    IOLoop.current().add_future(grader)
+    IOLoop.current().add_future(grader())
     IOLoop.current().start()
