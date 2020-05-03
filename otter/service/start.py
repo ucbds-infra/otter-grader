@@ -270,7 +270,7 @@ try:
                 SELECT user_id, submission_id, assignment_id, class_id, file_path 
                 FROM submissions 
                 WHERE user_id = '{}' 
-                ORDER BY timestamp 
+                ORDER BY timestamp DESC
                 LIMIT 1
                 """.format(user)
             )
