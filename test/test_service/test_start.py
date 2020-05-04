@@ -406,7 +406,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         )
         results = self.cursor.fetchall()
 
-        print(json.dumps(results, indent=4))
+        print(json.dumps(results, indent=4, default=lambda o: "not serializable"))
 
         for r in results:
             if not re.search('score.', str(r[6])):
