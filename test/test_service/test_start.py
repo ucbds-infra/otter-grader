@@ -262,7 +262,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         request = {'api_key': 'key1', 'nb': data}
         resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
         enable_print()
-        
+
         self.assertEqual(resp1.code, 200)
 
         self.cursor.execute(
@@ -389,11 +389,14 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         # start.CONN = self.conn
 
         # tornado test will timeout grade() once SUBMISSION_QUEUE is depleted
-        block_print()
-        try:
-            await start.start_grading_queue()
-        except CancelledError:
-            pass
+        with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
+            try:
+                m = mock.mock_open()
+                with mock.patch.object(start.stdio_proxy, "redirect_stdout", m):
+                    with mock.patch.object(start.stdio_proxy, "redirect_stderr", m):
+                        await start.start_grading_queue()
+            except CancelledError:
+                pass
         enable_print()
 
         self.cursor.execute(

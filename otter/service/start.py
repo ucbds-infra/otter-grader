@@ -10,8 +10,8 @@ try:
     import yaml
     import hashlib
     import jwt
-    import logging
-    import traceback
+    # import logging
+    # import traceback
     import tornado.options
     import queries
     import stdio_proxy
