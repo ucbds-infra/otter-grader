@@ -407,7 +407,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         )
         results = self.cursor.fetchall()
 
-        for r in results;
+        for r in results:
             if not re.search('score.', str(r[6])):
                 print(r)
                 print(r[6])
