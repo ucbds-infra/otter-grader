@@ -401,20 +401,16 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         self.cursor.execute(
             """
             SELECT * FROM submissions
-            ORDER BY timestamp ASC
-            """
-        )
-        results = self.cursor.fetchall()
-        print(results)
-        self.cursor.execute(
-            """
-            SELECT * FROM submissions
             WHERE user_id = ANY ('{1,2,3}'::int[])
             ORDER BY timestamp ASC
             """
         )
         results = self.cursor.fetchall()
-        print(results)
+
+        for r in results;
+            if not re.search('score.', str(r[6])):
+                print(r)
+                print(r[6])
 
         # check scores are updated in submissions table
         scores = [re.search('score.', str(row[6])).group(0) for row in results]
