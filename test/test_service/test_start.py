@@ -406,15 +406,8 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         )
         results = self.cursor.fetchall()
 
-        print(json.dumps(results, indent=4, default=lambda o: "not serializable"))
-
-        for r in results:
-            if not re.search('score.', str(r[6])):
-                print(r)
-                print(r[6])
-
         # check scores are updated in submissions table
-        scores = [re.search('score.', str(row[6])).group(0) for row in results]
+        scores = [re.search('score.', json.dumps(row[6], default=lambda o: "not serializable"), flags=re.MULTILINE).group(0) for row in results]
         expected_scores = [re.search('score.', score.to_json()).group(0) for score in mock_scores]
         self.assertCountEqual(expected_scores, scores)
 
