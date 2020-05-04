@@ -355,7 +355,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
             """
         )
 
-    @mock.patch('otter.service.start.grade_assignments', autospec=True)
+    @mock.patch.object(start, 'grade_assignments', autospec=True)
     @mock.patch('io.StringIO', return_value='', autospec=True)
     @gen_test(timeout=1)
     async def test_grade(self, mock_io, mock_grade):
