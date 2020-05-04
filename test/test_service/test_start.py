@@ -91,31 +91,30 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
         async def __call__(self, *args, **kwargs):
             return next(self._keys)
     
-    # @mock.patch.object(start.GoogleOAuth2LoginHandler, 'get_authenticated_user', new_callable=GetAuthenticatedUserMock)
-    # @mock.patch.object(start.GoogleOAuth2LoginHandler, 'get_argument', return_value=True, autospec=True)
-    # @mock.patch('jwt.decode', return_value={'email': 'user3@example.com'}, autospec=True)
-    # @mock.patch.object(start.os, 'urandom', autospec=True)
-    # def test_google_auth(self, mock_getarg, mock_get_user, mock_jwt_decode, mock_urandom):
-    #     mock_urandom.side_effect = [str(i).encode() for i in range(4)]
-    #     with redirect_stdout(StringIO()):
-    #         resp1 = self.fetch('/auth/google')
-    #         resp2 = self.fetch('/auth/google')
-    #     # self.assertEqual(resp1.code, 200, resp1.body)
-    #     # self.assertEqual(resp2.code, 200, resp2.body)
+    @mock.patch.object(start.GoogleOAuth2LoginHandler, 'get_authenticated_user', new_callable=GetAuthenticatedUserMock)
+    @mock.patch.object(start.GoogleOAuth2LoginHandler, 'get_argument', return_value=True, autospec=True)
+    @mock.patch('jwt.decode', return_value={'email': 'user3@example.com'}, autospec=True)
+    @mock.patch.object(start.os, 'urandom', autospec=True)
+    def test_google_auth(self, mock_urandom, mock_jwt_decode, mock_getarg, mock_get_user):
+        mock_urandom.side_effect = [str(i).encode() for i in range(4)]
+        with redirect_stdout(StringIO()):
+            resp1 = self.fetch('/auth/google')
+            resp2 = self.fetch('/auth/google')
+        self.assertEqual(resp1.code, 200, resp1.body)
+        self.assertEqual(resp2.code, 200, resp2.body)
 
-    #     self.cursor.execute("SELECT * FROM users")
-    #     print(self.cursor.fetchall())
+        self.cursor.execute("SELECT * FROM users")
 
-    #     self.cursor.execute(
-    #         """
-    #         SELECT * FROM users WHERE email = 'user3@example.com'
-    #         """
-    #     )
-    #     results = self.cursor.fetchall()
+        self.cursor.execute(
+            """
+            SELECT * FROM users WHERE email = 'user3@example.com'
+            """
+        )
+        results = self.cursor.fetchall()
 
-    #     # check database has the expected api keys after two auth requests
-    #     self.assertEqual(len(results), 1)
-    #     self.assertEqual(results[0][1], ['key1', 'key2'])
+        # check database has the expected api keys after two auth requests
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0][1], ['30', '31'])
 
     @mock.patch('os.urandom', autospec=True)
     @mock.patch('hashlib.sha256', autospec=True)
@@ -388,7 +387,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         # # set conn so start has access to it
         # start.CONN = self.conn
 
-        # tornado test will timeout grade() once SUBMISSION_QUEUE is depleted
+        # tornado test will timeout start_grading_queue once SUBMISSION_QUEUE is depleted
         with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
             try:
                 m = mock.mock_open()
@@ -397,6 +396,9 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
                         await start.start_grading_queue()
             except CancelledError:
                 pass
+
+        # wait for all calls to grade_submission to finish
+        start.EXECUTOR.shutdown(wait=True)
 
         self.cursor.execute(
             """
