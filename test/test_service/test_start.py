@@ -93,7 +93,7 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
     
     @mock.patch.object(start.GoogleOAuth2LoginHandler, 'get_authenticated_user', new_callable=GetAuthenticatedUserMock)
     @mock.patch.object(start.GoogleOAuth2LoginHandler, 'get_argument', return_value=True, autospec=True)
-    @mock.patch('jwt.decode', return_value={'email': 'user3@example.com'}, autospec=True)
+    @mock.patch.object(start.jwt, 'decode', return_value={'email': 'user3@example.com'}, autospec=True)
     @mock.patch.object(start.os, 'urandom', autospec=True)
     def test_google_auth(self, mock_urandom, mock_jwt_decode, mock_getarg, mock_get_user):
         mock_urandom.side_effect = [str(i).encode() for i in range(4)]
@@ -393,12 +393,9 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
                 m = mock.mock_open()
                 with mock.patch.object(start.stdio_proxy, "redirect_stdout", m):
                     with mock.patch.object(start.stdio_proxy, "redirect_stderr", m):
-                        await start.start_grading_queue()
+                        await start.start_grading_queue(shutdown=True)
             except CancelledError:
                 pass
-
-        # wait for all calls to grade_submission to finish
-        start.EXECUTOR.shutdown(wait=True)
 
         self.cursor.execute(
             """
@@ -408,11 +405,6 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
             """
         )
         results = self.cursor.fetchall()
-
-        for r in results:
-            if not re.search('score.', str(r[6])):
-                print(r)
-                print(r[6])
 
         # check scores are updated in submissions table
         scores = [re.search('score.', str(row[6])).group(0) for row in results]

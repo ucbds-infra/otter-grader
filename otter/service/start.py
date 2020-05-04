@@ -378,8 +378,13 @@ try:
         return message, df
 
 
-    async def start_grading_queue():
-        """Pops submission ids off SUBMISSION_QUEUE and sending them into EXECUTOR to be graded"""
+    async def start_grading_queue(shutdown=False):
+        """Pops submission ids off SUBMISSION_QUEUE and sending them into EXECUTOR to be graded
+        
+        Args:
+            shutdown (bool): default `False`; whether or not to shutdown EXECUTOR after processing
+                queue
+        """
         global SUBMISSION_QUEUE
 
         async for submission_id in SUBMISSION_QUEUE:
@@ -391,6 +396,9 @@ try:
 
             # Set task done in queue
             SUBMISSION_QUEUE.task_done()
+        
+        if shutdown:
+            EXECUTOR.shutdown(wait=True)
 
 
     class Application(tornado.web.Application):
