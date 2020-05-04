@@ -397,8 +397,15 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
                         await start.start_grading_queue()
             except CancelledError:
                 pass
-        enable_print()
 
+        self.cursor.execute(
+            """
+            SELECT * FROM submissions
+            ORDER BY timestamp ASC
+            """
+        )
+        results = self.cursor.fetchall()
+        print(results)
         self.cursor.execute(
             """
             SELECT * FROM submissions
@@ -407,6 +414,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
             """
         )
         results = self.cursor.fetchall()
+        print(results)
 
         # check scores are updated in submissions table
         scores = [re.search('score.', str(row[6])).group(0) for row in results]

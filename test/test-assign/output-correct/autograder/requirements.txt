@@ -23,7 +23,6 @@ stdio-proxy
 
 # testing requirements
 testing.postgresql
-pyembedpg
 
 # documentation requirements
 recommonmark
