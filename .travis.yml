@@ -20,7 +20,7 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - coverage run -m unittest test.test_service.test_stsart
+  - coverage run -m unittest test.test_service.test_start
 
 after_success:
   - codecov
