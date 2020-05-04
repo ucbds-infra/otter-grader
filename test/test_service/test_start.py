@@ -355,65 +355,61 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
             """
         )
 
-    @mock.patch.object(start, 'grade_assignments', autospec=True)
-    @mock.patch('io.StringIO', return_value='', autospec=True)
-    @gen_test(timeout=1)
-    async def test_grade(self, mock_io, mock_grade):
-        import pandas as pd
-        import re
+    # @mock.patch.object(start, 'grade_assignments', autospec=True)
+    # @mock.patch('io.StringIO', return_value='', autospec=True)
+    # @gen_test(timeout=1)
+    # async def test_grade(self, mock_io, mock_grade):
+    #     import pandas as pd
+    #     import re
 
-        mock_scores = [pd.DataFrame(['score1']),
-                       pd.DataFrame(['score2']),
-                       pd.DataFrame(['score3']),
-                       pd.DataFrame(['score4']),
-                       pd.DataFrame(['score5'])]
-        mock_grade.side_effect = mock_scores
-        timestamps = [datetime.utcnow() - timedelta(days=x) for x in range(5)]
-        for submission in [1, 2, 3, 4, 5]:
-            start.SUBMISSION_QUEUE.put(submission)
+    #     mock_scores = [pd.DataFrame(['score1']),
+    #                    pd.DataFrame(['score2']),
+    #                    pd.DataFrame(['score3']),
+    #                    pd.DataFrame(['score4']),
+    #                    pd.DataFrame(['score5'])]
+    #     mock_grade.side_effect = mock_scores
+    #     timestamps = [datetime.utcnow() - timedelta(days=x) for x in range(5)]
+    #     for submission in [1, 2, 3, 4, 5]:
+    #         start.SUBMISSION_QUEUE.put(submission)
 
-        self.cursor.execute(
-            """
-            INSERT INTO submissions (submission_id, assignment_id, class_id, user_id, file_path, timestamp)
-            VALUES (5, '1', 1, 2, ' ', %s),
-                   (4, '1', 1, 1, ' ', %s),
-                   (3, '1', 1, 3, ' ', %s),
-                   (2, '1', 1, 2, ' ', %s),
-                   (1, '1', 1, 1, ' ', %s)
-            """,
-            timestamps
-        )
+    #     self.cursor.execute(
+    #         """
+    #         INSERT INTO submissions (submission_id, assignment_id, class_id, user_id, file_path, timestamp)
+    #         VALUES (5, '1', 1, 2, ' ', %s),
+    #                (4, '1', 1, 1, ' ', %s),
+    #                (3, '1', 1, 3, ' ', %s),
+    #                (2, '1', 1, 2, ' ', %s),
+    #                (1, '1', 1, 1, ' ', %s)
+    #         """,
+    #         timestamps
+    #     )
 
-        # # set conn so start has access to it
-        # start.CONN = self.conn
+    #     # # set conn so start has access to it
+    #     # start.CONN = self.conn
 
-        # tornado test will timeout start_grading_queue once SUBMISSION_QUEUE is depleted
-        with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
-            try:
-                m = mock.mock_open()
-                with mock.patch.object(start.stdio_proxy, "redirect_stdout", m):
-                    with mock.patch.object(start.stdio_proxy, "redirect_stderr", m):
-                        await start.start_grading_queue(shutdown=True)
-            except CancelledError:
-                pass
+    #     # tornado test will timeout start_grading_queue once SUBMISSION_QUEUE is depleted
+    #     with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
+    #         try:
+    #             m = mock.mock_open()
+    #             with mock.patch.object(start.stdio_proxy, "redirect_stdout", m):
+    #                 with mock.patch.object(start.stdio_proxy, "redirect_stderr", m):
+    #                     await start.start_grading_queue(shutdown=True)
+    #         except CancelledError:
+    #             pass
 
-        self.cursor.execute(
-            """
-            SELECT * FROM submissions
-            WHERE user_id = ANY ('{1,2,3}'::int[])
-            ORDER BY timestamp ASC
-            """
-        )
-        results = self.cursor.fetchall()
+    #     self.cursor.execute(
+    #         """
+    #         SELECT * FROM submissions
+    #         WHERE user_id = ANY ('{1,2,3}'::int[])
+    #         ORDER BY timestamp ASC
+    #         """
+    #     )
+    #     results = self.cursor.fetchall()
 
-        self.assertEqual(start.EXECUTOR._work_queue.qsize() + sum(
-            [bool(re.search('score.', json.dumps(row[6], default=lambda o: "not serializable"), flags=re.MULTILINE)) for row in results]
-        ), 5)
-
-        # # check scores are updated in submissions table
-        # scores = [re.search('score.', json.dumps(row[6], default=lambda o: "not serializable"), flags=re.MULTILINE).group(0) for row in results]
-        # expected_scores = [re.search('score.', score.to_json()).group(0) for score in mock_scores]
-        # self.assertCountEqual(expected_scores, scores)
+    #     # check scores are updated in submissions table
+    #     scores = [re.search('score.', json.dumps(row[6], default=lambda o: "not serializable"), flags=re.MULTILINE).group(0) for row in results]
+    #     expected_scores = [re.search('score.', score.to_json()).group(0) for score in mock_scores]
+    #     self.assertCountEqual(expected_scores, scores)
 
     @classmethod
     def tearDownClass(cls):
