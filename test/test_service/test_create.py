@@ -51,16 +51,16 @@ class TestBuild(unittest.TestCase):
         self.cursor.execute("""INSERT INTO classes (class_id, class_name)
                                 VALUES (1234, 'dummy name')""")
         self.cursor.execute("""SELECT * FROM classes 
-                                WHERE class_id = 1234 """)
+                                WHERE class_id = '1234' """)
         assert self.cursor.rowcount == 1, "Couldn't insert/find dummy class"
 
         # assignments table
         self.cursor.execute("""INSERT INTO assignments (assignment_id, class_id, assignment_name)
-                                VALUES ('dummyid', 1234, 'dummy name')""")
+                                VALUES ('dummyid', '1234', 'dummy name')""")
         self.cursor.execute("""SELECT * FROM assignments 
                                 WHERE assignment_id = 'dummyid' """)
         output = self.cursor.fetchall()
-        expected = [("dummyid", 1234, "dummy name")]
+        expected = [("dummyid", '1234', "dummy name", None)]
         assert output == expected, "Expected {} but was {}".format(expected, output)
 
         # submissions table

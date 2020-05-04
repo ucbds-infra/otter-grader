@@ -7,7 +7,7 @@ import shutil
 import os
 import yaml
 
-from subprocess import PIPE
+from subprocess import PIPE, DEVNULL
 from io import BytesIO
 from jinja2 import Template
 from psycopg2.errors import UniqueViolation
@@ -137,7 +137,8 @@ def main(args, conn=None, close_conn=True):
         
         build_out = subprocess.Popen(
             ["docker", "build", "-f", "-", ".", "-t", a["assignment_id"]],
-            stdin=echo_dockerfile.stdout
+            stdin=echo_dockerfile.stdout, 
+            stdout=DEVNULL if args.quiet else None
         )
         build_out.wait()
         

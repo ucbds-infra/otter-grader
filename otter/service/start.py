@@ -417,11 +417,11 @@ try:
             
             # Initialize database session
             self.db = queries.TornadoSession(queries.uri(
-                host='localhost',
-                port=5432,
+                host=ARGS.db_host,
+                port=ARGS.db_port,
                 dbname='otter_db',
-                user='root',
-                password='root'
+                user=ARGS.db_user,
+                password=ARGS.db_pass
             ))
 
 except ImportError:
