@@ -17,7 +17,7 @@ psycopg2
 queries
 pyyaml
 docker
-jwt
+PyJWT
 tornado
 stdio-proxy
 
