@@ -7,10 +7,14 @@ sudo: false
 
 services:
   - docker
+  - postgresql
 
 before_install:
   # - docker pull ucbdsinfra/otter-grader:latest
   - docker pull gradescope/auto-builds:latest
+
+before_script:
+  - psql -c "create user root createdb password 'root';" -U postgres
 
 install:
   - pip install -r requirements.txt

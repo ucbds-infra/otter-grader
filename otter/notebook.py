@@ -44,14 +44,14 @@ class Notebook:
 			assert len(otter_configs) == 1, "More than 1 otter config file found"
 
 			# load in config file
-			with open(otter_configs) as f:
+			with open(otter_configs[0]) as f:
 				self._config = json.load(f)
 
 			# check that config file has required info
-			assert all([key in self._config for key in ["endpoint", "auth", "assignment", "notebook"]]), "config file missing required information"
+			assert all([key in self._config for key in ["endpoint", "auth", "assignment_id", "class_id", "notebook"]]), "config file missing required information"
 
-			self._google_auth_url = os.path.join(self._config["endpoint"], "google_auth")
-			self._default_auth_url = os.path.join(self._config["endpoint"], "personal_auth")
+			self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
+			self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
 			self._submit_url = os.path.join(self._config["endpoint"], "submit")
 
 			if _API_KEY is None:
@@ -238,7 +238,8 @@ class Notebook:
 		with open(notebook_path) as f:
 			notebook_data = json.load(f)
 
-		notebook_data["metadata"]["assignment_id"] = self._config["assignment"]
+		notebook_data["metadata"]["assignment_id"] = self._config["assignment_id"]
+		notebook_data["metadata"]["class_id"] = self._config["class_id"]
 		
 		print("Submitting notebook to server...")
 

@@ -6,146 +6,147 @@ import subprocess
 import shutil
 import os
 import yaml
-import docker
 
-from subprocess import PIPE
+from subprocess import PIPE, DEVNULL
 from io import BytesIO
 from jinja2 import Template
+from psycopg2.errors import UniqueViolation
 
 from ..utils import connect_db
 
-
 DOCKERFILE_TEMPLATE = Template("""
-FROM ucbdsinfra/otter-grader
+FROM {{ image }}
 RUN mkdir /home/notebooks
-ADD {{ test_folder_path }} /home{% if test_folder_name != "tests" %}
-RUN mv /home/{{ test_folder_name }} /home/tests{% endif %}{% if requirements %}
-ADD {{ requirements }} /home
-RUN pip3 install /home/{{ requirements_filename }}{% endif %}{% if global_requirements %}
+ADD {{ test_folder_path }} /home/tests{% if global_requirements %}
 ADD {{ global_requirements }} /home
-RUN pip3 install /home/{{ global_requirements_filename }}{% endif %}
+RUN pip3 install -r /home/{{ global_requirements_filename }}{% endif %}{% if requirements %}
+ADD {{ requirements }} /home
+RUN pip3 install -r /home/{{ requirements_filename }}{% endif %}{% for file in files %}
+ADD {{ file }} /home/notebooks{% endfor %}
 """)
 
-def check_assignment_id(assignment_ids, conn):
-    cursor = conn.cursor()
-    total_row_matches = 0
-    duplicate_ids = []
-    for i, assignment_id in enumerate(assignment_ids):
-        sql_command = "SELECT * FROM assignments WHERE assignment_id = {}".format(i)
-        cursor.execute(sql_command)
-        if cursor.rowcount > 0:
-            duplicate_ids.append(assignment_id)
-        total_row_matches += cursor.rowcount
-    cursor.close()
-    return total_row_matches == 0, duplicate_ids
+def write_class_info(class_id, class_name, conn):
+    """Writes the given class_name to the database, auto-generating a class_id
 
-def write_class_info(class_name, conn):
+    Args:
+        class_name (str): Name of new class to add to the database
+        conn (Connection): Connection object for database
+    
+    Returns:
+        class_id: Class ID for newly added class.
+    """
     cursor = conn.cursor()
-    insert_command = "INSERT INTO classes (class_name) \
-        VALUES(\'{}\')".format(class_name)
-    cursor.execute(insert_command)
-    select_command = "SELECT class_id FROM classes \
-        WHERE class_name = \'{}\'".format(class_name)
-    cursor.execute(select_command)
-    select_result = cursor.fetchall()
-    class_id = None
-    for row in select_result:
-        class_id = row[0]
+    insert_command = "INSERT INTO classes (class_id, class_name) \
+        VALUES(%s, %s)"#.format(class_name)
+    try:
+        cursor.execute(insert_command, (class_id, class_name))
+    except UniqueViolation:
+        pass
     conn.commit()
     cursor.close()
     return class_id
 
-def write_assignment_info(assignment_id, class_id, assignment_name, conn):
+def write_assignment_info(assignment_id, class_id, assignment_name, seed, conn):
+    """Inserts/Updates assignment class_id and assignment_name in database. Inserts if assignment_id
+        is not present. Updates if assignment_id is present.
+
+    Args:
+        assignment_id (str): Assignment id which will be created or updated
+        class_id (str): Class id to insert/update
+        assignment_name (str): Assignment name to insert/update
+        conn (Connection): Connection object for database
+    """
     cursor = conn.cursor()
-    sql_command = """INSERT INTO assignments (assignment_id, class_id, assignment_name)
-                    VALUES(\'{}\', {}, \'{}\')
-                    ON CONFLICT (assignment_id, class_id)
-                    DO UPDATE SET assignment_name = \'{}\'
-                    """.format(assignment_id, class_id, assignment_name, assignment_name)
-    cursor.execute(sql_command)
+    find_sql_command = """SELECT * FROM assignments
+    WHERE assignment_id = '{}' AND class_id = '{}'
+    """.format(assignment_id, class_id)
+    cursor.execute(find_sql_command)
+
+    # if seed is None:
+    #     seed = "NULL"
+
+    # If conflict on assignment_id, class_id
+    # Update assignment_name
+    if cursor.rowcount == 1:
+        sql_command = """UPDATE assignments
+                        SET assignment_name = %s, seed = %s
+                        WHERE assignment_id = %s AND class_id = %s
+                        """#.format(assignment_id, class_id, assignment_name, assignment_name)
+        cursor.execute(sql_command, (assignment_name, seed, assignment_id, class_id))
+    # Else, just insert
+    else:
+        sql_command = """INSERT INTO assignments (assignment_id, class_id, assignment_name, seed)
+                        VALUES (%s, %s, %s, %s)
+                        """#.format(assignment_id, class_id, assignment_name, assignment_name)
+        cursor.execute(sql_command, (assignment_id, class_id, assignment_name, seed))
+
     conn.commit()
     cursor.close()
 
-def main(args):
-    repo_path = input("What is the absolute path of your assignments repo? [/home/assignments] ")
-    if not repo_path:
-        repo_path = "/home/assignments"
+def main(args, conn=None, close_conn=True):
+    # repo_path = input("What is the absolute path of your assignments repo? [/home/assignments] ")
+    # if not repo_path:
+    #     repo_path = "/home/assignments"
 
+    repo_path = args.repo_path
     assert os.path.exists(repo_path) and os.path.isdir(repo_path), "{} does not exist or is not a directory".format(repo_path)
 
+    current_dir = os.getcwd()
     os.chdir(repo_path)
 
-    # # get commit hash
-    # commit_hash_cmd = subprocess.run(["git", "rev-parse", "HEAD"], stdout=PIPE, stderr=PIPE)
-    # assert not commit_hash_cmd.stderr, commit_hash_cmd.stderr.decode("utf-8")
-
-    # # get last known commit hash
-    # TODO: Create file if not exists
-    # with open("/home/.LAST_COMMIT_HASH", "r+") as f:
-    #     last_commit_hash = f.read()
-
-    # if last_commit_hash == commit_hash_cmd.stdout:
-    #     # write commit hash
-    #     with open("/home/.LAST_COMMIT_HASH", "w+") as f:
-    #         f.write(commit_hash_cmd.stdout)
-        
-    #     print("No changes since last pull.")
-    #     return
-    
     # parse conf.yml
     assert os.path.isfile("conf.yml"), "conf.yml does not exist"
     with open("conf.yml") as f:
         config = yaml.safe_load(f)
 
     assignments = config["assignments"]
-    name_id_pairs = [(a["name"], a["assignment_id"]) for a in assignments]
+    assignment_cfs = [(a["name"], a["assignment_id"], a.get("seed", None)) for a in assignments]
     ids = [a["assignment_id"] for a in assignments]
     assert len(ids) == len(set(ids)), "Found non-unique assignment IDs in conf.yml"
-    
+
     # Use one global connection for all db-related commands
-    # TODO: fill in the arguments
-    conn = conn = connect_db(args.db_host, args.db_port, args.db_user, args.db_pass)
-    class_id = write_class_info(config["course"], conn)
-    
-    # check for no assignment id conflicts in db
-    found_match, duplicate_ids = check_assignment_id(ids, conn)
-    assert found_match, "Ids: {} are already in the database".format(duplicate_ids)
-    
+    if conn is None:
+        conn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port)
+    class_id = write_class_info(config["class_id"], config["class_name"], conn)
+
     # write to the database
-    for name, assignment_id in name_id_pairs:
-        write_assignment_info(assignment_id, class_id, name, conn)
-    
+    for name, assignment_id, seed in assignment_cfs:
+        write_assignment_info(assignment_id, class_id, name, seed, conn)
+
     # TODO: start building docker images
     for a in assignments:
         requirements = a["requirements"] if "requirements" in a else ""
         global_requirements = config["requirements"] if "requirements" in config else ""
 
         dockerfile = DOCKERFILE_TEMPLATE.render(
+            image = args.image,
             test_folder_path = a["tests_path"],
             test_folder_name = os.path.split(a["tests_path"])[1],
             requirements = requirements,
             requirements_filename = os.path.split(requirements)[1],
             global_requirements = global_requirements,
-            global_requirements_filename = os.path.split(global_requirements)[1]
+            global_requirements_filename = os.path.split(global_requirements)[1],
+            files = a.get("files", [])
         )
 
-        # with open("DOCKERFILE", "w+") as f:
-        #     f.write(str(dockerfile))
-
+        print("Building Docker image {}".format(a["assignment_id"]))
+        
         # Build the docker image
-        echo_dockerfile = subprocess.run(["echo", dockerfile], stdout=PIPE, stderr=PIPE)
-        assert not echo_dockerfile.stderr, echo_dockerfile.stderr.decode("utf-8")
-        build_out = subprocess.run(
-            ["docker", "build", "-", "-t", a["assignment_id"]], 
-            stdin=echo_dockerfile.stdout, stdout=PIPE, stderr=PIPE
+        echo_dockerfile = subprocess.Popen(["echo", dockerfile], stdout=PIPE)
+        echo_dockerfile.wait()
+        
+        build_out = subprocess.Popen(
+            ["docker", "build", "-f", "-", ".", "-t", a["assignment_id"]],
+            stdin=echo_dockerfile.stdout, 
+            stdout=DEVNULL if args.quiet else None
         )
-        assert not build_out.stderr, build_out.stderr.decode("utf-8")
-
-        # new_image = CLIENT.images.build(
-        #     fileobj=BytesIO(dockerfile.encode("utf-8")), 
-        #     pull=True,
-        #     tag=a["assignment_id"]
-        # )
-        # print("Built Docker image {}".format(new_image.tags))
+        build_out.wait()
+        
+        echo_dockerfile.stdout.close()
 
         print("Built Docker image {}".format(a["assignment_id"]))
+    
+    if close_conn:
+        conn.close()
+    
+    os.chdir(current_dir)

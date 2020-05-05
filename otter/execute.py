@@ -173,7 +173,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
 
     return score_mapping
 
-def grade(ipynb_path, pdf, tag_filter, html_filter, script, seed=None):
+def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, seed=None, cwd=None):
     """
     Grades a single ipython notebook and returns the score
 
@@ -197,7 +197,7 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, seed=None):
     test_files = glob('/home/tests/*.py')
 
     # get score
-    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=True, seed=seed)
+    result = grade_notebook(ipynb_path, test_files, script=script, ignore_errors=ignore_errors, seed=seed, cwd=cwd)
 
     # output PDF
     if pdf:
@@ -293,7 +293,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                     # TODO: move this patch into CheckCallWrapper
                     m = mock.mock_open()
                     with mock.patch('otter.Notebook.export', m):
-                        exec(source + cell_source, global_env)
+                        exec(cell_source, global_env)
                     source += cell_source
                 except:
                     if not ignore_errors:
@@ -406,6 +406,8 @@ def main(args=None):
     parser.add_argument("--html-filter", action="store_true", default=False)
     parser.add_argument("--scripts", action="store_true", default=False)
     parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
+    parser.add_argument("--verbose", default=False, action="store_true", help="If present prints scores and hints to stdout")
+    parser.add_argument("--debug", default=False, action="store_true", help="Does not ignore errors on execution")
 
     if args is None:
         args = parser.parse_args()
@@ -425,7 +427,10 @@ def main(args=None):
 
     for ipynb_name, ipynb_path in all_ipynb:
         all_results["file"].append(ipynb_name)
-        score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts, seed=args.seed)
+        score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts, ignore_errors=not args.debug, seed=args.seed, cwd=dir_path)
+        if args.verbose:
+            print("Score details for {}".format(ipynb_name))
+            print(json.dumps(score, default=lambda o: repr(o)))
         # del score["TEST_HINTS"]
         all_results["score"].append({t : score[t]["score"] if type(score[t]) == dict else score[t] for t in score})
         if args.pdf or args.html_filter or args.tag_filter:

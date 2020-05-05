@@ -117,8 +117,8 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     file. This function can grade files with .py or .ipynb extensions (use scripts=True for .py). 
 
     Args:
-        tests_dir (str, optional): Directory of test files
-        notebooks_dir (str, optional): Directory of notebooks to grade
+        tests_dir (str): Directory of test files
+        notebooks_dir (str): Directory of notebooks to grade
         id (str, optional): Id of this function for mc use
         image (str, optional): Docker image to do grading in
         verbose (bool, optional): Whether function should print information about various steps
@@ -189,6 +189,9 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     # if we are grading scripts, add the --script flag
     if scripts:
         grade_command += ["--scripts"]
+    
+    if debug:
+        grade_command += ["--verbose"]
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
     
@@ -211,7 +214,11 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     #     log_file.write("\n")
     #     log_file.close()
 
-    all_commands = [launch, copy, tests, grade]
+    all_commands = [launch, copy, grade]
+    try: 
+        all_commands += [tests]
+    except UnboundLocalError:
+        pass
     try:
         all_commands += [requirements, install]
     except UnboundLocalError:
@@ -300,11 +307,18 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
         raise
     
     # check that no commands errored, if they did rais an informative exception
-    all_commands = [launch, copy, tests, grade, csv, csv_cleanup, stop, remove]
+    all_commands = [launch, copy, grade, csv, csv_cleanup, stop, remove]
+
+    try:
+        all_commands += [tests]
+    except UnboundLocalError:
+        pass
+
     try:
         all_commands += [requirements, install]
     except UnboundLocalError:
         pass
+
     for command in all_commands:
         if command.stderr.decode('utf-8') != '':
             raise Exception("Error running ", command, " failed with error: ", \
