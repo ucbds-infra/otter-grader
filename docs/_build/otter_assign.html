@@ -279,7 +279,7 @@ export_cell: true
     <span class="n">show_results</span><span class="p">:</span> <span class="n">true</span>
 </pre></div>
 </div>
-<p>These values, if left unspecified, take on the default values of their flags as described below and in <a class="reference internal" href="otter_generate.html"><span class="doc">Otter Generate</span></a>.</p>
+<p>These values, if left unspecified, take on the default values of their flags as described in <a class="reference internal" href="otter_generate.html"><span class="doc">Otter Generate</span></a>.</p>
 <p>As an example, the following assignment metadata includes an export cell but no filtering, not init cell, and calls Otter Generate with the flags <code class="docutils literal notranslate"><span class="pre">--points</span> <span class="pre">3</span> <span class="pre">--seed</span> <span class="pre">0</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>```
 BEGIN ASSIGNMENT
@@ -553,10 +553,6 @@ Make sure you have run all cells in your notebook in order before running the ce
 </div>
 <p>If I wanted no initialization cell and no cell filtering in the export cell, I would run</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">assign</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">init</span><span class="o">-</span><span class="n">cell</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">filtering</span> <span class="n">hw00</span><span class="o">.</span><span class="n">ipynb</span> <span class="n">dist</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
-</pre></div>
-</div>
-<p>And if I wanted a Gradescope autograder with a seed of 42, I would run</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">assign</span> <span class="o">--</span><span class="n">generate</span> <span class="o">--</span><span class="n">seed</span> <span class="mi">42</span> <span class="n">hw00</span><span class="o">.</span><span class="n">ipynb</span> <span class="n">dist</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
 </pre></div>
 </div>
 </div>

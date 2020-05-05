@@ -4,7 +4,6 @@
 #######################################################
 
 # TODO: move seed to inside solution cell
-# TODO: add otter service
 
 import copy
 import json
