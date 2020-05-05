@@ -4,6 +4,7 @@
 #######################################################
 
 # TODO: move seed to inside solution cell
+# TODO: add otter service
 
 import copy
 import json
@@ -77,6 +78,8 @@ def main(args):
     if ASSIGNMENT_METADATA.get('solutions_pdf', False):
         filtering = ASSIGNMENT_METADATA.get('solutions_pdf') == 'filtered'
         nb2pdf.convert(str(result / 'autograder' / master.name), filtering=filtering)
+    if ASSIGNMENT_METADATA.get('service', {}):
+        gen_otter_file(master, result)
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         block_print()
@@ -108,6 +111,25 @@ def main(args):
         subprocess.run(generate_cmd)
 
         os.chdir(curr_dir)
+
+
+def gen_otter_file(master, result):
+    """Creates an otter service config file
+    """
+    service = ASSIGNMENT_METADATA['service']
+    service_config = {
+        "endpoint": service["endpoint"],
+        "auth": service.get("auth", "google"),
+        "assignment_id": service["assignment_id"],
+        "class_id": service["class_id"],
+        "notebook": service.get('notebook', master.name)
+    }
+
+    config_name = master.stem + '.otter'
+    with open(result / 'autograder' / config_name, "w+") as f:
+        json.dump(service_config, f, indent=4)
+    with open(result / 'student' / config_name, "w+") as f:
+        json.dump(service_config, f, indent=4)
 
 
 def convert_to_ok(nb_path, dir, args):
