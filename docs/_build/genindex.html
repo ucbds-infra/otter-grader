@@ -37,7 +37,7 @@
 <div id="navbar-menu" class="collapse navbar-collapse">
   <ul id="navbar-main-elements" class="navbar-nav mr-auto">
     <li class="nav-item">
-        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="index_beta.html">Home</a>
     </li>
     
     
@@ -63,6 +63,10 @@
     
     <li class="nav-item ">
         <a class="nav-link" href="otter_generate.html">Grading on Gradescope</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_service.html">Deploying a Grading Service</a>
     </li>
     
     <li class="nav-item ">
@@ -108,6 +112,8 @@
   
 
   <ul class="nav bd-sidenav">
+      
+      
       
       
       
@@ -215,12 +221,10 @@
       </ul></li>
       <li><a href="otter.html#otter.notebook.Notebook.check_all">check_all() (otter.notebook.Notebook method)</a>, <a href="otter_check.html#otter.notebook.Notebook.check_all">[1]</a>
 </li>
-      <li><a href="otter.service.html#otter.service.build.check_assignment_id">check_assignment_id() (in module otter.service.build)</a>
+      <li><a href="otter.html#otter.ok_parser.CheckCallWrapper.check_node_constructor">check_node_constructor() (otter.ok_parser.CheckCallWrapper method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="otter.html#otter.ok_parser.CheckCallWrapper.check_node_constructor">check_node_constructor() (otter.ok_parser.CheckCallWrapper method)</a>
-</li>
       <li><a href="otter.html#otter.ok_parser.CheckCallWrapper">CheckCallWrapper (class in otter.ok_parser)</a>
 </li>
       <li><a href="otter.html#otter.utils.connect_db">connect_db() (in module otter.utils)</a>
@@ -231,6 +235,8 @@
         <li><a href="otter.html#otter.jassign.convert_to_ok">(in module otter.jassign)</a>
 </li>
       </ul></li>
+      <li><a href="otter.service.html#otter.service.create.create_users">create_users() (in module otter.service.create)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -251,12 +257,14 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="otter.html#otter.utils.enable_print">enable_print() (in module otter.utils)</a>
+      <li><a href="otter.html#otter.assign.EmptyCellException">EmptyCellException</a>
 </li>
-      <li><a href="otter.html#otter.execute.execute_notebook">execute_notebook() (in module otter.execute)</a>
+      <li><a href="otter.html#otter.utils.enable_print">enable_print() (in module otter.utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#otter.execute.execute_notebook">execute_notebook() (in module otter.execute)</a>
+</li>
       <li><a href="otter.html#otter.execute.execute_script">execute_script() (in module otter.execute)</a>
 </li>
       <li><a href="otter.html#otter.notebook.Notebook.export">export() (otter.notebook.Notebook method)</a>, <a href="otter_check.html#otter.notebook.Notebook.export">[1]</a>
@@ -366,6 +374,8 @@
       <ul>
         <li><a href="otter.service.html#otter.service.start.LoginHandler.get">(otter.service.start.LoginHandler method)</a>
 </li>
+        <li><a href="otter.service.html#otter.service.start.SubmissionHandler.get">(otter.service.start.SubmissionHandler method)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -412,14 +422,12 @@
       <li><a href="otter.html#otter.ok_parser.OKTestsResult.grade">grade (otter.ok_parser.OKTestsResult attribute)</a>
 </li>
       <li><a href="otter.html#otter.execute.grade">grade() (in module otter.execute)</a>
-
-      <ul>
-        <li><a href="otter.service.html#otter.service.start.grade">(in module otter.service.start)</a>
 </li>
-      </ul></li>
       <li><a href="otter.html#otter.containers.grade_assignments">grade_assignments() (in module otter.containers)</a>
 </li>
       <li><a href="otter.html#otter.execute.grade_notebook">grade_notebook() (in module otter.execute)</a>
+</li>
+      <li><a href="otter.service.html#otter.service.start.grade_submission">grade_submission() (in module otter.service.start)</a>
 </li>
       <li><a href="otter.html#otter.metadata.GradescopeParser">GradescopeParser (class in otter.metadata)</a>
 </li>
@@ -675,14 +683,16 @@
         <li><a href="otter.html#otter.jassign.remove_hidden_tests">(in module otter.jassign)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.html#otter.assign.remove_output">remove_output() (in module otter.assign)</a>
 
       <ul>
         <li><a href="otter.html#otter.jassign.remove_output">(in module otter.jassign)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.service.html#otter.service.create.remove_users">remove_users() (in module otter.service.create)</a>
+</li>
       <li><a href="otter.html#otter.assign.replace_solutions">replace_solutions() (in module otter.assign)</a>
 
       <ul>
@@ -719,6 +729,8 @@
         <li><a href="otter.html#otter.jassign.solution_line_sub">(in module otter.jassign)</a>
 </li>
       </ul></li>
+      <li><a href="otter.service.html#otter.service.start.start_grading_queue">start_grading_queue() (in module otter.service.start)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.html#otter.utils.str_to_doctest">str_to_doctest() (in module otter.utils)</a>

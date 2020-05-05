@@ -9,6 +9,8 @@
 # CURRENT_VERSION: current version of the package (what to change)
 # NEW_VERSION: new version of the package (what to change it to)
 # FILES_WITH_VERSIONS: list of files that need to be updated
+# BETA: whether the new release is the current beta version
+# UNDO_BETA: whether we're undoing a beta release
 
 import re
 
@@ -19,7 +21,7 @@ BETA = True
 UNDO_BETA = False
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
-    "docker/Dockerfile",
+    "Dockerfile",
     "otter/generate.py",
     "test/test-generate/autograder-correct/requirements.txt",
     # "requirements.txt",
@@ -48,7 +50,45 @@ def main():
         with open(file, "w") as f:
             f.write(contents)
     
-    if not BETA:
+    if BETA:
+        # fix documentation
+        with open("docs/conf.py") as f:
+            contents = f.read()
+
+        contents = re.sub("master_doc = 'index'", "master_doc = 'index_beta'", contents)
+
+        with open("docs/conf.py", "w") as f:
+            f.write(contents)
+
+        # fix Makefile
+        with open("Makefile") as f:
+            contents = f.read()
+
+        contents = re.sub("ucbdsinfra/otter-grader", "ucbdsinfra/otter-grader:beta", contents)
+
+        with open("Makefile", "w") as f:
+            f.write(contents)
+
+    elif UNDO_BETA:
+        # fix documentation
+        with open("docs/conf.py") as f:
+            contents = f.read()
+
+        contents = re.sub("master_doc = 'index_beta'", "master_doc = 'index'", contents)
+
+        with open("docs/conf.py", "w") as f:
+            f.write(contents)
+
+        # fix Makefile
+        with open("Makefile") as f:
+            contents = f.read()
+
+        contents = re.sub("ucbdsinfra/otter-grader:beta", "ucbdsinfra/otter-grader", contents)
+
+        with open("Makefile", "w") as f:
+            f.write(contents)
+    
+    else:
         with open("setup.py") as f:
             contents = f.read()
 
