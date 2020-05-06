@@ -18,7 +18,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Deploying a Grading Service" href="otter_service.html" />
+    <link rel="next" title="Grading on a Deployed Service" href="otter_service.html" />
     <link rel="prev" title="Grading Locally" href="otter_grade.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -67,7 +67,7 @@
     </li>
     
     <li class="nav-item ">
-        <a class="nav-link" href="otter_service.html">Deploying a Grading Service</a>
+        <a class="nav-link" href="otter_service.html">Grading on a Deployed Service</a>
     </li>
     
     <li class="nav-item ">
@@ -204,6 +204,20 @@
     
         <li class="nav-item toc-entry toc-h3">
             <a href="#student-view" class="nav-link">Student View</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#otter-generate-reference" class="nav-link">otter generate Reference</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#Positional Arguments" class="nav-link">Positional Arguments</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#Named Arguments" class="nav-link">Named Arguments</a>
         </li>
     
             </ul>
@@ -383,6 +397,54 @@
 <p>Note that, because some tests are hidden, students will never see the autograder score in the right sidebar; instead, their score will only show as a dash <code class="docutils literal notranslate"><span class="pre">-</span></code> out of the points possible. Therefore, the only way for students to calculate their autograder score is to use the DataFrame printed to the stdout if <code class="docutils literal notranslate"><span class="pre">--show-results</span></code> is passed.</p>
 </div>
 </div>
+<div class="section" id="otter-generate-reference">
+<h2><code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">generate</span></code> Reference<a class="headerlink" href="#otter-generate-reference" title="Permalink to this headline">¶</a></h2>
+<p><p>Generates zipfile to configure Gradescope autograder</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">otter</span> <span class="n">generate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="p">[</span><span class="n">TESTS_PATH</span><span class="p">]]</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="p">[</span><span class="n">OUTPUT_PATH</span><span class="p">]]</span>
+                      <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="p">[</span><span class="n">REQUIREMENTS</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">threshold</span> <span class="n">THRESHOLD</span><span class="p">]</span>
+                      <span class="p">[</span><span class="o">--</span><span class="n">points</span> <span class="n">POINTS</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">results</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">seed</span> <span class="n">SEED</span><span class="p">]</span>
+                      <span class="p">[</span><span class="n">files</span> <span class="p">[</span><span class="n">files</span> <span class="o">...</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>files</kbd></dt>
+<dd><p>Other support files needed for grading (e.g. .py files, data files)</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>-t, --tests-path</kbd></dt>
+<dd><p>Path to test files</p>
+<p>Default: “./tests/”</p>
+</dd>
+<dt><kbd>-o, --output-path</kbd></dt>
+<dd><p>Path to which to write zipfile</p>
+<p>Default: “./”</p>
+</dd>
+<dt><kbd>-r, --requirements</kbd></dt>
+<dd><p>Path to requirements.txt file; ./requirements.txt automatically checked</p>
+<p>Default: “requirements.txt”</p>
+</dd>
+<dt><kbd>--threshold</kbd></dt>
+<dd><p>Pass/fail score threshold</p>
+</dd>
+<dt><kbd>--points</kbd></dt>
+<dd><p>Points possible, overrides sum of test points</p>
+</dd>
+<dt><kbd>--show-results</kbd></dt>
+<dd><p>Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)</p>
+</dd>
+<dt><kbd>--seed</kbd></dt>
+<dd><p>A random seed to be executed before each cell</p>
+</dd>
+</dl>
+</div>
+</div>
 </div>
 
 
@@ -392,7 +454,7 @@
               <div class='prev-next-bottom'>
                 
     <a class='left-prev' id="prev-link" href="otter_grade.html" title="previous page">Grading Locally</a>
-    <a class='right-next' id="next-link" href="otter_service.html" title="next page">Deploying a Grading Service</a>
+    <a class='right-next' id="next-link" href="otter_service.html" title="next page">Grading on a Deployed Service</a>
 
               </div>
               

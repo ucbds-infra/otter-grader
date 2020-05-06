@@ -198,52 +198,7 @@ An example of a manuall-graded written question with a custom prompt:
 
 ## Usage and Output
 
-Otter Assign is called using the `otter assign` command. This command takes in two required arguments.
-
-```
-$ otter assign --help
-usage: otter assign [-h] [--no-export-cell] [--no-run-tests] [--no-init-cell]
-                    [--no-check-all] [--no-filter]
-                    [--instructions INSTRUCTIONS] [--jassign] [--debug]
-                    [--generate] [-r [REQUIREMENTS]] [--threshold THRESHOLD]
-                    [--points POINTS] [--seed SEED] [--show-results]
-                    master result [files [files ...]]
-
-Create distribution versions of Otter Assign-formatted notebook
-
-positional arguments:
-  master                Notebook with solutions and tests.
-  result                Directory containing the result.
-  files                 Other support files needed for distribution (e.g. .py
-                        files, data files)
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --no-export-cell      Don't inject an export cell into the notebook
-  --no-run-tests        Don't run tests.
-  --no-init-cell        Don't automatically generate an Otter init cell
-  --no-check-all        Don't automatically add a check_all cell
-  --no-filter           Don't filter the PDF.
-  --instructions INSTRUCTIONS
-                        Additional submission instructions for students
-  --jassign             Use jassign notebook format
-  --debug               Do not ignore errors in running tests for debugging
-  --generate            Generate Gradescope autograder zipfile
-  -r [REQUIREMENTS], --requirements [REQUIREMENTS]
-                        Path to requirements.txt file; ./requirements.txt
-                        automatically checked; use with --generate only
-  --threshold THRESHOLD
-                        Pass/fail score threshold; use with --generate only
-  --points POINTS       Points possible, overrides sum of test points; use
-                        with --generate only
-  --seed SEED           A random seed to be executed before each cell; use
-                        with --generate only
-  --show-results        Show autograder test results (P/F only, no hints)
-                        after publishing grades (incl. hidden tests); use with
-                        --generate only
-```
-
-The first is `master`, the path to the master notebook (the one formatted as described above), and the second is `result`, the path at which output shoud be written. The optional `files` argument takes an arbitrary number of paths to files that should be shipped with notebooks (e.g. data files, images, Python executables).
+Otter Assign is called using the `otter assign` command. This command takes in two required arguments. The first is `master`, the path to the master notebook (the one formatted as described above), and the second is `result`, the path at which output shoud be written. The optional `files` argument takes an arbitrary number of paths to files that should be shipped with notebooks (e.g. data files, images, Python executables).
 
 The default behavior of Otter Assign is to do the following:
 
@@ -382,4 +337,15 @@ And if I wanted a Gradescope autograder with a seed of 42, I would run
 
 ```
 otter assign --generate --seed 42 hw00.ipynb dist data.csv
+```
+
+## `otter assign` Reference
+
+```eval_rst
+.. argparse::
+   :module: otter.argparser
+   :func: get_parser
+   :prog: otter
+   :path: assign
+   :nodefaultconst:
 ```

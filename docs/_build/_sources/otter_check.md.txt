@@ -161,9 +161,22 @@ Got:
     True
 ```
 
-## `otter.Notebook` Reference
+## Otter Reference
+
+### `otter.Notebook`
 
 ```eval_rst
 .. autoclass:: Notebook
     :members:
+```
+
+### `otter check`
+
+```eval_rst
+.. argparse::
+   :module: otter.argparser
+   :func: get_parser
+   :prog: otter
+   :path: check
+   :nodefaultconst:
 ```

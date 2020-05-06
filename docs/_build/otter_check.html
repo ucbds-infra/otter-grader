@@ -67,7 +67,7 @@
     </li>
     
     <li class="nav-item ">
-        <a class="nav-link" href="otter_service.html">Deploying a Grading Service</a>
+        <a class="nav-link" href="otter_service.html">Grading on a Deployed Service</a>
     </li>
     
     <li class="nav-item ">
@@ -160,7 +160,27 @@
         </li>
     
         <li class="nav-item toc-entry toc-h2">
-            <a href="#otter-notebook-reference" class="nav-link">otter.Notebook Reference</a>
+            <a href="#otter-reference" class="nav-link">Otter Reference</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#otter-notebook" class="nav-link">otter.Notebook</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#otter-check" class="nav-link">otter check</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h4">
+            <a href="#Positional Arguments" class="nav-link">Positional Arguments</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h4">
+            <a href="#Named Arguments" class="nav-link">Named Arguments</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+            </ul>
         </li>
     
     </ul>
@@ -298,8 +318,10 @@ Got:
 </pre></div>
 </div>
 </div>
-<div class="section" id="otter-notebook-reference">
-<h2><code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code> Reference<a class="headerlink" href="#otter-notebook-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="otter-reference">
+<h2>Otter Reference<a class="headerlink" href="#otter-reference" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="otter-notebook">
+<h3><code class="docutils literal notranslate"><span class="pre">otter.Notebook</span></code><a class="headerlink" href="#otter-notebook" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="otter.notebook.Notebook">
 <em class="property">class </em><code class="sig-prename descclassname">otter.notebook.</code><code class="sig-name descname">Notebook</code><span class="sig-paren">(</span><em class="sig-param">test_dir='./tests'</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.notebook.Notebook" title="Permalink to this definition">¶</a></dt>
@@ -383,6 +405,38 @@ tags, respectively.</p></li>
 
 </dd></dl>
 
+</div>
+<div class="section" id="otter-check">
+<h3><code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">check</span></code><a class="headerlink" href="#otter-check" title="Permalink to this headline">¶</a></h3>
+<p><p>Checks Python file against tests</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">otter</span> <span class="n">check</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">q</span> <span class="n">QUESTION</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TESTS_PATH</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">seed</span> <span class="n">SEED</span><span class="p">]</span> <span class="n">file</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>file</kbd></dt>
+<dd><p>Python file to grade</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>-q, --question</kbd></dt>
+<dd><p>Grade a specific test</p>
+</dd>
+<dt><kbd>-t, --tests-path</kbd></dt>
+<dd><p>Path to test files</p>
+<p>Default: “tests”</p>
+</dd>
+<dt><kbd>--seed</kbd></dt>
+<dd><p>A random seed to be executed before each cell</p>
+</dd>
+</dl>
+</div>
+</div>
 </div>
 </div>
 
