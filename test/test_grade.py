@@ -224,7 +224,7 @@ class TestGrade(unittest.TestCase):
             "-o", "test/",
             "--tag-filter",
             "--containers", "5",
-            "--image", "otter-test",
+            "--image", "otter-test"
         ]
         args = parser.parse_args(grade_command)
         args.func(args)
