@@ -60,24 +60,13 @@ Once you have cloned your assignments repo onto your Otter Service deployment, u
 
 The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be `./` (i.e. it is assumed to be the working directory). 
 
+## `otter service build` Reference
+
+```eval_rst
+.. argparse::
+   :module: otter.argparser
+   :func: get_parser
+   :prog: otter
+   :path: service build
+   :nodefaultconst:
 ```
-usage: otter service build [-h] [--db-host DB_HOST] [--db-port DB_PORT]
-                           [-u DB_USER] [-p DB_PASS] [--image IMAGE] [-q]
-                           repo_path
-
-Build images for an otter-service instance
-
-positional arguments:
-  repo_path             Path to assignments repo root
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --db-host DB_HOST     Postgres database host
-  --db-port DB_PORT     Postgres database port
-  -u DB_USER, --db-user DB_USER
-                        Postgres database user
-  -p DB_PASS, --db-pass DB_PASS
-                        Postgres database password
-  --image IMAGE         Based image for grading containers
-  -q, --quiet           Build images without writing Docker messages to stdout
-  ```

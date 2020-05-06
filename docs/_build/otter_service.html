@@ -147,6 +147,45 @@
               
 
 
+<div class="tocsection onthispage"><i class="fas fa-list"></i> On this page</div>
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#configuration-repo" class="nav-link">Configuration Repo</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#the-configuration-file" class="nav-link">The Configuration File</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#other-files" class="nav-link">Other Files</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#building-the-images" class="nav-link">Building the Images</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#otter-service-build-reference" class="nav-link">otter service build Reference</a><ul class="nav section-nav flex-column">
+                
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#Positional Arguments" class="nav-link">Positional Arguments</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h3">
+            <a href="#Named Arguments" class="nav-link">Named Arguments</a>
+        </li>
+    
+            </ul>
+        </li>
+    
+    </ul>
+</nav>
+
               
           </div>
           
@@ -158,6 +197,107 @@
                 
   <div class="section" id="deploying-a-grading-service">
 <h1>Deploying a Grading Service<a class="headerlink" href="#deploying-a-grading-service" title="Permalink to this headline">¶</a></h1>
+<p>Otter Service is a deployable grading server that students can send submissions to from in the notebook and which will grade submissions based on predefined tests. It is a service packaged with Otter but has additional requirements that are not necessary for running Otter without Otter Service. Otter Service is a tornado server that accepts requests with student submissions, writes the submission to disk, grades them, and saves the grade breakdowns in a Postgres database. This page details how to configure an already-deployed Otter Service instance, and is agnostic of deployment type. For more information on deploying an Otter Service instance, see <a class="reference external" href="#">here</a>.</p>
+<div class="section" id="configuration-repo">
+<h2>Configuration Repo<a class="headerlink" href="#configuration-repo" title="Permalink to this headline">¶</a></h2>
+<p>Otter Service is configured to grade assignments through a repository structure. While maintaing a git repo of assignment configurations is not required, it certainly makes editing and updated your assignments easier. Any directory that has the structure described here will do to set up assignments on an Otter Service deployments. If you are grading multiple classes on an Otter Service deployment, you must have one assignments repo for <strong>each</strong> class.</p>
+<p>The first and most important file required is the <code class="docutils literal notranslate"><span class="pre">conf.yml</span></code> file, at the root of the repo. This file will define some important configurations and provide paths to the necessary files for each assignment. While the following structure is not required, we recommend something like it to keep a logical structure to the repo.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">data</span><span class="o">-</span><span class="mi">8</span><span class="o">-</span><span class="n">assignments</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">conf</span><span class="o">.</span><span class="n">yml</span>
+    <span class="o">|</span> <span class="o">-</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+    <span class="o">|</span> <span class="n">hw</span>
+        <span class="o">|</span> <span class="n">hw01</span>
+            <span class="o">|</span> <span class="o">-</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+            <span class="o">|</span> <span class="n">test</span>
+                <span class="o">|</span> <span class="o">-</span> <span class="n">q0</span><span class="o">.</span><span class="n">py</span>
+                <span class="o">|</span> <span class="o">-</span> <span class="n">q1</span><span class="o">.</span><span class="n">py</span>
+                <span class="o">...</span>
+        <span class="o">|</span> <span class="n">hw02</span>
+        <span class="o">...</span>
+    <span class="o">|</span> <span class="n">proj</span>
+        <span class="o">|</span> <span class="n">proj01</span>
+        <span class="o">...</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<div class="section" id="the-configuration-file">
+<h3>The Configuration File<a class="headerlink" href="#the-configuration-file" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">conf.yml</span></code> file is a YAML-formatted file that defines the necessary configurations and paths to set up assignments on an Otter Service deployment. It has the following structure:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">class_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Data 8</span>      <span class="c1"># the name of the course</span>
+<span class="nt">class_id</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">data8x</span>        <span class="c1"># a **unique** ID for the course</span>
+<span class="nt">requirements</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">requirements.txt</span>      <span class="c1"># Path to a **global** reuquirements file</span>
+<span class="nt">assignments</span><span class="p">:</span>                        <span class="c1"># list of assignments</span>
+    <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Project 2</span>               <span class="c1"># assignment name</span>
+      <span class="nt">assignment_id</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">proj02</span>         <span class="c1"># assignment ID, unique among all assignments in this config</span>
+      <span class="nt">tests_path</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">proj/proj02/tests</span>                     <span class="c1"># path to directory of tests for this assignment</span>
+      <span class="nt">requirements</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">proj/proj02/requirements.txt</span>        <span class="c1"># path to requirements specific to **this** assignment</span>
+      <span class="nt">seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">42</span>                      <span class="c1"># random seed for intercell seeding</span>
+      <span class="nt">files</span><span class="p">:</span>                        <span class="c1"># list of files needed by the autograder, e.g. data files</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">proj/proj02/frontiers1.csv</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">proj/proj02/frontiers2.csv</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">proj/proj02/players.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">...</span>
+</pre></div>
+</div>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">class_id</span></code> must be unique among <strong>all</strong> classes being run on the Otter Service instance, whereas the <code class="docutils literal notranslate"><span class="pre">assignment_id</span></code>s must be unique only within a specific class. Also note that there are two requirements files: a global requirements file that contains requirements not <a class="reference external" href="otter_grade.html#requirements">already in the Docker image</a> to be installed on <strong>all</strong> assignment images in this config, and an assignment-specific requirements file to be installed <strong>only</strong> in the image for that assignment. Also note that all paths are relative to the root of the assignments repo.</p>
+</div>
+<div class="section" id="other-files">
+<h3>Other Files<a class="headerlink" href="#other-files" title="Permalink to this headline">¶</a></h3>
+<p>Other files can be included basically anywhere as long as its a subdirectory of the assignments repo, as long as their paths are specified in the <code class="docutils literal notranslate"><span class="pre">conf.yml</span></code> file. The assignments repo should contain any necessary requirements files, all test files, and any support files needed to execute the notebooks (e.g. data files, Python scripts).</p>
+</div>
+</div>
+<div class="section" id="building-the-images">
+<h2>Building the Images<a class="headerlink" href="#building-the-images" title="Permalink to this headline">¶</a></h2>
+<p>Once you have cloned your assignments repo onto your Otter Service deployment, use the command <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> to add assignments to the database and create their Docker images. Note that it is often necessary to run <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> with <code class="docutils literal notranslate"><span class="pre">sudo</span></code> so that you have the necessary permissions; in this section, assume we have prepended each command with <code class="docutils literal notranslate"><span class="pre">sudo</span></code>.</p>
+<p>The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be <code class="docutils literal notranslate"><span class="pre">./</span></code> (i.e. it is assumed to be the working directory).</p>
+</div>
+<div class="section" id="otter-service-build-reference">
+<h2><code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> Reference<a class="headerlink" href="#otter-service-build-reference" title="Permalink to this headline">¶</a></h2>
+<p><p>Build images for an otter-service instance</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">otter</span> <span class="n">service</span> <span class="n">build</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">host</span> <span class="n">DB_HOST</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">db</span><span class="o">-</span><span class="n">port</span> <span class="n">DB_PORT</span><span class="p">]</span>
+                           <span class="p">[</span><span class="o">-</span><span class="n">u</span> <span class="n">DB_USER</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="n">DB_PASS</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">image</span> <span class="n">IMAGE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">q</span><span class="p">]</span>
+                           <span class="n">repo_path</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>repo_path</kbd></dt>
+<dd><p>Path to assignments repo root</p>
+<p>Default: “.”</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>--db-host</kbd></dt>
+<dd><p>Postgres database host</p>
+<p>Default: “localhost”</p>
+</dd>
+<dt><kbd>--db-port</kbd></dt>
+<dd><p>Postgres database port</p>
+<p>Default: 5432</p>
+</dd>
+<dt><kbd>-u, --db-user</kbd></dt>
+<dd><p>Postgres database user</p>
+<p>Default: “root”</p>
+</dd>
+<dt><kbd>-p, --db-pass</kbd></dt>
+<dd><p>Postgres database password</p>
+<p>Default: “root”</p>
+</dd>
+<dt><kbd>--image</kbd></dt>
+<dd><p>Based image for grading containers</p>
+<p>Default: “ucbdsinfra/otter-grader”</p>
+</dd>
+<dt><kbd>-q, --quiet</kbd></dt>
+<dd><p>Build images without writing Docker messages to stdout</p>
+</dd>
+</dl>
+</div>
+</div>
 </div>
 
 

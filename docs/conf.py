@@ -53,7 +53,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx_markdown_tables',
     'sphinx.ext.autosummary',
-    'sphinxcontrib.apidoc'
+    'sphinxcontrib.apidoc',
+    'sphinxarg.ext',
 ]
 
 napoleon_google_docstring = True
