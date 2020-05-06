@@ -1,0 +1,475 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>otter.service package &#8212; Otter-Grader  documentation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link href="_static/css/index.css" rel="stylesheet">
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
+
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
+
+<div id="navbar-menu" class="collapse navbar-collapse">
+  <ul id="navbar-main-elements" class="navbar-nav mr-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="index.html">Home</a>
+    </li>
+    
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="tutorial.html">Tutorial</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="test_files.html">Test Files</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_assign.html">Distributing Assignments</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_check.html">Student Usage</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_grade.html">Grading Locally</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="otter_generate.html">Grading on Gradescope</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="pdfs.html">PDF Generation and Filtering</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="seeding.html">Intercell Seeding</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="changelog.html">Changelog</a>
+    </li>
+    
+    
+  </ul>
+  <ul class="navbar-nav ml-auto">
+    
+      <li class="nav-item">
+        <a class="nav-link" href="https://github.com/ucbds-infra/otter-grader" target="_blank" rel="noopener">
+          <span><i class="fab fa-github-square"></i></span>
+        </a>
+      </li>
+    
+    
+  </ul>
+</div>
+    </nav>
+    
+
+    <div class="container-fluid">
+      <div class="row">
+          
+          <div class="col-12 col-md-3 col-xl-2 bd-sidebar">
+
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+
+  <div class="bd-toc-item active">
+  
+
+  <ul class="nav bd-sidenav">
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </ul>
+
+</nav>
+          </div>
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+              
+
+
+<div class="tocsection onthispage"><i class="fas fa-list"></i> On this page</div>
+<nav id="bd-toc-nav">
+    <ul class="nav section-nav flex-column">
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#submodules" class="nav-link">Submodules</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#module-otter.service.build" class="nav-link">otter.service.build module</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#module-otter.service.create" class="nav-link">otter.service.create module</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#module-otter.service.start" class="nav-link">otter.service.start module</a>
+        </li>
+    
+        <li class="nav-item toc-entry toc-h2">
+            <a href="#module-otter.service" class="nav-link">Module contents</a>
+        </li>
+    
+    </ul>
+</nav>
+
+              
+          </div>
+          
+
+          
+          <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="otter-service-package">
+<h1>otter.service package<a class="headerlink" href="#otter-service-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-otter.service.build">
+<span id="otter-service-build-module"></span><h2>otter.service.build module<a class="headerlink" href="#module-otter.service.build" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.service.build.main">
+<code class="sig-prename descclassname">otter.service.build.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">args</em>, <em class="sig-param">conn=None</em>, <em class="sig-param">close_conn=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.build.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.service.build.write_assignment_info">
+<code class="sig-prename descclassname">otter.service.build.</code><code class="sig-name descname">write_assignment_info</code><span class="sig-paren">(</span><em class="sig-param">assignment_id</em>, <em class="sig-param">class_id</em>, <em class="sig-param">assignment_name</em>, <em class="sig-param">seed</em>, <em class="sig-param">conn</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.build.write_assignment_info" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Inserts/Updates assignment class_id and assignment_name in database. Inserts if assignment_id</dt><dd><p>is not present. Updates if assignment_id is present.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assignment_id</strong> (<em>str</em>) – Assignment id which will be created or updated</p></li>
+<li><p><strong>class_id</strong> (<em>str</em>) – Class id to insert/update</p></li>
+<li><p><strong>assignment_name</strong> (<em>str</em>) – Assignment name to insert/update</p></li>
+<li><p><strong>conn</strong> (<em>Connection</em>) – Connection object for database</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.service.build.write_class_info">
+<code class="sig-prename descclassname">otter.service.build.</code><code class="sig-name descname">write_class_info</code><span class="sig-paren">(</span><em class="sig-param">class_id</em>, <em class="sig-param">class_name</em>, <em class="sig-param">conn</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.build.write_class_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the given class_name to the database, auto-generating a class_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class_name</strong> (<em>str</em>) – Name of new class to add to the database</p></li>
+<li><p><strong>conn</strong> (<em>Connection</em>) – Connection object for database</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Class ID for newly added class.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>class_id</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.service.create">
+<span id="otter-service-create-module"></span><h2>otter.service.create module<a class="headerlink" href="#module-otter.service.create" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="otter.service.create.create_users">
+<code class="sig-prename descclassname">otter.service.create.</code><code class="sig-name descname">create_users</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">host=None</em>, <em class="sig-param">username=None</em>, <em class="sig-param">password=None</em>, <em class="sig-param">conn=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.create.create_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts usernames from filepath into db</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>) – Path to CSV files with usernames in first column,
+passwords in second</p></li>
+<li><p><strong>host</strong> (<em>str</em><em>, </em><em>optional</em>) – Hostname where postgresql is running</p></li>
+<li><p><strong>username</strong> (<em>str</em><em>, </em><em>optional</em>) – Username for writing to postgres database</p></li>
+<li><p><strong>password</strong> (<em>str</em><em>, </em><em>optional</em>) – Password corresponding to provided username</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.service.create.main">
+<code class="sig-prename descclassname">otter.service.create.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">args</em>, <em class="sig-param">conn=None</em>, <em class="sig-param">close_conn=True</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.create.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>conn is arg to pre-made db connection</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.service.create.remove_users">
+<code class="sig-prename descclassname">otter.service.create.</code><code class="sig-name descname">remove_users</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">host=None</em>, <em class="sig-param">username=None</em>, <em class="sig-param">password=None</em>, <em class="sig-param">conn=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.create.remove_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes users specified in file FILEPATH</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>) – Path to CSV files with usernames in first column,
+passwords in second</p></li>
+<li><p><strong>host</strong> (<em>str</em><em>, </em><em>optional</em>) – Hostname where postgresql is running</p></li>
+<li><p><strong>username</strong> (<em>str</em><em>, </em><em>optional</em>) – Username for writing to postgres database</p></li>
+<li><p><strong>password</strong> (<em>str</em><em>, </em><em>optional</em>) – Password corresponding to provided username</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.service.start">
+<span id="otter-service-start-module"></span><h2>otter.service.start module<a class="headerlink" href="#module-otter.service.start" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="otter.service.start.Application">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">Application</code><a class="headerlink" href="#otter.service.start.Application" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.Application</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.service.start.BaseHandler">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">BaseHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.BaseHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code></p>
+<p>Base login handler</p>
+<dl class="method">
+<dt id="otter.service.start.BaseHandler.get_current_user">
+<code class="sig-name descname">get_current_user</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.BaseHandler.get_current_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets secure user cookie for personal authentication</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.service.start.GoogleOAuth2LoginHandler">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">GoogleOAuth2LoginHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.GoogleOAuth2LoginHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.auth.GoogleOAuth2Mixin</span></code></p>
+<dl class="method">
+<dt id="otter.service.start.GoogleOAuth2LoginHandler.db">
+<em class="property">property </em><code class="sig-name descname">db</code><a class="headerlink" href="#otter.service.start.GoogleOAuth2LoginHandler.db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.GoogleOAuth2LoginHandler.get">
+<em class="property">async </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.GoogleOAuth2LoginHandler.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Google OAuth login handler</p>
+<p>Handler for authenticating users with Google OAuth. Requires that user sets environment
+variables containing their client key and secret. Provides users with an API key that they
+can enter in the notebook by way of authenticating.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.service.start.LoginHandler">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">LoginHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.LoginHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#otter.service.start.BaseHandler" title="otter.service.start.BaseHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">otter.service.start.BaseHandler</span></code></a></p>
+<p>Default auth handler</p>
+<p>A login handler that requires instructors to setup users and passwords in database
+beforehand, allowing students to auth within the notebook.</p>
+<dl class="method">
+<dt id="otter.service.start.LoginHandler.db">
+<em class="property">property </em><code class="sig-name descname">db</code><a class="headerlink" href="#otter.service.start.LoginHandler.db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.LoginHandler.get">
+<em class="property">async </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.LoginHandler.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get request for personal/default authentication login</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="otter.service.start.SubmissionHandler">
+<em class="property">class </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">SubmissionHandler</code><span class="sig-paren">(</span><em class="sig-param">application</em>, <em class="sig-param">request</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tornado.web.RequestHandler</span></code></p>
+<p>Processes and validations student submission</p>
+<p>Handler for processing and validating a student’s submission. Ensure that notebook is present
+and valid, checks API key, and implements rate limiting to prevent spamming the autograder.
+Queues submission for grading by EXECUTOR.</p>
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.db">
+<em class="property">property </em><code class="sig-name descname">db</code><a class="headerlink" href="#otter.service.start.SubmissionHandler.db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.get">
+<em class="property">async </em><code class="sig-name descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Route to warn users that this is a POST-only route</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.post">
+<em class="property">async </em><code class="sig-name descname">post</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post request function for handling python notebook submissions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.submit">
+<em class="property">async </em><code class="sig-name descname">submit</code><span class="sig-paren">(</span><em class="sig-param">notebook</em>, <em class="sig-param">api_key</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.submit" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>If valid submission, inserts notebook into submissions table in database and queues</dt><dd><p>it for grading.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>notebook</strong> (<em>json</em>) – notebook in json form</p></li>
+<li><p><strong>api_key</strong> (<em>str</em>) – API Key generated during submission</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.validate">
+<em class="property">async </em><code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param">notebook</em>, <em class="sig-param">api_key</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures a submision is valid by checking user credentials, submission frequency, and
+validity of notebook file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>notebook</strong> (<em>json</em>) – notebook in json form</p></li>
+<li><p><strong>api_key</strong> (<em>str</em>) – API Key generated during submission</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>submission information</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="otter.service.start.SubmissionHandler.write_error">
+<code class="sig-name descname">write_error</code><span class="sig-paren">(</span><em class="sig-param">status_code</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.SubmissionHandler.write_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override to implement custom error pages.</p>
+<p><code class="docutils literal notranslate"><span class="pre">write_error</span></code> may call <cite>write</cite>, <cite>render</cite>, <cite>set_header</cite>, etc
+to produce output as usual.</p>
+<p>If this error was caused by an uncaught exception (including
+HTTPError), an <code class="docutils literal notranslate"><span class="pre">exc_info</span></code> triple will be available as
+<code class="docutils literal notranslate"><span class="pre">kwargs[&quot;exc_info&quot;]</span></code>.  Note that this exception may not be
+the “current” exception for purposes of methods like
+<code class="docutils literal notranslate"><span class="pre">sys.exc_info()</span></code> or <code class="docutils literal notranslate"><span class="pre">traceback.format_exc</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.service.start.grade_submission">
+<code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">grade_submission</code><span class="sig-paren">(</span><em class="sig-param">submission_id</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.grade_submission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grades a single submission with id SUBMISSION_ID</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>submission_id</strong> (<em>str</em>) – the id of the submission to grade</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>grading message and results dataframe for printing</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="otter.service.start.main">
+<code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">cli_args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="otter.service.start.start_grading_queue">
+<em class="property">async </em><code class="sig-prename descclassname">otter.service.start.</code><code class="sig-name descname">start_grading_queue</code><span class="sig-paren">(</span><em class="sig-param">shutdown=False</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.service.start.start_grading_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pops submission ids off SUBMISSION_QUEUE and sending them into EXECUTOR to be graded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>shutdown</strong> (<em>bool</em>) – default <cite>False</cite>; whether or not to shutdown EXECUTOR after processing
+queue</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-otter.service">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-otter.service" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+
+              </div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+
+    <script src="_static/js/index.js"></script>
+    <footer class="footer">
+  <div class="container">
+    <p>
+          &copy; Copyright 2020, UC Berkeley Division of Data Science and Information.<br/>
+        Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -51,8 +51,17 @@ extensions = [
     # 'sphinx.ext.autodoc', 
     'sphinx.ext.coverage', 
     'sphinx.ext.napoleon',
-    'sphinx_markdown_tables'
+    'sphinx_markdown_tables',
+    'sphinx.ext.autosummary',
+    'sphinxcontrib.apidoc'
 ]
+
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+
+apidoc_module_dir = '../otter'
+apidoc_output_dir = '.'
+apidoc_excluded_paths = []
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -93,23 +102,10 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
-    'canonical_url': '',
-    # 'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
-    'logo_only': False,
-    'display_version': True,
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
-    'vcs_pageview_mode': '',
-    'style_nav_header_background': 'white',
-    # Toc options
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'navigation_depth': 2,
-    'includehidden': True,
-    'titles_only': False,
+    'github_url': 'https://github.com/ucbds-infra/otter-grader'
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme

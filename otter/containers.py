@@ -2,19 +2,20 @@
 ##### Docker Container Management for Otter-Grader #####
 ########################################################
 
-import pandas as pd
 import subprocess
-from subprocess import PIPE
-import json
 import re
-from concurrent.futures import ThreadPoolExecutor, wait
 import os
 import shutil
+import pandas as pd
+
+from subprocess import PIPE
+from concurrent.futures import ThreadPoolExecutor, wait
+
 
 def launch_parallel_containers(
     tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, tag_filter=False, 
     html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
-    scripts=False, no_kill=False):
+    scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     """Grades notebooks in parallel docker containers
 
     This function runs NUM_CONTAINERS docker containers in parallel to grade the student submissions
@@ -50,46 +51,56 @@ def launch_parallel_containers(
     if len(notebooks) < num_containers:
         num_containers = len(notebooks)
 
-    # calculate number of notebooks per container
-    num_per_group = int(len(notebooks) / num_containers)
+    # # calculate number of notebooks per container
+    # num_per_group = int(len(notebooks) / num_containers)
 
-    # create tmp directories and add non-notebook files
-    for i in range(num_containers):
-        os.mkdir(os.path.join(dir_path, "tmp{}".format(i)))
+    try:
+        # create tmp directories and add non-notebook files
+        for i in range(num_containers):
+            os.mkdir(os.path.join(dir_path, "tmp{}".format(i)))
 
-        # copy all non-notebook files into each tmp directory
-        for file in os.listdir(dir_path):
-            if os.path.isfile(os.path.join(dir_path, file)) and not file.endswith(file_extension):
-                shutil.copy(os.path.join(dir_path, file), os.path.join(dir_path, "tmp{}".format(i)))
+            # copy all non-notebook files into each tmp directory
+            for file in os.listdir(dir_path):
+                if os.path.isfile(os.path.join(dir_path, file)) and not file.endswith(file_extension):
+                    shutil.copy(os.path.join(dir_path, file), os.path.join(dir_path, "tmp{}".format(i)))
 
-    # copy notebooks in tmp directories
-    for k, v in enumerate(notebooks):
-        shutil.copy(v, os.path.join(dir_path, "tmp{}".format(k % num_containers)))
+        # copy notebooks in tmp directories
+        for k, v in enumerate(notebooks):
+            shutil.copy(v, os.path.join(dir_path, "tmp{}".format(k % num_containers)))
 
-    # execute containers in parallel
-    pool = ThreadPoolExecutor(num_containers)
-    futures = []
-    for i in range(num_containers):
-        futures += [pool.submit(grade_assignments, 
-            tests_dir, 
-            os.path.join(dir_path, "tmp{}".format(i)), 
-            str(i), 
-            verbose=verbose, 
-            unfiltered_pdfs=unfiltered_pdfs, 
-            tag_filter=tag_filter,
-            html_filter=html_filter,
-            reqs=reqs,
-            image=image,
-            scripts=scripts,
-            no_kill=no_kill
-        )]
+        # execute containers in parallel
+        pool = ThreadPoolExecutor(num_containers)
+        futures = []
+        for i in range(num_containers):
+            futures += [pool.submit(grade_assignments, 
+                tests_dir, 
+                os.path.join(dir_path, "tmp{}".format(i)), 
+                str(i), 
+                verbose=verbose, 
+                unfiltered_pdfs=unfiltered_pdfs, 
+                tag_filter=tag_filter,
+                html_filter=html_filter,
+                reqs=reqs,
+                image=image,
+                scripts=scripts,
+                no_kill=no_kill,
+                output_path=output_path,
+                debug=debug
+            )]
 
-    # stop execution while containers are running
-    finished_futures = wait(futures)
-
-    # clean up tmp directories
-    for i in range(num_containers):
-        shutil.rmtree(os.path.join(dir_path, "tmp{}".format(i)))
+        # stop execution while containers are running
+        finished_futures = wait(futures)
+    
+    # cleanup tmp directories on failure
+    except:
+        for i in range(num_containers):
+            shutil.rmtree(os.path.join(dir_path, "tmp{}".format(i)), ignore_errors=True)
+        raise
+    
+    # cleanup tmp directories
+    else:
+        for i in range(num_containers):
+            shutil.rmtree(os.path.join(dir_path, "tmp{}".format(i)))
 
     # return list of dataframes
     return [df.result() for df in finished_futures[0]]
@@ -97,7 +108,7 @@ def launch_parallel_containers(
 
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
 unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, 
-scripts=False, no_kill=False):
+scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     """
     Grades multiple assignments in a directory using a single docker container. 
 
@@ -106,8 +117,8 @@ scripts=False, no_kill=False):
     file. This function can grade files with .py or .ipynb extensions (use scripts=True for .py). 
 
     Args:
-        tests_dir (str, optional): Directory of test files
-        notebooks_dir (str, optional): Directory of notebooks to grade
+        tests_dir (str): Directory of test files
+        notebooks_dir (str): Directory of notebooks to grade
         id (str, optional): Id of this function for mc use
         image (str, optional): Docker image to do grading in
         verbose (bool, optional): Whether function should print information about various steps
@@ -136,8 +147,9 @@ scripts=False, no_kill=False):
     copy = subprocess.run(copy_command, stdout=PIPE, stderr=PIPE)
     
     # copy the test files to the container
-    tests_command = ["docker", "cp", tests_dir, container_id+ ":/home/tests/"]
-    tests = subprocess.run(tests_command, stdout=PIPE, stderr=PIPE)
+    if tests_dir is not None:
+        tests_command = ["docker", "cp", tests_dir, container_id+ ":/home/tests/"]
+        tests = subprocess.run(tests_command, stdout=PIPE, stderr=PIPE)
 
     # copy the requirements file to the container
     if reqs:
@@ -157,9 +169,9 @@ scripts=False, no_kill=False):
     
     # Now we have the notebooks in home/notebooks, we should tell the container 
     # to execute the grade command....
-    # grade_command = ["docker", "exec", "-t", container_id, "python3", "/home/grade.py", 
+    # grade_command = ["docker", "exec", "-t", container_id, "python3", "/home/execute.py", 
     # "/home/notebooks"]
-    grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.grade", \
+    grade_command = ["docker", "exec", "-t", container_id, "python3", "-m", "otter.execute", \
         "/home/notebooks"]
 
     # if we want PDF output, add the necessary flag
@@ -169,16 +181,44 @@ scripts=False, no_kill=False):
         grade_command += ["--tag-filter"]
     if html_filter:
         grade_command += ["--html-filter"]
+    
+    # seed
+    if seed is not None:
+        grade_command += ["--seed", str(seed)]
 
     # if we are grading scripts, add the --script flag
     if scripts:
         grade_command += ["--scripts"]
+    
+    if debug:
+        grade_command += ["--verbose"]
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
-    # print(grade.stdout.decode("utf-8"))
-    # print(grade.stderr.decode("utf-8"))
+    
+    if debug:
+        print(grade.stdout.decode("utf-8"))
+        print(grade.stderr.decode("utf-8"))
 
-    all_commands = [launch, copy, tests, grade]
+    # TODO: move this to serve with contextlib???
+    # if logging:
+    #     # TODO: are the print statements necessary?
+    #     # # Logging stdout/stderr with print statements
+    #     # print(grade.stdout.decode('utf-8'))
+    #     # print(grade.stderr.decode('utf-8'))
+
+    #     # Logging stdout/stderr to file
+    #     log_file = open("log_file_container_ {}.txt".format(id), "a+")
+    #     log_file.write(grade.stdout.decode('utf-8'))
+    #     log_file.write("\n")
+    #     log_file.write(grade.stderr.decode('utf-8'))
+    #     log_file.write("\n")
+    #     log_file.close()
+
+    all_commands = [launch, copy, grade]
+    try: 
+        all_commands += [tests]
+    except UnboundLocalError:
+        pass
     try:
         all_commands += [requirements, install]
     except UnboundLocalError:
@@ -200,20 +240,23 @@ scripts=False, no_kill=False):
         df = pd.read_csv("./grades"+id+".csv")
 
         if unfiltered_pdfs or tag_filter or html_filter:
-            mkdir_pdf_command = ["mkdir", "manual_submissions"]
-            mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
+            pdf_folder = os.path.join(output_path, "submission_pdfs")
+            if not os.path.isdir(pdf_folder):
+                mkdir_pdf_command = ["mkdir", pdf_folder]
+                mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
+                assert not mkdir_pdf.stderr, mkdir_pdf.stderr.decode("utf-8")
             
             # copy out manual submissions
             for pdf in df["manual"]:
-                copy_cmd = ["docker", "cp", container_id + ":" + pdf, "./manual_submissions/" \
-                    + re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1]]
+                copy_cmd = ["docker", "cp", container_id + ":" + pdf, os.path.join(pdf_folder, 
+                    re.search(r"\/([\w\-\_]*?\.pdf)", pdf)[1])]
                 copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
 
             def clean_pdf_filepaths(row):
                 """
                 Generates a clean filepath for a PDF
 
-                Replaces occurrences of '/home/notebooks' with 'manual_submission' in the
+                Replaces occurrences of '/home/notebooks' with 'submission_pdfs' in the
                 path. 
                 
                 Arguments:
@@ -223,7 +266,7 @@ scripts=False, no_kill=False):
                     str: cleaned PDF filepath
                 """
                 path = row["manual"]
-                return re.sub(r"\/home\/notebooks", "manual_submissions", path)
+                return re.sub(r"\/home\/notebooks", "submission_pdfs", path)
 
             df["manual"] = df.apply(clean_pdf_filepaths, axis=1)
         
@@ -241,7 +284,16 @@ scripts=False, no_kill=False):
             remove_command = ["docker", "rm", container_id]
             remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
 
-    except BaseException as e:
+    except:
+        # delete the file we just read
+        csv_cleanup_command = ["rm", "./grades"+id+".csv"]
+        csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
+
+        # delete the submission PDFs on failure
+        if unfiltered_pdfs or tag_filter or html_filter:
+            csv_cleanup_command = ["rm", "-rf", os.path.join(output_path, "submission_pdfs")]
+            csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
+
         if not no_kill:
             if verbose:
                 print("Stopping container {}...".format(container_id[:12]))
@@ -252,14 +304,21 @@ scripts=False, no_kill=False):
             remove_command = ["docker", "rm", container_id]
             remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
         
-        raise e
+        raise
     
     # check that no commands errored, if they did rais an informative exception
-    all_commands = [launch, copy, tests, grade, csv, csv_cleanup, stop, remove]
+    all_commands = [launch, copy, grade, csv, csv_cleanup, stop, remove]
+
+    try:
+        all_commands += [tests]
+    except UnboundLocalError:
+        pass
+
     try:
         all_commands += [requirements, install]
     except UnboundLocalError:
         pass
+
     for command in all_commands:
         if command.stderr.decode('utf-8') != '':
             raise Exception("Error running ", command, " failed with error: ", \

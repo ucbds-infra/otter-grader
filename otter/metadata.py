@@ -9,9 +9,11 @@ import os
 import re
 import shutil
 
-from .utils import *
+from .utils import list_files
+
 
 FILENAME_REGEX = r"^.+\."
+
 
 class GradescopeParser:
 	"""Metadata parser for Gradescope exports
@@ -56,7 +58,7 @@ class GradescopeParser:
 					"filename": folder + ".ipynb"
 				}]
 
-		self._file_to_id = {file["filename"] : [i for i in file["identifier"]] for file in self._metadata}
+		self._file_to_id = {file["filename"] : file["identifier"] for file in self._metadata}
 		self._id_to_file = {file["identifier"] : file["filename"] for file in self._metadata}
 
 	def get_metadata(self):
@@ -78,7 +80,7 @@ class GradescopeParser:
 			str: identifier corresponding to filename
 
 		"""
-		return " ".join(self._file_to_id[file])
+		return self._file_to_id[file]
 
 	def id_to_file(self, identifier):
 		"""Returns a filename given an identifier
@@ -109,6 +111,7 @@ class GradescopeParser:
 
 		"""
 		return [file["filename"] for file in self._metadata]
+
 
 class CanvasParser:
 	"""Metadata parser for Canvas exports
@@ -269,6 +272,7 @@ class JSONParser:
 		
 		"""
 		return [file["filename"] for file in self._metadata]
+
 
 class YAMLParser:
 	"""Metadata parser for YAML format

@@ -12,15 +12,18 @@
 
 import re
 
-CURRENT_VERSION = "0.4.6"
-NEW_VERSION = "0.4.7"
+CURRENT_VERSION = "0.4.7"
+NEW_VERSION = "1.0.0"
+
+BETA = True
+UNDO_BETA = False
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "docker/Dockerfile",
-    "otter/gs_generator.py",
-    "test/integration/autograder-correct/requirements.txt",
-    "requirements.txt",
-    "Makefile"
+    "otter/generate.py",
+    "test/test-generate/autograder-correct/requirements.txt",
+    # "requirements.txt",
+    # "Makefile"
 ]
 
 def main():
@@ -28,38 +31,47 @@ def main():
         with open(file) as f:
             contents = f.read()
 
+        old_version = "otter-grader=={}".format(CURRENT_VERSION)
+        if UNDO_BETA:
+            old_version = "git+https://github.com/ucbds-infra/otter-grader.git@beta"
+        
+        new_version = "otter-grader=={}".format(NEW_VERSION)
+        if BETA:
+            new_version = "git+https://github.com/ucbds-infra/otter-grader.git@beta"
+
         contents = re.sub(
-            "otter-grader=={}".format(CURRENT_VERSION), 
-            "otter-grader=={}".format(NEW_VERSION), 
+            old_version, 
+            new_version, 
             contents
         )
 
         with open(file, "w") as f:
             f.write(contents)
+    
+    if not BETA:
+        with open("setup.py") as f:
+            contents = f.read()
 
-    with open("setup.py") as f:
-        contents = f.read()
+        contents = re.sub(
+            "version = \"{}\",".format(CURRENT_VERSION),
+            "version = \"{}\",".format(NEW_VERSION),
+            contents
+        )
 
-    contents = re.sub(
-        "version = \"{}\",".format(CURRENT_VERSION),
-        "version = \"{}\",".format(NEW_VERSION),
-        contents
-    )
+        with open("setup.py", "w") as f:
+            f.write(contents)
 
-    with open("setup.py", "w") as f:
-        f.write(contents)
+        with open("otter/__init__.py") as f:
+            contents = f.read()
 
-    with open("otter/__init__.py") as f:
-        contents = f.read()
+        contents = re.sub(
+            "__version__ = \"{}\"".format(CURRENT_VERSION),
+            "__version__ = \"{}\"".format(NEW_VERSION),
+            contents
+        )
 
-    contents = re.sub(
-        "__version__ = \"{}\"".format(CURRENT_VERSION),
-        "__version__ = \"{}\"".format(NEW_VERSION),
-        contents
-    )
-
-    with open("otter/__init__.py", "w") as f:
-        f.write(contents)
+        with open("otter/__init__.py", "w") as f:
+            f.write(contents)
 
 if __name__ == "__main__":
     main()

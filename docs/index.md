@@ -6,47 +6,54 @@
    :caption: Contents:
    :hidden:
 
-   install
    tutorial
-   using_otter
    test_files
-   metadata_files
-   student_usage
-   command-line
-   gradescope
+   otter_assign
+   otter_check
+   otter_grade
+   otter_generate
    pdfs
-   The Otter API <otter>
+   seeding
+   changelog
 ```
-
-[![](https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master)](https://travis-ci.org/ucbds-infra/otter-grader)
-[![](https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg)](https://codecov.io/gh/ucbds-infra/otter-grader)
-[![](https://readthedocs.org/projects/otter-grader/badge/?version=latest)](https://otter-grader.readthedocs.io/en/latest/?badge=latest)
-[![](https://img.shields.io/endpoint?logo=slack&url=https%3A%2F%2Fraw.githubusercontent.com%2Fucbds-infra%2Fotter-grader%2Fmaster%2Fslack-shields.json)](https://join.slack.com/t/otter-grader/shared_invite/enQtOTM5MTQ0MzkwMTk0LTBiNWIzZTYxNDA2NDZmM2JkMzcwZjA4YWViNDM4ZTgyNDVhNDgwOTQ0NjNlZjcwNmY5YzJiZjZhZGNhNzc5MjA)
 
 Otter-Grader is an open-source local grader from the Division of Computing, Data Science, and Society at the University of California, Berkeley. It is designed to be a scalable grader that utilizes parallel Docker containers on the instructor's machine in order to remove the traditional overhead requirement of a live server. It also supports student-run tests in Jupyter Notebooks and from the command line, and is compatible with Gradescope's proprietary autograding service.
 
-## Changelog
+Otter is a command-line tool organized into four basic commands: `assign`, `check`, `generate`, and `grade`. These commands provide functionality that allows instructors to create, distribute, and grade assignments locally or using a variety of learning management system (LMS) integrations. Otter also allows students to run publically distributed tests while working through assignments.
 
-**v0.4.7:**
+* [Otter Assign](otter_assign.md) is an assignment development and distribution tool that allows instructors to create assignments with prompts, solutions, and tests in a simple notebook format that it then converts into santized versions for distribution to students and autograders.
+* [Otter Check and the `otter.Notebook` class](otter_check.md) allow students to run publically distributed tests written by instructors against their solutions as they work through assignments to verify their thought processes and design implementations.
+* [Otter Generate](otter_generate.md) creates the necessary files so that instructors can autograde assignments using Gradescope's autograding platform.
+* [Otter Grade](otter_grade.md) grades students' assignments locally on the instructor's machine in parallel Docker containers, returning grade breakdowns as a CSV file. It also supports [PDF generation an cell filtering with nb2pdf](pdfs.md) so that instructors can manually grade written portions of assignments.
 
-* fix relative import issue on Gradescope (again, *sigh*)
+## Installation
 
-**v0.4.6:** re-release of v0.4.5
+Otter is a Python package that can be installed using pip. To install the current stable version, install with
 
-**v0.4.5:**
+```
+pip install otter-grader
+```
 
-* added missing patch of `otter.Notebook.export` in [otter/grade.py](otter/grade.py)
-* added `__version__` global in [otter/__init__.py](otter/__init__.py)
-* fixed relative import issue when running on Gradescope
-* fixed not finding/rerunning tests on Gradescope with `otter.Notebook.check`
+To install the **beta** version, install from git:
 
-**v0.4.4:**
+```
+pip install git+https://github.com/ucbds-infra/otter-grader.git@beta
+```
 
-* fixed template escape bug in [otter/gs_generator.py](otter/gs_generator.py)
+### Docker
 
-**v0.4.3:**
+Otter uses Docker to create containers in which to run the students' submissions. Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks.
 
-* fixed dead link in [docs/gradescope.md](docs/gradescope.md)
-* updated to Python 3.7 in setup.sh for Gradescope
-* made `otter` and `otter gen` CLIs find `./requirements.txt` automatically if it exists
-* fix bug where GS generator fails if no `-r` flag specified
+#### Pull from DockerHub
+
+To pull the image from DockerHub, run `docker pull ucbdsinfra/otter-grader`. If you choose this method, otter will automatically use this image for you.
+
+#### Download the Dockerfile from GitHub
+
+To install from the GitHub repo, follow the steps below:
+
+1. Clone the GitHub repo
+2. `cd` into the `otter-grader/docker` directory
+3. Build the Docker image with this command: `docker build . -t YOUR_DESIRED_IMAGE_NAME`
+
+_Note:_ With this setup, you will need to pass in a custom docker image name when using the CLI with the `--image` flag.

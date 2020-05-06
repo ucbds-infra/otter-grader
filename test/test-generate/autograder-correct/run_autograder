@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+
+import json
+import os
+import shutil
+import subprocess
+import re
+import pandas as pd
+
+from glob import glob
+from textwrap import dedent
+from otter.execute import grade_notebook
+
+SCORE_THRESHOLD = None
+POINTS_POSSIBLE = None
+SHOW_ALL_ON_RELEASE = False
+SEED = None
+
+UTILS_IMPORT_REGEX = r"\"from utils import [\w\*, ]+"
+NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
+
+if __name__ == "__main__":
+    # put files into submission directory
+    if os.path.exists("/autograder/source/files"):
+        for filename in glob("/autograder/source/files/*.*"):
+            shutil.copy(filename, "/autograder/submission")
+
+    # create __init__.py files
+    subprocess.run(["touch", "/autograder/__init__.py"])
+    subprocess.run(["touch", "/autograder/submission/__init__.py"])
+
+    os.chdir("/autograder/submission")
+
+    # check for *.ipynb.json files
+    jsons = glob("*.ipynb.json")
+    for file in jsons:
+        shutil.copy(file, file[:-5])
+
+    # check for *.ipynb.html files
+    htmls = glob("*.ipynb.html")
+    for file in htmls:
+        shutil.copy(file, file[:-5])
+
+    nb_path = glob("*.ipynb")[0]
+
+    # fix utils import
+    try:
+        with open(nb_path) as f:
+            contents = f.read()
+    except UnicodeDecodeError:
+        with open(nb_path, "r", encoding="utf-8") as f:
+            contents = f.read()
+
+    # contents = re.sub(UTILS_IMPORT_REGEX, "\"from .utils import *", contents)
+    contents = re.sub(NOTEBOOK_INSTANCE_REGEX, "otter.Notebook()", contents)
+
+    try:
+        with open(nb_path, "w") as f:
+            f.write(contents)
+    except UnicodeEncodeError:
+        with open(nb_path, "w", encoding="utf-8") as f:
+            f.write(contents)
+
+    try:
+        os.mkdir("/autograder/submission/tests")
+    except FileExistsError:
+        pass
+
+    tests_glob = glob("/autograder/source/tests/*.py")
+    for file in tests_glob:
+        shutil.copy(file, "/autograder/submission/tests")
+
+    scores = grade_notebook(nb_path, glob("/autograder/submission/tests/*.py"), name="submission", gradescope=True, ignore_errors=True, seed=SEED)
+    # del scores["TEST_HINTS"]
+
+    output = {"tests" : []}
+    for key in scores:
+        if key != "total" and key != "possible":
+            if scores[key].get("hidden", False):
+                output["tests"] += [{
+                    "name" : key,
+                    "score" : 0,
+                    "possible": 0,
+                    "visibility": "visible"
+                }]
+            output["tests"] += [{
+                "name" : (key, key + " HIDDEN")[scores[key].get("hidden", False)],
+                "score" : scores[key]["score"],
+                "possible": scores[key]["possible"],
+                "visibility": ("visible", "hidden")[scores[key].get("hidden", False)]
+            }]
+            if "hint" in scores[key]:
+                output["tests"][-1]["output"] = repr(scores[key]["hint"])
+    
+    if SHOW_ALL_ON_RELEASE:
+        output["stdout_visibility"] = "after_published"
+
+    if POINTS_POSSIBLE is not None:
+        output["score"] = scores["total"] / scores["possible"] * POINTS_POSSIBLE
+
+    if SCORE_THRESHOLD is not None:
+        if scores["total"] / scores["possible"] >= SCORE_THRESHOLD:
+            output["score"] = POINTS_POSSIBLE or scores["possible"]
+        else:
+            output["score"] = 0
+
+    with open("/autograder/results/results.json", "w+") as f:
+        json.dump(output, f, indent=4)
+
+    print("\n\n")
+    print(dedent("""\
+    Test scores are summarized in the table below. If a student fails a hidden tests, a second 
+    output cell is shown that is hidden from students with the output of the failed test. If 
+    a student fails a public test, they are shown the failed test. If a student passes both tests,
+    a single output cell is shown.
+    """))
+    df = pd.DataFrame(output["tests"])
+    if "output" in df.columns:
+        df.drop(columns=["output"], inplace=True)
+    # df.drop(columns=["hidden"], inplace=True)
+    print(df)
