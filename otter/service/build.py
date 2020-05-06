@@ -136,7 +136,7 @@ def main(args, conn=None, close_conn=True):
         echo_dockerfile.wait()
         
         build_out = subprocess.Popen(
-            ["docker", "build", "-f", "-", ".", "-t", a["assignment_id"]],
+            ["docker", "build", "-f", "-", ".", "-t", class_id + "-" + a["assignment_id"]],
             stdin=echo_dockerfile.stdout, 
             stdout=DEVNULL if args.quiet else None
         )

@@ -346,7 +346,7 @@ try:
                     tests_dir=None, 
                     notebooks_dir=file_path, 
                     id=assignment_id, 
-                    image=assignment_id,
+                    image=class_id + "-" + assignment_id,
                     debug=True,
                     verbose=True,
                     seed=seed
