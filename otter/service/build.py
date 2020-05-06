@@ -129,7 +129,7 @@ def main(args, conn=None, close_conn=True):
             files = a.get("files", [])
         )
 
-        print("Building Docker image {}".format(a["assignment_id"]))
+        print("Building Docker image {}".format(class_id + "-" + a["assignment_id"]))
         
         # Build the docker image
         echo_dockerfile = subprocess.Popen(["echo", dockerfile], stdout=PIPE)
@@ -144,7 +144,7 @@ def main(args, conn=None, close_conn=True):
         
         echo_dockerfile.stdout.close()
 
-        print("Built Docker image {}".format(a["assignment_id"]))
+        print("Built Docker image {}".format(class_id + "-" + a["assignment_id"]))
     
     if close_conn:
         conn.close()
