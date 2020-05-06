@@ -45,7 +45,7 @@ generate:
     show_results: true
 ```
 
-These values, if left unspecified, take on the default values of their flags as described below and in [Otter Generate](otter_generate.md).
+These values, if left unspecified, take on the default values of their flags as described in [Otter Generate](otter_generate.md).
 
 As an example, the following assignment metadata includes an export cell but no filtering, not init cell, and calls Otter Generate with the flags `--points 3 --seed 0`.
 
@@ -331,21 +331,4 @@ If I wanted no initialization cell and no cell filtering in the export cell, I w
 
 ```
 otter assign --no-init-cell --no-filtering hw00.ipynb dist data.csv
-```
-
-And if I wanted a Gradescope autograder with a seed of 42, I would run
-
-```
-otter assign --generate --seed 42 hw00.ipynb dist data.csv
-```
-
-## `otter assign` Reference
-
-```eval_rst
-.. argparse::
-   :module: otter.argparser
-   :func: get_parser
-   :prog: otter
-   :path: assign
-   :nodefaultconst:
 ```

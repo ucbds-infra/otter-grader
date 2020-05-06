@@ -77,6 +77,8 @@ def main(args):
     if ASSIGNMENT_METADATA.get('solutions_pdf', False):
         filtering = ASSIGNMENT_METADATA.get('solutions_pdf') == 'filtered'
         nb2pdf.convert(str(result / 'autograder' / master.name), filtering=filtering)
+    if ASSIGNMENT_METADATA.get('service', {}):
+        gen_otter_file(master, result)
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         block_print()
@@ -110,20 +112,42 @@ def main(args):
         os.chdir(curr_dir)
 
 
-def convert_to_ok(nb_path, dir, args):
-    """Convert a master notebook to an ok notebook, tests dir, and .ok file.
+def gen_otter_file(master, result):
+    """Creates an otter service config file
 
-    nb -- Path
-    endpoint -- OK endpoint for notebook submission (e.g., cal/data100/sp19)
-    dir -- Path
+    Uses ASSIGNMENT_METADATA to generate a .otter file to configure the use of an Otter Service
+    disribution for remotely grading assignments.
 
     Args:
-        nb_path (Path): pathlib Path object to iPython master notebook
-        dir (Path): pathlib Path object for directory
-        args (???): ???
+        master (pathlib.Path): path to master notebook
+        result (pathlib.Path): path to result directory
+    """
+    service = ASSIGNMENT_METADATA['service']
+    service_config = {
+        "endpoint": service["endpoint"],
+        "auth": service.get("auth", "google"),
+        "assignment_id": service["assignment_id"],
+        "class_id": service["class_id"],
+        "notebook": service.get('notebook', master.name)
+    }
+
+    config_name = master.stem + '.otter'
+    with open(result / 'autograder' / config_name, "w+") as f:
+        json.dump(service_config, f, indent=4)
+    with open(result / 'student' / config_name, "w+") as f:
+        json.dump(service_config, f, indent=4)
+
+
+def convert_to_ok(nb_path, dir, args):
+    """Convert a master notebook to an Otter notebook and tests dir.
+
+    Args:
+        nb_path (pathlib.Path): pathlib Path object to iPython master notebook
+        dir (pathlib.Path): pathlib Path object for directory
+        args (argparse.Namespace): parsed command line arguments
 
     Returns:
-        str: ok_nb_path, which is the path with the notebook, tests dir, and .ok file
+        str: ok_nb_path, which is the path with the notebook and tests dir
 
     """
     ok_nb_path = dir / nb_path.name
@@ -379,7 +403,7 @@ def is_question_cell(cell):
         cell (cell): Python code cell
     
     Returns:
-        ???
+        bool: whether the current cell is a questio definition cell
 
     """
     if cell['cell_type'] != 'markdown':
@@ -866,7 +890,7 @@ def remove_hidden_tests(test_dir):
     """Rewrite test files to remove hidden tests.
     
     Args:
-        test_dir (Path): pathlib Path object for test files directory
+        test_dir (pathlib.Path): pathlib Path object for test files directory
     """
     for f in test_dir.iterdir():
         if f.name == '__init__.py' or f.suffix != '.py':
@@ -886,7 +910,7 @@ def gen_views(master_nb, result_dir, args):
     """Generate student and autograder views.
 
     master_nb (dict): Dict of master notebook JSON
-    result_dir (Path): pathlib Path object for the result directory
+    result_dir (pathlib.Path): pathlib Path object for the result directory
     """
     autograder_dir = result_dir / 'autograder'
     student_dir = result_dir / 'student'

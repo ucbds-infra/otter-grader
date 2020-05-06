@@ -295,21 +295,17 @@
 <dl class="function">
 <dt id="otter.assign.convert_to_ok">
 <code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">convert_to_ok</code><span class="sig-paren">(</span><em class="sig-param">nb_path</em>, <em class="sig-param">dir</em>, <em class="sig-param">args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.convert_to_ok" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a master notebook to an ok notebook, tests dir, and .ok file.</p>
-<p>nb – Path
-endpoint – OK endpoint for notebook submission (e.g., cal/data100/sp19)
-dir – Path</p>
+<dd><p>Convert a master notebook to an Otter notebook and tests dir.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nb_path</strong> (<em>Path</em>) – pathlib Path object to iPython master notebook</p></li>
-<li><p><strong>dir</strong> (<em>Path</em>) – pathlib Path object for directory</p></li>
-<li><p><strong>args</strong> – <p>???</p>
-</p></li>
+<li><p><strong>nb_path</strong> (<em>pathlib.Path</em>) – pathlib Path object to iPython master notebook</p></li>
+<li><p><strong>dir</strong> (<em>pathlib.Path</em>) – pathlib Path object for directory</p></li>
+<li><p><strong>args</strong> (<em>argparse.Namespace</em>) – parsed command line arguments</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>ok_nb_path, which is the path with the notebook, tests dir, and .ok file</p>
+<dd class="field-even"><p>ok_nb_path, which is the path with the notebook and tests dir</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>str</p>
@@ -454,6 +450,22 @@ None: if BEGIN QUESTION not present in code</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="otter.assign.gen_otter_file">
+<code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">gen_otter_file</code><span class="sig-paren">(</span><em class="sig-param">master</em>, <em class="sig-param">result</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_otter_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an otter service config file</p>
+<p>Uses ASSIGNMENT_METADATA to generate a .otter file to configure the use of an Otter Service
+disribution for remotely grading assignments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>master</strong> (<em>pathlib.Path</em>) – path to master notebook</p></li>
+<li><p><strong>result</strong> (<em>pathlib.Path</em>) – path to result directory</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="otter.assign.gen_question_cell">
 <code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">gen_question_cell</code><span class="sig-paren">(</span><em class="sig-param">cell</em>, <em class="sig-param">manual</em>, <em class="sig-param">format</em>, <em class="sig-param">in_manual_block</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_question_cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the cell with metadata hidden in an HTML comment.</p>
@@ -514,7 +526,7 @@ None: if BEGIN ASSIGNMENT not present in code</p>
 <code class="sig-prename descclassname">otter.assign.</code><code class="sig-name descname">gen_views</code><span class="sig-paren">(</span><em class="sig-param">master_nb</em>, <em class="sig-param">result_dir</em>, <em class="sig-param">args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.assign.gen_views" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate student and autograder views.</p>
 <p>master_nb (dict): Dict of master notebook JSON
-result_dir (Path): pathlib Path object for the result directory</p>
+result_dir (pathlib.Path): pathlib Path object for the result directory</p>
 </dd></dl>
 
 <dl class="function">
@@ -577,8 +589,10 @@ result_dir (Path): pathlib Path object for the result directory</p>
 <dd class="field-odd"><p><strong>cell</strong> (<em>cell</em>) – Python code cell</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>???</p>
-</p>
+<dd class="field-even"><p>whether the current cell is a questio definition cell</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -707,7 +721,7 @@ result_dir (Path): pathlib Path object for the result directory</p>
 <dd><p>Rewrite test files to remove hidden tests.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>test_dir</strong> (<em>Path</em>) – pathlib Path object for test files directory</p>
+<dd class="field-odd"><p><strong>test_dir</strong> (<em>pathlib.Path</em>) – pathlib Path object for test files directory</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1841,22 +1855,22 @@ doctest, so we roll with it.</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_fail_template">
-<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11d428e80&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11dd1eda0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_pass_template">
-<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11cb7d240&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11cb38da0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_fail_template">
-<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11d428da0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11cb40be0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_pass_template">
-<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11d42f470&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11cb38c50&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2024,12 +2038,12 @@ OKTest objects</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.html_result_template">
-<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11d43e438&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11dd1e7f0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.plain_result_template">
-<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11cb7d2b0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11dd30d30&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

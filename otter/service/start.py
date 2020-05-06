@@ -450,7 +450,7 @@ def main(cli_args):
     ARGS = cli_args
     CONN = connect_db(ARGS.db_host, ARGS.db_user, ARGS.db_pass, ARGS.db_port)
 
-    port = 5000
+    port = ARGS.port
     tornado.options.parse_command_line()
 
     # make submissions forlder
