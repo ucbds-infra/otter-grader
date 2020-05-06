@@ -56,9 +56,17 @@ Other files can be included basically anywhere as long as its a subdirectory of 
 
 ## Building the Images
 
-Once you have cloned your assignments repo onto your Otter Service deployment, use the command `otter service build` to add assignments to the database and create their Docker images. Note that it is often necessary to run `otter service build` with `sudo` so that you have the necessary permissions; in this section, assume we have prepended each command with `sudo`.
+Once you have cloned your assignments repo onto your Otter Service deployment, use the command `otter service build` to add assignments to the database and create their Docker images. Note that it is often necessary to run `otter service build` with `sudo` so that you have the necessary permissions; in this section, assume that we have prepended each command with `sudo`.
 
-The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be `./` (i.e. it is assumed to be the working directory). 
+The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be `./` (i.e. it is assumed to be the working directory). It also has four arguments corresponding to Posgres connection information (the host, port, username, and password which default to `localhost`, `5432`, `root`, and `root`, resp.), an optional `--image` flag to change out the base image for the Docker images (defaults to `ucbdsinfra/otter-grader`), and quiet `-q` flag to stop Docker from printing to the console on building the images.
+
+From the root of the assignments repo, building couldn't be simpler:
+
+```
+otter service build
+```
+
+This command will add all assignments in the `conf.yml` to the database and create the needed Docker images to grade submissions.
 
 ## Otter Service Reference
 

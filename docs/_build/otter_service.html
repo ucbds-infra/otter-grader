@@ -31,6 +31,10 @@
     
     <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
 
+<a class="navbar-brand" href="index_beta.html">
+  <img src="_static/otter-logo-smaller.png" class="logo" alt="logo">
+</a>
+
 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
 </button>
@@ -258,8 +262,13 @@
 </div>
 <div class="section" id="building-the-images">
 <h2>Building the Images<a class="headerlink" href="#building-the-images" title="Permalink to this headline">¶</a></h2>
-<p>Once you have cloned your assignments repo onto your Otter Service deployment, use the command <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> to add assignments to the database and create their Docker images. Note that it is often necessary to run <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> with <code class="docutils literal notranslate"><span class="pre">sudo</span></code> so that you have the necessary permissions; in this section, assume we have prepended each command with <code class="docutils literal notranslate"><span class="pre">sudo</span></code>.</p>
-<p>The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be <code class="docutils literal notranslate"><span class="pre">./</span></code> (i.e. it is assumed to be the working directory).</p>
+<p>Once you have cloned your assignments repo onto your Otter Service deployment, use the command <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> to add assignments to the database and create their Docker images. Note that it is often necessary to run <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> with <code class="docutils literal notranslate"><span class="pre">sudo</span></code> so that you have the necessary permissions; in this section, assume that we have prepended each command with <code class="docutils literal notranslate"><span class="pre">sudo</span></code>.</p>
+<p>The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be <code class="docutils literal notranslate"><span class="pre">./</span></code> (i.e. it is assumed to be the working directory). It also has four arguments corresponding to Posgres connection information (the host, port, username, and password which default to <code class="docutils literal notranslate"><span class="pre">localhost</span></code>, <code class="docutils literal notranslate"><span class="pre">5432</span></code>, <code class="docutils literal notranslate"><span class="pre">root</span></code>, and <code class="docutils literal notranslate"><span class="pre">root</span></code>, resp.), an optional <code class="docutils literal notranslate"><span class="pre">--image</span></code> flag to change out the base image for the Docker images (defaults to <code class="docutils literal notranslate"><span class="pre">ucbdsinfra/otter-grader</span></code>), and quiet <code class="docutils literal notranslate"><span class="pre">-q</span></code> flag to stop Docker from printing to the console on building the images.</p>
+<p>From the root of the assignments repo, building couldn’t be simpler:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">service</span> <span class="n">build</span>
+</pre></div>
+</div>
+<p>This command will add all assignments in the <code class="docutils literal notranslate"><span class="pre">conf.yml</span></code> to the database and create the needed Docker images to grade submissions.</p>
 </div>
 <div class="section" id="otter-service-reference">
 <h2>Otter Service Reference<a class="headerlink" href="#otter-service-reference" title="Permalink to this headline">¶</a></h2>
