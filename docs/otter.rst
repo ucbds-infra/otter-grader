@@ -11,6 +11,14 @@ Subpackages
 Submodules
 ----------
 
+otter.argparser module
+----------------------
+
+.. automodule:: otter.argparser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 otter.assign module
 -------------------
 

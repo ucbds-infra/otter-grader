@@ -346,7 +346,7 @@ try:
                     tests_dir=None, 
                     notebooks_dir=file_path, 
                     id=assignment_id, 
-                    image=assignment_id,
+                    image=class_id + "-" + assignment_id,
                     debug=True,
                     verbose=True,
                     seed=seed
@@ -450,7 +450,7 @@ def main(cli_args):
     ARGS = cli_args
     CONN = connect_db(ARGS.db_host, ARGS.db_user, ARGS.db_pass, ARGS.db_port)
 
-    port = 5000
+    port = ARGS.port
     tornado.options.parse_command_line()
 
     # make submissions forlder

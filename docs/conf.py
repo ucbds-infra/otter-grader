@@ -53,7 +53,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx_markdown_tables',
     'sphinx.ext.autosummary',
-    'sphinxcontrib.apidoc'
+    'sphinxcontrib.apidoc',
+    'sphinxarg.ext',
 ]
 
 napoleon_google_docstring = True
@@ -77,7 +78,7 @@ source_suffix = ['.rst', '.md']
 # }
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'index_beta'
 
 github_doc_root = 'https://github.com/ucbds-infra/otter-grader/tree/master/docs/'
 

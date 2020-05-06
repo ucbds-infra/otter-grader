@@ -16,8 +16,8 @@ test-pypi:
 	python3 -m twine upload dist/* --repository-url https://test.pypi.org/legacy/
 
 docker:
-	docker build . -t ucbdsinfra/otter-grader
-	docker push ucbdsinfra/otter-grader
+	docker build . -t ucbdsinfra/otter-grader:beta
+	docker push ucbdsinfra/otter-grader:beta
 
 docker-test:
 	cp -r Dockerfile test-Dockerfile
@@ -26,7 +26,7 @@ docker-test:
 	rm test-Dockerfile
 
 documentation:
-	sphinx-apidoc -fo docs otter
+	# sphinx-apidoc -fo docs otter
 	sphinx-build -b html docs docs/_build -aEv
 
 tutorial-zip:
