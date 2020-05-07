@@ -46,9 +46,9 @@ class TestGenerate(unittest.TestCase):
         Check that the correct zipfile is created by gs_generator.py
         """
         # create the zipfile
-        generate_command = ["generate",
+        generate_command = ["generate", "autograder",
             "-t", TEST_FILES_PATH + "tests",
-            "-o", "test/",
+            "-o", TEST_FILES_PATH,
             "-r", TEST_FILES_PATH + "requirements.txt",
             TEST_FILES_PATH + "test-df.csv"
         ]
@@ -56,12 +56,12 @@ class TestGenerate(unittest.TestCase):
         args.func(args)
 
         # unzip the zipfile
-        unzip_command = ["unzip", "-o", "test/autograder.zip", "-d", "test/autograder"]
+        unzip_command = ["unzip", "-o", TEST_FILES_PATH + "autograder.zip", "-d", TEST_FILES_PATH + "autograder"]
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(unzip.stderr), 0, unzip.stderr)
 
         # go through files and ensure that they are correct
-        for file in glob("test/autograder/*"):
+        for file in glob(TEST_FILES_PATH + "autograder/*"):
             if os.path.isfile(file):
                 correct_file_path = os.path.join(TEST_FILES_PATH + "autograder-correct", os.path.split(file)[1])
                 with open(file) as f:
@@ -75,7 +75,7 @@ class TestGenerate(unittest.TestCase):
                             self.assertEqual(f.read(), g.read(), "{} does not match {}".format(subfile, correct_file_path))
 
         # cleanup files
-        cleanup_command = ["rm", "-rf", "test/autograder", "test/autograder.zip"]
+        cleanup_command = ["rm", "-rf", TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder.zip"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
 
@@ -85,7 +85,7 @@ class TestGenerate(unittest.TestCase):
         Checks that the Gradescope autograder works
         """
         # generate the zipfile
-        generate_command = ["generate",
+        generate_command = ["generate", "autograder",
             "-t", TEST_FILES_PATH + "tests",
             "-o", TEST_FILES_PATH,
             "-r", TEST_FILES_PATH + "requirements.txt",

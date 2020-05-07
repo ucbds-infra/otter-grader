@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+   otter.generate
    otter.service
 
 Submodules
@@ -47,14 +48,6 @@ otter.execute module
 --------------------
 
 .. automodule:: otter.execute
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.generate module
----------------------
-
-.. automodule:: otter.generate
    :members:
    :undoc-members:
    :show-inheritance:

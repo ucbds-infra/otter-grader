@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="PDF Generation and Filtering" href="pdfs.html" />
-    <link rel="prev" title="Grading on Gradescope" href="otter_generate.html" />
+    <link rel="prev" title="Deploying a Grading Service" href="deploy_service.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="docsearch:language" content="en">
@@ -64,6 +64,10 @@
     
     <li class="nav-item ">
         <a class="nav-link" href="otter_generate.html">Grading on Gradescope</a>
+    </li>
+    
+    <li class="nav-item ">
+        <a class="nav-link" href="deploy_service.html">Deploying a Grading Service</a>
     </li>
     
     <li class="nav-item active">
@@ -113,6 +117,8 @@
   
 
   <ul class="nav bd-sidenav">
+      
+      
       
       
       
@@ -258,8 +264,13 @@
 </div>
 <div class="section" id="building-the-images">
 <h2>Building the Images<a class="headerlink" href="#building-the-images" title="Permalink to this headline">¶</a></h2>
-<p>Once you have cloned your assignments repo onto your Otter Service deployment, use the command <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> to add assignments to the database and create their Docker images. Note that it is often necessary to run <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> with <code class="docutils literal notranslate"><span class="pre">sudo</span></code> so that you have the necessary permissions; in this section, assume we have prepended each command with <code class="docutils literal notranslate"><span class="pre">sudo</span></code>.</p>
-<p>The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be <code class="docutils literal notranslate"><span class="pre">./</span></code> (i.e. it is assumed to be the working directory).</p>
+<p>Once you have cloned your assignments repo onto your Otter Service deployment, use the command <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> to add assignments to the database and create their Docker images. Note that it is often necessary to run <code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">service</span> <span class="pre">build</span></code> with <code class="docutils literal notranslate"><span class="pre">sudo</span></code> so that you have the necessary permissions; in this section, assume that we have prepended each command with <code class="docutils literal notranslate"><span class="pre">sudo</span></code>.</p>
+<p>The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be <code class="docutils literal notranslate"><span class="pre">./</span></code> (i.e. it is assumed to be the working directory). It also has four arguments corresponding to Posgres connection information (the host, port, username, and password which default to <code class="docutils literal notranslate"><span class="pre">localhost</span></code>, <code class="docutils literal notranslate"><span class="pre">5432</span></code>, <code class="docutils literal notranslate"><span class="pre">root</span></code>, and <code class="docutils literal notranslate"><span class="pre">root</span></code>, resp.), an optional <code class="docutils literal notranslate"><span class="pre">--image</span></code> flag to change out the base image for the Docker images (defaults to <code class="docutils literal notranslate"><span class="pre">ucbdsinfra/otter-grader</span></code>), and quiet <code class="docutils literal notranslate"><span class="pre">-q</span></code> flag to stop Docker from printing to the console on building the images.</p>
+<p>From the root of the assignments repo, building couldn’t be simpler:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">service</span> <span class="n">build</span>
+</pre></div>
+</div>
+<p>This command will add all assignments in the <code class="docutils literal notranslate"><span class="pre">conf.yml</span></code> to the database and create the needed Docker images to grade submissions.</p>
 </div>
 <div class="section" id="otter-service-reference">
 <h2>Otter Service Reference<a class="headerlink" href="#otter-service-reference" title="Permalink to this headline">¶</a></h2>
@@ -322,7 +333,7 @@
               
               <div class='prev-next-bottom'>
                 
-    <a class='left-prev' id="prev-link" href="otter_generate.html" title="previous page">Grading on Gradescope</a>
+    <a class='left-prev' id="prev-link" href="deploy_service.html" title="previous page">Deploying a Grading Service</a>
     <a class='right-next' id="next-link" href="pdfs.html" title="next page">PDF Generation and Filtering</a>
 
               </div>

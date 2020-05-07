@@ -66,6 +66,10 @@
     </li>
     
     <li class="nav-item ">
+        <a class="nav-link" href="deploy_service.html">Deploying a Grading Service</a>
+    </li>
+    
+    <li class="nav-item ">
         <a class="nav-link" href="otter_service.html">Grading on a Deployed Service</a>
     </li>
     
@@ -133,6 +137,8 @@
       
       
       
+      
+      
     </ul>
 
 </nav>
@@ -175,6 +181,7 @@
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  | <a href="#Y"><strong>Y</strong></a>
@@ -191,6 +198,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.generate.html#otter.generate.token.APIClient">APIClient (class in otter.generate.token)</a>
+</li>
       <li><a href="otter.service.html#otter.service.start.Application">Application (class in otter.service.start)</a>
 </li>
   </ul></td>
@@ -525,14 +534,16 @@
 </li>
       <li><a href="otter.html#otter.utils.list_files">list_files() (in module otter.utils)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.html#otter.assign.lock">lock() (in module otter.assign)</a>
 
       <ul>
         <li><a href="otter.html#otter.jassign.lock">(in module otter.jassign)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.generate.html#otter.generate.token.APIClient.log_in">log_in() (otter.generate.token.APIClient method)</a>
+</li>
       <li><a href="otter.service.html#otter.service.start.LoginHandler">LoginHandler (class in otter.service.start)</a>
 </li>
   </ul></td>
@@ -548,7 +559,7 @@
 </li>
         <li><a href="otter.html#otter.execute.main">(in module otter.execute)</a>
 </li>
-        <li><a href="otter.html#otter.generate.main">(in module otter.generate)</a>
+        <li><a href="otter.generate.html#otter.generate.generate.main">(in module otter.generate.generate)</a>
 </li>
         <li><a href="otter.html#otter.grade.main">(in module otter.grade)</a>
 </li>
@@ -599,16 +610,20 @@
 </li>
       <li><a href="otter.html#module-otter.execute">otter.execute (module)</a>
 </li>
-      <li><a href="otter.html#module-otter.generate">otter.generate (module)</a>
+      <li><a href="otter.generate.html#module-otter.generate">otter.generate (module)</a>
+</li>
+      <li><a href="otter.generate.html#module-otter.generate.generate">otter.generate.generate (module)</a>
+</li>
+      <li><a href="otter.generate.html#module-otter.generate.token">otter.generate.token (module)</a>
 </li>
       <li><a href="otter.html#module-otter.grade">otter.grade (module)</a>
 </li>
       <li><a href="otter.html#module-otter.jassign">otter.jassign (module)</a>
 </li>
-      <li><a href="otter.html#module-otter.metadata">otter.metadata (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.html#module-otter.metadata">otter.metadata (module)</a>
+</li>
       <li><a href="otter.html#module-otter.notebook">otter.notebook (module)</a>
 </li>
       <li><a href="otter.html#module-otter.ok_parser">otter.ok_parser (module)</a>
@@ -661,8 +676,12 @@
 </li>
       <li><a href="otter.html#otter.ok_parser.OKTestsResult.plain_result_template">plain_result_template (otter.ok_parser.OKTestsResult attribute)</a>
 </li>
-      <li><a href="otter.service.html#otter.service.start.SubmissionHandler.post">post() (otter.service.start.SubmissionHandler method)</a>
+      <li><a href="otter.generate.html#otter.generate.token.APIClient.post">post() (otter.generate.token.APIClient method)</a>
+
+      <ul>
+        <li><a href="otter.service.html#otter.service.start.SubmissionHandler.post">(otter.service.start.SubmissionHandler method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -698,6 +717,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.service.html#otter.service.create.remove_users">remove_users() (in module otter.service.create)</a>
+</li>
+      <li><a href="otter.generate.html#otter.generate.token.APIClient.replace_pdf_submission">replace_pdf_submission() (otter.generate.token.APIClient method)</a>
 </li>
       <li><a href="otter.html#otter.assign.replace_solutions">replace_solutions() (in module otter.assign)</a>
 
@@ -778,6 +799,18 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="otter.html#otter.notebook.Notebook.to_pdf">to_pdf() (otter.notebook.Notebook method)</a>, <a href="otter_check.html#otter.notebook.Notebook.to_pdf">[1]</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.generate.html#otter.generate.token.APIClient.upload_pdf_submission">upload_pdf_submission() (otter.generate.token.APIClient method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="otter.generate.html#otter.generate.token.APIClient.upload_programming_submission">upload_programming_submission() (otter.generate.token.APIClient method)</a>
 </li>
   </ul></td>
 </tr></table>

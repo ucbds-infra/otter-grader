@@ -90,7 +90,7 @@ def main(args):
         print("Generating autograder zipfile...")
         curr_dir = os.getcwd()
         os.chdir(str(result / 'autograder'))
-        generate_cmd = ["otter", "generate"]
+        generate_cmd = ["otter", "generate", "autograder"]
 
         if generate_args.get('points', None) is not None or args.points is not None:
             generate_cmd += ["--points", args.points or generate_args.get('points', None)]
@@ -103,6 +103,15 @@ def main(args):
         
         if generate_args.get('seed', None) is not None or args.seed is not None:
             generate_cmd += ["--seed", str(args.seed or generate_args.get('seed', None))]
+
+        if generate_args.get('pdfs', {}):
+            pdf_args = generate_args.get('pdfs', {})
+            generate_cmd += ["--token", str(pdf_args["token"])]
+            generate_cmd += ["--course-id", str(pdf_args["course_id"])]
+            generate_cmd += ["--assignment-id", str(pdf_args["assignment_id"])]
+
+            if not pdf_args.get("filtering", True):
+                generate_cmd += ["--unfiltered-pdfs"]
         
         if ASSIGNMENT_METADATA.get('files', []) or args.files:
             generate_cmd += args.files or ASSIGNMENT_METADATA.get('files', [])

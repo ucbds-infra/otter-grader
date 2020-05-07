@@ -65,6 +65,10 @@
     </li>
     
     <li class="nav-item ">
+        <a class="nav-link" href="deploy_service.html">Deploying a Grading Service</a>
+    </li>
+    
+    <li class="nav-item ">
         <a class="nav-link" href="otter_service.html">Grading on a Deployed Service</a>
     </li>
     
@@ -132,6 +136,8 @@
       
       
       
+      
+      
     </ul>
 
 </nav>
@@ -173,10 +179,6 @@
     
         <li class="nav-item toc-entry toc-h2">
             <a href="#module-otter.execute" class="nav-link">otter.execute module</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#module-otter.generate" class="nav-link">otter.generate module</a>
         </li>
     
         <li class="nav-item toc-entry toc-h2">
@@ -225,6 +227,13 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="otter.generate.html">otter.generate package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="otter.generate.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otter.generate.html#module-otter.generate.generate">otter.generate.generate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otter.generate.html#module-otter.generate.token">otter.generate.token module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="otter.generate.html#module-otter.generate">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="otter.service.html">otter.service package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="otter.service.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="otter.service.html#module-otter.service.build">otter.service.build module</a></li>
@@ -1010,15 +1019,6 @@ execute functions</p></li>
 <dt id="otter.execute.main">
 <code class="sig-prename descclassname">otter.execute.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">args=None</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.execute.main" title="Permalink to this definition">¶</a></dt>
 <dd><p>When executing this file from the command line, this function will be run.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-otter.generate">
-<span id="otter-generate-module"></span><h2>otter.generate module<a class="headerlink" href="#module-otter.generate" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="otter.generate.main">
-<code class="sig-prename descclassname">otter.generate.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param">args</em><span class="sig-paren">)</span><a class="headerlink" href="#otter.generate.main" title="Permalink to this definition">¶</a></dt>
-<dd><p>Main function for configuring a Gradescope based autograder.</p>
 </dd></dl>
 
 </div>
@@ -1855,22 +1855,22 @@ doctest, so we roll with it.</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_fail_template">
-<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11dd1eda0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_fail_template</code><em class="property"> = &lt;Template memory:11d536518&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.html_result_pass_template">
-<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11cb38da0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_pass_template</code><em class="property"> = &lt;Template memory:11cc7e588&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.html_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_fail_template">
-<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11cb40be0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_fail_template</code><em class="property"> = &lt;Template memory:11d5365c0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_fail_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTest.plain_result_pass_template">
-<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11cb38c50&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_pass_template</code><em class="property"> = &lt;Template memory:11cc7e438&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTest.plain_result_pass_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -2038,12 +2038,12 @@ OKTest objects</p>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.html_result_template">
-<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11dd1e7f0&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">html_result_template</code><em class="property"> = &lt;Template memory:11d549f28&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.html_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="otter.ok_parser.OKTestsResult.plain_result_template">
-<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11dd30d30&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plain_result_template</code><em class="property"> = &lt;Template memory:11cc8e400&gt;</em><a class="headerlink" href="#otter.ok_parser.OKTestsResult.plain_result_template" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

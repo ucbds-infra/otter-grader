@@ -67,6 +67,10 @@
     </li>
     
     <li class="nav-item ">
+        <a class="nav-link" href="deploy_service.html">Deploying a Grading Service</a>
+    </li>
+    
+    <li class="nav-item ">
         <a class="nav-link" href="otter_service.html">Grading on a Deployed Service</a>
     </li>
     
@@ -136,6 +140,8 @@
       
       
       
+      
+      
     </ul>
 
 </nav>
@@ -188,20 +194,6 @@
     
         <li class="nav-item toc-entry toc-h3">
             <a href="#otter-assign-example" class="nav-link">Otter Assign Example</a>
-        </li>
-    
-            </ul>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h2">
-            <a href="#otter-assign-reference" class="nav-link">otter assign Reference</a><ul class="nav section-nav flex-column">
-                
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#Positional Arguments" class="nav-link">Positional Arguments</a>
-        </li>
-    
-        <li class="nav-item toc-entry toc-h3">
-            <a href="#Named Arguments" class="nav-link">Named Arguments</a>
         </li>
     
             </ul>
@@ -532,81 +524,6 @@ Make sure you have run all cells in your notebook in order before running the ce
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">otter</span> <span class="n">assign</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">init</span><span class="o">-</span><span class="n">cell</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">filtering</span> <span class="n">hw00</span><span class="o">.</span><span class="n">ipynb</span> <span class="n">dist</span> <span class="n">data</span><span class="o">.</span><span class="n">csv</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="otter-assign-reference">
-<h2><code class="docutils literal notranslate"><span class="pre">otter</span> <span class="pre">assign</span></code> Reference<a class="headerlink" href="#otter-assign-reference" title="Permalink to this headline">¶</a></h2>
-<p><p>Create distribution versions of otter-assign-formatted notebook</p>
-</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">otter</span> <span class="n">assign</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">export</span><span class="o">-</span><span class="n">cell</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">run</span><span class="o">-</span><span class="n">tests</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">init</span><span class="o">-</span><span class="n">cell</span><span class="p">]</span>
-                    <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">check</span><span class="o">-</span><span class="nb">all</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="nb">filter</span><span class="p">]</span>
-                    <span class="p">[</span><span class="o">--</span><span class="n">instructions</span> <span class="n">INSTRUCTIONS</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">jassign</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span>
-                    <span class="p">[</span><span class="o">--</span><span class="n">generate</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span> <span class="p">[</span><span class="n">REQUIREMENTS</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">threshold</span> <span class="n">THRESHOLD</span><span class="p">]</span>
-                    <span class="p">[</span><span class="o">--</span><span class="n">points</span> <span class="n">POINTS</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">seed</span> <span class="n">SEED</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">results</span><span class="p">]</span>
-                    <span class="n">master</span> <span class="n">result</span> <span class="p">[</span><span class="n">files</span> <span class="p">[</span><span class="n">files</span> <span class="o">...</span><span class="p">]]</span>
-</pre></div>
-</div>
-<div class="section" id="Positional Arguments">
-<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
-<dl class="option-list">
-<dt><kbd>master</kbd></dt>
-<dd><p>Notebook with solutions and tests.</p>
-</dd>
-<dt><kbd>result</kbd></dt>
-<dd><p>Directory containing the result.</p>
-</dd>
-<dt><kbd>files</kbd></dt>
-<dd><p>Other support files needed for distribution (e.g. .py files, data files)</p>
-</dd>
-</dl>
-</div>
-<div class="section" id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
-<dl class="option-list">
-<dt><kbd>--no-export-cell</kbd></dt>
-<dd><p>Don’t inject an export cell into the notebook</p>
-</dd>
-<dt><kbd>--no-run-tests</kbd></dt>
-<dd><p>Don’t run tests.</p>
-</dd>
-<dt><kbd>--no-init-cell</kbd></dt>
-<dd><p>Don’t automatically generate an Otter init cell</p>
-</dd>
-<dt><kbd>--no-check-all</kbd></dt>
-<dd><p>Don’t automatically add a check_all cell</p>
-</dd>
-<dt><kbd>--no-filter</kbd></dt>
-<dd><p>Don’t filter the PDF.</p>
-</dd>
-<dt><kbd>--instructions</kbd></dt>
-<dd><p>Additional submission instructions for students</p>
-</dd>
-<dt><kbd>--jassign</kbd></dt>
-<dd><p>Use jassign notebook format</p>
-</dd>
-<dt><kbd>--debug</kbd></dt>
-<dd><p>Do not ignore errors in running tests for debugging</p>
-</dd>
-<dt><kbd>--generate</kbd></dt>
-<dd><p>Generate Gradescope autograder zipfile</p>
-</dd>
-<dt><kbd>-r, --requirements</kbd></dt>
-<dd><p>Path to requirements.txt file; ./requirements.txt automatically checked; use with –generate only</p>
-<p>Default: “requirements.txt”</p>
-</dd>
-<dt><kbd>--threshold</kbd></dt>
-<dd><p>Pass/fail score threshold; use with –generate only</p>
-</dd>
-<dt><kbd>--points</kbd></dt>
-<dd><p>Points possible, overrides sum of test points; use with –generate only</p>
-</dd>
-<dt><kbd>--seed</kbd></dt>
-<dd><p>A random seed to be executed before each cell; use with –generate only</p>
-</dd>
-<dt><kbd>--show-results</kbd></dt>
-<dd><p>Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests); use with –generate only</p>
-</dd>
-</dl>
 </div>
 </div>
 </div>

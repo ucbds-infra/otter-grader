@@ -9,12 +9,28 @@ import pandas as pd
 
 from glob import glob
 from textwrap import dedent
+from nb2pdf import convert
+
 from otter.execute import grade_notebook
+from otter.generate.token import APIClient
 
 SCORE_THRESHOLD = None
 POINTS_POSSIBLE = None
 SHOW_ALL_ON_RELEASE = False
 SEED = None
+
+# for auto-uploading PDFs
+TOKEN = None
+COURSE_ID = 'None'
+ASSIGNMENT_ID = 'None'
+FILTERING = True
+FILTER_TYPE = 'html'
+
+if TOKEN is not None:
+    CLIENT = APIClient(token=TOKEN)
+    GENERATE_PDF = True
+else:
+    GENERATE_PDF = False
 
 UTILS_IMPORT_REGEX = r"\"from utils import [\w\*, ]+"
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
@@ -72,6 +88,21 @@ if __name__ == "__main__":
 
     scores = grade_notebook(nb_path, glob("/autograder/submission/tests/*.py"), name="submission", gradescope=True, ignore_errors=True, seed=SEED)
     # del scores["TEST_HINTS"]
+
+    if GENERATE_PDF:
+        convert(nb_path, filtering=FILTERING, filter_type=FILTER_TYPE)
+        pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
+
+        # get student email
+        with open("../submission_metadata.json") as f:
+            metadata = json.load(f)
+
+        student_emails = []
+        for user in metadata["users"]:
+            student_emails.append(user["email"])
+        
+        for student_email in student_emails:
+            CLIENT.upload_pdf_submission(COURSE_ID, ASSIGNMENT_ID, student_email, pdf_path)
 
     output = {"tests" : []}
     for key in scores:
