@@ -39,10 +39,21 @@ This cell is removed from both output notebooks. These configurations, listed in
 
 A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`). If you require additional arguments, e.g. `points` or `show_results`, then set `generate` to a nested dictionary of these parameters and their values:
 
-```
+```yaml
 generate:
     seed: 42
     show_results: true
+```
+
+You can also set the autograder up to automatically upload PDFs to student submissions to another Gradescope assignment by setting the necessary keys in the `pdfs` subkey of `generate`:
+
+```yaml
+generate:
+  pdfs:
+    token: YOUR_GS_TOKEN   # required
+    class_id: 1234         # required
+    assignment_id: 5678    # required
+    filtering: true        # true is the default
 ```
 
 These values, if left unspecified, take on the default values of their flags as described in [Otter Generate](otter_generate.md).

@@ -12,6 +12,8 @@
    otter_check
    otter_grade
    otter_generate
+   deploy_service
+   otter_service
    pdfs
    seeding
    changelog

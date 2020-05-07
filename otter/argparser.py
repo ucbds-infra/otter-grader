@@ -4,6 +4,7 @@ from . import grade
 from . import generate
 from . import check
 from . import assign
+from .generate import token
 from .service import build
 from .service import create
 from .service import start
@@ -33,7 +34,7 @@ def get_parser():
     assign_parser.add_argument("--jassign", default=False, action="store_true", help="Use jassign notebook format")
     assign_parser.add_argument("--debug", default=False, action="store_true", help="Do not ignore errors in running tests for debugging")
 
-    # generate options
+    # generate options -- COMMENTED OUT BECAUSE YOU SHOULD USE THE ASSIGNMENT METADATA FOR THIS
     assign_parser.add_argument("--generate", default=False, action="store_true", help="Generate Gradescope autograder zipfile")
     assign_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked; use with --generate only")
     assign_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold; use with --generate only")
@@ -58,16 +59,31 @@ def get_parser():
 
     ##### PARSER FOR otter generate #####
     generate_parser = subparsers.add_parser("generate", description="Generates zipfile to configure Gradescope autograder")
-    generate_parser.add_argument("-t", "--tests-path", nargs='?', type=str, default="./tests/", help="Path to test files")
-    generate_parser.add_argument("-o", "--output-path", nargs='?', type=str, default="./", help="Path to which to write zipfile")
-    generate_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
-    generate_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
-    generate_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
-    generate_parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
-    generate_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
-    generate_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
+    generate_subparsers = generate_parser.add_subparsers()
 
-    generate_parser.set_defaults(func=generate.main)
+
+    ##### PARSER FOR otter generate autograder #####
+    generate_autograder_parser = generate_subparsers.add_parser("autograder", description="Create an autograder zip file for Gradescope")
+    generate_autograder_parser.add_argument("-t", "--tests-path", nargs='?', type=str, default="./tests/", help="Path to test files")
+    generate_autograder_parser.add_argument("-o", "--output-path", nargs='?', type=str, default="./", help="Path to which to write zipfile")
+    generate_autograder_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
+    generate_autograder_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
+    generate_autograder_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
+    generate_autograder_parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
+    generate_autograder_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
+    generate_autograder_parser.add_argument("--token", default=None, help="Gradescope token for generating and uploading PDFs")
+    generate_autograder_parser.add_argument("--unfiltered-pdfs", default=False, action="store_true", help="Whether the PDFs should be unfiltered")
+    generate_autograder_parser.add_argument("--course-id", default=None, help="Gradescope course ID")
+    generate_autograder_parser.add_argument("--assignment-id", default=None, help="Gradescope assignment ID for PDFs")
+    generate_autograder_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
+
+    generate_autograder_parser.set_defaults(func=generate.main)
+
+
+    ##### PARSER FOR otter generate token #####
+    generate_token_parser = generate_subparsers.add_parser("token", description="Get a Gradescope token")
+
+    generate_token_parser.set_defaults(func=token.main)
 
 
     ##### PARSER FOR otter grade #####
@@ -119,7 +135,6 @@ def get_parser():
     service_build_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
     service_build_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Based image for grading containers")
     service_build_parser.add_argument("-q", "--quiet", default=False, action="store_true", help="Build images without writing Docker messages to stdout")
-    # TODO: add arguments
 
     service_build_parser.set_defaults(func=build.main)
 
@@ -130,7 +145,6 @@ def get_parser():
     service_create_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
     service_create_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
     service_create_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
-    # TODO: add arguments
 
     service_create_parser.set_defaults(func=create.main)
 
