@@ -1,6 +1,6 @@
 # Grading on a Deployed Service
 
-Otter Service is a deployable grading server that students can send submissions to from in the notebook and which will grade submissions based on predefined tests. It is a service packaged with Otter but has additional requirements that are not necessary for running Otter without Otter Service. Otter Service is a tornado server that accepts requests with student submissions, writes the submission to disk, grades them, and saves the grade breakdowns in a Postgres database. This page details how to configure an already-deployed Otter Service instance, and is agnostic of deployment type. For more information on deploying an Otter Service instance, see [here]().
+Otter Service is a deployable grading server that students can send submissions to from in the notebook and which will grade submissions based on predefined tests. It is a service packaged with Otter but has additional requirements that are not necessary for running Otter without Otter Service. Otter Service is a tornado server that accepts requests with student submissions, writes the submission to disk, grades them, and saves the grade breakdowns in a Postgres database. This page details how to configure an already-deployed Otter Service instance, and is agnostic of deployment type. For more information on deploying an Otter Service instance, see [here](deploy_service.md).
 
 ## Configuration Repo
 
