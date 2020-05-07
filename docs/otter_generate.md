@@ -102,7 +102,7 @@ Your token is:
 Otter Generate also needs the course ID and assignment ID of the assignment to which PDFs should be submitted. This information can be gathered from the assignment URL on Gradescope:
 
 ```
-https://www.gradescope.com/courses/{COURSE ID}/assignments/{ASSIGNEMTN ID}
+https://www.gradescope.com/courses/{COURSE ID}/assignments/{ASSIGNMENT ID}
 ```
 
 Currently, this action only supports [HTML comment filtering](pdfs.md), but filtering can be turned off with the `--unfiltered-pdfs` flag.
