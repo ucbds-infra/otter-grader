@@ -75,7 +75,7 @@ export OTTER_ENDPOINT="http://my-otter-service-instance.westus.cloudapp.azure.co
 
 Finally, the last thing to do is allow inbound traffic on port 80 (or whatever port you pass to the `--port` flag of `otter service start`). This will allow requests to be sent to the VM for grading.
 
-Now that you have set up your VM, you're ready to start [grading with it](otter_service.md)
+Now that you have set up your VM, you're ready to start [grading with it](otter_service.md).
 
 ## Step-by-Step Deployments
 
