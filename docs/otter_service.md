@@ -66,7 +66,65 @@ From the root of the assignments repo, building couldn't be simpler:
 otter service build
 ```
 
-This command will add all assignments in the `conf.yml` to the database and create the needed Docker images to grade submissions.
+This command will add all assignments in the `conf.yml` to the database and create the needed Docker images to grade submissions. Images will be tagged as `{CLASS ID}-{ASSIGNMENT ID}` from the `conf.yml` file. So the first assignment in the example above would be tagged `data8x-proj02`.
+
+## Running the Service
+
+Once you have run `otter service build`, you are ready to start the service instance listening for requests. To do this, run `otter service start`, which takes an optional `--port` flag that indicates the port to listen on (this defaults to 80, the HTTP port). When a student submits, their submission is written to the disk and a job to grade the assignment is sent to a `concurrent.futures.ThreadPoolExecutor`. Once grading is finished, the database entry for that submission is updated with the score and the stdout and stderr of the grading process are written to text files in the submission directory. A submission is written to the following path:
+
+```
+/otter-service/submissions/class-{CLASS ID}/assignment-{ASSIGNMENT ID}/submission-{SUBMISSION ID}/{ASSIGNMENT NAME}.ipynb
+```
+
+To start Otter Service, run
+
+```
+$ otter service start
+Listening on port 80
+```
+
+If you need to run Otter Service in the background, e.g. so you can log out of your SSH session, we recommend using [screen](https://linuxize.com/post/how-to-use-linux-screen/) to run the process in a separate session.
+
+## Interacting with the Database
+
+In setting up your Otter Service deployment, a Postgres database called `otter_db` was created to hold information about classes, assignments, and scores. The database has the following schema:
+
+```sql
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    api_keys VARCHAR[] CHECK (cardinality(api_keys) > 0),
+    username TEXT UNIQUE,
+    password VARCHAR,
+    email TEXT UNIQUE,
+    CONSTRAINT has_username_or_email CHECK (username IS NOT NULL or email IS NOT NULL)
+)
+
+CREATE TABLE classes (
+    class_id TEXT PRIMARY KEY,
+    class_name TEXT NOT NULL
+)
+
+CREATE TABLE assignments (
+    assignment_id TEXT NOT NULL,
+    class_id TEXT REFERENCES classes (class_id) NOT NULL,
+    assignment_name TEXT NOT NULL,
+    seed INTEGER,
+    PRIMARY KEY (assignment_id, class_id)
+)
+
+CREATE TABLE submissions (
+    submission_id SERIAL PRIMARY KEY,
+    assignment_id TEXT NOT NULL,
+    class_id TEXT NOT NULL,
+    user_id INTEGER REFERENCES users(user_id) NOT NULL,
+    file_path TEXT NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
+    score JSONB,
+    FOREIGN KEY (assignment_id, class_id) REFERENCES assignments (assignment_id, class_id)
+)
+```
+
+The above tables encompass all of the information that Otter Service stores. When a student sends a POST request with their submission, the submission is logged in the `submissions` table with a null `score`. Once grading finishes, the `score` for that submission is filled in as a JSON object that maps question identifiers to scores by question.
 
 ## Otter Service Reference
 
@@ -82,3 +140,12 @@ This command will add all assignments in the `conf.yml` to the database and crea
 ```
 
 ### `otter service start`
+
+```eval_rst
+.. argparse::
+   :module: otter.argparser
+   :func: get_parser
+   :prog: otter
+   :path: service start
+   :nodefaultconst:
+```
