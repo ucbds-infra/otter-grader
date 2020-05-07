@@ -180,8 +180,6 @@ def convert_to_ok(nb_path, dir, args):
             ASSIGNMENT_METADATA.get('instructions', '') or args.instructions, 
             filtering = ASSIGNMENT_METADATA.get('filtering', True) and not args.no_filter
         )
-        
-    remove_output(nb)
 
     with open(ok_nb_path, 'w') as f:
         nbformat.write(nb, f, NB_VERSION)
@@ -848,6 +846,9 @@ def strip_solutions(original_nb_path, stripped_nb_path):
     md_solutions.reverse()
     for i in md_solutions:
         del nb['cells'][i]
+    
+    # remove output from student version
+    remove_output(nb)
     with open(stripped_nb_path, 'w') as f:
         nbformat.write(nb, f, NB_VERSION)
 
