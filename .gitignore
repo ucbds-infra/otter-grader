@@ -10,3 +10,4 @@ test/tests
 .vscode
 test/output
 .sos
+docs/_build
