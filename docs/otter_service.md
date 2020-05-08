@@ -1,6 +1,6 @@
 # Grading on a Deployed Service
 
-Otter Service is a deployable grading server that students can send submissions to from in the notebook and which will grade submissions based on predefined tests. It is a service packaged with Otter but has additional requirements that are not necessary for running Otter without Otter Service. Otter Service is a tornado server that accepts requests with student submissions, writes the submission to disk, grades them, and saves the grade breakdowns in a Postgres database. This page details how to configure an already-deployed Otter Service instance, and is agnostic of deployment type. For more information on deploying an Otter Service instance, see [here](deploy_service.md).
+Otter Service is a deployable grading server that students can send submissions to from in the notebook and which will grade submissions based on predefined tests. It is a service packaged with Otter but has additional requirements that are not necessary for running Otter without Otter Service. Otter Service is a tornado server that accepts requests with student submissions, writes the submission to disk, grades them, and saves the grade breakdowns in a Postgres database. This page details how to configure an already-deployed Otter Service instance, and is agnostic of deployment type. For more information on deploying an Otter Service instance, see [here](deploy_service.md). 
 
 ## Configuration Repo
 
@@ -56,7 +56,7 @@ Other files can be included basically anywhere as long as its a subdirectory of 
 
 ## Building the Images
 
-Once you have cloned your assignments repo onto your Otter Service deployment, use the command `otter service build` to add assignments to the database and create their Docker images. Note that it is often necessary to run `otter service build` with `sudo` so that you have the necessary permissions; in this section, assume that we have prepended each command with `sudo`.
+Once you have cloned your assignments repo onto your Otter Service deployment, use the command `otter service build` to add assignments to the database and create their Docker images. Note that it is often necessary to run `otter service build` with `sudo` so that you have the necessary permissions; in this section, assume that we have prepended each command with `sudo -E`.
 
 The builder takes one positional argument that corresponds to the path to the assignments repo; this is assumed to be `./` (i.e. it is assumed to be the working directory). It also has four arguments corresponding to Posgres connection information (the host, port, username, and password which default to `localhost`, `5432`, `root`, and `root`, resp.), an optional `--image` flag to change out the base image for the Docker images (defaults to `ucbdsinfra/otter-grader`), and quiet `-q` flag to stop Docker from printing to the console on building the images.
 
