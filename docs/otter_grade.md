@@ -292,7 +292,7 @@ otter grade -y meta.yml -f ../data/data.csv
 Or I could move (or copy) `data.csv` into `grading`:
 
 ```
-$ mv ../data/data.csv ./
+mv ../data/data.csv ./
 ```
 
 ```
