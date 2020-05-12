@@ -15,6 +15,7 @@ from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 
 from .execute import check
+from .export import export_notebook
 
 _API_KEY = None
 
@@ -116,7 +117,7 @@ class Notebook:
 
 
 	# @staticmethod
-	def to_pdf(self, nb_path=None, filtering=True, filter_type="html", display_link=True):
+	def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True):
 		"""Exports notebook to PDF
 
 		FILTER_TYPE can be "html" or "tags" if filtering by HTML comments or cell tags,
@@ -125,8 +126,7 @@ class Notebook:
 		Args:
 			nb_path (str): Path to iPython notebook we want to export
 			filtering (bool, optional): Set true if only exporting a subset of nb cells to PDF
-			filter_type (str, optional): "html" or "tags" if filtering by HTML comments or cell
-				tags, respectively.
+			pagebreaks (bool, optional): If true, pagebreaks are included between questions
 			display_link (bool, optional): Whether or not to display a download link
 		
 		"""
@@ -141,7 +141,8 @@ class Notebook:
 		elif nb_path is None:
 			raise ValueError("nb_path is None and no otter-service config is available")
 
-		convert(nb_path, filtering=filtering, filter_type=filter_type)
+		# convert(nb_path, filtering=filtering, filter_type=filter_type)
+		export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 
 		if display_link:
 			# create and display output HTML
@@ -153,7 +154,7 @@ class Notebook:
 			display(HTML(out_html))
 
 
-	def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, filter_type="html", files=[], display_link=True):
+	def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], display_link=True):
 		"""Exports a submission to a zipfile
 
 		Creates a submission zipfile from a notebook at NB_PATH, optionally including a PDF export
@@ -164,8 +165,7 @@ class Notebook:
 			export_path (str, optional): Path at which to write zipfile
 			pdf (bool, optional): True if PDF should be included
 			filtering (bool, optional): Set true if only exporting a subset of nb cells to PDF
-			filter_type (str, optional): "html" or "tags" if filtering by HTML comments or cell
-				tags, respectively.
+			pagebreaks (bool, optional): If true, pagebreaks are included between questions
 			files (list, optional): Other files to include in the zipfile
 			display_link (bool, optional): Whether or not to display a download link
 		
@@ -191,7 +191,8 @@ class Notebook:
 
 		if pdf:
 			pdf_path = ".".join(nb_path.split(".")[:-1]) + ".pdf"
-			convert(nb_path, filtering=filtering, filter_type=filter_type)
+			# convert(nb_path, filtering=filtering, filter_type=filter_type)
+			export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 			zf.write(pdf_path)
 
 		for file in files:

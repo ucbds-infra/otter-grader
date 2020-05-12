@@ -6,13 +6,11 @@ import pkg_resources
 from .filter import load_notebook
 
 
-def notebook_to_pdf(nb, dest, templating="test.tplx", debug=False):
+def notebook_to_pdf(nb, dest=None, templating="test.tplx", debug=False):
     """
     https://github.com/dibyaghosh/gsExport/blob/master/gsExport/utils.py
     """
-    # shutil.copyfile(pkg_resources.resource_filename(__name__, templating), "test.tplx")
     pdf_exporter = nbconvert.PDFExporter()
-    # pdf_exporter.template_file = "test.tplx"
     pdf_exporter.template_file = pkg_resources.resource_filename(__name__, templating)
     try:
         pdf_output = pdf_exporter.from_notebook_node(nb)
@@ -40,6 +38,6 @@ def export_notebook(nb_path, dest=None, filtering=True, pagebreaks=False, debug=
     if dest is not None:
         pdf_name = dest
     else:
-        pdf_name = os.path.splitext(nb_path)[0]
+        pdf_name = os.path.splitext(nb_path)[0] + ".pdf"
         
     notebook_to_pdf(notebook, pdf_name, debug=debug)
