@@ -24,7 +24,7 @@ def notebook_to_pdf(nb, dest=None, templating="test.tplx", debug=False):
 
         else:
             print("Showing concise error message")
-            output = "\n".join(error.output.split("\n")[-30:])
+            output = "\n".join(error.output.split("\n")[-15:])
         print("=" * 60)
         print(output)
         print("=" * 60)
@@ -41,3 +41,13 @@ def export_notebook(nb_path, dest=None, filtering=True, pagebreaks=False, debug=
         pdf_name = os.path.splitext(nb_path)[0] + ".pdf"
         
     notebook_to_pdf(notebook, pdf_name, debug=debug)
+
+
+def main(args):
+    export_notebook(
+        args.source,
+        dest = args.dest,
+        filtering = args.filtering,
+        pagebreaks = args.pagebreaks,
+        debug = args.debug
+    )

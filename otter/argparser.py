@@ -1,9 +1,10 @@
 import argparse
 
+from . import assign
+from . import check
+from . import export
 from . import grade
 from . import generate
-from . import check
-from . import assign
 from .generate import token
 from .service import build
 from .service import create
@@ -55,6 +56,17 @@ def get_parser():
     check_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
 
     check_parser.set_defaults(func=check.main)
+
+
+    ##### PARSER FOR otter export #####
+    export_parser = subparsers.add_parser("export", description="Exports a Jupyter Notebook to PDF with optional filtering")
+    export_parser.add_argument("source", help="Notebook to export")
+    export_parser.add_argument("dest", nargs='?', default=None, help="Path to write PDF")
+    export_parser.add_argument("--filtering", default=False, action="store_true", help="Whether the PDF should be filtered")
+    export_parser.add_argument("--pagebreaks", default=False, action="store_true", help="Whether the PDF should have pagebreaks between questions")
+    export_parser.add_argument("--debug", default=False, action="store_true", help="Export in debug mode")
+
+    export_parser.set_defaults(func=export.main)
 
 
     ##### PARSER FOR otter generate #####
