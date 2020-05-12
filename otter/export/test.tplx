@@ -17,8 +17,13 @@
 	\ifodd\value{page}\else\null\clearpage\fi}
 \date\today
 \renewcommand{\linethickness}{0.05em}
+\setlength{\parskip}{2em}
+\setlength{\parindent}{0em}
 
 ((* endblock docclass *))
+
+((* block maketitle *))
+((* endblock maketitle *))
 
 ((* block markdowncell scoped *))
         ((*- if cell.source and "#newpage" in cell.source-*))

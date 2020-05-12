@@ -10,7 +10,8 @@ NBFORMAT_VERSION = 4
 BEGIN_QUESTION_REGEX = r"<!--\s*BEGIN QUESTION\s*-->"
 END_QUESTION_REGEX = r"<!--\s*END QUESTION\s*-->"
 NEW_PAGE_REGEX = r"<!--\s*NEW PAGE\s*-->"
-NEW_PAGE_CELL_SOURCE = "\\\\newpage"
+# NEW_PAGE_CELL_SOURCE = "\\\\newpage"
+NEW_PAGE_CELL_SOURCE = "<!-- #newpage -->"
 
 
 def load_notebook(nb_path, filtering=True, pagebreaks=False):
