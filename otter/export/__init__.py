@@ -32,7 +32,7 @@ def notebook_to_pdf(nb, dest=None, templating="test.tplx", debug=False):
     # return "%s.pdf" % name
 
 
-def export_notebook(nb_path, dest=None, filtering=True, pagebreaks=False, debug=False):
+def export_notebook(nb_path, dest=None, filtering=False, pagebreaks=False, debug=False):
     notebook = load_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 
     if dest is not None:

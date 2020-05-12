@@ -4,9 +4,7 @@
 
 import os
 import shutil
-# import argparse
 import subprocess
-# import sys
 
 from glob import glob
 from subprocess import PIPE
@@ -22,7 +20,8 @@ scipy
 seaborn
 sklearn
 jinja2
-nb2pdf
+nbconvert
+nbformat
 tornado==5.1.1
 git+https://github.com/ucbds-infra/otter-grader.git@beta{% if other_requirements %}
 {{ other_requirements }}{% endif %}
@@ -32,12 +31,16 @@ SETUP_SH = """#!/usr/bin/env bash
 
 apt-get install -y python3.7 python3-pip
 
-apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \\
-       libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \\
-       libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \\
-       libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \\
-       libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation \\
-       libappindicator1 libnss3 lsb-release xdg-utils wget
+# apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \\
+#        libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \\
+#        libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \\
+#        libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \\
+#        libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation \\
+#        libappindicator1 libnss3 lsb-release xdg-utils wget
+
+apt-get update
+apt-get install -y pandoc
+apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended
 
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
@@ -58,6 +61,7 @@ from textwrap import dedent
 from nb2pdf import convert
 
 from otter.execute import grade_notebook
+from otter.export import export_notebook
 from otter.generate.token import APIClient
 
 SCORE_THRESHOLD = {{ threshold }}
@@ -70,7 +74,7 @@ SEED = {{ seed }}
 COURSE_ID = '{{ course_id }}'
 ASSIGNMENT_ID = '{{ assignment_id }}'
 FILTERING = {{ filtering }}
-FILTER_TYPE = '{{ filter_type }}'
+PAGEBREAKS = {{ pagebreaks }}
 
 if TOKEN is not None:
     CLIENT = APIClient(token=TOKEN)
@@ -136,7 +140,7 @@ if __name__ == "__main__":
     # del scores["TEST_HINTS"]
 
     if GENERATE_PDF:
-        convert(nb_path, filtering=FILTERING, filter_type=FILTER_TYPE)
+        export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
 
         # get student email
@@ -216,7 +220,7 @@ def main(args):
         course_id = str(args.course_id),
         assignment_id = str(args.assignment_id),
         filtering = str(not args.unfiltered_pdfs),
-        filter_type = 'html'
+        pagebreaks = str(not args.no_pagebreaks)
     )
 
     # create tmp directory to zip inside

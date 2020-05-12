@@ -1,5 +1,5 @@
 ######################################
-##### otter server update Script #####
+##### Otter Service Build Script #####
 ######################################
 
 import subprocess

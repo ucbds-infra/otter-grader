@@ -12,6 +12,7 @@ from textwrap import dedent
 from nb2pdf import convert
 
 from otter.execute import grade_notebook
+from otter.export import export_notebook
 from otter.generate.token import APIClient
 
 SCORE_THRESHOLD = None
@@ -24,7 +25,7 @@ TOKEN = None
 COURSE_ID = 'None'
 ASSIGNMENT_ID = 'None'
 FILTERING = True
-FILTER_TYPE = 'html'
+PAGEBREAKS = True
 
 if TOKEN is not None:
     CLIENT = APIClient(token=TOKEN)
@@ -90,7 +91,7 @@ if __name__ == "__main__":
     # del scores["TEST_HINTS"]
 
     if GENERATE_PDF:
-        convert(nb_path, filtering=FILTERING, filter_type=FILTER_TYPE)
+        export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
 
         # get student email

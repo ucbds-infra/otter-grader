@@ -34,6 +34,7 @@ This cell is removed from both output notebooks. These configurations, listed in
 | `check_all_cell` | `True` | Whether or not to include an `otter.Notebook.check_all` cell |
 | `run_tests` | `True` | Whether or not to run tests on the autograder notebook |
 | `solutions_pdf` | `False` | Whether to generate a solutions PDF from notebook; either `true`, `false`, or `filtered`; defaults to unfiltered PDF |
+| `template_pdf` | `False` | Whether to generate a filtered template PDF from notebook for setting up a Gradescope assignment |
 | `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
 | `files` | `[]` | A list of support files required either for students or Otter Generate |
 
