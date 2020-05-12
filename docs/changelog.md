@@ -2,8 +2,9 @@
 
 **v1.0.0:**
 
-* Changed structure of CLI into give main commands: `otter assign`, `otter check`, `otter generate`, `otter grade`, and `otter service`
+* Changed structure of CLI into six main commands: `otter assign`, `otter check`, `otter export`, `otter generate`, `otter grade`, and `otter service`
 * Added Otter Assign, a forked version of [jassign](https://github.com/okpy/jassign) that works with Otter
+* Added Otter Export, a forked version of [nb2pdf](https://github.com/ucbds-infra/otter-grader) and [gsExport](https://github.com/dibyaghosh/gsExport) for generating PDFs of notebooks
 * Added Otter Service, a deployable grading service that students can POST their submissions to
 * Changed filenames inside the package so that names match commands (e.g. `otter/cli.py` is now `otter/grade.py`)
 * Added intercell seeding

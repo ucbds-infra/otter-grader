@@ -13,4 +13,4 @@ if __name__ == "__main__":
 	if hasattr(args, 'func'):
 		args.func(args)
 	else:
-		print("You must specify a command:\n    assign\n    check\n    generate\n    grade\n	service")
+		print("You must specify a command:\n    assign\n    check\n    export\n    generate\n    grade\n	service")

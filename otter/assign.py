@@ -1,5 +1,5 @@
 #######################################################
-#####              Otter-Assign Tool              #####
+#####              Otter Assign Tool              #####
 ##### forked from https://github.com/okpy/jassign #####
 #######################################################
 
@@ -22,6 +22,7 @@ from glob import glob
 
 from .execute import grade_notebook
 from .jassign import gen_views as jassign_views
+from .export import export_notebook
 from .utils import block_print, enable_print, str_to_doctest
 
 
@@ -71,20 +72,43 @@ def main(args):
         jassign_views(master, result, args)
     else:
         gen_views(master, result, args)
+
+    # check that we have a seed if needed
     if SEED_REQUIRED:
         assert (not ASSIGNMENT_METADATA.get('generate', {}) and not args.generate) or \
             (ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) is not None or args.seed is not None), "Seeding cell found but no seed provided"
+    
+    # generate PDF of solutions with nb2pdf
     if ASSIGNMENT_METADATA.get('solutions_pdf', False):
         filtering = ASSIGNMENT_METADATA.get('solutions_pdf') == 'filtered'
-        nb2pdf.convert(str(result / 'autograder' / master.name), filtering=filtering)
+        nb2pdf.convert(
+            str(result / 'autograder' / master.name),
+            dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
+            filtering=filtering
+        )
+
+    # generate a tempalte PDF for Gradescope
+    if ASSIGNMENT_METADATA.get('template_pdf', False):
+        export_notebook(
+            str(result / 'autograder' / master.name),
+            dest=str(result / 'autograder' / (master.stem + '-template.pdf')), 
+            filtering=True, 
+            pagebreaks=True
+        )
+
+    # generate the .otter file if needed
     if ASSIGNMENT_METADATA.get('service', {}):
         gen_otter_file(master, result)
+    
+    # run tests on autograder notebook
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         block_print()
         run_tests(result / 'autograder'  / master.name, debug=args.debug, seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) or args.seed)
         enable_print()
         print("All tests passed!")
+
+    # generate Gradescope autograder zipfile
     if ASSIGNMENT_METADATA.get('generate', {}) or args.generate:
         generate_args = ASSIGNMENT_METADATA.get('generate', {})
         print("Generating autograder zipfile...")
@@ -348,14 +372,15 @@ def gen_ok_cells(cells, tests_dir):
                 manual = question.get('manual', False)
                 format = question.get('format', '')
                 in_manual_block = False
-                if manual and need_close_export:
+                if manual:
                     manual_questions.append(question['name'])
-                    in_manual_block = True
-                elif need_close_export:
-                    add_close_export_to_cell(cell)
-                    need_close_export = False
+                    # in_manual_block = True
+                # if need_close_export:
+                #     add_close_export_to_cell(cell)
+                #     need_close_export = False
                 try:
-                    ok_cells.append(gen_question_cell(cell, manual, format, in_manual_block))
+                    ok_cells.append(gen_question_cell(cell, manual, format, need_close_export))
+                    need_close_export = False
                 except EmptyCellException:
                     pass
 
@@ -515,7 +540,7 @@ def find_assignment_spec(source):
     return begins[0] if begins else None
 
 
-def gen_question_cell(cell, manual, format, in_manual_block):
+def gen_question_cell(cell, manual, format, need_close_export):
     """Return the cell with metadata hidden in an HTML comment.
     
     Args:
@@ -527,8 +552,10 @@ def gen_question_cell(cell, manual, format, in_manual_block):
     """
     cell = copy.deepcopy(cell)
     source = get_source(cell)
-    if manual and not in_manual_block:
+    if manual:
         source = ["<!-- BEGIN QUESTION -->", ""] + source
+    if need_close_export:
+        source = ["<!-- END QUESTION -->", ""] + source
     begin_question_line = find_question_spec(source)
     start = begin_question_line - 1
     assert source[start].strip() == BLOCK_QUOTE

@@ -11,6 +11,8 @@ jinja2
 docker
 nb2pdf
 requests
+nbconvert
+nbformat
 
 # otter service requirements
 psycopg2

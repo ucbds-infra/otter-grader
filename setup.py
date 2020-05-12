@@ -6,9 +6,9 @@ with open("README.md", "r") as fh:
 setuptools.setup(
 	name = "otter-grader",
 	version = "1.0.0",
-	author = "UC Berkeley Division of Data Science and Information",
+	author = "Chris Pyles",
 	author_email = "cpyles@berkeley.edu",
-	description = "Jupyter Notebook Autograder",
+	description = "Python and Jupyter Notebook autograder",
 	long_description = long_description,
 	long_description_content_type = "text/markdown",
 	url = "https://github.com/ucbds-infra/otter-grader",
@@ -24,5 +24,5 @@ setuptools.setup(
 		"docker", "jinja2"
 	],
 	scripts=["bin/otter"],
-	package_data={"otter.service": ["templates/*.html"]}
+	package_data={"otter.service": ["templates/*.html"], "otter.export": ["*.tplx"]}
 )

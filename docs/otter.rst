@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+   otter.export
    otter.generate
    otter.service
 
