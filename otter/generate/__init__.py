@@ -1,1 +1,1 @@
-from .generate import main
+from .autograder import main
