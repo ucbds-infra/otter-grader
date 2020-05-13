@@ -20,49 +20,58 @@ except ImportError:
     MISSING_PACKAGES = True
 
 
+@contextmanager
 def block_print():
-	"""
-	Disables printing to stdout.
-	"""
-	sys.stdout = open(os.devnull, 'w')
+    """
+    Disables printing to stdout.
+    """
+    sys.stdout = open(os.devnull, 'w')
+    try:
+        yield
+    finally:
+        try:
+            sys.stdout.close()
+        except:
+            pass
+        sys.stdout = sys.__stdout__
 
 
-def enable_print():
-	"""
-	Enables printing to stdout.
-	"""
-	try:
-		sys.stdout.close()
-	except:
-		pass
-	sys.stdout = sys.__stdout__
+# def enable_print():
+#     """
+#     Enables printing to stdout.
+#     """
+#     try:
+#         sys.stdout.close()
+#     except:
+#         pass
+#     sys.stdout = sys.__stdout__
 
 
 def list_files(path):
-	"""Returns a list of all non-hidden files in a directory
-	
-	Args:
-		path (str): Path to a directory
-	
-	Returns:
-		list: List of filenames (str) in the given directory
+    """Returns a list of all non-hidden files in a directory
+    
+    Args:
+        path (str): Path to a directory
+    
+    Returns:
+        list: List of filenames (str) in the given directory
 
-	"""
-	return [file for file in os.listdir(path) if os.path.isfile(os.path.join(path, file)) and file[0] != "."]
+    """
+    return [file for file in os.listdir(path) if os.path.isfile(os.path.join(path, file)) and file[0] != "."]
 
 
 def merge_csv(dataframes):
-	"""Merges dataframes returned by Docker containers
-	
-	Args:
-		dataframes (list): List of Pandas dataframes (all should have same headers)
-	
-	Returns:
-		pandas.core.frame.DataFrame: A merged dataframe resulting from 'stacking' all input df's
+    """Merges dataframes returned by Docker containers
+    
+    Args:
+        dataframes (list): List of Pandas dataframes (all should have same headers)
+    
+    Returns:
+        pandas.core.frame.DataFrame: A merged dataframe resulting from 'stacking' all input df's
 
-	"""
-	final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
-	return final_dataframe
+    """
+    final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
+    return final_dataframe
 
 
 def connect_db(host="localhost", username="admin", password="", port="5432", db="otter_db"):
@@ -174,7 +183,7 @@ def str_to_doctest(code_lines, lines):
     line = code_lines.pop(0)
     if line.startswith(" ") or line.startswith("\t"):
         return str_to_doctest(code_lines, lines + ["... " + line])
-    elif line.startswith("except:") or line.startswith("elif ") or line.startswith("else:"):
+    elif line.startswith("except:") or line.startswith("elif ") or line.startswith("else:") or line.startswith("finally:"):
         return str_to_doctest(code_lines, lines + ["... " + line])
     elif len(lines) > 0 and lines[-1].strip().endswith("\\"):
         return str_to_doctest(code_lines, lines + ["... " + line])

@@ -6,7 +6,7 @@ import unittest
 import os
 import shutil
 
-from otter.utils import block_print, enable_print
+from otter.utils import block_print
 
 # read in argument parser
 bin_globals = {}
@@ -31,9 +31,9 @@ class TestAssign(unittest.TestCase):
         args = parser.parse_args(run_assign_args)
 
         # block stdout while running
-        block_print()
-        args.func(args)
-        enable_print()
+        with block_print():
+            args.func(args)
+        # enable_print()
 
         # check that we have the correct output contents
         self.assertTrue(os.path.isdir(TEST_FILES_PATH + "output"))
@@ -82,9 +82,9 @@ class TestAssign(unittest.TestCase):
         args = parser.parse_args(run_assign_args)
 
         # block stdout while running
-        block_print()
-        args.func(args)
-        enable_print()
+        with block_print():
+            args.func(args)
+        # enable_print()
 
         # check that we have the correct output contents
         self.assertTrue(os.path.isdir(TEST_FILES_PATH + "output-jassign"))

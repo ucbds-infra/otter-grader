@@ -46,14 +46,14 @@ class TestCheck(unittest.TestCase):
 
                 # mock block_print and enable_print otherwise they interfere with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    with mock.patch("otter.check.enable_print"):
-                        args.func(args)
-                        if os.path.split(file)[1] != "q2.py":
-                            self.assertEqual(
-                                output.getvalue().strip().split("\n")[-1].strip(), 
-                                "All tests passed!", 
-                                "Did not pass test at {}".format(file)
-                            )
+                    # with mock.patch("otter.check.enable_print"):
+                    args.func(args)
+                    if os.path.split(file)[1] != "q2.py":
+                        self.assertEqual(
+                            output.getvalue().strip().split("\n")[-1].strip(), 
+                            "All tests passed!", 
+                            "Did not pass test at {}".format(file)
+                        )
 
         # run checker command
         check_command = check_command = ["check",
@@ -68,36 +68,36 @@ class TestCheck(unittest.TestCase):
 
             # mock block_print and enable_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                with mock.patch("otter.check.enable_print"):
-                    args.func(args)
-                    self.assertEqual(
-                        output.getvalue().strip(), 
-                        dedent("""\
-                            [0.         0.02002002 0.04004004 0.06006006 0.08008008]
-                            4 of 5 tests passed
+                # with mock.patch("otter.check.enable_print"):
+                args.func(args)
+                self.assertEqual(
+                    output.getvalue().strip(), 
+                    dedent("""\
+                        [0.         0.02002002 0.04004004 0.06006006 0.08008008]
+                        4 of 5 tests passed
 
-                            Tests passed:
-                             q1  q3  q4  q5 
+                        Tests passed:
+                            q1 q3 q4 q5 
 
 
-                            Tests failed: 
-                               test/test-check/tests/q2.py
+                        Tests failed: 
+                           test/test-check/tests/q2.py
 
-                            Test result:
-                            Trying:
-                                1 == 1
-                            Expecting:
-                                False
-                            **********************************************************************
-                            Line 2, in test/test-check/tests/q2.py 1
-                            Failed example:
-                                1 == 1
-                            Expected:
-                                False
-                            Got:
-                                True"""), 
-                        "Did not pass correct tests"
-                    )
+                        Test result:
+                        Trying:
+                            1 == 1
+                        Expecting:
+                            False
+                        **********************************************************************
+                        Line 2, in test/test-check/tests/q2.py 1
+                        Failed example:
+                            1 == 1
+                        Expected:
+                            False
+                        Got:
+                            True"""), 
+                    "Did not pass correct tests"
+                )
 
 
     def test_otter_check_notebook(self):
@@ -119,14 +119,14 @@ class TestCheck(unittest.TestCase):
 
                 # mock block_print and enable_print otherwise they interfere with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    with mock.patch("otter.check.enable_print"):
-                        args.func(args)
-                        if os.path.split(file)[1] != "q2.py":
-                            self.assertEqual(
-                                output.getvalue().strip().split("\n")[-1].strip(), 
-                                "All tests passed!", 
-                                "Did not pass test at {}".format(file)
-                            )
+                    # with mock.patch("otter.check.enable_print"):
+                    args.func(args)
+                    if os.path.split(file)[1] != "q2.py":
+                        self.assertEqual(
+                            output.getvalue().strip().split("\n")[-1].strip(), 
+                            "All tests passed!", 
+                            "Did not pass test at {}".format(file)
+                        )
 
         # run checker command
         check_command = check_command = ["check",
@@ -141,36 +141,36 @@ class TestCheck(unittest.TestCase):
 
             # mock block_print and enable_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                with mock.patch("otter.check.enable_print"):
-                    args.func(args)
-                    self.assertEqual(
-                        output.getvalue().strip(), 
-                        dedent("""\
-                            [0.         0.02002002 0.04004004 0.06006006 0.08008008]
-                            4 of 5 tests passed
+                # with mock.patch("otter.check.enable_print"):
+                args.func(args)
+                self.assertEqual(
+                    output.getvalue().strip(), 
+                    dedent("""\
+                        [0.         0.02002002 0.04004004 0.06006006 0.08008008]
+                        4 of 5 tests passed
 
-                            Tests passed:
-                             q1  q3  q4  q5 
+                        Tests passed:
+                            q1 q3 q4 q5 
 
 
-                            Tests failed: 
-                               test/test-check/tests/q2.py
+                        Tests failed: 
+                           test/test-check/tests/q2.py
 
-                            Test result:
-                            Trying:
-                                1 == 1
-                            Expecting:
-                                False
-                            **********************************************************************
-                            Line 2, in test/test-check/tests/q2.py 1
-                            Failed example:
-                                1 == 1
-                            Expected:
-                                False
-                            Got:
-                                True"""), 
-                        "Did not pass correct tests"
-                    )
+                        Test result:
+                        Trying:
+                            1 == 1
+                        Expecting:
+                            False
+                        **********************************************************************
+                        Line 2, in test/test-check/tests/q2.py 1
+                        Failed example:
+                            1 == 1
+                        Expected:
+                            False
+                        Got:
+                            True"""), 
+                    "Did not pass correct tests"
+                )
 
 
     def test_notebook_class(self):
