@@ -28,6 +28,7 @@ class Notebook:
 	"""
 
 	def __init__(self, test_dir="./tests"): #, config_path="config.json", otter_service_enabled=False):
+		global _API_KEY
 		assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
 		
 		self._path = test_dir
@@ -55,13 +56,17 @@ class Notebook:
 			self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
 			self._submit_url = os.path.join(self._config["endpoint"], "submit")
 
-			if _API_KEY is None:
-				self._auth()
+			self._auth()
 
 	# TODO: cut out personal auth?
 	def _auth(self):
+		global _API_KEY
 		assert self._service_enabled, 'notebook not configured for otter service'
 		assert self._config["auth"] in ["google", "default"], "invalid auth provider"
+
+		if _API_KEY is not None:
+			self._api_key = _API_KEY
+			return
 
 		# have users authenticate with OAuth
 		if self._config["auth"] == "google":
@@ -228,7 +233,7 @@ class Notebook:
 	def submit(self):
 		assert self._service_enabled, 'notebook not configured for otter service'
 		
-		if not hasattr(self, '_api_key') and _API_KEY is None:
+		if not hasattr(self, '_api_key'):
 			self._auth()
 
 		notebook_path = os.path.join(os.getcwd(), self._config["notebook"])
