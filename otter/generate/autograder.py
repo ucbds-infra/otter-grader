@@ -22,6 +22,7 @@ sklearn
 jinja2
 nbconvert
 nbformat
+numpy==1.16.0
 tornado==5.1.1
 git+https://github.com/ucbds-infra/otter-grader.git@beta{% if other_requirements %}
 {{ other_requirements }}{% endif %}
