@@ -105,7 +105,6 @@ def main(args):
         print("Running tests...")
         with block_print():
             run_tests(result / 'autograder'  / master.name, debug=args.debug, seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) or args.seed)
-        # enable_print()
         print("All tests passed!")
 
     # generate Gradescope autograder zipfile

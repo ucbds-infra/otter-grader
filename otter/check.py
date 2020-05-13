@@ -40,7 +40,6 @@ def main(args):
 			script=args.file[-3:] == ".py",
 			seed=args.seed
 		)
-	# enable_print()
 
 	passed_tests = [test for test in results if test not in ["possible", "total"] and "hint" not in results[test]]
 	failed_tests = [results[test]["hint"] for test in results if test not in ["possible", "total"] and "hint" in results[test]]

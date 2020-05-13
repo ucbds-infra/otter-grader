@@ -13,7 +13,7 @@ from psycopg2 import connect, extensions
 from psycopg2.errors import DuplicateTable
 
 from otter.service.build import write_assignment_info, write_class_info, main
-from otter.utils import block_print#, enable_print
+from otter.utils import block_print
 
 TEST_FILES_PATH = "test/test_service/test-build/"
 
@@ -35,7 +35,6 @@ class TestBuild(unittest.TestCase):
 
             args = parser.parse_args(["service", "build", TEST_FILES_PATH, "-q"])
             args.func(args, conn=cls.conn, close_conn=False) # Function has built-in assert statement for error-checking
-        # enable_print()
 
         cls.cursor = cls.conn.cursor()
         cls.cursor.execute("""INSERT INTO classes (class_id, class_name)

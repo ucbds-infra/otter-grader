@@ -44,9 +44,8 @@ class TestCheck(unittest.TestCase):
             output = StringIO()
             with contextlib.redirect_stdout(output):
 
-                # mock block_print and enable_print otherwise they interfere with capture of stdout
+                # mock block_print otherwise they interfere with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    # with mock.patch("otter.check.enable_print"):
                     args.func(args)
                     if os.path.split(file)[1] != "q2.py":
                         self.assertEqual(
@@ -66,9 +65,8 @@ class TestCheck(unittest.TestCase):
         output = StringIO()
         with contextlib.redirect_stdout(output):
 
-            # mock block_print and enable_print otherwise they interfere with capture of stdout
+            # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                # with mock.patch("otter.check.enable_print"):
                 args.func(args)
                 self.assertEqual(
                     output.getvalue().strip(), 
@@ -117,9 +115,8 @@ class TestCheck(unittest.TestCase):
             output = StringIO()
             with contextlib.redirect_stdout(output):
 
-                # mock block_print and enable_print otherwise they interfere with capture of stdout
+                # mock block_print otherwise they interfere with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    # with mock.patch("otter.check.enable_print"):
                     args.func(args)
                     if os.path.split(file)[1] != "q2.py":
                         self.assertEqual(
@@ -139,9 +136,8 @@ class TestCheck(unittest.TestCase):
         output = StringIO()
         with contextlib.redirect_stdout(output):
 
-            # mock block_print and enable_print otherwise they interfere with capture of stdout
+            # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                # with mock.patch("otter.check.enable_print"):
                 args.func(args)
                 self.assertEqual(
                     output.getvalue().strip(), 

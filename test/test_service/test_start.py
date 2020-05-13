@@ -20,7 +20,7 @@ from psycopg2 import connect, extensions
 from collections import namedtuple
 
 from otter.service import start
-from otter.utils import block_print#, enable_print
+from otter.utils import block_print
 
 TEST_FILES_PATH = "test/test_service/test-start/"
 
@@ -260,7 +260,6 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         with block_print():
             request = {'api_key': 'key1', 'nb': data}
             resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
-        # enable_print()
 
         self.assertEqual(resp1.code, 200)
 
@@ -296,7 +295,6 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
             resp3 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
             user2_request = {'api_key': 'key3', 'nb': data}
             resp5 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
-        # enable_print()
 
         self.assertEqual(resp1.code, 200)
         self.assertEqual(resp2.code, 200)

@@ -36,17 +36,6 @@ def block_print():
         sys.stdout = sys.__stdout__
 
 
-# def enable_print():
-#     """
-#     Enables printing to stdout.
-#     """
-#     try:
-#         sys.stdout.close()
-#     except:
-#         pass
-#     sys.stdout = sys.__stdout__
-
-
 def list_files(path):
     """Returns a list of all non-hidden files in a directory
     

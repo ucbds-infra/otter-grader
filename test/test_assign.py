@@ -33,7 +33,6 @@ class TestAssign(unittest.TestCase):
         # block stdout while running
         with block_print():
             args.func(args)
-        # enable_print()
 
         # check that we have the correct output contents
         self.assertTrue(os.path.isdir(TEST_FILES_PATH + "output"))
@@ -84,7 +83,6 @@ class TestAssign(unittest.TestCase):
         # block stdout while running
         with block_print():
             args.func(args)
-        # enable_print()
 
         # check that we have the correct output contents
         self.assertTrue(os.path.isdir(TEST_FILES_PATH + "output-jassign"))
