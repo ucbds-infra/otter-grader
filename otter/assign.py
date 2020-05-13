@@ -23,7 +23,7 @@ from glob import glob
 from .execute import grade_notebook
 from .jassign import gen_views as jassign_views
 from .export import export_notebook
-from .utils import block_print, enable_print, str_to_doctest
+from .utils import block_print, str_to_doctest
 
 
 NB_VERSION = 4
@@ -103,9 +103,8 @@ def main(args):
     # run tests on autograder notebook
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
-        block_print()
-        run_tests(result / 'autograder'  / master.name, debug=args.debug, seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) or args.seed)
-        enable_print()
+        with block_print():
+            run_tests(result / 'autograder'  / master.name, debug=args.debug, seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) or args.seed)
         print("All tests passed!")
 
     # generate Gradescope autograder zipfile

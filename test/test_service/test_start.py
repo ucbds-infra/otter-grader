@@ -20,7 +20,7 @@ from psycopg2 import connect, extensions
 from collections import namedtuple
 
 from otter.service import start
-from otter.utils import block_print, enable_print
+from otter.utils import block_print
 
 TEST_FILES_PATH = "test/test_service/test-start/"
 
@@ -257,10 +257,9 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         data["metadata"]["assignment_id"] = "1"
         data["metadata"]["class_id"] = "1"
 
-        block_print()
-        request = {'api_key': 'key1', 'nb': data}
-        resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
-        enable_print()
+        with block_print():
+            request = {'api_key': 'key1', 'nb': data}
+            resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
 
         self.assertEqual(resp1.code, 200)
 
@@ -285,18 +284,17 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         data["metadata"]["assignment_id"] = "1"
         data["metadata"]["class_id"] = "1"
         
-        block_print()
-        user1_request = {'api_key': 'key1', 'nb': data}
-        resp1 = self.fetch('/submit', method='POST', body=json.dumps(user1_request))
-        user3_request = {'api_key': 'key4', 'nb': data}
-        resp2 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
-        user2_request = {'api_key': 'key2', 'nb': data}
-        resp4 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
-        self.reset_timestamps()
-        resp3 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
-        user2_request = {'api_key': 'key3', 'nb': data}
-        resp5 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
-        enable_print()
+        with block_print():
+            user1_request = {'api_key': 'key1', 'nb': data}
+            resp1 = self.fetch('/submit', method='POST', body=json.dumps(user1_request))
+            user3_request = {'api_key': 'key4', 'nb': data}
+            resp2 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
+            user2_request = {'api_key': 'key2', 'nb': data}
+            resp4 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
+            self.reset_timestamps()
+            resp3 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
+            user2_request = {'api_key': 'key3', 'nb': data}
+            resp5 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
 
         self.assertEqual(resp1.code, 200)
         self.assertEqual(resp2.code, 200)

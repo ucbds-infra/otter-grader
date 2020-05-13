@@ -8,13 +8,13 @@ from glob import glob
 from jinja2 import Template
 
 from .execute import grade_notebook, check
-from .utils import block_print, enable_print
+from .utils import block_print
 
 
 RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ scores|length - 2 }} tests passed
 {% if passed_tests %}
 Tests passed:
-{% for passed_test in passed_tests %} {{ passed_test }} {% endfor %}
+    {% for passed_test in passed_tests %}{{ passed_test }} {% endfor %}
 {% endif %}
 {% if failed_tests %}
 Tests failed: 
@@ -33,14 +33,13 @@ def main(args):
 	assert os.path.isfile(args.file), "{} is not a file".format(args.file)
 	assert args.file[-6:] == ".ipynb" or args.file[-3:] == ".py", "{} is not a Jupyter Notebook or Python file".format(args.file)
 
-	block_print()
-	results = grade_notebook(
-		args.file,
-		tests_glob=qs,
-		script=args.file[-3:] == ".py",
-		seed=args.seed
-	)
-	enable_print()
+	with block_print():
+		results = grade_notebook(
+			args.file,
+			tests_glob=qs,
+			script=args.file[-3:] == ".py",
+			seed=args.seed
+		)
 
 	passed_tests = [test for test in results if test not in ["possible", "total"] and "hint" not in results[test]]
 	failed_tests = [results[test]["hint"] for test in results if test not in ["possible", "total"] and "hint" in results[test]]
