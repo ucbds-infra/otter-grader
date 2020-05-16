@@ -1,14 +1,15 @@
+############################################
+##### Argument Parser for Otter Grader #####
+############################################
+
 import argparse
 
 from . import assign
 from . import check
 from . import export
-from . import grade
 from . import generate
-from .generate import token
-from .service import build
-from .service import create
-from .service import start
+from . import grade
+from . import service
 
 
 def get_parser():
@@ -90,13 +91,13 @@ def get_parser():
     generate_autograder_parser.add_argument("--assignment-id", default=None, help="Gradescope assignment ID for PDFs")
     generate_autograder_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
-    generate_autograder_parser.set_defaults(func=generate.main)
+    generate_autograder_parser.set_defaults(func=generate.autograder.main)
 
 
     ##### PARSER FOR otter generate token #####
     generate_token_parser = generate_subparsers.add_parser("token", description="Get a Gradescope token")
 
-    generate_token_parser.set_defaults(func=token.main)
+    generate_token_parser.set_defaults(func=generate.token.main)
 
 
     ##### PARSER FOR otter grade #####
@@ -149,7 +150,7 @@ def get_parser():
     service_build_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Based image for grading containers")
     service_build_parser.add_argument("-q", "--quiet", default=False, action="store_true", help="Build images without writing Docker messages to stdout")
 
-    service_build_parser.set_defaults(func=build.main)
+    service_build_parser.set_defaults(func=service.build.main)
 
 
     ##### PARSER FOR otter service create #####
@@ -159,7 +160,7 @@ def get_parser():
     service_create_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
     service_create_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
 
-    service_create_parser.set_defaults(func=create.main)
+    service_create_parser.set_defaults(func=service.create.main)
 
 
     ##### PARSER FOR otter service start #####
@@ -175,7 +176,7 @@ def get_parser():
     service_start_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
     service_start_parser.add_argument("-l", "--rate-limit", default=120, type=int, help="Rate limit for submissions in seconds")
 
-    service_start_parser.set_defaults(func=start.main)
+    service_start_parser.set_defaults(func=service.start.main)
 
 
     return parser

@@ -1,1 +1,2 @@
-from .autograder import main
+from . import autograder
+from . import token
