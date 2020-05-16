@@ -1,3 +1,7 @@
+#########################################
+##### Jupyter Notebook PDF Exporter #####
+#########################################
+
 import os
 import nbformat
 import nbconvert

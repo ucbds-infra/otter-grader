@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#######################################################
+##### Gradescope Token Generator for Otter-Grader #####
+#####    original sript provided by Gradescope    #####
+#######################################################
+
 import requests
 import getpass
 
