@@ -7,6 +7,7 @@ import requests
 import json
 import os
 import zipfile
+import pickle
 
 from getpass import getpass
 from glob import glob
@@ -18,6 +19,7 @@ from .execute import check
 from .export import export_notebook
 
 _API_KEY = None
+_OTTER_STATE_FILENAME = ".OTTER_STATE"
 
 class Notebook:
 	"""Notebook class for in-notebook autograding
@@ -40,8 +42,6 @@ class Notebook:
 		# assume using otter service if there is a .otter file
 		otter_configs = glob("*.otter")
 		if otter_configs:
-			self._service_enabled = True
-
 			# check that there is only 1 config
 			assert len(otter_configs) == 1, "More than 1 otter config file found"
 
@@ -49,14 +49,18 @@ class Notebook:
 			with open(otter_configs[0]) as f:
 				self._config = json.load(f)
 
-			# check that config file has required info
-			assert all([key in self._config for key in ["endpoint", "auth", "assignment_id", "class_id", "notebook"]]), "config file missing required information"
+			self._service_enabled = "endpoint" in self._config
+			self._pregraded_questions = self._config.get("pregraded_questions", [])
 
-			self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
-			self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
-			self._submit_url = os.path.join(self._config["endpoint"], "submit")
+			if self._service_enabled:
+				# check that config file has required info
+				assert all([key in self._config for key in ["endpoint", "auth", "assignment_id", "class_id", "notebook"]]), "config file missing required information"
 
-			self._auth()
+				self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
+				self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
+				self._submit_url = os.path.join(self._config["endpoint"], "submit")
+
+				self._auth()
 
 	# TODO: cut out personal auth?
 	def _auth(self):
@@ -95,6 +99,20 @@ class Notebook:
 		_API_KEY = self._api_key
 
 
+	def _dump_state(self, new_state):
+		"""Pickles and dumps state"""
+		if os.path.isfile(_OTTER_STATE_FILENAME):
+			with open(_OTTER_STATE_FILENAME, "rb") as f:
+				current_state = pickle.load(f)
+		else:
+			current_state = {}
+		
+		current_state.update(new_state)
+
+		with open(_OTTER_STATE_FILENAME, "wb+") as f:
+			pickle.dump(current_state, f)
+
+
 	def check(self, question, global_env=None):
 		"""Checks question using gofer
 		
@@ -117,8 +135,13 @@ class Notebook:
 		if global_env is None:
 			global_env = inspect.currentframe().f_back.f_globals
 
-		# pass the check to gofer
-		return check(test_path, global_env)
+		# run the check
+		result = check(test_path, global_env)
+
+		if question in self._pregraded_questions:
+			self._dump_state({question: result})
+
+		return result
 
 
 	# @staticmethod
@@ -199,6 +222,9 @@ class Notebook:
 			# convert(nb_path, filtering=filtering, filter_type=filter_type)
 			export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 			zf.write(pdf_path)
+
+		if self._pregraded_questions:
+			zf.write(_OTTER_STATE_FILENAME)
 
 		for file in files:
 			zf.write(file)

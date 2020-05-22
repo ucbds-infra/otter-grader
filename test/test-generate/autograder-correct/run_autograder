@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import re
+import pickle
 import pandas as pd
 
 from glob import glob
@@ -14,6 +15,7 @@ from nb2pdf import convert
 from otter.execute import grade_notebook
 from otter.export import export_notebook
 from otter.generate.token import APIClient
+from otter.notebook import _OTTER_STATE_FILENAME
 
 SCORE_THRESHOLD = None
 POINTS_POSSIBLE = None
@@ -87,23 +89,41 @@ if __name__ == "__main__":
     for file in tests_glob:
         shutil.copy(file, "/autograder/submission/tests")
 
-    scores = grade_notebook(nb_path, glob("/autograder/submission/tests/*.py"), name="submission", gradescope=True, ignore_errors=True, seed=SEED)
+    pregraded_questions = {}
+    if os.path.isfile(_OTTER_STATE_FILENAME):
+        with open(_OTTER_STATE_FILENAME, "rb") as f:
+            pregraded_questions = pickle.load(f)
+
+    pregraded_results = list(pregraded_questions.values())
+
+    scores = grade_notebook(
+        nb_path, 
+        glob("/autograder/submission/tests/*.py"), 
+        name="submission", 
+        gradescope=True, 
+        ignore_errors=True, 
+        seed=SEED,
+        pregraded_results=pregraded_results
+    )
     # del scores["TEST_HINTS"]
 
     if GENERATE_PDF:
-        export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
-        pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
+        try:
+            export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
+            pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
 
-        # get student email
-        with open("../submission_metadata.json") as f:
-            metadata = json.load(f)
+            # get student email
+            with open("../submission_metadata.json") as f:
+                metadata = json.load(f)
 
-        student_emails = []
-        for user in metadata["users"]:
-            student_emails.append(user["email"])
-        
-        for student_email in student_emails:
-            CLIENT.upload_pdf_submission(COURSE_ID, ASSIGNMENT_ID, student_email, pdf_path)
+            student_emails = []
+            for user in metadata["users"]:
+                student_emails.append(user["email"])
+            
+            for student_email in student_emails:
+                CLIENT.upload_pdf_submission(COURSE_ID, ASSIGNMENT_ID, student_email, pdf_path)
+        except:
+            print("\n\nATTENTION: Unsuccessful PDF generation and submission\n\n")
 
     output = {"tests" : []}
     for key in scores:
