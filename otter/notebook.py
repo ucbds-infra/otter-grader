@@ -274,6 +274,10 @@ class Notebook:
 			if os.path.isfile(_OTTER_LOG_FILENAME):
 				zf.write(_OTTER_LOG_FILENAME)
 
+			if glob("*.otter"):
+				assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
+				zf.add(glob("*.otter")[0])
+
 			for file in files:
 				zf.write(file)
 

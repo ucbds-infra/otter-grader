@@ -45,11 +45,7 @@ class LogEntry:
         )
 
     def get_results(self):
-        return self.results
-
-    def get_question_results(self, question):
         assert self.event_type is EventType.CHECK
-        assert question == self.question, "question {} not in this log entry".format(question)
         if isinstance(self.results, list):
             return self.results[0]
         return self.results
