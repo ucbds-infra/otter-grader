@@ -276,7 +276,7 @@ class Notebook:
 
 			if glob("*.otter"):
 				assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
-				zf.add(glob("*.otter")[0])
+				zf.write(glob("*.otter")[0])
 
 			for file in files:
 				zf.write(file)
