@@ -142,7 +142,7 @@ if __name__ == "__main__":
         shutil.copy(file, "/autograder/submission/tests")
 
     if glob("*.otter"):
-        assert len("*.otter") == 1, "Too many .otter files (max 1 allowed)"
+        assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
         with open(glob("*.otter")[0]) as f:
             config = json.load(f)
     else:
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     if os.path.isfile(_OTTER_LOG_FILENAME) and config:
         log = LogEntry.log_from_file(_OTTER_LOG_FILENAME, ascending=False)
 
-        for question in cofig.get("pregraded_questions", []):
+        for question in config.get("pregraded_questions", []):
             for entry in log:
                 if entry.event_type == EventType.CHECK and entry.question == question:
                     pregraded_questions[question] = entry.get_results()

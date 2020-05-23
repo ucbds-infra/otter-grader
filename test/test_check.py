@@ -193,3 +193,8 @@ class TestCheck(unittest.TestCase):
                 self.assertEqual(result.grade, 1, "Test {} failed".format(q))
             else:
                 self.assertEqual(result.grade, 0, "Test {} passed".format(q))
+    
+    @classmethod
+    def tearDownClass(cls):
+        if os.path.exists(".OTTER_LOG"):
+            os.system("rm .OTTER_LOG")
