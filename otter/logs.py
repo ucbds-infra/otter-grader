@@ -107,9 +107,9 @@ class Log:
         return cls(entries=LogEntry.log_from_file(filename, ascending=ascending), ascending=ascending)
 
     def get_results(self, question):
-        if not self.ascending:
+        if self.ascending:
             self.entries = LogEntry.sort_log(self.entries)
-            self.ascending = True
+            self.ascending = False
         for entry in self.entries:
             if entry.question == question:
                 return entry.results
