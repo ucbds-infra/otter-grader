@@ -16,7 +16,7 @@ from nb2pdf import convert
 from otter.execute import grade_notebook
 from otter.export import export_notebook
 from otter.generate.token import APIClient
-from otter.logs import LogEntry, EventType
+from otter.logs import Log, QuestionNotInLogException
 from otter.notebook import _OTTER_LOG_FILENAME
 
 SCORE_THRESHOLD = None
@@ -100,13 +100,13 @@ if __name__ == "__main__":
 
     pregraded_questions = {}
     if os.path.isfile(_OTTER_LOG_FILENAME) and config:
-        log = LogEntry.log_from_file(_OTTER_LOG_FILENAME, ascending=False)
+        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
 
         for question in config.get("pregraded_questions", []):
-            for entry in log:
-                if entry.event_type == EventType.CHECK and entry.question == question:
-                    pregraded_questions[question] = entry.get_results()
-                    break
+            try:
+                pregraded_questions[question] = log.get_results(question)
+            except QuestionNotInLogException:
+                pass
 
         print("\n\nFound pregraded questions {}\n\n".format(", ".join(pregraded_questions.keys())))
 

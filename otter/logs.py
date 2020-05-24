@@ -7,8 +7,12 @@ import datetime as dt
 from enum import Enum, auto
 
 
+class QuestionNotInLogException(Exception):
+    pass
+
+
 class EventType(Enum):
-    """
+    """Enum of event types for log entries
     """
     AUTH = auto()
     BEGIN_CHECK_ALL = auto()
@@ -78,4 +82,27 @@ class LogEntry:
             
         finally:
             file.close()
-        
+
+class Log:
+    """
+    """
+
+    def __init__(self, entries=[], ascending=True):
+        self.entries = []
+        self.ascending = ascending
+        self.unflushed_index = 0
+
+    @classmethod
+    def from_file(cls, filename, ascending=True):
+        return cls(LogEntry.log_from_file(filename), ascending=ascending)
+
+    def get_results(self, question):
+        if ascending:
+            for entry in self.entries[::-1]:
+                if entry.question == question:
+                    return entry.results
+        else:
+            for entry in self.entries:
+                if entry.question == question:
+                    return entry.results
+        raise QuestionNotInLogException()
