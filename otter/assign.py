@@ -97,10 +97,11 @@ def main(args):
         )
 
     # generate the .otter file if needed
-    if ASSIGNMENT_METADATA.get('service', {}):
+    if ASSIGNMENT_METADATA.get('service', {}) or ASSIGNMENT_METADATA.get('pregraded_questions', []):
         gen_otter_file(master, result)
     
     # run tests on autograder notebook
+    
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         with block_print():
@@ -154,20 +155,27 @@ def gen_otter_file(master, result):
         master (pathlib.Path): path to master notebook
         result (pathlib.Path): path to result directory
     """
-    service = ASSIGNMENT_METADATA['service']
-    service_config = {
-        "endpoint": service["endpoint"],
-        "auth": service.get("auth", "google"),
-        "assignment_id": service["assignment_id"],
-        "class_id": service["class_id"],
-        "notebook": service.get('notebook', master.name)
-    }
+    config = {}
+
+    service = ASSIGNMENT_METADATA.get('service', {})
+    if service:
+        config.update({
+            "endpoint": service["endpoint"],
+            "auth": service.get("auth", "google"),
+            "assignment_id": service["assignment_id"],
+            "class_id": service["class_id"],
+            "notebook": service.get('notebook', master.name)
+        })
+
+    pregraded_questions = ASSIGNMENT_METADATA.get('pregraded_questions', [])
+    if pregraded_questions:
+        config["pregraded_questions"] = pregraded_questions
 
     config_name = master.stem + '.otter'
     with open(result / 'autograder' / config_name, "w+") as f:
-        json.dump(service_config, f, indent=4)
+        json.dump(config, f, indent=4)
     with open(result / 'student' / config_name, "w+") as f:
-        json.dump(service_config, f, indent=4)
+        json.dump(config, f, indent=4)
 
 
 def convert_to_ok(nb_path, dir, args):
