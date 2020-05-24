@@ -63,6 +63,12 @@ class LogEntry:
             file.close()
 
     @staticmethod
+    def sort_log(log, ascending=True):
+        if ascending:
+            return list(sorted(log, key = lambda l: l.timestamp))
+        return list(sorted(log, key = lambda l: l.timestamp, reverse = True))
+
+    @staticmethod
     def log_from_file(filename, ascending=True):
         """Returns list of log entries"""
         try:
@@ -75,7 +81,9 @@ class LogEntry:
                 except EOFError:
                     break
 
-            if not ascending:
+            if ascending:
+                log = list(sorted(log, key = lambda l: l.timestamp))
+            else:
                 log = list(sorted(log, key = lambda l: l.timestamp, reverse = True))
             
             return log
@@ -96,15 +104,13 @@ class Log:
 
     @classmethod
     def from_file(cls, filename, ascending=True):
-        return cls(entries=LogEntry.log_from_file(filename), ascending=ascending)
+        return cls(entries=LogEntry.log_from_file(filename, ascending=ascending), ascending=ascending)
 
     def get_results(self, question):
-        if ascending:
-            for entry in self.entries[::-1]:
-                if entry.question == question:
-                    return entry.results
-        else:
-            for entry in self.entries:
-                if entry.question == question:
-                    return entry.results
+        if not self.ascending:
+            self.entries = LogEntry.sort_log(self.entries)
+            self.ascending = True
+        for entry in self.entries:
+            if entry.question == question:
+                return entry.results
         raise QuestionNotInLogException()
