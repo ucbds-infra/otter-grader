@@ -72,7 +72,7 @@ class Notebook:
 					self._submit_url = os.path.join(self._config["endpoint"], "submit")
 
 					self._auth()
-					
+
 		except Exception as e:
 			self._log_event(EventType.INIT, success=False, error=e)
 			raise e
@@ -162,9 +162,7 @@ class Notebook:
 				notebook/script (see execute.execute_notebook for more on this)
 
 		Returns:
-			OKTestsResult: Result of running gofer.check which contains grade, failed tests, and
-				more related information (see gofer.OKTestsResult for more)
-
+			otter.ok_parser.OKTestsResult: The grade for the question
 		"""
 		try:
 			test_path = os.path.join(self._path, question + ".py")
