@@ -41,6 +41,7 @@ class Notebook:
 			
 			self._path = test_dir
 			self._service_enabled = False
+			self._notebook = None
 			
 			# assume using otter service if there is a .otter file
 			otter_configs = glob("*.otter")
@@ -55,15 +56,23 @@ class Notebook:
 				self._service_enabled = "endpoint" in self._config
 				self._pregraded_questions = self._config.get("pregraded_questions", [])
 
+				if "notebook" not in self._config:
+					assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
+					self._notebook = glob("*.ipynb")[0]
+					
+				else:
+					self._notebook = self._config["notebook"]
+
 				if self._service_enabled:
 					# check that config file has required info
-					assert all([key in self._config for key in ["endpoint", "auth", "assignment_id", "class_id", "notebook"]]), "config file missing required information"
+					assert all([key in self._config for key in ["endpoint", "auth", "assignment_id", "class_id"]]), "Otter config file missing required information"
 
 					self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
 					self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
 					self._submit_url = os.path.join(self._config["endpoint"], "submit")
 
 					self._auth()
+					
 		except Exception as e:
 			self._log_event(EventType.INIT, success=False, error=e)
 			raise e
@@ -197,8 +206,8 @@ class Notebook:
 		
 		"""
 		try:
-			if nb_path is None and self._service_enabled:
-				nb_path = self._config["notebook"]
+			if nb_path is None and self._notebook is not None:
+				nb_path = self._notebook
 
 			elif nb_path is None and glob("*.ipynb"):
 				notebooks = glob("*.ipynb")
@@ -246,8 +255,8 @@ class Notebook:
 		self._log_event(EventType.BEGIN_EXPORT)
 
 		try:
-			if nb_path is None and self._service_enabled:
-				nb_path = self._config["notebook"]
+			if nb_path is None and self._notebook is not None:
+				nb_path = self._notebook
 
 			elif nb_path is None and glob("*.ipynb"):
 				notebooks = glob("*.ipynb")
@@ -332,10 +341,10 @@ class Notebook:
 			if not hasattr(self, '_api_key'):
 				self._auth()
 
-			notebook_path = os.path.join(os.getcwd(), self._config["notebook"])
+			notebook_path = os.path.join(os.getcwd(), self._notebook)
 
 			assert os.path.exists(notebook_path) and os.path.isfile(notebook_path), \
-			"Could not find notebook: {}".format(self._config["notebook"])
+			"Could not find notebook: {}".format(self._notebook)
 
 			with open(notebook_path) as f:
 				notebook_data = json.load(f)
