@@ -311,11 +311,12 @@ class Notebook:
 			tests = glob(os.path.join(self._path, "*.py"))
 			global_env = inspect.currentframe().f_back.f_globals
 			for file in sorted(tests):
-				test_name = os.path.split(file)[1][:-3]
-				result = self.check(test_name, global_env)
-				check_html = result._repr_html_()
-				check_html = "<p><strong>{}</strong></p>".format(test_name) + check_html
-				display(HTML(check_html))
+				if "__init__.py" not in file:
+					test_name = os.path.split(file)[1][:-3]
+					result = self.check(test_name, global_env)
+					check_html = result._repr_html_()
+					check_html = "<p><strong>{}</strong></p>".format(test_name) + check_html
+					display(HTML(check_html))
 
 		except Exception as e:
 			self._log_event(EventType.END_CHECK_ALL, success=False, error=e)

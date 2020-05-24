@@ -94,7 +94,7 @@ class Log:
 
     @classmethod
     def from_file(cls, filename, ascending=True):
-        return cls(LogEntry.log_from_file(filename), ascending=ascending)
+        return cls(entries=LogEntry.log_from_file(filename), ascending=ascending)
 
     def get_results(self, question):
         if ascending:
