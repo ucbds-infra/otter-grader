@@ -88,9 +88,8 @@ class Log:
     """
 
     def __init__(self, entries=[], ascending=True):
-        self.entries = []
+        self.entries = entries
         self.ascending = ascending
-        self.unflushed_index = 0
 
     @classmethod
     def from_file(cls, filename, ascending=True):
