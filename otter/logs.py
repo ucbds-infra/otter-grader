@@ -92,7 +92,7 @@ class Log:
         self.ascending = ascending
 
     def __repr__(self):
-        return "otter.logs.Log([{}])".format(",\n".join([repr(e) for e in self.entries]))
+        return "otter.logs.Log([\n\t{}\n])".format(",\n\t".join([repr(e) for e in self.entries]))
 
     @classmethod
     def from_file(cls, filename, ascending=True):
