@@ -36,6 +36,7 @@ This cell is removed from both output notebooks. These configurations, listed in
 | `solutions_pdf` | `False` | Whether to generate a solutions PDF from notebook; either `true`, `false`, or `filtered`; defaults to unfiltered PDF |
 | `template_pdf` | `False` | Whether to generate a filtered template PDF from notebook for setting up a Gradescope assignment |
 | `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
+| `pregraded_questions` | `[]` | A list of question names to be pregraded using the [log](logging.mds) |
 | `files` | `[]` | A list of support files required either for students or Otter Generate |
 
 A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`). If you require additional arguments, e.g. `points` or `show_results`, then set `generate` to a nested dictionary of these parameters and their values:

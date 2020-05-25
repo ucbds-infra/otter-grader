@@ -151,6 +151,10 @@ otter generate autograder -t hidden-tests data.csv --show-results
 
 If `--show-results` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
 
+#### Pregrading Questions
+
+Otter allows some or all questions to be pre-graded during student execution using entirely hidden tests using the log. This can be configured using an Otter configuration file (a JSON-formatted text file with the `.otter` extension). See [Logging](logging.md) for more information.
+
 #### Generating with Otter Assign
 
 Otter Assign also comes with an option to generate this zipfile automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](otter_assign.md) for more details.

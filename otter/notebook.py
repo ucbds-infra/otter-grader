@@ -122,28 +122,9 @@ class Notebook:
 		finally:
 			self._log_event(EventType.AUTH)
 
-
-	# def _dump_state(self, new_state):
-	# 	"""Pickles and dumps state"""
-	# 	if os.path.isfile(_OTTER_STATE_FILENAME):
-	# 		with open(_OTTER_STATE_FILENAME, "rb") as f:
-	# 			current_state = pickle.load(f)
-	# 	else:
-	# 		current_state = {}
-		
-	# 	current_state.update(new_state)
-
-	# 	with open(_OTTER_STATE_FILENAME, "wb+") as f:
-	# 		pickle.dump(current_state, f)
-
 		
 	def _log_event(self, event_type, results=[], question=None, success=True, error=None):
 		"""Logs an event"""
-		# if os.path.isfile(_OTTER_LOG_FILENAME):
-		# 	with open(_OTTER_LOG_FILENAME, "rb") as f:
-		# 		log = pickle.load(f)
-		# else:
-		# 	log = []
 		LogEntry(
 			event_type,
 			results=results,

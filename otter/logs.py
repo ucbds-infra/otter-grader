@@ -1,5 +1,6 @@
-
-#####  #####
+####################################
+##### Logging for Otter-Grader #####
+####################################
 
 import pickle
 import datetime as dt
@@ -39,7 +40,7 @@ class LogEntry:
     """
 
     def __init__(self, event_type, results=[], question=None, success=True, error=None):
-        assert event_type in EventType
+        assert event_type in EventType, "Invalid event type"
         self.event_type = event_type
         self.results = results
         self.question = question
@@ -64,10 +65,15 @@ class LogEntry:
             ``list`` of ``otter.ok_parser.OKTestsResult``: the results at this entry if this is an 
                 ``otter.logs.EventType.CHECK`` record
         """
-        assert self.event_type is EventType.CHECK
+        assert self.event_type is EventType.CHECK, "this record type has no results"
         if isinstance(self.results, list):
             return self.results[0]
         return self.results
+
+    def raise_error(self):
+        if self.error is not None:
+            raise self.error
+        raise ValueError("No error is stored in this log entry")
 
     def flush_to_file(self, filename):
         """Appends this log entry (pickled) to a file
@@ -177,5 +183,5 @@ class Log:
             self.ascending = False
         for entry in self.entries:
             if entry.question == question:
-                return entry.results
+                return entry.get_results()
         raise QuestionNotInLogException()
