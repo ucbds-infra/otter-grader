@@ -26,8 +26,8 @@ from recommonmark.transform import AutoStructify
 # -- Project information -----------------------------------------------------
 
 project = 'Otter-Grader'
-copyright = '2020, UC Berkeley Division of Data Science and Information'
-author = 'UCBDS Infrastructure Team'
+copyright = '2020, UC Berkeley Data Science Education Program'
+author = 'UC Berkeley Data Science Education Program Infrastructure Team'
 
 # The short X.Y version
 version = ''
