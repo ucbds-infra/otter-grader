@@ -19,9 +19,9 @@ with open("bin/otter") as f:
 
 parser = bin_globals["parser"]
 
-TEST_FILES_PATH = "test/test-generate/"
+TEST_FILES_PATH = "test/test_generate/test-autograder/"
 
-class TestGenerate(unittest.TestCase):
+class TestAutograder(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
