@@ -23,7 +23,7 @@ Tests failed:
 {% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
 """)
 
-def _log_event(self, event_type, results=[], question=None, success=True, error=None):
+def _log_event(event_type, results=[], question=None, success=True, error=None):
 	"""Logs an event"""
 	LogEntry(
 		event_type,
