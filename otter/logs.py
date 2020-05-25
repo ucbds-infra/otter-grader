@@ -71,9 +71,14 @@ class LogEntry:
         return self.results
 
     def raise_error(self):
+        """Raises the error stored in this entry
+
+        Raises:
+            ``Exception``: the error stored at this entry, if present
+        """
         if self.error is not None:
             raise self.error
-        raise ValueError("No error is stored in this log entry")
+        # raise ValueError("No error is stored in this log entry")
 
     def flush_to_file(self, filename):
         """Appends this log entry (pickled) to a file
