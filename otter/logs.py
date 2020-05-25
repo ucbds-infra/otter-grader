@@ -50,11 +50,11 @@ class LogEntry:
 
     def __repr__(self):
         if self.question:
-            return "otter.logs.LogEntry(event_type={}, question={}, sucess={}, timestamp={})".format(
+            return "otter.logs.LogEntry(event_type={}, question={}, success={}, timestamp={})".format(
                 self.event_type, self.question, self.success, self.timestamp.isoformat()
             )
 
-        return "otter.logs.LogEntry(event_type={}, sucess={}, timestamp={})".format(
+        return "otter.logs.LogEntry(event_type={}, success={}, timestamp={})".format(
             self.event_type, self.success, self.timestamp.isoformat()
         )
 
@@ -140,6 +140,7 @@ class LogEntry:
             
         finally:
             file.close()
+
 
 class Log:
     """A class for reading and interacting with a log. *Does not support editing the log file.*
