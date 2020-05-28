@@ -213,7 +213,7 @@ class Log:
         self.entries = LogEntry.sort_log(self.entries, ascending=ascending)
 
     def get_questions(self):
-        all_questions = [entry.question for entry in self.entries]
+        all_questions = [entry.question for entry in self.entries if entry.event_type == EventType.CHECK]
         return list(sorted(set(all_questions)))
 
     @classmethod
