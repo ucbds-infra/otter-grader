@@ -9,8 +9,6 @@ import os
 import re
 import zipfile
 import pickle
-import shelve
-import tempfile
 import datetime as dt
 
 from getpass import getpass
@@ -21,12 +19,13 @@ from IPython.display import display, HTML, Javascript
 
 from .execute import check
 from .export import export_notebook
-from .logs import LogEntry, EventType, _SHELF_FILENAME
+from .logs import LogEntry, EventType
 
 
 _API_KEY = None
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
+_SHELVE = False
 
 
 class Notebook:
@@ -39,7 +38,7 @@ class Notebook:
 
 	def __init__(self, test_dir="./tests"):
 		try:
-			global _API_KEY
+			global _API_KEY, _SHELVE
 			# assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
 			
 			self._path = test_dir
@@ -55,7 +54,8 @@ class Notebook:
 				# load in config file
 				with open(otter_configs[0]) as f:
 					self._config = json.load(f)
-
+				
+				_SHELVE = self._config.get("save_environment", False)
 				self._service_enabled = "endpoint" in self._config
 				self._pregraded_questions = self._config.get("pregraded_questions", [])
 
@@ -128,10 +128,8 @@ class Notebook:
 		
 	def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env=None):
 		"""Logs an event"""
-		# if event_type == EventType.CHECK:
-		# 	shelf, unshelved = self._shelve_environment(global_env=shelve_env)
-		# else:
-		# 	shelf, unshelved = None, []
+		global _SHELVE
+		
 		entry = LogEntry(
 			event_type,
 			results=results,
@@ -140,7 +138,7 @@ class Notebook:
 			error=error
 		)
 
-		if event_type == EventType.CHECK:
+		if _SHELVE and event_type == EventType.CHECK:
 			entry.shelve(shelve_env)
 
 		entry.flush_to_file(_OTTER_LOG_FILENAME)
