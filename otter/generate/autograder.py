@@ -73,6 +73,7 @@ SCORE_THRESHOLD = {{ threshold }}
 POINTS_POSSIBLE = {{ points }}
 SHOW_ALL_ON_RELEASE = {{ show_all }}
 SEED = {{ seed }}
+GRADE_FROM_LOG = {{ grade_from_log }}
 
 # for auto-uploading PDFs
 {% if token != 'None' %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
@@ -148,19 +149,12 @@ if __name__ == "__main__":
     else:
         config = None
 
-    pregraded_questions = {}
-    if os.path.isfile(_OTTER_LOG_FILENAME) and config:
+    if GRADE_FROM_LOG:
+        assert os.path.isfile(_OTTER_LOG_FILENAME), "missing log"
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-
-        for question in config.get("pregraded_questions", []):
-            try:
-                pregraded_questions[question] = log.get_results(question)
-            except QuestionNotInLogException:
-                pass
-
-        print("\\n\\nFound pregraded questions {}\\n\\n".format(", ".join(pregraded_questions.keys())))
-
-    pregraded_results = list(pregraded_questions.values())
+        print("\\n\\n")     # for logging in otter.execute.execute_log
+    else:
+        log = None
 
     scores = grade_notebook(
         nb_path, 
@@ -169,7 +163,7 @@ if __name__ == "__main__":
         gradescope=True, 
         ignore_errors=True, 
         seed=SEED,
-        pregraded_results=pregraded_results
+        log=log
     )
     # del scores["TEST_HINTS"]
 
@@ -258,7 +252,8 @@ def main(args):
         course_id = str(args.course_id),
         assignment_id = str(args.assignment_id),
         filtering = str(not args.unfiltered_pdfs),
-        pagebreaks = str(not args.no_pagebreaks)
+        pagebreaks = str(not args.no_pagebreaks),
+        grade_from_log = str(True)
     )
 
     # create tmp directory to zip inside

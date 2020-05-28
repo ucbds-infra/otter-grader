@@ -241,15 +241,18 @@ def execute_log(log, secret='secret', initial_env=None, ignore_errors=False, cwd
         if cwd:
             source +=  f"import sys\nsys.path.append(\"{cwd}\")\n"
 
+        logged_questions = []
         m = mock.mock_open()
         with mock.patch("otter.logs", m):
             exec(source, global_env)
             for entry in log.question_iterator():
-                print(entry)
                 shelf = entry.unshelve()
                 global_env.update(shelf)
                 script = f"check_results_{secret}.append(grader.check(\"{entry.question}\"))\n"
                 exec(script, global_env)
+                logged_questions.append(entry.question)
+
+        print("Questions executed from log: {}".format(", ".join(logged_questions)))
         
         return global_env
 
