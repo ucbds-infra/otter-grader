@@ -129,7 +129,7 @@ class Notebook:
 		if global_env is None:
 			global_env = inspect.currentframe().f_back.f_globals
 		unshelved = []
-		with tempfile.TemporaryFile as tf:
+		with tempfile.TemporaryFile() as tf:
 			with shelve.open(tf) as shelf:
 				for k, v in global_env.items():
 					try:
