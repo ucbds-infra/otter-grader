@@ -8,6 +8,8 @@ import json
 import os
 import zipfile
 import pickle
+import shelve
+import tempfile
 import datetime as dt
 
 from getpass import getpass
@@ -122,11 +124,29 @@ class Notebook:
 		finally:
 			self._log_event(EventType.AUTH)
 
+	
+	def _shelve_environment(self, global_env=None):
+		if global_env is None:
+			global_env = inspect.currentframe().f_back.f_globals
+		unshelved = []
+		with tempfile.TemporaryFile as tf:
+			with shelve.open(tf) as shelf:
+				for k, v in global_env.items():
+					try:
+						shelf[k] = v
+					except:
+						unshelved.append(k)
+			shelf_contents = tf.read()
+		return shelf_contents, unshelved
+
 		
 	def _log_event(self, event_type, results=[], question=None, success=True, error=None):
 		"""Logs an event"""
+		shelf, unshelved = self._shelve_environment()
 		LogEntry(
 			event_type,
+			shelf=shelf,
+			unshelved=unshelved,
 			results=results,
 			question=question, 
 			success=success, 

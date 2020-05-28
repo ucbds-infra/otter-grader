@@ -39,9 +39,11 @@ class LogEntry:
         error (``Exception``, optional): an error thrown by the process being logged if any
     """
 
-    def __init__(self, event_type, results=[], question=None, success=True, error=None):
+    def __init__(self, event_type, shelf=None, unshelved=[], results=[], question=None, success=True, error=None):
         assert event_type in EventType, "Invalid event type"
         self.event_type = event_type
+        self.shelf = shelf
+        self.unshelved = []
         self.results = results
         self.question = question
         self.timestamp = dt.datetime.utcnow()
