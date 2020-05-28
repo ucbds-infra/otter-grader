@@ -128,7 +128,7 @@ class Notebook:
 	
 	def _shelve_environment(self, global_env=None):
 		if global_env is None:
-			global_env = inspect.currentframe().f_back.f_globals
+			global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
 		unshelved = []
 		with shelve.open(".OTTER_ENV") as shelf:
 			for k, v in global_env.items():
@@ -146,10 +146,10 @@ class Notebook:
 		return shelf_files, unshelved
 
 		
-	def _log_event(self, event_type, results=[], question=None, success=True, error=None):
+	def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env=None):
 		"""Logs an event"""
 		if event_type == EventType.CHECK:
-			shelf, unshelved = self._shelve_environment()
+			shelf, unshelved = self._shelve_environment(global_env=shelve_env)
 		else:
 			shelf, unshelved = None, []
 		LogEntry(
@@ -163,7 +163,7 @@ class Notebook:
 		).flush_to_file(_OTTER_LOG_FILENAME)
 
 
-	def check(self, question, global_env=None):
+	def check(self, question, global_env=None, shelve_env=True):
 		"""Checks question using gofer
 		
 		Args:
@@ -193,10 +193,10 @@ class Notebook:
 			return result
 		
 		except Exception as e:
-			self._log_event(EventType.CHECK, question=question, success=False, error=e)
+			self._log_event(EventType.CHECK, question=question, success=False, error=e, shelve_env=global_env)
 			raise e
 		finally:
-			self._log_event(EventType.CHECK, [result], question=question)
+			self._log_event(EventType.CHECK, [result], question=question, shelve_env=global_env)
 
 
 	# @staticmethod
