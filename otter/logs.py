@@ -231,6 +231,15 @@ class Log:
         """
         return cls(entries=LogEntry.log_from_file(filename, ascending=ascending), ascending=ascending)
 
+    def get_question_entry(self, question):
+        if self.ascending:
+            self.entries = LogEntry.sort_log(self.entries)
+            self.ascending = False
+        for entry in self.entries:
+            if entry.question == question:
+                return entry
+        raise QuestionNotInLogException()
+
     def get_results(self, question):
         """Gets the most recent grading result for a specified question from this log
 
@@ -243,13 +252,7 @@ class Log:
         Raises:
             ``otter.logs.QuestionNotInLogException``: if the question is not found
         """
-        if self.ascending:
-            self.entries = LogEntry.sort_log(self.entries)
-            self.ascending = False
-        for entry in self.entries:
-            if entry.question == question:
-                return entry.get_results()
-        raise QuestionNotInLogException()
+        return self.get_question_entry(question).get_results()
 
 
 class QuestionLogIterator:
