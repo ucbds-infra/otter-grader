@@ -166,22 +166,22 @@ class LogEntry:
 
     @staticmethod
     def shelve_environment(self, env):
-		unshelved = []
-		with shelve.open(_SHELF_FILENAME) as shelf:
-			for k, v in env.items():
-				try:
-					shelf[k] = v
-				except:
-					unshelved.append(k)
-		
-		shelf_files = {}
-		for file in glob(_SHELF_FILENAME + "*"):
-			ext = re.sub(_SHELF_FILENAME, "", file)
-			f = open(file, "rb")
-			shelf_files[ext] = f.read()
-			f.close()
-			
-		return shelf_files, unshelved
+        unshelved = []
+        with shelve.open(_SHELF_FILENAME) as shelf:
+            for k, v in env.items():
+                try:
+                    shelf[k] = v
+                except:
+                    unshelved.append(k)
+        
+        shelf_files = {}
+        for file in glob(_SHELF_FILENAME + "*"):
+            ext = re.sub(_SHELF_FILENAME, "", file)
+            f = open(file, "rb")
+            shelf_files[ext] = f.read()
+            f.close()
+            
+        return shelf_files, unshelved
 
 
 class Log:
