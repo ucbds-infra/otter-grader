@@ -57,7 +57,7 @@ def check(test_file_path, global_env=None):
 
 
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    gradescope=False, cwd=None, test_dir=None, seed=None, pregraded_results=[]):
+    gradescope=False, cwd=None, test_dir=None, seed=None, pregraded_results=[], log=None):
     """
     Grade a notebook file & return grade
 
@@ -98,7 +98,9 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     if name:
         initial_env["__name__"] = name
 
-    if script:
+    if log is not None:
+        global_env = execute_log(log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir)
+    elif script:
         global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, seed=seed)
     else:
         global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, test_dir=test_dir, seed=seed)
@@ -250,7 +252,6 @@ def execute_log(log, secret='secret', initial_env=None, ignore_errors=False, cwd
                 exec(script, global_env)
         
         return global_env
-        
 
 def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None, test_dir=None, seed=None):
     """
