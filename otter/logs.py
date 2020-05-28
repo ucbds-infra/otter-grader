@@ -2,11 +2,13 @@
 ##### Logging for Otter-Grader #####
 ####################################
 
+import re
 import pickle
 import shelve
 import datetime as dt
 
 from enum import Enum, auto
+from glob import glob
 
 
 _SHELF_FILENAME = ".OTTER_ENV"
@@ -99,6 +101,12 @@ class LogEntry:
         finally:
             file.close()
 
+    def shelve(self, env):
+        shelf_files, unshelved = LogEntry.shelve_environment(env)
+        self.shelf = shelf_files
+        self.unshelved = unshelved
+        return self
+        
     def unshelve(self):
         assert self.shelf, "no shelf in this entry"
         for ext in self.shelf:
@@ -155,6 +163,25 @@ class LogEntry:
             
         finally:
             file.close()
+
+    @staticmethod
+    def shelve_environment(self, env):
+		unshelved = []
+		with shelve.open(_SHELF_FILENAME) as shelf:
+			for k, v in env.items():
+				try:
+					shelf[k] = v
+				except:
+					unshelved.append(k)
+		
+		shelf_files = {}
+		for file in glob(_SHELF_FILENAME + "*"):
+			ext = re.sub(_SHELF_FILENAME, "", file)
+			f = open(file, "rb")
+			shelf_files[ext] = f.read()
+			f.close()
+			
+		return shelf_files, unshelved
 
 
 class Log:

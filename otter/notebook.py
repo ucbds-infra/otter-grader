@@ -125,43 +125,25 @@ class Notebook:
 		finally:
 			self._log_event(EventType.AUTH)
 
-	
-	def _shelve_environment(self, global_env=None):
-		if global_env is None:
-			global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
-		unshelved = []
-		with shelve.open(_SHELF_FILENAME) as shelf:
-			for k, v in global_env.items():
-				try:
-					shelf[k] = v
-				except:
-					unshelved.append(k)
-		
-		shelf_files = {}
-		for file in glob(_SHELF_FILENAME + "*"):
-			ext = re.sub(_SHELF_FILENAME, "", file)
-			f = open(file, "rb")
-			shelf_files[ext] = f.read()
-			f.close()
-			
-		return shelf_files, unshelved
-
 		
 	def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env=None):
 		"""Logs an event"""
-		if event_type == EventType.CHECK:
-			shelf, unshelved = self._shelve_environment(global_env=shelve_env)
-		else:
-			shelf, unshelved = None, []
-		LogEntry(
+		# if event_type == EventType.CHECK:
+		# 	shelf, unshelved = self._shelve_environment(global_env=shelve_env)
+		# else:
+		# 	shelf, unshelved = None, []
+		entry = LogEntry(
 			event_type,
-			shelf=shelf,
-			unshelved=unshelved,
 			results=results,
 			question=question, 
 			success=success, 
 			error=error
-		).flush_to_file(_OTTER_LOG_FILENAME)
+		)
+
+		if event_type == EventType.CHECK:
+			entry.shelve(shelve_env)
+
+		entry.flush_to_file(_OTTER_LOG_FILENAME)
 
 
 	def check(self, question, global_env=None, shelve_env=True):
