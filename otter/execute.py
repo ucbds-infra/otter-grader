@@ -224,6 +224,34 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, 
 
     return result
 
+def execute_log(log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None):
+    with hide_outputs():
+        if initial_env:
+            global_env = initial_env.copy()
+        else:
+            global_env = {}
+
+        if test_dir:
+            source = f"import otter\ngrader = otter.Notebook(\"{test_dir}\")\n"
+        else:
+            source = f"import otter\ngrader = otter.Notebook()\n"
+        
+        if cwd:
+            source +=  f"import sys\nsys.path.append(\"{cwd}\")\n"
+
+        m = mock.mock_open()
+        with mock.patch("otter.logs", m):
+            exec(source, global_env)
+            for entry in log.question_iterator():
+                print(entry)
+                shelf = entry.unshelve()
+                global_env.update(shelf)
+                script = f"check_results_{secret}.append(grader.check(\"{entry.question}\"))\n"
+                exec(script, global_env)
+        
+        return global_env
+        
+
 def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None, test_dir=None, seed=None):
     """
     Executes an ipython notebook and return the global environment that results from execution.
