@@ -21,13 +21,12 @@ from IPython.display import display, HTML, Javascript
 
 from .execute import check
 from .export import export_notebook
-from .logs import LogEntry, EventType
+from .logs import LogEntry, EventType, _SHELF_FILENAME
 
 
 _API_KEY = None
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
-_SHELF_FILENAME = ".OTTER_ENV"
 
 
 class Notebook:

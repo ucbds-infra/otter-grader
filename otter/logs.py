@@ -8,7 +8,8 @@ import datetime as dt
 
 from enum import Enum, auto
 
-from .notebook import _SHELF_FILENAME
+
+_SHELF_FILENAME = ".OTTER_ENV"
 
 
 class QuestionNotInLogException(Exception):
