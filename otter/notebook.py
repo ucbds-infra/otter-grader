@@ -142,7 +142,8 @@ class Notebook:
 		
 	def _log_event(self, event_type, results=[], question=None, success=True, error=None):
 		"""Logs an event"""
-		shelf, unshelved = self._shelve_environment()
+		if event_type == EventType.CHECK:
+			shelf, unshelved = self._shelve_environment()
 		LogEntry(
 			event_type,
 			shelf=shelf,
