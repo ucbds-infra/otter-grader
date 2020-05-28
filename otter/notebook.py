@@ -27,6 +27,7 @@ from .logs import LogEntry, EventType
 _API_KEY = None
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
+_SHELF_FILENAME = ".OTTER_ENV"
 
 
 class Notebook:
@@ -130,7 +131,7 @@ class Notebook:
 		if global_env is None:
 			global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
 		unshelved = []
-		with shelve.open(".OTTER_ENV") as shelf:
+		with shelve.open(_SHELF_FILENAME) as shelf:
 			for k, v in global_env.items():
 				try:
 					shelf[k] = v
@@ -138,11 +139,12 @@ class Notebook:
 					unshelved.append(k)
 		
 		shelf_files = {}
-		for file in glob(".OTTER_ENV*"):
-			ext = re.sub(r"\.OTTER_ENV", "", file)
-			file = open(file, "rb")
-			shelf_files[ext] = file.read()
-			file.close()
+		for file in glob(_SHELF_FILENAME + "*"):
+			ext = re.sub(_SHELF_FILENAME, "", file)
+			f = open(file, "rb")
+			shelf_files[ext] = f.read()
+			f.close()
+			
 		return shelf_files, unshelved
 
 		

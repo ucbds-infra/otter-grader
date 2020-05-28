@@ -3,9 +3,12 @@
 ####################################
 
 import pickle
+import shelve
 import datetime as dt
 
 from enum import Enum, auto
+
+from .notebook import _SHELF_FILENAME
 
 
 class QuestionNotInLogException(Exception):
@@ -95,6 +98,15 @@ class LogEntry:
         finally:
             file.close()
 
+    def unshelve(self):
+        assert self.shelf, "no shelf in this entry"
+        for ext in self.shelf:
+            with open(_SHELF_FILENAME + ext, "wb+") as f:
+                f.write(self.shelf[ext])
+        
+        shelf = shelve.open(_SHELF_FILENAME)
+        return shelf
+
     @staticmethod
     def sort_log(log, ascending=True):
         """Sorts a list of log entries by timestamp
@@ -159,6 +171,9 @@ class Log:
 
     def __repr__(self):
         return "otter.logs.Log([\n  {}\n])".format(",\n  ".join([repr(e) for e in self.entries]))
+
+    def __getitem__(self, idx):
+        return self.entries[idx]
 
     @classmethod
     def from_file(cls, filename, ascending=True):
