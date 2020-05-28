@@ -102,30 +102,32 @@ class LogEntry:
         finally:
             file.close()
 
-    def shelve(self, env, filename):
+    def shelve(self, env, delete=False, filename=None):
         # delete old entry without reading entire log
-        try:
-            entries = []
-            os.system(f"cp {filename} .TEMP_LOG")
-            os.system(f"rm -f {filename}")
-            with open(".TEMP_LOG", "rb") as tf:
-                while True:
-                    try:
-                        entry = pickle.load(tf)
+        if delete:
+            assert filename, "old env deletion indicated but no log filename provided"
+            try:
+                entries = []
+                os.system(f"cp {filename} .TEMP_LOG")
+                os.system(f"rm -f {filename}")
+                with open(".TEMP_LOG", "rb") as tf:
+                    while True:
+                        try:
+                            entry = pickle.load(tf)
 
-                        if entry.question == self.question:
-                            entry.shelf = None
+                            if entry.question == self.question:
+                                entry.shelf = None
 
-                        entry.flush_to_file(filename)
+                            entry.flush_to_file(filename)
 
-                        del locals()["entry"]
+                            del locals()["entry"]
 
-                    except EOFError:
-                        break
-            os.system("rm -f .TEMP_LOG")
+                        except EOFError:
+                            break
+                os.system("rm -f .TEMP_LOG")
 
-        except FileNotFoundError:
-            pass
+            except FileNotFoundError:
+                pass
 
         shelf_files, unshelved = LogEntry.shelve_environment(env)
         self.shelf = shelf_files

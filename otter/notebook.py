@@ -152,7 +152,7 @@ class Notebook:
 		)
 
 		if _SHELVE and event_type == EventType.CHECK:
-			entry.shelve(shelve_env, _OTTER_LOG_FILENAME)
+			entry.shelve(shelve_env, delete=True, filename=_OTTER_LOG_FILENAME)
 
 		entry.flush_to_file(_OTTER_LOG_FILENAME)
 
