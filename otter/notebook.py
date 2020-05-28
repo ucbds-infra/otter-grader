@@ -185,14 +185,14 @@ class Notebook:
 
 			# if question in self._pregraded_questions:
 			# 	self._dump_state({question: result})
-
-			return result
 		
 		except Exception as e:
 			self._log_event(EventType.CHECK, question=question, success=False, error=e, shelve_env=global_env)
 			raise e
 		else:
 			self._log_event(EventType.CHECK, [result], question=question, shelve_env=global_env)
+
+		return result
 
 
 	# @staticmethod
