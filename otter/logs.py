@@ -270,6 +270,6 @@ class QuestionLogIterator:
             raise StopIteration
 
         question = self.questions[self.curr_idx]
-        result = self.log.get_results(question)
+        entry = self.log.get_question_entry(question)
         self.curr_idx += 1
-        return question, result
+        return entry
