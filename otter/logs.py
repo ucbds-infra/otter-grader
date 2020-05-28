@@ -3,6 +3,7 @@
 ####################################
 
 import re
+import os
 import pickle
 import shelve
 import datetime as dt
@@ -101,7 +102,31 @@ class LogEntry:
         finally:
             file.close()
 
-    def shelve(self, env):
+    def shelve(self, env, filename):
+        # delete old entry without reading entire log
+        try:
+            entries = []
+            os.system(f"cp {filename} .TEMP_LOG")
+            os.system(f"rm -f {filename}")
+            with open(".TEMP_LOG", "rb") as tf:
+                while True:
+                    try:
+                        entry = pickle.load(tf)
+
+                        if entry.question == self.question:
+                            entry.shelf = None
+
+                        entry.flush_to_file(filename)
+
+                        del locals()["entry"]
+
+                    except EOFError:
+                        break
+            os.system("rm -f .TEMP_LOG")
+
+        except FileNotFoundError:
+            pass
+
         shelf_files, unshelved = LogEntry.shelve_environment(env)
         self.shelf = shelf_files
         self.unshelved = unshelved
