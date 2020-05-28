@@ -160,7 +160,8 @@ if __name__ == "__main__":
         nb_path, 
         glob("/autograder/submission/tests/*.py"), 
         name="submission", 
-        gradescope=True, 
+        cwd="/autograder/submission", 
+        test_dir="/autograder/submission/tests",
         ignore_errors=True, 
         seed=SEED,
         log=log
@@ -236,7 +237,7 @@ if __name__ == "__main__":
 
 def main(args):
     """
-    Main function for configuring a Gradescope based autograder.
+    Runs ``otter generate autograder``
     """
     assert args.threshold is None or 0 <= args.threshold <= 1, "{} is not a valid threshold".format(
         args.threshold

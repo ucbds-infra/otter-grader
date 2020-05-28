@@ -32,8 +32,7 @@ class Notebook:
 	"""Notebook class for in-notebook autograding
 	
 	Args:
-		test_dir (str, optional): Path to tests directory
-
+		test_dir (``str``, optional): path to tests directory
 	"""
 
 	def __init__(self, test_dir="./tests"):
@@ -79,11 +78,18 @@ class Notebook:
 		except Exception as e:
 			self._log_event(EventType.INIT, success=False, error=e)
 			raise e
-		finally:
+		else:
 			self._log_event(EventType.INIT)
 
 	# TODO: cut out personal auth?
 	def _auth(self):
+		"""
+		Asks student to authenticate with an Otter Service instance if Otter Service is configured
+		for this notebook
+
+		Raises:
+			``AssertionError``: if Otter Service is not enabled or an invalid auth provider is indicated
+		"""
 		try:
 			global _API_KEY
 			assert self._service_enabled, 'notebook not configured for otter service'
@@ -122,14 +128,21 @@ class Notebook:
 		except Exception as e:
 			self._log_event(EventType.AUTH, success=False, error=e)
 			raise e
-		finally:
+		else:
 			self._log_event(EventType.AUTH)
 
 		
-	def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env=None):
-		"""Logs an event"""
-		global _SHELVE
-		
+	def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
+		"""Logs an event
+
+		Args:
+			event_type (``otter.logs.EventType``): the type of event
+			results (``list`` of ``otter.ok_parser.OKTestsResult``, optional): the results of any checks
+				recorded by the entry
+			question (``str``, optional): the question name for this check
+			success (``bool``, optional): whether the operation was successful
+			error (``Exception``, optional): the exception thrown by the operation, if applicable
+		"""
 		entry = LogEntry(
 			event_type,
 			results=results,
@@ -145,15 +158,17 @@ class Notebook:
 
 
 	def check(self, question, global_env=None, shelve_env=True):
-		"""Checks question using gofer
+		"""
+		Runs tests for a specific question against a global environment. If no global environment 
+		is provided, the test is run against the calling frame's environment.
 		
 		Args:
-			question (str): Name of question being graded
-			global_env (dict): Global environment resulting from execution of a single 
-				notebook/script (see execute.execute_notebook for more on this)
+			question (``str``): name of question being graded
+			global_env (``dict``, optional): global environment resulting from execution of a single 
+				notebook
 
 		Returns:
-			otter.ok_parser.OKTestsResult: The grade for the question
+			``otter.ok_parser.OKTestsResult``: the grade for the question
 		"""
 		try:
 			test_path = os.path.join(self._path, question + ".py")
@@ -176,23 +191,22 @@ class Notebook:
 		except Exception as e:
 			self._log_event(EventType.CHECK, question=question, success=False, error=e, shelve_env=global_env)
 			raise e
-		finally:
+		else:
 			self._log_event(EventType.CHECK, [result], question=question, shelve_env=global_env)
 
 
 	# @staticmethod
 	def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True):
-		"""Exports notebook to PDF
+		"""Exports a notebook to a PDF
 
-		FILTER_TYPE can be "html" or "tags" if filtering by HTML comments or cell tags,
+		``filter_type`` can be ``"html"`` or ``"tags"`` if filtering by HTML comments or cell tags,
 		respectively. 
 		
 		Args:
-			nb_path (str): Path to iPython notebook we want to export
-			filtering (bool, optional): Set true if only exporting a subset of nb cells to PDF
-			pagebreaks (bool, optional): If true, pagebreaks are included between questions
-			display_link (bool, optional): Whether or not to display a download link
-		
+			nb_path (``str``): Path to iPython notebook we want to export
+			filtering (``bool``, optional): Set true if only exporting a subset of nb cells to PDF
+			pagebreaks (``bool``, optional): If true, pagebreaks are included between questions
+			display_link (``bool``, optional): Whether or not to display a download link
 		"""
 		try:
 			if nb_path is None and self._notebook is not None:
@@ -221,25 +235,25 @@ class Notebook:
 		except Exception as e:
 			self._log_event(EventType.TO_PDF, success=False, error=e)
 			raise e
-		finally:
+		else:
 			self._log_event(EventType.TO_PDF)
 
 
 	def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], display_link=True):
 		"""Exports a submission to a zipfile
 
-		Creates a submission zipfile from a notebook at NB_PATH, optionally including a PDF export
-		of the notebook and any files in FILES.
+		Creates a submission zipfile from a notebook at ``nb_path``, optionally including a PDF export
+		of the notebook and any files in ``files``.
 		
 		Args:
-			nb_path (str): Path to iPython notebook we want to export
-			export_path (str, optional): Path at which to write zipfile
-			pdf (bool, optional): True if PDF should be included
-			filtering (bool, optional): Set true if only exporting a subset of nb cells to PDF
-			pagebreaks (bool, optional): If true, pagebreaks are included between questions
-			files (list, optional): Other files to include in the zipfile
-			display_link (bool, optional): Whether or not to display a download link
-		
+			nb_path (``str``): path to notebook we want to export
+			export_path (``str``, optional): path at which to write zipfile
+			pdf (``bool``, optional): whether a PDF should be included
+			filtering (``bool``, optional): whether the PDF should be filtered; ignored if ``pdf`` is
+				``False``
+			pagebreaks (``bool``, optional): whether pagebreaks should be included between questions
+			files (``list`` of ``str``, optional): paths to other files to include in the zipfile
+			display_link (``bool``, optional): whether or not to display a download link
 		"""
 		self._log_event(EventType.BEGIN_EXPORT)
 
@@ -293,7 +307,7 @@ class Notebook:
 		except Exception as e:
 			self._log_event(EventType.END_EXPORT, success=False, error=e)
 			raise e
-		finally:
+		else:
 			self._log_event(EventType.END_EXPORT)
 
 
@@ -319,11 +333,16 @@ class Notebook:
 		except Exception as e:
 			self._log_event(EventType.END_CHECK_ALL, success=False, error=e)
 			raise e
-		finally:
+		else:
 			self._log_event(EventType.END_CHECK_ALL)
 
 
 	def submit(self):
+		"""Submits this notebook to an Otter Service instance if Otter Service is configured
+
+		Raises:
+			``AssertionError``: if this notebook is not configured for Otter Service
+		"""
 		assert self._service_enabled, 'notebook not configured for otter service'
 		
 		try:
@@ -352,5 +371,5 @@ class Notebook:
 		except Exception as e:
 			self._log_event(EventType.SUBMIT, success=False, error=e)
 			raise e
-		finally:
+		else:
 			self._log_event(EventType.SUBMIT)
