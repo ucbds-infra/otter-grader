@@ -206,8 +206,15 @@ class Log:
     def __iter__(self):
         return iter(self.entries)
 
+    def question_iterator(self):
+        return QuestionLogIterator(self)
+
     def sort(self, ascending=True):
         self.entries = LogEntry.sort_log(self.entries, ascending=ascending)
+
+    def get_questions(self):
+        all_questions = [entry.question for entry in self.entries]
+        return list(sorted(set(all_questions)))
 
     @classmethod
     def from_file(cls, filename, ascending=True):
@@ -242,3 +249,22 @@ class Log:
             if entry.question == question:
                 return entry.get_results()
         raise QuestionNotInLogException()
+
+
+class QuestionLogIterator:
+    def __init__(self, log):
+        self.log = log
+        self.questions = self.log.get_questions()
+        self.curr_idx = 0
+    
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if self.curr_idx >= len(self.questions):
+            raise StopIteration
+
+        question = self.questions[self.curr_idx]
+        result = self.log.get_results(QuestionLogIterator)
+        self.curr_idx += 1
+        return question, result
