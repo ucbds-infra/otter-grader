@@ -130,13 +130,13 @@ class Notebook:
 			global_env = inspect.currentframe().f_back.f_globals
 		unshelved = []
 		_, tf_path = tempfile.mkstemp()
-		tf = open(tf_path, "wb")
-		with shelve.open(tf) as shelf:
+		with shelve.open(tf_path) as shelf:
 			for k, v in global_env.items():
 				try:
 					shelf[k] = v
 				except:
 					unshelved.append(k)
+		tf = open(tf_path, "wb")
 		shelf_contents = tf.read()
 		tf.close()
 		return shelf_contents, unshelved
