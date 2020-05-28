@@ -144,6 +144,8 @@ class Notebook:
 		"""Logs an event"""
 		if event_type == EventType.CHECK:
 			shelf, unshelved = self._shelve_environment()
+		else:
+			shelf, unshelved = None, []
 		LogEntry(
 			event_type,
 			shelf=shelf,
