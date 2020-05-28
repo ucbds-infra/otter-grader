@@ -165,7 +165,7 @@ class LogEntry:
             file.close()
 
     @staticmethod
-    def shelve_environment(self, env):
+    def shelve_environment(env):
         unshelved = []
         with shelve.open(_SHELF_FILENAME) as shelf:
             for k, v in env.items():
