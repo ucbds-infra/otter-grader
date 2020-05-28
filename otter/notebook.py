@@ -129,14 +129,16 @@ class Notebook:
 		if global_env is None:
 			global_env = inspect.currentframe().f_back.f_globals
 		unshelved = []
-		with tempfile.TemporaryFile() as tf:
-			with shelve.open(tf) as shelf:
-				for k, v in global_env.items():
-					try:
-						shelf[k] = v
-					except:
-						unshelved.append(k)
-			shelf_contents = tf.read()
+		_, tf_path = tempfile.mkstemp()
+		tf = open(tf_path, "wb")
+		with shelve.open(tf) as shelf:
+			for k, v in global_env.items():
+				try:
+					shelf[k] = v
+				except:
+					unshelved.append(k)
+		shelf_contents = tf.read()
+		tf.close()
 		return shelf_contents, unshelved
 
 		
