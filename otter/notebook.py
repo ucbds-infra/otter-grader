@@ -139,7 +139,7 @@ class Notebook:
 		
 		shelf_files = {}
 		for file in glob(".OTTER_ENV*"):
-			ext = file.sub(r"\.OTTER_ENV", "", file)
+			ext = re.sub(r"\.OTTER_ENV", "", file)
 			file = open(file, "rb")
 			shelf_files[ext] = file.read()
 			file.close()
