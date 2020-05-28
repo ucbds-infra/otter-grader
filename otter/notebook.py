@@ -6,6 +6,7 @@ import inspect
 import requests
 import json
 import os
+import re
 import zipfile
 import pickle
 import shelve
@@ -135,11 +136,14 @@ class Notebook:
 					shelf[k] = v
 				except:
 					unshelved.append(k)
-		tf = open(".OTTER_ENV", "rb")
-		shelf_contents = tf.read()
-		tf.close()
-		# os.rm(".OTTER_ENV")
-		return shelf_contents, unshelved
+		
+		shelf_files = {}
+		for file in glob(".OTTER_ENV*"):
+			ext = file.sub(r"\.OTTER_ENV", "", file)
+			file = open(file, "rb")
+			shelf_files[ext] = file.read()
+			file.close()
+		return shelf_files, unshelved
 
 		
 	def _log_event(self, event_type, results=[], question=None, success=True, error=None):
