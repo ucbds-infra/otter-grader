@@ -203,6 +203,12 @@ class Log:
     def __getitem__(self, idx):
         return self.entries[idx]
 
+    def __iter__(self):
+        return iter(self.entries)
+
+    def sort(self, ascending=True):
+        self.entries = LogEntry.sort_log(self.entries, ascending=ascending)
+
     @classmethod
     def from_file(cls, filename, ascending=True):
         """Loads a log from a file
