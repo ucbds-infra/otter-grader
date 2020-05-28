@@ -211,6 +211,7 @@ class Log:
 
     def sort(self, ascending=True):
         self.entries = LogEntry.sort_log(self.entries, ascending=ascending)
+        self.ascending = ascending
 
     def get_questions(self):
         all_questions = [entry.question for entry in self.entries if entry.event_type == EventType.CHECK]
@@ -253,6 +254,7 @@ class Log:
 
 class QuestionLogIterator:
     def __init__(self, log):
+        log.sort(ascending=False)
         self.log = log
         self.questions = self.log.get_questions()
         self.curr_idx = 0
@@ -265,6 +267,6 @@ class QuestionLogIterator:
             raise StopIteration
 
         question = self.questions[self.curr_idx]
-        result = self.log.get_results(QuestionLogIterator)
+        result = self.log.get_results(question)
         self.curr_idx += 1
         return question, result
