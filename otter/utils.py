@@ -23,7 +23,7 @@ except ImportError:
 @contextmanager
 def block_print():
     """
-    Disables printing to stdout.
+    Context manager that disables printing to stdout.
     """
     sys.stdout = open(os.devnull, 'w')
     try:
@@ -40,23 +40,23 @@ def list_files(path):
     """Returns a list of all non-hidden files in a directory
     
     Args:
-        path (str): Path to a directory
+        path (``str``): path to a directory
     
     Returns:
-        list: List of filenames (str) in the given directory
+        ``list`` of ``str``: list of filenames in the given directory
 
     """
     return [file for file in os.listdir(path) if os.path.isfile(os.path.join(path, file)) and file[0] != "."]
 
 
 def merge_csv(dataframes):
-    """Merges dataframes returned by Docker containers
+    """Merges dataframes along the vertical axis
     
     Args:
-        dataframes (list): List of Pandas dataframes (all should have same headers)
+        dataframes (``list`` of ``pandas.core.frame.DataFrame``): list of dataframes with same columns
     
     Returns:
-        pandas.core.frame.DataFrame: A merged dataframe resulting from 'stacking' all input df's
+        ``pandas.core.frame.DataFrame``: A merged dataframe resulting from 'stacking' all input dataframes
 
     """
     final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
@@ -64,18 +64,19 @@ def merge_csv(dataframes):
 
 
 def connect_db(host="localhost", username="admin", password="", port="5432", db="otter_db"):
-    """Connects to a specific postgres database with provided parameters/credentials
+    """Connects to a specific Postgres database with provided parameters/credentials
 
-    Keyword Arguments:
-        host (str, optional): Hostname for database (default localhost)
-        username (str, optional): Username with proper read/write permissions for postgres
-        password (str, optional): Password for provided username
-        port (str, optional): Port on which Postgres is running
-    Raises:
-        ImportError: if psycopg2 is missing
+    Arguments:
+        host (``str``, optional): hostname for database (default 'localhost')
+        username (``str``, optional): username with proper read/write permissions for Postgres
+        password (``str``, optional): password for provided username
+        port (``str``, optional): port on which Postgres is running
 
     Returns:
-        connection: Connection object for executing sql commands on postgres database
+        ``connection``: connection object for executing SQL commands on Postgres database
+
+    Raises:
+        ``ImportError``: if psycopg2 is not installed
     """
     if MISSING_PACKAGES:
         raise ImportError(
@@ -95,14 +96,13 @@ def connect_db(host="localhost", username="admin", password="", port="5432", db=
 
 def flush_inline_matplotlib_plots():
     """
-    Flush matplotlib plots immediately, rather than asynchronously.
-    Basically, the inline backend only shows the plot after the entire
-    cell executes, which means we can't easily use a contextmanager to
-    suppress displaying it. See https://github.com/jupyter-widgets/ipywidgets/issues/1181/
-    and https://github.com/ipython/ipython/issues/10376 for more details. This
-    function displays flushes any pending matplotlib plots if we are using
-    the inline backend.
-    Stolen from https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35
+    Flush matplotlib plots immediately, rather than asynchronously
+    
+    Basically, the inline backend only shows the plot after the entire cell executes, which means we 
+    can't easily use a context manager to suppress displaying it. See https://github.com/jupyter-widgets/ipywidgets/issues/1181/ 
+    and https://github.com/ipython/ipython/issues/10376 for more details. This function displays flushes 
+    any pending matplotlib plots if we are using the inline backend. Stolen from 
+    https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35
     """
     if 'matplotlib' not in sys.modules:
         # matplotlib hasn't been imported, nothing to do.
@@ -123,8 +123,8 @@ def flush_inline_matplotlib_plots():
 @contextmanager
 def hide_outputs():
     """
-    Context manager for hiding outputs from display() calls.
-    IPython handles matplotlib outputs specially, so those are supressed too.
+    Context manager for hiding outputs from ``display()`` calls. IPython handles matplotlib outputs 
+    specially, so those are supressed too.
     """
     ipy = get_ipython()
     if ipy is None:
@@ -146,26 +146,25 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     This function generates a random name using the given length and character set.
     
     Args:
-        size (int): Length of output name
-        chars (str): Set of characters used to create function name
+        size (``int``): length of output name
+        chars (``str``, optional): set of characters used to create function name
     
     Returns:
-        str: Randomized string name for grading function
-
+        ``str``: randomized string name for grading function
     """
     return ''.join(random.choice(chars) for _ in range(size))
 
 
 def str_to_doctest(code_lines, lines):
     """
-    Converts a list of lines of Python code CODE_LINES to a list of doctest-formatted lines LINES
+    Converts a list of lines of Python code ``code_lines`` to a list of doctest-formatted lines ``lines``
 
     Args:
-        code_lines (list): List of lines of python code
-        lines (list): Set of characters used to create function name
+        code_lines (``list``): list of lines of python code
+        lines (``list``): set of characters used to create function name
     
     Returns:
-        list: doc-test formatted list of lines
+        ``list`` of ``str``: doctest formatted list of lines
     """
     if len(code_lines) == 0:
         return lines

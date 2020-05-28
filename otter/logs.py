@@ -131,10 +131,7 @@ class LogEntry:
                 except EOFError:
                     break
 
-            if ascending:
-                log = list(sorted(log, key = lambda l: l.timestamp))
-            else:
-                log = list(sorted(log, key = lambda l: l.timestamp, reverse = True))
+            log = list(sorted(log, key = lambda l: l.timestamp, reverse = not ascending))
             
             return log
             

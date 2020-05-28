@@ -1,6 +1,7 @@
-#########################################
-##### Jupyter Notebook PDF Exporter #####
-#########################################
+###########################################
+#####  Jupyter Notebook PDF Exporter  #####
+##### forked from nb2pdf and gsExport #####
+###########################################
 
 import os
 import nbformat
@@ -12,7 +13,14 @@ from .filter import load_notebook
 
 def notebook_to_pdf(nb, dest=None, templating="test.tplx", debug=False):
     """
+    Writes a parsed notebook ``nb`` to a PDF file using nbconvert. Forked from
     https://github.com/dibyaghosh/gsExport/blob/master/gsExport/utils.py
+    
+    Args:
+        nb (``nbformat.NotebookNode``): parsed notebook
+        dest (``str``, optional): path to write PDF
+        templating (``str``, optional): path to template file relative to install directory of Otter
+        debug (``bool``, optional): whether to run export in debug mode
     """
     pdf_exporter = nbconvert.PDFExporter()
     pdf_exporter.template_file = pkg_resources.resource_filename(__name__, templating)
@@ -37,6 +45,16 @@ def notebook_to_pdf(nb, dest=None, templating="test.tplx", debug=False):
 
 
 def export_notebook(nb_path, dest=None, filtering=False, pagebreaks=False, debug=False):
+    """
+    Exports a notebook file at ``nb_path`` to a PDF with optional filtering and pagebreaks
+
+    Args:
+        nb_path (``str``): path to notebook
+        dest (``str``, optional): path to write PDF
+        filtering (``bool``, optional): whether the PDF should be filtered with HTML comments
+        pagebreaks (``bool``, optional): whether there should be pagebreaks after questions in the PDF
+        debug (``bool``, optional): whether to run export in debug mode
+    """
     notebook = load_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 
     if dest is not None:
@@ -48,6 +66,11 @@ def export_notebook(nb_path, dest=None, filtering=False, pagebreaks=False, debug
 
 
 def main(args):
+    """Runs Otter Export
+
+    Args:
+        args (``argparse.Namespace``): parsed command line arguments
+    """
     export_notebook(
         args.source,
         dest = args.dest,

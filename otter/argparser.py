@@ -13,7 +13,11 @@ from . import service
 
 
 def get_parser():
-    """Creates and returns the argument parser for Otter"""
+    """Creates and returns the argument parser for Otter
+    
+    Returns:
+        ``argparse.ArgumentParser``: the argument parser for Otter command-line tools
+    """
 
     parser = argparse.ArgumentParser(description="""
     A Python-based autograder for Jupyter Notebooks and Python scripts that runs locally on the instructors machine.

@@ -12,31 +12,39 @@ from subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor, wait
 
 
-def launch_parallel_containers(
-    tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, tag_filter=False, 
-    html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
+def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, 
+    tag_filter=False, html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
     scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
     """Grades notebooks in parallel docker containers
 
-    This function runs NUM_CONTAINERS docker containers in parallel to grade the student submissions
-    in NOTEBOOKS_DIR using the tests in TESTS_DIR. It can additionally generate PDFs for the parts
+    This function runs ``num_containers`` docker containers in parallel to grade the student submissions
+    in ``notebooks_dir`` using the tests in ``tests_dir``. It can additionally generate PDFs for the parts
     of the assignment needing manual grading. 
 
     Args:
-        tests_dir (str): Path to directory with ok-style tests
-        notebooks_dir (str): Path to student submissions to be graded against provided tests
-        verbose (bool, optional): Set true to see logs of grade_assignments function as it runs
-        unfiltered_pdfs (bool, optional): Set true to create PDF of entire ipython notebook
-        tag_filter (bool, optional): Set true if notebook cells should be filtered by tag
-        html_filter (bool, optional): Set true if notebook cells should be filtered by comments
-        reqs (str, optional): Path to requirements.txt file with non-standard packages needed
-        num_containers (int, optional): The number of parallel containers that will be run
-        image (str, optional): Name of docker image used for grading environment
-        scripts (bool, optional): Set true if student submissions are .py instead of .ipynb
-        no_kill (bool, optional): Set true to keep containers running after function terminates
+        tests_dir (``str``): path to directory of tests
+        notebooks_dir (``str``): path to directory of student submissions to be graded
+        verbose (``bool``, optional): whether status messages should be printed to the command line
+        unfiltered_pdfs (``bool``, optional): whether **unfiltered** PDFs of notebooks should be generated
+        tag_filter (``bool``, optional): whether **cell tag-filtered** PDFs of notebooks should be 
+            generated
+        html_filter (``bool``, optional): whether **HTML comment-filtered** PDFs of notebooks should be 
+            generated
+        reqs (``str``, optional): Path to requirements.txt file with non-standard packages needed
+        num_containers (``int``, optional): The number of parallel containers that will be run
+        image (``str``, optional): a docker image tag to be used for grading environment
+        scripts (``bool``, optional): whether student submissions are Python scripts rather than
+            Jupyter notebooks
+        no_kill (``bool``, optional): whether the grading containers should be kept running after
+            grading finishes
+        output_path (``str``, optional): path at which to write grades CSVs copied from the container
+        debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR 
+            from each container to the command line)
+        seed (``int``, optional): a random seed to use for intercell seeding during grading
 
     Returns:
-        list: List of all dataframes which result from each container's execution
+        ``list`` of ``pandas.core.frame.DataFrame``: the grades returned by each container spawned during
+            grading
     """
     if not num_containers:
         num_containers = 4
@@ -107,30 +115,35 @@ def launch_parallel_containers(
 
 
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
-unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, 
-scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
+    unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, scripts=False, no_kill=False, 
+    output_path="./", debug=False, seed=None):
     """
-    Grades multiple assignments in a directory using a single docker container. 
-
-    If no PDF assignment is wanted, set all three PDF params (unfiltered_pdfs, tag_filter, 
-    html_filter) to false. Also, list any non-standard package requirements in a requirements.txt 
-    file. This function can grade files with .py or .ipynb extensions (use scripts=True for .py). 
+    Grades multiple assignments in a directory using a single docker container. If no PDF assignment is 
+    wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
 
     Args:
-        tests_dir (str): Directory of test files
-        notebooks_dir (str): Directory of notebooks to grade
-        id (str, optional): Id of this function for mc use
-        image (str, optional): Docker image to do grading in
-        verbose (bool, optional): Whether function should print information about various steps
-        unfiltered_pdfs (bool, optional): Set true if no filtering needed (generate pdf of whole nb)
-        tag_filter (bool, optional): Set true if notebook cells should be filtered by tag
-        html_filter (bool, optional): Set true if notebook cells should be filtered by comments
-        reqs (str, optional): Path to pip-style requirements.txt file 
-        scripts (bool, optional): Set true if we are grading .py files instead of ipython notebooks
-        no_kill (bool, optional: Set true to keep containers running after function terminates
+        tests_dir (``str``): path to directory of tests
+        notebooks_dir (``str``): path to directory of student submissions to be graded
+        id (``int``): grading container index
+        image (``str``, optional): a docker image tag to be used for grading environment
+        verbose (``bool``, optional): whether status messages should be printed to the command line
+        unfiltered_pdfs (``bool``, optional): whether **unfiltered** PDFs of notebooks should be generated
+        tag_filter (``bool``, optional): whether **cell tag-filtered** PDFs of notebooks should be 
+            generated
+        html_filter (``bool``, optional): whether **HTML comment-filtered** PDFs of notebooks should be 
+            generated
+        reqs (``str``, optional): Path to requirements.txt file with non-standard packages needed
+        scripts (``bool``, optional): whether student submissions are Python scripts rather than
+            Jupyter notebooks
+        no_kill (``bool``, optional): whether the grading containers should be kept running after
+            grading finishes
+        output_path (``str``, optional): path at which to write grades CSVs copied from the container
+        debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR 
+            from each container to the command line)
+        seed (``int``, optional): a random seed to use for intercell seeding during grading
 
     Returns:
-        pandas.core.frame.DataFrame: A dataframe of file to grades information
+        ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
     # launch our docker conainer
     launch_command = ["docker", "run", "-d","-it", image]
@@ -199,21 +212,6 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
         print(grade.stdout.decode("utf-8"))
         print(grade.stderr.decode("utf-8"))
 
-    # TODO: move this to serve with contextlib???
-    # if logging:
-    #     # TODO: are the print statements necessary?
-    #     # # Logging stdout/stderr with print statements
-    #     # print(grade.stdout.decode('utf-8'))
-    #     # print(grade.stderr.decode('utf-8'))
-
-    #     # Logging stdout/stderr to file
-    #     log_file = open("log_file_container_ {}.txt".format(id), "a+")
-    #     log_file.write(grade.stdout.decode('utf-8'))
-    #     log_file.write("\n")
-    #     log_file.write(grade.stderr.decode('utf-8'))
-    #     log_file.write("\n")
-    #     log_file.close()
-
     all_commands = [launch, copy, grade]
     try: 
         all_commands += [tests]
@@ -260,10 +258,10 @@ scripts=False, no_kill=False, output_path="./", debug=False, seed=None):
                 path. 
                 
                 Arguments:
-                    row (pandas.core.series.Series): row of a dataframe
+                    row (``pandas.core.series.Series``): row of a dataframe
                 
                 Returns:
-                    str: cleaned PDF filepath
+                    ``str``: cleaned PDF filepath
                 """
                 path = row["manual"]
                 return re.sub(r"\/home\/notebooks", "submission_pdfs", path)

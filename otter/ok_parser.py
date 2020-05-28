@@ -21,48 +21,54 @@ from .utils import hide_outputs
 
 
 class CheckCallWrapper(ast.NodeTransformer):
-    """NodeTransformer visits and replaces nodes in place.
-    CheckCallWrapper finds nodes with check(..) and replaces it with
-    check_results_<secret>(check(...))
+    """Visits and replaces nodes in an abstract syntax tree in-place.
+    
+    Tracks import syntax and instances of ``otter.Notebook`` in an AST. Wraps calls to 
+    ``otter.Notebook.check`` in calls to ``list.append`` to collect results of execution. Removes calls
+    to ``otter.Notebook.check_all``, `otter.Notebook.export``, and ``otter.Notebook.to_pdf``.
     
     Args:
-        secret (str): Random digits string that prevents check function from being modified
+        secret (``str``): random digits string that prevents check function from being modified
     
     Attributes:
-        secret (str): Random digits string that prevents check function from being modified
-
+        secret (``str``): random digits string that prevents check function from being modified
     """
     OTTER_IMPORT_SYNTAX = "import"
     OTTER_IMPORT_NAME = "otter"
     OTTER_CLASS_NAME = "Notebook"
     OTTER_INSTANCE_NAME = "grader"
 
-
     def __init__(self, secret):
         self.secret = secret
 
-
     def check_node_constructor(self, expression):
-        """Creates node that wraps expression in a list (check_results_XX) append call
+        """Creates node that wraps expression in a list (``check_results_XX``) append call
         
         Args:
-            expression (ast.Name): Name for check function
+            expression (``ast.Name``): name for check function
 
         Returns:
-            ast.Call: Function call object from calling check
+            ``ast.Call``: function call object from calling check
 
         """
         args = [expression]
-        func = ast.Attribute(attr='append',
-                             value=ast.Name(id='check_results_{}'.format(self.secret),
-                                            ctx=ast.Load()),
-                             ctx=ast.Load(),
-                             keywords=[])
+        func = ast.Attribute(
+            attr='append',
+            value=ast.Name(id='check_results_{}'.format(self.secret), ctx=ast.Load()),
+            ctx=ast.Load(),
+            keywords=[]
+        )
         return ast.Call(func=func, args=args, keywords=[])
-
 
     def visit_ImportFrom(self, node):
         """
+        Visits ``from ... import ...`` nodes and tracks the import syntax and alias of ``otter.Notebook``
+
+        Args:
+            node (``ast.ImportFrom``): the import node
+
+        Returns:
+            ``ast.ImportFrom``: the original node
         """
         if node.module == "otter" and "Notebook" in [n.name for n in node.names]:
             CheckCallWrapper.OTTER_IMPORT_SYNTAX = "from"
@@ -71,9 +77,15 @@ class CheckCallWrapper(ast.NodeTransformer):
                 CheckCallWrapper.OTTER_CLASS_NAME = nb_asname
         return node
 
-            
     def visit_Import(self, node):
         """
+        Visits ``import ...`` nodes and tracks the import syntax and alias of ``otter``
+
+        Args:
+            node (``ast.Import``): the import node
+
+        Returns:
+            ``ast.Import``: the original node
         """
         if "otter" in [n.name for n in node.names]:
             CheckCallWrapper.OTTER_IMPORT_SYNTAX = "import"
@@ -82,9 +94,16 @@ class CheckCallWrapper(ast.NodeTransformer):
                 CheckCallWrapper.OTTER_IMPORT_NAME = otter_asname
         return node
 
-
     def visit_Assign(self, node):
         """
+        Visits assignment nodes to determine the name assigned to the instance of ``otter.Notebook``
+        created.
+
+        Args:
+            node (``ast.Assign``): the assignment node
+
+        Returns:
+            ``ast.Assign``: the original node
         """
         if isinstance(node.value, ast.Call):
             if isinstance(node.value.func, ast.Attribute) and CheckCallWrapper.OTTER_IMPORT_SYNTAX == "import":
@@ -98,68 +117,43 @@ class CheckCallWrapper(ast.NodeTransformer):
                     CheckCallWrapper.OTTER_INSTANCE_NAME = node.targets[0].id
         return node
 
-
-    # def visit_Call(self, node):
-    #     """Function that handles whether a given function call is a 'check' call
-    #     and transforms the node accordingly.
-        
-    #     Args:
-    #         node (ast.Call): Function call object, calling the check function
-
-    #     Returns:
-    #         ast.Call: Transformed version of input node
-
-    #     """
-    #     if isinstance(node.func, ast.Attribute):
-    #         if isinstance(node.func.value, ast.Name) and node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
-    #             if node.func.attr == "check":
-    #                 return self.check_node_constructor(node)
-    #     return node
-    
-
     def visit_Expr(self, node):
         """
+        Visits expression nodes and removes them if they are calls to ``otter.Notebook.check_all``,
+        ``otter.Notebook.export``, or ``otter.Notebook.to_pdf`` or wraps them using 
+        ``CheckCallWrapper.check_node_constructor`` if they are calls to ``otter.Notebook.check``.
+
+        Args:
+            node (``ast.Expr``): the expression node
+
+        Returns:
+            ``ast.Expr``: the transformed node
+            ``None``: if the node was a removed call
         """
         if isinstance(node.value, ast.Call):
             call_node = node.value
             if isinstance(call_node.func, ast.Attribute):
                 if isinstance(call_node.func.value, ast.Name) and call_node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
-                    if call_node.func.attr == "check_all":
+                    if call_node.func.attr in ["check_all", "export", "to_pdf"]:
                         return None
                     elif call_node.func.attr == "check":
                         node.value = self.check_node_constructor(call_node)
         return node
 
 
-
-
-        # # test case is if check is .check
-        # if isinstance(node.func, ast.Attribute):
-        #     return node
-        # elif isinstance(node.func, ast.Name):
-        #     if node.func.id == 'check':
-        #         return self.node_constructor(node)
-        #     else:
-        #         return node
-        # else:
-        #     return node
-
-
 def run_doctest(name, doctest_string, global_environment):
     """
-    Run a single test with given global_environment.
-    Returns (True, '') if the doctest passes.
-    Returns (False, failure_message) if the doctest fails.
+    Run a single test with given ``global_environment``. Returns ``(True, '')`` if the doctest passes. 
+    Returns ``(False, failure_message)`` if the doctest fails.
 
     Args:
-        name (str): Name of doctest
-        doctest_string (str): Doctest in string form
-        global_environment (dict of str: str): Global environment resulting from the execution
-            of a python script/notebook
+        name (``str``): name of doctest
+        doctest_string (``str``): doctest in string form
+        global_environment (``dict``): global environment resulting from the execution of a python 
+            script/notebook
     
     Returns:
-        (bool, str): Results from running the test
-
+        ``tuple`` of (``bool``, ``str``): results from running the test
     """
     examples = doctest.DocTestParser().parse(
         doctest_string,
@@ -188,38 +182,23 @@ def run_doctest(name, doctest_string, global_environment):
         return False, runresults.getvalue()
 
 
-# class OKTestCase:
-#     def __init__(self, test, hidden):
-#         self.test = test
-#         self.hidden = hidden
-
-
 class OKTest:
     """
-    A single DocTest defined by OKPy.
-    Instances of this class are callable. When called, it takes
-    a global_environment dict, and returns a TestResult object.
-    We only take a global_environment, *not* a local_environment.
-    This makes tests not useful inside functions, methods or
-    other scopes with local variables. This is a limitation of
-    doctest, so we roll with it.
+    A single test (set of doctests) for Otter.
+    
+    Instances of this class are callable. When called, it takes a ``global_environment`` dict, and returns 
+    an ``otter.ok_parser.OKTestsResult`` object. We only take a global_environment, *not* a 
+    ``local_environment``. This makes tests not useful inside functions, methods or other scopes with 
+    local variables. This is a limitation of doctest, so we roll with it.
 
-    The last 2 attributes (passed, failed_test) are set after calling run().
+    The last 2 attributes (``passed``, ``failed_test``) are set after calling ``run()``.
 
     Args:
-        name (str): Name of test
-        tests (:obj:`list` of :obj:`str`): List of docstring tests to be run
-        value (int, optional): Point value of this test, defaults to 1
-        hidden (bool, optional): Set true if this test should be hidden
-
-    Attributes:
-        name (str): Name of test
-        tests (:obj:`list` of :obj:`str`): List of docstring tests to be run
-        value (int): Point value of this test object, defaults to 1
-        hidden (bool): True if this test should be hidden
-        passed (bool): True if all tests passed
-        failed_test (str): Docstring of first failed test, if any
-
+        name (``str``): name of test
+        tests (``list`` of ``str``): ;ist of docstring tests to be run
+        hiddens (``list`` of ``bool``): visibility of each tests in ``tests``
+        value (``int``, optional): point value of this test, defaults to 1
+        hidden (``bool``, optional): wheter this test is hidden
     """
     html_result_pass_template = Template("""
     <p><strong>{{ name }}</strong> passed!</p>
@@ -260,9 +239,6 @@ class OKTest:
             )
 
     def __init__(self, name, tests, hiddens, value=1, hidden=True):
-        """
-        tests is list of doctests that should be run.
-        """
         self.name = name
         self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
         self.hidden_tests = [t for t, h in zip(tests, hiddens) if h]
@@ -273,14 +249,14 @@ class OKTest:
         self.failed_test_hidden = None
 
     def run(self, global_environment):
-        """Runs tests on a given global_environment.
+        """Runs tests on a given ``global_environment``
         
         Arguments:
-            global_environment (dict of str: str): Result of executing a python notebook/script
+            ``global_environment`` (``dict``): result of executing a Python notebook/script
         
         Returns:
-            (bool, OKTest): Whether the test passed and a pointer to the current OKTest object
-
+            ``tuple`` of (``bool``, ``otter.ok_parser.OKTest``): whether the test passed and a pointer 
+                to the current ``otter.ok_parser.OKTest`` object
         """
         for i, t in enumerate(self.public_tests + self.hidden_tests):
             passed, result = run_doctest(self.name + ' ' + str(i), t, global_environment)
@@ -296,15 +272,13 @@ class OKTest:
     @classmethod
     def from_file(cls, path):
         """
-        Parse an ok test file & return an OKTest
+        Parse an ok test file & return an ``OKTest``
 
         Args:
-            cls (OKTest): Uses this to create a new OKTest object from the given file
-            path (str): Path to ok test file
+            path (``str``): path to ok test file
 
         Returns:
-            OKTest: new OKTest object created from the given file
-
+            ``otter.ok_parser.OKTest``: new ``OKTest`` object created from the given file
         """
         # ok test files are python files, with a global 'test' defined
         test_globals = {}
@@ -341,15 +315,10 @@ class OKTest:
 
 
 class OKTests:
-    """Test Class for Ok-style tests used to grade assignments.
+    """Test class for ok-style tests used to grade assignments
     
     Args:
-        test_paths (:obj:`list` of :obj:`str`): List of paths to ok tests
-    
-    Attributes:
-        paths (:obj:`list` of :obj:`str`): List of paths to ok tests
-        tests (:obj:`list` of :obj:`OKTest`): List of OKTest objects for each path
-
+        test_paths (``list`` of ``str``): list of paths to ok tests
     """
     def __init__(self, test_paths):
         self.paths = test_paths
@@ -359,14 +328,12 @@ class OKTests:
         """Run this object's tests on a given global environment (from running a notebook/script)
         
         Arguments:
-            global_environment (dict of str: str): Result of executing a python notebook/script
-                see grade.execute_notebook for more
-            include_grade (boolean, optional): Set true if grade should be included in result
+            global_environment (``dict``): result of executing a Python notebook/script
+            include_grade (``bool``, optional): whether grade should be included in result
         
         Returns:
-            OKTestsResult: Object resulting from running tests on GLOBAL_ENVIRONMENT, with grade,
-                tests passed, and more information.
-
+            ``otter.ok_parser.OKTestsResult``: object resulting from running tests on ``global_environment`` 
+                with grade, tests passed, and more information
         """
         passed_tests = []
         failed_tests = []
@@ -392,25 +359,25 @@ class OKTests:
 
 class OKTestsResult:
     """
-    Displayable result from running OKTests
+    Displayable result generated from ``otter.ok_parser.OKTests``
 
     Args:
-        grade (float): Grade as a decimal in the range [0, 1]
-        paths (:obj:`list` of :obj:`str`): List of paths to ok tests
-        tests (:obj:`list` of :obj:`OKTest`): List of OKTest objects for each path
-        passed_tests (:obj:`list` of :obj:`str`): List of passed test docstrings
-        failed_tests (:obj:`list` of :obj:`str`, :obj:`OKTest`): List of failed test docstrings and
-            OKTest objects
-        include_grade (boolean, optional): Set true if grade should be included in result
+        grade (``float``): grade as a decimal in the range [0, 1]
+        paths (``list`` of ``str``): list of paths to ok tests
+        tests (``list`` of ``OKTest``): list of OKTest objects for each path
+        passed_tests (``list`` of ``str``): list of passed test docstrings
+        failed_tests (``list`` of ``str``, ``otter.ok_parser.OKTest``): list of failed test docstrings and
+            ``OKTest`` objects
+        include_grade (``bool``, optional): whether grade should be included in result
 
     Attributes:
-        grade (float): Grade as a decimal in the range [0, 1]
-        paths (:obj:`list` of :obj:`str`): List of paths to ok tests
-        tests (:obj:`list` of :obj:`OKTest`): List of OKTest objects for each path
-        passed_tests (:obj:`list` of :obj:`str`): List of passed test docstrings
-        failed_tests (:obj:`list` of :obj:`str`, :obj:`OKTest`): List of failed test docstrings and
-            OKTest objects
-        include_grade (boolean, optional): Set true if grade should be included in result
+        grade (``float``): grade as a decimal in the range [0, 1]
+        paths (``list`` of ``str``): list of paths to ok tests
+        tests (``list`` of ``OKTest``): list of OKTest objects for each path
+        passed_tests (``list`` of ``str``): list of passed test docstrings
+        failed_tests (``list`` of ``str``, ``otter.ok_parser.OKTest``): list of failed test docstrings and
+            ``OKTest`` objects
+        include_grade (``bool``, optional): whether grade should be included in result
 
     """
 

@@ -9,6 +9,15 @@ import getpass
 BASE_URL = 'https://www.gradescope.com'
 
 class APIClient:
+    """
+    Client for Gradescope's API. Logs in users and retrieves token, uploads PDF and code assignment
+    submissions. 
+    
+    Client code originally provided by Gradescope.
+
+    Args:
+        token (``str``, optional): a pre-retrieved token for the client
+    """
     def __init__(self, token=None):
         self.session = requests.Session()
         if token is not None:
@@ -72,6 +81,9 @@ class APIClient:
         return r
 
 def main(args):
+    """
+    Runs ``otter generate token``
+    """
     client = APIClient()
     email = input("Please provide the email address on your Gradescope account: ")
     password = getpass.getpass('Password: ')
