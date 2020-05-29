@@ -204,7 +204,11 @@ class LogEntry:
             if type(v) == types.ModuleType:
                 unshelved.append(k)
             else:
-                filtered_env[k] = v
+                try:
+                    dill.dumps(v)
+                    filtered_env[k] = v
+                except:
+                    unshelved.append(k)
 
         # with shelve.open(_SHELF_FILENAME) as shelf:
         #     for k, v in env.items():
