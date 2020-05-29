@@ -243,22 +243,24 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
                     # transform the input to executable Python
                     # FIXME: use appropriate IPython functions here
                     isp = IPythonInputSplitter(line_input_checker=False)
-                    try:
-                        code_lines = []
-                        cell_source_lines = cell['source']
-                        source_is_str_bool = False
-                        if isinstance(cell_source_lines, str):
-                            source_is_str_bool = True
-                            cell_source_lines = cell_source_lines.split('\n')
+                    
+                    code_lines = []
+                    cell_source_lines = cell['source']
+                    source_is_str_bool = False
+                    if isinstance(cell_source_lines, str):
+                        source_is_str_bool = True
+                        cell_source_lines = cell_source_lines.split('\n')
 
-                        # only execute import statements
-                        cell_source_lines = [re.sub(r"^\s+", "", l) for l in cell_source_lines if "import" in l]                                
-                        cell_source = "\n".join(cell_source_lines)
-                        exec(cell_source, global_env)
-                        # source += cell_source
-                    except:
-                        if not ignore_errors:
-                            raise
+                    # only execute import statements
+                    cell_source_lines = [re.sub(r"^\s+", "", l) for l in cell_source_lines if "import" in l]                                
+                    
+                    for line in cell_source_lines:
+                        try:
+                            exec(line, global_env)
+                    # source += cell_source
+                        except:
+                            if not ignore_errors:
+                                raise
 
 
             for entry in log.question_iterator():
