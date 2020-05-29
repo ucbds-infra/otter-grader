@@ -6,6 +6,9 @@ import re
 import os
 import pickle
 import shelve
+import types
+import dill
+import tempfile
 import datetime as dt
 
 from enum import Enum, auto
@@ -129,18 +132,22 @@ class LogEntry:
             except FileNotFoundError:
                 pass
 
-        shelf_files, unshelved = LogEntry.shelve_environment(env)
-        self.shelf = shelf_files
+        shelf_contents, unshelved = LogEntry.shelve_environment(env)
+        self.shelf = shelf_contents
         self.unshelved = unshelved
         return self
         
     def unshelve(self):
         assert self.shelf, "no shelf in this entry"
-        for ext in self.shelf:
-            with open(_SHELF_FILENAME + ext, "wb+") as f:
-                f.write(self.shelf[ext])
+        # for ext in self.shelf:
+        #     with open(_SHELF_FILENAME + ext, "wb+") as f:
+        #         f.write(self.shelf[ext])
         
-        shelf = shelve.open(_SHELF_FILENAME)
+        # shelf = shelve.open(_SHELF_FILENAME)
+        with tempfile.TemporaryFile() as tf:
+            tf.write(self.shelf)
+            shelf = dill.load(tf)
+
         return shelf
 
     @staticmethod
@@ -191,21 +198,34 @@ class LogEntry:
     @staticmethod
     def shelve_environment(env):
         unshelved = []
-        with shelve.open(_SHELF_FILENAME) as shelf:
-            for k, v in env.items():
-                try:
-                    shelf[k] = v
-                except:
-                    unshelved.append(k)
+        filtered_env = {}
+        for k, v in env.items():
+            if type(k) == types.ModuleType:
+                unshelved.append(k)
+            else:
+                filtered_env[k] = v
+
+        # with shelve.open(_SHELF_FILENAME) as shelf:
+        #     for k, v in env.items():
+        #         if type(v) == types.ModuleType:
+        #             continue
+        #         try:
+        #             shelf[k] = v
+        #         except:
+        #             unshelved.append(k)
         
-        shelf_files = {}
-        for file in glob(_SHELF_FILENAME + "*"):
-            ext = re.sub(_SHELF_FILENAME, "", file)
-            f = open(file, "rb")
-            shelf_files[ext] = f.read()
-            f.close()
+        # shelf_files = {}
+        # for file in glob(_SHELF_FILENAME + "*"):
+        #     ext = re.sub(_SHELF_FILENAME, "", file)
+        #     f = open(file, "rb")
+        #     shelf_files[ext] = f.read()
+        #     f.close()
+
+        with tempfile.TemporaryFile() as tf:
+            dill.dump(filtered_env, tf)
+            shelf_contents = tf.read()
             
-        return shelf_files, unshelved
+        return shelf_contents, unshelved
 
 
 class Log:
