@@ -23,7 +23,7 @@ SCORE_THRESHOLD = None
 POINTS_POSSIBLE = None
 SHOW_ALL_ON_RELEASE = False
 SEED = None
-GRADE_FROM_LOG = True
+GRADE_FROM_LOG = False
 
 # for auto-uploading PDFs
 TOKEN = None
