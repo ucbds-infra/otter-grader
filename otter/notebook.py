@@ -158,7 +158,7 @@ class Notebook:
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
 
-    def check(self, question, global_env=None, shelve_env=True):
+    def check(self, question, global_env=None, back_frames=1, shelve_env=True):
         """
         Runs tests for a specific question against a global environment. If no global environment 
         is provided, the test is run against the calling frame's environment.
@@ -179,7 +179,11 @@ class Notebook:
             
             # pass the correct global environment
             if global_env is None:
-                global_env = inspect.currentframe().f_back.f_globals
+                frame = inspect.currentframe()
+                while back_frames:
+                    frame = frame.f_back
+                    back_frames -= 1
+                global_env = frame.f_globals
 
             # run the check
             result = check(test_path, global_env)

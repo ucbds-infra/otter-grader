@@ -14,6 +14,8 @@ import datetime as dt
 from enum import Enum, auto
 from glob import glob
 
+from .notebook import Notebook
+
 
 _SHELF_FILENAME = ".OTTER_ENV"
 
@@ -197,7 +199,7 @@ class LogEntry:
         unshelved = []
         filtered_env = {}
         for k, v in env.items():
-            if type(v) == types.ModuleType:
+            if type(v) == types.ModuleType or type(v) == Notebook:
                 unshelved.append(k)
             elif type(v) == types.FunctionType and v.__module__ in ignore_modules:
                 unshelved.append(k)

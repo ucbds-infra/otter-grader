@@ -251,11 +251,8 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
                             source_is_str_bool = True
                             cell_source_lines = cell_source_lines.split('\n')
 
-                        for i, line in enumerate(cell_source_lines):
-                            # only allow import statements
-                            if "import" not in line:
-                                del cell_source_lines[i]
-                                
+                        # only execute import statements
+                        cell_source_lines = [re.sub(r"^\s+", "", l) for l in cell_source_lines if "import" in l]                                
                         cell_source = "\n".join(cell_source_lines)
                         exec(cell_source, global_env)
                         # source += cell_source
@@ -267,8 +264,9 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
             for entry in log.question_iterator():
                 shelf = entry.unshelve()
                 global_env.update(shelf)
-                script = f"check_results_{secret}.append(grader.check(\"{entry.question}\"))\n"
-                exec(script, global_env)
+                # script = f"check_results_{secret}.append(grader.check(\"{entry.question}\", back_frames=2))\n"
+                # exec(script, global_env)
+                global_env[f"check_results_{secret}"].append(global_env["grader"].check(entry.question, global_env=global_env))
                 logged_questions.append(entry.question)
 
         print("Questions executed from log: {}".format(", ".join(logged_questions)))
