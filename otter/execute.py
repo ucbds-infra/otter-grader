@@ -218,7 +218,7 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, 
 
     return result
 
-def execute_log(log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None):
+def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None):
     with hide_outputs():
         if initial_env:
             global_env = initial_env.copy()
@@ -237,6 +237,33 @@ def execute_log(log, secret='secret', initial_env=None, ignore_errors=False, cwd
         m = mock.mock_open()
         with mock.patch("otter.notebook.Notebook._log_event", m):
             exec(source, global_env)
+
+            for cell in nb['cells']:
+                if cell['cell_type'] == 'code':
+                    # transform the input to executable Python
+                    # FIXME: use appropriate IPython functions here
+                    isp = IPythonInputSplitter(line_input_checker=False)
+                    try:
+                        code_lines = []
+                        cell_source_lines = cell['source']
+                        source_is_str_bool = False
+                        if isinstance(cell_source_lines, str):
+                            source_is_str_bool = True
+                            cell_source_lines = cell_source_lines.split('\n')
+
+                        for i, line in enumerate(cell_source_lines):
+                            # only allow import statements
+                            if "import" not in line:
+                                del cell_source_lines[i]
+                                
+                        cell_source = "\n".join(cell_source_lines)
+                        exec(cell_source, global_env)
+                        # source += cell_source
+                    except:
+                        if not ignore_errors:
+                            raise
+
+
             for entry in log.question_iterator():
                 shelf = entry.unshelve()
                 global_env.update(shelf)
