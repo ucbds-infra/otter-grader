@@ -219,7 +219,7 @@ class LogEntry:
             
         # return shelf_files, unshelved
 
-        dill.dump_session(filename='.TEMP_ENV')#, main=env)
+        dill.dump_session(filename='.TEMP_ENV', main=env)
         with open('.TEMP_ENV', "rb") as f:
             shelf_contents = f.read()
         os.system("rm -f .TEMP_ENV")
