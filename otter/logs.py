@@ -201,7 +201,7 @@ class LogEntry:
         unshelved = []
         filtered_env = {}
         for k, v in env.items():
-            if type(k) == types.ModuleType:
+            if type(v) == types.ModuleType:
                 unshelved.append(k)
             else:
                 filtered_env[k] = v
