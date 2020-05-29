@@ -146,6 +146,7 @@ class LogEntry:
         # shelf = shelve.open(_SHELF_FILENAME)
         with tempfile.TemporaryFile() as tf:
             tf.write(self.shelf)
+            tf.seek(0)
             shelf = dill.load(tf)
 
         return shelf
@@ -223,6 +224,7 @@ class LogEntry:
 
         with tempfile.TemporaryFile() as tf:
             dill.dump(filtered_env, tf)
+            tf.seek(0)
             shelf_contents = tf.read()
             
         return shelf_contents, unshelved
