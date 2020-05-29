@@ -13,8 +13,10 @@ import datetime as dt
 
 from enum import Enum, auto
 from glob import glob
+from typing import TYPE_CHECKING
 
-from .notebook import Notebook
+if TYPE_CHECKING:
+    from .notebook import Notebook
 
 
 _SHELF_FILENAME = ".OTTER_ENV"
