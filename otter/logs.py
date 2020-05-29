@@ -144,6 +144,10 @@ class LogEntry:
             tf.write(self.shelf)
             tf.seek(0)
             shelf = dill.load(tf)
+            
+        for k, v in shelf.items():
+            if type(v) == types.FunctionType:
+                v.__globals__.update(shelf)
 
         return shelf
 
