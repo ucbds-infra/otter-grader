@@ -5,7 +5,7 @@
 import re
 import os
 import pickle
-import shelve
+import dill
 import datetime as dt
 
 from enum import Enum, auto
@@ -46,11 +46,11 @@ class LogEntry:
         error (``Exception``, optional): an error thrown by the process being logged if any
     """
 
-    def __init__(self, event_type, shelf=None, unshelved=[], results=[], question=None, success=True, error=None):
+    def __init__(self, event_type, shelf=None, results=[], question=None, success=True, error=None):
         assert event_type in EventType, "Invalid event type"
         self.event_type = event_type
         self.shelf = shelf
-        self.unshelved = []
+        # self.unshelved = []
         self.results = results
         self.question = question
         self.timestamp = dt.datetime.utcnow()
@@ -129,19 +129,28 @@ class LogEntry:
             except FileNotFoundError:
                 pass
 
-        shelf_files, unshelved = LogEntry.shelve_environment(env)
-        self.shelf = shelf_files
-        self.unshelved = unshelved
+        shelf_contents = LogEntry.shelve_environment(env)
+        self.shelf = shelf_contents
+        # self.unshelved = unshelved
         return self
         
     def unshelve(self):
         assert self.shelf, "no shelf in this entry"
-        for ext in self.shelf:
-            with open(_SHELF_FILENAME + ext, "wb+") as f:
-                f.write(self.shelf[ext])
+        # for ext in self.shelf:
+        #     with open(_SHELF_FILENAME + ext, "wb+") as f:
+        #         f.write(self.shelf[ext])
         
-        shelf = shelve.open(_SHELF_FILENAME)
-        return shelf
+        # shelf = shelve.open(_SHELF_FILENAME)
+        # return shelf
+
+        with open(".TEMP_ENV", "wb+") as f:
+            f.write(self.shelf)
+        
+        env = {}
+        dill.load_session(filename=".TEMP_ENV", main=env)
+
+        os.system("rm -f .TEMP_ENV")
+        return env
 
     @staticmethod
     def sort_log(log, ascending=True):
@@ -190,22 +199,28 @@ class LogEntry:
 
     @staticmethod
     def shelve_environment(env):
-        unshelved = []
-        with shelve.open(_SHELF_FILENAME) as shelf:
-            for k, v in env.items():
-                try:
-                    shelf[k] = v
-                except:
-                    unshelved.append(k)
+        # unshelved = []
+        # with shelve.open(_SHELF_FILENAME) as shelf:
+        #     for k, v in env.items():
+        #         try:
+        #             shelf[k] = v
+        #         except:
+        #             unshelved.append(k)
         
-        shelf_files = {}
-        for file in glob(_SHELF_FILENAME + "*"):
-            ext = re.sub(_SHELF_FILENAME, "", file)
-            f = open(file, "rb")
-            shelf_files[ext] = f.read()
-            f.close()
+        # shelf_files = {}
+        # for file in glob(_SHELF_FILENAME + "*"):
+        #     ext = re.sub(_SHELF_FILENAME, "", file)
+        #     f = open(file, "rb")
+        #     shelf_files[ext] = f.read()
+        #     f.close()
             
-        return shelf_files, unshelved
+        # return shelf_files, unshelved
+
+        dill.dump_session(filename='.TEMP_ENV', main=env)
+        with open('.TEMP_ENV', "rb") as f:
+            shelf_contents = f.read()
+        os.system("rm -f .TEMP_ENV")
+        return shelf_contents
 
 
 class Log:
