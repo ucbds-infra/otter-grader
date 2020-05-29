@@ -106,7 +106,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         initial_env["__name__"] = name
 
     if log is not None:
-        global_env = execute_log(log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir)
+        global_env = execute_log(nb, log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir)
     elif script:
         global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, seed=seed)
     else:
