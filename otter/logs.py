@@ -139,11 +139,7 @@ class LogEntry:
         
     def unshelve(self):
         assert self.shelf, "no shelf in this entry"
-        # for ext in self.shelf:
-        #     with open(_SHELF_FILENAME + ext, "wb+") as f:
-        #         f.write(self.shelf[ext])
-        
-        # shelf = shelve.open(_SHELF_FILENAME)
+
         with tempfile.TemporaryFile() as tf:
             tf.write(self.shelf)
             tf.seek(0)
