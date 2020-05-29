@@ -13,10 +13,6 @@ import datetime as dt
 
 from enum import Enum, auto
 from glob import glob
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .notebook import Notebook
 
 
 _SHELF_FILENAME = ".OTTER_ENV"
@@ -198,6 +194,7 @@ class LogEntry:
 
     @staticmethod
     def shelve_environment(env, ignore_modules=[]):
+        from .notebook import Notebook
         unshelved = []
         filtered_env = {}
         for k, v in env.items():
