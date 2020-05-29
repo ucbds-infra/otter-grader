@@ -235,7 +235,7 @@ def execute_log(log, secret='secret', initial_env=None, ignore_errors=False, cwd
 
         logged_questions = []
         m = mock.mock_open()
-        with mock.patch("otter.logs.LogEntry.flush_to_file", m), mock.patch("otter.logs.LogEntry.shelve_environment", m):
+        with mock.patch("otter.notebook.Notebook._log_event", m):
             exec(source, global_env)
             for entry in log.question_iterator():
                 shelf = entry.unshelve()
