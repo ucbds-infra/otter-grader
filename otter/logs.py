@@ -5,7 +5,6 @@
 import re
 import os
 import pickle
-import types
 import dill
 import datetime as dt
 
@@ -147,12 +146,10 @@ class LogEntry:
         with open(".TEMP_ENV", "wb+") as f:
             f.write(self.shelf)
         
-        mod = types.ModuleType("otter_dummy_module")
-        dill.load_session(filename=".TEMP_ENV", main=mod)
+        env = {}
+        dill.load_session(filename=".TEMP_ENV", main=env)
+
         os.system("rm -f .TEMP_ENV")
-
-        env = mod.__dict__
-
         return env
 
     @staticmethod
