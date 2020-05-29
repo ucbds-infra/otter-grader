@@ -58,6 +58,7 @@ The general usage of `otter generate autograder` is to create a zipfile at some 
 | `--course-id` |  | Course ID for PDF upload |
 | `--assignment-id` |  | Assignment ID for PDF upload |
 | `--unfiltered-pdfs` |  | Indicates that PDFs uploaded for students should be unfiltered |
+| `--grade-from-log` |  | Indicates that the assignment should be graded from the environments stored in the log |
 
 If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts).
 

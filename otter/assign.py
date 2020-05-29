@@ -129,6 +129,9 @@ def main(args):
         if generate_args.get('show_results', False) or args.show_results:
             generate_cmd += ["--show-results"]
         
+        if generate_args.get('grade_from_log', False) or args.grade_from_log:
+            generate_cmd += ["--grade-from-log"]
+        
         if generate_args.get('seed', None) is not None or args.seed is not None:
             generate_cmd += ["--seed", str(args.seed or generate_args.get('seed', None))]
 
@@ -174,6 +177,9 @@ def gen_otter_file(master, result):
     pregraded_questions = ASSIGNMENT_METADATA.get('pregraded_questions', [])
     if pregraded_questions:
         config["pregraded_questions"] = pregraded_questions
+
+    config["save_environment"] = ASSIGNMENT_METADATA.get("save_environment", False)
+    config["ignored_modules"] = ASSIGNMENT_METADATA.get("ignored_modules", [])
 
     config_name = master.stem + '.otter'
     with open(result / 'autograder' / config_name, "w+") as f:
@@ -626,7 +632,7 @@ def read_question_metadata(cell):
     while source[i].strip() != BLOCK_QUOTE:
         lines.append(source[i])
         i = i + 1
-    metadata = yaml.full_load('\n'.join(lines))
+    metadata = yaml.load('\n'.join(lines))
     assert ALLOWED_NAME.match(metadata.get('name', '')), metadata
     return metadata
 
@@ -646,7 +652,7 @@ def read_assignment_metadata(cell):
     while source[i].strip() != BLOCK_QUOTE:
         lines.append(source[i])
         i = i + 1
-    metadata = yaml.full_load('\n'.join(lines))
+    metadata = yaml.load('\n'.join(lines))
     return metadata
 
 

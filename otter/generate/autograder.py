@@ -255,7 +255,7 @@ def main(args):
         assignment_id = str(args.assignment_id),
         filtering = str(not args.unfiltered_pdfs),
         pagebreaks = str(not args.no_pagebreaks),
-        grade_from_log = str(True)
+        grade_from_log = str(args.grade_from_log)
     )
 
     # create tmp directory to zip inside
