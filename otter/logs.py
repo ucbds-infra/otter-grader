@@ -281,12 +281,12 @@ class Log:
 
     def get_question_entry(self, question):
         if self.ascending:
-            self.entries = LogEntry.sort_log(self.entries)
+            self.entries = LogEntry.sort_log(self.entries, ascending=False)
             self.ascending = False
         for entry in self.entries:
             if entry.question == question:
                 return entry
-        raise QuestionNotInLogException()
+        raise QuestionNotInLogException(f"question {question} is not in the log")
 
     def get_results(self, question):
         """Gets the most recent grading result for a specified question from this log
