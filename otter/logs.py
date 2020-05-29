@@ -105,7 +105,7 @@ class LogEntry:
         finally:
             file.close()
 
-    def shelve(self, env, delete=False, filename=None):
+    def shelve(self, env, delete=False, filename=None, ignore_modules=[]):
         # delete old entry without reading entire log
         if delete:
             assert filename, "old env deletion indicated but no log filename provided"
@@ -132,7 +132,7 @@ class LogEntry:
             except FileNotFoundError:
                 pass
 
-        shelf_contents, unshelved = LogEntry.shelve_environment(env)
+        shelf_contents, unshelved = LogEntry.shelve_environment(env, ignore_modules=ignore_modules)
         self.shelf = shelf_contents
         self.unshelved = unshelved
         return self
@@ -193,11 +193,13 @@ class LogEntry:
             file.close()
 
     @staticmethod
-    def shelve_environment(env):
+    def shelve_environment(env, ignore_modules=[]):
         unshelved = []
         filtered_env = {}
         for k, v in env.items():
             if type(v) == types.ModuleType:
+                unshelved.append(k)
+            elif type(v) == types.FunctionType and v.__module__ in ignore_modules:
                 unshelved.append(k)
             else:
                 try:
