@@ -7,6 +7,7 @@
 * Added Otter Export, a forked version of [nb2pdf](https://github.com/ucbds-infra/otter-grader) and [gsExport](https://github.com/dibyaghosh/gsExport) for generating PDFs of notebooks
 * Added Otter Service, a deployable grading service that students can POST their submissions to
 * Added logging to `otter.Notebook` and Otter Check
+* Added saving environments in log for grading
 * Changed filenames inside the package so that names match commands (e.g. `otter/cli.py` is now `otter/grade.py`)
 * Added intercell seeding
 * Moved all argparse calls into `otter.argparser`
