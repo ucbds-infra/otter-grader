@@ -23,7 +23,19 @@ class QuestionNotInLogException(Exception):
 
 
 class EventType(Enum):
-    """Event types for log entries"""
+    """Enum of event types for log entries
+    
+    Attributes:
+        AUTH: an auth event
+        BEGIN_CHECK_ALL: beginning of a check-all call
+        BEGIN_EXPORT: beginning of an assignment export
+        CHECK: a check of a single question
+        END_CHECK_ALL: ending of a check-all call
+        END_EXPORT: ending of an assignment export
+        INIT: initialization of an ``otter.Notebook`` object
+        SUBMIT: submission of an assignment
+        TO_PDF: PDF export of a notebook
+    """
 
     AUTH = auto()
     BEGIN_CHECK_ALL = auto()
