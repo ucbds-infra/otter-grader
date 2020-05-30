@@ -47,6 +47,17 @@ class LogEntry:
         question (``str``, optional): the question name for an EventType.CHECK record
         success (``bool``, optional): whether the operation was successful
         error (``Exception``, optional): an error thrown by the process being logged if any
+
+    Attributes:
+        event_type (``otter.logs.EventType``): the entry type
+        shelf (``bytes``): a pickled environment stored as a bytes string
+        unshelved (``list`` of ``str``): a list of variable names that were unable to be pickled during
+            shelving
+        results (``list`` of ``otter.ok_parser.OKTestsResult``): grading results if this is a check
+            entry
+        question (``str``): question name if this is a check entry
+        success (``bool``): whether the operation tracked by this entry was successful
+        error (``Exception``): an error thrown by the tracked process if applicable
     """
 
     def __init__(self, event_type, shelf=None, unshelved=[], results=[], question=None, success=True, error=None):
@@ -265,12 +276,19 @@ class LogEntry:
 
 
 class Log:
-    """A class for reading and interacting with a log. *Does not support editing the log file.*
+    """
+    A class for reading and interacting with a log. Allows you to iterate over the entries in the log 
+    and supports integer indexing. *Does not support editing the log file.*
 
     Args:
         entries (``list`` of ``otter.logs.LogEntry``): the list of entries for this log
         ascending (``bool``, optional): whether the log is sorted in ascending (chronological) order;
             default ``True``
+
+    Attributes:
+        entries (``list`` of ``otter.logs.LogEntry``): the list of log entries in this log
+        ascending (``bool``): whether ``entries`` is sorted chronologically; ``False`` indicates reverse-
+            chronological order
     """
 
     def __init__(self, entries, ascending=True):
@@ -372,6 +390,11 @@ class QuestionLogIterator:
 
     Args:
         log (``otter.logs.Log``): the log over which to iterate
+
+    Attributes:
+        log (``otter.logs.Log``): the log being iterated over
+        questions (``list`` of ``str``): the list of question names
+        curr_idx (``int``): the integer index of the next question in  ``questions``
     """
     def __init__(self, log):
         log.sort(ascending=False)
