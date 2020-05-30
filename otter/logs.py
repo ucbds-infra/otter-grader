@@ -137,7 +137,7 @@ class LogEntry:
         self.unshelved = unshelved
         return self
         
-    def unshelve(self):
+    def unshelve(self, global_env={}):
         assert self.shelf, "no shelf in this entry"
 
         with tempfile.TemporaryFile() as tf:
@@ -148,6 +148,7 @@ class LogEntry:
         for k, v in shelf.items():
             if type(v) == types.FunctionType:
                 v.__globals__.update(shelf)
+                v.__globals__.update(global_env)
 
         return shelf
 

@@ -264,7 +264,7 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
 
 
             for entry in log.question_iterator():
-                shelf = entry.unshelve()
+                shelf = entry.unshelve(global_env)
                 global_env.update(shelf)
                 # script = f"check_results_{secret}.append(grader.check(\"{entry.question}\", back_frames=2))\n"
                 # exec(script, global_env)
