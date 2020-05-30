@@ -219,6 +219,26 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, 
     return result
 
 def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None):
+    """
+    Executes a notebook from logged environments and returns the global environment that results from execution
+
+    Execute notebook & return the global environment that results from execution. If ``ignore_errors`` 
+    is ``True``, exceptions are swallowed. ``secret`` contains random digits so ``check_results`` and 
+    ``check`` are not easily modifiable. ``nb`` is passed in as a dictionary that's a parsed notebook
+
+    Args:
+        nb (``dict``): JSON representation of a notebook
+        log (``otter.logs.Log``): log from notebook execution
+        secret (``str``, optional): randomly generated integer used to rebind check function
+        initial_env (``str``, optional): name of initial environment
+        ignore_errors (``bool``, optional): whether exceptions should be ignored
+        cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
+            grading environment
+        test_dir (``str``, optional): path to directory of tests in grading environment
+    
+    Results:
+        ``dict``: global environment resulting from executing all code of the input notebook
+    """
     with hide_outputs():
         if initial_env:
             global_env = initial_env.copy()
@@ -266,8 +286,6 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
             for entry in log.question_iterator():
                 shelf = entry.unshelve(global_env)
                 global_env.update(shelf)
-                # script = f"check_results_{secret}.append(grader.check(\"{entry.question}\", back_frames=2))\n"
-                # exec(script, global_env)
                 global_env[f"check_results_{secret}"].append(global_env["grader"].check(entry.question, global_env=global_env))
                 logged_questions.append(entry.question)
 

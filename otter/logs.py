@@ -106,6 +106,24 @@ class LogEntry:
             file.close()
 
     def shelve(self, env, delete=False, filename=None, ignore_modules=[]):
+        """
+        Stores an environment ``env`` in this log entry using dill as a ``bytes`` object in this entry
+        as the ``shelf`` attribute. Writes names of any variables in ``env`` that are not stored to
+        the ``unshelved`` attribute.
+
+        If ``delete`` is ``True``, old environments in the log at ``filename`` for this question are
+        cleared before writing ``env``. Any module names in ``ignore_modules`` will have their functions
+        ignored during pickling.
+
+        Args:
+            env (``dict``): the environment to pickle
+            delete (``bool``, optional): whether to delete old environments
+            filename (``str``, optional): path to log file; ignored if ``delete`` is ``False``
+            ignore_modules (``list`` of ``str``, optional): module names to ignore during pickling
+
+        Returns:
+            ``otter.logs.LogEntry``: this entry
+        """
         # delete old entry without reading entire log
         if delete:
             assert filename, "old env deletion indicated but no log filename provided"
@@ -138,6 +156,17 @@ class LogEntry:
         return self
         
     def unshelve(self, global_env={}):
+        """
+        Parses a ``bytes`` object stored in the ``shelf`` attribute and unpickles the object stored
+        there using dill. Updates the ``__globals__`` of any functions in ``shelf`` to include elements
+        in the shelf. Optionally includes the env passed in as ``global_env``.
+
+        Args:
+            global_env (``dict``, optional): a global env to include in unpickled function globals
+
+        Returns:
+            ``dict``: the shelved environment
+        """
         assert self.shelf, "no shelf in this entry"
 
         with tempfile.TemporaryFile() as tf:
@@ -199,6 +228,19 @@ class LogEntry:
 
     @staticmethod
     def shelve_environment(env, ignore_modules=[]):
+        """
+        Pickles an environment ``env`` using dill, ignoring any functions whose module is listed in
+        ``ignore_modules``. Returns the pickle file contents as a ``bytes`` object and a list of
+        variable names that were unable to be shelved/ignored during shelving.
+
+        Args:
+            env (``dict``): the environment to shelve
+            ignore_modules (``list`` of ``str``, optional): the module names to igonre
+
+        Returns:
+            ``tuple`` of (``bytes``, ``list`` of ``str``): the pickled environment and list of unshelved
+                variable names.
+        """
         from .notebook import Notebook
         unshelved = []
         filtered_env = {}
@@ -213,22 +255,6 @@ class LogEntry:
                     filtered_env[k] = v
                 except:
                     unshelved.append(k)
-
-        # with shelve.open(_SHELF_FILENAME) as shelf:
-        #     for k, v in env.items():
-        #         if type(v) == types.ModuleType:
-        #             continue
-        #         try:
-        #             shelf[k] = v
-        #         except:
-        #             unshelved.append(k)
-        
-        # shelf_files = {}
-        # for file in glob(_SHELF_FILENAME + "*"):
-        #     ext = re.sub(_SHELF_FILENAME, "", file)
-        #     f = open(file, "rb")
-        #     shelf_files[ext] = f.read()
-        #     f.close()
 
         with tempfile.TemporaryFile() as tf:
             dill.dump(filtered_env, tf)
@@ -261,19 +287,37 @@ class Log:
         return iter(self.entries)
 
     def question_iterator(self):
+        """
+        Returns an iterator over the most recent entries for each question.
+
+        Returns:
+            ``otter.logs.QuestionLogIterator``: the iterator
+        """
         return QuestionLogIterator(self)
 
     def sort(self, ascending=True):
+        """
+        Sorts this logs entries by timestmap using ``otter.logs.LogEntry.sort_log``.
+
+        Args:
+            ascending (``bool``, optional): whether to sort the log chronologically; defaults to ``True``
+        """
         self.entries = LogEntry.sort_log(self.entries, ascending=ascending)
         self.ascending = ascending
 
     def get_questions(self):
+        """
+        Returns a sorted list of all question names that have entries in this log.
+
+        Returns:
+            ``list`` of ``str``: the questions in this log
+        """
         all_questions = [entry.question for entry in self.entries if entry.event_type == EventType.CHECK]
         return list(sorted(set(all_questions)))
 
     @classmethod
     def from_file(cls, filename, ascending=True):
-        """Loads a log from a file
+        """Loads and sorts a log from a file.
 
         Args:
             filename (``str``): the path to the log
@@ -286,6 +330,18 @@ class Log:
         return cls(entries=LogEntry.log_from_file(filename, ascending=ascending), ascending=ascending)
 
     def get_question_entry(self, question):
+        """
+        Gets the most recent entry corresponding to the question ``question``
+
+        Args:
+            question (``str``): the question to get
+
+        Returns:
+            ``otter.logs.LogEntry``: the most recent log entry for ``question``
+        
+        Raises:
+            ``otter.logs.QuestionNotInLogException``: if the question is not in the log
+        """
         if self.ascending:
             self.entries = LogEntry.sort_log(self.entries, ascending=False)
             self.ascending = False
@@ -310,6 +366,13 @@ class Log:
 
 
 class QuestionLogIterator:
+    """
+    An iterator over the most recent entries for each question in the log. Sorts the log when initialized
+    and uses `Log.get_questions` to retrieve the list of questions.
+
+    Args:
+        log (``otter.logs.Log``): the log over which to iterate
+    """
     def __init__(self, log):
         log.sort(ascending=False)
         self.log = log

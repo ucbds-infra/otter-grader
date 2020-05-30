@@ -158,7 +158,7 @@ class Notebook:
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
 
-    def check(self, question, global_env=None, back_frames=1, shelve_env=True):
+    def check(self, question, global_env=None):
         """
         Runs tests for a specific question against a global environment. If no global environment 
         is provided, the test is run against the calling frame's environment.
@@ -166,7 +166,7 @@ class Notebook:
         Args:
             question (``str``): name of question being graded
             global_env (``dict``, optional): global environment resulting from execution of a single 
-                notebook
+                notebook 
 
         Returns:
             ``otter.ok_parser.OKTestsResult``: the grade for the question
@@ -179,11 +179,7 @@ class Notebook:
             
             # pass the correct global environment
             if global_env is None:
-                frame = inspect.currentframe()
-                while back_frames:
-                    frame = frame.f_back
-                    back_frames -= 1
-                global_env = frame.f_globals
+                global_env = inspect.currentframe().f_back.f_globals
 
             # run the check
             result = check(test_path, global_env)
@@ -318,7 +314,8 @@ class Notebook:
 
     def check_all(self):
         """
-        Runs all tests on this notebook.
+        Runs all tests on this notebook. Tests are run against the current global environment, so any
+        tests with variable name collisions will fail.
         """
         # TODO: this should use functions in execute.py to run tests in-sequence so that variable
         # name collisions are accounted for
