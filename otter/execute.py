@@ -58,7 +58,7 @@ def check(test_file_path, global_env=None):
 
 
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    cwd=None, test_dir=None, seed=None, pregraded_results=[], log=None):
+    cwd=None, test_dir=None, seed=None, log=None):
     """
     Grade a notebook file & return grade information
 
@@ -75,8 +75,6 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             grading environment
         test_dir (``str``, optional): path to directory of tests in grading environment
         seed (``int``, optional): random seed for intercell seeding
-        pregraded_results (``list`` of ``otter.ok_parser.OKTestResults``): a list of grading results
-            for pregraded questions
 
     Returns:
         ``dict``: a score mapping with keys for each test, the student's scores, and total points 
@@ -129,21 +127,6 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 extra_tests.append(OKTests([t]))
         extra_results = [t.run(global_env, include_grade=False) for t in extra_tests]
         test_results += extra_results
-
-    if pregraded_results:
-        # test_results += pregraded_results
-
-        tested_set = list(itertools.chain(*[r.paths for r in test_results]))
-        for r in pregraded_results:
-            removal_indices = []
-            for i, tested in enumerate(tested_set):
-                if any([tested in path for path in r.paths]):     # e.g. if 'tests/q1.py' is in /srv/repo/lab01/tests/q1.py'
-                    removal_indices.append(i)
-            removal_indices.reverse()
-            for i in removal_indices:
-                del test_results[i]
-
-        test_results += pregraded_results
 
     score_mapping = {}
     points_possible, total_score = 0, 0

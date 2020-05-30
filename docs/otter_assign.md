@@ -36,8 +36,7 @@ This cell is removed from both output notebooks. These configurations, listed in
 | `solutions_pdf` | `False` | Whether to generate a solutions PDF from notebook; either `true`, `false`, or `filtered`; defaults to unfiltered PDF |
 | `template_pdf` | `False` | Whether to generate a filtered template PDF from notebook for setting up a Gradescope assignment |
 | `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
-| `pregraded_questions` | `[]` | A list of question names to be pregraded using the [log](logging.mds) |
-| `save_environment` | `False` | Whether to store environment copies in the log |
+| `save_environment` | `False` | Whether to store environment copies in the [log](logging.mds) |
 | `ignore_modules` | `[]` | A list of modules whose functions to ignore when pickling the environment |
 | `files` | `[]` | A list of support files required either for students or Otter Generate |
 
@@ -346,4 +345,15 @@ If I wanted no initialization cell and no cell filtering in the export cell, I w
 
 ```
 otter assign --no-init-cell --no-filtering hw00.ipynb dist data.csv
+```
+
+## Otter Assign Reference
+
+```eval_rst
+.. argparse::
+   :module: otter.argparser
+   :func: get_parser
+   :prog: otter
+   :path: assign
+   :nodefaultconst:
 ```

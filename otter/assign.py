@@ -101,7 +101,7 @@ def main(args):
         )
 
     # generate the .otter file if needed
-    if ASSIGNMENT_METADATA.get('service', {}) or ASSIGNMENT_METADATA.get('pregraded_questions', []):
+    if ASSIGNMENT_METADATA.get('service', {}) or ASSIGNMENT_METADATA.get('save_environment', False):
         gen_otter_file(master, result)
     
     # run tests on autograder notebook
@@ -156,7 +156,7 @@ def gen_otter_file(master, result):
     """Creates an Otter config file
 
     Uses ``ASSIGNMENT_METADATA`` to generate a ``.otter`` file to configure student use of Otter tools, 
-    including pregraded questions and submission to an Otter Service deployment
+    including saving environments and submission to an Otter Service deployment
 
     Args:
         master (``pathlib.Path``): path to master notebook
@@ -173,10 +173,6 @@ def gen_otter_file(master, result):
             "class_id": service["class_id"],
             "notebook": service.get('notebook', master.name)
         })
-
-    pregraded_questions = ASSIGNMENT_METADATA.get('pregraded_questions', [])
-    if pregraded_questions:
-        config["pregraded_questions"] = pregraded_questions
 
     config["save_environment"] = ASSIGNMENT_METADATA.get("save_environment", False)
     config["ignored_modules"] = ASSIGNMENT_METADATA.get("ignored_modules", [])

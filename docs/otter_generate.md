@@ -88,6 +88,17 @@ Now let's say that I need some functions defined in `utils.py`; then I would add
 otter generate autograder -t hidden-tests data.csv utils.py
 ```
 
+#### Grading with Environments
+
+Otter can grade assignments using saved environemnts in the log in the Gradescope container. This works by unshelving the environment stored in each check entry of Otter's log and grading against it. The notebook is parsed and only its import statements are executed. For more inforamtion about saving and using environments, see [Logging](logging.md).
+
+To configure this behavior, two things are required:
+
+* the use of the `--grade-from-log` flag when generating an autograder zipfile
+* using an Otter configuration file with `save_environments` set to `true`
+
+This will tell Otter to shelve the global environment each time a student calls `Notebook.check` (pruning the environments of old calls each time it is called on the same question). When the assignment is exported using `Notebook.export`, the log file (at `.OTTER_LOG`) is also exported with the global environments. These environments are read in in the Gradescope container and are then used for grading. Because one environment is saved for each check call, variable name collisions can be averted, since each question is graded using the global environment at the time it was checked. Note that any requirements needed for execution need to be installed in the Gradescope container, because Otter's shelving mechanism does not store module objects.
+
 #### Autosubmission of Notebook PDFs
 
 Otter Generate allows instructors to automatically generate PDFs of students' notebooks and upload these as submissions to a separate Gradescope assignment. This requires a Gradescope token, which can be obtained with `otter generate token`. This will ask you to log in to Gradescope with your credentials and will provide you with a token, which can be passed to the `--token` flag of `otter generate autograder` to initialize the generation of PDFs.
@@ -151,10 +162,6 @@ otter generate autograder -t hidden-tests data.csv --show-results
 ```
 
 If `--show-results` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
-
-#### Pregrading Questions
-
-Otter allows some or all questions to be pre-graded during student execution using entirely hidden tests using the log. This can be configured using an Otter configuration file (a JSON-formatted text file with the `.otter` extension). See [Logging](logging.md) for more information.
 
 #### Generating with Otter Assign
 

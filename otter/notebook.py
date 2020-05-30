@@ -56,7 +56,6 @@ class Notebook:
                 
                 _SHELVE = self._config.get("save_environment", False)
                 self._service_enabled = "endpoint" in self._config
-                self._pregraded_questions = self._config.get("pregraded_questions", [])
                 self._ignore_modules = self._config.get("ignore_modules", [])
 
                 if "notebook" not in self._config:
@@ -183,9 +182,6 @@ class Notebook:
 
             # run the check
             result = check(test_path, global_env)
-
-            # if question in self._pregraded_questions:
-            #     self._dump_state({question: result})
         
         except Exception as e:
             self._log_event(EventType.CHECK, question=question, success=False, error=e, shelve_env=global_env)

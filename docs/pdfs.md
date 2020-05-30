@@ -22,7 +22,7 @@ Along with HTML comment filtering, nb2pdf supports filtering cells using cell ta
 
 If you would like to override the behavior above, tag a cell with `ignore` and it will not be included.
 
-## `otter export` Reference
+## Otter Export Reference
 
 ```eval_rst
 .. argparse::

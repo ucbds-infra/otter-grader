@@ -161,7 +161,7 @@ Got:
     True
 ```
 
-## Otter Reference
+## Otter Check Reference
 
 ### `otter.Notebook`
 
