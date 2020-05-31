@@ -274,7 +274,7 @@ class LogEntry:
         filtered_env = {}
         for k, v in env.items():
 
-            # don't store modules
+            # don't store modules or otter.Notebook instances
             if type(v) == types.ModuleType or type(v) == Notebook:
                 unshelved.append(k)
             
@@ -286,10 +286,13 @@ class LogEntry:
             else:
                 try:
                     dill.dumps(v)
+
+                    # only store variable names in variables
                     if (variables and k in variables) or not variables:
                         filtered_env[k] = v
                     else:
                         unshelved.append(k)
+                        
                 except:
                     unshelved.append(k)
 
