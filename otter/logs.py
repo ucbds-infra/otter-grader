@@ -162,7 +162,7 @@ class LogEntry:
                         try:
                             entry = pickle.load(tf)
 
-                            if entry.question == self.question:
+                            if entry.question == self.question and entry.shelf is not None:
                                 variables = list(entry.unshelve().keys())
                                 entry.shelf = None
 
