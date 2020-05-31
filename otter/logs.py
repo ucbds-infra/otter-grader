@@ -113,7 +113,6 @@ class LogEntry:
         """
         if self.error is not None:
             raise self.error
-        # raise ValueError("No error is stored in this log entry")
 
     def flush_to_file(self, filename):
         """Appends this log entry (pickled) to a file
@@ -152,9 +151,13 @@ class LogEntry:
             assert filename, "old env deletion indicated but no log filename provided"
             try:
                 entries = []
-                os.system(f"cp {filename} .TEMP_LOG")
-                os.system(f"rm -f {filename}")
-                with open(".TEMP_LOG", "rb") as tf:
+                
+                # copy the existing log to a temporary file so that we can edit the original
+                with tempfile.TemporaryFile() as tf:
+                    with open(filename, "rb") as f:
+                        tf.write(f.read())
+                    tf.seek(0)
+                    os.system(f"rm -f {filename}")
                     while True:
                         try:
                             entry = pickle.load(tf)
@@ -168,7 +171,6 @@ class LogEntry:
 
                         except EOFError:
                             break
-                os.system("rm -f .TEMP_LOG")
 
             except FileNotFoundError:
                 pass
@@ -192,11 +194,13 @@ class LogEntry:
         """
         assert self.shelf, "no shelf in this entry"
 
+        # read bytes in self.shelf and load with dill
         with tempfile.TemporaryFile() as tf:
             tf.write(self.shelf)
             tf.seek(0)
             shelf = dill.load(tf)
             
+        # add the unpickeld env and global_env to all function __globals__
         for k, v in shelf.items():
             if type(v) == types.FunctionType:
                 v.__globals__.update(shelf)
@@ -268,10 +272,16 @@ class LogEntry:
         unshelved = []
         filtered_env = {}
         for k, v in env.items():
+
+            # don't store modules
             if type(v) == types.ModuleType or type(v) == Notebook:
                 unshelved.append(k)
+            
+            # ignore any functions whose __module__ is in ignore_modules
             elif type(v) == types.FunctionType and v.__module__ in ignore_modules:
                 unshelved.append(k)
+            
+            # ensure object is pickleable by attempting dump and if so add to filtered_env
             else:
                 try:
                     dill.dumps(v)
@@ -279,6 +289,7 @@ class LogEntry:
                 except:
                     unshelved.append(k)
 
+        # dump filtered_env to a temporary file and then return the bytes and unshelved list
         with tempfile.TemporaryFile() as tf:
             dill.dump(filtered_env, tf)
             tf.seek(0)

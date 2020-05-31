@@ -224,10 +224,10 @@ if __name__ == "__main__":
 
     print("\\n\\n")
     print(dedent(\"\"\"\\
-    Test scores are summarized in the table below. If a student fails a hidden tests, a second 
-    output cell is shown that is hidden from students with the output of the failed test. If 
-    a student fails a public test, they are shown the failed test. If a student passes both tests,
-    a single output cell is shown.
+    Test scores are summarized in the table below. Passed tests appear as a single cell with no output.
+    Failed public tests appear as a single cell with the output of the failed test. Failed hidden tests
+    appear as two cells, one with no output (the public tests) and another with the output of the failed
+    (hidden) test that is not visible to the student.
     \"\"\"))
     df = pd.DataFrame(output["tests"])
     if "output" in df.columns:
