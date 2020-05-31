@@ -150,7 +150,7 @@ class LogEntry:
         if delete:
             assert filename, "old env deletion indicated but no log filename provided"
             try:
-                entries = []
+                variables = None
                 
                 # copy the existing log to a temporary file so that we can edit the original
                 with tempfile.TemporaryFile() as tf:
@@ -163,6 +163,7 @@ class LogEntry:
                             entry = pickle.load(tf)
 
                             if entry.question == self.question:
+                                variables = list(entry.unshelve().keys())
                                 entry.shelf = None
 
                             entry.flush_to_file(filename)
@@ -175,7 +176,7 @@ class LogEntry:
             except FileNotFoundError:
                 pass
 
-        shelf_contents, unshelved = LogEntry.shelve_environment(env, ignore_modules=ignore_modules)
+        shelf_contents, unshelved = LogEntry.shelve_environment(env, variables=variables, ignore_modules=ignore_modules)
         self.shelf = shelf_contents
         self.unshelved = unshelved
         return self
@@ -254,7 +255,7 @@ class LogEntry:
             file.close()
 
     @staticmethod
-    def shelve_environment(env, ignore_modules=[]):
+    def shelve_environment(env, variables=None, ignore_modules=[]):
         """
         Pickles an environment ``env`` using dill, ignoring any functions whose module is listed in
         ``ignore_modules``. Returns the pickle file contents as a ``bytes`` object and a list of
@@ -285,7 +286,10 @@ class LogEntry:
             else:
                 try:
                     dill.dumps(v)
-                    filtered_env[k] = v
+                    if (variables and k in variables) or not variables:
+                        filtered_env[k] = v
+                    else:
+                        unshelved.append(k)
                 except:
                     unshelved.append(k)
 
