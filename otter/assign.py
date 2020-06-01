@@ -175,7 +175,7 @@ def gen_otter_file(master, result):
         })
 
     config["save_environment"] = ASSIGNMENT_METADATA.get("save_environment", False)
-    config["ignored_modules"] = ASSIGNMENT_METADATA.get("ignored_modules", [])
+    config["ignore_modules"] = ASSIGNMENT_METADATA.get("ignore_modules", [])
 
     config_name = master.stem + '.otter'
     with open(result / 'autograder' / config_name, "w+") as f:
