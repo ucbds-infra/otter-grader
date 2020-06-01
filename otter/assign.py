@@ -266,9 +266,9 @@ def gen_export_cells(nb_path, instruction_text, filtering=True):
     export = nbformat.v4.new_code_cell()
     source_lines = ["# Save your notebook first, then run this cell to export your submission."]
     if filtering:
-        source_lines.append(f"grader.export(\"{ nb_path.name }\")")
+        source_lines.append(f"grader.export()")
     else:
-        source_lines.append(f"grader.export(\"{ nb_path.name }\", filtering=False)")
+        source_lines.append(f"grader.export(filtering=False)")
     export.source = "\n".join(source_lines)
 
     lock(instructions)
