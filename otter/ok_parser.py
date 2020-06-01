@@ -306,7 +306,11 @@ class OKTest:
         assert not bool(test_suite.get('teardown'))
 
         if 'hidden' in test_spec:
-            warnings.warn("The global 'hidden' key of ok-tests is deprecated since v1.0.0", warnings.FutureWarning)
+            warnings.warn(
+                "The global 'hidden' key of ok-tests is deprecated since v1.0.0. "
+                "This key will be ignored.", 
+                warnings.FutureWarning
+            )
 
         tests = []
         hiddens = []
