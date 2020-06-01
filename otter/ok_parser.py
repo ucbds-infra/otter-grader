@@ -8,6 +8,7 @@ import os
 import doctest
 import io
 import string
+import warnings
 
 from glob import glob
 from contextlib import redirect_stderr, redirect_stdout
@@ -303,6 +304,9 @@ class OKTest:
         # Not setup and teardown supported
         assert not bool(test_suite.get('setup'))
         assert not bool(test_suite.get('teardown'))
+
+        if 'hidden' in test_spec:
+            warnings.warn("The global 'hidden' key of ok-tests is deprecated since v1.0.0", warnings.FutureWarning)
 
         tests = []
         hiddens = []
