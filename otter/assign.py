@@ -628,7 +628,7 @@ def read_question_metadata(cell):
     while source[i].strip() != BLOCK_QUOTE:
         lines.append(source[i])
         i = i + 1
-    metadata = yaml.load('\n'.join(lines))
+    metadata = yaml.full_load('\n'.join(lines))
     assert ALLOWED_NAME.match(metadata.get('name', '')), metadata
     return metadata
 
@@ -648,7 +648,7 @@ def read_assignment_metadata(cell):
     while source[i].strip() != BLOCK_QUOTE:
         lines.append(source[i])
         i = i + 1
-    metadata = yaml.load('\n'.join(lines))
+    metadata = yaml.full_load('\n'.join(lines))
     return metadata
 
 
