@@ -242,7 +242,6 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
             if not os.path.isdir(pdf_folder):
                 mkdir_pdf_command = ["mkdir", pdf_folder]
                 mkdir_pdf = subprocess.run(mkdir_pdf_command, stdout=PIPE, stderr=PIPE)
-                assert not mkdir_pdf.stderr, mkdir_pdf.stderr.decode("utf-8")
             
             # copy out manual submissions
             for pdf in df["manual"]:
