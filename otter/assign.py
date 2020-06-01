@@ -285,7 +285,7 @@ def gen_check_all_cell():
         ``list`` of ``nbformat.NotebookNode``: generated check-all cells
     """
     instructions = nbformat.v4.new_markdown_cell()
-    instructions.source = "To double-check your work, the cell below will rerun all of the autograder tests."
+    instructions.source = "---\n\nTo double-check your work, the cell below will rerun all of the autograder tests."
 
     check_all = nbformat.v4.new_code_cell("grader.check_all()")
 
