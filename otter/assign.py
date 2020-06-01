@@ -84,6 +84,7 @@ def main(args):
     
     # generate PDF of solutions with nb2pdf
     if ASSIGNMENT_METADATA.get('solutions_pdf', False):
+        print("Generating solutions PDF...")
         filtering = ASSIGNMENT_METADATA.get('solutions_pdf') == 'filtered'
         nb2pdf.convert(
             str(result / 'autograder' / master.name),
@@ -93,6 +94,7 @@ def main(args):
 
     # generate a tempalte PDF for Gradescope
     if ASSIGNMENT_METADATA.get('template_pdf', False):
+        print("Generating template PDF...")
         export_notebook(
             str(result / 'autograder' / master.name),
             dest=str(result / 'autograder' / (master.stem + '-template.pdf')), 
@@ -103,19 +105,11 @@ def main(args):
     # generate the .otter file if needed
     if ASSIGNMENT_METADATA.get('service', {}) or ASSIGNMENT_METADATA.get('save_environment', False):
         gen_otter_file(master, result)
-    
-    # run tests on autograder notebook
-    
-    if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
-        print("Running tests...")
-        with block_print():
-            run_tests(result / 'autograder'  / master.name, debug=args.debug, seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) or args.seed)
-        print("All tests passed!")
 
     # generate Gradescope autograder zipfile
     if ASSIGNMENT_METADATA.get('generate', {}) or args.generate:
-        generate_args = ASSIGNMENT_METADATA.get('generate', {})
         print("Generating autograder zipfile...")
+        generate_args = ASSIGNMENT_METADATA.get('generate', {})
         curr_dir = os.getcwd()
         os.chdir(str(result / 'autograder'))
         generate_cmd = ["otter", "generate", "autograder"]
@@ -150,6 +144,13 @@ def main(args):
         subprocess.run(generate_cmd)
 
         os.chdir(curr_dir)
+
+    # run tests on autograder notebook
+    if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
+        print("Running tests...")
+        with block_print():
+            run_tests(result / 'autograder'  / master.name, debug=args.debug, seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) or args.seed)
+        print("All tests passed!")
 
 
 def gen_otter_file(master, result):
