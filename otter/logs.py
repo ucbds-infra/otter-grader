@@ -2,10 +2,8 @@
 ##### Logging for Otter-Grader #####
 ####################################
 
-import re
 import os
 import pickle
-import shelve
 import types
 import dill
 import tempfile
@@ -13,9 +11,6 @@ import datetime as dt
 
 from enum import Enum, auto
 from glob import glob
-
-
-_SHELF_FILENAME = ".OTTER_ENV"
 
 
 class QuestionNotInLogException(Exception):
@@ -70,6 +65,7 @@ class LogEntry:
         question (``str``): question name if this is a check entry
         success (``bool``): whether the operation tracked by this entry was successful
         error (``Exception``): an error thrown by the tracked process if applicable
+        timestamp (``datetime.datetime``): timestamp of event in UTC
     """
 
     def __init__(self, event_type, shelf=None, unshelved=[], results=[], question=None, success=True, error=None):
