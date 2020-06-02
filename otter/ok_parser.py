@@ -309,7 +309,7 @@ class OKTest:
             warnings.warn(
                 "The global 'hidden' key of ok-tests is deprecated since v1.0.0. "
                 "This key will be ignored.", 
-                warnings.FutureWarning
+                FutureWarning
             )
 
         tests = []
