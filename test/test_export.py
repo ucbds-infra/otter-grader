@@ -30,6 +30,7 @@ TEST_FILES_PATH = "test/test-export/"
 class TestExport(unittest.TestCase):
 
     # TODO: stable method of pdf content checking
+
     def test_success_HTML(self):
         test_file = "successful-html-test"
         grade_command = ["export", "--filtering", 
@@ -106,16 +107,3 @@ class TestExport(unittest.TestCase):
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(cleanup.returncode, 0,"Error in cleanup:" + str(cleanup.stderr))
         pass
-
-
-
-
-# determine the test cases for filtering:
-# 1) no open tag - err
-# 2) no close tag - 
-# 3) successful
-# 4) page break flag
-# ------------------- nb2pdf:
-# 5) cell tag: ignore cells
-# 6) cells with image in output
-# 7) tagged with include 
