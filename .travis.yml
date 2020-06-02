@@ -18,9 +18,9 @@ before_script:
 
 install:
   - pip install -r requirements.txt
-  - apt-get update
-  - apt-get install -y pandoc
-  - apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended
+  - sudo apt-get update
+  - sudo apt-get install -y pandoc
+  - sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended
 
 script:
   - coverage run -m unittest discover
