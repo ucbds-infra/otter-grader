@@ -120,8 +120,11 @@ def main(args):
         if generate_args.get('threshold', None) is not None or args.threshold is not None:
             generate_cmd += ["--threshold", args.threshold or generate_args.get('threshold', None)]
         
-        if generate_args.get('show_results', False) or args.show_results:
-            generate_cmd += ["--show-results"]
+        if generate_args.get('show_stdout', False) or args.show_stdout:
+            generate_cmd += ["--show-stdout"]
+        
+        if generate_args.get('show_hidden', False) or args.show_hidden:
+            generate_cmd += ["--show-hidden"]
         
         if generate_args.get('grade_from_log', False) or args.grade_from_log:
             generate_cmd += ["--grade-from-log"]
@@ -171,10 +174,10 @@ def gen_otter_file(master, result):
             "endpoint": service["endpoint"],
             "auth": service.get("auth", "google"),
             "assignment_id": service["assignment_id"],
-            "class_id": service["class_id"],
-            "notebook": service.get('notebook', master.name)
+            "class_id": service["class_id"]
         })
 
+    config["notebook"] = service.get('notebook', master.name)
     config["save_environment"] = ASSIGNMENT_METADATA.get("save_environment", False)
     config["ignore_modules"] = ASSIGNMENT_METADATA.get("ignore_modules", [])
 

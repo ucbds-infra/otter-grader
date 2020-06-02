@@ -53,7 +53,8 @@ The general usage of `otter generate autograder` is to create a zipfile at some 
 | `--threshold` |  | Percentage of pass/fail threshold (as decimal) |
 | `--points` |  | Number of points to scale assignment to |
 | `--seed` |  | A random seed for intercell seeding |
-| `--show-results` |  | Show autograder resutls (score breakdown) to students after grades published |
+| `--show-stdout` |  | Show autograder results (score breakdown) to students after grades published |
+| `--show-hidden` |  | Show autograder results of hidden teststo students after grades published |
 | `--token` |  | Your Gradescope token for uploading PDFs |
 | `--course-id` |  | Course ID for PDF upload |
 | `--assignment-id` |  | Assignment ID for PDF upload |
@@ -155,13 +156,13 @@ otter generate autograder -t hidden-tests data.csv --seed 42
 
 The generator lastly allows intructors to specify whether or not the stdout of the grading process (anything printed to the console by the grader or the notebook) is shown to students. **The stdout includes a summary of the student's test results, including the points earned and possible of public _and_ hidden tests, as well as the visibility of tests as indicated by `test["hidden"]`.** 
 
-This behavior is turned off by default and can be turned on by passing the `--show-results` flag to `otter generate autograder`.
+This behavior is turned off by default and can be turned on by passing the `--show-stdout` flag to `otter generate autograder`.
 
 ```
-otter generate autograder -t hidden-tests data.csv --show-results
+otter generate autograder -t hidden-tests data.csv --show-stdout
 ```
 
-If `--show-results` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
+If `--show-stdout` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
 
 #### Generating with Otter Assign
 
@@ -189,9 +190,9 @@ Instructors will be able to see _all_ tests. The visibility of a test to student
 
 On submission, students will only be able to see the results of those test cases for which `test["suites"][0]["cases"][<int>]["hidden"]` evaluates to `True` (see [Test Files](test_files.md) for more info). If `test["suites"][0]["cases"][<int>]["hidden"]` is `False` or not specified, then that test case is hidden.
 
-If `--show-results` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout.
+If `--show-stdout` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout. If `--show-hidden` was passed, students will also see the failed otput of the failed hidden tests.
 
-Note that, because some tests are hidden, students will never see the autograder score in the right sidebar; instead, their score will only show as a dash `-` out of the points possible. Therefore, the only way for students to calculate their autograder score is to use the DataFrame printed to the stdout if `--show-results` is passed.
+Note that, because some tests are hidden, students will never see the autograder score in the right sidebar; instead, their score will only show as a dash `-` out of the points possible. Therefore, the only way for students to calculate their autograder score is to use the DataFrame printed to the stdout if `--show-stdout` is passed.
 
 ## Otter Generate Reference
 

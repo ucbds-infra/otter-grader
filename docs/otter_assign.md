@@ -40,12 +40,13 @@ This cell is removed from both output notebooks. These configurations, listed in
 | `ignore_modules` | `[]` | A list of modules whose functions to ignore when pickling the environment |
 | `files` | `[]` | A list of support files required either for students or Otter Generate |
 
-A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`). If you require additional arguments, e.g. `points` or `show_results`, then set `generate` to a nested dictionary of these parameters and their values:
+A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`). If you require additional arguments, e.g. `points` or `show_stdout`, then set `generate` to a nested dictionary of these parameters and their values:
 
 ```yaml
 generate:
     seed: 42
-    show_results: true
+    show_stdout: true
+    show_hidden: true
 ```
 
 You can also set the autograder up to automatically upload PDFs to student submissions to another Gradescope assignment by setting the necessary keys in the `pdfs` subkey of `generate`:

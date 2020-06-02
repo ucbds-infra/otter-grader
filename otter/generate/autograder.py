@@ -72,7 +72,8 @@ from otter.notebook import _OTTER_LOG_FILENAME
 
 SCORE_THRESHOLD = {{ threshold }}
 POINTS_POSSIBLE = {{ points }}
-SHOW_ALL_ON_RELEASE = {{ show_all }}
+SHOW_STDOUT_ON_RELEASE = {{ show_stdout }}
+SHOW_HIDDEN_TESTS_ON_RELEASE = {{ show_hidden }}
 SEED = {{ seed }}
 GRADE_FROM_LOG = {{ grade_from_log }}
 
@@ -191,6 +192,9 @@ if __name__ == "__main__":
             print("\\n\\n")
             warnings.warn("PDF generation or submission failed", warnings.RuntimeWarning)
 
+    # hidden visibility determined by SHOW_HIDDEN_TESTS_ON_RELEASE
+    hidden_test_visibility = ("hidden", "after_published")[SHOW_HIDDEN_TESTS_ON_RELEASE]
+
     output = {"tests" : []}
     for key in scores:
         if key != "total" and key != "possible":
@@ -205,12 +209,12 @@ if __name__ == "__main__":
                 "name" : (key, key + " HIDDEN")[scores[key].get("hidden", False)],
                 "score" : scores[key]["score"],
                 "possible": scores[key]["possible"],
-                "visibility": ("visible", "hidden")[scores[key].get("hidden", False)]
+                "visibility": ("visible", hidden_test_visibility)[scores[key].get("hidden", False)]
             }]
             if "hint" in scores[key]:
                 output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
-    if SHOW_ALL_ON_RELEASE:
+    if SHOW_STDOUT_ON_RELEASE:
         output["stdout_visibility"] = "after_published"
 
     if POINTS_POSSIBLE is not None:
@@ -251,7 +255,8 @@ def main(args):
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
         points = str(args.points),
-        show_all = str(args.show_results),
+        show_stdout = str(args.show_stdout),
+        show_hidden = str(args.show_hidden),
         seed = str(args.seed),
         token = str(args.token),
         course_id = str(args.course_id),
