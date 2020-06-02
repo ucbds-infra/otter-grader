@@ -46,7 +46,8 @@ def get_parser():
     assign_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold; use with --generate only")
     assign_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points; use with --generate only")
     assign_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell; use with --generate only")
-    assign_parser.add_argument("--show-results", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests); use with --generate only")
+    assign_parser.add_argument("--show-stdout", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
+    assign_parser.add_argument("--show-hidden", action="store_true", default=False, help="Show autograder results for hidden tests after publishing grades")
     assign_parser.add_argument("--grade-from-log", default=False, action="store_true", help="Whether to grade assignments based on the logged environments")
 
     assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
