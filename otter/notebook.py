@@ -57,6 +57,7 @@ class Notebook:
                 _SHELVE = self._config.get("save_environment", False)
                 self._service_enabled = "endpoint" in self._config
                 self._ignore_modules = self._config.get("ignore_modules", [])
+                self._vars_to_store = self._config.get("variables", None)
 
                 if "notebook" not in self._config:
                     assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
@@ -152,7 +153,13 @@ class Notebook:
         )
 
         if _SHELVE and event_type == EventType.CHECK:
-            entry.shelve(shelve_env, delete=True, filename=_OTTER_LOG_FILENAME, ignore_modules=self._ignore_modules)
+            entry.shelve(
+                shelve_env, 
+                delete=True, 
+                filename=_OTTER_LOG_FILENAME, 
+                ignore_modules=self._ignore_modules,
+                variables=self._vars_to_store
+            )
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
