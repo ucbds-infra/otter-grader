@@ -138,8 +138,8 @@ class LogEntry:
             delete (``bool``, optional): whether to delete old environments
             filename (``str``, optional): path to log file; ignored if ``delete`` is ``False``
             ignore_modules (``list`` of ``str``, optional): module names to ignore during pickling
-            variables (``dict``): map of variable name to type string indicating **only** variables 
-                to include (all variables not in this dictionary will be ignored)
+            variables (``dict``, optional): map of variable name to type string indicating **only** 
+                variables to include (all variables not in this dictionary will be ignored)
 
         Returns:
             ``otter.logs.LogEntry``: this entry
@@ -179,8 +179,11 @@ class LogEntry:
             except FileNotFoundError:
                 pass
 
-        if isinstance(variables_stored, list):
-            variables = {k : v for k, v in variables.items() if k in variables_stored}
+        try:
+            if isinstance(variables_stored, list):
+                variables = {k : v for k, v in variables.items() if k in variables_stored}
+        except UnboundLocalError:
+            pass
 
         shelf_contents, unshelved = LogEntry.shelve_environment(env, variables=variables, ignore_modules=ignore_modules)
         self.shelf = shelf_contents
@@ -269,9 +272,9 @@ class LogEntry:
 
         Args:
             env (``dict``): the environment to shelve
-            variables (``dict`` *or* ``list``): a map of variable name to type string indicating **only** variables 
-                to include (all variables not in this dictionary will be ignored) or a list of variable
-                names to include regardless of tpye
+            variables (``dict`` *or* ``list``, optional): a map of variable name to type string indicating 
+                **only** variables to include (all variables not in this dictionary will be ignored) 
+                or a list of variable names to include regardless of tpye
             ignore_modules (``list`` of ``str``, optional): the module names to igonre
 
         Returns:

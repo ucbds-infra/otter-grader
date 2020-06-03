@@ -58,7 +58,7 @@ def check(test_file_path, global_env=None):
 
 
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    cwd=None, test_dir=None, seed=None, log=None):
+    cwd=None, test_dir=None, seed=None, log=None, variables=None):
     """
     Grade a notebook file & return grade information
 
@@ -75,6 +75,9 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             grading environment
         test_dir (``str``, optional): path to directory of tests in grading environment
         seed (``int``, optional): random seed for intercell seeding
+        log (``otter.logs.Log``, optional): log from which to grade questions
+        variables (``dict``, optional): map of variable names -> type string to check type of deserialized
+            object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
 
     Returns:
         ``dict``: a score mapping with keys for each test, the student's scores, and total points 
@@ -104,7 +107,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         initial_env["__name__"] = name
 
     if log is not None:
-        global_env = execute_log(nb, log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir)
+        global_env = execute_log(nb, log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, variables=variables)
     elif script:
         global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, seed=seed)
     else:
@@ -201,7 +204,7 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, 
 
     return result
 
-def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None):
+def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None, variables=None):
     """
     Executes a notebook from logged environments and returns the global environment that results from execution
 
@@ -218,6 +221,8 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
         cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
             grading environment
         test_dir (``str``, optional): path to directory of tests in grading environment
+        variables (``dict``, optional): map of variable names -> type string to check type of deserialized
+            object to prevent arbitrary code from being put into the environment
     
     Results:
         ``dict``: global environment resulting from executing all code of the input notebook
@@ -268,6 +273,14 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
 
             for entry in log.question_iterator():
                 shelf = entry.unshelve(global_env)
+
+                if variables is not None:
+                    for k, v in shelf.items():
+                        full_type = type(v).__module__ + "." + type(v).__name__
+                        if not (k in variables and variables[k] == full_type):
+                            del shelf[k]
+                            print(f"Found variable of different type than expected: {k}")
+
                 global_env.update(shelf)
                 global_env[f"check_results_{secret}"].append(global_env["grader"].check(entry.question, global_env=global_env))
                 logged_questions.append(entry.question)

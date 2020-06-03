@@ -76,6 +76,7 @@ SHOW_STDOUT_ON_RELEASE = {{ show_stdout }}
 SHOW_HIDDEN_TESTS_ON_RELEASE = {{ show_hidden }}
 SEED = {{ seed }}
 GRADE_FROM_LOG = {{ grade_from_log }}
+SERIALIZED_VARIABLES = {{ serialized_variables }}
 
 # for auto-uploading PDFs
 {% if token != 'None' %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
@@ -263,7 +264,8 @@ def main(args):
         assignment_id = str(args.assignment_id),
         filtering = str(not args.unfiltered_pdfs),
         pagebreaks = str(not args.no_pagebreaks),
-        grade_from_log = str(args.grade_from_log)
+        grade_from_log = str(args.grade_from_log),
+        serialized_variables = str(args.serialized_variables)
     )
 
     # create tmp directory to zip inside

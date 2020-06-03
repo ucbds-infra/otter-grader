@@ -97,6 +97,7 @@ def get_parser():
     generate_autograder_parser.add_argument("--course-id", default=None, help="Gradescope course ID")
     generate_autograder_parser.add_argument("--assignment-id", default=None, help="Gradescope assignment ID for PDFs")
     generate_autograder_parser.add_argument("--grade-from-log", default=False, action="store_true", help="Whether to grade assignments based on the logged environments")
+    generate_autograder_parser.add_argument("--serialized-variables", default="{}", help="String representation of Python dict mapping variable names to full types for verification when deserializing log")
     generate_autograder_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
     generate_autograder_parser.set_defaults(func=generate.autograder.main)

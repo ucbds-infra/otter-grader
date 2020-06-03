@@ -143,6 +143,9 @@ def main(args):
         
         if ASSIGNMENT_METADATA.get('files', []) or args.files:
             generate_cmd += args.files or ASSIGNMENT_METADATA.get('files', [])
+
+        if ASSIGNMENT_METADATA.get('variables', {}):
+            generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
         
         subprocess.run(generate_cmd)
 
