@@ -165,7 +165,7 @@ class LogEntry:
                                     variables = list(entry.unshelve().keys())
                                     variables_stored = None
                                 else:
-                                    variables_stored = list(entry.unshelve.keys())
+                                    variables_stored = list(entry.unshelve().keys())
                                 
                                 entry.shelf = None
 
