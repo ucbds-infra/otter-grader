@@ -254,8 +254,10 @@ def main(args):
         args.threshold
     )
 
-    if not args.token:
-        args.token = APIClient.get_token()
+    if args.course_id or args.assignment_id:
+        assert args.course_id and args.assignment_id, "Either course ID or assignment ID unspecified for PDF submissions"
+        if not args.token:
+            args.token = APIClient.get_token()
 
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
