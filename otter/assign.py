@@ -19,6 +19,7 @@ import nb2pdf
 
 from collections import namedtuple
 from glob import glob
+from getpass import getpass
 
 from .execute import grade_notebook
 from .jassign import gen_views as jassign_views
@@ -134,7 +135,8 @@ def main(args):
 
         if generate_args.get('pdfs', {}):
             pdf_args = generate_args.get('pdfs', {})
-            generate_cmd += ["--token", str(pdf_args["token"])]
+            token = getpass("What is your Gradescope token? ")
+            generate_cmd += ["--token", token]
             generate_cmd += ["--course-id", str(pdf_args["course_id"])]
             generate_cmd += ["--assignment-id", str(pdf_args["assignment_id"])]
 
