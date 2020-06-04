@@ -81,7 +81,7 @@ GRADE_FROM_LOG = {{ grade_from_log }}
 SERIALIZED_VARIABLES = {{ serialized_variables }}
 
 # for auto-uploading PDFs
-{% if token != 'None' %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
+{% if token %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
 COURSE_ID = '{{ course_id }}'
 ASSIGNMENT_ID = '{{ assignment_id }}'
 FILTERING = {{ filtering }}
