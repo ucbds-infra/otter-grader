@@ -91,7 +91,7 @@ def get_parser():
     generate_autograder_parser.add_argument("--show-stdout", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
     generate_autograder_parser.add_argument("--show-hidden", action="store_true", default=False, help="Show autograder results for hidden tests after publishing grades")
     generate_autograder_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
-    generate_autograder_parser.add_argument("--token", default=None, help="Gradescope token for generating and uploading PDFs")
+    generate_autograder_parser.add_argument("--token", default="", nargs="?", help="Gradescope token for generating and uploading PDFs")
     generate_autograder_parser.add_argument("--unfiltered-pdfs", default=False, action="store_true", help="Whether the PDFs should be unfiltered")
     generate_autograder_parser.add_argument("--no-pagebreaks", default=False, action="store_true", help="Whether the PDFs should not have page breaks between questions")
     generate_autograder_parser.add_argument("--course-id", default=None, help="Gradescope course ID")

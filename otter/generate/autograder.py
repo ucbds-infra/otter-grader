@@ -10,6 +10,8 @@ from glob import glob
 from subprocess import PIPE
 from jinja2 import Template
 
+from .token import APIClient
+
 REQUIREMENTS = Template("""datascience
 jupyter_client
 ipykernel
@@ -251,6 +253,9 @@ def main(args):
     assert args.threshold is None or 0 <= args.threshold <= 1, "{} is not a valid threshold".format(
         args.threshold
     )
+
+    if not args.token:
+        args.token = APIClient.get_token()
 
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
