@@ -10,6 +10,8 @@ from glob import glob
 from subprocess import PIPE
 from jinja2 import Template
 
+from .token import APIClient
+
 REQUIREMENTS = Template("""datascience
 jupyter_client
 ipykernel
@@ -76,9 +78,10 @@ SHOW_STDOUT_ON_RELEASE = {{ show_stdout }}
 SHOW_HIDDEN_TESTS_ON_RELEASE = {{ show_hidden }}
 SEED = {{ seed }}
 GRADE_FROM_LOG = {{ grade_from_log }}
+SERIALIZED_VARIABLES = {{ serialized_variables }}
 
 # for auto-uploading PDFs
-{% if token != 'None' %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
+{% if token %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
 COURSE_ID = '{{ course_id }}'
 ASSIGNMENT_ID = '{{ assignment_id }}'
 FILTERING = {{ filtering }}
@@ -251,6 +254,11 @@ def main(args):
         args.threshold
     )
 
+    if args.course_id or args.assignment_id:
+        assert args.course_id and args.assignment_id, "Either course ID or assignment ID unspecified for PDF submissions"
+        if not args.token:
+            args.token = APIClient.get_token()
+
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
@@ -263,7 +271,8 @@ def main(args):
         assignment_id = str(args.assignment_id),
         filtering = str(not args.unfiltered_pdfs),
         pagebreaks = str(not args.no_pagebreaks),
-        grade_from_log = str(args.grade_from_log)
+        grade_from_log = str(args.grade_from_log),
+        serialized_variables = str(args.serialized_variables)
     )
 
     # create tmp directory to zip inside

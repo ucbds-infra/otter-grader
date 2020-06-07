@@ -123,7 +123,7 @@ class LogEntry:
         finally:
             file.close()
 
-    def shelve(self, env, delete=False, filename=None, ignore_modules=[]):
+    def shelve(self, env, delete=False, filename=None, ignore_modules=[], variables=None):
         """
         Stores an environment ``env`` in this log entry using dill as a ``bytes`` object in this entry
         as the ``shelf`` attribute. Writes names of any variables in ``env`` that are not stored to
@@ -138,6 +138,8 @@ class LogEntry:
             delete (``bool``, optional): whether to delete old environments
             filename (``str``, optional): path to log file; ignored if ``delete`` is ``False``
             ignore_modules (``list`` of ``str``, optional): module names to ignore during pickling
+            variables (``dict``, optional): map of variable name to type string indicating **only** 
+                variables to include (all variables not in this dictionary will be ignored)
 
         Returns:
             ``otter.logs.LogEntry``: this entry
@@ -145,9 +147,7 @@ class LogEntry:
         # delete old entry without reading entire log
         if delete:
             assert filename, "old env deletion indicated but no log filename provided"
-            try:
-                variables = None
-                
+            try:                
                 # copy the existing log to a temporary file so that we can edit the original
                 with tempfile.TemporaryFile() as tf:
                     with open(filename, "rb") as f:
@@ -159,7 +159,14 @@ class LogEntry:
                             entry = pickle.load(tf)
 
                             if entry.question == self.question and entry.shelf is not None:
-                                variables = list(entry.unshelve().keys())
+
+                                # only edit variables if it's not provided
+                                if variables is None:
+                                    variables = list(entry.unshelve().keys())
+                                    variables_stored = None
+                                else:
+                                    variables_stored = list(entry.unshelve().keys())
+                                
                                 entry.shelf = None
 
                             entry.flush_to_file(filename)
@@ -171,6 +178,12 @@ class LogEntry:
 
             except FileNotFoundError:
                 pass
+
+        try:
+            if isinstance(variables_stored, list):
+                variables = {k : v for k, v in variables.items() if k in variables_stored}
+        except UnboundLocalError:
+            pass
 
         shelf_contents, unshelved = LogEntry.shelve_environment(env, variables=variables, ignore_modules=ignore_modules)
         self.shelf = shelf_contents
@@ -259,6 +272,9 @@ class LogEntry:
 
         Args:
             env (``dict``): the environment to shelve
+            variables (``dict`` *or* ``list``, optional): a map of variable name to type string indicating 
+                **only** variables to include (all variables not in this dictionary will be ignored) 
+                or a list of variable names to include regardless of tpye
             ignore_modules (``list`` of ``str``, optional): the module names to igonre
 
         Returns:
@@ -283,9 +299,17 @@ class LogEntry:
                 try:
                     dill.dumps(v)
 
-                    # only store variable names in variables
+                    # only store variable names in variables that have the correct type
                     if (variables and k in variables) or not variables:
-                        filtered_env[k] = v
+                        full_type = type(v).__module__ + "." + type(v).__name__
+
+                        if (isinstance(variables, dict) and full_type == variables[k]) or \
+                            isinstance(variables, list) or not variables:
+                            filtered_env[k] = v
+
+                        else:
+                            unshelved.append(k)
+
                     else:
                         unshelved.append(k)
                         

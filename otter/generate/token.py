@@ -23,6 +23,14 @@ class APIClient:
         if token is not None:
             self.token = token
 
+    @classmethod
+    def get_token(cls):
+        client = cls()
+        email = input("Please provide the email address on your Gradescope account: ")
+        password = getpass.getpass('Password: ')
+        client.log_in(email, password)
+        return client.token
+
     def post(self, *args, **kwargs):
         return self.session.post(*args, **kwargs)
 

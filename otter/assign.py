@@ -19,11 +19,13 @@ import nb2pdf
 
 from collections import namedtuple
 from glob import glob
+from getpass import getpass
 
 from .execute import grade_notebook
 from .jassign import gen_views as jassign_views
 from .export import export_notebook
 from .utils import block_print, str_to_doctest
+from .generate.token import APIClient
 
 
 NB_VERSION = 4
@@ -134,7 +136,8 @@ def main(args):
 
         if generate_args.get('pdfs', {}):
             pdf_args = generate_args.get('pdfs', {})
-            generate_cmd += ["--token", str(pdf_args["token"])]
+            token = APIClient.get_token()
+            generate_cmd += ["--token", token]
             generate_cmd += ["--course-id", str(pdf_args["course_id"])]
             generate_cmd += ["--assignment-id", str(pdf_args["assignment_id"])]
 
@@ -143,6 +146,9 @@ def main(args):
         
         if ASSIGNMENT_METADATA.get('files', []) or args.files:
             generate_cmd += args.files or ASSIGNMENT_METADATA.get('files', [])
+
+        if ASSIGNMENT_METADATA.get('variables', {}):
+            generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
         
         subprocess.run(generate_cmd)
 
@@ -180,6 +186,9 @@ def gen_otter_file(master, result):
     config["notebook"] = service.get('notebook', master.name)
     config["save_environment"] = ASSIGNMENT_METADATA.get("save_environment", False)
     config["ignore_modules"] = ASSIGNMENT_METADATA.get("ignore_modules", [])
+
+    if ASSIGNMENT_METADATA.get("variables", None):
+        config["variables"] = ASSIGNMENT_METADATA.get("variables")
 
     config_name = master.stem + '.otter'
     with open(result / 'autograder' / config_name, "w+") as f:

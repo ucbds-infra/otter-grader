@@ -25,6 +25,7 @@ SHOW_STDOUT_ON_RELEASE = False
 SHOW_HIDDEN_TESTS_ON_RELEASE = False
 SEED = None
 GRADE_FROM_LOG = False
+SERIALIZED_VARIABLES = {}
 
 # for auto-uploading PDFs
 TOKEN = None
