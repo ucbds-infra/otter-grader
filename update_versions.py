@@ -14,6 +14,7 @@
 
 import re
 import subprocess
+import warnings
 
 CURRENT_VERSION = "0.4.7"
 NEW_VERSION = "1.0.0"
@@ -30,6 +31,12 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
 ]
 
 def main():
+    if TO_GIT and subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip():
+        warnings.warn(
+            "You have uncommitted changes that will not be included in this release. To include "
+            "them, commit your changes and rerun this script.",
+            UserWarning
+        )
     for file in FILES_WITH_VERSIONS:
         with open(file) as f:
             contents = f.read()
