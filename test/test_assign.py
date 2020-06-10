@@ -76,7 +76,7 @@ class TestAssign(unittest.TestCase):
         """
         # run otter assign
         run_assign_args = [
-            "assign", "--no-run-tests", "--jassign", TEST_FILES_PATH + "jassign-example.ipynb", TEST_FILES_PATH + "output-jassign", TEST_FILES_PATH + "data.csv"
+            "assign", "--no-run-tests", TEST_FILES_PATH + "jassign-example.ipynb", TEST_FILES_PATH + "output-jassign", TEST_FILES_PATH + "data.csv"
         ]
         args = parser.parse_args(run_assign_args)
 
@@ -89,7 +89,7 @@ class TestAssign(unittest.TestCase):
         self.assertEqual(os.listdir(TEST_FILES_PATH + "output-jassign"), ["autograder", "student"])
 
         # check contents of autograder directory
-        self.assertEqual(len(os.listdir(TEST_FILES_PATH + "output-jassign/autograder")), 3)
+        self.assertEqual(len(os.listdir(TEST_FILES_PATH + "output-jassign/autograder")), 4)
         for f in ["tests", "data.csv", "jassign-example.ipynb"]:
             self.assertIn(f, os.listdir(TEST_FILES_PATH + "output-jassign/autograder"))
         for f in ["q1.py", "q3.py"]:

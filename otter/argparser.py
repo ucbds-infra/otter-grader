@@ -37,7 +37,7 @@ def get_parser():
     assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
     # assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
     # assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
-    # assign_parser.add_argument("--jassign", default=False, action="store_true", help="Use jassign notebook format")
+    # assign_parser.add_argument("--jassign", default=False, action="store_true", help="Use jassign output notebook format")
     assign_parser.add_argument("--debug", default=False, action="store_true", help="Do not ignore errors in running tests for debugging")
 
     # generate options -- COMMENTED OUT BECAUSE YOU SHOULD USE THE ASSIGNMENT METADATA FOR THIS

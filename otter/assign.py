@@ -239,7 +239,7 @@ def convert_to_ok(nb_path, dir, args):
         nb['cells'] += gen_check_all_cell()
     
     if ASSIGNMENT_METADATA.get('export_cell', True) and not args.no_export_cell:
-        export_cell = ASSIGNMENT_METADATA.get("export_cell")
+        export_cell = ASSIGNMENT_METADATA.get("export_cell", True)
         if export_cell is True:
             export_cell = {}
 
