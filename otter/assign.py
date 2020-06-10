@@ -74,15 +74,15 @@ def main(args):
     """
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
-    if args.jassign:
-        jassign_views(master, result, args)
-    else:
-        gen_views(master, result, args)
+    # if args.jassign:
+    #     jassign_views(master, result, args)
+    # else:
+    gen_views(master, result, args)
 
     # check that we have a seed if needed
     if SEED_REQUIRED:
-        assert (not ASSIGNMENT_METADATA.get('generate', {}) and not args.generate) or \
-            (ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) is not None or args.seed is not None), "Seeding cell found but no seed provided"
+        assert not ASSIGNMENT_METADATA.get('generate', {})  or \
+            ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) is not None, "Seeding cell found but no seed provided"
     
     # generate PDF of solutions with nb2pdf
     if ASSIGNMENT_METADATA.get('solutions_pdf', False):
@@ -109,30 +109,34 @@ def main(args):
         gen_otter_file(master, result)
 
     # generate Gradescope autograder zipfile
-    if ASSIGNMENT_METADATA.get('generate', {}) or args.generate:
+    if ASSIGNMENT_METADATA.get('generate', {}):
         print("Generating autograder zipfile...")
+
         generate_args = ASSIGNMENT_METADATA.get('generate', {})
+        if generate_args is True:
+            generate_args = {}
+
         curr_dir = os.getcwd()
         os.chdir(str(result / 'autograder'))
         generate_cmd = ["otter", "generate", "autograder"]
 
-        if generate_args.get('points', None) is not None or args.points is not None:
-            generate_cmd += ["--points", args.points or generate_args.get('points', None)]
+        if generate_args.get('points', None) is not None:
+            generate_cmd += ["--points", generate_args.get('points', None)]
         
-        if generate_args.get('threshold', None) is not None or args.threshold is not None:
-            generate_cmd += ["--threshold", args.threshold or generate_args.get('threshold', None)]
+        if generate_args.get('threshold', None) is not None:
+            generate_cmd += ["--threshold", generate_args.get('threshold', None)]
         
-        if generate_args.get('show_stdout', False) or args.show_stdout:
+        if generate_args.get('show_stdout', False):
             generate_cmd += ["--show-stdout"]
         
-        if generate_args.get('show_hidden', False) or args.show_hidden:
+        if generate_args.get('show_hidden', False):
             generate_cmd += ["--show-hidden"]
         
-        if generate_args.get('grade_from_log', False) or args.grade_from_log:
+        if generate_args.get('grade_from_log', False):
             generate_cmd += ["--grade-from-log"]
         
-        if generate_args.get('seed', None) is not None or args.seed is not None:
-            generate_cmd += ["--seed", str(args.seed or generate_args.get('seed', None))]
+        if generate_args.get('seed', None) is not None:
+            generate_cmd += ["--seed", str(generate_args.get('seed', None))]
 
         if generate_args.get('pdfs', {}):
             pdf_args = generate_args.get('pdfs', {})
@@ -144,8 +148,8 @@ def main(args):
             if not pdf_args.get("filtering", True):
                 generate_cmd += ["--unfiltered-pdfs"]
         
-        if ASSIGNMENT_METADATA.get('files', []) or args.files:
-            generate_cmd += args.files or ASSIGNMENT_METADATA.get('files', [])
+        if ASSIGNMENT_METADATA.get('files', []):
+            generate_cmd += ASSIGNMENT_METADATA.get('files', [])
 
         if ASSIGNMENT_METADATA.get('variables', {}):
             generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
@@ -158,7 +162,7 @@ def main(args):
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         with block_print():
-            run_tests(result / 'autograder'  / master.name, debug=args.debug, seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) or args.seed)
+            run_tests(result / 'autograder' / master.name, debug=args.debug, seed=ASSIGNMENT_METADATA.get('generate', {}).get('seed', None))
         print("All tests passed!")
 
 
@@ -213,15 +217,16 @@ def convert_to_ok(nb_path, dir, args):
     tests_dir = dir / 'tests'
     os.makedirs(tests_dir, exist_ok=True)
 
-    if os.path.isfile(args.requirements):
-        shutil.copy(args.requirements, str(dir / 'requirements.txt'))
+    requirements = ASSIGNMENT_METADATA.get('requirements', None) or args.requirements
+    if os.path.isfile(requirements):
+        shutil.copy(requirements, str(dir / 'requirements.txt'))
 
     with open(nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
     ok_cells = gen_ok_cells(nb['cells'], tests_dir)
 
     # copy files
-    for file in ASSIGNMENT_METADATA.get('files', []) or args.files:
+    for file in ASSIGNMENT_METADATA.get('files', []):
         shutil.copy(file, str(dir))
 
     if ASSIGNMENT_METADATA.get('init_cell', True) and not args.no_init_cell:
@@ -234,10 +239,15 @@ def convert_to_ok(nb_path, dir, args):
         nb['cells'] += gen_check_all_cell()
     
     if ASSIGNMENT_METADATA.get('export_cell', True) and not args.no_export_cell:
+        export_cell = ASSIGNMENT_METADATA.get("export_cell")
+        if export_cell is True:
+            export_cell = {}
+
         nb['cells'] += gen_export_cells(
             nb_path, 
-            ASSIGNMENT_METADATA.get('instructions', '') or args.instructions, 
-            filtering = ASSIGNMENT_METADATA.get('filtering', True) and not args.no_filter
+            export_cell.get('instructions', ''), 
+            pdf = export_cell.get('pdf', True),
+            filtering = export_cell.get('filtering', True)
         )
 
     with open(ok_nb_path, 'w') as f:
@@ -256,12 +266,13 @@ def gen_init_cell():
     return cell
 
 
-def gen_export_cells(nb_path, instruction_text, filtering=True):
+def gen_export_cells(nb_path, instruction_text, pdf=True, filtering=True):
     """Generates export cells
     
     Args:
         nb_path (``str``): path to master notebook
         instruction_text (``str``): extra instructions for students when exporting
+        pdf (``bool``, optional): whether a PDF is needed
         filtering (``bool``, optional): whether PDF filtering is needed
     
     Returns:
@@ -278,10 +289,12 @@ def gen_export_cells(nb_path, instruction_text, filtering=True):
 
     export = nbformat.v4.new_code_cell()
     source_lines = ["# Save your notebook first, then run this cell to export your submission."]
-    if filtering:
+    if filtering and pdf:
         source_lines.append(f"grader.export()")
-    else:
+    elif not filtering:
         source_lines.append(f"grader.export(filtering=False)")
+    else:
+        source_lines.append(f"grader.export(pdf=False)")
     export.source = "\n".join(source_lines)
 
     lock(instructions)
@@ -927,8 +940,11 @@ def gen_views(master_nb, result_dir, args):
     ok_nb_path = convert_to_ok(master_nb, autograder_dir, args)
     shutil.rmtree(student_dir, ignore_errors=True)
     shutil.copytree(autograder_dir, student_dir)
-    if os.path.isfile(str(student_dir / os.path.split(args.requirements)[1])):
-        os.remove(str(student_dir / os.path.split(args.requirements)[1]))
+
+    requirements = ASSIGNMENT_METADATA.get('requirements', None) or args.requirements
+    if os.path.isfile(str(student_dir / os.path.split(requirements)[1])):
+        os.remove(str(student_dir / os.path.split(requirements)[1]))
+
     student_nb_path = student_dir / ok_nb_path.name
     os.remove(student_nb_path)
     strip_solutions(ok_nb_path, student_nb_path)
