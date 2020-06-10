@@ -50,7 +50,7 @@ def get_parser():
     # assign_parser.add_argument("--show-hidden", action="store_true", default=False, help="Show autograder results for hidden tests after publishing grades")
     # assign_parser.add_argument("--grade-from-log", default=False, action="store_true", help="Whether to grade assignments based on the logged environments")
 
-    # assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
+    assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
 
     assign_parser.set_defaults(func=assign.main)
 

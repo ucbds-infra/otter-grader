@@ -148,8 +148,8 @@ def main(args):
             if not pdf_args.get("filtering", True):
                 generate_cmd += ["--unfiltered-pdfs"]
         
-        if ASSIGNMENT_METADATA.get('files', []):
-            generate_cmd += ASSIGNMENT_METADATA.get('files', [])
+        if ASSIGNMENT_METADATA.get('files', []) or args.files:
+            generate_cmd += ASSIGNMENT_METADATA.get('files', []) or args.files
 
         if ASSIGNMENT_METADATA.get('variables', {}):
             generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
@@ -226,7 +226,7 @@ def convert_to_ok(nb_path, dir, args):
     ok_cells = gen_ok_cells(nb['cells'], tests_dir)
 
     # copy files
-    for file in ASSIGNMENT_METADATA.get('files', []):
+    for file in ASSIGNMENT_METADATA.get('files', []) or args.files:
         shutil.copy(file, str(dir))
 
     if ASSIGNMENT_METADATA.get('init_cell', True) and not args.no_init_cell:
