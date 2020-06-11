@@ -22,7 +22,7 @@ from glob import glob
 from getpass import getpass
 
 from .execute import grade_notebook
-from .jassign import gen_views as jassign_views
+# from .jassign import gen_views as jassign_views
 from .export import export_notebook
 from .utils import block_print, str_to_doctest
 from .generate.token import APIClient
