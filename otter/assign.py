@@ -881,6 +881,15 @@ def strip_solutions(original_nb_path, stripped_nb_path):
     md_solutions.reverse()
     for i in md_solutions:
         del nb['cells'][i]
+
+    empty_remove = []
+    for i, cell in enumerate(nb['cells']):
+        # Remove any empty cells and the grader.check cell that follows it.
+        if cell['source'].strip() == '...':
+            empty_remove += [i, i+1]
+    empty_remove.reverse()
+    for i in empty_remove:
+        del nb['cells'][i]
     
     # remove output from student version
     remove_output(nb)
