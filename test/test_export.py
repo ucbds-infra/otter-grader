@@ -118,7 +118,7 @@ class TestExport(unittest.TestCase):
         with contextlib.redirect_stdout(actual_output):
             args.func(args)
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             actual_output.getvalue().strip(), 
             expected_output.strip(), 
             f"Empty TeX did not fail: \n\n{actual_output.getvalue()}"
