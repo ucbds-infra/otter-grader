@@ -10,7 +10,6 @@ import pkg_resources
 
 from .filter import load_notebook
 
-
 def notebook_to_pdf(nb, dest, templating="test.tplx", save_tex=False, debug=False):
     """
     Writes a parsed notebook ``nb`` to a PDF file using nbconvert. Forked from
