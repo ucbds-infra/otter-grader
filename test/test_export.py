@@ -9,6 +9,7 @@ import json
 import re
 import contextlib
 import nbconvert
+import filecmp
 
 from io import StringIO
 from unittest import mock
@@ -33,7 +34,7 @@ class TestExport(unittest.TestCase):
 
     def test_success_HTML(self):
         test_file = "successful-html-test"
-        grade_command = ["export", "--filtering", 
+        grade_command = ["export", "--filtering", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
         args = parser.parse_args(grade_command)
@@ -42,9 +43,9 @@ class TestExport(unittest.TestCase):
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".pdf"))
 
         #TODO: checks for equality
-
+        self.assertTrue(filecmp.cmp(TEST_FILES_PATH + test_file+".tex",TEST_FILES_PATH + "/correct/"+test_file+".tex"))
         #cleanup
-        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf"]
+        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(cleanup.returncode, 0,"Error in cleanup: " + str(cleanup.stderr))
         pass
@@ -55,7 +56,7 @@ class TestExport(unittest.TestCase):
         """
         test_file = "success-pagebreak-test"
         grade_command = ["export", "--filtering",
-            "--pagebreaks", 
+            "--pagebreaks", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
         args = parser.parse_args(grade_command)
@@ -64,9 +65,9 @@ class TestExport(unittest.TestCase):
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".pdf"))
 
         # TODO : checks for equality 
-
+        self.assertTrue(filecmp.cmp(TEST_FILES_PATH + test_file+".tex",TEST_FILES_PATH + "/correct/"+test_file+".tex"))
         #cleanup
-        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf"]
+        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(cleanup.returncode, 0,"Error in cleanup: " + str(cleanup.stderr))
         pass
@@ -92,7 +93,7 @@ class TestExport(unittest.TestCase):
         """
         test_file = "no-close-tag-test"
         grade_command = ["export", "--filtering",
-            "--pagebreaks", 
+            "--pagebreaks", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
         args = parser.parse_args(grade_command)
@@ -101,9 +102,9 @@ class TestExport(unittest.TestCase):
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".pdf"))
 
         # TODO : checks for equality 
-
+        self.assertTrue(filecmp.cmp(TEST_FILES_PATH + test_file+".tex",TEST_FILES_PATH + "/correct/"+test_file+".tex"))
         #cleanup
-        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf"]
+        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(cleanup.returncode, 0,"Error in cleanup:" + str(cleanup.stderr))
         pass
