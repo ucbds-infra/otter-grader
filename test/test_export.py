@@ -53,7 +53,9 @@ class TestExport(unittest.TestCase):
         # check correct TeX
         with open(TEST_FILES_PATH + test_file + ".tex") as actual:
             with open(TEST_FILES_PATH + "/correct/" + test_file + ".tex") as expected:
-                self.assertEqual(actual.read(), expected.read(), f"TeX is not equal: \n\n{actual}")
+                actual_contents = actual.read()
+                expected_contents = expected.read()
+                self.assertEqual(actual_contents, expected_contents, f"TeX is not equal: \n\n{actual_contents}")
 
         # cleanup
         cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
@@ -78,7 +80,9 @@ class TestExport(unittest.TestCase):
         # check correct TeX
         with open(TEST_FILES_PATH + test_file + ".tex") as actual:
             with open(TEST_FILES_PATH + "/correct/" + test_file + ".tex") as expected:
-                self.assertEqual(actual.read(), expected.read(), f"TeX is not equal: \n\n{actual}")
+                actual_contents = actual.read()
+                expected_contents = expected.read()
+                self.assertEqual(actual_contents, expected_contents, f"TeX is not equal: \n\n{actual_contents}")
 
         # cleanup
         cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
@@ -138,7 +142,9 @@ class TestExport(unittest.TestCase):
         # check correct TeX
         with open(TEST_FILES_PATH + test_file + ".tex") as actual:
             with open(TEST_FILES_PATH + "/correct/" + test_file + ".tex") as expected:
-                self.assertEqual(actual.read(), expected.read(), f"TeX is not equal: \n\n{actual}")
+                actual_contents = actual.read()
+                expected_contents = expected.read()
+                self.assertEqual(actual_contents, expected_contents, f"TeX is not equal: \n\n{actual_contents}")
 
         # cleanup
         cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
