@@ -328,7 +328,7 @@ Otter Grader also supports [intercell seeding](seeding.md) via the `--seed` flag
 otter grade --seed 42
 ```
 
-## `otter grade` Reference
+## Otter Grade Reference
 
 ```eval_rst
 .. argparse::

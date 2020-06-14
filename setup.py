@@ -21,7 +21,7 @@ setuptools.setup(
 	],
 	install_requires=[
 		"pyyaml", "nbformat", "ipython", "nbconvert", "tqdm", "setuptools", "pandas", "nb2pdf", "tornado",
-		"docker", "jinja2"
+		"docker", "jinja2", "dill"
 	],
 	scripts=["bin/otter"],
 	package_data={"otter.service": ["templates/*.html"], "otter.export": ["*.tplx"]}

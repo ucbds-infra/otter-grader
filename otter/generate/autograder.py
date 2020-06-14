@@ -10,6 +10,8 @@ from glob import glob
 from subprocess import PIPE
 from jinja2 import Template
 
+from .token import APIClient
+
 REQUIREMENTS = Template("""datascience
 jupyter_client
 ipykernel
@@ -22,9 +24,10 @@ sklearn
 jinja2
 nbconvert
 nbformat
+dill
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@beta{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@f39f7bedafc0204b8dd482591de58c2e4a400198{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
@@ -55,6 +58,8 @@ import os
 import shutil
 import subprocess
 import re
+import pickle
+import warnings
 import pandas as pd
 
 from glob import glob
@@ -64,14 +69,19 @@ from nb2pdf import convert
 from otter.execute import grade_notebook
 from otter.export import export_notebook
 from otter.generate.token import APIClient
+from otter.logs import Log, QuestionNotInLogException
+from otter.notebook import _OTTER_LOG_FILENAME
 
 SCORE_THRESHOLD = {{ threshold }}
 POINTS_POSSIBLE = {{ points }}
-SHOW_ALL_ON_RELEASE = {{ show_all }}
+SHOW_STDOUT_ON_RELEASE = {{ show_stdout }}
+SHOW_HIDDEN_TESTS_ON_RELEASE = {{ show_hidden }}
 SEED = {{ seed }}
+GRADE_FROM_LOG = {{ grade_from_log }}
+SERIALIZED_VARIABLES = {{ serialized_variables }}
 
 # for auto-uploading PDFs
-{% if token != 'None' %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
+{% if token %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
 COURSE_ID = '{{ course_id }}'
 ASSIGNMENT_ID = '{{ assignment_id }}'
 FILTERING = {{ filtering }}
@@ -137,23 +147,56 @@ if __name__ == "__main__":
     for file in tests_glob:
         shutil.copy(file, "/autograder/submission/tests")
 
-    scores = grade_notebook(nb_path, glob("/autograder/submission/tests/*.py"), name="submission", gradescope=True, ignore_errors=True, seed=SEED)
+    if glob("*.otter"):
+        assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
+        with open(glob("*.otter")[0]) as f:
+            config = json.load(f)
+    else:
+        config = None
+
+    if GRADE_FROM_LOG:
+        assert os.path.isfile(_OTTER_LOG_FILENAME), "missing log"
+        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+        print("\\n\\n")     # for logging in otter.execute.execute_log
+    else:
+        log = None
+
+    scores = grade_notebook(
+        nb_path, 
+        glob("/autograder/submission/tests/*.py"), 
+        name="submission", 
+        cwd="/autograder/submission", 
+        test_dir="/autograder/submission/tests",
+        ignore_errors=True, 
+        seed=SEED,
+        log=log
+    )
     # del scores["TEST_HINTS"]
 
     if GENERATE_PDF:
-        export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
-        pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
+        try:
+            export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
+            pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
 
-        # get student email
-        with open("../submission_metadata.json") as f:
-            metadata = json.load(f)
+            # get student email
+            with open("../submission_metadata.json") as f:
+                metadata = json.load(f)
 
-        student_emails = []
-        for user in metadata["users"]:
-            student_emails.append(user["email"])
-        
-        for student_email in student_emails:
-            CLIENT.upload_pdf_submission(COURSE_ID, ASSIGNMENT_ID, student_email, pdf_path)
+            student_emails = []
+            for user in metadata["users"]:
+                student_emails.append(user["email"])
+            
+            for student_email in student_emails:
+                CLIENT.upload_pdf_submission(COURSE_ID, ASSIGNMENT_ID, student_email, pdf_path)
+
+            print("\\n\\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
+
+        except:
+            print("\\n\\n")
+            warnings.warn("PDF generation or submission failed", warnings.RuntimeWarning)
+
+    # hidden visibility determined by SHOW_HIDDEN_TESTS_ON_RELEASE
+    hidden_test_visibility = ("hidden", "after_published")[SHOW_HIDDEN_TESTS_ON_RELEASE]
 
     output = {"tests" : []}
     for key in scores:
@@ -169,12 +212,12 @@ if __name__ == "__main__":
                 "name" : (key, key + " HIDDEN")[scores[key].get("hidden", False)],
                 "score" : scores[key]["score"],
                 "possible": scores[key]["possible"],
-                "visibility": ("visible", "hidden")[scores[key].get("hidden", False)]
+                "visibility": ("visible", hidden_test_visibility)[scores[key].get("hidden", False)]
             }]
             if "hint" in scores[key]:
                 output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
-    if SHOW_ALL_ON_RELEASE:
+    if SHOW_STDOUT_ON_RELEASE:
         output["stdout_visibility"] = "after_published"
 
     if POINTS_POSSIBLE is not None:
@@ -191,10 +234,10 @@ if __name__ == "__main__":
 
     print("\\n\\n")
     print(dedent(\"\"\"\\
-    Test scores are summarized in the table below. If a student fails a hidden tests, a second 
-    output cell is shown that is hidden from students with the output of the failed test. If 
-    a student fails a public test, they are shown the failed test. If a student passes both tests,
-    a single output cell is shown.
+    Test scores are summarized in the table below. Passed tests appear as a single cell with no output.
+    Failed public tests appear as a single cell with the output of the failed test. Failed hidden tests
+    appear as two cells, one with no output (the public tests) and another with the output of the failed
+    (hidden) test that is not visible to the student.
     \"\"\"))
     df = pd.DataFrame(output["tests"])
     if "output" in df.columns:
@@ -205,23 +248,31 @@ if __name__ == "__main__":
 
 def main(args):
     """
-    Main function for configuring a Gradescope based autograder.
+    Runs ``otter generate autograder``
     """
     assert args.threshold is None or 0 <= args.threshold <= 1, "{} is not a valid threshold".format(
         args.threshold
     )
 
+    if args.course_id or args.assignment_id:
+        assert args.course_id and args.assignment_id, "Either course ID or assignment ID unspecified for PDF submissions"
+        if not args.token:
+            args.token = APIClient.get_token()
+
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
         points = str(args.points),
-        show_all = str(args.show_results),
+        show_stdout = str(args.show_stdout),
+        show_hidden = str(args.show_hidden),
         seed = str(args.seed),
         token = str(args.token),
         course_id = str(args.course_id),
         assignment_id = str(args.assignment_id),
         filtering = str(not args.unfiltered_pdfs),
-        pagebreaks = str(not args.no_pagebreaks)
+        pagebreaks = str(not args.no_pagebreaks),
+        grade_from_log = str(args.grade_from_log),
+        serialized_variables = str(args.serialized_variables)
     )
 
     # create tmp directory to zip inside

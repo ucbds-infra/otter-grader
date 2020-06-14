@@ -11,8 +11,10 @@ from .utils import merge_csv
 
 
 def main(args):
-    """
-    Main function for running otter from the command line.
+    """Runs Otter Grade
+
+    Args:
+        args (``argparse.Namespace``): parsed command line arguments
     """
     # Asserts that exactly one metadata flag is provided
     assert sum([meta != False for meta in [

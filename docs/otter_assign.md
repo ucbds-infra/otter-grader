@@ -36,14 +36,17 @@ This cell is removed from both output notebooks. These configurations, listed in
 | `solutions_pdf` | `False` | Whether to generate a solutions PDF from notebook; either `true`, `false`, or `filtered`; defaults to unfiltered PDF |
 | `template_pdf` | `False` | Whether to generate a filtered template PDF from notebook for setting up a Gradescope assignment |
 | `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
+| `save_environment` | `False` | Whether to store environment copies in the [log](logging.mds) |
+| `ignore_modules` | `[]` | A list of modules whose functions to ignore when pickling the environment |
 | `files` | `[]` | A list of support files required either for students or Otter Generate |
 
-A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`). If you require additional arguments, e.g. `points` or `show_results`, then set `generate` to a nested dictionary of these parameters and their values:
+A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`). If you require additional arguments, e.g. `points` or `show_stdout`, then set `generate` to a nested dictionary of these parameters and their values:
 
 ```yaml
 generate:
     seed: 42
-    show_results: true
+    show_stdout: true
+    show_hidden: true
 ```
 
 You can also set the autograder up to automatically upload PDFs to student submissions to another Gradescope assignment by setting the necessary keys in the `pdfs` subkey of `generate`:
@@ -343,4 +346,15 @@ If I wanted no initialization cell and no cell filtering in the export cell, I w
 
 ```
 otter assign --no-init-cell --no-filtering hw00.ipynb dist data.csv
+```
+
+## Otter Assign Reference
+
+```eval_rst
+.. argparse::
+   :module: otter.argparser
+   :func: get_parser
+   :prog: otter
+   :path: assign
+   :nodefaultconst:
 ```

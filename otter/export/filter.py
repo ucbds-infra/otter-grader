@@ -1,7 +1,7 @@
-################################################
-##### Cell Filtering for Jupyter Notebooks #####
-#####    forked from nb2pdf and gsExport   #####
-################################################
+#######################################################
+##### Cell Filtering for Jupyter Notebook Exports #####
+#####       forked from nb2pdf and gsExport       #####
+#######################################################
 
 import re
 import nbformat
@@ -15,6 +15,19 @@ NEW_PAGE_CELL_SOURCE = "<!-- #newpage -->"
 
 
 def load_notebook(nb_path, filtering=True, pagebreaks=False):
+    """
+    Loads notebook at ``nb_path`` with nbformat and returns the parsed notebook, optionally filtered
+    and with pagebreak metadata hidden in HTML comments.
+
+    Args:
+        nb_path (``str``): path to notebook
+        filtering (``bool``, optional): whetheer cells should be filtered
+        pagebreaks (``bool``, optional): whether to include pagebreaks between each question; ignored
+            if ``filtering`` is ``False``
+
+    Returns:
+        ``nbformat.NotebookNode``: the parsed and (optionally) filtered notebook
+    """
     with open(nb_path) as f:
         notebook = nbformat.read(f, as_version=NBFORMAT_VERSION)
     if filtering:
@@ -23,19 +36,78 @@ def load_notebook(nb_path, filtering=True, pagebreaks=False):
 
 
 def has_begin(line):
+    """Returns whether a string contains a begin question comment
+
+    A begin question comment is an HTML comment on a single line that denotes the beginning of an 
+    export block. The begin question comment looks like:
+
+    .. code-block:: html
+
+        <!-- BEGIN QUESTION -->
+    
+    Args:
+        line (``str``): the line to search
+    
+    Returns:
+        ``bool``: whether the line contains a substring matching the begin question regex
+    """
     return bool(re.search(BEGIN_QUESTION_REGEX, line, flags=re.IGNORECASE))
 
 def has_end(line):
+    """Returns whether a string contains an end question comment
+
+    An end question comment is an HTML comment on a single line that denotes the end of an export 
+    block. The begin question comment looks like:
+
+    .. code-block:: html
+
+        <!-- END QUESTION -->
+    
+    Args:
+        line (``str``): the line to search
+    
+    Returns:
+        ``bool``: whether the line contains a substring matching the end question regex
+    """
     return bool(re.search(END_QUESTION_REGEX, line, flags=re.IGNORECASE))
 
-def create_new_page_cell(line):
-    return nbformat.v4.new_markdown_cell(source=NEW_PAGE_CELL_SOURCE)
+# def create_new_page_cell(line):
+#     """
+
+#     """
+#     return nbformat.v4.new_markdown_cell(source=NEW_PAGE_CELL_SOURCE)
 
 def sub_end_for_new_page(line):
+    """Subsitutes an end question comment for a newpage comment
+
+    The end question HTML comment (cf. ``otter.export.filter.has_end``) is replaced with the following
+    HTML comment to indicate a pagebreak in the LaTeX template.
+
+    .. code-block:: html
+
+        <!-- #newpage -->
+
+    Args:
+        ``line``: the line to substitute in
+
+    Returns:
+        ``str``: the line with the end question match substituted for the newpage comment
+    """
     return re.sub(END_QUESTION_REGEX, NEW_PAGE_CELL_SOURCE, line)
 
 
 def filter_notebook_cells_by_comments(notebook, pagebreaks=False):
+    """
+    Filters a parsed notebook using HTML comments in Markdown cells. Optionally inserts pagebreak
+    metadata as HTML comments.
+
+    Args:
+        notebook (``nbformat.NotebookNode``): the parsed notebook
+        pagebreaks (``bool``, optional): whether to include pagebreaks between questions
+
+    Returns:
+        ``nbformat.NotebookNode``: the filtered notebook with (optional) pagebreaks
+    """
     cells = notebook["cells"]
 
     idx_to_delete, in_question = [], False

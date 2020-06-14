@@ -8,6 +8,8 @@ from glob import glob
 from jinja2 import Template
 
 from .execute import grade_notebook, check
+from .logs import LogEntry, EventType
+from .notebook import _OTTER_LOG_FILENAME
 from .utils import block_print
 
 
@@ -21,34 +23,67 @@ Tests failed:
 {% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
 """)
 
+def _log_event(event_type, results=[], question=None, success=True, error=None):
+	"""Logs an event
+
+	Args:
+		event_type (``otter.logs.EventType``): the type of event
+		results (``list`` of ``otter.ok_parser.OKTestsResult``, optional): the results of any checks
+			recorded by the entry
+		question (``str``, optional): the question name for this check
+		success (``bool``, optional): whether the operation was successful
+		error (``Exception``, optional): the exception thrown by the operation, if applicable
+	"""
+	LogEntry(
+		event_type,
+		results=results,
+		question=question, 
+		success=success, 
+		error=error
+	).flush_to_file(_OTTER_LOG_FILENAME)
+
 def main(args):
+	"""Runs Otter Check
 
-	if args.question:
-		test_path = os.path.join(args.tests_path, args.question + ".py")
-		assert os.path.isfile(test_path), "Test {} does not exist".format(args.question)
-		qs = [test_path]
-	else:
-		qs = glob(os.path.join(args.tests_path, "*.py"))
+	Args:
+		args (``argparse.Namespace``): parsed command line arguments
+	"""
 
-	assert os.path.isfile(args.file), "{} is not a file".format(args.file)
-	assert args.file[-6:] == ".ipynb" or args.file[-3:] == ".py", "{} is not a Jupyter Notebook or Python file".format(args.file)
+	try:
+		if args.question:
+			test_path = os.path.join(args.tests_path, args.question + ".py")
+			assert os.path.isfile(test_path), "Test {} does not exist".format(args.question)
+			qs = [test_path]
+		else:
+			qs = glob(os.path.join(args.tests_path, "*.py"))
 
-	with block_print():
-		results = grade_notebook(
-			args.file,
-			tests_glob=qs,
-			script=args.file[-3:] == ".py",
-			seed=args.seed
+		assert os.path.isfile(args.file), "{} is not a file".format(args.file)
+		assert args.file[-6:] == ".ipynb" or args.file[-3:] == ".py", "{} is not a Jupyter Notebook or Python file".format(args.file)
+
+		script = args.file[-3:] == ".py"
+
+		with block_print():
+			results = grade_notebook(
+				args.file,
+				tests_glob=qs,
+				script=script,
+				seed=args.seed
+			)
+
+		passed_tests = [test for test in results if test not in ["possible", "total"] and "hint" not in results[test]]
+		failed_tests = [results[test]["hint"] for test in results if test not in ["possible", "total"] and "hint" in results[test]]
+
+		output = RESULT_TEMPLATE.render(
+			grade=results["total"] / results["possible"],
+			passed_tests=passed_tests,
+			failed_tests=failed_tests,
+			scores=results
 		)
 
-	passed_tests = [test for test in results if test not in ["possible", "total"] and "hint" not in results[test]]
-	failed_tests = [results[test]["hint"] for test in results if test not in ["possible", "total"] and "hint" in results[test]]
+		print(output)
 
-	output = RESULT_TEMPLATE.render(
-		grade=results["total"] / results["possible"],
-		passed_tests=passed_tests,
-		failed_tests=failed_tests,
-		scores=results
-	)
-
-	print(output)
+	except Exception as e:
+		_log_event(EventType.CHECK, success=False, error=e)
+			
+	else:
+		_log_event(EventType.CHECK, results=results)

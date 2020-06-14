@@ -4,10 +4,10 @@ otter.generate package
 Submodules
 ----------
 
-otter.generate.generate module
-------------------------------
+otter.generate.autograder module
+--------------------------------
 
-.. automodule:: otter.generate.generate
+.. automodule:: otter.generate.autograder
    :members:
    :undoc-members:
    :show-inheritance:

@@ -69,6 +69,14 @@ otter.jassign module
    :undoc-members:
    :show-inheritance:
 
+otter.logs module
+-----------------
+
+.. automodule:: otter.logs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 otter.metadata module
 ---------------------
 

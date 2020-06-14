@@ -19,9 +19,8 @@ class GradescopeParser:
 	"""Metadata parser for Gradescope exports
 
     Args:
-        submissions_dir (str): Path to directory with student submission files which contains 
-			the submission_metadata.yml file
-
+        submissions_dir (``str``): path to directory with student submission files which contains 
+			the ``submission_metadata.yml`` file
 	"""
 
 	def __init__(self, submissions_dir):
@@ -65,8 +64,8 @@ class GradescopeParser:
 		"""Returns mapping of identifiers to files
 		
 		Returns:
-			dict: List of dictionaries with identifier and filename information for each submitter
-
+			``list`` of ``dict``: list of dictionaries with identifier and filename information for 
+				each submission
 		"""
 		return self._metadata
 
@@ -74,11 +73,10 @@ class GradescopeParser:
 		"""Returns a identifier given a filename
 		
 		Args:
-			file (str): Filename
+			file (``str``): filename of a submission
 		
 		Returns:
-			str: identifier corresponding to filename
-
+			``str``: identifier corresponding to filename
 		"""
 		return self._file_to_id[file]
 
@@ -86,11 +84,10 @@ class GradescopeParser:
 		"""Returns a filename given an identifier
 		
 		Args:
-			identifier (str): Identifier of a submitter
+			identifier (``str``): identifier of a submitter
 
 		Returns:
-			str: filename of that submitter's submission
-		
+			``str``: filename of that submitter's submission
 		"""
 		return self._id_to_file[identifier]
 
@@ -98,8 +95,7 @@ class GradescopeParser:
 		"""Returns list of submission identifiers
 		
 		Returns:
-			list: all identifiers from this parser
-
+			``list``: all identifiers from this parser
 		"""
 		return [file["identifier"] for file in self._metadata]
 
@@ -107,8 +103,7 @@ class GradescopeParser:
 		"""Returns list of filenames in the submission directory
 		
 		Returns:
-			list: all filenames from this parser
-
+			``list``: all filenames from this parser
 		"""
 		return [file["filename"] for file in self._metadata]
 
@@ -117,8 +112,7 @@ class CanvasParser:
 	"""Metadata parser for Canvas exports
 	
 	Args:
-        submissions_dir (str): Path to directory with student submission files
-
+        submissions_dir (``str``): path to directory with student submission files
 	"""
 	def __init__(self, submissions_dir):
 		# list all files in the submissions directory since Canvas
@@ -146,8 +140,8 @@ class CanvasParser:
 		"""Returns mapping of identifiers to files
 		
 		Returns:
-			dict: List of dictionaries with identifier and filename information for each submitter
-		
+			``list`` of ``dict``: list of dictionaries with identifier and filename information for 
+				each submission
 		"""
 		return self._metadata
 
@@ -155,11 +149,10 @@ class CanvasParser:
 		"""Returns a identifier given a filename
 		
 		Args:
-			file (str): Filename
+			file (``str``): filename of a submission
 		
 		Returns:
-			str: Identifier corresponding to filename
-		
+			``str``: identifier corresponding to filename
 		"""
 		return self._file_to_id[file]
 
@@ -167,11 +160,10 @@ class CanvasParser:
 		"""Returns a filename given an identifier
 		
 		Args:
-			identifier (str): Identifier of a submitter
+			identifier (``str``): identifier of a submitter
 
 		Returns:
-			str: filename of that submitter's submission
-		
+			``str``: filename of that submitter's submission
 		"""
 		return self._id_to_file[identifier]
 
@@ -179,8 +171,7 @@ class CanvasParser:
 		"""Returns list of submission identifiers
 		
 		Returns:
-			list: all identifiers from this parser
-		
+			``list``: all identifiers from this parser
 		"""
 		return [file["identifier"] for file in self._metadata]
 
@@ -188,8 +179,7 @@ class CanvasParser:
 		"""Returns list of filenames in the submission directory
 		
 		Returns:
-			list: all filenames from this parser
-			
+			``list``: all filenames from this parser
 		"""
 		return [file["filename"] for file in self._metadata]
 
@@ -198,7 +188,7 @@ class JSONParser:
 	"""Metadata parser for JSON format
 	
 	Args:
-        submissions_dir (str): Path to directory with student submission files
+        file_path (``str``): path to JSON metadata file
 	
 	"""
 	def __init__(self, file_path):
@@ -226,8 +216,8 @@ class JSONParser:
 		"""Returns mapping of identifiers to files
 		
 		Returns:
-			dict: List of dictionaries with identifier and filename information for each submitter
-
+			``list`` of ``dict``: list of dictionaries with identifier and filename information for 
+				each submission
 		"""
 		return self._metadata
 
@@ -235,11 +225,10 @@ class JSONParser:
 		"""Returns a identifier given a filename
 		
 		Args:
-			file (str): Filename
+			file (``str``): filename of a submission
 		
 		Returns:
-			str: Identifier corresponding to filename
-		
+			``str``: identifier corresponding to filename
 		"""
 		return self._file_to_id[file]
 
@@ -247,11 +236,10 @@ class JSONParser:
 		"""Returns a filename given an identifier
 		
 		Args:
-			identifier (str): Identifier of a submitter
+			identifier (``str``): identifier of a submitter
 
 		Returns:
-			str: filename of that submitter's submission
-			
+			``str``: filename of that submitter's submission
 		"""
 		return self._id_to_file[identifier]
 
@@ -259,8 +247,7 @@ class JSONParser:
 		"""Returns list of submission identifiers
 		
 		Returns:
-			list: all identifiers from this parser
-			
+			``list``: all identifiers from this parser
 		"""
 		return [file["identifier"] for file in self._metadata]
 
@@ -268,8 +255,7 @@ class JSONParser:
 		"""Returns list of filenames in the submission directory
 		
 		Returns:
-			list: all filenames from this parser
-		
+			``list``: all filenames from this parser
 		"""
 		return [file["filename"] for file in self._metadata]
 
@@ -278,8 +264,7 @@ class YAMLParser:
 	"""Metadata parser for YAML format
 	
 	Args:
-        submissions_dir (str): Path to directory with student submission files
-
+        file_path (``str``): path to YAML metadata file
 	"""
 	def __init__(self, file_path):
 		# open the YAML file and parse with yaml library
@@ -307,8 +292,8 @@ class YAMLParser:
 		"""Returns mapping of identifiers to files
 		
 		Returns:
-			dict: List of dictionaries with identifier and filename information for each submitter
-		
+			``list`` of ``dict``: list of dictionaries with identifier and filename information for 
+				each submission
 		"""
 		return self._metadata
 
@@ -316,11 +301,10 @@ class YAMLParser:
 		"""Returns a identifier given a filename
 		
 		Args:
-			file (str): Filename
+			file (``str``): filename of a submission
 		
 		Returns:
-			str: Identifier corresponding to filename
-			
+			``str``: identifier corresponding to filename
 		"""
 		return self._file_to_id[file]
 
@@ -328,11 +312,10 @@ class YAMLParser:
 		"""Returns a filename given an identifier
 		
 		Args:
-			identifier (str): Identifier of a submitter
+			identifier (``str``): identifier of a submitter
 
 		Returns:
-			str: filename of that submitter's submission
-		
+			``str``: filename of that submitter's submission
 		"""
 		return self._id_to_file[identifier]
 
@@ -340,8 +323,7 @@ class YAMLParser:
 		"""Returns list of submission identifiers
 		
 		Returns:
-			list: all identifiers from this parser
-		
+			``list``: all identifiers from this parser
 		"""
 		return [file["identifier"] for file in self._metadata]
 
@@ -349,7 +331,6 @@ class YAMLParser:
 		"""Returns list of filenames in the submission directory
 		
 		Returns:
-			list: all filenames from this parser
-		
+			``list``: all filenames from this parser
 		"""
 		return [file["filename"] for file in self._metadata]

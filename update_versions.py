@@ -13,33 +13,48 @@
 # UNDO_BETA: whether we're undoing a beta release
 
 import re
+import subprocess
+import warnings
 
 CURRENT_VERSION = "0.4.7"
 NEW_VERSION = "1.0.0"
 
-BETA = True
-UNDO_BETA = False
+FROM_GIT = True
+TO_GIT = True
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "Dockerfile",
-    "otter/generate.py",
-    "test/test-generate/autograder-correct/requirements.txt",
+    "otter/generate/autograder.py",
+    "test/test_generate/test-autograder/autograder-correct/requirements.txt",
     # "requirements.txt",
     # "Makefile"
 ]
 
 def main():
+    if TO_GIT and subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip():
+        warnings.warn(
+            "You have uncommitted changes that will not be included in this release. To include "
+            "them, commit your changes and rerun this script.",
+            UserWarning
+        )
     for file in FILES_WITH_VERSIONS:
         with open(file) as f:
             contents = f.read()
 
         old_version = "otter-grader=={}".format(CURRENT_VERSION)
-        if UNDO_BETA:
-            old_version = "git+https://github.com/ucbds-infra/otter-grader.git@beta"
+        if FROM_GIT:
+            old_version = r"git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@\w+"
         
         new_version = "otter-grader=={}".format(NEW_VERSION)
-        if BETA:
-            new_version = "git+https://github.com/ucbds-infra/otter-grader.git@beta"
+        if TO_GIT:
+            new_hash = (
+                subprocess
+                .run(["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE)
+                .stdout
+                .decode("utf-8")
+                .strip()
+            )
+            new_version = f"git+https://github.com/ucbds-infra/otter-grader.git@{new_hash}"
 
         contents = re.sub(
             old_version, 
@@ -50,7 +65,7 @@ def main():
         with open(file, "w") as f:
             f.write(contents)
     
-    if BETA:
+    if TO_GIT:
         # fix documentation
         with open("docs/conf.py") as f:
             contents = f.read()
@@ -64,12 +79,12 @@ def main():
         with open("Makefile") as f:
             contents = f.read()
 
-        contents = re.sub("ucbdsinfra/otter-grader", "ucbdsinfra/otter-grader:beta", contents)
+        contents = re.sub(r"ucbdsinfra/otter-grader$", "ucbdsinfra/otter-grader:beta", contents)
 
         with open("Makefile", "w") as f:
             f.write(contents)
 
-    elif UNDO_BETA:
+    elif FROM_GIT:
         # fix documentation
         with open("docs/conf.py") as f:
             contents = f.read()
@@ -88,30 +103,36 @@ def main():
         with open("Makefile", "w") as f:
             f.write(contents)
     
+    # else:
+    with open("setup.py") as f:
+        contents = f.read()
+
+    contents = re.sub(
+        "version = \"{}\",".format(CURRENT_VERSION),
+        "version = \"{}\",".format(NEW_VERSION),
+        contents
+    )
+
+    with open("setup.py", "w") as f:
+        f.write(contents)
+
+    with open("otter/__init__.py") as f:
+        contents = f.read()
+
+    contents = re.sub(
+        "__version__ = \"{}\"".format(CURRENT_VERSION),
+        "__version__ = \"{}\"".format(NEW_VERSION),
+        contents
+    )
+
+    with open("otter/__init__.py", "w") as f:
+        f.write(contents)
+
+    if TO_GIT:
+        print(f"Versions updated. New commit hash is {new_hash}. Commit and push to release.")
+    
     else:
-        with open("setup.py") as f:
-            contents = f.read()
-
-        contents = re.sub(
-            "version = \"{}\",".format(CURRENT_VERSION),
-            "version = \"{}\",".format(NEW_VERSION),
-            contents
-        )
-
-        with open("setup.py", "w") as f:
-            f.write(contents)
-
-        with open("otter/__init__.py") as f:
-            contents = f.read()
-
-        contents = re.sub(
-            "__version__ = \"{}\"".format(CURRENT_VERSION),
-            "__version__ = \"{}\"".format(NEW_VERSION),
-            contents
-        )
-
-        with open("otter/__init__.py", "w") as f:
-            f.write(contents)
+        print(f"Versions updated. New version is {NEW_VERSION}. Run 'make distro' to release.")
 
 if __name__ == "__main__":
     main()

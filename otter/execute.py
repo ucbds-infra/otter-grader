@@ -29,19 +29,20 @@ except ImportError:
 
 def check(test_file_path, global_env=None):
     """
-    check global_env against given test_file in oktest format
-    If global_env is none, the global environment of the calling
-    function is used. The following two calls are equivalent:
-    check('tests/q1.py')
-    check('tests/q1.py', globals())
+    Checks ``global_env`` against given ``test_file`` in OK-format. If global_env is ``None``, the 
+    global environment of the calling function is used. The following two calls are equivalent:
+
+    .. code-block:: python
+        check('tests/q1.py')
+        check('tests/q1.py', globals())
     
     Args:
-        test_file_path (str): Path to ok test file
-        global_env (dict of str: str, optional): A global environment resulting from the execution 
-            of a python script or notebook.
+        test_file_path (``str``): path to test file
+        global_env (``dict``, optional): a global environment resulting from the execution 
+            of a python script or notebook
 
     Returns:
-        OKTestsResult: result of running the tests in the given global environment.
+        ``otter.ok_parser.OKTestsResult``: result of running the tests in the given global environment
 
     """
     tests = OKTests([test_file_path])
@@ -57,23 +58,30 @@ def check(test_file_path, global_env=None):
 
 
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    gradescope=False, cwd=None, test_dir=None, seed=None):
+    cwd=None, test_dir=None, seed=None, log=None, variables=None):
     """
-    Grade a notebook file & return grade
+    Grade a notebook file & return grade information
 
-    This function grades a single ipython notebook using the provided tests. If grading a .py file,
-    set script to true. 
+    This function grades a single Jupyter notebook using the provided tests. If grading a Python file,
+    set ``script`` to true. 
 
     Args:
-        notebook_path (str): path to a single notebook
-        tests_glob (:obj:`list` of :obj:`str`, optional): names of test files
-        name (str, optional): initial environment name
-        ignore_errors (bool, optional): whether errors should be ignored, passed as an arg to 
-            execute functions
-        script (bool, optional): true if the notebook_path is a python script, false if notebook
+        notebook_path (``str``): path to a single notebook
+        tests_glob (``list`` of ``str``, optional): names of test files
+        name (``str``, optional): initial environment name
+        ignore_errors (``bool``, optional): whether errors in execution should be ignored
+        script (``bool``, optional): whether the notebook_path is a Python script
+        cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
+            grading environment
+        test_dir (``str``, optional): path to directory of tests in grading environment
+        seed (``int``, optional): random seed for intercell seeding
+        log (``otter.logs.Log``, optional): log from which to grade questions
+        variables (``dict``, optional): map of variable names -> type string to check type of deserialized
+            object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
 
     Returns:
-        dict: a score mapping with values for each test, student score, and total points possible 
+        ``dict``: a score mapping with keys for each test, the student's scores, and total points 
+            earned and possible 
     """
     # ensure this is not being executed inside a notebook
     assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"
@@ -98,10 +106,12 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     if name:
         initial_env["__name__"] = name
 
-    if script:
-        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, seed=seed)
+    if log is not None:
+        global_env = execute_log(nb, log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, variables=variables)
+    elif script:
+        global_env = execute_script(nb, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, seed=seed)
     else:
-        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, gradescope=gradescope, cwd=cwd, test_dir=test_dir, seed=seed)
+        global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, seed=seed)
 
     test_results = global_env[results_array]
 
@@ -151,26 +161,6 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     score_mapping["total"] = total_score
     score_mapping["possible"] = points_possible
 
-    # score_mapping["TEST_HINTS"] = {}
-    # points_possible = 0
-    # total_score = 0
-    # for r in test_results:
-    #     try:
-    #         for test in r.tests:
-    #             test_name = os.path.split(test.name)[1][:-3]
-    #             score_mapping[test_name] = r.grade * test.value
-    #             total_score += r.grade * test.value
-    #             points_possible += test.value
-    #         for tup in r.failed_tests:
-    #             test_name = os.path.split(tup[0].name)[1][:-3]
-    #             score_mapping["TEST_HINTS"][test_name] = tup[1]
-    #     except IndexError:
-    #         pass
-
-    # # add in total score and avoid divide by zero error if there are no tests
-    # score_mapping["total"] = total_score
-    # score_mapping["possible"] = points_possible
-
     return score_mapping
 
 def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, seed=None, cwd=None):
@@ -181,14 +171,19 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, 
     files, set script to true.
 
     Args:
-        ipynb_path (str): path to the ipython notebook
-        pdf (bool): set true if no filtering needed to generate pdf 
-        tag_filter (bool): whether cells should be filtered by tag
-        html_filter (bool): whether cells should be filtered by comments
-        script (bool): whether the input file is a python script
+        ipynb_path (``str``): path to the notebook
+        pdf (``bool``): whether unfiltered PDFs of notebooks should be generated
+        tag_filter (``bool``): whether cell tag-filtered PDFs of notebooks should be generated
+        html_filter (``bool``): whether HTML comment-filtered PDFs of notebooks should be generated
+        script (``bool``): whether the input file is a Python script
+        ignore_errors (``bool``, optional): whether errors should be ignored during execution
+        seed (``int``, optional): random seed for intercell seeding
+        cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
+            grading environment
 
     Returns:
-        dict: a score mapping with values for each test, student score, and total points possible 
+        ``dict``: a score mapping with keys for each test, the student's scores, and total points 
+            earned and possible 
     """
     # # get path of notebook file
     # base_path = os.path.dirname(ipynb_path)
@@ -209,24 +204,111 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, 
 
     return result
 
-def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None, test_dir=None, seed=None):
+def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None, variables=None):
     """
-    Executes an ipython notebook and return the global environment that results from execution.
+    Executes a notebook from logged environments and returns the global environment that results from execution
 
-    Execute notebook & return the global environment that results from execution.
-    TODO: write a note about the injection of check_results
-    If ignore_errors is True, exceptions are swallowed.
-    secret contains random digits so check_results and check are not easily modifiable
-    nb is passed in as a dictionary that's a parsed ipynb file
+    Execute notebook & return the global environment that results from execution. If ``ignore_errors`` 
+    is ``True``, exceptions are swallowed. ``secret`` contains random digits so ``check_results`` and 
+    ``check`` are not easily modifiable. ``nb`` is passed in as a dictionary that's a parsed notebook
 
     Args:
-        nb (dict of str: str): json representation of ipython notebook
-        secret (str, optional): randomly generated integer used to rebind check function
-        initial_env (str, optional): name of initial environment
-        ignore_errors (bool, optional): whether exceptions should be ignored
+        nb (``dict``): JSON representation of a notebook
+        log (``otter.logs.Log``): log from notebook execution
+        secret (``str``, optional): randomly generated integer used to rebind check function
+        initial_env (``str``, optional): name of initial environment
+        ignore_errors (``bool``, optional): whether exceptions should be ignored
+        cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
+            grading environment
+        test_dir (``str``, optional): path to directory of tests in grading environment
+        variables (``dict``, optional): map of variable names -> type string to check type of deserialized
+            object to prevent arbitrary code from being put into the environment
     
     Results:
-        dict of str: object: global environment resulting from executing all code of the input notebook
+        ``dict``: global environment resulting from executing all code of the input notebook
+    """
+    with hide_outputs():
+        if initial_env:
+            global_env = initial_env.copy()
+        else:
+            global_env = {}
+
+        if test_dir:
+            source = f"import otter\ngrader = otter.Notebook(\"{test_dir}\")\n"
+        else:
+            source = f"import otter\ngrader = otter.Notebook()\n"
+        
+        if cwd:
+            source +=  f"import sys\nsys.path.append(\"{cwd}\")\n"
+
+        logged_questions = []
+        m = mock.mock_open()
+        with mock.patch("otter.notebook.Notebook._log_event", m):
+            exec(source, global_env)
+
+            for cell in nb['cells']:
+                if cell['cell_type'] == 'code':
+                    # transform the input to executable Python
+                    # FIXME: use appropriate IPython functions here
+                    isp = IPythonInputSplitter(line_input_checker=False)
+                    
+                    code_lines = []
+                    cell_source_lines = cell['source']
+                    source_is_str_bool = False
+                    if isinstance(cell_source_lines, str):
+                        source_is_str_bool = True
+                        cell_source_lines = cell_source_lines.split('\n')
+
+                    # only execute import statements
+                    cell_source_lines = [re.sub(r"^\s+", "", l) for l in cell_source_lines if "import" in l]                                
+                    
+                    for line in cell_source_lines:
+                        try:
+                            exec(line, global_env)
+                    # source += cell_source
+                        except:
+                            if not ignore_errors:
+                                raise
+
+
+            for entry in log.question_iterator():
+                shelf = entry.unshelve(global_env)
+
+                if variables is not None:
+                    for k, v in shelf.items():
+                        full_type = type(v).__module__ + "." + type(v).__name__
+                        if not (k in variables and variables[k] == full_type):
+                            del shelf[k]
+                            print(f"Found variable of different type than expected: {k}")
+
+                global_env.update(shelf)
+                global_env[f"check_results_{secret}"].append(global_env["grader"].check(entry.question, global_env=global_env))
+                logged_questions.append(entry.question)
+
+        print("Questions executed from log: {}".format(", ".join(logged_questions)))
+        
+        return global_env
+
+def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None, seed=None):
+    """
+    Executes a notebook and returns the global environment that results from execution
+
+    Execute notebook & return the global environment that results from execution. If ``ignore_errors`` 
+    is ``True``, exceptions are swallowed. ``secret`` contains random digits so ``check_results`` and 
+    ``check`` are not easily modifiable. ``nb`` is passed in as a dictionary that's a parsed notebook
+
+    Args:
+        nb (``dict``): JSON representation of a notebook
+        secret (``str``, optional): randomly generated integer used to rebind check function
+        initial_env (``str``, optional): name of initial environment
+        ignore_errors (``bool``, optional): whether exceptions should be ignored
+        cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
+            grading environment
+        test_dir (``str``, optional): path to directory of tests in grading environment
+        seed (``int``, optional): random seed for intercell seeding
+    
+    Results:
+        ``dict``: global environment resulting from executing all code of the input notebook
     """
     with hide_outputs():
         if initial_env:
@@ -235,9 +317,10 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
             global_env = {}
 
         source = ""
-        if gradescope:
-            source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
-        elif cwd:
+        # if gradescope:
+        #     source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
+        # el
+        if cwd:
             source =  f"import sys\nsys.path.append(\"{cwd}\")\n"
         if seed is not None:
             # source += "import numpy as np\nimport random\n"
@@ -275,9 +358,10 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                                     code_lines.append('\n')
                             elif re.search(r"otter\.Notebook\(.*?\)", line):
                                 # TODO: move this check into CheckCallWrapper
-                                if gradescope:
-                                    line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
-                                elif test_dir:
+                                # if gradescope:
+                                #     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
+                                # el
+                                if test_dir:
                                     line = re.sub(r"otter\.Notebook\(.*?\)", f"otter.Notebook(\"{test_dir}\")", line)
                                 else:
                                     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
@@ -322,20 +406,23 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                 raise
         return global_env
 
-def execute_script(script, secret='secret', initial_env=None, ignore_errors=False, gradescope=False, cwd=None, seed=None):
+def execute_script(script, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None, seed=None):
     """
-    Executes code of a python (.py) script and returns the resulting global environment
+    Executes code of a Python script and returns the resulting global environment
 
-    Execute script & return the global environment that results from execution.
-    If ignore_errors is True, exceptions are swallowed.
-    secret contains random digits so check_results and check are not easily modifiable
-    script is passed in as a string
+    Execute script & return the global environment that results from execution. If ``ignore_errors`` is 
+    ``True``, exceptions are swallowed. ``secret`` contains random digits so ``check_results`` and 
+    ``check`` are not easily modifiable. ``script`` is passed in as a string.
 
     Args:
-        script (str): string representation of python script code
-        secret (str, optional): secret string for naming check function
-        initial_env (str, optional): name of initial environment
-        ignore_errors (bool): whether exceptions should be ignored
+        script (``str``): string representation of Python script code
+        secret (``str``, optional): randomly generated integer used to rebind check function
+        initial_env (``str``, optional): name of initial environment
+        ignore_errors (``bool``, optional): whether exceptions should be ignored
+        cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
+            grading environment
+        test_dir (``str``, optional): path to directory of tests in grading environment
+        seed (``int``, optional): random seed for intercell seeding
     
     Results:
         dict: global environment resulting from executing all code of the input script
@@ -346,9 +433,10 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
         else:
             global_env = {}
         source = ""
-        if gradescope:
-            source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
-        elif cwd:
+        # if gradescope:
+        #     source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
+        # el
+        if cwd:
             source =  f"import sys\nsys.path.append(\"{cwd}\")\n"
         if seed is not None:
             # source += "import numpy as np\nimport random\n"
@@ -362,8 +450,11 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
         for i, line in enumerate(lines):
             # TODO: move this check into CheckCallWrapper
             if re.search(r"otter\.Notebook\(.*?\)", line):
-                if gradescope:
-                    line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
+                # if gradescope:
+                #     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
+                # else:
+                if test_dir:
+                    line = re.sub(r"otter\.Notebook\(.*?\)", f"otter.Notebook(\"{test_dir}\")", line)
                 else:
                     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
             lines[i] = line
@@ -396,7 +487,11 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
 
 def main(args=None):
     """
-    When executing this file from the command line, this function will be run.
+    Parses command line arguments and executes submissions. Writes grades to a CSV file and optionally
+    generates PDFs of submissions.
+
+    Args:
+        args (``list`` of ``str``, optional): alternate command line arguments
     """
     # implement argparser
     parser = argparse.ArgumentParser()

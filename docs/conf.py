@@ -26,8 +26,8 @@ from recommonmark.transform import AutoStructify
 # -- Project information -----------------------------------------------------
 
 project = 'Otter-Grader'
-copyright = '2020, UC Berkeley Division of Data Science and Information'
-author = 'UCBDS Infrastructure Team'
+copyright = '2020, UC Berkeley Data Science Education Program'
+author = 'UC Berkeley Data Science Education Program Infrastructure Team'
 
 # The short X.Y version
 version = ''
@@ -92,7 +92,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'modules.rst']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'modules.rst', 'otter*.rst', 'modules.rst']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -103,11 +103,12 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pydata_sphinx_theme'
+html_theme = 'sphinx_book_theme'
 html_logo = '../logo/otter-logo-smaller.png'
 
 html_theme_options = {
-    'github_url': 'https://github.com/ucbds-infra/otter-grader'
+    'github_url': 'https://github.com/ucbds-infra/otter-grader',
+    'repository_url': 'https://github.com/ucbds-infra/otter-grader'
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
