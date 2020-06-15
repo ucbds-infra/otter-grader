@@ -149,7 +149,8 @@ def main(args):
                 generate_cmd += ["--unfiltered-pdfs"]
         
         if ASSIGNMENT_METADATA.get('files', []) or args.files:
-            generate_cmd += ASSIGNMENT_METADATA.get('files', []) or args.files
+            # os.path.split fixes issues due to relative paths
+            generate_cmd += [os.path.split(file)[1] for file in ASSIGNMENT_METADATA.get('files', []) or args.files]
 
         if ASSIGNMENT_METADATA.get('variables', {}):
             generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
