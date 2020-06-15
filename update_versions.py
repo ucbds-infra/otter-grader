@@ -37,6 +37,7 @@ def main():
             "them, commit your changes and rerun this script.",
             UserWarning
         )
+        
     for file in FILES_WITH_VERSIONS:
         with open(file) as f:
             contents = f.read()
