@@ -133,7 +133,7 @@ def main():
         print(f"Versions updated. New commit hash is {new_hash} -- commit and push to release.")
     
     else:
-        print(f"Versions updated. New version is {NEW_VERSION} -- tun 'make distro' to release.")
+        print(f"Versions updated. New version is {NEW_VERSION} -- run 'make distro' to release.")
 
 if __name__ == "__main__":
     main()
