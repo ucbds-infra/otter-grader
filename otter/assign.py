@@ -54,7 +54,7 @@ def run_tests(nb_path, debug=False, seed=None):
     """Run tests in the autograder version of the notebook.
     
     Args:
-        nb_path (``str``): Path to iPython notebooks
+        nb_path (``pathlib.Path``): Path to iPython notebooks
         debug (``bool``, optional): ``True`` if errors should not be ignored
         seed (``int``, optional): Random seed for numpy
     """
@@ -74,6 +74,11 @@ def main(args):
     """
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
+
+    # change dir to parent of master nb
+    result = master.relative_to(master.parent)
+    os.chdir(str(master.parent))
+
     # if args.jassign:
     #     jassign_views(master, result, args)
     # else:

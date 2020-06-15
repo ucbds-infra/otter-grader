@@ -12,7 +12,7 @@ from jinja2 import Template
 
 from .token import APIClient
 
-REQUIREMENTS = Template("""datascience
+REQUIREMENTS = Template("""{% if not overwrite %}datascience
 jupyter_client
 ipykernel
 matplotlib
@@ -27,13 +27,13 @@ nbformat
 dill
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@9877bb0d8cb69b1b6de52948748ef7e5e6c3a4a3{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@9877bb0d8cb69b1b6de52948748ef7e5e6c3a4a3{% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
 SETUP_SH = """#!/usr/bin/env bash
 
-apt-get install -y python3.7 python3-pip
+apt-get install -y python3.7 python3-pip python3.7-dev
 
 # apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \\
 #        libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \\
@@ -287,6 +287,7 @@ def main(args):
         if os.path.isfile(args.requirements):
             with open(args.requirements) as f:
                 requirements = REQUIREMENTS.render(
+                    overwrite = args.overwrite_requirements,
                     other_requirements = f.read()
                 )
         elif args.requirements != "requirements.txt":
@@ -312,8 +313,8 @@ def main(args):
             os.mkdir(os.path.join("tmp", "files"))
 
             for file in args.files:
-                if file == "gen":
-                    continue
+                # if file == "gen":
+                #     continue
                 shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))
 
         os.chdir("./tmp")

@@ -37,7 +37,7 @@ def main():
             "them, commit your changes and rerun this script.",
             UserWarning
         )
-        
+
     for file in FILES_WITH_VERSIONS:
         with open(file) as f:
             contents = f.read()
@@ -130,10 +130,10 @@ def main():
         f.write(contents)
 
     if TO_GIT:
-        print(f"Versions updated. New commit hash is {new_hash}. Commit and push to release.")
+        print(f"Versions updated. New commit hash is {new_hash} -- commit and push to release.")
     
     else:
-        print(f"Versions updated. New version is {NEW_VERSION}. Run 'make distro' to release.")
+        print(f"Versions updated. New version is {NEW_VERSION} -- tun 'make distro' to release.")
 
 if __name__ == "__main__":
     main()
