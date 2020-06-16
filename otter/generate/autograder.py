@@ -176,6 +176,7 @@ if __name__ == "__main__":
     # verify the scores against the log
     print("\\n\\n")
     if os.path.isfile(_OTTER_LOG_FILENAME):
+        warnings.simplefilter("always")
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
         try:
             found_discrepancy = log.verify_scores(scores)
@@ -183,6 +184,7 @@ if __name__ == "__main__":
                 print("No discrepancies found while verifying scores against the log.")
         except BaseException as e:
             warnings.warn(f"Error encountered while trying to verify scores with log:\\n{e}")
+        warnings.simplefilter("default")
     else:
         warnings.warn("No log found with which to verify student scores")
 
@@ -207,7 +209,7 @@ if __name__ == "__main__":
 
         except:
             print("\\n\\n")
-            warnings.warn("PDF generation or submission failed", warnings.RuntimeWarning)
+            warnings.warn("PDF generation or submission failed", RuntimeWarning)
 
     # hidden visibility determined by SHOW_HIDDEN_TESTS_ON_RELEASE
     hidden_test_visibility = ("hidden", "after_published")[SHOW_HIDDEN_TESTS_ON_RELEASE]
