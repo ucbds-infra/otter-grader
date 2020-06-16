@@ -450,6 +450,7 @@ class Log:
             ``UserWarning``: if the logged score for a test differs by more than the default tolerance
                 of ``numpy.isclose``
         """
+        found_discrepancy = False
         for test in score_mapping:
             score = score_mapping[test]["score"]
             try:
@@ -459,8 +460,11 @@ class Log:
                     warnings.warn("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
                         test, score, result.grade
                     ))
+                    found_discrepancy = True
             except QuestionNotInLogException:
                 warnings.warn(f"No score for {test} found in this log")
+                found_discrepancy = True
+        return found_discrepancy
 
 
 class QuestionLogIterator:
