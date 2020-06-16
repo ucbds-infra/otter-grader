@@ -9,6 +9,7 @@ import os
 import re
 import zipfile
 import pickle
+import time
 import datetime as dt
 
 from getpass import getpass
@@ -163,6 +164,16 @@ class Notebook:
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
+    def _save_notebook(self):
+        """
+        """
+        if get_ipython() is not None:
+            display(Javascript("""
+                require(["base/js/namespace"], function() {
+                    Jupyter.notebook.save_notebook();
+                });
+            """))
+            time.sleep(0.5)
 
     def check(self, question, global_env=None):
         """
@@ -212,6 +223,7 @@ class Notebook:
             pagebreaks (``bool``, optional): If true, pagebreaks are included between questions
             display_link (``bool``, optional): Whether or not to display a download link
         """
+        self._save_notebook()
         try:
             if nb_path is None and self._notebook is not None:
                 nb_path = self._notebook
@@ -260,6 +272,7 @@ class Notebook:
             display_link (``bool``, optional): whether or not to display a download link
         """
         self._log_event(EventType.BEGIN_EXPORT)
+        self._save_notebook()
 
         try:
             if nb_path is None and self._notebook is not None:
