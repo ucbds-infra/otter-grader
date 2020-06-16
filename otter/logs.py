@@ -445,6 +445,9 @@ class Log:
             score_mapping (``dict``): the score mapping from ``otter.execute.grade_notebook`` to verify
                 against this log
 
+        Returns:
+            ``bool``: whether a discrepancy was found
+
         Warns:
             ``UserWarning``: if there is no entry in this log for a test in ``score_mapping``
             ``UserWarning``: if the logged score for a test differs by more than the default tolerance
@@ -452,6 +455,8 @@ class Log:
         """
         found_discrepancy = False
         for test in score_mapping:
+            if test == "total" or test == "possible":
+                continue
             score = score_mapping[test]["score"]
             try:
                 result = self.get_results(test)
