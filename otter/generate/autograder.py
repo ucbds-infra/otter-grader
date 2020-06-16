@@ -27,7 +27,7 @@ nbformat
 dill
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@01b8efd5fb47a772ca0d4be80868ae720cf95b3a{% endif %}{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@f90620eb7924801d7f7bc14dea11718f0f2ec45f{% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
@@ -173,6 +173,22 @@ if __name__ == "__main__":
     )
     # del scores["TEST_HINTS"]
 
+    # verify the scores against the log
+    print("\\n\\n")
+    if os.path.isfile(_OTTER_LOG_FILENAME):
+        warnings.simplefilter("always")
+        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+        try:
+            found_discrepancy = log.verify_scores(scores)
+            if not found_discrepancy:
+                print("No discrepancies found while verifying scores against the log.")
+        except BaseException as e:
+            warnings.warn(f"Error encountered while trying to verify scores with log:\\n{e}")
+        warnings.simplefilter("default")
+    else:
+        warnings.warn("No log found with which to verify student scores")
+
+
     if GENERATE_PDF:
         try:
             export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
@@ -193,7 +209,7 @@ if __name__ == "__main__":
 
         except:
             print("\\n\\n")
-            warnings.warn("PDF generation or submission failed", warnings.RuntimeWarning)
+            warnings.warn("PDF generation or submission failed", RuntimeWarning)
 
     # hidden visibility determined by SHOW_HIDDEN_TESTS_ON_RELEASE
     hidden_test_visibility = ("hidden", "after_published")[SHOW_HIDDEN_TESTS_ON_RELEASE]
