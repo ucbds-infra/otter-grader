@@ -120,6 +120,18 @@ if __name__ == "__main__":
     )
     # del scores["TEST_HINTS"]
 
+    # verify the scores against the log
+    print("\n\n")
+    if os.path.isfile(_OTTER_LOG_FILENAME):
+        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+        try:
+            log.verify_scores(scores)
+        except BaseException as e:
+            warnings.warn(f"Error encountered while trying to verify scores with log:\n{e}")
+    else:
+        warnings.warn("No log found with which to verify student scores")
+
+
     if GENERATE_PDF:
         try:
             export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)

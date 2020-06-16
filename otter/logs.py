@@ -7,7 +7,9 @@ import pickle
 import types
 import dill
 import tempfile
+import warnings
 import datetime as dt
+import numpy as np
 
 from enum import Enum, auto
 from glob import glob
@@ -431,6 +433,34 @@ class Log:
             ``otter.logs.QuestionNotInLogException``: if the question is not found
         """
         return self.get_question_entry(question).get_results()
+    
+    def verify_scores(self, score_mapping):
+        """
+        Verifies scores in ``score_mapping`` (a ``dict`` of the structure returned by 
+        ``otter.execute.grade_notebook``) against the results stored in this log using the results 
+        returned by ``Log.get_results`` for comparison. Raises a ``UserWarning`` if the scores differ
+        by more than the default tolerance of ``numpy.isclose``.
+
+        Args:
+            score_mapping (``dict``): the score mapping from ``otter.execute.grade_notebook`` to verify
+                against this log
+
+        Warns:
+            ``UserWarning``: if there is no entry in this log for a test in ``score_mapping``
+            ``UserWarning``: if the logged score for a test differs by more than the default tolerance
+                of ``numpy.isclose``
+        """
+        for test in score_mapping:
+            score = score_mapping[test]["score"]
+            try:
+                result = self.get_results(test)
+                grade = result.grade * result.tests[0].value
+                if not np.isclose(score, result.grade):
+                    warnings.warn("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
+                        test, score, result.grade
+                    ))
+            except QuestionNotInLogException:
+                warnings.warn(f"No score for {test} found in this log")
 
 
 class QuestionLogIterator:
