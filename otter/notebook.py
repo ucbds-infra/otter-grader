@@ -165,7 +165,7 @@ class Notebook:
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
     def _save_notebook(self):
-        """
+        """Runs Jupyter JS to force-save a notebook for use before beginning an export
         """
         if get_ipython() is not None:
             display(Javascript("""
