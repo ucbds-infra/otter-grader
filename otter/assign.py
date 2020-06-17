@@ -147,6 +147,11 @@ def main(args):
 
             if not pdf_args.get("filtering", True):
                 generate_cmd += ["--unfiltered-pdfs"]
+
+        requirements = ASSIGNMENT_METADATA.get('requirements', None) or args.requirements
+        if os.path.isfile(requirements):
+            if ASSIGNMENT_METADATA.get('overwrite_requirements', False) or args.overwrite_requirements:
+                generate_cmd += ["--overwrite-requirements"]
         
         if ASSIGNMENT_METADATA.get('files', []) or args.files:
             # os.path.split fixes issues due to relative paths

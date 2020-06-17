@@ -310,6 +310,7 @@ def main(args):
             assert False, "requirements file {} not found".format(args.requirements)
         else:
             requirements = REQUIREMENTS.render(
+                overwrite = args.overwrite_requirements,
                 other_requirements = ""
             )
 
