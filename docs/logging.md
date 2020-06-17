@@ -53,6 +53,8 @@ True
 
 See the reference [below](#otter-logs-reference) for more information about the arguments to `LogEntry.shelve` and `LogEntry.unshelve`.
 
+<!-- TODO: describe variables dict arg -->
+
 ## Debugging with the Log
 
 The log is useful to help students debug tests that they are repeatedly failing. Log entries story any errors thrown by the process tracked by that entry and, if the log is a call to `otter.Notebook.check`, also the test results. Any errors held by the log entry can be re-thrown by calling `LogEntry.raise_error`:

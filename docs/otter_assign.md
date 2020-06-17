@@ -75,6 +75,9 @@ generate:
 ```
 ````
 
+<!-- TODO: update description of export key -->
+<!-- TODO: talk about setting up storing envs -->
+
 ### Autograded Questions
 
 Here is an example question in an Otter Assign-formatted notebook:
