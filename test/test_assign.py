@@ -5,6 +5,10 @@
 import unittest
 import os
 import shutil
+import subprocess
+
+from subprocess import PIPE
+from glob import glob
 
 from otter.utils import block_print
 
@@ -19,6 +23,45 @@ parser = bin_globals["parser"]
 TEST_FILES_PATH = "test/test-assign/"
 
 class TestAssign(unittest.TestCase):
+
+    def check_gradescope_zipfile(self, path, config, tests=[], files=[]):
+        # unzip the zipfile
+        unzip_command = ["unzip", "-o", path, "-d", TEST_FILES_PATH + "autograder"]
+        unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
+        self.assertEqual(len(unzip.stderr), 0, unzip.stderr)
+
+        expected_files = ["run_autograder", "setup.sh", "requirements.txt"]
+        expected_directories = ["tests", "files"]
+
+        # go through files and ensure that they all exist
+        for file in expected_files:
+            fp = TEST_FILES_PATH + "autograder/" + file
+            self.assertTrue(os.path.isfile(fp), f"File {fp} does not exist")
+        
+        for drct in expected_directories:
+            dp = TEST_FILES_PATH + "autograder/" + drct
+            self.assertTrue(os.path.isdir(dp), f"Directory {dp} does not exist")
+        
+        for file in files:
+            fp = TEST_FILES_PATH + "autograder/files/" + file
+            self.assertTrue(os.path.isfile(fp), f"Support file {fp} does not exist")
+        
+        for test in tests:
+            tp = TEST_FILES_PATH + "autograder/tests/" + test
+            self.assertTrue(os.path.isfile(tp), f"Test file {tp} does not exist")
+
+        # check configurations in autograder/run_autograder
+        with open(TEST_FILES_PATH + "autograder/run_autograder") as f:
+            run_autograder = f.read()
+
+        # exec with __name__ not __main__ so that the grading doesn't occur and it only loads globals
+        run_autograder_globals = {"__name__": "__not_main__"}
+        exec(run_autograder, run_autograder_globals)
+
+        for k, v in config.items():
+            self.assertEqual(run_autograder_globals[k], v, 
+                f"Expected config value for {k} ({v}) does not match actual value ({run_autograder_globals[k]})"
+            )
     
     def test_convert_example(self):
         """
