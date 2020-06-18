@@ -21,11 +21,11 @@ The main use of a `.otter` file is to configure submission to an [Otter Service 
 
 ```json
 {
-    "notebook": "hw00.ipynb",       // required
-    "endpoint": "http://some.url",  // required for Otter Service
-    "assignment_id": "hw00",        // required for Otter Service
-    "class_id": "some_class",       // required for Otter Service
-    "auth": "google"                // the default
+    "notebook": "hw00.ipynb",
+    "endpoint": "http://some.url",
+    "assignment_id": "hw00",
+    "class_id": "some_class",
+    "auth": "google"
 }
 ```
 

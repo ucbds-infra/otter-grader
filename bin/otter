@@ -9,17 +9,10 @@ import sys
 from textwrap import dedent
 from otter.argparser import get_parser
 
-parser, MISSING_PACKAGES = get_parser()
+parser = get_parser()
 
 if __name__ == "__main__":
     args = parser.parse_args()
-
-    if MISSING_PACKAGES and sys.argv[1] == "service":
-        raise ImportError(
-            "Missing some packages required for otter service. "
-            "Please install all requirements at "
-            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
-        )
 
     if hasattr(args, 'func'):
         args.func(args)

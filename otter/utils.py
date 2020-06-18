@@ -172,6 +172,12 @@ def str_to_doctest(code_lines, lines):
         return str_to_doctest(code_lines, lines + [">>> " + line])
 
 def get_variable_type(obj):
+    """Returns the fully-qualified type string of an object ``obj``
+
+    Args:
+        obj (object): the object in question
+
+    Returns:
+        ``str``: the fully-qualified type string
     """
-    """
-    return  type(obj).__module__ + "." + type(obj).__name__
+    return type(obj).__module__ + "." + type(obj).__name__
