@@ -16,7 +16,7 @@ from unittest import mock
 from subprocess import Popen, PIPE
 from glob import glob
 
-from otter.export import export_notebook
+from otter.export.filter import load_notebook
 
 # read in argument parser
 bin_globals = {}
@@ -43,7 +43,7 @@ class TestExport(unittest.TestCase):
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".pdf"))
 
         #TODO: checks for equality
-        self.assertTrue(filecmp.cmp(TEST_FILES_PATH + test_file+".tex",TEST_FILES_PATH + "/correct/"+test_file+".tex"))
+        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".tex"))
         #cleanup
         cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
@@ -65,7 +65,7 @@ class TestExport(unittest.TestCase):
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".pdf"))
 
         # TODO : checks for equality 
-        self.assertTrue(filecmp.cmp(TEST_FILES_PATH + test_file+".tex",TEST_FILES_PATH + "/correct/"+test_file+".tex"))
+        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".tex"))
         #cleanup
         cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
@@ -102,7 +102,7 @@ class TestExport(unittest.TestCase):
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".pdf"))
 
         # TODO : checks for equality 
-        self.assertTrue(filecmp.cmp(TEST_FILES_PATH + test_file+".tex",TEST_FILES_PATH + "/correct/"+test_file+".tex"))
+        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file+".tex"))
         #cleanup
         cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
