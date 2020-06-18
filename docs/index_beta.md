@@ -10,6 +10,7 @@
    test_files
    otter_assign
    otter_check
+   dot_otter_files
    otter_grade
    otter_generate
    otter_service

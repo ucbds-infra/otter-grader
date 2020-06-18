@@ -60,16 +60,19 @@ class Notebook:
                 self._ignore_modules = self._config.get("ignore_modules", [])
                 self._vars_to_store = self._config.get("variables", None)
 
-                if "notebook" not in self._config:
-                    assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
-                    self._notebook = glob("*.ipynb")[0]
+                # if "notebook" not in self._config:
+                #     assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
+                #     self._notebook = glob("*.ipynb")[0]
                     
-                else:
-                    self._notebook = self._config["notebook"]
+                # else:
+                self._notebook = self._config["notebook"]
 
                 if self._service_enabled:
                     # check that config file has required info
-                    assert all([key in self._config for key in ["endpoint", "auth", "assignment_id", "class_id"]]), "Otter config file missing required information"
+                    assert all([key in self._config for key in ["endpoint", "assignment_id", "class_id"]]), "Otter config file missing required information"
+
+                    if "auth" not in self._config:
+                        self._config["auth"] = "google"
 
                     self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
                     self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
