@@ -23,24 +23,17 @@ TEST_FILES_PATH = "test/test_generate/test-autograder/"
 
 class TestAutograder(unittest.TestCase):
     
-    @classmethod
-    def setUpClass(cls):
+    def create_docker_image(self):
         create_image_cmd = ["make", "docker-test"]
         create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
         assert not create_image.stderr, create_image.stderr.decode("utf-8")
 
-
-    def test_docker(self):
-        """
-        Check that we have the right container installed and that docker is running
-        """
         # use docker image inspect to see that the image is installed and tagged as otter-grader
         inspect = subprocess.run(["docker", "image", "inspect", "otter-test"], stdout=PIPE, stderr=PIPE)
 
         # assert that it didn't fail, it will fail if it is not installed
         self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
    
-
     def test_gs_generator(self):
         """
         Check that the correct zipfile is created by gs_generator.py
@@ -79,11 +72,12 @@ class TestAutograder(unittest.TestCase):
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
 
-
     def test_gradescope(self):
         """
         Checks that the Gradescope autograder works
         """
+        self.create_docker_image()
+
         # generate the zipfile
         generate_command = ["generate", "autograder",
             "-t", TEST_FILES_PATH + "tests",

@@ -168,13 +168,13 @@ if __name__ == "__main__":
                 output["tests"] += [{
                     "name" : key,
                     "score" : 0,
-                    "possible": 0,
+                    "max_score": 0,
                     "visibility": "visible"
                 }]
             output["tests"] += [{
                 "name" : (key, key + " HIDDEN")[scores[key].get("hidden", False)],
                 "score" : scores[key]["score"],
-                "possible": scores[key]["possible"],
+                "max_score": scores[key]["possible"],
                 "visibility": ("visible", hidden_test_visibility)[scores[key].get("hidden", False)]
             }]
             if "hint" in scores[key]:
