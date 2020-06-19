@@ -139,7 +139,7 @@ def main(args):
             generate_cmd += ["--seed", str(generate_args.get('seed', None))]
 
         if generate_args.get('public_multiplier', None) is not None:
-            generate_cmd += ["--seed", str(generate_args.get('public_multiplier', None))]
+            generate_cmd += ["--public-multiplier", str(generate_args.get('public_multiplier', None))]
 
         if generate_args.get('pdfs', {}):
             pdf_args = generate_args.get('pdfs', {})
