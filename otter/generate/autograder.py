@@ -79,6 +79,7 @@ SHOW_HIDDEN_TESTS_ON_RELEASE = {{ show_hidden }}
 SEED = {{ seed }}
 GRADE_FROM_LOG = {{ grade_from_log }}
 SERIALIZED_VARIABLES = {{ serialized_variables }}
+PUBLIC_TEST_MULTIPLIER = {{ public_test_multiplier }}
 
 # for auto-uploading PDFs
 {% if token %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
@@ -214,22 +215,28 @@ if __name__ == "__main__":
     output = {"tests" : []}
     for key in scores:
         if key != "total" and key != "possible":
+            hidden, incorrect = scores[key].get("hidden", False), "hint" in scores[key]
+            score, possible = scores[key]["score"], scores[key]["possible"]
+            public_score, hidden_score = score * PUBLIC_TEST_MULTIPLIER, score * (1 - PUBLIC_TEST_MULTIPLIER)
+            public_possible, hidden_possible = possible * PUBLIC_TEST_MULTIPLIER, possible * (1 - PUBLIC_TEST_MULTIPLIER)
+            
             output["tests"] += [{
                 "name" : key + " - Public",
-                "score" : (0, scores[key]["score"])[not scores[key].get("hidden", False) and "hint" in scores[key]],
-                "max_score": (0, scores[key]["possible"])[not scores[key].get("hidden", False) and "hint" in scores[key]],
+                "score" : (pulic_score, score)[not hidden and incorrect],
+                "max_score": (public_possible, possible)[not hidden and incorrect],
                 "visibility": "visible",
             }]
-            if not scores[key].get("hidden", False) and "hint" in scores[key]:
+            if not hidden and incorrect:
                 output["tests"][-1]["output"] = repr(scores[key]["hint"])
-            if not (not scores[key].get("hidden", False) and "hint" in scores[key]):
+            
+            if not (not hidden and incorrect):
                 output["tests"] += [{
                     "name" : key + " - Hidden",
-                    "score" : (scores[key]["score"], 0)[not scores[key].get("hidden", False) and "hint" in scores[key]],
-                    "max_score": (scores[key]["possible"], 0)[not scores[key].get("hidden", False) and "hint" in scores[key]],
+                    "score" : (score, hidden_score)[not hidden and incorrect],
+                    "max_score": (possible, hidden_possible)[not hidden and incorrect],
                     "visibility": hidden_test_visibility,
                 }]
-                if scores[key].get("hidden", False) and "hint" in scores[key]:
+                if hidden and incorrect:
                     output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
     if SHOW_STDOUT_ON_RELEASE:
