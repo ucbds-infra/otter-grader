@@ -186,7 +186,6 @@ if __name__ == "__main__":
     else:
         print("No log found with which to verify student scores")
 
-
     if GENERATE_PDF:
         try:
             export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
