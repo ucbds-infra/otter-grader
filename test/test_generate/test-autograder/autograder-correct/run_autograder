@@ -169,7 +169,7 @@ if __name__ == "__main__":
             
             output["tests"] += [{
                 "name" : key + " - Public",
-                "score" : (pulic_score, score)[not hidden and incorrect],
+                "score" : (public_score, score)[not hidden and incorrect],
                 "max_score": (public_possible, possible)[not hidden and incorrect],
                 "visibility": "visible",
             }]
