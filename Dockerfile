@@ -10,4 +10,8 @@ RUN apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2
        libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
        libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation \
        libappindicator1 libnss3 lsb-release xdg-utils wget
+<<<<<<< HEAD
 RUN pip3 install git+https://github.com/ucbds-infra/otter-grader.git@0dedd918eeb9fa72f2b7674ad387c4499565a6b5
+=======
+RUN pip3 install git+https://github.com/ucbds-infra/otter-grader.git@a1637c7d6e6a72a4707ab1c257d44cb28d0dde9f
+>>>>>>> update-docs

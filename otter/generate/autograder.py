@@ -79,6 +79,7 @@ SHOW_HIDDEN_TESTS_ON_RELEASE = {{ show_hidden }}
 SEED = {{ seed }}
 GRADE_FROM_LOG = {{ grade_from_log }}
 SERIALIZED_VARIABLES = {{ serialized_variables }}
+PUBLIC_TEST_MULTIPLIER = {{ public_test_multiplier }}
 
 # for auto-uploading PDFs
 {% if token %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
@@ -176,18 +177,15 @@ if __name__ == "__main__":
     # verify the scores against the log
     print("\\n\\n")
     if os.path.isfile(_OTTER_LOG_FILENAME):
-        warnings.simplefilter("always")
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
         try:
             found_discrepancy = log.verify_scores(scores)
             if not found_discrepancy:
                 print("No discrepancies found while verifying scores against the log.")
         except BaseException as e:
-            warnings.warn(f"Error encountered while trying to verify scores with log:\\n{e}")
-        warnings.simplefilter("default")
+            print(f"Error encountered while trying to verify scores with log:\\n{e}")
     else:
-        warnings.warn("No log found with which to verify student scores")
-
+        print("No log found with which to verify student scores")
 
     if GENERATE_PDF:
         try:
@@ -217,21 +215,29 @@ if __name__ == "__main__":
     output = {"tests" : []}
     for key in scores:
         if key != "total" and key != "possible":
-            if scores[key].get("hidden", False):
-                output["tests"] += [{
-                    "name" : key,
-                    "score" : 0,
-                    "max_score": 0,
-                    "visibility": "visible"
-                }]
+            hidden, incorrect = scores[key].get("hidden", False), "hint" in scores[key]
+            score, possible = scores[key]["score"], scores[key]["possible"]
+            public_score, hidden_score = score * PUBLIC_TEST_MULTIPLIER, score * (1 - PUBLIC_TEST_MULTIPLIER)
+            public_possible, hidden_possible = possible * PUBLIC_TEST_MULTIPLIER, possible * (1 - PUBLIC_TEST_MULTIPLIER)
+            
             output["tests"] += [{
-                "name" : (key, key + " HIDDEN")[scores[key].get("hidden", False)],
-                "score" : scores[key]["score"],
-                "max_score": scores[key]["possible"],
-                "visibility": ("visible", hidden_test_visibility)[scores[key].get("hidden", False)]
+                "name" : key + " - Public",
+                "score" : (public_score, score)[not hidden and incorrect],
+                "max_score": (public_possible, possible)[not hidden and incorrect],
+                "visibility": "visible",
             }]
-            if "hint" in scores[key]:
+            if not hidden and incorrect:
                 output["tests"][-1]["output"] = repr(scores[key]["hint"])
+            
+            if not (not hidden and incorrect):
+                output["tests"] += [{
+                    "name" : key + " - Hidden",
+                    "score" : (score, hidden_score)[not hidden and incorrect],
+                    "max_score": (possible, hidden_possible)[not hidden and incorrect],
+                    "visibility": hidden_test_visibility,
+                }]
+                if hidden and incorrect:
+                    output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
     if SHOW_STDOUT_ON_RELEASE:
         output["stdout_visibility"] = "after_published"
@@ -275,6 +281,9 @@ def main(args):
         if not args.token:
             args.token = APIClient.get_token()
 
+    # check that args.public_multiplier is valid
+    assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
+
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
@@ -288,7 +297,8 @@ def main(args):
         filtering = str(not args.unfiltered_pdfs),
         pagebreaks = str(not args.no_pagebreaks),
         grade_from_log = str(args.grade_from_log),
-        serialized_variables = str(args.serialized_variables)
+        serialized_variables = str(args.serialized_variables),
+        public_test_multiplier = str(args.public_multiplier)
     )
 
     # create tmp directory to zip inside
