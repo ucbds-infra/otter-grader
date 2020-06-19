@@ -281,6 +281,9 @@ def main(args):
         if not args.token:
             args.token = APIClient.get_token()
 
+    # check that args.public_multiplier is valid
+    assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
+
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
@@ -294,7 +297,8 @@ def main(args):
         filtering = str(not args.unfiltered_pdfs),
         pagebreaks = str(not args.no_pagebreaks),
         grade_from_log = str(args.grade_from_log),
-        serialized_variables = str(args.serialized_variables)
+        serialized_variables = str(args.serialized_variables),
+        public_test_multiplier = str(args.public_multiplier)
     )
 
     # create tmp directory to zip inside
