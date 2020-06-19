@@ -217,21 +217,23 @@ if __name__ == "__main__":
     output = {"tests" : []}
     for key in scores:
         if key != "total" and key != "possible":
-            if scores[key].get("hidden", False):
-                output["tests"] += [{
-                    "name" : key,
-                    "score" : 0,
-                    "max_score": 0,
-                    "visibility": "visible"
-                }]
             output["tests"] += [{
-                "name" : (key, key + " HIDDEN")[scores[key].get("hidden", False)],
-                "score" : scores[key]["score"],
-                "max_score": scores[key]["possible"],
-                "visibility": ("visible", hidden_test_visibility)[scores[key].get("hidden", False)]
+                "name" : key + " - Public",
+                "score" : (0, scores[key]["score"])[not scores[key].get("hidden", False) and "hint" in scores[key]],
+                "max_score": (0, scores[key]["possible"])[not scores[key].get("hidden", False) and "hint" in scores[key]],
+                "visibility": "visible",
             }]
-            if "hint" in scores[key]:
+            if not scores[key].get("hidden", False) and "hint" in scores[key]:
                 output["tests"][-1]["output"] = repr(scores[key]["hint"])
+            if not (not scores[key].get("hidden", False) and "hint" in scores[key]):
+                output["tests"] += [{
+                    "name" : key + " - Hidden",
+                    "score" : (scores[key]["score"], 0)[not scores[key].get("hidden", False) and "hint" in scores[key]],
+                    "max_score": (scores[key]["possible"], 0)[not scores[key].get("hidden", False) and "hint" in scores[key]],
+                    "visibility": hidden_test_visibility,
+                }]
+                if scores[key].get("hidden", False) and "hint" in scores[key]:
+                    output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
     if SHOW_STDOUT_ON_RELEASE:
         output["stdout_visibility"] = "after_published"
