@@ -7,7 +7,6 @@ import pickle
 import types
 import dill
 import tempfile
-import warnings
 import datetime as dt
 import numpy as np
 
@@ -462,12 +461,12 @@ class Log:
                 result = self.get_results(test)
                 grade = result.grade * result.tests[0].value
                 if not np.isclose(score, result.grade):
-                    warnings.warn("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
+                    print("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
                         test, score, result.grade
                     ))
                     found_discrepancy = True
             except QuestionNotInLogException:
-                warnings.warn(f"No score for {test} found in this log")
+                print(f"No score for {test} found in this log")
                 found_discrepancy = True
         return found_discrepancy
 

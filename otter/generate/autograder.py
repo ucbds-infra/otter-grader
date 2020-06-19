@@ -176,17 +176,15 @@ if __name__ == "__main__":
     # verify the scores against the log
     print("\\n\\n")
     if os.path.isfile(_OTTER_LOG_FILENAME):
-        warnings.simplefilter("always")
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
         try:
             found_discrepancy = log.verify_scores(scores)
             if not found_discrepancy:
                 print("No discrepancies found while verifying scores against the log.")
         except BaseException as e:
-            warnings.warn(f"Error encountered while trying to verify scores with log:\\n{e}")
-        warnings.simplefilter("default")
+            print(f"Error encountered while trying to verify scores with log:\\n{e}")
     else:
-        warnings.warn("No log found with which to verify student scores")
+        print("No log found with which to verify student scores")
 
 
     if GENERATE_PDF:
