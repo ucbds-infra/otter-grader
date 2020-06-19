@@ -90,6 +90,8 @@ otter generate autograder -t hidden-tests data.csv utils.py
 ```
 
 <!-- TODO: add step-by-step of what autograder does; should include verification with log -->
+<!-- TODO: add public test multipler -->
+<!-- TODO: update for dummy rows -->
 
 #### Grading with Environments
 
