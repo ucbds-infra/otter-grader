@@ -138,6 +138,9 @@ def main(args):
         if generate_args.get('seed', None) is not None:
             generate_cmd += ["--seed", str(generate_args.get('seed', None))]
 
+        if generate_args.get('public_multiplier', None) is not None:
+            generate_cmd += ["--seed", str(generate_args.get('public_multiplier', None))]
+
         if generate_args.get('pdfs', {}):
             pdf_args = generate_args.get('pdfs', {})
             token = APIClient.get_token()
