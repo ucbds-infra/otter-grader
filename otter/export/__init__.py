@@ -48,8 +48,6 @@ def notebook_to_pdf(nb, dest, templating="test.tplx", save_tex=False, debug=Fals
         print("=" * 60)
         print(output)
         print("=" * 60)
-        # return None
-    # return "%s.pdf" % name
 
 
 def export_notebook(nb_path, dest=None, filtering=False, pagebreaks=False, save_tex=False, debug=False):
