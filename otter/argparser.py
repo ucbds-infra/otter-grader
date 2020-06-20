@@ -2,8 +2,6 @@
 ##### Argument Parser for Otter Grader #####
 ############################################
 
-MISSING_PACKAGES = False
-
 import argparse
 
 from . import assign
@@ -11,12 +9,7 @@ from . import check
 from . import export
 from . import generate
 from . import grade
-
-try:
-    from . import service
-except ImportError:
-    MISSING_PACKAGES = True
-
+from . import service
 
 def get_parser():
     """Creates and returns the argument parser for Otter
@@ -48,7 +41,8 @@ def get_parser():
 
     # generate options -- COMMENTED OUT BECAUSE YOU SHOULD USE THE ASSIGNMENT METADATA FOR THIS
     # assign_parser.add_argument("--generate", default=False, action="store_true", help="Generate Gradescope autograder zipfile")
-    assign_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked; use with --generate only")
+    assign_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ignored if no generate key in assignment metadata")
+    assign_parser.add_argument("--overwrite-requirements", default=False, action="store_true", help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
     # assign_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold; use with --generate only")
     # assign_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points; use with --generate only")
     # assign_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell; use with --generate only")
@@ -93,6 +87,7 @@ def get_parser():
     generate_autograder_parser.add_argument("-t", "--tests-path", nargs='?', type=str, default="./tests/", help="Path to test files")
     generate_autograder_parser.add_argument("-o", "--output-path", nargs='?', type=str, default="./", help="Path to which to write zipfile")
     generate_autograder_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
+    generate_autograder_parser.add_argument("--overwrite-requirements", default=False, action="store_true", help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
     generate_autograder_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
     generate_autograder_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
     generate_autograder_parser.add_argument("--show-stdout", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
@@ -105,6 +100,7 @@ def get_parser():
     generate_autograder_parser.add_argument("--assignment-id", default=None, help="Gradescope assignment ID for PDFs")
     generate_autograder_parser.add_argument("--grade-from-log", default=False, action="store_true", help="Whether to grade assignments based on the logged environments")
     generate_autograder_parser.add_argument("--serialized-variables", default="{}", help="String representation of Python dict mapping variable names to full types for verification when deserializing log")
+    generate_autograder_parser.add_argument("--public-multiplier", default=0, type=float, help="Percentage of points to award for passing all public tests")
     generate_autograder_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
     generate_autograder_parser.set_defaults(func=generate.autograder.main)
@@ -150,50 +146,50 @@ def get_parser():
 
     grade_parser.set_defaults(func=grade.main)
 
-    if not MISSING_PACKAGES:
-        
-        ###### PARSER FOR otter service #####
-        service_parser = subparsers.add_parser("service", description="Create and manage an otter-service")
-        service_subparsers = service_parser.add_subparsers()
+
+    
+    ###### PARSER FOR otter service #####
+    service_parser = subparsers.add_parser("service", description="Create and manage an otter-service")
+    service_subparsers = service_parser.add_subparsers()
 
 
-        ##### PARSER FOR otter service build #####
-        service_build_parser = service_subparsers.add_parser("build", description="Build images for an otter-service instance")
-        service_build_parser.add_argument("repo_path", default=".", help="Path to assignments repo root")
-        service_build_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
-        service_build_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
-        service_build_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
-        service_build_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
-        service_build_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Based image for grading containers")
-        service_build_parser.add_argument("-q", "--quiet", default=False, action="store_true", help="Build images without writing Docker messages to stdout")
+    ##### PARSER FOR otter service build #####
+    service_build_parser = service_subparsers.add_parser("build", description="Build images for an otter-service instance")
+    service_build_parser.add_argument("repo_path", default=".", help="Path to assignments repo root")
+    service_build_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
+    service_build_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
+    service_build_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
+    service_build_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
+    service_build_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Based image for grading containers")
+    service_build_parser.add_argument("-q", "--quiet", default=False, action="store_true", help="Build images without writing Docker messages to stdout")
 
-        service_build_parser.set_defaults(func=service.build.main)
-
-
-        ##### PARSER FOR otter service create #####
-        service_create_parser = service_subparsers.add_parser("create", description="Create database for otter-service")
-        service_create_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
-        service_create_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
-        service_create_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
-        service_create_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
-
-        service_create_parser.set_defaults(func=service.create.main)
+    service_build_parser.set_defaults(func=service.build.main)
 
 
-        ##### PARSER FOR otter service start #####
-        service_start_parser = service_subparsers.add_parser("start", description="Start an otter-service instance")
-        service_start_parser.add_argument("-c", "--config", help="Path to config file")
-        service_start_parser.add_argument("-e", "--endpoint", help="Address of this VM including port")
-        service_start_parser.add_argument("--port", type=int, default=80, help="Port for server to listen on")
-        service_start_parser.add_argument("-k", "--google-key", help="Google OAuth key; use environment variable if not specified")
-        service_start_parser.add_argument("-s", "--google-secret", help="Google OAuth secret; use environment variable if not specified")
-        service_start_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
-        service_start_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
-        service_start_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
-        service_start_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
-        service_start_parser.add_argument("-l", "--rate-limit", default=120, type=int, help="Rate limit for submissions in seconds")
+    ##### PARSER FOR otter service create #####
+    service_create_parser = service_subparsers.add_parser("create", description="Create database for otter-service")
+    service_create_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
+    service_create_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
+    service_create_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
+    service_create_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
 
-        service_start_parser.set_defaults(func=service.start.main)
+    service_create_parser.set_defaults(func=service.create.main)
 
 
-    return parser, MISSING_PACKAGES
+    ##### PARSER FOR otter service start #####
+    service_start_parser = service_subparsers.add_parser("start", description="Start an otter-service instance")
+    service_start_parser.add_argument("-c", "--config", help="Path to config file")
+    service_start_parser.add_argument("-e", "--endpoint", help="Address of this VM including port")
+    service_start_parser.add_argument("--port", type=int, default=80, help="Port for server to listen on")
+    service_start_parser.add_argument("-k", "--google-key", help="Google OAuth key; use environment variable if not specified")
+    service_start_parser.add_argument("-s", "--google-secret", help="Google OAuth secret; use environment variable if not specified")
+    service_start_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
+    service_start_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
+    service_start_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
+    service_start_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
+    service_start_parser.add_argument("-l", "--rate-limit", default=120, type=int, help="Rate limit for submissions in seconds")
+
+    service_start_parser.set_defaults(func=service.start.main)
+
+
+    return parser

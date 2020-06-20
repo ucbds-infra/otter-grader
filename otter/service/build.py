@@ -2,17 +2,23 @@
 ##### Cointainer Building for Otter Service #####
 #################################################
 
-import subprocess
-import shutil
-import os
-import yaml
+MISSING_PACKAGES = False
 
-from subprocess import PIPE, DEVNULL
-from io import BytesIO
-from jinja2 import Template
-from psycopg2.errors import UniqueViolation
+try:
+    import subprocess
+    import shutil
+    import os
+    import yaml
 
-from ..utils import connect_db
+    from subprocess import PIPE, DEVNULL
+    from io import BytesIO
+    from jinja2 import Template
+    from psycopg2.errors import UniqueViolation
+
+    from ..utils import connect_db
+
+except ImportError:
+    MISSING_PACKAGES = True
 
 DOCKERFILE_TEMPLATE = Template("""
 FROM {{ image }}
@@ -84,9 +90,12 @@ def write_assignment_info(assignment_id, class_id, assignment_name, seed, conn):
     cursor.close()
 
 def main(args, conn=None, close_conn=True):
-    # repo_path = input("What is the absolute path of your assignments repo? [/home/assignments] ")
-    # if not repo_path:
-    #     repo_path = "/home/assignments"
+    if MISSING_PACKAGES:
+        raise ImportError(
+            "Missing some packages required for otter service. "
+            "Please install all requirements at "
+            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+        )
 
     repo_path = args.repo_path
     assert os.path.exists(repo_path) and os.path.isdir(repo_path), "{} does not exist or is not a directory".format(repo_path)

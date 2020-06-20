@@ -138,6 +138,9 @@ def main(args):
         if generate_args.get('seed', None) is not None:
             generate_cmd += ["--seed", str(generate_args.get('seed', None))]
 
+        if generate_args.get('public_multiplier', None) is not None:
+            generate_cmd += ["--public-multiplier", str(generate_args.get('public_multiplier', None))]
+
         if generate_args.get('pdfs', {}):
             pdf_args = generate_args.get('pdfs', {})
             token = APIClient.get_token()
@@ -147,9 +150,15 @@ def main(args):
 
             if not pdf_args.get("filtering", True):
                 generate_cmd += ["--unfiltered-pdfs"]
+
+        requirements = ASSIGNMENT_METADATA.get('requirements', None) or args.requirements
+        if os.path.isfile(requirements):
+            if ASSIGNMENT_METADATA.get('overwrite_requirements', False) or args.overwrite_requirements:
+                generate_cmd += ["--overwrite-requirements"]
         
         if ASSIGNMENT_METADATA.get('files', []) or args.files:
-            generate_cmd += ASSIGNMENT_METADATA.get('files', []) or args.files
+            # os.path.split fixes issues due to relative paths
+            generate_cmd += [os.path.split(file)[1] for file in ASSIGNMENT_METADATA.get('files', []) or args.files]
 
         if ASSIGNMENT_METADATA.get('variables', {}):
             generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]

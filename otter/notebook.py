@@ -9,6 +9,7 @@ import os
 import re
 import zipfile
 import pickle
+import time
 import datetime as dt
 
 from getpass import getpass
@@ -59,16 +60,19 @@ class Notebook:
                 self._ignore_modules = self._config.get("ignore_modules", [])
                 self._vars_to_store = self._config.get("variables", None)
 
-                if "notebook" not in self._config:
-                    assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
-                    self._notebook = glob("*.ipynb")[0]
+                # if "notebook" not in self._config:
+                #     assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
+                #     self._notebook = glob("*.ipynb")[0]
                     
-                else:
-                    self._notebook = self._config["notebook"]
+                # else:
+                self._notebook = self._config["notebook"]
 
                 if self._service_enabled:
                     # check that config file has required info
-                    assert all([key in self._config for key in ["endpoint", "auth", "assignment_id", "class_id"]]), "Otter config file missing required information"
+                    assert all([key in self._config for key in ["endpoint", "assignment_id", "class_id"]]), "Otter config file missing required information"
+
+                    if "auth" not in self._config:
+                        self._config["auth"] = "google"
 
                     self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
                     self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
@@ -163,6 +167,16 @@ class Notebook:
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
+    def _save_notebook(self):
+        """Runs Jupyter JS to force-save a notebook for use before beginning an export
+        """
+        if get_ipython() is not None:
+            display(Javascript("""
+                require(["base/js/namespace"], function() {
+                    Jupyter.notebook.save_notebook();
+                });
+            """))
+            time.sleep(0.5)
 
     def check(self, question, global_env=None):
         """
@@ -212,6 +226,7 @@ class Notebook:
             pagebreaks (``bool``, optional): If true, pagebreaks are included between questions
             display_link (``bool``, optional): Whether or not to display a download link
         """
+        self._save_notebook()
         try:
             if nb_path is None and self._notebook is not None:
                 nb_path = self._notebook
@@ -260,6 +275,7 @@ class Notebook:
             display_link (``bool``, optional): whether or not to display a download link
         """
         self._log_event(EventType.BEGIN_EXPORT)
+        self._save_notebook()
 
         try:
             if nb_path is None and self._notebook is not None:

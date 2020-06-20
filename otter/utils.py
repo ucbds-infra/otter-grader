@@ -35,7 +35,6 @@ def block_print():
             pass
         sys.stdout = sys.__stdout__
 
-
 def list_files(path):
     """Returns a list of all non-hidden files in a directory
     
@@ -47,7 +46,6 @@ def list_files(path):
 
     """
     return [file for file in os.listdir(path) if os.path.isfile(os.path.join(path, file)) and file[0] != "."]
-
 
 def merge_csv(dataframes):
     """Merges dataframes along the vertical axis
@@ -61,7 +59,6 @@ def merge_csv(dataframes):
     """
     final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
     return final_dataframe
-
 
 def connect_db(host="localhost", username="admin", password="", port="5432", db="otter_db"):
     """Connects to a specific Postgres database with provided parameters/credentials
@@ -93,7 +90,6 @@ def connect_db(host="localhost", username="admin", password="", port="5432", db=
     conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     return conn
 
-
 def flush_inline_matplotlib_plots():
     """
     Flush matplotlib plots immediately, rather than asynchronously
@@ -119,7 +115,6 @@ def flush_inline_matplotlib_plots():
     if mpl.get_backend() == 'module://ipykernel.pylab.backend_inline':
         flush_figures()
 
-
 @contextmanager
 def hide_outputs():
     """
@@ -139,7 +134,6 @@ def hide_outputs():
         # flush_inline_matplotlib_plots()
         ipy.display_formatter.formatters = old_formatters
 
-
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     """Used to generate a dynamic variable name for grading functions
 
@@ -153,7 +147,6 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         ``str``: randomized string name for grading function
     """
     return ''.join(random.choice(chars) for _ in range(size))
-
 
 def str_to_doctest(code_lines, lines):
     """
@@ -177,3 +170,14 @@ def str_to_doctest(code_lines, lines):
         return str_to_doctest(code_lines, lines + ["... " + line])
     else:
         return str_to_doctest(code_lines, lines + [">>> " + line])
+
+def get_variable_type(obj):
+    """Returns the fully-qualified type string of an object ``obj``
+
+    Args:
+        obj (object): the object in question
+
+    Returns:
+        ``str``: the fully-qualified type string
+    """
+    return type(obj).__module__ + "." + type(obj).__name__

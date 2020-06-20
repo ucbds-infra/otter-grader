@@ -36,7 +36,8 @@ This cell is removed from both output notebooks. These configurations, listed in
 | `solutions_pdf` | `False` | Whether to generate a solutions PDF from notebook; either `true`, `false`, or `filtered`; defaults to unfiltered PDF |
 | `template_pdf` | `False` | Whether to generate a filtered template PDF from notebook for setting up a Gradescope assignment |
 | `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
-| `save_environment` | `False` | Whether to store environment copies in the [log](logging.mds) |
+| `service` | `{}` | A set of configurations for submitting to an Otter Service deployment (if applicable) |
+| `save_environment` | `False` | Whether to store environment copies in the [log](logging.md) |
 | `ignore_modules` | `[]` | A list of modules whose functions to ignore when pickling the environment |
 | `files` | `[]` | A list of support files required either for students or Otter Generate |
 
@@ -62,6 +63,16 @@ generate:
 
 These values, if left unspecified, take on the default values of their flags as described in [Otter Generate](otter_generate.md).
 
+If you have an Otter Service deployment to which you would like students to submit, the necessary configurations for this submission can be specified in the `service` key of the assignment metadata. This has the required keys `endpoint` (the URL of the VM), `assignment_id` (the ID of the assignment in the Otter Service database), and `class_id` (the class ID in the database). You can optionally also set an auth provider with the `auth` key (which defaults to `google`).
+
+```yaml
+service:
+  endpoint: https://some.url   # required
+  assignment_id: hw00          # required
+  class_id: some_class         # required
+  auth: google                 # the default
+```
+
 As an example, the following assignment metadata includes an export cell but no filtering, not init cell, and calls Otter Generate with the flags `--points 3 --seed 0`.
 
 ````
@@ -74,6 +85,9 @@ generate:
     seed: 0
 ```
 ````
+
+<!-- TODO: update description of export key -->
+<!-- TODO: talk about setting up storing envs -->
 
 ### Autograded Questions
 

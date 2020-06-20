@@ -12,7 +12,7 @@ from jinja2 import Template
 
 from .token import APIClient
 
-REQUIREMENTS = Template("""datascience
+REQUIREMENTS = Template("""{% if not overwrite %}datascience
 jupyter_client
 ipykernel
 matplotlib
@@ -27,13 +27,13 @@ nbformat
 dill
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@f39f7bedafc0204b8dd482591de58c2e4a400198{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@3d49d9d723a27706aa50ac82a740a5b5a4a0dc40{% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
 SETUP_SH = """#!/usr/bin/env bash
 
-apt-get install -y python3.7 python3-pip
+apt-get install -y python3.7 python3-pip python3.7-dev
 
 # apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \\
 #        libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \\
@@ -79,6 +79,7 @@ SHOW_HIDDEN_TESTS_ON_RELEASE = {{ show_hidden }}
 SEED = {{ seed }}
 GRADE_FROM_LOG = {{ grade_from_log }}
 SERIALIZED_VARIABLES = {{ serialized_variables }}
+PUBLIC_TEST_MULTIPLIER = {{ public_test_multiplier }}
 
 # for auto-uploading PDFs
 {% if token %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
@@ -173,6 +174,19 @@ if __name__ == "__main__":
     )
     # del scores["TEST_HINTS"]
 
+    # verify the scores against the log
+    print("\\n\\n")
+    if os.path.isfile(_OTTER_LOG_FILENAME):
+        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+        try:
+            found_discrepancy = log.verify_scores(scores)
+            if not found_discrepancy:
+                print("No discrepancies found while verifying scores against the log.")
+        except BaseException as e:
+            print(f"Error encountered while trying to verify scores with log:\\n{e}")
+    else:
+        print("No log found with which to verify student scores")
+
     if GENERATE_PDF:
         try:
             export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
@@ -193,7 +207,7 @@ if __name__ == "__main__":
 
         except:
             print("\\n\\n")
-            warnings.warn("PDF generation or submission failed", warnings.RuntimeWarning)
+            warnings.warn("PDF generation or submission failed", RuntimeWarning)
 
     # hidden visibility determined by SHOW_HIDDEN_TESTS_ON_RELEASE
     hidden_test_visibility = ("hidden", "after_published")[SHOW_HIDDEN_TESTS_ON_RELEASE]
@@ -201,21 +215,29 @@ if __name__ == "__main__":
     output = {"tests" : []}
     for key in scores:
         if key != "total" and key != "possible":
-            if scores[key].get("hidden", False):
-                output["tests"] += [{
-                    "name" : key,
-                    "score" : 0,
-                    "possible": 0,
-                    "visibility": "visible"
-                }]
+            hidden, incorrect = scores[key].get("hidden", False), "hint" in scores[key]
+            score, possible = scores[key]["score"], scores[key]["possible"]
+            public_score, hidden_score = score * PUBLIC_TEST_MULTIPLIER, score * (1 - PUBLIC_TEST_MULTIPLIER)
+            public_possible, hidden_possible = possible * PUBLIC_TEST_MULTIPLIER, possible * (1 - PUBLIC_TEST_MULTIPLIER)
+            
             output["tests"] += [{
-                "name" : (key, key + " HIDDEN")[scores[key].get("hidden", False)],
-                "score" : scores[key]["score"],
-                "possible": scores[key]["possible"],
-                "visibility": ("visible", hidden_test_visibility)[scores[key].get("hidden", False)]
+                "name" : key + " - Public",
+                "score" : (public_score, score)[not hidden and incorrect],
+                "max_score": (public_possible, possible)[not hidden and incorrect],
+                "visibility": "visible",
             }]
-            if "hint" in scores[key]:
+            if not hidden and incorrect:
                 output["tests"][-1]["output"] = repr(scores[key]["hint"])
+            
+            if not (not hidden and incorrect):
+                output["tests"] += [{
+                    "name" : key + " - Hidden",
+                    "score" : (score, hidden_score)[not hidden and incorrect],
+                    "max_score": (possible, hidden_possible)[not hidden and incorrect],
+                    "visibility": hidden_test_visibility,
+                }]
+                if hidden and incorrect:
+                    output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
     if SHOW_STDOUT_ON_RELEASE:
         output["stdout_visibility"] = "after_published"
@@ -259,6 +281,9 @@ def main(args):
         if not args.token:
             args.token = APIClient.get_token()
 
+    # check that args.public_multiplier is valid
+    assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
+
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
@@ -272,7 +297,8 @@ def main(args):
         filtering = str(not args.unfiltered_pdfs),
         pagebreaks = str(not args.no_pagebreaks),
         grade_from_log = str(args.grade_from_log),
-        serialized_variables = str(args.serialized_variables)
+        serialized_variables = str(args.serialized_variables),
+        public_test_multiplier = str(args.public_multiplier)
     )
 
     # create tmp directory to zip inside
@@ -287,12 +313,14 @@ def main(args):
         if os.path.isfile(args.requirements):
             with open(args.requirements) as f:
                 requirements = REQUIREMENTS.render(
+                    overwrite = args.overwrite_requirements,
                     other_requirements = f.read()
                 )
         elif args.requirements != "requirements.txt":
             assert False, "requirements file {} not found".format(args.requirements)
         else:
             requirements = REQUIREMENTS.render(
+                overwrite = args.overwrite_requirements,
                 other_requirements = ""
             )
 
@@ -312,8 +340,8 @@ def main(args):
             os.mkdir(os.path.join("tmp", "files"))
 
             for file in args.files:
-                if file == "gen":
-                    continue
+                # if file == "gen":
+                #     continue
                 shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))
 
         os.chdir("./tmp")

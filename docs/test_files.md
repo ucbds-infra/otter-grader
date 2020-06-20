@@ -2,6 +2,8 @@
 
 Otter requires OK-formatted tests to check students' work against. These have a very specific format, described in detail in the [OkPy documentation](https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests).
 
+<!-- TODO: add link to test etiquette docs -->
+
 ## OK Format Caveats
 
 While Otter uses OK format, there are a few caveats to the tests when using them with Otter.
@@ -35,7 +37,7 @@ test = {
                 {
                     "code": r"""
                     >>> for i in range(4):
-                    ... 	print(i == 1)
+                    ...     print(i == 1)
                     False
                     True
                     False

@@ -53,6 +53,8 @@ True
 
 See the reference [below](#otter-logs-reference) for more information about the arguments to `LogEntry.shelve` and `LogEntry.unshelve`.
 
+<!-- TODO: describe variables dict arg -->
+
 ## Debugging with the Log
 
 The log is useful to help students debug tests that they are repeatedly failing. Log entries story any errors thrown by the process tracked by that entry and, if the log is a call to `otter.Notebook.check`, also the test results. Any errors held by the log entry can be re-thrown by calling `LogEntry.raise_error`:
@@ -70,6 +72,7 @@ The test results of an entry can be returned using `LogEntry.get_results`:
 entry.get_results()
 ```
 
+<!-- TODO: change this to grading from serialized environments -->
 ## Pregrading Questions
 
 Logs can also be used to pregrade questions. If the grading environment does not have the dependencies necessary to run all code, the results of tests in the log can be used to allow the results of public tests in the students' execution environments to overwrite the grade assignment by the grading environment. For example, if the execution hub has access to a large SQL server that cannot be accessed by a Gradescope grading container, these questions can still be graded (albeit with only public  tests) using the log of checks run by the students. 

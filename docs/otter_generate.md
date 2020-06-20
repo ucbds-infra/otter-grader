@@ -89,6 +89,10 @@ Now let's say that I need some functions defined in `utils.py`; then I would add
 otter generate autograder -t hidden-tests data.csv utils.py
 ```
 
+<!-- TODO: add step-by-step of what autograder does; should include verification with log -->
+<!-- TODO: add public test multipler -->
+<!-- TODO: update for dummy rows -->
+
 #### Grading with Environments
 
 Otter can grade assignments using saved environemnts in the log in the Gradescope container. This works by unshelving the environment stored in each check entry of Otter's log and grading against it. The notebook is parsed and only its import statements are executed. For more inforamtion about saving and using environments, see [Logging](logging.md).
