@@ -15,6 +15,24 @@ The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
 PRs are welcome! Please submit a PR to the master branch with any updates. Make sure to update the changelog in the docs with any information about the contribution.
 
+To set up the testing environment, install the requirements in `requirements.txt` and run the `test` directory as a module to execute the tests:
+
+```
+python3 -m test
+```
+
+To run the tests for a specific tool, add the command-line path for that tool to the command. For example, to run the tests for `otter generate autograder`, run
+
+```
+python3 -m test generate autograder
+```
+
+or to run all tests for commands under `otter generate`, run
+
+```
+python3 -m test generate
+```
+
 ## Changelog
 
 The changelog can be found in the [documentation](https://otter-grader.rtfd.io).
