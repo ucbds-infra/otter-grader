@@ -224,6 +224,7 @@ if __name__ == "__main__":
                 public_score, hidden_score = possible * PUBLIC_TEST_MULTIPLIER, 0
             elif not hidden and incorrect:
                 public_score, hidden_score = 0, 0
+                public_possible = possible
             
             output["tests"] += [{
                 "name" : key + " - Public",

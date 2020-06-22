@@ -166,11 +166,17 @@ if __name__ == "__main__":
             score, possible = scores[key]["score"], scores[key]["possible"]
             public_score, hidden_score = score * PUBLIC_TEST_MULTIPLIER, score * (1 - PUBLIC_TEST_MULTIPLIER)
             public_possible, hidden_possible = possible * PUBLIC_TEST_MULTIPLIER, possible * (1 - PUBLIC_TEST_MULTIPLIER)
+
+            if hidden and incorrect:
+                public_score, hidden_score = possible * PUBLIC_TEST_MULTIPLIER, 0
+            elif not hidden and incorrect:
+                public_score, hidden_score = 0, 0
+                public_possible = possible
             
             output["tests"] += [{
                 "name" : key + " - Public",
-                "score" : (public_score, score)[not hidden and incorrect],
-                "max_score": (public_possible, possible)[not hidden and incorrect],
+                "score" : public_score,
+                "max_score": public_possible,
                 "visibility": "visible",
                 "output": repr(scores[key]["test"]),
             }]
@@ -180,8 +186,8 @@ if __name__ == "__main__":
             if not (not hidden and incorrect):
                 output["tests"] += [{
                     "name" : key + " - Hidden",
-                    "score" : (score, hidden_score)[not hidden and incorrect],
-                    "max_score": (possible, hidden_possible)[not hidden and incorrect],
+                    "score" : hidden_score,
+                    "max_score": hidden_possible,
                     "visibility": hidden_test_visibility,
                     "output": repr(scores[key]["test"])
                 }]
