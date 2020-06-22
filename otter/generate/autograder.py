@@ -27,7 +27,7 @@ nbformat
 dill
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@3d49d9d723a27706aa50ac82a740a5b5a4a0dc40{% endif %}{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@3b5cfa421cf5fa31a14e25094c34a54fbf1548da{% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
@@ -155,11 +155,12 @@ if __name__ == "__main__":
     else:
         config = None
 
-    if GRADE_FROM_LOG:
-        assert os.path.isfile(_OTTER_LOG_FILENAME), "missing log"
+    if os.path.isfile(_OTTER_LOG_FILENAME):
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-        print("\\n\\n")     # for logging in otter.execute.execute_log
+        if GRADE_FROM_LOG:
+            print("\\n\\n")     # for logging in otter.execute.execute_log
     else:
+        assert not GRADE_FROM_LOG, "missing log"
         log = None
 
     scores = grade_notebook(
@@ -170,14 +171,13 @@ if __name__ == "__main__":
         test_dir="/autograder/submission/tests",
         ignore_errors=True, 
         seed=SEED,
-        log=log
+        log=log if GRADE_FROM_LOG else None
     )
     # del scores["TEST_HINTS"]
 
     # verify the scores against the log
     print("\\n\\n")
-    if os.path.isfile(_OTTER_LOG_FILENAME):
-        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+    if log is not None:
         try:
             found_discrepancy = log.verify_scores(scores)
             if not found_discrepancy:
@@ -219,25 +219,33 @@ if __name__ == "__main__":
             score, possible = scores[key]["score"], scores[key]["possible"]
             public_score, hidden_score = score * PUBLIC_TEST_MULTIPLIER, score * (1 - PUBLIC_TEST_MULTIPLIER)
             public_possible, hidden_possible = possible * PUBLIC_TEST_MULTIPLIER, possible * (1 - PUBLIC_TEST_MULTIPLIER)
+
+            if hidden and incorrect:
+                public_score, hidden_score = possible * PUBLIC_TEST_MULTIPLIER, 0
+            elif not hidden and incorrect:
+                public_score, hidden_score = 0, 0
+                public_possible = possible
             
             output["tests"] += [{
                 "name" : key + " - Public",
-                "score" : (public_score, score)[not hidden and incorrect],
-                "max_score": (public_possible, possible)[not hidden and incorrect],
+                "score" : public_score,
+                "max_score": public_possible,
                 "visibility": "visible",
+                "output": repr(scores[key]["test"]),
             }]
-            if not hidden and incorrect:
-                output["tests"][-1]["output"] = repr(scores[key]["hint"])
+            # if not hidden and incorrect:
+            #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
             
             if not (not hidden and incorrect):
                 output["tests"] += [{
                     "name" : key + " - Hidden",
-                    "score" : (score, hidden_score)[not hidden and incorrect],
-                    "max_score": (possible, hidden_possible)[not hidden and incorrect],
+                    "score" : hidden_score,
+                    "max_score": hidden_possible,
                     "visibility": hidden_test_visibility,
+                    "output": repr(scores[key]["test"])
                 }]
-                if hidden and incorrect:
-                    output["tests"][-1]["output"] = repr(scores[key]["hint"])
+                # if hidden and incorrect:
+                #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
     if SHOW_STDOUT_ON_RELEASE:
         output["stdout_visibility"] = "after_published"

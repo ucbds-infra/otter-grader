@@ -22,12 +22,34 @@ from .execute import check
 from .export import export_notebook
 from .logs import LogEntry, EventType, Log
 
-
 _API_KEY = None
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
 
+class OKTestsDisplay:
+    """
+    Class for stitching together OKTestsResult objects and displaying them in HTML and plaintext
+
+    Args:
+        results (``list`` of ``tuple(str, OKTestsResult)``): the test names and results for each test
+            to be displayed
+    """
+    def __init__(self, results):
+        self.test_names = [r[0] for r in results]
+        self.results = [r[1] for r in results]
+    
+    def __repr__(self):
+        ret = ""
+        for name, result in zip(self.test_names, self.results):
+            ret += f"{name}:\n{repr(result)}\n\n"
+        return ret
+
+    def _repr_html_(self):
+        ret = ""
+        for name, result in zip(self.test_names, self.results):
+            ret += f"<p><strong>{name}:</strong></p>\n{result._repr_html_()}\n\n"
+        return ret
 
 class Notebook:
     """Notebook class for in-notebook autograding
@@ -330,7 +352,6 @@ class Notebook:
         else:
             self._log_event(EventType.END_EXPORT)
 
-
     def check_all(self):
         """
         Runs all tests on this notebook. Tests are run against the current global environment, so any
@@ -343,14 +364,13 @@ class Notebook:
         try:
             tests = glob(os.path.join(self._path, "*.py"))
             global_env = inspect.currentframe().f_back.f_globals
+            results = []
             if not _SHELVE:
                 for file in sorted(tests):
                     if "__init__.py" not in file:
                         test_name = os.path.split(file)[1][:-3]
                         result = self.check(test_name, global_env)
-                        check_html = result._repr_html_()
-                        check_html = "<p><strong>{}</strong></p>".format(test_name) + check_html
-                        display(HTML(check_html))
+                        results.append((test_name, result))
             else:
                 log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
                 for file in sorted(tests):
@@ -363,17 +383,15 @@ class Notebook:
                         del locals()["env"]
                         
                         result = self.check(test_name, global_env)
-                        check_html = result._repr_html_()
-                        check_html = "<p><strong>{}</strong></p>".format(test_name) + check_html
-                        display(HTML(check_html))
-
+                        results.append((test_name, result))
 
         except Exception as e:
             self._log_event(EventType.END_CHECK_ALL, success=False, error=e)
             raise e
         else:
             self._log_event(EventType.END_CHECK_ALL)
-
+        
+        return OKTestsDisplay(results)
 
     def submit(self):
         """Submits this notebook to an Otter Service instance if Otter Service is configured
