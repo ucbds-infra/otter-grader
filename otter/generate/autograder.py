@@ -155,11 +155,12 @@ if __name__ == "__main__":
     else:
         config = None
 
-    if GRADE_FROM_LOG:
-        assert os.path.isfile(_OTTER_LOG_FILENAME), "missing log"
+    if os.path.isfile(_OTTER_LOG_FILENAME):
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-        print("\\n\\n")     # for logging in otter.execute.execute_log
+        if GRADE_FROM_LOG:
+            print("\\n\\n")     # for logging in otter.execute.execute_log
     else:
+        assert not GRADE_FROM_LOG, "missing log"
         log = None
 
     scores = grade_notebook(
@@ -170,14 +171,13 @@ if __name__ == "__main__":
         test_dir="/autograder/submission/tests",
         ignore_errors=True, 
         seed=SEED,
-        log=log
+        log=log if GRADE_FROM_LOG else None
     )
     # del scores["TEST_HINTS"]
 
     # verify the scores against the log
     print("\\n\\n")
-    if os.path.isfile(_OTTER_LOG_FILENAME):
-        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+    if log is not None:
         try:
             found_discrepancy = log.verify_scores(scores)
             if not found_discrepancy:
