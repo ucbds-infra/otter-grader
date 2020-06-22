@@ -48,7 +48,7 @@ class OKTestsDisplay:
     def _repr_html_(self):
         ret = ""
         for name, result in zip(self.test_names, self.results):
-            ret += f"<p><strong>{name}</strong></p>:\n{result._repr_html_()}\n\n"
+            ret += f"<p><strong>{name}:</strong></p>\n{result._repr_html_()}\n\n"
         return ret
 
 class Notebook:
@@ -351,7 +351,6 @@ class Notebook:
             raise e
         else:
             self._log_event(EventType.END_EXPORT)
-
 
     def check_all(self):
         """
