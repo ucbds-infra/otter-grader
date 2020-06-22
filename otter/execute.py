@@ -140,6 +140,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 score_mapping[test_name] = {
                     "score": r.grade * test.value,
                     "possible": test.value,
+                    "test": test,
                     # "hidden": test.hidden
                 }
                 total_score += r.grade * test.value
@@ -152,7 +153,8 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 else:
                     score_mapping[test_name] = {
                         "hint": tup[1],#.__repr__()
-                        "hidden": tup[1].failed_test_hidden
+                        "hidden": tup[1].failed_test_hidden,
+                        "test": tup[0],
                     }
         except IndexError:
             pass

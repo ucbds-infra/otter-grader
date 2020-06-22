@@ -225,9 +225,10 @@ if __name__ == "__main__":
                 "score" : (public_score, score)[not hidden and incorrect],
                 "max_score": (public_possible, possible)[not hidden and incorrect],
                 "visibility": "visible",
+                "output": repr(scores[key]["test"]),
             }]
-            if not hidden and incorrect:
-                output["tests"][-1]["output"] = repr(scores[key]["hint"])
+            # if not hidden and incorrect:
+            #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
             
             if not (not hidden and incorrect):
                 output["tests"] += [{
@@ -235,9 +236,10 @@ if __name__ == "__main__":
                     "score" : (score, hidden_score)[not hidden and incorrect],
                     "max_score": (possible, hidden_possible)[not hidden and incorrect],
                     "visibility": hidden_test_visibility,
+                    "output": repr(scores[key]["test"])
                 }]
-                if hidden and incorrect:
-                    output["tests"][-1]["output"] = repr(scores[key]["hint"])
+                # if hidden and incorrect:
+                #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
     if SHOW_STDOUT_ON_RELEASE:
         output["stdout_visibility"] = "after_published"
