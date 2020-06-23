@@ -198,7 +198,7 @@ class Notebook:
                     Jupyter.notebook.save_notebook();
                 });
             """))
-            time.sleep(0.5)
+            time.sleep(0.75)
 
     def check(self, question, global_env=None):
         """
