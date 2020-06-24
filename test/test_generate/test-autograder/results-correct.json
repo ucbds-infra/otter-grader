@@ -5,7 +5,7 @@
             "score": 0,
             "max_score": 0,
             "visibility": "visible",
-            "output": "/autograder/submission/tests/q1.py passed!"
+            "output": "All tests passed!"
         },
         {
             "name": "q1 - Hidden",
@@ -26,7 +26,7 @@
             "score": 0.0,
             "max_score": 0,
             "visibility": "visible",
-            "output": "/autograder/submission/tests/q3.py passed!"
+            "output": "All tests passed!"
         },
         {
             "name": "q3 - Hidden",
@@ -40,7 +40,7 @@
             "score": 0.0,
             "max_score": 0,
             "visibility": "visible",
-            "output": "/autograder/submission/tests/q4.py passed!"
+            "output": "All tests passed!"
         },
         {
             "name": "q4 - Hidden",
@@ -54,7 +54,7 @@
             "score": 0,
             "max_score": 0,
             "visibility": "visible",
-            "output": "   /autograder/submission/tests/q6.py\n\nTest result:\nTrying:\n    fib = fiberator()\nExpecting nothing\nok\nTrying:\n    for _ in range(10):\n        print(next(fib))\nExpecting:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\n**********************************************************************\nLine 3, in /autograder/submission/tests/q6.py 1\nFailed example:\n    for _ in range(10):\n        print(next(fib))\nExpected:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\nGot:\n    0\n    1\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n"
+            "output": "All tests passed!"
         },
         {
             "name": "q6 - Hidden",
@@ -68,7 +68,7 @@
             "score": 0.0,
             "max_score": 0,
             "visibility": "visible",
-            "output": "/autograder/submission/tests/q7.py passed!"
+            "output": "All tests passed!"
         },
         {
             "name": "q7 - Hidden",

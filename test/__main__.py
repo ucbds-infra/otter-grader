@@ -8,11 +8,11 @@ else:
     module = "test"
 
     # extract top-level prog
-    if len(sys.argv)== 2:
+    if len(sys.argv) >= 2:
         module += f".test_{sys.argv[1]}"
 
     # extract next prog if applicable
-    if len(sys.argv) == 3:
+    if len(sys.argv) >= 3:
         module += f".test_{sys.argv[2]}"
 
 if __name__ == "__main__":

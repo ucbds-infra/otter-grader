@@ -178,7 +178,7 @@ if __name__ == "__main__":
                 "score" : public_score,
                 "max_score": public_possible,
                 "visibility": "visible",
-                "output": repr(scores[key]["test"]),
+                "output": repr(scores[key]["test"]) if not hidden and incorrect else "All tests passed!",
             }]
             # if not hidden and incorrect:
             #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
