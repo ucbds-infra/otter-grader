@@ -1,0 +1,9 @@
+{
+    "endpoint": "https://some.url",
+    "auth": "google",
+    "assignment_id": "hw00",
+    "class_id": "some_class",
+    "notebook": "generate-otter.ipynb",
+    "save_environment": false,
+    "ignore_modules": []
+}
