@@ -225,3 +225,7 @@ class TestAssign(unittest.TestCase):
         
         # cleanup the output
         shutil.rmtree(TEST_FILES_PATH + "output")
+    
+    def tearDown(self):
+        from otter.assign import _clear_assignment_metadata
+        _clear_assignment_metadata()
