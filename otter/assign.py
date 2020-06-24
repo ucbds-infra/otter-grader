@@ -87,12 +87,20 @@ def main(args):
     # generate PDF of solutions with nb2pdf
     if ASSIGNMENT_METADATA.get('solutions_pdf', False):
         print("Generating solutions PDF...")
-        filtering = ASSIGNMENT_METADATA.get('solutions_pdf') == 'filtered'
-        nb2pdf.convert(
-            str(result / 'autograder' / master.name),
-            dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
-            filtering=filtering
-        )
+        try:
+            filtering = ASSIGNMENT_METADATA.get('solutions_pdf') == 'filtered'
+            nb2pdf.convert(
+                str(result / 'autograder' / master.name),
+                dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
+                filtering=filtering
+            )
+        except:
+            export_notebook(
+                str(result / 'autograder' / master.name),
+                dest=str(result / 'autograder' / (master.stem + '-sol.pdf')), 
+                filtering=True, 
+                pagebreaks=True
+            )
 
     # generate a tempalte PDF for Gradescope
     if ASSIGNMENT_METADATA.get('template_pdf', False):
