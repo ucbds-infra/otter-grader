@@ -9,7 +9,6 @@ import subprocess
 import re
 import pickle
 import warnings
-import pathlib
 import pandas as pd
 
 from glob import glob
