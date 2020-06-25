@@ -5,6 +5,7 @@
 import os
 import shutil
 import subprocess
+import pathlib
 
 from glob import glob
 from subprocess import PIPE
@@ -146,9 +147,20 @@ def main(args):
             os.mkdir(os.path.join("tmp", "files"))
 
             for file in args.files:
-                # if file == "gen":
-                #     continue
-                shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))
+                # if a directory, copy the entire dir
+                if os.path.isdir(file):
+                    shutil.copytree(file, str(dir / os.path.basename(file)))
+                else:
+                    # check that file is in subdir
+                    file = os.path.abspath(file)
+                    assert os.getcwd() in file, \
+                        f"{file} is not in a subdirectory of the working directory"
+                    wd_path = pathlib.Path(os.getcwd())
+                    file_path = pathlib.Path(file)
+                    rel_path = file_path.parent.relative_to(wd_path)
+                    output_path = os.path.join("tmp", "files", rel_path)
+                    os.makedirs(output_path, exist_ok=True)
+                    shutil.copy(file, output_path)
 
         os.chdir("./tmp")
 

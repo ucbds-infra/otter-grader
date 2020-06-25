@@ -22,6 +22,24 @@ parser = bin_globals["parser"]
 TEST_FILES_PATH = "test/test_generate/test-autograder/"
 
 class TestAutograder(unittest.TestCase):
+
+    def assertFilesEqual(self, p1, p2):
+        with open(p1) as f1:
+            with open(p2) as f2:
+                self.assertEqual(f1.read(), f2.read(), f"Contents of {p1} did not equal contents of {p2}")
+
+    def assertDirsEqual(self, dir1, dir2):
+        self.assertTrue(os.path.exists(dir1), f"{dir1} does not exist")
+        self.assertTrue(os.path.exists(dir2), f"{dir2} does not exist")
+        self.assertTrue(os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type")
+
+        if os.path.isfile(dir1):
+            self.assertFilesEqual(dir1, dir2)
+        else:
+            self.assertEqual(os.listdir(dir1), os.listdir(dir2), f"{dir1} and {dir2} have different contents")
+            for f1, f2 in zip(os.listdir(dir1), os.listdir(dir2)):
+                f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
+                self.assertDirsEqual(f1, f2)
     
     def create_docker_image(self):
         create_image_cmd = ["make", "docker-test"]
@@ -43,7 +61,7 @@ class TestAutograder(unittest.TestCase):
             "-t", TEST_FILES_PATH + "tests",
             "-o", TEST_FILES_PATH,
             "-r", TEST_FILES_PATH + "requirements.txt",
-            TEST_FILES_PATH + "test-df.csv"
+            TEST_FILES_PATH + "data/test-df.csv"
         ]
         args = parser.parse_args(generate_command)
         args.func(args)
@@ -53,19 +71,20 @@ class TestAutograder(unittest.TestCase):
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(unzip.stderr), 0, unzip.stderr)
 
-        # go through files and ensure that they are correct
-        for file in glob(TEST_FILES_PATH + "autograder/*"):
-            if os.path.isfile(file):
-                correct_file_path = os.path.join(TEST_FILES_PATH + "autograder-correct", os.path.split(file)[1])
-                with open(file) as f:
-                    with open(correct_file_path) as g:
-                        self.assertEqual(f.read(), g.read(), "{} does not match {}".format(file, correct_file_path))
-            else:
-                for subfile in glob(os.path.join(file, "*")):
-                    correct_file_path = os.path.join(TEST_FILES_PATH + "autograder-correct", os.path.split(file)[1], os.path.split(subfile)[1])
-                    with open(subfile) as f:
-                        with open(correct_file_path) as g:
-                            self.assertEqual(f.read(), g.read(), "{} does not match {}".format(subfile, correct_file_path))
+        # # go through files and ensure that they are correct
+        # for file in glob(TEST_FILES_PATH + "autograder/*"):
+        #     if os.path.isfile(file):
+        #         correct_file_path = os.path.join(TEST_FILES_PATH + "autograder-correct", os.path.split(file)[1])
+        #         with open(file) as f:
+        #             with open(correct_file_path) as g:
+        #                 self.assertEqual(f.read(), g.read(), "{} does not match {}".format(file, correct_file_path))
+        #     else:
+        #         for subfile in glob(os.path.join(file, "*")):
+        #             correct_file_path = os.path.join(TEST_FILES_PATH + "autograder-correct", os.path.split(file)[1], os.path.split(subfile)[1])
+        #             with open(subfile) as f:
+        #                 with open(correct_file_path) as g:
+        #                     self.assertEqual(f.read(), g.read(), "{} does not match {}".format(subfile, correct_file_path))
+        self.assertDirsEqual(TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder-correct")
 
         # cleanup files
         cleanup_command = ["rm", "-rf", TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder.zip"]
@@ -83,7 +102,7 @@ class TestAutograder(unittest.TestCase):
             "-t", TEST_FILES_PATH + "tests",
             "-o", TEST_FILES_PATH,
             "-r", TEST_FILES_PATH + "requirements.txt",
-            TEST_FILES_PATH + "test-df.csv"
+            TEST_FILES_PATH + "data/test-df.csv"
         ]
         args = parser.parse_args(generate_command)
         args.func(args)
