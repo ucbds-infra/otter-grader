@@ -158,7 +158,8 @@ def main(args):
         
         if ASSIGNMENT_METADATA.get('files', []) or args.files:
             # os.path.split fixes issues due to relative paths
-            generate_cmd += [os.path.split(file)[1] for file in ASSIGNMENT_METADATA.get('files', []) or args.files]
+            generate_cmd += ASSIGNMENT_METADATA.get('files', []) or args.files
+            # [os.path.split(file)[1] for file in ASSIGNMENT_METADATA.get('files', []) or args.files]
 
         if ASSIGNMENT_METADATA.get('variables', {}):
             generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
@@ -236,7 +237,17 @@ def convert_to_ok(nb_path, dir, args):
 
     # copy files
     for file in ASSIGNMENT_METADATA.get('files', []) or args.files:
-        shutil.copy(file, str(dir))
+        # if a directory, copy the entire dir
+        if os.path.isdir(file):
+            shutil.copytree(file, str(dir / os.path.basename(file)))
+        else:
+            # check that file is in subdir
+            assert os.path.abspath(nb_path.parent) in os.path.abspath(file), \
+                f"{file} is not in a subdirectory of the master notebook directory"
+            file_path = pathlib.Path(file)
+            rel_path = file_path.parent.relative_to(nb_path.parent)
+            os.makedirs(dir / rel_path, exist_ok=True)
+            shutil.copy(file, str(dir / rel_path))
 
     if ASSIGNMENT_METADATA.get('init_cell', True) and not args.no_init_cell:
         init = gen_init_cell()
