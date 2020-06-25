@@ -175,7 +175,7 @@ def main(config):
                     "score" : hidden_score,
                     "max_score": hidden_possible,
                     "visibility": hidden_test_visibility,
-                    "output": repr(scores[key]["test"])
+                    "output": repr(scores[key]["test"]) if incorrect else "All tests passed!"
                 }]
                 # if hidden and incorrect:
                 #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
