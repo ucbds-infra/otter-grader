@@ -357,6 +357,23 @@ grade_script = function(script_path, tests_glob, secret) {
   return(results)
 }
 
+#' Run autograder in a Gradescope container and return the results as a properly-formatted JSON
+#' string
+#'
+#' @param script_path The path to the script
+#' @param secret The string to be appended to the name `check_results_` as the list name to collect
+#' results (optional)
+#' @return The JSON string
+#' @export
+run_gradescope = function(script_path, secret) {
+  if (missing(secret)) {
+    secret = make_secret()
+  }
+  results = grade_script(script_path, "/autograder/source/tests/*.[Rr]", secret)
+  results = results_to_list(results)
+  return(jsonlite::toJSON(results), auto_unbox=TRUE, pretty=TRUE)
+}
+
 
 #---------------------------------------------------------------------------------------------------
 # Utilities

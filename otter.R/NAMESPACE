@@ -2,3 +2,4 @@
 
 export(check)
 export(grade_script)
+export(run_gradescope)
