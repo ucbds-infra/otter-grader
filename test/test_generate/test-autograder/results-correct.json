@@ -12,7 +12,7 @@
             "score": 0,
             "max_score": 0,
             "visibility": "hidden",
-            "output": "/autograder/submission/tests/q1.py passed!"
+            "output": "All tests passed!"
         },
         {
             "name": "q2 - Public",
@@ -33,7 +33,7 @@
             "score": 2.0,
             "max_score": 2,
             "visibility": "hidden",
-            "output": "/autograder/submission/tests/q3.py passed!"
+            "output": "All tests passed!"
         },
         {
             "name": "q4 - Public",
@@ -47,7 +47,7 @@
             "score": 1.0,
             "max_score": 1,
             "visibility": "hidden",
-            "output": "/autograder/submission/tests/q4.py passed!"
+            "output": "All tests passed!"
         },
         {
             "name": "q6 - Public",
@@ -75,7 +75,7 @@
             "score": 1.0,
             "max_score": 1,
             "visibility": "hidden",
-            "output": "/autograder/submission/tests/q7.py passed!"
+            "output": "All tests passed!"
         }
     ]
 }
