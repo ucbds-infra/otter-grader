@@ -9,6 +9,7 @@ import subprocess
 import re
 import pickle
 import warnings
+import pathlib
 import pandas as pd
 
 from glob import glob
@@ -38,8 +39,12 @@ def main(config):
 
     # put files into submission directory
     if os.path.exists("/autograder/source/files"):
-        for filename in glob("/autograder/source/files/*.*"):
-            shutil.copy(filename, "/autograder/submission")
+        for file in os.listdir("/autograder/source/files"):
+            fp = os.path.join("/autograder/source/files", file)
+            if os.path.isdir(fp):
+                shutil.copytree(fp, os.path.join("/autograder/submission", os.path.basename(fp)))
+            else:
+                shutil.copy(fp, "/autograder/submission")
 
     # create __init__.py files
     subprocess.run(["touch", "/autograder/__init__.py"])
