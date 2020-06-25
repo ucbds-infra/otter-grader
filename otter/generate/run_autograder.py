@@ -24,7 +24,12 @@ from ..notebook import _OTTER_LOG_FILENAME
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
 
 def main(config):
-    """Runs autograder on Gradescope"""
+    """
+    Runs autograder on Gradescope based on predefined configurations.
+
+    Args:
+        config (``dict``): configurations for autograder
+    """
     if config.get("token", None) is not None:
         client = APIClient(token=config.get("token", None))
         generate_pdf = True
