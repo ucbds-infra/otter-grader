@@ -24,7 +24,7 @@ from getpass import getpass
 from .execute import grade_notebook
 # from .jassign import gen_views as jassign_views
 from .export import export_notebook
-from .utils import block_print, str_to_doctest
+from .utils import block_print, str_to_doctest, get_relpath
 from .generate.token import APIClient
 
 
@@ -74,6 +74,14 @@ def main(args):
     """
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
+
+    # TODO: update this condition
+    if True:
+        result = get_relpath(master.parent, result)
+        orig_dir = os.getcwd()
+        os.chdir(os.path.abspath(master.parent))
+        master = pathlib.Path(master.name)
+
     # if args.jassign:
     #     jassign_views(master, result, args)
     # else:

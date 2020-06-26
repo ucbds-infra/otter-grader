@@ -181,3 +181,25 @@ def get_variable_type(obj):
         ``str``: the fully-qualified type string
     """
     return type(obj).__module__ + "." + type(obj).__name__
+
+def get_relpath(src, dst):
+    """
+    Returns the relative path from ``src`` to ``dst``
+
+    Args:
+        src (``pathlib.Path``): the source directory
+        dst (``pathlib.Path``): the destination directory
+
+    Returns:
+        ``pathlib.Path``: the relative path
+    """
+    osrc = src
+    ups = 0
+    while True:
+        try:
+            dst.relative_to(src)
+            break
+        except ValueError:
+            src = src.parent
+            ups += 1
+    return pathlib.Path(("../" * ups) / dst.relative_to(src))
