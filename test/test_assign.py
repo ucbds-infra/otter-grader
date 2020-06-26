@@ -14,6 +14,7 @@ from subprocess import PIPE
 from glob import glob
 from unittest import mock
 
+from otter.assign import clear_assignment_metadata
 from otter.utils import block_print
 
 # read in argument parser
@@ -73,6 +74,8 @@ class TestAssign(unittest.TestCase):
         Checks that otter assign filters and outputs correctly
         """
         # run otter assign
+        clear_assignment_metadata()
+
         run_assign_args = [
             "assign", "--no-run-tests", TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", TEST_FILES_PATH + "data.csv"
         ]
@@ -116,12 +119,14 @@ class TestAssign(unittest.TestCase):
             self.assertEqual(correct_contents, contents, "Student file {} incorrect".format(file))
         
         # cleanup the output
+
         shutil.rmtree(TEST_FILES_PATH + "output")
 
     def test_otter_example(self):
         
         # Checks that otter assign filters and outputs correctly
-        
+        clear_assignment_metadata()
+
         # run otter assign
         run_assign_args = [
             "assign", "--no-init-cell", "--no-check-all", TEST_FILES_PATH + "generate-otter.ipynb", 
@@ -168,12 +173,14 @@ class TestAssign(unittest.TestCase):
             self.assertEqual(correct_contents, contents, "Student file {} incorrect".format(file))
         
         # cleanup the output
+
         shutil.rmtree(TEST_FILES_PATH + "output")
 
     def test_pdf_example(self):
         
         #Checks that otter assign filters and outputs correctly
-        
+        clear_assignment_metadata()
+
         # run otter assign
         run_assign_args = [
             "assign", "--no-export-cell", "--no-run-tests", "--no-init-cell", 
@@ -224,6 +231,7 @@ class TestAssign(unittest.TestCase):
             self.assertEqual(correct_contents, contents, "Student file {} incorrect".format(file))
         
         # cleanup the output
+
         shutil.rmtree(TEST_FILES_PATH + "output")
     
     def tearDown(self):
