@@ -147,7 +147,7 @@ def main(config):
     Args:
         config (``dict``): configurations for autograder
     """
-    if config.lang == "r":
+    if config.get("lang", "python") == "r":
         run_r_autograder(config)
         return
 

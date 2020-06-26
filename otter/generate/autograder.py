@@ -26,6 +26,7 @@ jinja2
 nbconvert
 nbformat
 dill
+jupytext
 numpy==1.16.0
 tornado==5.1.1
 git+https://github.com/ucbds-infra/otter-grader.git@b51dd2ec1b4c56011e1f0634ca3f9b691b6f3aaf{% endif %}{% if other_requirements %}
@@ -110,7 +111,7 @@ def main(args):
         grade_from_log = str(args.grade_from_log),
         serialized_variables = str(args.serialized_variables),
         public_test_multiplier = str(args.public_multiplier),
-        lanuage = str(args.lang.lower())
+        language = str(args.lang.lower())
     )
 
     # create tmp directory to zip inside

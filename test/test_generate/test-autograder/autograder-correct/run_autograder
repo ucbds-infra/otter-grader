@@ -15,7 +15,8 @@ config = {
     "course_id": 'None',
     "assignment_id": 'None',
     "filtering": True,
-    "pagebreaks": True
+    "pagebreaks": True,
+    "language": 'python',
 }
 
 run_autograder(config)
