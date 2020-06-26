@@ -11,3 +11,5 @@ test/tests
 test/output
 .sos
 docs/_build
+.Rproj.user
+.Rhistory

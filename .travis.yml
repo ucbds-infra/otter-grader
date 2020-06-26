@@ -22,7 +22,8 @@ install:
   - sudo apt-get install fonts-lmodern
 
 script:
-  - coverage run -m unittest discover
+  # runs test.__main__
+  - coverage run -m test
 
 after_success:
   - codecov

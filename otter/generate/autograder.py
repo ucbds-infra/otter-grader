@@ -5,6 +5,7 @@
 import os
 import shutil
 import subprocess
+import pathlib
 
 from glob import glob
 from subprocess import PIPE
@@ -27,7 +28,7 @@ nbformat
 dill
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@3d49d9d723a27706aa50ac82a740a5b5a4a0dc40{% endif %}{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@d43e7371f094c92f2d056f70f80c0e568e73df5d{% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
@@ -53,219 +54,25 @@ pip3 install -r /autograder/source/requirements.txt
 
 RUN_AUTOGRADER = Template("""#!/usr/bin/env python3
 
-import json
-import os
-import shutil
-import subprocess
-import re
-import pickle
-import warnings
-import pandas as pd
+from otter.generate.run_autograder import main as run_autograder
 
-from glob import glob
-from textwrap import dedent
-from nb2pdf import convert
+config = {
+    "score_threshold": {{ threshold }},
+    "points_possible": {{ points }},
+    "show_stdout_on_release": {{ show_stdout }},
+    "show_hidden_tests_on_release": {{ show_hidden }},
+    "seed": {{ seed }},
+    "grade_from_log": {{ grade_from_log }},
+    "serialized_variables": {{ serialized_variables }},
+    "public_test_multiplier": {{ public_test_multiplier }},
+    "token": {% if token %}'{{ token }}'{% else %}None{% endif %},
+    "course_id": '{{ course_id }}',
+    "assignment_id": '{{ assignment_id }}',
+    "filtering": {{ filtering }},
+    "pagebreaks": {{ pagebreaks }}
+}
 
-from otter.execute import grade_notebook
-from otter.export import export_notebook
-from otter.generate.token import APIClient
-from otter.logs import Log, QuestionNotInLogException
-from otter.notebook import _OTTER_LOG_FILENAME
-
-SCORE_THRESHOLD = {{ threshold }}
-POINTS_POSSIBLE = {{ points }}
-SHOW_STDOUT_ON_RELEASE = {{ show_stdout }}
-SHOW_HIDDEN_TESTS_ON_RELEASE = {{ show_hidden }}
-SEED = {{ seed }}
-GRADE_FROM_LOG = {{ grade_from_log }}
-SERIALIZED_VARIABLES = {{ serialized_variables }}
-PUBLIC_TEST_MULTIPLIER = {{ public_test_multiplier }}
-
-# for auto-uploading PDFs
-{% if token %}TOKEN = '{{ token }}'{% else %}TOKEN = None{% endif %}
-COURSE_ID = '{{ course_id }}'
-ASSIGNMENT_ID = '{{ assignment_id }}'
-FILTERING = {{ filtering }}
-PAGEBREAKS = {{ pagebreaks }}
-
-if TOKEN is not None:
-    CLIENT = APIClient(token=TOKEN)
-    GENERATE_PDF = True
-else:
-    GENERATE_PDF = False
-
-UTILS_IMPORT_REGEX = r"\\"from utils import [\\w\\*, ]+"
-NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\\(.+\\)"
-
-if __name__ == "__main__":
-    # put files into submission directory
-    if os.path.exists("/autograder/source/files"):
-        for filename in glob("/autograder/source/files/*.*"):
-            shutil.copy(filename, "/autograder/submission")
-
-    # create __init__.py files
-    subprocess.run(["touch", "/autograder/__init__.py"])
-    subprocess.run(["touch", "/autograder/submission/__init__.py"])
-
-    os.chdir("/autograder/submission")
-
-    # check for *.ipynb.json files
-    jsons = glob("*.ipynb.json")
-    for file in jsons:
-        shutil.copy(file, file[:-5])
-
-    # check for *.ipynb.html files
-    htmls = glob("*.ipynb.html")
-    for file in htmls:
-        shutil.copy(file, file[:-5])
-
-    nb_path = glob("*.ipynb")[0]
-
-    # fix utils import
-    try:
-        with open(nb_path) as f:
-            contents = f.read()
-    except UnicodeDecodeError:
-        with open(nb_path, "r", encoding="utf-8") as f:
-            contents = f.read()
-
-    # contents = re.sub(UTILS_IMPORT_REGEX, "\\"from .utils import *", contents)
-    contents = re.sub(NOTEBOOK_INSTANCE_REGEX, "otter.Notebook()", contents)
-
-    try:
-        with open(nb_path, "w") as f:
-            f.write(contents)
-    except UnicodeEncodeError:
-        with open(nb_path, "w", encoding="utf-8") as f:
-            f.write(contents)
-
-    try:
-        os.mkdir("/autograder/submission/tests")
-    except FileExistsError:
-        pass
-
-    tests_glob = glob("/autograder/source/tests/*.py")
-    for file in tests_glob:
-        shutil.copy(file, "/autograder/submission/tests")
-
-    if glob("*.otter"):
-        assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
-        with open(glob("*.otter")[0]) as f:
-            config = json.load(f)
-    else:
-        config = None
-
-    if GRADE_FROM_LOG:
-        assert os.path.isfile(_OTTER_LOG_FILENAME), "missing log"
-        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-        print("\\n\\n")     # for logging in otter.execute.execute_log
-    else:
-        log = None
-
-    scores = grade_notebook(
-        nb_path, 
-        glob("/autograder/submission/tests/*.py"), 
-        name="submission", 
-        cwd="/autograder/submission", 
-        test_dir="/autograder/submission/tests",
-        ignore_errors=True, 
-        seed=SEED,
-        log=log
-    )
-    # del scores["TEST_HINTS"]
-
-    # verify the scores against the log
-    print("\\n\\n")
-    if os.path.isfile(_OTTER_LOG_FILENAME):
-        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-        try:
-            found_discrepancy = log.verify_scores(scores)
-            if not found_discrepancy:
-                print("No discrepancies found while verifying scores against the log.")
-        except BaseException as e:
-            print(f"Error encountered while trying to verify scores with log:\\n{e}")
-    else:
-        print("No log found with which to verify student scores")
-
-    if GENERATE_PDF:
-        try:
-            export_notebook(nb_path, filtering=FILTERING, pagebreaks=PAGEBREAKS)
-            pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
-
-            # get student email
-            with open("../submission_metadata.json") as f:
-                metadata = json.load(f)
-
-            student_emails = []
-            for user in metadata["users"]:
-                student_emails.append(user["email"])
-            
-            for student_email in student_emails:
-                CLIENT.upload_pdf_submission(COURSE_ID, ASSIGNMENT_ID, student_email, pdf_path)
-
-            print("\\n\\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
-
-        except:
-            print("\\n\\n")
-            warnings.warn("PDF generation or submission failed", RuntimeWarning)
-
-    # hidden visibility determined by SHOW_HIDDEN_TESTS_ON_RELEASE
-    hidden_test_visibility = ("hidden", "after_published")[SHOW_HIDDEN_TESTS_ON_RELEASE]
-
-    output = {"tests" : []}
-    for key in scores:
-        if key != "total" and key != "possible":
-            hidden, incorrect = scores[key].get("hidden", False), "hint" in scores[key]
-            score, possible = scores[key]["score"], scores[key]["possible"]
-            public_score, hidden_score = score * PUBLIC_TEST_MULTIPLIER, score * (1 - PUBLIC_TEST_MULTIPLIER)
-            public_possible, hidden_possible = possible * PUBLIC_TEST_MULTIPLIER, possible * (1 - PUBLIC_TEST_MULTIPLIER)
-            
-            output["tests"] += [{
-                "name" : key + " - Public",
-                "score" : (public_score, score)[not hidden and incorrect],
-                "max_score": (public_possible, possible)[not hidden and incorrect],
-                "visibility": "visible",
-            }]
-            if not hidden and incorrect:
-                output["tests"][-1]["output"] = repr(scores[key]["hint"])
-            
-            if not (not hidden and incorrect):
-                output["tests"] += [{
-                    "name" : key + " - Hidden",
-                    "score" : (score, hidden_score)[not hidden and incorrect],
-                    "max_score": (possible, hidden_possible)[not hidden and incorrect],
-                    "visibility": hidden_test_visibility,
-                }]
-                if hidden and incorrect:
-                    output["tests"][-1]["output"] = repr(scores[key]["hint"])
-    
-    if SHOW_STDOUT_ON_RELEASE:
-        output["stdout_visibility"] = "after_published"
-
-    if POINTS_POSSIBLE is not None:
-        output["score"] = scores["total"] / scores["possible"] * POINTS_POSSIBLE
-
-    if SCORE_THRESHOLD is not None:
-        if scores["total"] / scores["possible"] >= SCORE_THRESHOLD:
-            output["score"] = POINTS_POSSIBLE or scores["possible"]
-        else:
-            output["score"] = 0
-
-    with open("/autograder/results/results.json", "w+") as f:
-        json.dump(output, f, indent=4)
-
-    print("\\n\\n")
-    print(dedent(\"\"\"\\
-    Test scores are summarized in the table below. Passed tests appear as a single cell with no output.
-    Failed public tests appear as a single cell with the output of the failed test. Failed hidden tests
-    appear as two cells, one with no output (the public tests) and another with the output of the failed
-    (hidden) test that is not visible to the student.
-    \"\"\"))
-    df = pd.DataFrame(output["tests"])
-    if "output" in df.columns:
-        df.drop(columns=["output"], inplace=True)
-    # df.drop(columns=["hidden"], inplace=True)
-    print(df)
+run_autograder(config)
 """)
 
 def main(args):
@@ -340,9 +147,20 @@ def main(args):
             os.mkdir(os.path.join("tmp", "files"))
 
             for file in args.files:
-                # if file == "gen":
-                #     continue
-                shutil.copy(file, os.path.join(os.getcwd(), "tmp", "files"))
+                # if a directory, copy the entire dir
+                if os.path.isdir(file):
+                    shutil.copytree(file, str(dir / os.path.basename(file)))
+                else:
+                    # check that file is in subdir
+                    file = os.path.abspath(file)
+                    assert os.getcwd() in file, \
+                        f"{file} is not in a subdirectory of the working directory"
+                    wd_path = pathlib.Path(os.getcwd())
+                    file_path = pathlib.Path(file)
+                    rel_path = file_path.parent.relative_to(wd_path)
+                    output_path = os.path.join("tmp", "files", rel_path)
+                    os.makedirs(output_path, exist_ok=True)
+                    shutil.copy(file, output_path)
 
         os.chdir("./tmp")
 
