@@ -49,6 +49,10 @@ ASSIGNMENT_METADATA = {}
 class EmptyCellException(Exception):
     """Exception for empty cells to indicate deletion"""
 
+def _clear_assignment_metadata():
+    """Replaces ASSIGNMENT_METADATA with an empty dictionary for testing"""
+    global ASSIGNMENT_METADATA
+    ASSIGNMENT_METADATA = {}
 
 def run_tests(nb_path, debug=False, seed=None):
     """Run tests in the autograder version of the notebook.
