@@ -79,7 +79,7 @@ def main(args):
     if True:
         result = get_relpath(master.parent, result)
         orig_dir = os.getcwd()
-        os.chdir(os.path.abspath(master.parent))
+        os.chdir(master.parent)
         master = pathlib.Path(master.name)
 
     # if args.jassign:
@@ -182,6 +182,10 @@ def main(args):
         with block_print():
             run_tests(result / 'autograder' / master.name, debug=args.debug, seed=ASSIGNMENT_METADATA.get('generate', {}).get('seed', None))
         print("All tests passed!")
+
+    # TODO: change this condition
+    if True:
+        os.chdir(orig_dir)
 
 
 def gen_otter_file(master, result):
