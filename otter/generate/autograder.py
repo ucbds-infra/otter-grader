@@ -119,7 +119,8 @@ def main(args):
     try:
         # copy tests into tmp
         os.mkdir(os.path.join("tmp", "tests"))
-        for file in glob(os.path.join(args.tests_path, "*.py")):
+        pattern = ("*.py", "*.[Rr]")[args.lang.lower() == "r"]
+        for file in glob(os.path.join(args.tests_path, pattern)):
             shutil.copy(file, os.path.join("tmp", "tests"))
 
         if os.path.isfile(args.requirements):
