@@ -465,3 +465,13 @@ results_to_list = function(results) {
   }
   return(out)
 }
+
+#' Export a list of `test_suite_result`s to a JSON string
+#'
+#' @param results The list of result objects
+#' @return The JSON string
+#' @export
+results_to_json = function(results) {
+  results = results_to_list(results)
+  return(jsonlite::toJSON(results, auto_unbox = T, pretty = T))
+}
