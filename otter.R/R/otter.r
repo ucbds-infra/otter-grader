@@ -313,7 +313,12 @@ execute_script = function(script, secret) {
 
   # run the script, capturing stdout, and return the environment
   testthat::capture_output({
-    eval(parse(text=updated_script), envir=test_env)
+    for (expr in as.list(parse(text=updated_script))) {
+      tryCatch(
+        eval(expr, envir=test_env),
+        error = function(e){}
+      )
+    }
   })
   return(test_env)
 }

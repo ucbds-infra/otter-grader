@@ -69,7 +69,8 @@ config = {
     "course_id": '{{ course_id }}',
     "assignment_id": '{{ assignment_id }}',
     "filtering": {{ filtering }},
-    "pagebreaks": {{ pagebreaks }}
+    "pagebreaks": {{ pagebreaks }},
+    "language": '{{ language }}',
 }
 
 run_autograder(config)
@@ -91,6 +92,9 @@ def main(args):
     # check that args.public_multiplier is valid
     assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
 
+    # check for valid language
+    assert args.lang.lower() in ["python", "r"], f"{args.lang} is not a supported language"
+
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
@@ -105,7 +109,8 @@ def main(args):
         pagebreaks = str(not args.no_pagebreaks),
         grade_from_log = str(args.grade_from_log),
         serialized_variables = str(args.serialized_variables),
-        public_test_multiplier = str(args.public_multiplier)
+        public_test_multiplier = str(args.public_multiplier),
+        lanuage = str(args.lang.lower())
     )
 
     # create tmp directory to zip inside
