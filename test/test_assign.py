@@ -14,7 +14,7 @@ from subprocess import PIPE
 from glob import glob
 from unittest import mock
 
-from otter.assign import _clear_assignment_metadata
+from otter.assign import clear_assignment_metadata
 from otter.utils import block_print
 
 # read in argument parser
@@ -117,7 +117,7 @@ class TestAssign(unittest.TestCase):
             self.assertEqual(correct_contents, contents, "Student file {} incorrect".format(file))
         
         # cleanup the output
-        _clear_assignment_metadata()
+        clear_assignment_metadata()
 
         shutil.rmtree(TEST_FILES_PATH + "output")
 
@@ -171,7 +171,7 @@ class TestAssign(unittest.TestCase):
             self.assertEqual(correct_contents, contents, "Student file {} incorrect".format(file))
         
         # cleanup the output
-        _clear_assignment_metadata()
+        clear_assignment_metadata()
 
         shutil.rmtree(TEST_FILES_PATH + "output")
 
@@ -229,6 +229,6 @@ class TestAssign(unittest.TestCase):
             self.assertEqual(correct_contents, contents, "Student file {} incorrect".format(file))
         
         # cleanup the output
-        _clear_assignment_metadata()
+        clear_assignment_metadata()
 
         shutil.rmtree(TEST_FILES_PATH + "output")
