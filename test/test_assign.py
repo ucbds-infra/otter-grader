@@ -112,7 +112,8 @@ class TestAssign(unittest.TestCase):
         
         # cleanup the output
         shutil.rmtree(TEST_FILES_PATH + "output")
-
+        from otter.assign import ASSIGNMENT_METADATA
+        ASSIGNMENT_METADATA = {}
     def test_otter_example(self):
         # Checks that otter assign filters and outputs correctly
         # run otter assign
@@ -132,7 +133,8 @@ class TestAssign(unittest.TestCase):
         
         # cleanup the output
         shutil.rmtree(TEST_FILES_PATH + "output")
-
+        from otter.assign import ASSIGNMENT_METADATA
+        ASSIGNMENT_METADATA = {}
     def test_pdf_example(self):
         # run otter assign
         run_assign_args = [
@@ -152,3 +154,6 @@ class TestAssign(unittest.TestCase):
         
         # cleanup the output
         shutil.rmtree(TEST_FILES_PATH + "output")
+
+        from otter.assign import ASSIGNMENT_METADATA
+        ASSIGNMENT_METADATA = {}
