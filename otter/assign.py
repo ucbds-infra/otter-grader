@@ -73,7 +73,6 @@ def main(args):
     """
     # reset ASSIGNMENT_METADATA for multiple runs in same session
     global ASSIGNMENT_METADATA
-    ASSIGNMENT_METADATA = {}
 
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
@@ -193,6 +192,8 @@ def main(args):
         with block_print():
             run_tests(result / 'autograder' / master.name, debug=args.debug, seed=ASSIGNMENT_METADATA.get('generate', {}).get('seed', None))
         print("All tests passed!")
+
+    ASSIGNMENT_METADATA.clear()
 
     # TODO: change this condition
     if True:
