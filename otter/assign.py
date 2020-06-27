@@ -26,6 +26,7 @@ from .execute import grade_notebook
 from .export import export_notebook
 from .utils import block_print, str_to_doctest, get_relpath
 from .generate.token import APIClient
+from subprocess import PIPE
 
 
 NB_VERSION = 4
@@ -79,7 +80,6 @@ def main(args):
 
     orig_dir = os.getcwd()
 
-
     # TODO: update this condition
     if True:
         result = get_relpath(master.parent, result)
@@ -128,8 +128,6 @@ def main(args):
     # generate the .otter file if needed
     if ASSIGNMENT_METADATA.get('service', {}) or ASSIGNMENT_METADATA.get('save_environment', False):
         gen_otter_file(master, result)
-    
-    
 
     # generate Gradescope autograder zipfile
     if ASSIGNMENT_METADATA.get('generate', {}):
@@ -142,7 +140,7 @@ def main(args):
             generate_args = {}
 
         os.chdir(str(result / 'autograder'))
-        generate_cmd = ["otter", "generate", "autograder"]
+        generate_cmd = [shutil.which("otter"), "generate", "autograder"]
 
         if generate_args.get('points', None) is not None:
             generate_cmd += ["--points", generate_args.get('points', None)]
@@ -188,7 +186,7 @@ def main(args):
         if ASSIGNMENT_METADATA.get('variables', {}):
             generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
 
-        subprocess.run(generate_cmd)
+        subprocess.run(generate_cmd, stdout=PIPE, stderr=PIPE)
 
         os.chdir(curr_dir)
 
