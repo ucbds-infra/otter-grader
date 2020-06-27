@@ -26,7 +26,14 @@ parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test-assign/"
 
+orig_path = ""
+
 class TestAssign(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        global orig_path
+        orig_path = os.getcwd()
 
     def check_gradescope_zipfile(self, path, config, tests=[], files=[]):
         # unzip the zipfile
@@ -112,8 +119,6 @@ class TestAssign(unittest.TestCase):
         
         # cleanup the output
         shutil.rmtree(TEST_FILES_PATH + "output")
-        #from otter.assign import ASSIGNMENT_METADATA
-        #ASSIGNMENT_METADATA = {}
 
     def test_otter_example(self):
         # Checks that otter assign filters and outputs correctly
@@ -134,17 +139,17 @@ class TestAssign(unittest.TestCase):
         
         # cleanup the output
         shutil.rmtree(TEST_FILES_PATH + "output")
-        #from otter.assign import ASSIGNMENT_METADATA
-        #ASSIGNMENT_METADATA = {}
 
     def test_pdf_example(self):
         # run otter assign
+    
         run_assign_args = [
             "assign", "--no-run-tests", TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output", "data.csv"
         ]
         args = parser.parse_args(run_assign_args)
 
         # block stdout while running
+
         output = StringIO()
         with block_print():
             args.func(args)
@@ -157,5 +162,5 @@ class TestAssign(unittest.TestCase):
         # cleanup the output
         shutil.rmtree(TEST_FILES_PATH + "output")
 
-        #from otter.assign import ASSIGNMENT_METADATA
-        #ASSIGNMENT_METADATA = {}
+    def tearDown(self):
+        os.chdir(orig_path)

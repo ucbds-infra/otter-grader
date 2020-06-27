@@ -77,10 +77,12 @@ def main(args):
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
 
+    orig_dir = os.getcwd()
+
+
     # TODO: update this condition
     if True:
         result = get_relpath(master.parent, result)
-        orig_dir = os.getcwd()
         os.chdir(master.parent)
         master = pathlib.Path(master.name)
 
@@ -93,7 +95,8 @@ def main(args):
     if SEED_REQUIRED:
         assert not ASSIGNMENT_METADATA.get('generate', {})  or \
             ASSIGNMENT_METADATA.get('generate', {}).get('seed', None) is not None, "Seeding cell found but no seed provided"
-    
+
+
     # generate PDF of solutions with nb2pdf
     if ASSIGNMENT_METADATA.get('solutions_pdf', False):
         print("Generating solutions PDF...")
@@ -125,16 +128,19 @@ def main(args):
     # generate the .otter file if needed
     if ASSIGNMENT_METADATA.get('service', {}) or ASSIGNMENT_METADATA.get('save_environment', False):
         gen_otter_file(master, result)
+    
+    
 
     # generate Gradescope autograder zipfile
     if ASSIGNMENT_METADATA.get('generate', {}):
-        print("Generating autograder zipfile...")
+        curr_dir = os.getcwd()
 
+        print("Generating autograder zipfile...")
         generate_args = ASSIGNMENT_METADATA.get('generate', {})
+
         if generate_args is True:
             generate_args = {}
 
-        curr_dir = os.getcwd()
         os.chdir(str(result / 'autograder'))
         generate_cmd = ["otter", "generate", "autograder"]
 
@@ -181,7 +187,7 @@ def main(args):
 
         if ASSIGNMENT_METADATA.get('variables', {}):
             generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
-        
+
         subprocess.run(generate_cmd)
 
         os.chdir(curr_dir)
@@ -193,11 +199,13 @@ def main(args):
             run_tests(result / 'autograder' / master.name, debug=args.debug, seed=ASSIGNMENT_METADATA.get('generate', {}).get('seed', None))
         print("All tests passed!")
 
-    ASSIGNMENT_METADATA.clear()
+    os.chdir(orig_dir)
 
     # TODO: change this condition
-    if True:
-        os.chdir(orig_dir)
+
+    #if True:
+    #    os.chdir(orig_dir)
+    ASSIGNMENT_METADATA.clear()
 
 
 def gen_otter_file(master, result):
