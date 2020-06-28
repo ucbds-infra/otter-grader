@@ -22,12 +22,10 @@ from glob import glob
 from getpass import getpass
 
 from .execute import grade_notebook
-# from .jassign import gen_views as jassign_views
 from .export import export_notebook
-from .utils import block_print, str_to_doctest, get_relpath
 from .generate.token import APIClient
-from subprocess import PIPE
-
+from .utils import block_print, str_to_doctest, get_relpath
+# from subprocess import PIPE
 
 NB_VERSION = 4
 BLOCK_QUOTE = "```"
@@ -140,7 +138,7 @@ def main(args):
             generate_args = {}
 
         os.chdir(str(result / 'autograder'))
-        generate_cmd = [shutil.which("otter"), "generate", "autograder"]
+        generate_cmd = ["generate", "autograder"]
 
         if generate_args.get('points', None) is not None:
             generate_cmd += ["--points", generate_args.get('points', None)]
@@ -186,7 +184,11 @@ def main(args):
         if ASSIGNMENT_METADATA.get('variables', {}):
             generate_cmd += ["--serialized-variables", str(ASSIGNMENT_METADATA["variables"])]
 
-        subprocess.run(generate_cmd, stdout=PIPE, stderr=PIPE)
+        # subprocess.run(generate_cmd, stdout=PIPE, stderr=PIPE)
+        from .argparser import get_parser
+        parser = get_parser()
+        generate_args = parser.parse_args(generate_cmd)
+        generate_args.func(generate_args)
 
         os.chdir(curr_dir)
 
