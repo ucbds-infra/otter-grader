@@ -190,7 +190,8 @@ class Notebook:
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
     def _save_notebook(self):
-        """Runs Jupyter JS to force-save a notebook for use before beginning an export
+        """
+        Runs Jupyter JS to force-save a notebook for use before beginning an export
         """
         if get_ipython() is not None:
             display(Javascript("""
@@ -199,6 +200,18 @@ class Notebook:
                 });
             """))
             time.sleep(0.75)
+
+    # def _restart_kernel(self):
+    #     """
+    #     Runs Jupyter JS to force-save a notebook for use before beginning an export
+    #     """
+    #     if get_ipython() is not None:
+    #         display(Javascript("""
+    #             require(["base/js/namespace"], function() {
+    #                 Jupyter.notebook.kernel.restart();
+    #             });
+    #         """))
+    #         time.sleep(0.75)
 
     def check(self, question, global_env=None):
         """
