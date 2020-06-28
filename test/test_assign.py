@@ -14,26 +14,14 @@ from subprocess import PIPE
 from glob import glob
 from unittest import mock
 
+from otter.argparser import get_parser
 from otter.utils import block_print
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 TEST_FILES_PATH = "test/test-assign/"
 
-orig_path = ""
-
 class TestAssign(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        global orig_path
-        orig_path = os.getcwd()
 
     def check_gradescope_zipfile(self, path, config, tests=[], files=[]):
         # unzip the zipfile
@@ -70,10 +58,13 @@ class TestAssign(unittest.TestCase):
         exec(run_autograder, run_autograder_globals)
 
         for k, v in config.items():
-            self.assertEqual(run_autograder_globals[k], v, 
+            self.assertEqual(run_autograder_globals["config"][k], v, 
                 f"Expected config value for {k} ({v}) does not match actual value ({run_autograder_globals[k]})"
             )
-        shutil.rmtree(TEST_FILES_PATH+"autograder")
+        
+        # cleanup
+        if os.path.exists(TEST_FILES_PATH + "autograder"):
+            shutil.rmtree(TEST_FILES_PATH + "autograder")
 
     def assertFilesEqual(self, p1, p2):
         try:
@@ -116,9 +107,10 @@ class TestAssign(unittest.TestCase):
             args.func(args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
-        
-        # cleanup the output
-        shutil.rmtree(TEST_FILES_PATH + "output")
+
+        # cleanup
+        if os.path.exists(TEST_FILES_PATH + "output"):
+            shutil.rmtree(TEST_FILES_PATH + "output")
 
     def test_otter_example(self):
         # Checks that otter assign filters and outputs correctly
@@ -136,9 +128,10 @@ class TestAssign(unittest.TestCase):
                 args.func(args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "otter-correct")
-        
-        # cleanup the output
-        shutil.rmtree(TEST_FILES_PATH + "output")
+
+        # cleanup
+        if os.path.exists(TEST_FILES_PATH + "output"):
+            shutil.rmtree(TEST_FILES_PATH + "output")      
 
     def test_pdf_example(self):
         # run otter assign
@@ -157,10 +150,11 @@ class TestAssign(unittest.TestCase):
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf", ".zip"])
         
         # check gradescope zip file
-        self.check_gradescope_zipfile(TEST_FILES_PATH+"output/autograder/autograder.zip",{},["q1.py","q3.py","q8.py"],["data.csv"])
-        
-        # cleanup the output
-        shutil.rmtree(TEST_FILES_PATH + "output")
+        self.check_gradescope_zipfile(
+            TEST_FILES_PATH + "output/autograder/autograder.zip", 
+            {},  ["q1.py","q3.py","q8.py"], ["data.csv"]
+        )
 
-    def tearDown(self):
-        os.chdir(orig_path)
+        # cleanup
+        if os.path.exists(TEST_FILES_PATH + "output"):
+            shutil.rmtree(TEST_FILES_PATH + "output")
