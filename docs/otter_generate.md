@@ -74,6 +74,7 @@ otter generate autograder -t hidden-tests data.csv utils.py
 ```
 
 <!-- TODO: update for dummy rows -->
+<!-- TODO: update images -->
 
 #### Grading with Environments
 
