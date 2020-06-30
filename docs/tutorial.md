@@ -1,5 +1,7 @@
 # Tutorial
 
+<!-- TODO: overhaul this -->
+
 This tutorial can help you to verify that you have installed Otter correctly and introduce you to the general Otter workflow. 
 
 ## Verifying Your Installation

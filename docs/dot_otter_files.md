@@ -2,18 +2,20 @@
 
 In many use cases, the use of the `otter.Notebook` class by students requires some configurations to be set. These configurations are stored in a simple JSON-formatted file ending in the `.otter` extension. When `otter.Notebook` is instantiated, it globs all `.otter` files in the working directory and, if any are present, asserts that there is only 1 and loads this as the configuration. If no `.otter` config is found, it is assumed that there is no configuration file and, therefore, only features that don't require a config file are available.
 
-The available keys in a `.otter` file are listed below. The only required key is `notebook` (i.e. if you use `.otter` file it must specify a value for `notebook`).
+The available keys in a `.otter` file are listed below, along with their default values. The only required key is `notebook` (i.e. if you use `.otter` file it must specify a value for `notebook`).
 
-| Key | Default Value | Description |
-|-----|-----|-----|
-| `notebook` |  | Path to notebook from working directory |
-| `endpoint` | `None` | The URL of the Otter Service VM |
-| `assignment_id` | `None` | The assignment ID in the Otter Service database |
-| `class_id` | `None` | The class ID in the Otter Service database |
-| `auth` | `"google"` | The name of the auth provider; one of `"default"`, `"google"` |
-| `save_environment` | `False` | Whether to save students' environments when they run a check |
-| `ignore_modules` | `[]` | A list of module names whose functions to ignore when serializing environments |
-| `variables` | `None` | If provided, a mapping of variable names to fully-qualified type strings for saving environments |
+```json
+{
+    "notebook": "",            // the notebook filename
+    "endpoint": null,          // the Otter Service endpoint
+    "assignment_id": "",       // assignment ID in the Otter Service database
+    "class_id": "",            // class ID in the Otter Service database
+    "auth": "google",          // the auth type for your Otter Service deployment
+    "save_environment": false, // whether to serialize the environment in the log during checks
+    "ignore_modules": [],      // a list of modules whose functions to ignore during serialization
+    "variables": {}            // a mapping of variable names -> types to resitrct during serialization
+}
+```
 
 ## Configuring Otter Service
 
