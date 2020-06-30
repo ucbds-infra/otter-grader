@@ -23,23 +23,43 @@ export_cell: true
 ```
 ````
 
-This cell is removed from both output notebooks. These configurations, listed in the table below, can be **overwritten** by their command line counterparts (e.g. `init_cell: true` is overwritten by the `--no-init-cell` flag). The options, their defaults (converted to Python data types), and descriptions are listed in the following table. Any unspecified keys will keep their default values. For more information about many of these arguments, see the [Usage and Output section](#usage-and-output).
+This cell is removed from both output notebooks. These configurations, listed in the YAML snippet below, can be **overwritten** by their command line counterparts (e.g. `init_cell: true` is overwritten by the `--no-init-cell` flag). The options, their defaults, and descriptions are listed below. Any unspecified keys will keep their default values. For more information about many of these arguments, see the [Usage and Output section](#usage-and-output). Any keys that map to sub-dictionaries (e.g. `export_cell`, `generate`) can have their behaviors turned off by changing their value to `false`. The only one that defaults to true (with the specified sub-key defaults) is `export_cell`.
 
-| Key | Default Value | Description |
-|-----|---------------|-------------|
-| `init_cell` | `True` | Whether or not to include an Otter initialization cell |
-| `export_cell` | `True` | Whether or not to include a PDF generation cell |
-| `filtering` | `True` | Whether or not the output PDF should be filtered |
-| `instructions` | `''` | Additional submission instructions to be placed just before the PDF export cell |
-| `check_all_cell` | `True` | Whether or not to include an `otter.Notebook.check_all` cell |
-| `run_tests` | `True` | Whether or not to run tests on the autograder notebook |
-| `solutions_pdf` | `False` | Whether to generate a solutions PDF from notebook; either `true`, `false`, or `filtered`; defaults to unfiltered PDF |
-| `template_pdf` | `False` | Whether to generate a filtered template PDF from notebook for setting up a Gradescope assignment |
-| `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
-| `service` | `{}` | A set of configurations for submitting to an Otter Service deployment (if applicable) |
-| `save_environment` | `False` | Whether to store environment copies in the [log](logging.md) |
-| `ignore_modules` | `[]` | A list of modules whose functions to ignore when pickling the environment |
-| `files` | `[]` | A list of support files required either for students or Otter Generate; should be **relative to the directory containing the notebook** |
+```yaml
+run_tests: true                # whether to run tests on the resulting autograder directory
+requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
+overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
+init_cell: true                # include an Otter initialization cell at the top of the notebook
+check_all_cell: true           # include a check-all cell at the end of the notebook
+export_cell:                   # include an export cell at the end of the notebook; set to false for no cell
+  pdf: true                    # include a PDF in the export zip file
+  filtering: true              # whether the PDF in the export should be filtered
+  instructions: ''             # additional instructions for submission included above export cell
+solutions_pdf: false           # whether to generate a PDF of the autograder notebook for solutions
+tempalte_pdf: false            # whether to generate a manual question template PDF for Gradescope
+generate:                      # configurations for running Otter Generate; defaults to false
+  points: null                 # number of points to scale assignment to on Gradescope
+  threshold: null              # a pass/fail threshold for the assignment on Gradescope
+  show_stdout: false           # whether to show grading stdout to students once grades are published
+  show_hidden: false           # whether to show hidden test results to students once grades are published
+  grade_from_log: false        # whether to grade students' submissions from serialized environments in the log
+  seed: null                   # a seed for intercell seeding during grading
+  public_multiplier: null      # a percentage of test points to award for passing public tests
+  pdfs:                        # configurations for generating PDFs for manually-graded questions. defaults to false
+    course_id: ''              # Gradescope course ID for uploading PDFs for manually-graded questions
+    assignment_id: ''          # Gradescope assignment ID for uploading PDFs for manually-graded questions
+    filtering: true            # whether the PDFs should be filtered
+service:                       # confgiurations for Otter Service
+  notebook: ''                 # path to the notebook to submit if different from the master notebook name
+  endpoint: ''                 # the endpoint for your Otter Service deployment; required
+  auth: google                 # auth type for your Otter Service deployment
+  assignment_id: ''            # the assignment ID from the Otter Service database
+  class_id: ''                 # the class ID from the Otter Service database
+save_environment: false        # whether to save students' environments in the log for grading
+variables: {}                  # a mapping of variable names -> types for serialization
+ignore_modules: []             # a list of module names whose functions to ignore during serialization
+files: []                      # a list of file paths to include in the distribution directories
+```
 
 A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`, whose paths should be **relative to the directory containing the notebook**, not to the directory of execution). If you require additional arguments, e.g. `points` or `show_stdout`, then set `generate` to a nested dictionary of these parameters and their values:
 
@@ -61,8 +81,6 @@ generate:
     filtering: true        # true is the default
 ```
 
-These values, if left unspecified, take on the default values of their flags as described in [Otter Generate](otter_generate.md).
-
 If you have an Otter Service deployment to which you would like students to submit, the necessary configurations for this submission can be specified in the `service` key of the assignment metadata. This has the required keys `endpoint` (the URL of the VM), `assignment_id` (the ID of the assignment in the Otter Service database), and `class_id` (the class ID in the database). You can optionally also set an auth provider with the `auth` key (which defaults to `google`).
 
 ```yaml
@@ -71,6 +89,14 @@ service:
   assignment_id: hw00          # required
   class_id: some_class         # required
   auth: google                 # the default
+```
+
+If you are grading from the log or would like to store students' environments in the log, use the `save_environment` key. If this key is set to `true`, Otter will serialize the stuednt's environment whenever a check is run, as described in [Logging](logging.md). To restrict the serialization of variables to specific names and types, use the `variables` key, which maps variable names to fully-qualified type strings. The `ignore_modules` key is used to ignore functions from specific modules. To turn on grading from the log on Gradescope, set `generate[grade_from_log]` to `true`. The configuration below turns on the serialization of environments, storing only variables of the name `df` that are pandas dataframes.
+
+```yaml
+save_environment: true
+variables:
+  df: pandas.core.frame.DataFrame
 ```
 
 As an example, the following assignment metadata includes an export cell but no filtering, not init cell, and calls Otter Generate with the flags `--points 3 --seed 0`.
@@ -85,9 +111,6 @@ generate:
     seed: 0
 ```
 ````
-
-<!-- TODO: update description of export key -->
-<!-- TODO: talk about setting up storing envs -->
 
 ### Autograded Questions
 
