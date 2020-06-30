@@ -3,6 +3,7 @@ import sys
 
 if len(sys.argv) == 1:
     module = None
+    test_name = None
 
 else:
     module = "test"
