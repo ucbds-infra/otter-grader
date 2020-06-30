@@ -154,11 +154,11 @@ def main(config):
         if key != "total" and key != "possible":
             hidden, incorrect = scores[key].get("hidden", False), "hint" in scores[key]
             score, possible = scores[key]["score"], scores[key]["possible"]
-            public_score, hidden_score = score * config.get("public_test_multiplier", 0), score * (1 - config.get("public_test_multiplier", 0))
-            public_possible, hidden_possible = possible * config.get("public_test_multiplier", 0), possible * (1 - config.get("public_test_multiplier", 0))
+            public_score, hidden_score = score * config.get("public_multiplier", 0), score * (1 - config.get("public_multiplier", 0))
+            public_possible, hidden_possible = possible * config.get("public_multiplier", 0), possible * (1 - config.get("public_multiplier", 0))
 
             if hidden and incorrect:
-                public_score, hidden_score = possible * config.get("public_test_multiplier", 0), 0
+                public_score, hidden_score = possible * config.get("public_multiplier", 0), 0
             elif not hidden and incorrect:
                 public_score, hidden_score = 0, 0
                 public_possible = possible

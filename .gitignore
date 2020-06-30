@@ -13,3 +13,4 @@ test/output
 docs/_build
 .Rproj.user
 .Rhistory
+.ionide

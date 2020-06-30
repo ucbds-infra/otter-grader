@@ -75,9 +75,13 @@ def main(args):
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
 
+    # for correcting this path
+    requirements = ASSIGNMENT_METADATA.get('requirements', None) or args.requirements
+
     # TODO: update this condition
     if True:
         result = get_relpath(master.parent, result)
+        requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))
         orig_dir = os.getcwd()
         os.chdir(master.parent)
         master = pathlib.Path(master.name)
@@ -159,8 +163,8 @@ def main(args):
             if not pdf_args.get("filtering", True):
                 generate_cmd += ["--unfiltered-pdfs"]
 
-        requirements = ASSIGNMENT_METADATA.get('requirements', None) or args.requirements
         if os.path.isfile(requirements):
+            generate_cmd += ["-r", requirements]
             if ASSIGNMENT_METADATA.get('overwrite_requirements', False) or args.overwrite_requirements:
                 generate_cmd += ["--overwrite-requirements"]
         
