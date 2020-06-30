@@ -122,7 +122,7 @@ variables:
   df: pandas.core.frame.DataFrame
 ```
 
-As an example, the following assignment metadata includes an export cell but no filtering, not init cell, and calls Otter Generate with the flags `--points 3 --seed 0`.
+As an example, the following assignment metadata includes an export cell but no filtering, no init cell, and calls Otter Generate with the flags `--points 3 --seed 0`.
 
 ````
 ```
@@ -159,7 +159,7 @@ manual: false
 ```
 ````
 
-Solution cells contain code formatted in such a way that the assign parser replaces lines or portions of lines with prespecified prompts. Otter uses the same solution replacement rules as jassign. From the [jassign docs](https://github.com/okpy/jassign/blob/master/docs/notebook-format.md):
+Solution cells contain code formatted in such a way that the assign parser replaces lines or portions of lines with prespecified prompts. Otter uses the same solution replacement rules as jassign. From the [jAssign docs](https://github.com/okpy/jassign/blob/master/docs/notebook-format.md):
 
 * A line ending in `# SOLUTION` will be replaced by `...`, properly indented. If
   that line is an assignment statement, then only the expression(s) after the
@@ -236,7 +236,7 @@ print(2)
 
 #### Intercell Seeding
 
-Otter assign maintains support for [intercell seeding](seeding.md) by allowing seed cells to be placed between question cells and solution cells. To create a seed cell, put `## Seed ##` (case insensitive) on the first line of a code cell between the two. This allows instructors to write code with deterministic output, with which hidden tests can be generated. Consider the following example:
+Otter Assign maintains support for [intercell seeding](seeding.md) by allowing seed cells to be placed between question cells and solution cells. To create a seed cell, put `## Seed ##` (case insensitive) on the first line of a code cell between the two. This allows instructors to write code with deterministic output, with which hidden tests can be generated. Consider the following example:
 
 ![](images/assign_intercell_seeding.png)
 
@@ -255,7 +255,7 @@ Manually-graded solution cells have two formats:
 * If a code cell, they can be delimited by solution removal syntax as above.
 * If a Markdown cell, the start of at least one line must match the regex `(<strong>|\*{2})solution:?(<\/strong>|\*{2})`.
 
-The latter means that as long as one of the lines in the cell starts with `SOLUTION` (case insensitive, with or without a colon `:`) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, Otter Assign automatically adds a Markdown cell with the contents `_Type your answer here, replacing this test._`.
+The latter means that as long as one of the lines in the cell starts with `SOLUTION` (case insensitive, with or without a colon `:`) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, Otter Assign automatically adds a Markdown cell with the contents `_Type your answer here, replacing this text._`.
 
 Manually graded questions are automatically enclosed in `<!-- BEGIN QUESTION -->` and `<!-- END QUESTION -->` tags by Otter Assign so that only these questions are exported to the PDF when filtering is turned on (the default). In the autograder notebook, this includes the question cell, prompt cell, and solution cell. In the student notebook, this includes only the question and prompt cells. The `<!-- END QUESTION -->` tag is automatically inserted at the top of the next cell if it is a Markdown cell or in a new Markdown cell before the next cell if it is not.
 

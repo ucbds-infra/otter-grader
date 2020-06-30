@@ -12,11 +12,11 @@ For more information on how tests are displayed to students, see [below](#grades
 
 ## Using the Command Line Generator
 
-To use Otter with Gradescope's autograder, you must first generate a zipfile that you will upload to Gradescope so that they can create a Docker image with which to grade submissions. Otter's command line utility `otter generate autograder` allows instructors to create this zipfile from their machines. It is divided into two subcommands: `autograder` and `token`.
+To use Otter with Gradescope's autograder, you must first generate a zipfile that you will upload to Gradescope so that they can create a Docker image with which to grade submissions. Otter's command line utility `otter generate` allows instructors to create this zipfile from their machines. It is divided into two subcommands: `autograder` and `token`.
 
 ### Before Using Otter Generate
 
-Before using Otter Generate, you should already have written [tests](test_files.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](otter_grade.html#requirements)).
+Before using Otter Generate, you should already have written [tests](test_files.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](otter_grade.html#requirements)). (Note: these default requirements can be overwritten by your requirements by passing the `--overwrite-requirements` flag.)
 
 ### Directory Structure
 
@@ -83,7 +83,7 @@ Otter can grade assignments using saved environemnts in the log in the Gradescop
 To configure this behavior, two things are required:
 
 * the use of the `--grade-from-log` flag when generating an autograder zipfile
-* using an Otter configuration file with `save_environments` set to `true`
+* using an [Otter configuration file](dot_otter_files.md) with `save_environments` set to `true`
 
 This will tell Otter to shelve the global environment each time a student calls `Notebook.check` (pruning the environments of old calls each time it is called on the same question). When the assignment is exported using `Notebook.export`, the log file (at `.OTTER_LOG`) is also exported with the global environments. These environments are read in in the Gradescope container and are then used for grading. Because one environment is saved for each check call, variable name collisions can be averted, since each question is graded using the global environment at the time it was checked. Note that any requirements needed for execution need to be installed in the Gradescope container, because Otter's shelving mechanism does not store module objects.
 
@@ -157,11 +157,17 @@ This behavior is turned off by default and can be turned on by passing the `--sh
 otter generate autograder data.csv --show-stdout
 ```
 
-If `--show-stdout` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
+If `--show-stdout` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The same can be done for hidden test outputs using the `--show-hidden` flag:
+
+```
+otter generate autograder --show-hidden
+```
+
+The [next section](#gradescope-results) details more about how output on Gradescope is formatted.
 
 #### Generating with Otter Assign
 
-Otter Assign also comes with an option to generate this zipfile automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](otter_assign.md) for more details.
+Otter Assign comes with an option to generate this zipfile automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](otter_assign.md) for more details.
 
 ## Gradescope Results
 
