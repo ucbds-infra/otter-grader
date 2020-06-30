@@ -21,7 +21,6 @@ else:
 
     # extract test name
     if len(sys.argv) >= 4:
-        # module += f".Test{sys.argv[2].capitalize()}.test_{sys.argv[3]}"
         test_name = f"Test{sys.argv[2].capitalize()}.test_{sys.argv[3]}"
 
 if __name__ == "__main__":
