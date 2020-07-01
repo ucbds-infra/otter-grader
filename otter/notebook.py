@@ -14,7 +14,6 @@ import datetime as dt
 
 from getpass import getpass
 from glob import glob
-from nb2pdf import convert
 from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 

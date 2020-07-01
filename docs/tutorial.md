@@ -71,7 +71,7 @@ Let's now construct a call to Otter that will grade these notebooks. We know tha
 Let's run Otter:
 
 ```
-$ otter grade -j meta.json -t hidden-tests --html-filter -v
+otter grade -j meta.json -t hidden-tests --html-filter -v
 ```
 
 (I've added the `-v` flag so that we get verbose output.) After this finishes running, there should be a new file and a new folder in the working directory: `final_grades.csv` should contain the grades for each file, and should look something like this:
@@ -231,4 +231,3 @@ After this command finishes running, you should have a file called `autograder.z
 To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
 
 You can find more information about Gradescope usage [here](otter_generate.md).
-

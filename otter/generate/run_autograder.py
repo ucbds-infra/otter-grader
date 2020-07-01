@@ -13,7 +13,6 @@ import pandas as pd
 
 from glob import glob
 from textwrap import dedent
-from nb2pdf import convert
 
 from ..execute import grade_notebook
 from ..export import export_notebook
