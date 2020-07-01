@@ -187,25 +187,30 @@ This section details how the autograder runs and how results are displayed to st
 
 ### Instructor View
 
-Once a student's submission has been autograder, the Autograder Results page will show the stdout of the grading process in the "Autograder Output" box and the student's score in the side bar to the right of the output. The stdout includes a DataFrame that contains the student's score breakdown by question and a summary of the information about test output visibility at the top of this page:
+Once a student's submission has been autograded, the Autograder Results page will show the stdout of the grading process in the "Autograder Output" box and the student's score in the side bar to the right of the output. The stdout includes information from verifying the student's scores against the logged scores, a dataframe that contains the student's score breakdown by question, and a summary of the information about test output visibility:
 
 ![](images/gradescope_autograder_output.png)
 
-Below the autograder output, each test case is broken down into boxes. If there is no output for the box, then that test was passed. If a test is failed, then the usual test failure output is displayed.
+Note that the above submission shows a discrepancy between the autograder score and the logged score (the line printed above the dataframe). If there are no discrepancies, the stdout will say so:
 
+![](images/gradescope_autograder_output_no_discrepancy.png)
+
+Below the autograder output, each test case is broken down into boxes. Based on the passing of public and hidden tests, there are three possible cases:
+
+* If a public test is failed, there is a single box for the test called `{test name} - Public` that displays the failed output of the test.<br/>
+![](images/gradescope_failed_public_test.png)
+* If all public tests pass but a hidden test fails, there are two boxes: one called `{test name} - Public` that shows `All tests passed!` and a second called `{test name} - Hidden` that shows the failed output of the test.<br/>
+![](images/gradescope_failed_hidden_test.png)
+* If all tests pass, there are two boxes, `{test name} - Public` and `{test name} - Hidden`, that both show `All tests passed!`.<br/>
 ![](images/gradescope_instructor_test_breakdown.png)
 
-Instructors will be able to see _all_ tests. The visibility of a test to students is indicated to instructors by the <img src="_images/gradescope_hidden_test_icon.png" width="24px"/> icon (all tests with this icon are hidden to students). As noted earlier, if a student passes all public tests for a question but fails a hidden test, two boxes are shown to the instructor, of which only the first is visibile to the student:
-
-![](images/gradescope_failed_hidden_test.png)
+Note that these examples award points with a public test multiplier of 0.5; if it had been 0, all of the `{test name} - Public` tests (except failed ones, which are worth full points always) would be worth 0 points Instructors will be able to see _all_ tests. The invisibility of a test to students is indicated to instructors by the <img src="_images/gradescope_hidden_test_icon.png" width="24px"/> icon (all tests with this icon are hidden to students).
 
 ### Student View
 
 On submission, students will only be able to see the results of those test cases for which `test["suites"][0]["cases"][<int>]["hidden"]` evaluates to `True` (see [Test Files](test_files.md) for more info). If `test["suites"][0]["cases"][<int>]["hidden"]` is `False` or not specified, then that test case is hidden.
 
-If `--show-stdout` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout. If `--show-hidden` was passed, students will also see the failed otput of the failed hidden tests.
-
-Note that, because some tests are hidden, students will never see the autograder score in the right sidebar; instead, their score will only show as a dash `-` out of the points possible. Therefore, the only way for students to calculate their autograder score is to use the DataFrame printed to the stdout if `--show-stdout` is passed.
+If `--show-stdout` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout. If `--show-hidden` was passed, students will also see the failed otput of the failed hidden tests (again, once grades are published).
 
 ## Otter Generate Reference
 
