@@ -9,6 +9,7 @@ import sys
 import pathlib
 import random
 import string
+import time
 import pandas as pd
 
 from contextlib import contextmanager
@@ -203,3 +204,25 @@ def get_relpath(src, dst):
             src = src.parent
             ups += 1
     return pathlib.Path(("../" * ups) / dst.relative_to(src))
+
+def wait_for_save(filename, timeout=5):
+    """
+    Waits for `filename` to update, waiting up to `timeout` seconds. Returns True if a save was detected, 
+    and False otherwise. Stolen from 
+    https://github.com/okpy/ok-client/blob/25c9e85caf60c3fb68bd072419ee704da07c5764/client/api/notebook.py#L158
+
+    Args:
+        filename (``str``): the filename
+        timeout (``int``, optional): number of seconds to wait
+    
+    Returns:
+        ``bool``: whether the file updated
+    """
+    modification_time = os.path.getmtime(filename)
+    start_time = time.time()
+    while time.time() < start_time + timeout:
+        if (os.path.getmtime(filename) > modification_time and
+            os.path.getsize(filename) > 0):
+            return True
+        time.sleep(0.2)
+    return False
