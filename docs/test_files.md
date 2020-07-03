@@ -1,8 +1,6 @@
 # Test Files
 
-Otter requires OK-formatted tests to check students' work against. These have a very specific format, described in detail in the [OkPy documentation](https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests).
-
-<!-- TODO: add link to test etiquette docs -->
+Otter requires OK-formatted tests to check students' work against. These have a very specific format, described in detail in the [OkPy documentation](https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests). There is also a resource we developed on writing autograder tests that can be found [here](https://autograder-tests.rtfd.io); this guide details things like the doctest format, the pitfalls of string comparison, and seeding tests.
 
 ## OK Format Caveats
 

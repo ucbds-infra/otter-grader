@@ -23,23 +23,66 @@ export_cell: true
 ```
 ````
 
-This cell is removed from both output notebooks. These configurations, listed in the table below, can be **overwritten** by their command line counterparts (e.g. `init_cell: true` is overwritten by the `--no-init-cell` flag). The options, their defaults (converted to Python data types), and descriptions are listed in the following table. Any unspecified keys will keep their default values. For more information about many of these arguments, see the [Usage and Output section](#usage-and-output).
+This cell is removed from both output notebooks. These configurations, listed in the YAML snippet below, can be **overwritten** by their command line counterparts (e.g. `init_cell: true` is overwritten by the `--no-init-cell` flag). The options, their defaults, and descriptions are listed below. Any unspecified keys will keep their default values. For more information about many of these arguments, see the [Usage and Output section](#usage-and-output). Any keys that map to sub-dictionaries (e.g. `export_cell`, `generate`) can have their behaviors turned off by changing their value to `false`. The only one that defaults to true (with the specified sub-key defaults) is `export_cell`.
 
-| Key | Default Value | Description |
-|-----|---------------|-------------|
-| `init_cell` | `True` | Whether or not to include an Otter initialization cell |
-| `export_cell` | `True` | Whether or not to include a PDF generation cell |
-| `filtering` | `True` | Whether or not the output PDF should be filtered |
-| `instructions` | `''` | Additional submission instructions to be placed just before the PDF export cell |
-| `check_all_cell` | `True` | Whether or not to include an `otter.Notebook.check_all` cell |
-| `run_tests` | `True` | Whether or not to run tests on the autograder notebook |
-| `solutions_pdf` | `False` | Whether to generate a solutions PDF from notebook; either `true`, `false`, or `filtered`; defaults to unfiltered PDF |
-| `template_pdf` | `False` | Whether to generate a filtered template PDF from notebook for setting up a Gradescope assignment |
-| `generate` | `False` | Either a list of arguments for Otter Generate or whether or not Otter Generate should be called on the output |
-| `service` | `{}` | A set of configurations for submitting to an Otter Service deployment (if applicable) |
-| `save_environment` | `False` | Whether to store environment copies in the [log](logging.md) |
-| `ignore_modules` | `[]` | A list of modules whose functions to ignore when pickling the environment |
-| `files` | `[]` | A list of support files required either for students or Otter Generate; should be **relative to the directory containing the notebook** |
+```yaml
+run_tests: true                # whether to run tests on the resulting autograder directory
+requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
+overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
+init_cell: true                # include an Otter initialization cell at the top of the notebook
+check_all_cell: true           # include a check-all cell at the end of the notebook
+export_cell:                   # include an export cell at the end of the notebook; set to false for no cell
+  pdf: true                    # include a PDF in the export zip file
+  filtering: true              # whether the PDF in the export should be filtered
+  instructions: ''             # additional instructions for submission included above export cell
+solutions_pdf: false           # whether to generate a PDF of the autograder notebook for solutions
+tempalte_pdf: false            # whether to generate a manual question template PDF for Gradescope
+generate:                      # configurations for running Otter Generate; defaults to false
+  points: null                 # number of points to scale assignment to on Gradescope
+  threshold: null              # a pass/fail threshold for the assignment on Gradescope
+  show_stdout: false           # whether to show grading stdout to students once grades are published
+  show_hidden: false           # whether to show hidden test results to students once grades are published
+  grade_from_log: false        # whether to grade students' submissions from serialized environments in the log
+  seed: null                   # a seed for intercell seeding during grading
+  public_multiplier: null      # a percentage of test points to award for passing public tests
+  pdfs:                        # configurations for generating PDFs for manually-graded questions. defaults to false
+    course_id: ''              # Gradescope course ID for uploading PDFs for manually-graded questions
+    assignment_id: ''          # Gradescope assignment ID for uploading PDFs for manually-graded questions
+    filtering: true            # whether the PDFs should be filtered
+service:                       # confgiurations for Otter Service
+  notebook: ''                 # path to the notebook to submit if different from the master notebook name
+  endpoint: ''                 # the endpoint for your Otter Service deployment; required
+  auth: google                 # auth type for your Otter Service deployment
+  assignment_id: ''            # the assignment ID from the Otter Service database
+  class_id: ''                 # the class ID from the Otter Service database
+save_environment: false        # whether to save students' environments in the log for grading
+variables: {}                  # a mapping of variable names -> types for serialization
+ignore_modules: []             # a list of module names whose functions to ignore during serialization
+files: []                      # a list of file paths to include in the distribution directories
+```
+
+All paths specified in the configuration should be **relative to the directory containing the master notebook**. If, for example, I was running Otter Assign on the `lab00.ipynb` notebook in the structure below:
+
+```
+| dev
+  | - requirements.txt
+  | lab
+    | lab00
+      | - lab00.ipynb
+      | - utils.py
+      | data
+        | - data.csv
+```
+
+and I wanted my requirements from `dev/requirements.txt` to be include, my configuration would look something like this:
+
+```yaml
+requirements: ../../requirements.txt
+files:
+  - data/data.csv
+  - utils.py
+...
+```
 
 A note about Otter Generate: the `generate` key of the assignment metadata has two forms. If you just want to generate and require no additional arguments, set `generate: true` in the YAML and Otter Assign will simply run `otter generate` from the autograder directory (this will also include any files passed to `files`, whose paths should be **relative to the directory containing the notebook**, not to the directory of execution). If you require additional arguments, e.g. `points` or `show_stdout`, then set `generate` to a nested dictionary of these parameters and their values:
 
@@ -61,8 +104,6 @@ generate:
     filtering: true        # true is the default
 ```
 
-These values, if left unspecified, take on the default values of their flags as described in [Otter Generate](otter_generate.md).
-
 If you have an Otter Service deployment to which you would like students to submit, the necessary configurations for this submission can be specified in the `service` key of the assignment metadata. This has the required keys `endpoint` (the URL of the VM), `assignment_id` (the ID of the assignment in the Otter Service database), and `class_id` (the class ID in the database). You can optionally also set an auth provider with the `auth` key (which defaults to `google`).
 
 ```yaml
@@ -73,7 +114,15 @@ service:
   auth: google                 # the default
 ```
 
-As an example, the following assignment metadata includes an export cell but no filtering, not init cell, and calls Otter Generate with the flags `--points 3 --seed 0`.
+If you are grading from the log or would like to store students' environments in the log, use the `save_environment` key. If this key is set to `true`, Otter will serialize the stuednt's environment whenever a check is run, as described in [Logging](logging.md). To restrict the serialization of variables to specific names and types, use the `variables` key, which maps variable names to fully-qualified type strings. The `ignore_modules` key is used to ignore functions from specific modules. To turn on grading from the log on Gradescope, set `generate[grade_from_log]` to `true`. The configuration below turns on the serialization of environments, storing only variables of the name `df` that are pandas dataframes.
+
+```yaml
+save_environment: true
+variables:
+  df: pandas.core.frame.DataFrame
+```
+
+As an example, the following assignment metadata includes an export cell but no filtering, no init cell, and calls Otter Generate with the flags `--points 3 --seed 0`.
 
 ````
 ```
@@ -85,9 +134,6 @@ generate:
     seed: 0
 ```
 ````
-
-<!-- TODO: update description of export key -->
-<!-- TODO: talk about setting up storing envs -->
 
 ### Autograded Questions
 
@@ -113,7 +159,7 @@ manual: false
 ```
 ````
 
-Solution cells contain code formatted in such a way that the assign parser replaces lines or portions of lines with prespecified prompts. Otter uses the same solution replacement rules as jassign. From the [jassign docs](https://github.com/okpy/jassign/blob/master/docs/notebook-format.md):
+Solution cells contain code formatted in such a way that the assign parser replaces lines or portions of lines with prespecified prompts. Otter uses the same solution replacement rules as jassign. From the [jAssign docs](https://github.com/okpy/jassign/blob/master/docs/notebook-format.md):
 
 * A line ending in `# SOLUTION` will be replaced by `...`, properly indented. If
   that line is an assignment statement, then only the expression(s) after the
@@ -190,7 +236,7 @@ print(2)
 
 #### Intercell Seeding
 
-Otter assign maintains support for [intercell seeding](seeding.md) by allowing seed cells to be placed between question cells and solution cells. To create a seed cell, put `## Seed ##` (case insensitive) on the first line of a code cell between the two. This allows instructors to write code with deterministic output, with which hidden tests can be generated. Consider the following example:
+Otter Assign maintains support for [intercell seeding](seeding.md) by allowing seed cells to be placed between question cells and solution cells. To create a seed cell, put `## Seed ##` (case insensitive) on the first line of a code cell between the two. This allows instructors to write code with deterministic output, with which hidden tests can be generated. Consider the following example:
 
 ![](images/assign_intercell_seeding.png)
 
@@ -209,7 +255,7 @@ Manually-graded solution cells have two formats:
 * If a code cell, they can be delimited by solution removal syntax as above.
 * If a Markdown cell, the start of at least one line must match the regex `(<strong>|\*{2})solution:?(<\/strong>|\*{2})`.
 
-The latter means that as long as one of the lines in the cell starts with `SOLUTION` (case insensitive, with or without a colon `:`) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, Otter Assign automatically adds a Markdown cell with the contents `_Type your answer here, replacing this test._`.
+The latter means that as long as one of the lines in the cell starts with `SOLUTION` (case insensitive, with or without a colon `:`) in boldface, the cell is considered a solution cell. If there is a prompt cell for manually-graded questions (i.e. a cell between the question cell and solution cell), then this prompt is included in the output. If none is present, Otter Assign automatically adds a Markdown cell with the contents `_Type your answer here, replacing this text._`.
 
 Manually graded questions are automatically enclosed in `<!-- BEGIN QUESTION -->` and `<!-- END QUESTION -->` tags by Otter Assign so that only these questions are exported to the PDF when filtering is turned on (the default). In the autograder notebook, this includes the question cell, prompt cell, and solution cell. In the student notebook, this includes only the question and prompt cells. The `<!-- END QUESTION -->` tag is automatically inserted at the top of the next cell if it is a Markdown cell or in a new Markdown cell before the next cell if it is not.
 
@@ -227,7 +273,26 @@ An example of a manuall-graded written question with a custom prompt:
 
 ## Usage and Output
 
-Otter Assign is called using the `otter assign` command. This command takes in two required arguments. The first is `master`, the path to the master notebook (the one formatted as described above), and the second is `result`, the path at which output shoud be written. The optional `files` argument takes an arbitrary number of paths to files that should be shipped with notebooks (e.g. data files, images, Python executables).
+Otter Assign is called using the `otter assign` command. This command takes in two required arguments. The first is `master`, the path to the master notebook (the one formatted as described above), and the second is `result`, the path at which output shoud be written. The optional `files` argument takes an arbitrary number of paths to files that should be shipped with notebooks (e.g. data files, images, Python executables). **Note:** The path to the master notebook and to the result directory should be relative to the _working_ directory, but any paths in `files` should be relative to the parent directory of the master notebook. To clarify, the following directory structure:
+
+```
+| dev
+  | lab
+    | lab00
+      | - lab00.ipynb
+      | data
+        | - data.csv
+  | dist
+    | lab
+      | lab00
+        # THIS is where we want the results to go
+```
+
+would be run through Otter Assign from the `dev` directory with
+
+```
+otter assign lab/lab00/lab00.ipynb dist/lab/lab00 data/data.csv
+```
 
 The default behavior of Otter Assign is to do the following:
 
@@ -239,13 +304,13 @@ The default behavior of Otter Assign is to do the following:
 6. Write *public* tests to `student/tests`
 7. Copy `files` into `autograder` and `student` directories
 8. Run all tests in `autograder/tests` on the solutions notebook to ensure they pass
-9. (If `--generate` is passed,) generate a Gradescope autograder zipfile from the `autograder` directory
+9. (If `generate` is passed,) generate a Gradescope autograder zipfile from the `autograder` directory
 
 The behaviors described in step 2 can be overridden using the optional arguments described in the help specification.
 
 **An important note:** make sure that you *run all cells* in the master notebook and save it *with the outputs* so that Otter Assign can generate the test files based on these outputs. The outputs will be cleared in the copies generated by Otter Assign.
 
-For more information about the commands linked to `--generate`, see the documentation for [Otter Generate](otter_generate.md).
+<!-- For more information about the commands linked to `--generate`, see the documentation for [Otter Generate](otter_generate.md). -->
 
 ### Export Formats and Flags
 

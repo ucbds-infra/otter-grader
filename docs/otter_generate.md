@@ -12,11 +12,11 @@ For more information on how tests are displayed to students, see [below](#grades
 
 ## Using the Command Line Generator
 
-To use Otter with Gradescope's autograder, you must first generate a zipfile that you will upload to Gradescope so that they can create a Docker image with which to grade submissions. Otter's command line utility `otter generate autograder` allows instructors to create this zipfile from their machines. It is divided into two subcommands: `autograder` and `token`.
+To use Otter with Gradescope's autograder, you must first generate a zipfile that you will upload to Gradescope so that they can create a Docker image with which to grade submissions. Otter's command line utility `otter generate` allows instructors to create this zipfile from their machines. It is divided into two subcommands: `autograder` and `token`.
 
 ### Before Using Otter Generate
 
-Before using Otter Generate, you should already have written [tests](test_files.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](otter_grade.html#requirements)).
+Before using Otter Generate, you should already have written [tests](test_files.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](otter_grade.html#requirements)). (Note: these default requirements can be overwritten by your requirements by passing the `--overwrite-requirements` flag.)
 
 ### Directory Structure
 
@@ -43,23 +43,7 @@ Also assume that we have `cd`ed into `hw00-dev`.
 
 ### Usage
 
-The general usage of `otter generate autograder` is to create a zipfile at some output path (`-o` flag, default `./`) which you will then upload to Gradescope. Otter Generate has a few optional flags:
-
-| Flag | Default Value | Description |
-|-----|-----|-----|
-| `-t`, `--tests-path` | `./tests` | Path to directory of tests |
-| `-o`, `--output-path` | `./` | Path at which to write the zipfile |
-| `-r`, `--requirements` | `./requirements.txt` | Path to requirements.txt file |
-| `--threshold` |  | Percentage of pass/fail threshold (as decimal) |
-| `--points` |  | Number of points to scale assignment to |
-| `--seed` |  | A random seed for intercell seeding |
-| `--show-stdout` |  | Show autograder results (score breakdown) to students after grades published |
-| `--show-hidden` |  | Show autograder results of hidden teststo students after grades published |
-| `--token` |  | Your Gradescope token for uploading PDFs |
-| `--course-id` |  | Course ID for PDF upload |
-| `--assignment-id` |  | Assignment ID for PDF upload |
-| `--unfiltered-pdfs` |  | Indicates that PDFs uploaded for students should be unfiltered |
-| `--grade-from-log` |  | Indicates that the assignment should be graded from the environments stored in the log |
+The general usage of `otter generate autograder` is to create a zipfile at some output path (`-o` flag, default `./`) which you will then upload to Gradescope. Otter Generate has a few optional flags, described in the [Otter Generate Reference](#otter-generate-autograder) below.
 
 If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts).
 
@@ -89,10 +73,6 @@ Now let's say that I need some functions defined in `utils.py`; then I would add
 otter generate autograder -t hidden-tests data.csv utils.py
 ```
 
-<!-- TODO: add step-by-step of what autograder does; should include verification with log -->
-<!-- TODO: add public test multipler -->
-<!-- TODO: update for dummy rows -->
-
 #### Grading with Environments
 
 Otter can grade assignments using saved environemnts in the log in the Gradescope container. This works by unshelving the environment stored in each check entry of Otter's log and grading against it. The notebook is parsed and only its import statements are executed. For more inforamtion about saving and using environments, see [Logging](logging.md).
@@ -100,7 +80,7 @@ Otter can grade assignments using saved environemnts in the log in the Gradescop
 To configure this behavior, two things are required:
 
 * the use of the `--grade-from-log` flag when generating an autograder zipfile
-* using an Otter configuration file with `save_environments` set to `true`
+* using an [Otter configuration file](dot_otter_files.md) with `save_environments` set to `true`
 
 This will tell Otter to shelve the global environment each time a student calls `Notebook.check` (pruning the environments of old calls each time it is called on the same question). When the assignment is exported using `Notebook.export`, the log file (at `.OTTER_LOG`) is also exported with the global environments. These environments are read in in the Gradescope container and are then used for grading. Because one environment is saved for each check call, variable name collisions can be averted, since each question is graded using the global environment at the time it was checked. Note that any requirements needed for execution need to be installed in the Gradescope container, because Otter's shelving mechanism does not store module objects.
 
@@ -131,7 +111,7 @@ The Gradescope generator supports providing a pass/fail threshold. A threshold i
 The threshold is specified with the `--threshold` flag:
 
 ```
-otter generate autograder -t hidden-tests data.csv --threshold 0.75
+otter generate autograder data.csv --threshold 0.75
 ```
 
 For example, if a student passes a 2- and 1- point test but fails a 4-point test (a 43%) on a 25% threshold, they will get all 7 points. If they only pass the 1-point test (a 14%), they will get 0 points.
@@ -145,7 +125,15 @@ For example, if a student passes a 2- and 1- point test but fails a 4-point test
 As an example, the command below scales the number of points to 3:
 
 ```
-otter generate autograder -t hidden-tests data.csv --points 3
+otter generate autograder data.csv --points 3
+```
+
+#### Public Test Multiplier
+
+You can optionally specify a percentage of the points to award students for passing all of the public tests. This percentage defaults to 0 but this can be changed using the `--public-multiplier` flag:
+
+```
+otter generate autograder --public-multiplier 0.5
 ```
 
 #### Intercell Seeding
@@ -153,7 +141,7 @@ otter generate autograder -t hidden-tests data.csv --points 3
 The Gradescope autograder supports intercell seeding with the use of the `--seed` flag. Passing it an integer will cause the autograder to seed NumPy and Python's `random` library between *every* pair of code cells. This is useful for writing deterministic hidden tests. More information about Otter seeding [here](seeding.md). As an example, I can set an intercell seed of 42 with
 
 ```
-otter generate autograder -t hidden-tests data.csv --seed 42
+otter generate autograder data.csv --seed 42
 ```
 
 #### Showing Autograder Results
@@ -163,40 +151,63 @@ The generator lastly allows intructors to specify whether or not the stdout of t
 This behavior is turned off by default and can be turned on by passing the `--show-stdout` flag to `otter generate autograder`.
 
 ```
-otter generate autograder -t hidden-tests data.csv --show-stdout
+otter generate autograder data.csv --show-stdout
 ```
 
-If `--show-stdout` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The [next section](#gradescope-results) details more about what is included in the stdout.
+If `--show-stdout` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The same can be done for hidden test outputs using the `--show-hidden` flag:
+
+```
+otter generate autograder --show-hidden
+```
+
+The [next section](#gradescope-results) details more about how output on Gradescope is formatted.
 
 #### Generating with Otter Assign
 
-Otter Assign also comes with an option to generate this zipfile automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](otter_assign.md) for more details.
+Otter Assign comes with an option to generate this zip file automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](otter_assign.md) for more details.
 
 ## Gradescope Results
 
-This section details how results are displayed to students and instructors on Gradescope.
+This section details how the autograder runs and how results are displayed to students and instructors on Gradescope. When a student submits to Gradescpe, the autograder does the following:
+
+1. Copies the tests and support files from the autograder source
+2. Globs the first IPYNB file and assumes this to be the submission to be graded
+3. Corrects instances of `otter.Notebook` for different test paths using a regex
+4. Reads in the log from the submission if it exists
+5. Grades the notebook, globbing all tests and grading from the log if specified
+6. Looks for discrepancies between the logged scores and the autograder scores and warngs about these if present
+7. If indicated, exports the notebook to a PDF and POSTs this notebook to the other Gradescope assignment
+8. Generates the JSON object for Gradescope's results
+9. Makes adjustments to the scores and visibility based on the configurations
+10. Writes the JSON to the results file
+11. Prints the results as a dataframe to stdout
 
 ### Instructor View
 
-Once a student's submission has been autograder, the Autograder Results page will show the stdout of the grading process in the "Autograder Output" box and the student's score in the side bar to the right of the output. The stdout includes a DataFrame that contains the student's score breakdown by question and a summary of the information about test output visibility at the top of this page:
+Once a student's submission has been autograded, the Autograder Results page will show the stdout of the grading process in the "Autograder Output" box and the student's score in the side bar to the right of the output. The stdout includes information from verifying the student's scores against the logged scores, a dataframe that contains the student's score breakdown by question, and a summary of the information about test output visibility:
 
 ![](images/gradescope_autograder_output.png)
 
-Below the autograder output, each test case is broken down into boxes. If there is no output for the box, then that test was passed. If a test is failed, then the usual test failure output is displayed.
+Note that the above submission shows a discrepancy between the autograder score and the logged score (the line printed above the dataframe). If there are no discrepancies, the stdout will say so:
 
+![](images/gradescope_autograder_output_no_discrepancy.png)
+
+Below the autograder output, each test case is broken down into boxes. Based on the passing of public and hidden tests, there are three possible cases:
+
+* If a public test is failed, there is a single box for the test called `{test name} - Public` that displays the failed output of the test.<br/>
+![](images/gradescope_failed_public_test.png)
+* If all public tests pass but a hidden test fails, there are two boxes: one called `{test name} - Public` that shows `All tests passed!` and a second called `{test name} - Hidden` that shows the failed output of the test.<br/>
+![](images/gradescope_failed_hidden_test.png)
+* If all tests pass, there are two boxes, `{test name} - Public` and `{test name} - Hidden`, that both show `All tests passed!`.<br/>
 ![](images/gradescope_instructor_test_breakdown.png)
 
-Instructors will be able to see _all_ tests. The visibility of a test to students is indicated to instructors by the <img src="_images/gradescope_hidden_test_icon.png" width="24px"/> icon (all tests with this icon are hidden to students). As noted earlier, if a student passes all public tests for a question but fails a hidden test, two boxes are shown to the instructor, of which only the first is visibile to the student:
-
-![](images/gradescope_failed_hidden_test.png)
+Note that these examples award points with a public test multiplier of 0.5; if it had been 0, all of the `{test name} - Public` tests (except failed ones, which are worth full points always) would be worth 0 points Instructors will be able to see _all_ tests. The invisibility of a test to students is indicated to instructors by the <img src="_images/gradescope_hidden_test_icon.png" width="24px"/> icon (all tests with this icon are hidden to students).
 
 ### Student View
 
 On submission, students will only be able to see the results of those test cases for which `test["suites"][0]["cases"][<int>]["hidden"]` evaluates to `True` (see [Test Files](test_files.md) for more info). If `test["suites"][0]["cases"][<int>]["hidden"]` is `False` or not specified, then that test case is hidden.
 
-If `--show-stdout` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout. If `--show-hidden` was passed, students will also see the failed otput of the failed hidden tests.
-
-Note that, because some tests are hidden, students will never see the autograder score in the right sidebar; instead, their score will only show as a dash `-` out of the points possible. Therefore, the only way for students to calculate their autograder score is to use the DataFrame printed to the stdout if `--show-stdout` is passed.
+If `--show-stdout` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout. If `--show-hidden` was passed, students will also see the failed otput of the failed hidden tests (again, once grades are published).
 
 ## Otter Generate Reference
 

@@ -32,8 +32,9 @@ documentation:
 	# sphinx-apidoc -fo docs otter
 	sphinx-build -b html docs docs/_build -aEv
 
-tutorial-zip:
+tutorial:
 	# rm docs/tutorial/tutorial.zip
 	cd docs/tutorial; \
-	zip -r tutorial.zip hidden-tests tests demo-* meta.json -x "*.DS_Store"; \
-	cp tutorial.zip ../_static
+	zip -r tutorial.zip assign generate grade -x "*.DS_Store"; \
+	cp tutorial.zip ../_static; \
+	rm tutorial.zip

@@ -13,7 +13,6 @@ import pandas as pd
 
 from glob import glob
 from textwrap import dedent
-from nb2pdf import convert
 
 from ..execute import grade_notebook
 from ..export import export_notebook
@@ -200,12 +199,12 @@ def main(config):
         json.dump(output, f, indent=4)
 
     print("\n\n")
-    print(dedent("""\
-    Test scores are summarized in the table below. Passed tests appear as a single cell with no output.
-    Failed public tests appear as a single cell with the output of the failed test. Failed hidden tests
-    appear as two cells, one with no output (the public tests) and another with the output of the failed
-    (hidden) test that is not visible to the student.
-    """))
+    # print(dedent("""\
+    # Test scores are summarized in the table below. Passed tests appear as a single cell with no output.
+    # Failed public tests appear as a single cell with the output of the failed test. Failed hidden tests
+    # appear as two cells, one with no output (the public tests) and another with the output of the failed
+    # (hidden) test that is not visible to the student.
+    # """))
     df = pd.DataFrame(output["tests"])
     if "output" in df.columns:
         df.drop(columns=["output"], inplace=True)
