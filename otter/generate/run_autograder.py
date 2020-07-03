@@ -30,7 +30,7 @@ def main(config):
     Args:
         config (``dict``): configurations for autograder
     """
-    print(LOGO_WITH_VERSION, "\n\n")
+    print(LOGO_WITH_VERSION, "\n")
 
     if config.get("token", None) is not None:
         client = APIClient(token=config.get("token", None))
