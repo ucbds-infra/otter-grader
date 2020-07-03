@@ -20,6 +20,7 @@ from IPython.display import display, HTML, Javascript
 from .execute import check
 from .export import export_notebook
 from .logs import LogEntry, EventType, Log
+from .utils import wait_for_save
 
 _API_KEY = None
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
@@ -192,13 +193,25 @@ class Notebook:
         """
         Runs Jupyter JS to force-save a notebook for use before beginning an export
         """
+        if self._notebook is None:
+            assert len(glob("*.ipynb")) == 1, "Too many notebooks to infer notebook name"
+            nb = glob("*.ipynb")[0]
+        else:
+            nb = self._notebook
+        
         if get_ipython() is not None:
             display(Javascript("""
                 require(["base/js/namespace"], function() {
+                    Jupyter.notebook.save_checkpoint();
                     Jupyter.notebook.save_notebook();
                 });
             """))
-            time.sleep(0.75)
+            saved = wait_for_save(nb)
+            if not saved:
+                print(
+                    f"File {nb} was not saved before timeout. Please save and checkpoint "
+                    "this notebook and rerun this cell."
+                )
 
     # def _restart_kernel(self):
     #     """
