@@ -19,6 +19,7 @@ from ..export import export_notebook
 from .token import APIClient
 from ..logs import Log, QuestionNotInLogException
 from ..notebook import _OTTER_LOG_FILENAME
+from ..version import LOGO_WITH_VERSION
 
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
 
@@ -29,6 +30,8 @@ def main(config):
     Args:
         config (``dict``): configurations for autograder
     """
+    print(LOGO_WITH_VERSION, "\n\n")
+
     if config.get("token", None) is not None:
         client = APIClient(token=config.get("token", None))
         generate_pdf = True
