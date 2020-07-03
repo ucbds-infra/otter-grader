@@ -4,7 +4,7 @@ In many use cases, the use of the `otter.Notebook` class by students requires so
 
 The available keys in a `.otter` file are listed below, along with their default values. The only required key is `notebook` (i.e. if you use `.otter` file it must specify a value for `notebook`).
 
-```json
+```jsonc
 {
     "notebook": "",            // the notebook filename
     "endpoint": null,          // the Otter Service endpoint

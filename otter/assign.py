@@ -182,7 +182,11 @@ def main(args):
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         with block_print():
-            run_tests(result / 'autograder' / master.name, debug=args.debug, seed=ASSIGNMENT_METADATA.get('generate', {}).get('seed', None))
+            if isinstance(ASSIGNMENT_METADATA.get('generate', {}), bool):
+                seed = None
+            else:
+                seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None)
+            run_tests(result / 'autograder' / master.name, debug=args.debug, seed=seed)
         print("All tests passed!")
 
     # TODO: change this condition
