@@ -13,17 +13,25 @@ This tutorial can help you to verify that you have installed Otter correctly and
       | - q2.py
       | - q3.py
   | grade
-    | - demo-fails1.ipynb
-    | - demo-fails2.ipynb
-    | - demo-fails2Hidden.ipynb
-    | - demo-fails3.ipynb
-    | - demo-fails3Hidden.ipynb
-    | - demo-passesAll.ipynb
     | - meta.json
+    | ipynbs
+      | - demo-fails1.ipynb
+      | - demo-fails2.ipynb
+      | - demo-fails2Hidden.ipynb
+      | - demo-fails3.ipynb
+      | - demo-fails3Hidden.ipynb
+      | - demo-passesAll.ipynb
     | tests
       | - q1.py
       | - q2.py
       | - q3.py
+    | zips
+      | - demo-fails1.zip
+      | - demo-fails2.zip
+      | - demo-fails2Hidden.zip
+      | - demo-fails3.zip
+      | - demo-fails3Hidden.zip
+      | - demo-passesAll.zip
 ```
 
 ## Quickstart Tutorial
@@ -79,7 +87,7 @@ Otter Generate has quite a few options and configurations. For more information,
 
 ### Otter Grade
 
-Start by `cd`ing into `tutorial/grade`. The first thing to note is that we have provided a [metadata file](otter_grade.html#metadata) that maps student identifiers to filenames in `meta.json`. Note that metadata files are optional when using Otter, but we have provided one here to demonstrate their use.
+Start by `cd`ing into `tutorial/grade`. The first thing to note is that we have provided a [metadata file](otter_grade.html#metadata) that maps student identifiers to filenames in `meta.json`. Note that metadata files are optional when using Otter, but we have provided one here to demonstrate their use. This metadata file lists _only_ the files in the `ipynbs` subdirectory, so we won't use it when grading `zips`.
 
 ```json
 [
@@ -112,12 +120,12 @@ Start by `cd`ing into `tutorial/grade`. The first thing to note is that we have 
 
 The filename and identifier of each notebook indicate which tests should be failing; for example, `demo-fails2.ipynb` fails all cases for `q2` and `demo-fails2Hidden.ipynb` fails the hidden test cases for `q2`.
 
-Let's now construct a call to Otter that will grade these notebooks. We know that we have JSON-formatted metadata, so we'll be use the `-j` metadata flag. Our notebooks are in the current working directory, so we won't need to use the `-p` flag. The notebooks also contain a couple of written questions, and the [filtering](pdfs.md) is implemented using HTML comments, so we'll specify the `--html-filter` flag.
+Let's now construct a call to Otter that will grade these notebooks. We know that we have JSON-formatted metadata, so we'll be use the `-j` metadata flag. Our notebooks are in the `ipynbs` subdirectory, so we'll need to use the `-p` flag. The notebooks also contain a couple of written questions, and the [filtering](pdfs.md) is implemented using HTML comments, so we'll specify the `--html-filter` flag.
 
-Let's run Otter:
+Let's run Otter on the notebooks:
 
 ```console
-otter grade -j meta.json --html-filter -v
+otter grade -p ipynbs -j meta.json --html-filter -v
 ```
 
 (I've added the `-v` flag so that we get verbose output.) After this finishes running, there should be a new file and a new folder in the working directory: `final_grades.csv` and `submission_pdfs`. The former should contain the grades for each file, and should look something like this:
@@ -144,6 +152,14 @@ Let's make that a bit prettier:
 | passesAll    | submission_pdfs/demo-passesAll.pdf    | 1.0 | 1.0 | 1.0 | 3.0   | 3        |
 
 The latter, the `submission_pdfs` directory, should contain the filtered PDFs of each notebook (which should be relatively similar).
+
+Otter Grade can also grade the zip file exports provided by the `Notebook.export` method. To do this, just add the `-z` flag to your call to indicate that you're grading these zip files. We have provided some, with the same notebooks as above, in the `zips` directory, so let's grade those:
+
+```console
+otter grade -p zips -vz
+```
+
+This should have the same CSV output as above but no `submission_pdfs` directory since we didn't tell Otter to generate PDFs.
 
 ## Using Otter
 

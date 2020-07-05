@@ -16,7 +16,6 @@ from subprocess import PIPE
 from glob import glob
 
 from otter.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
-from otter.execute import main
 
 # read in argument parser
 bin_globals = {}

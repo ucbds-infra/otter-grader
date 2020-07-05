@@ -9,7 +9,6 @@ from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .containers import launch_parallel_containers
 from .utils import merge_csv
 
-
 def main(args):
     """Runs Otter Grade
 
@@ -51,11 +50,10 @@ def main(args):
         meta_parser = None
 
     # check that reqs file is valid
-    if not (os.path.exists(args.requirements) and os.path.isfile(args.requirements)):
+    if not os.path.isfile(args.requirements):
         
         # if user-specified requirements not found, fail with AssertionError
-        if args.requirements != "requirements.txt":
-            assert False, "requirements file {} does not exist".format(args.requirements)
+        assert args.requirements == "requirements.txt", f"requirements file {args.requirements} does not exist"
 
         # else just set to None and reqs are ignored
         args.requirements = None
@@ -77,7 +75,9 @@ def main(args):
         no_kill=args.no_kill,
         output_path=args.output_path,
         debug=args.debug,
-        seed=args.seed
+        seed=args.seed,
+        zips=args.zips,
+        meta_parser=meta_parser
     )
 
     if verbose:

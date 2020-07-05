@@ -107,6 +107,14 @@ class GradescopeParser:
 		"""
 		return [file["filename"] for file in self._metadata]
 
+	def get_folders(self):
+		"""Returns a list of the submission folder names from this parser
+
+		Returns:
+			``list``: the folder basenames
+		"""
+		return list(self._metadata.keys())
+
 
 class CanvasParser:
 	"""Metadata parser for Canvas exports
