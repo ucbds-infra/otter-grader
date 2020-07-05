@@ -229,4 +229,3 @@ After this command finishes running, you should have a file called `autograder.z
 To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
 
 You can find more information about Gradescope usage [here](otter_generate.md).
-

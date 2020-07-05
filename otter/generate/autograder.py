@@ -13,7 +13,8 @@ from jinja2 import Template
 
 from .token import APIClient
 
-REQUIREMENTS = Template("""{% if not overwrite %}datascience
+REQUIREMENTS = Template("""\
+{% if not overwrite %}datascience
 jupyter_client
 ipykernel
 matplotlib
@@ -33,9 +34,26 @@ git+https://github.com/ucbds-infra/otter-grader.git@b51dd2ec1b4c56011e1f0634ca3f
 {{ other_requirements }}{% endif %}
 """)
 
-SETUP_SH = """#!/usr/bin/env bash
+R_REQUIREMENTS = Template("""\
+{% if not overwrite %}install.packages(c(
+    "testthat",
+    "devtools",
+    "yaml",
+    "methods",
+    "jsonlite"
+), repos="http://cran.us.r-project.org")
 
-apt-get install -y python3.7 python3-pip python3.7-dev
+devtools::install_github(c(
+    "ucbds-infra/ottr"
+)){% endif %}{% if other_requirements %}
+{{ other_requirements }}
+{% endif %}
+""")
+
+SETUP_SH = Template("""#!/usr/bin/env bash
+
+apt-get update
+apt-get install -y python3.7 python3-pip python3.7-dev r-base
 
 # apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \\
 #        libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \\
@@ -49,9 +67,10 @@ apt-get install -y pandoc
 apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended
 
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
-
-pip3 install -r /autograder/source/requirements.txt
-"""
+{% if language == "python" %}
+pip3 install -r /autograder/source/requirements.txt{% elif language == "r" %}
+R --no-save < /autograder/source/requirements.r{% endif %}
+""")
 
 RUN_AUTOGRADER = Template("""#!/usr/bin/env python3
 
@@ -114,6 +133,11 @@ def main(args):
         language = str(args.lang.lower())
     )
 
+    # format setup.sh
+    setup_sh = SETUP_SH.render(
+        language = str(args.lang.lower())
+    )
+
     # create tmp directory to zip inside
     os.mkdir("./tmp")
 
@@ -124,27 +148,32 @@ def main(args):
         for file in glob(os.path.join(args.tests_path, pattern)):
             shutil.copy(file, os.path.join("tmp", "tests"))
 
-        if os.path.isfile(args.requirements):
-            with open(args.requirements) as f:
-                requirements = REQUIREMENTS.render(
-                    overwrite = args.overwrite_requirements,
-                    other_requirements = f.read()
-                )
-        elif args.requirements != "requirements.txt":
-            assert False, "requirements file {} not found".format(args.requirements)
-        else:
-            requirements = REQUIREMENTS.render(
-                overwrite = args.overwrite_requirements,
-                other_requirements = ""
-            )
+        # render the requirements
+        reqs_template = (REQUIREMENTS, R_REQUIREMENTS)[args.lang.lower() == "r"]
 
+        # open requirements if it exists
+        if os.path.isfile(args.requirements):
+            f = open(args.requirements)
+        else:
+            assert args.requirements == "requirements.txt", f"requirements file {args.requirements} not found"
+            f = open(os.devnull)
+
+        # render the template
+        requirements = reqs_template.render(
+            overwrite = args.overwrite_requirements,
+            other_requirements = f.read()
+        )
+
+        # close the stream
+        f.close()
+        
         # copy requirements into tmp
         with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
             f.write(requirements)
 
         # write setup.sh and run_autograder to tmp
         with open(os.path.join(os.getcwd(), "tmp", "setup.sh"), "w+") as f:
-            f.write(SETUP_SH)
+            f.write(setup_sh)
 
         with open(os.path.join(os.getcwd(), "tmp", "run_autograder"), "w+") as f:
             f.write(run_autograder)
