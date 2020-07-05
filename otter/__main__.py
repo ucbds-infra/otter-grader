@@ -8,6 +8,7 @@ import re
 import json
 import zipfile
 import shutil
+import tempfile
 import nb2pdf
 import pandas as pd
 
@@ -101,15 +102,16 @@ def main(args=None):
     if file_extension == ".zip":
         secret = id_generator()
         grading_dir = os.path.join(subs_dir, f"SUBMISSION_GRADING_DIRECTORY_{secret}")
-        os.makedirs(grading_dir)
 
-        # copy all support files/folders into the grading dir
+        # copy all support files/folders into a template grading dir which we will copy from 
+        # each time we grade a submission
+        template_grading_dir = tempfile.mkdtemp()
         for fn in os.listdir(subs_dir):
             fp = os.path.join(subs_dir, fn)
-            if os.path.isfile(fp):
-                shutil.copy(fp, grading_dir)
-            else:
-                shutil.copytree(fp, os.path.join(grading_dir, fn))
+            if os.path.isfile(fp) and os.path.splitext(fp)[1] != file_extension:
+                shutil.copy(fp, template_grading_dir)
+            elif os.path.isdir(fp):
+                shutil.copytree(fp, os.path.join(template_grading_dir, fn))
     
     else:
         grading_dir = None
@@ -122,12 +124,19 @@ def main(args=None):
 
         # if zips, extract zip file into grading dir and find the gradeable filename
         if file_extension == ".zip":
+            shutil.copytree(template_grading_dir, grading_dir)
             zf = zipfile.ZipFile(fpath)
-            zf.extract_all(grading_dir)
+            zf.extractall(grading_dir)
             os.chdir(grading_dir)
             gradeables = glob(os.path.join(grading_dir, ("*.py", "*.ipynb")[not args.scripts]))
             assert len(gradeables) == 1, f"Wrong number of gradeable files in submission {fname}"
             fpath = gradeables[0]
+        
+        print(os.getcwd())
+        print(fname)
+        print(fpath)
+        print(os.listdir("/home/notebooks"))
+        print(os.listdir())
 
         # grade the submission
         score = grade(
@@ -148,6 +157,14 @@ def main(args=None):
         if args.pdf:
             pdf_path = os.path.splitext(fpath)[0] + ".pdf"
             all_results["manual"].append(pdf_path)
+
+        if file_extension == ".zip":
+            shutil.rmtree(grading_dir)
+
+    os.chdir(subs_dir)
+
+    if file_extension ==  ".zip":
+        shutil.rmtree(template_grading_dir)
 
     try:
         # expand mappings in all_results["score"]

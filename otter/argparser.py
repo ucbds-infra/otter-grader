@@ -126,8 +126,9 @@ def get_parser():
     grade_parser.add_argument("-j", "--json", default=False, help="Flag for path to JSON metadata")
     grade_parser.add_argument("-y", "--yaml", default=False, help="Flag for path to YAML metadata")
 
-    # script grading argument
+    # submission format arguments
     grade_parser.add_argument("-s", "--scripts", action="store_true", default=False, help="Flag to incidicate grading Python scripts")
+    grade_parser.add_argument("-z", "--zips", action="store_true", default=False, help="Whether submissions are zip files from Notebook.export")
 
     # PDF export options
     grade_parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")

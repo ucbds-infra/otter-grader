@@ -16,7 +16,7 @@ from .metadata import GradescopeParser
 
 def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, 
     tag_filter=False, html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
-    scripts=False, no_kill=False, output_path="./", debug=False, seed=None, meta_parser=None):
+    scripts=False, no_kill=False, output_path="./", debug=False, seed=None, zips=False, meta_parser=None):
     """Grades notebooks in parallel docker containers
 
     This function runs ``num_containers`` docker containers in parallel to grade the student submissions
@@ -43,6 +43,9 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
         debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR 
             from each container to the command line)
         seed (``int``, optional): a random seed to use for intercell seeding during grading
+        zips (``bool``, False): whether the submissions are zip files formatted from ``Notebook.export``
+        meta_parser (object, optional): a metadata parser instance; one of the classes defined in
+            ``otter.metadata``
 
     Returns:
         ``list`` of ``pandas.core.frame.DataFrame``: the grades returned by each container spawned during
@@ -53,7 +56,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
 
     # list all notebooks in the dir
     dir_path = os.path.abspath(notebooks_dir)
-    file_extension = (".py", ".ipynb")[not scripts]
+    file_extension = (".zip", ".py", ".ipynb")[[zips, scripts, True].index(True)]
     notebooks = [os.path.join(dir_path, f) for f in os.listdir(dir_path) \
         if os.path.isfile(os.path.join(dir_path, f)) and f.endswith(file_extension)]
 
@@ -104,7 +107,9 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
                 scripts=scripts,
                 no_kill=no_kill,
                 output_path=output_path,
-                debug=debug
+                debug=debug,
+                seed=seed,
+                zips=zips
             )]
 
         # stop execution while containers are running
@@ -127,7 +132,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
 
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
     unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, scripts=False, no_kill=False, 
-    output_path="./", debug=False, seed=None):
+    output_path="./", debug=False, seed=None, zips=False):
     """
     Grades multiple assignments in a directory using a single docker container. If no PDF assignment is 
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
@@ -152,6 +157,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR 
             from each container to the command line)
         seed (``int``, optional): a random seed to use for intercell seeding during grading
+        zips (``bool``, False): whether the submissions are zip files formatted from ``Notebook.export``
 
     Returns:
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
@@ -215,6 +221,9 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     
     if debug:
         grade_command += ["--verbose"]
+
+    if zips:
+        grade_command += ["--zips"]
 
     grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
     
