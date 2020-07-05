@@ -277,7 +277,7 @@ Otter Grade supports the grading the zip archives produced by `otter.Notebook.ex
     ...
 ```
 
-we would grade with
+I would grade with
 
 ```console
 otter grade -zy meta.yml
