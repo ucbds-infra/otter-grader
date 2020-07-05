@@ -14,13 +14,13 @@ import pandas as pd
 
 from glob import glob
 from textwrap import dedent
-from nb2pdf import convert
 
 from ..execute import grade_notebook
 from ..export import export_notebook
 from .token import APIClient
 from ..logs import Log, QuestionNotInLogException
 from ..notebook import _OTTER_LOG_FILENAME
+from ..version import LOGO_WITH_VERSION
 
 NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
 
@@ -147,6 +147,8 @@ def main(config):
     Args:
         config (``dict``): configurations for autograder
     """
+    print(LOGO_WITH_VERSION, "\n")
+    
     if config.get("lang", "python") == "r":
         run_r_autograder(config)
         return
@@ -275,11 +277,11 @@ def main(config):
         if key != "total" and key != "possible":
             hidden, incorrect = scores[key].get("hidden", False), "hint" in scores[key]
             score, possible = scores[key]["score"], scores[key]["possible"]
-            public_score, hidden_score = score * config.get("public_test_multiplier", 0), score * (1 - config.get("public_test_multiplier", 0))
-            public_possible, hidden_possible = possible * config.get("public_test_multiplier", 0), possible * (1 - config.get("public_test_multiplier", 0))
+            public_score, hidden_score = score * config.get("public_multiplier", 0), score * (1 - config.get("public_multiplier", 0))
+            public_possible, hidden_possible = possible * config.get("public_multiplier", 0), possible * (1 - config.get("public_multiplier", 0))
 
             if hidden and incorrect:
-                public_score, hidden_score = possible * config.get("public_test_multiplier", 0), 0
+                public_score, hidden_score = possible * config.get("public_multiplier", 0), 0
             elif not hidden and incorrect:
                 public_score, hidden_score = 0, 0
                 public_possible = possible
@@ -321,12 +323,12 @@ def main(config):
         json.dump(output, f, indent=4)
 
     print("\n\n")
-    print(dedent("""\
-    Test scores are summarized in the table below. Passed tests appear as a single cell with no output.
-    Failed public tests appear as a single cell with the output of the failed test. Failed hidden tests
-    appear as two cells, one with no output (the public tests) and another with the output of the failed
-    (hidden) test that is not visible to the student.
-    """))
+    # print(dedent("""\
+    # Test scores are summarized in the table below. Passed tests appear as a single cell with no output.
+    # Failed public tests appear as a single cell with the output of the failed test. Failed hidden tests
+    # appear as two cells, one with no output (the public tests) and another with the output of the failed
+    # (hidden) test that is not visible to the student.
+    # """))
     df = pd.DataFrame(output["tests"])
     if "output" in df.columns:
         df.drop(columns=["output"], inplace=True)

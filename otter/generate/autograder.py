@@ -30,7 +30,7 @@ dill
 jupytext
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@b51dd2ec1b4c56011e1f0634ca3f9b691b6f3aaf{% endif %}{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@43b541024ad78b072d540a9060c1ff09a6158d78{% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
@@ -84,7 +84,7 @@ config = {
     "seed": {{ seed }},
     "grade_from_log": {{ grade_from_log }},
     "serialized_variables": {{ serialized_variables }},
-    "public_test_multiplier": {{ public_test_multiplier }},
+    "public_multiplier": {{ public_multiplier }},
     "token": {% if token %}'{{ token }}'{% else %}None{% endif %},
     "course_id": '{{ course_id }}',
     "assignment_id": '{{ assignment_id }}',
@@ -129,7 +129,7 @@ def main(args):
         pagebreaks = str(not args.no_pagebreaks),
         grade_from_log = str(args.grade_from_log),
         serialized_variables = str(args.serialized_variables),
-        public_test_multiplier = str(args.public_multiplier),
+        public_multiplier = str(args.public_multiplier),
         language = str(args.lang.lower())
     )
 

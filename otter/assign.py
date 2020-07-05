@@ -24,7 +24,7 @@ from getpass import getpass
 from .execute import grade_notebook
 # from .jassign import gen_views as jassign_views
 from .export import export_notebook
-from .utils import block_print, str_to_doctest
+from .utils import block_print, str_to_doctest, get_relpath
 from .generate.token import APIClient
 
 
@@ -74,6 +74,14 @@ def main(args):
     """
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
+    
+    # TODO: update this condition
+    if True:
+        result = get_relpath(master.parent, result)
+        orig_dir = os.getcwd()
+        os.chdir(master.parent)
+        master = pathlib.Path(master.name)
+
     # if args.jassign:
     #     jassign_views(master, result, args)
     # else:
@@ -152,7 +160,9 @@ def main(args):
                 generate_cmd += ["--unfiltered-pdfs"]
 
         requirements = ASSIGNMENT_METADATA.get('requirements', None) or args.requirements
+        requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))
         if os.path.isfile(requirements):
+            generate_cmd += ["-r", requirements]
             if ASSIGNMENT_METADATA.get('overwrite_requirements', False) or args.overwrite_requirements:
                 generate_cmd += ["--overwrite-requirements"]
         
@@ -172,8 +182,16 @@ def main(args):
     if ASSIGNMENT_METADATA.get('run_tests', True) and not args.no_run_tests:
         print("Running tests...")
         with block_print():
-            run_tests(result / 'autograder' / master.name, debug=args.debug, seed=ASSIGNMENT_METADATA.get('generate', {}).get('seed', None))
+            if isinstance(ASSIGNMENT_METADATA.get('generate', {}), bool):
+                seed = None
+            else:
+                seed = ASSIGNMENT_METADATA.get('generate', {}).get('seed', None)
+            run_tests(result / 'autograder' / master.name, debug=args.debug, seed=seed)
         print("All tests passed!")
+
+    # TODO: change this condition
+    if True:
+        os.chdir(orig_dir)
 
 
 def gen_otter_file(master, result):

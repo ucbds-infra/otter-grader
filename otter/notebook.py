@@ -14,13 +14,13 @@ import datetime as dt
 
 from getpass import getpass
 from glob import glob
-from nb2pdf import convert
 from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 
 from .execute import check
 from .export import export_notebook
 from .logs import LogEntry, EventType, Log
+from .utils import wait_for_save
 
 _API_KEY = None
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
@@ -190,15 +190,40 @@ class Notebook:
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
     def _save_notebook(self):
-        """Runs Jupyter JS to force-save a notebook for use before beginning an export
         """
+        Runs Jupyter JS to force-save a notebook for use before beginning an export
+        """
+        if self._notebook is None:
+            assert len(glob("*.ipynb")) == 1, "Too many notebooks to infer notebook name"
+            nb = glob("*.ipynb")[0]
+        else:
+            nb = self._notebook
+        
         if get_ipython() is not None:
             display(Javascript("""
                 require(["base/js/namespace"], function() {
+                    Jupyter.notebook.save_checkpoint();
                     Jupyter.notebook.save_notebook();
                 });
             """))
-            time.sleep(0.75)
+            saved = wait_for_save(nb)
+            if not saved:
+                print(
+                    f"File {nb} was not saved before timeout. Please save and checkpoint "
+                    "this notebook and rerun this cell."
+                )
+
+    # def _restart_kernel(self):
+    #     """
+    #     Runs Jupyter JS to force-save a notebook for use before beginning an export
+    #     """
+    #     if get_ipython() is not None:
+    #         display(Javascript("""
+    #             require(["base/js/namespace"], function() {
+    #                 Jupyter.notebook.kernel.restart();
+    #             });
+    #         """))
+    #         time.sleep(0.75)
 
     def check(self, question, global_env=None):
         """
@@ -340,7 +365,7 @@ class Notebook:
             if display_link:
                 # create and display output HTML
                 out_html = """
-                <p>Your file has been exported. Click <a href="{}" target="_blank">here</a> 
+                <p>Your submission has been exported. Click <a href="{}" target="_blank">here</a> 
                 to download the zip file.</p>
                 """.format(zip_path)
                 

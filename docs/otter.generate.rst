@@ -12,6 +12,14 @@ otter.generate.autograder module
    :undoc-members:
    :show-inheritance:
 
+otter.generate.run\_autograder module
+-------------------------------------
+
+.. automodule:: otter.generate.run_autograder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 otter.generate.token module
 ---------------------------
 

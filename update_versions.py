@@ -117,7 +117,7 @@ def main():
     with open("setup.py", "w") as f:
         f.write(contents)
 
-    with open("otter/__init__.py") as f:
+    with open("otter/version.py") as f:
         contents = f.read()
 
     contents = re.sub(
@@ -126,7 +126,7 @@ def main():
         contents
     )
 
-    with open("otter/__init__.py", "w") as f:
+    with open("otter/version.py", "w") as f:
         f.write(contents)
 
     if TO_GIT:
