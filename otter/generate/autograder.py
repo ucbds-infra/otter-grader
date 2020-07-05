@@ -30,7 +30,7 @@ dill
 jupytext
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@a6a5b21a1a93b3453e45081c55f396916a7c5a47{% endif %}{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@40f32200fc36709f2c3119ffe886be36bee4b3d8{% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
