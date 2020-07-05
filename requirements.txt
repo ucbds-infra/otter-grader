@@ -30,6 +30,6 @@ testing.postgresql
 # documentation requirements
 recommonmark
 sphinx_markdown_tables
-git+https://github.com/executablebookproject/sphinx-book-theme.git@35357b09fa4b3bc70259109d19ef795badbcd5b8
+sphinx-book-theme==0.0.29
 sphinxcontrib-apidoc
 sphinx-argparse
