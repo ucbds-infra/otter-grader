@@ -78,7 +78,7 @@ source_suffix = ['.rst', '.md']
 # }
 
 # The master toctree document.
-master_doc = 'index_beta'
+master_doc = 'index'
 
 github_doc_root = 'https://github.com/ucbds-infra/otter-grader/tree/master/docs/'
 

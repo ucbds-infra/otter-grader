@@ -43,7 +43,7 @@ R_REQUIREMENTS = Template("""\
     "methods",
     "jsonlite",
     "knitr"
-), repos="http://cran.us.r-project.org")
+), repos="http://cran.us.r-project.org", dependencies=TRUE)
 
 devtools::install_github(c(
     "ucbds-infra/ottr"

@@ -1,63 +1,130 @@
-# Otter-Grader Documentation
+# Logging
+
+In order to assist with debugging students' checks, Otter automatically logs events when called from `otter.Notebook` or `otter check`. The events are logged in the following methods of `otter.Notebook`:
+
+* `__init__`
+* `_auth`
+* `check`
+* `check_all`
+* `export`
+* `submit`
+* `to_pdf`
+
+The events are stored as `otter.logs.LogEntry` objects which are pickled and appended to a file called `.OTTER_LOG`. To interact with a log, the `otter.logs.Log` class is provided; logs can be read in using the class method `Log.from_file`:
+
+```python
+from otter.logs import Log
+log = Log.from_file(".OTTER_LOG")
+```
+
+The log order defaults to chronological (the order in which they were appended to the file) but this can be reversed by setting the `ascending` argument to `False`. To get the most recent results for a specific question, use `Log.get_results`:
+
+```python
+log.get_results("q1")
+```
+
+Note that the `otter.logs.Log` class does not support editing the log file, only reading and interacting with it.
+
+## Logging Environments
+
+Whenever a student runs a check cell, Otter can store their current global environment as a part of the log. The purpose of this is twofold: 1) to allow the grading of assignments to occur based on variables whose creation requires access to resources not possessed by the grading environment, and 2) to allow instructors to debug students' assignments by inspecting their global environment at the time of the check. **This behavior must be preconfigured with an [Otter configuration file](dot_otter_files.md) that has its `save_environment` key set to `true`.**
+
+Shelving is accomplished by using the dill library to pickle (almost) everything in the global environment, with the notable exception of modules (so libraries will need to be reimported in the instructor's environment). The environment (a dictionary) is pickled and the resulting file is then stored as a byte string in one of the fields of the log entry.
+
+Environments can be saved to a log entry by passing the environment (as a dictionary) to `LogEntry.shelve`. Any variables that can't be shelved (or are ignored) are added to the `unshelved` attribute of the entry.
+
+```python
+from otter.logs import LogEntry
+entry = LogEntry()
+entry.shelve(globals())
+```
+
+The `shelve` method also optionally takes a parameter `variables` that is a dictionary mapping variable names to fully-qualified type strings. If passed, only variables whose names are keys in this dictionary and whose types match their corresponding values will be stored in the environment. This helps from serializing unnecessary objects and prevents students from injecting malicious code into the autograder. To get the type string, use the function `otter.utils.get_variable_type`. As an example, the type string for a pandas `DataFrame` is `"pandas.core.frame.DataFrame"`:
+
+```python
+>>> import pandas as pd
+>>> from otter.utils import get_variable_type
+>>> df = pd.DataFrame()
+>>> get_variable_type(df)
+'pandas.core.frame.DataFrame'
+```
+
+With this, we can tell the log entry to only shelve dataframes named `df`:
+
+```python
+from otter.logs import LogEntry
+variables = {"df": "pandas.core.frame.DataFrame"}
+entry = LogEntry()
+entry.shelve(globals(), variables=variables)
+```
+
+If you are grading from the log and are utilizing `variables`, you **must** include this dictionary as a JSON string in your configuration, otherwise the autograder will deserialize anything that the student submits. This configuration is set in two places: in the [Otter configuration file](dot_otter_files.md) that you distribute with your notebook and in the autograder. Both of these are handled for you if you use [Otter Assign](otter_assign.md) to generate your distribution files.
+
+To retrieve a shelved environment from an entry, use the `LogEntry.unshelve` method. During the process of unshelving, all functions have their `__globals__` updated to include everything in the unshelved environment and, optionally, anything in the environment passed to `global_env`.
+
+```python
+>>> env = entry.unshelve() # this will have everything in the shelf in it -- but not factorial
+>>> from math import factorial
+>>> env_with_factorial = entry.unshelve({"factorial": factorial}) # add factorial to all fn __globals__
+>>> "factorial" in env_with_factorial["some_fn"].__globals__
+True
+>>> factorial is env_with_factorial["some_fn"].__globals__["factorial"]
+True
+```
+
+See the reference [below](#otter-logs-reference) for more information about the arguments to `LogEntry.shelve` and `LogEntry.unshelve`.
+
+## Debugging with the Log
+
+The log is useful to help students debug tests that they are repeatedly failing. Log entries store any errors thrown by the process tracked by that entry and, if the log is a call to `otter.Notebook.check`, also the test results. Any errors held by the log entry can be re-thrown by calling `LogEntry.raise_error`:
+
+```python
+from otter.logs import Log
+log = Log.from_file(".OTTER_LOG")
+entry = log.entries[0]
+entry.raise_error()
+```
+
+The test results of an entry can be returned using `LogEntry.get_results`:
+
+```python
+entry.get_results()
+```
+
+## Grading from the Log
+
+As noted earlier, the environments stored in logs can be used to grade students' assignments. If the grading environment does not have the dependencies necessary to run all code, the environment saved in the log entries will be used to run tests against. For example, if the execution hub has access to a large SQL server that cannot be accessed by a Gradescope grading container, these questions can still be graded using the log of checks run by the students and the environments pickled therein.
+
+To configure these pregraded questions, include an [Otter configuration file](dot_otter_files.md) in the assignment directory that defines the notebook name and that the saving of environments should be turned on:
+
+```json
+{
+    "notebook": "hw00.ipynb",
+    "save_environment": true
+}
+```
+
+If you are restricting the variables serialized during checks, also set the `variables` or `ignore_modules` parameters. If you are grading on Gradescope, you must also tell the autograder to grade from the log using the `--grade-from-log` flag when running or the `grade_from_log` subkey of `generate` if using Otter Assign.
+
+## Otter Logs Reference
+
+### `otter.logs.Log`
 
 ```eval_rst
-.. toctree::
-   :maxdepth: 1
-   :caption: Contents:
-   :hidden:
-
-   tutorial
-   test_files
-   otter_assign
-   otter_check
-   otter_grade
-   otter_generate
-   otter_service
-   pdfs
-   seeding
-   logging
-   changelog
+.. autoclass:: otter.logs.Log
+    :members:
 ```
 
-Otter-Grader is an open-source local grader from the Division of Computing, Data Science, and Society at the University of California, Berkeley. It is designed to be a scalable grader that utilizes parallel Docker containers on the instructor's machine in order to remove the traditional overhead requirement of a live server. It also supports student-run tests in Jupyter Notebooks and from the command line, and is compatible with Gradescope's proprietary autograding service.
+### `otter.logs.LogEntry`
 
-Otter is a command-line tool organized into six basic commands: `assign`, `check`, `export`, `generate`, `grade`, and `service`. These commands provide functionality that allows instructors to create, distribute, and grade assignments locally or using a variety of learning management system (LMS) integrations. Otter also allows students to run publically distributed tests while working through assignments.
-
-* [Otter Assign](otter_assign.md) is an assignment development and distribution tool that allows instructors to create assignments with prompts, solutions, and tests in a simple notebook format that it then converts into santized versions for distribution to students and autograders.
-* [Otter Check and the `otter.Notebook` class](otter_check.md) allow students to run publically distributed tests written by instructors against their solutions as they work through assignments to verify their thought processes and design implementations.
-* [Otter Export](pdfs.md) generates PDFs with optional filtering of Jupyter Notebooks for manually grading portions of assignments.
-* [Otter Generate](otter_generate.md) creates the necessary files so that instructors can autograde assignments using Gradescope's autograding platform.
-* [Otter Grade](otter_grade.md) grades students' assignments locally on the instructor's machine in parallel Docker containers, returning grade breakdowns as a CSV file. It also supports [PDF generation an cell filtering with nb2pdf](pdfs.md) so that instructors can manually grade written portions of assignments.
-* [Otter Service](otter_service.md) is a deployable grading server that students can submit their work to which grades these submissions and can optionally upload PDFs of these submission to Gradescope for manual grading.
-
-## Installation
-
-Otter is a Python package that can be installed using pip. To install the current stable version, install with
-
-```
-pip install otter-grader
+```eval_rst
+.. autoclass:: otter.logs.LogEntry
+    :members:
 ```
 
-To install the **beta** version, install from git:
+### `otter.logs.EventType`
 
+```eval_rst
+.. autoclass:: otter.logs.EventType
+    :members:
 ```
-pip install git+https://github.com/ucbds-infra/otter-grader.git@beta
-```
-
-### Docker
-
-Otter uses Docker to create containers in which to run the students' submissions. Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks.
-
-#### Pull from DockerHub
-
-To pull the image from DockerHub, run `docker pull ucbdsinfra/otter-grader`. If you choose this method, otter will automatically use this image for you.
-
-#### Download the Dockerfile from GitHub
-
-To install from the GitHub repo, follow the steps below:
-
-1. Clone the GitHub repo
-2. `cd` into the `otter-grader/docker` directory
-3. Build the Docker image with this command: `docker build . -t YOUR_DESIRED_IMAGE_NAME`
-
-_Note:_ With this setup, you will need to pass in a custom docker image name when using the CLI with the `--image` flag.
