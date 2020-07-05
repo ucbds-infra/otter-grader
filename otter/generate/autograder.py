@@ -150,6 +150,7 @@ def main(args):
 
         # render the requirements
         reqs_template = (REQUIREMENTS, R_REQUIREMENTS)[args.lang.lower() == "r"]
+        reqs_filename = "requirements." + ("txt", "r")[args.lang.lower() == "r"]
 
         # open requirements if it exists
         if os.path.isfile(args.requirements):
@@ -168,7 +169,7 @@ def main(args):
         f.close()
         
         # copy requirements into tmp
-        with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
+        with open(os.path.join(os.getcwd(), "tmp", reqs_filename), "w+") as f:
             f.write(requirements)
 
         # write setup.sh and run_autograder to tmp
@@ -201,7 +202,7 @@ def main(args):
         os.chdir("./tmp")
 
         zip_cmd = ["zip", "-r", os.path.join("..", args.output_path, "autograder.zip"), "run_autograder",
-                "setup.sh", "requirements.txt", "tests"]
+                "setup.sh", reqs_filename, "tests"]
 
         if args.files:
             zip_cmd += ["files"]
