@@ -82,8 +82,8 @@ def run_r_autograder(config):
         log = None
 
     grading_script = dedent(f"""\
-    results = otter::run_gradescope("{fp}")
-    otter::results_to_json(results)
+    results = ottr::run_gradescope("{fp}")
+    ottr::results_to_json(results)
     """)
     output = r(grading_script)[0]
 
@@ -148,7 +148,7 @@ def main(config):
         config (``dict``): configurations for autograder
     """
     print(LOGO_WITH_VERSION, "\n")
-    
+
     if config.get("lang", "python") == "r":
         run_r_autograder(config)
         return

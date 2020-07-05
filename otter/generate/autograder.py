@@ -41,7 +41,8 @@ R_REQUIREMENTS = Template("""\
     "devtools",
     "yaml",
     "methods",
-    "jsonlite"
+    "jsonlite",
+    "knitr"
 ), repos="http://cran.us.r-project.org")
 
 devtools::install_github(c(
