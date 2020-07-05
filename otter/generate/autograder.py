@@ -30,7 +30,7 @@ dill
 jupytext
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@43b541024ad78b072d540a9060c1ff09a6158d78{% endif %}{% if other_requirements %}
+git+https://github.com/ucbds-infra/otter-grader.git@a6a5b21a1a93b3453e45081c55f396916a7c5a47{% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
 
@@ -67,8 +67,8 @@ apt-get install -y pandoc
 apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended
 
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
-{% if language == "python" %}
-pip3 install -r /autograder/source/requirements.txt{% elif language == "r" %}
+
+pip3 install -r /autograder/source/requirements.txt{% if language == "r" %}
 R --no-save < /autograder/source/requirements.r{% endif %}
 """)
 
@@ -149,28 +149,52 @@ def main(args):
             shutil.copy(file, os.path.join("tmp", "tests"))
 
         # render the requirements
-        reqs_template = (REQUIREMENTS, R_REQUIREMENTS)[args.lang.lower() == "r"]
-        reqs_filename = "requirements." + ("txt", "r")[args.lang.lower() == "r"]
+        # reqs_template = (REQUIREMENTS, R_REQUIREMENTS)[args.lang.lower() == "r"]
+        # reqs_filename = "requirements." + ("txt", "r")[args.lang.lower() == "r"]
 
-        # open requirements if it exists
-        if os.path.isfile(args.requirements):
-            f = open(args.requirements)
-        else:
-            assert args.requirements == "requirements.txt", f"requirements file {args.requirements} not found"
-            f = open(os.devnull)
+        if args.lang.lower() == "python":
+            # open requirements if it exists
+            if os.path.isfile(args.requirements):
+                f = open(args.requirements)
+            else:
+                assert args.requirements == "requirements.txt", f"requirements file {args.requirements} not found"
+                f = open(os.devnull)
 
-        # render the template
-        requirements = reqs_template.render(
-            overwrite = args.overwrite_requirements,
-            other_requirements = f.read()
-        )
+            # render the templates
+            requirements = REQUIREMENTS.render(
+                overwrite = args.overwrite_requirements,
+                other_requirements = f.read()
+            )
+            r_requirements = None
+
+            # close the stream
+            f.close()
+            
+        elif args.lang.lower() == "r":
+            # open requirements if it exists
+            if os.path.isfile(args.requirements):
+                f = open(args.requirements)
+            else:
+                assert args.requirements == "requirements.txt", f"requirements file {args.requirements} not found"
+                f = open(os.devnull)
+
+            # render the templates
+            requirements = REQUIREMENTS.render()
+            r_requirements = R_REQUIREMENTS.render(
+                overwrite = args.overwrite_requirements,
+                other_requirements = f.read()
+            )
 
         # close the stream
         f.close()
         
         # copy requirements into tmp
-        with open(os.path.join(os.getcwd(), "tmp", reqs_filename), "w+") as f:
+        with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
             f.write(requirements)
+
+        if r_requirements:
+            with open(os.path.join(os.getcwd(), "tmp", "requirements.r"), "w+") as f:
+                f.write(r_requirements)
 
         # write setup.sh and run_autograder to tmp
         with open(os.path.join(os.getcwd(), "tmp", "setup.sh"), "w+") as f:
@@ -202,7 +226,10 @@ def main(args):
         os.chdir("./tmp")
 
         zip_cmd = ["zip", "-r", os.path.join("..", args.output_path, "autograder.zip"), "run_autograder",
-                "setup.sh", reqs_filename, "tests"]
+                "setup.sh", "requirements.txt", "tests"]
+        
+        if r_requirements:
+            zip_cmd += ["requirements.r"]
 
         if args.files:
             zip_cmd += ["files"]
