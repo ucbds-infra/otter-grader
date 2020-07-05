@@ -93,6 +93,7 @@ The grading interface, encapsulated in the `otter grade` command, runs the local
 | `-j`, `--json` |  | Path to JSON metadata file |
 | `-y`, `--yaml` |  | Path to YAML metadata file |
 | `-s`, `--scripts` |  | Indicates that Python scripts are being executed (not IPython notebooks) |
+| `-z`, `--zips` |  | Indicates that the submissions are zip files formatted by `otter.Notebook.export` |
 | `--pdf` |  | Generate unfiltered PDFs for manual grading |
 | `--tag-filter` |  | Generate PDFs filtered by cell tags for manual grading |
 | `--html-filter` |  | Generate PDFs filtered by HTML comments for manual grading |
@@ -251,11 +252,36 @@ If I wanted to grade Python scripts instead of IPython notebooks, my call to Ott
 
 My call to grade these submissions would be
 
-```
+```console
 otter grade -sy meta.yml
 ```
 
 **Note the lack of a PDF flag,** as it doesn't make sense to convert Python files to PDFs. PDF flags only work when grading IPython Notebooks.
+
+### Grading `otter.Notebook.export` Zip Files
+
+Otter Grade supports the grading the zip archives produced by `otter.Notebook.export`. To grade these, just add the `-z` flags to your `otter grade` command and run as normal. For example, for the following `grading` directory,
+
+```
+| grading
+  | - meta.yml
+  | - sub0.zip
+  | - sub1.zip
+  | - sub2.zip
+  ...
+  | - requirements.txt
+  | tests
+    | - q1.py
+    | - q2.py
+    | - q3.py
+    ...
+```
+
+we would grade with
+
+```console
+otter grade -zy meta.yml
+```
 
 ### Support Files
 
