@@ -6,6 +6,8 @@ import argparse
 import os
 import re
 import json
+import zipfile
+import shutil
 import nb2pdf
 import pandas as pd
 
@@ -16,8 +18,9 @@ except ImportError:
     raise ImportError('IPython needs to be installed for notebook grading')
 
 from .execute import grade_notebook
+from .utils import id_generator
 
-def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, seed=None, cwd=None):
+def grade(ipynb_path, pdf, script, ignore_errors=True, seed=None, cwd=None):
     """
     Grades a single ipython notebook and returns the score
 
@@ -50,11 +53,11 @@ def grade(ipynb_path, pdf, tag_filter, html_filter, script, ignore_errors=True, 
 
     # output PDF
     if pdf:
-        nb2pdf.convert(ipynb_path)
-    elif tag_filter:
-        nb2pdf.convert(ipynb_path, filtering=True, filter_type="tags")
-    elif html_filter:
-        nb2pdf.convert(ipynb_path, filtering=True, filter_type="html")
+        nb2pdf.convert(
+            ipynb_path, 
+            filtering = pdf != "unfiltered", 
+            filter_type = pdf if pdf != "unfiltered" else "tags"
+        )
 
     return result
 
@@ -68,12 +71,11 @@ def main(args=None):
     """
     # implement argparser
     parser = argparse.ArgumentParser()
-    parser.add_argument('notebook_directory', help='Path to directory with ipynb\'s to grade')
-    parser.add_argument("--pdf", action="store_true", default=False)
-    parser.add_argument("--tag-filter", action="store_true", default=False)
-    parser.add_argument("--html-filter", action="store_true", default=False)
+    parser.add_argument('submission_directory', help="Path to submissions directory")
+    parser.add_argument("--pdf", default=False, const="unfiltered", choices=["unfiltered", "tags", "html"], nargs="?")
     parser.add_argument("--scripts", action="store_true", default=False)
     parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
+    parser.add_argument("--zips", action="store_true", default=False, help="Whether the submissions are Notebook.export zip archives")
     parser.add_argument("--verbose", default=False, action="store_true", help="If present prints scores and hints to stdout")
     parser.add_argument("--debug", default=False, action="store_true", help="Does not ignore errors on execution")
 
@@ -82,27 +84,69 @@ def main(args=None):
     else:
         args = parser.parse_args(args)
 
-    # get all ipynb files
-    dir_path = os.path.abspath(args.notebook_directory)
-    os.chdir(dir_path)
-    file_extension = (".py", ".ipynb")[not args.scripts]
-    all_ipynb = [(f, os.path.join(dir_path, f)) for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f)) and f.endswith(file_extension)]
+    # cd into dir containing submissions
+    subs_dir = os.path.abspath(args.submission_directory)
+    os.chdir(subs_dir)
+
+    # get file extension and get all of those files in dir_path
+    file_extension = (".zip", ".py", ".ipynb")[[args.zips, args.scripts, True].index(True)]
+    files = [(f, os.path.join(subs_dir, f)) for f in os.listdir(subs_dir) if os.path.splitext(f)[1] == file_extension]
 
     all_results = {"file": [], "score": [], "manual": []}
 
-    if not args.pdf and not args.html_filter and not args.tag_filter:
+    if not args.pdf:
         del all_results["manual"]
 
-    for ipynb_name, ipynb_path in all_ipynb:
-        all_results["file"].append(ipynb_name)
-        score = grade(ipynb_path, args.pdf, args.tag_filter, args.html_filter, args.scripts, ignore_errors=not args.debug, seed=args.seed, cwd=dir_path)
+    # if zips, creat subdir to grade in
+    if file_extension == ".zip":
+        secret = id_generator()
+        grading_dir = os.path.join(subs_dir, f"SUBMISSION_GRADING_DIRECTORY_{secret}")
+        os.makedirs(grading_dir)
+
+        # copy all support files/folders into the grading dir
+        for fn in os.listdir(subs_dir):
+            fp = os.path.join(subs_dir, fn)
+            if os.path.isfile(fp):
+                shutil.copy(fp, grading_dir)
+            else:
+                shutil.copytree(fp, os.path.join(grading_dir, fn))
+    
+    else:
+        grading_dir = None
+
+    # grade files
+    for fname, fpath in files:
+        os.chdir(subs_dir)
+
+        all_results["file"].append(fname)
+
+        # if zips, extract zip file into grading dir and find the gradeable filename
+        if file_extension == ".zip":
+            zf = zipfile.ZipFile(fpath)
+            zf.extract_all(grading_dir)
+            os.chdir(grading_dir)
+            gradeables = glob(os.path.join(grading_dir, ("*.py", "*.ipynb")[not args.scripts]))
+            assert len(gradeables) == 1, f"Wrong number of gradeable files in submission {fname}"
+            fpath = gradeables[0]
+
+        # grade the submission
+        score = grade(
+            fpath, 
+            args.pdf, 
+            args.scripts, 
+            ignore_errors = not args.debug, 
+            seed = args.seed, 
+            cwd = grading_dir if grading_dir else subs_dir
+        )
+
         if args.verbose:
-            print("Score details for {}".format(ipynb_name))
-            print(json.dumps(score, default=lambda o: repr(o)))
-        # del score["TEST_HINTS"]
+            print("Score details for {}".format(fname))
+            print(json.dumps(score, default=lambda o: repr(o), indent=2))
+
         all_results["score"].append({t : score[t]["score"] if type(score[t]) == dict else score[t] for t in score})
-        if args.pdf or args.html_filter or args.tag_filter:
-            pdf_path = re.sub(r"\.ipynb$", ".pdf", ipynb_path)
+        
+        if args.pdf:
+            pdf_path = os.path.splitext(fpath)[0] + ".pdf"
             all_results["manual"].append(pdf_path)
 
     try:
@@ -121,7 +165,6 @@ def main(args=None):
 
     final_results = pd.DataFrame(all_results)
     final_results.to_csv("grades.csv", index=False)
-
 
 if __name__ == "__main__":
     main()

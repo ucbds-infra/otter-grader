@@ -200,10 +200,10 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     # if we want PDF output, add the necessary flag
     if unfiltered_pdfs:
         grade_command += ["--pdf"]
-    if tag_filter:
-        grade_command += ["--tag-filter"]
-    if html_filter:
-        grade_command += ["--html-filter"]
+    elif tag_filter:
+        grade_command += ["--pdf", "tags"]
+    elif html_filter:
+        grade_command += ["--pdf", "html"]
     
     # seed
     if seed is not None:

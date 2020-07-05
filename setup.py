@@ -24,5 +24,5 @@ setuptools.setup(
 		"docker", "jinja2", "dill"
 	],
 	scripts=["bin/otter"],
-	package_data={"otter.service": ["templates/*.html"], "otter.export": ["*.tplx"]}
+	package_data={"otter.service": ["templates/*.html"], "otter.export": ["*.tplx"]},
 )
