@@ -147,6 +147,7 @@ def main(args=None):
             seed = args.seed, 
             cwd = grading_dir if grading_dir else subs_dir
         )
+        score = score.to_dict()
 
         if args.verbose:
             print("Score details for {}".format(fname))
