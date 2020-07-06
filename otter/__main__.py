@@ -73,7 +73,7 @@ def main(args=None):
     # implement argparser
     parser = argparse.ArgumentParser()
     parser.add_argument('submission_directory', help="Path to submissions directory")
-    parser.add_argument("--pdf", default=False, const="unfiltered", choices=["unfiltered", "tags", "html"], nargs="?")
+    parser.add_argument("--pdfs", default=False, const="unfiltered", choices=["unfiltered", "tags", "html"], nargs="?")
     parser.add_argument("--scripts", action="store_true", default=False)
     parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
     parser.add_argument("--zips", action="store_true", default=False, help="Whether the submissions are Notebook.export zip archives")
@@ -95,7 +95,7 @@ def main(args=None):
 
     all_results = {"file": [], "score": [], "manual": []}
 
-    if not args.pdf:
+    if not args.pdfs:
         del all_results["manual"]
 
     # if zips, creat subdir to grade in
@@ -141,7 +141,7 @@ def main(args=None):
         # grade the submission
         score = grade(
             fpath, 
-            args.pdf, 
+            args.pdfs, 
             args.scripts, 
             ignore_errors = not args.debug, 
             seed = args.seed, 
@@ -154,7 +154,7 @@ def main(args=None):
 
         all_results["score"].append({t : score[t]["score"] if type(score[t]) == dict else score[t] for t in score})
         
-        if args.pdf:
+        if args.pdfs:
             pdf_path = os.path.splitext(fpath)[0] + ".pdf"
             all_results["manual"].append(pdf_path)
 

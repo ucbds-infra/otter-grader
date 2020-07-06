@@ -23,8 +23,8 @@ def main(args):
         args.yaml
     ]]) <= 1, "You can specify at most one metadata flag (-g, -j, -y, -c)"
 
-    # Asserts that either --pdf, --tag-filter, or --html-filter but not both provided
-    assert sum([args.pdf, args.tag_filter, args.html_filter]) <= 1, "Cannot provide more than 1 PDF flag"
+    # # Asserts that either --pdf, --tag-filter, or --html-filter but not both provided
+    # assert sum([args.pdf, args.tag_filter, args.html_filter]) <= 1, "Cannot provide more than 1 PDF flag"
 
     # verbose flag
     verbose = args.verbose
@@ -65,9 +65,10 @@ def main(args):
     grades_dfs = launch_parallel_containers(args.tests_path, 
         args.path, 
         verbose=verbose, 
-        unfiltered_pdfs=args.pdf, 
-        tag_filter=args.tag_filter,
-        html_filter=args.html_filter,
+        pdfs=args.pdfs,
+        # unfiltered_pdfs=args.pdf, 
+        # tag_filter=args.tag_filter,
+        # html_filter=args.html_filter,
         reqs=args.requirements,
         num_containers=args.containers,
         image=args.image,

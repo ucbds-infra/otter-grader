@@ -131,9 +131,10 @@ def get_parser():
     grade_parser.add_argument("-z", "--zips", action="store_true", default=False, help="Whether submissions are zip files from Notebook.export")
 
     # PDF export options
-    grade_parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
-    grade_parser.add_argument("--tag-filter", action="store_true", default=False, help="Create a tag-filtered PDF for manual grading")
-    grade_parser.add_argument("--html-filter", action="store_true", default=False, help="Create an HTML comment-filtered PDF for manual grading")
+    grade_parser.add_argument("--pdfs", default=False, const="unfiltered", choices=["unfiltered", "tags", "html"], nargs="?")
+    # grade_parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
+    # grade_parser.add_argument("--tag-filter", action="store_true", default=False, help="Create a tag-filtered PDF for manual grading")
+    # grade_parser.add_argument("--html-filter", action="store_true", default=False, help="Create an HTML comment-filtered PDF for manual grading")
 
     # other settings and optional arguments
     grade_parser.add_argument("-f", "--files", nargs="+", help="Specify support files needed to execute code (e.g. utils, data files)")
