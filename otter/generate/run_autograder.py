@@ -43,7 +43,7 @@ def main(config):
         for file in os.listdir("/autograder/source/files"):
             fp = os.path.join("/autograder/source/files", file)
             if os.path.isdir(fp):
-                shutil.copytree(fp, os.path.join("/autograder/submission", os.path.basename(fp)))
+                shutil.copytree(fp, os.path.join("/autograder/submission", os.path.basename(fp)), dirs_exist_ok=True)
             else:
                 shutil.copy(fp, "/autograder/submission")
 
