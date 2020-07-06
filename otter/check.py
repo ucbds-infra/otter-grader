@@ -13,7 +13,7 @@ from .notebook import _OTTER_LOG_FILENAME
 from .utils import block_print
 
 
-RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ scores|length - 2 }} tests passed
+RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ tests|length }} tests passed
 {% if passed_tests %}
 Tests passed:
     {% for passed_test in passed_tests %}{{ passed_test }} {% endfor %}
@@ -70,14 +70,19 @@ def main(args):
 				seed=args.seed
 			)
 
-		passed_tests = [test for test in results if test not in ["possible", "total"] and "hint" not in results[test]]
-		failed_tests = [results[test]["hint"] for test in results if test not in ["possible", "total"] and "hint" in results[test]]
+		passed_tests = [
+			results.get_result(test_name).name for test_name in results.tests if not results.get_result(test_name).incorrect
+			# test for test in results if test not in ["possible", "total"] and "hint" not in results[test]
+		]
+		failed_tests = [
+			repr(results.get_result(test_name).test) for test_name in results.tests if results.get_result(test_name).incorrect
+		]
 
 		output = RESULT_TEMPLATE.render(
-			grade=results["total"] / results["possible"],
+			grade=results.total / results.possible,
 			passed_tests=passed_tests,
 			failed_tests=failed_tests,
-			scores=results
+			tests=results.tests
 		)
 
 		print(output)

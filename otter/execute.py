@@ -23,8 +23,9 @@ except ImportError:
 from .ok_parser import OKTests, CheckCallWrapper
 from .utils import hide_outputs, id_generator
 
+TestResult = namedtuple("TestResult", ["name", "score", "possible", "test", "hidden", "incorrect"])
+
 class GradingResults:
-    TestResult = namedtuple("TestResult", ["name", "score", "possible", "test", "hidden", "incorrect"])
     def __init__(self, results):
         self.raw_results = results
         self.results = {}
@@ -33,7 +34,7 @@ class GradingResults:
         for result in results:
             for test in result.tests:
                 test_name = os.path.splitext(os.path.basename(test.name))[0]
-                tr = type(self).TestResult(
+                tr = TestResult(
                     name = test_name,
                     score = result.grade * test.value,
                     possible = test.value,
@@ -54,7 +55,7 @@ class GradingResults:
                         incorrect = True
                     )
                 else:
-                    self.results[test_name] = type(self).TestResult(
+                    self.results[test_name] = TestResult(
                         name = test_name,
                         score = 0,
                         possible = test.value,
