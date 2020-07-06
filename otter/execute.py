@@ -8,7 +8,6 @@ import json
 import ast
 import itertools
 import inspect
-import tempfile
 
 from unittest import mock
 from contextlib import redirect_stdout, redirect_stderr
@@ -332,7 +331,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                     # patch otter.Notebook.export so that we don't create PDFs in notebooks
                     # TODO: move this patch into CheckCallWrapper
                     m = mock.mock_open()
-                    with mock.patch('otter.Notebook.export', m):
+                    with mock.patch('otter.Notebook.export', m), mock.patch("otter.notebook.Notebook._log_event", m):
                         exec(cell_source, global_env)
                     source += cell_source
                 except:
@@ -355,7 +354,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
             with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
                 # patch otter.Notebook.export so that we don't create PDFs in notebooks
                 m = mock.mock_open()
-                with mock.patch('otter.Notebook.export', m):
+                with mock.patch('otter.Notebook.export', m), mock.patch("otter.notebook.Notebook._log_event", m):
                     exec(cleaned_source, global_env)
         except:
             if not ignore_errors:
