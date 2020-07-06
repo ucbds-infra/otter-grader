@@ -8,6 +8,7 @@ import json
 import ast
 import itertools
 import inspect
+import tempfile
 
 from unittest import mock
 from contextlib import redirect_stdout, redirect_stderr
