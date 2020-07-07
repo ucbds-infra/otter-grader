@@ -14,7 +14,6 @@ from concurrent.futures import ThreadPoolExecutor, wait
 
 from .metadata import GradescopeParser
 
-# TODO: docstring
 def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=None, reqs=None, 
     num_containers=None, image="ucbdsinfra/otter-grader", scripts=False, no_kill=False, output_path="./", 
     debug=False, seed=None, zips=False, meta_parser=None):
@@ -28,11 +27,9 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Non
         tests_dir (``str``): path to directory of tests
         notebooks_dir (``str``): path to directory of student submissions to be graded
         verbose (``bool``, optional): whether status messages should be printed to the command line
-        unfiltered_pdfs (``bool``, optional): whether **unfiltered** PDFs of notebooks should be generated
-        tag_filter (``bool``, optional): whether **cell tag-filtered** PDFs of notebooks should be 
-            generated
-        html_filter (``bool``, optional): whether **HTML comment-filtered** PDFs of notebooks should be 
-            generated
+        pdfs (``str``, optional): string indicating what type of PDF to generate; defaults to ``None``
+            indicating no PDFS but can be one of ``["unfiltered", "tags", "html"]`` corresponding to
+            the type of cell filtering to perform upon generation
         reqs (``str``, optional): Path to requirements.txt file with non-standard packages needed
         num_containers (``int``, optional): The number of parallel containers that will be run
         image (``str``, optional): a docker image tag to be used for grading environment
@@ -131,7 +128,6 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Non
     # return list of dataframes
     return [df.result() for df in finished_futures[0]]
 
-# TODO: docstring
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
     pdfs=False, reqs=None, scripts=False, no_kill=False, output_path="./", debug=False, seed=None, zips=False):
     """
@@ -144,11 +140,9 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         id (``int``): grading container index
         image (``str``, optional): a docker image tag to be used for grading environment
         verbose (``bool``, optional): whether status messages should be printed to the command line
-        unfiltered_pdfs (``bool``, optional): whether **unfiltered** PDFs of notebooks should be generated
-        tag_filter (``bool``, optional): whether **cell tag-filtered** PDFs of notebooks should be 
-            generated
-        html_filter (``bool``, optional): whether **HTML comment-filtered** PDFs of notebooks should be 
-            generated
+        pdfs (``str``, optional): string indicating what type of PDF to generate; defaults to ``None``
+            indicating no PDFS but can be one of ``["unfiltered", "tags", "html"]`` corresponding to
+            the type of cell filtering to perform upon generation
         reqs (``str``, optional): Path to requirements.txt file with non-standard packages needed
         scripts (``bool``, optional): whether student submissions are Python scripts rather than
             Jupyter notebooks
