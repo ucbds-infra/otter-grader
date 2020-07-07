@@ -6,9 +6,11 @@ import os
 import re
 import json
 import ast
+import math
 import itertools
 import inspect
 
+from collections import namedtuple
 from unittest import mock
 from contextlib import redirect_stdout, redirect_stderr
 from IPython import get_ipython
@@ -20,6 +22,129 @@ except ImportError:
 
 from .ok_parser import OKTests, CheckCallWrapper
 from .utils import hide_outputs, id_generator
+
+TestResult = namedtuple("TestResult", ["name", "score", "possible", "test", "hidden", "incorrect"])
+
+class GradingResults:
+    def __init__(self, results):
+        self.raw_results = results
+        self.results = {}
+        
+        total_score, points_possible = 0, 0
+        for result in results:
+            for test in result.tests:
+                test_name = os.path.splitext(os.path.basename(test.name))[0]
+                tr = TestResult(
+                    name = test_name,
+                    score = result.grade * test.value,
+                    possible = test.value,
+                    test = test,
+                    hidden = False,
+                    incorrect = False
+                )
+                self.results[test_name] = tr
+
+                total_score += result.grade * test.value
+                points_possible += test.value
+
+            for test, test_obj in result.failed_tests:
+                test_name = os.path.splitext(os.path.basename(test.name))[0]
+                if test_name in self.results:
+                    self.results[test_name] = self.results[test_name]._replace(
+                        hidden = test_obj.failed_test_hidden,
+                        incorrect = True
+                    )
+                else:
+                    self.results[test_name] = TestResult(
+                        name = test_name,
+                        score = 0,
+                        possible = test.value,
+                        test = test,
+                        hidden = test_obj.failed_test_hidden,
+                        incorrect = True
+                    )
+        
+        self.total = total_score
+        self.possible = points_possible
+    
+    @property
+    def tests(self):
+        return list(self.results.keys())
+    
+    def get_result(self, test_name):
+        return self.results[test_name]
+
+    def to_dict(self):
+        """
+        """
+        output = {}
+        for test_name in self.tests:
+            result = self.get_result(test_name)
+            output[test_name] = dict(result._asdict())
+
+        return output
+
+    def to_gradescope_dict(self, config={}):
+        output = {"tests": []}
+
+        # hidden visibility determined by show_hidden_tests_on_release
+        hidden_test_visibility = ("hidden", "after_published")[config.get("show_hidden_tests_on_release", False)]
+        no_separate_visibility = config.get("test_visibility", "hidden")
+        assert no_separate_visibility in ["hidden", "visible", "after_published"]
+
+        for test_name in self.tests:
+            result = self.get_result(test_name)
+            hidden, incorrect = result.hidden, result.incorrect
+            score, possible = result.score, result.possible
+            public_score, hidden_score = score * config.get("public_multiplier", 0), score * (1 - config.get("public_multiplier", 0))
+            public_possible, hidden_possible = possible * config.get("public_multiplier", 0), possible * (1 - config.get("public_multiplier", 0))
+        
+            if hidden and incorrect:
+                public_score, hidden_score = possible * config.get("public_multiplier", 0), 0
+            elif not hidden and incorrect:
+                public_score, hidden_score = 0, 0
+                public_possible = possible
+            
+            if config.get("separate_tests", True):
+                output["tests"].append({
+                    "name": result.name + " - Public",
+                    "score": public_score,
+                    "max_score": public_possible,
+                    "visibility": "visible",
+                    "output": repr(result.test) if not hidden and incorrect else "All tests passed!"
+                })
+
+                if not (not hidden and incorrect):
+                    output["tests"].append({
+                        "name" : result.name + " - Hidden",
+                        "score" : hidden_score,
+                        "max_score": hidden_possible,
+                        "visibility": hidden_test_visibility,
+                        "output": repr(result.test) if incorrect else "All tests passed!"
+                    })
+            
+            else:
+                output["tests"].append({
+                    "name": result.name,
+                    "score": score,
+                    "max_score": possible,
+                    "visibility": no_separate_visibility,
+                    "output": repr(result.test) if not hidden and incorrect else "All tests passed!"
+                })
+        
+        if config.get("show_stdout_on_release", False):
+            output["stdout_visibility"] = "after_published"
+
+        if config.get("points_possible", None) is not None:
+            output["score"] = self.total / self.possible * config.get("points_possible", None)
+
+        if config.get("score_threshold", None) is not None:
+            if self.total / self.possible >= config["score_threshold"]:
+                output["score"] = config.get("points_possible", None) or self.possible
+            else:
+                output["score"] = 0
+        
+        return output
 
 def check(test_file_path, global_env=None):
     """
@@ -124,39 +249,41 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         extra_results = [t.run(global_env, include_grade=False) for t in extra_tests]
         test_results += extra_results
 
-    score_mapping = {}
-    points_possible, total_score = 0, 0
-    for r in test_results:
-        try:
-            for test in r.tests:
-                test_name = os.path.split(test.name)[1][:-3]
-                score_mapping[test_name] = {
-                    "score": r.grade * test.value,
-                    "possible": test.value,
-                    "test": test,
-                    # "hidden": test.hidden
-                }
-                total_score += r.grade * test.value
-                points_possible += test.value
-            for tup in r.failed_tests:
-                test_name = os.path.split(tup[0].name)[1][:-3]
-                if test_name in score_mapping:
-                    score_mapping[test_name]["hint"] = tup[1]#.__repr__()
-                    score_mapping[test_name]["hidden"] = tup[1].failed_test_hidden
-                else:
-                    score_mapping[test_name] = {
-                        "hint": tup[1],#.__repr__()
-                        "hidden": tup[1].failed_test_hidden,
-                        "test": tup[0],
-                    }
-        except IndexError:
-            pass
+    # score_mapping = {}
+    # points_possible, total_score = 0, 0
+    # for r in test_results:
+    #     try:
+    #         for test in r.tests:
+    #             test_name = os.path.split(test.name)[1][:-3]
+    #             score_mapping[test_name] = {
+    #                 "score": r.grade * test.value,
+    #                 "possible": test.value,
+    #                 "test": test,
+    #                 # "hidden": test.hidden
+    #             }
+    #             total_score += r.grade * test.value
+    #             points_possible += test.value
+    #         for tup in r.failed_tests:
+    #             test_name = os.path.split(tup[0].name)[1][:-3]
+    #             if test_name in score_mapping:
+    #                 score_mapping[test_name]["hint"] = tup[1]#.__repr__()
+    #                 score_mapping[test_name]["hidden"] = tup[1].failed_test_hidden
+    #             else:
+    #                 score_mapping[test_name] = {
+    #                     "hint": tup[1],#.__repr__()
+    #                     "hidden": tup[1].failed_test_hidden,
+    #                     "test": tup[0],
+    #                 }
+    #     except IndexError:
+    #         pass
 
-    # add in total score and avoid divide by zero error if there are no tests
-    score_mapping["total"] = total_score
-    score_mapping["possible"] = points_possible
+    # # add in total score and avoid divide by zero error if there are no tests
+    # score_mapping["total"] = total_score
+    # score_mapping["possible"] = points_possible
 
-    return score_mapping
+    # return score_mapping
+
+    return GradingResults(test_results)
 
 def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None, variables=None):
     """
