@@ -124,8 +124,9 @@ class TestAssign(unittest.TestCase):
             shutil.rmtree(TEST_FILES_PATH + "output")
 
     def test_otter_example(self):
-        # Checks that otter assign filters and outputs correctly
-        # run otter assign
+        """
+        Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
+        """
         run_assign_args = [
             "assign", "--no-init-cell", "--no-check-all", TEST_FILES_PATH + "generate-otter.ipynb", 
             TEST_FILES_PATH + "output", "data.csv"
@@ -145,8 +146,9 @@ class TestAssign(unittest.TestCase):
             shutil.rmtree(TEST_FILES_PATH + "output")      
 
     def test_pdf_example(self):
-        # run otter assign
-    
+        """
+        Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
+        """
         run_assign_args = [
             "assign", "--no-run-tests", TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output", "data.csv"
         ]
