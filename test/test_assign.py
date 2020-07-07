@@ -23,7 +23,7 @@ TEST_FILES_PATH = "test/test-assign/"
 
 class TestAssign(unittest.TestCase):
 
-    def check_gradescope_zipfile(self, path, config, tests=[], files=[]):
+    def check_gradescope_zipfile(self, path, correctPath, config, tests=[], files=[]):
         # unzip the zipfile
         unzip_command = ["unzip", "-o", path, "-d", TEST_FILES_PATH + "autograder"]
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
@@ -62,9 +62,19 @@ class TestAssign(unittest.TestCase):
                 f"Expected config value for {k} ({v}) does not match actual value ({run_autograder_globals[k]})"
             )
         
+        # assumed correct dir checking
+
+        unzip_command = ["unzip", "-o", correctPath, "-d", TEST_FILES_PATH + "autograder-correct"]
+        unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
+        self.assertEqual(len(unzip.stderr), 0, unzip.stderr)
+
+        self.assertDirsEqual(TEST_FILES_PATH + "autograder",TEST_FILES_PATH + "autograder-correct", ignore_ext=[])
+
         # cleanup
         if os.path.exists(TEST_FILES_PATH + "autograder"):
             shutil.rmtree(TEST_FILES_PATH + "autograder")
+        if os.path.exists(TEST_FILES_PATH + "autograder-correct"):
+            shutil.rmtree(TEST_FILES_PATH + "autograder-correct")
 
     def assertFilesEqual(self, p1, p2):
         try:
@@ -85,6 +95,7 @@ class TestAssign(unittest.TestCase):
         if os.path.isfile(dir1):
             if os.path.splitext(dir1)[1] not in ignore_ext:
                 self.assertFilesEqual(dir1, dir2)
+
         else:
             self.assertEqual(os.listdir(dir1), os.listdir(dir2), f"{dir1} and {dir2} have different contents")
             for f1, f2 in zip(os.listdir(dir1), os.listdir(dir2)):
@@ -147,11 +158,11 @@ class TestAssign(unittest.TestCase):
         with block_print():
             args.func(args)
 
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf", ".zip"])
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
         
         # check gradescope zip file
         self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", 
+            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "pdf-correct/autograder/autograder.zip",
             {},  ["q1.py","q3.py","q8.py"], ["data.csv"]
         )
 
