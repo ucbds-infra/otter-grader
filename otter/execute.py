@@ -26,6 +26,23 @@ from .utils import hide_outputs, id_generator
 TestResult = namedtuple("TestResult", ["name", "score", "possible", "test", "hidden", "incorrect"])
 
 class GradingResults:
+    """
+    Stores and wrangles test result objects. Initialize with a list of ``otter.ok_parser.OKTestsResult``
+    objects and this class will store the results as named tuples so that they can be accessed/manipulated
+    easily. Also contains methods to put the results into a nice ``dict`` format or into the correct
+    format for Gradescope.
+
+    Args:
+        results (``list`` of ``otter.ok_parser.OKTestsResult``): the list of grading results
+    
+    Attributes:
+        raw_results (``list`` of ``otter.ok_parser.OKTestsResult``): the results passed to the constructor
+        results (``dict``): maps test names to ``TestResult`` named tuples containing the test result
+            information
+        total (numeric): the total points earned by the submission
+        possible (numeric): the total points possible based on the tests
+        tests (``list`` of ``str``): list of test names according to the keys of ``results``
+    """
     def __init__(self, results):
         self.raw_results = results
         self.results = {}
@@ -72,10 +89,24 @@ class GradingResults:
         return list(self.results.keys())
     
     def get_result(self, test_name):
+        """
+        Returns the ``TestResult`` named tuple corresponding to the test with name ``test_name``
+
+        Args:
+            test_name (``str``): the name of the desired test
+        
+        Returns:
+            ``TestResult``: the results of that test
+        """
         return self.results[test_name]
 
     def to_dict(self):
         """
+        Converts these results into a dictinary, extending the fields of the named tuples in ``results``
+        into key, value pairs in a ``dict``.
+
+        Returns:
+            ``dict``: the results in dictionary form
         """
         output = {}
         for test_name in self.tests:
@@ -85,6 +116,16 @@ class GradingResults:
         return output
 
     def to_gradescope_dict(self, config={}):
+        """
+        Converts these results into a dictionary formatted for Gradescope's autograder. Requires a 
+        dictionary of configurations for the Gradescope assignment generated using Otter Generate.
+
+        Args:
+            config (``dict``): the grading configurations
+
+        Returns:
+            ``dict``: the results formatted for Gradescope
+        """
         output = {"tests": []}
 
         # hidden visibility determined by show_hidden_tests_on_release
@@ -198,8 +239,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
 
     Returns:
-        ``dict``: a score mapping with keys for each test, the student's scores, and total points 
-            earned and possible 
+        ``GradingResults``: the results of grading
     """
     # ensure this is not being executed inside a notebook
     assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"
@@ -458,7 +498,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                     # patch otter.Notebook.export so that we don't create PDFs in notebooks
                     # TODO: move this patch into CheckCallWrapper
                     m = mock.mock_open()
-                    with mock.patch('otter.Notebook.export', m):
+                    with mock.patch('otter.Notebook.export', m), mock.patch("otter.Notebook._log_event", m):
                         exec(cell_source, global_env)
                     source += cell_source
                 except:
@@ -481,7 +521,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
             with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
                 # patch otter.Notebook.export so that we don't create PDFs in notebooks
                 m = mock.mock_open()
-                with mock.patch('otter.Notebook.export', m):
+                with mock.patch('otter.Notebook.export', m), mock.patch("otter.Notebook._log_event", m):
                     exec(cleaned_source, global_env)
         except:
             if not ignore_errors:
