@@ -19,8 +19,8 @@ import warnings
 CURRENT_VERSION = "1.0.0"
 NEW_VERSION = "1.0.0.b1"
 
-FROM_GIT = True
-TO_GIT = False
+FROM_BETA = "b" in CURRENT_VERSION.split(".")[-1]
+TO_BETA = "b" in NEW_VERSION.split(".")[-1]
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "Dockerfile",
@@ -31,31 +31,31 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
 ]
 
 def main():
-    if TO_GIT and subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip():
-        warnings.warn(
-            "You have uncommitted changes that will not be included in this release. To include "
-            "them, commit your changes and rerun this script.",
-            UserWarning
-        )
+    # if TO_GIT and subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip():
+    #     warnings.warn(
+    #         "You have uncommitted changes that will not be included in this release. To include "
+    #         "them, commit your changes and rerun this script.",
+    #         UserWarning
+    #     )
 
     for file in FILES_WITH_VERSIONS:
         with open(file) as f:
             contents = f.read()
 
         old_version = "otter-grader=={}".format(CURRENT_VERSION)
-        if FROM_GIT:
-            old_version = r"git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@\w+"
+        # if FROM_GIT:
+        #     old_version = r"git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@\w+"
         
         new_version = "otter-grader=={}".format(NEW_VERSION)
-        if TO_GIT:
-            new_hash = (
-                subprocess
-                .run(["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE)
-                .stdout
-                .decode("utf-8")
-                .strip()
-            )
-            new_version = f"git+https://github.com/ucbds-infra/otter-grader.git@{new_hash}"
+        # if TO_GIT:
+        #     new_hash = (
+        #         subprocess
+        #         .run(["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE)
+        #         .stdout
+        #         .decode("utf-8")
+        #         .strip()
+        #     )
+        #     new_version = f"git+https://github.com/ucbds-infra/otter-grader.git@{new_hash}"
 
         contents = re.sub(
             old_version, 
@@ -65,41 +65,41 @@ def main():
 
         with open(file, "w") as f:
             f.write(contents)
-    
-    if TO_GIT:
-        # fix documentation
-        with open("docs/conf.py") as f:
-            contents = f.read()
 
-        contents = re.sub("master_doc = 'index'", "master_doc = 'index_beta'", contents)
+    if FROM_BETA:
+        # # fix documentation
+        # with open("docs/conf.py") as f:
+        #     contents = f.read()
 
-        with open("docs/conf.py", "w") as f:
-            f.write(contents)
+        # contents = re.sub("master_doc = 'index_beta'", "master_doc = 'index'", contents)
 
-        # fix Makefile
-        with open("Makefile") as f:
-            contents = f.read()
-
-        contents = re.sub(r"ucbdsinfra/otter-grader$", "ucbdsinfra/otter-grader:beta", contents)
-
-        with open("Makefile", "w") as f:
-            f.write(contents)
-
-    elif FROM_GIT:
-        # fix documentation
-        with open("docs/conf.py") as f:
-            contents = f.read()
-
-        contents = re.sub("master_doc = 'index_beta'", "master_doc = 'index'", contents)
-
-        with open("docs/conf.py", "w") as f:
-            f.write(contents)
+        # with open("docs/conf.py", "w") as f:
+        #     f.write(contents)
 
         # fix Makefile
         with open("Makefile") as f:
             contents = f.read()
 
         contents = re.sub("ucbdsinfra/otter-grader:beta", "ucbdsinfra/otter-grader", contents)
+
+        with open("Makefile", "w") as f:
+            f.write(contents)
+
+    if TO_BETA:
+        # # fix documentation
+        # with open("docs/conf.py") as f:
+        #     contents = f.read()
+
+        # contents = re.sub("master_doc = 'index'", "master_doc = 'index_beta'", contents)
+
+        # with open("docs/conf.py", "w") as f:
+        #     f.write(contents)
+
+        # fix Makefile
+        with open("Makefile") as f:
+            contents = f.read()
+
+        contents = re.sub(r"ucbdsinfra/otter-grader", "ucbdsinfra/otter-grader:beta", contents)
 
         with open("Makefile", "w") as f:
             f.write(contents)
@@ -121,19 +121,15 @@ def main():
         contents = f.read()
 
     contents = re.sub(
-        "__version__ = \"{}\"".format(CURRENT_VERSION),
-        "__version__ = \"{}\"".format(NEW_VERSION),
+       fr"__version__ = ['\"]{CURRENT_VERSION}['\"]",
+        f"__version__ = \"{NEW_VERSION}\"",
         contents
     )
 
     with open("otter/version.py", "w") as f:
         f.write(contents)
 
-    if TO_GIT:
-        print(f"Versions updated. Release commit hash is {new_hash} -- commit and push to release.")
-    
-    else:
-        print(f"Versions updated. Release version is {NEW_VERSION} -- run 'make distro' to release.")
+    print(f"Versions updated. Release version is {NEW_VERSION} -- run 'make distro' to release.")
 
 if __name__ == "__main__":
     main()
