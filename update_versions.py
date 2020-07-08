@@ -80,7 +80,7 @@ def main():
         with open("Makefile") as f:
             contents = f.read()
 
-        contents = re.sub("ucbdsinfra/otter-grader:beta", "ucbdsinfra/otter-grader", contents, flags=re.MULTILINE)
+        contents = re.sub("ucbdsinfra/otter-grader:beta", "ucbdsinfra/otter-grader", contents)
 
         with open("Makefile", "w") as f:
             f.write(contents)
@@ -99,7 +99,7 @@ def main():
         with open("Makefile") as f:
             contents = f.read()
 
-        contents = re.sub(r"ucbdsinfra/otter-grader$", "ucbdsinfra/otter-grader:beta", contents, flags=re.MULTILINE)
+        contents = re.sub(r"ucbdsinfra/otter-grader", "ucbdsinfra/otter-grader:beta", contents)
 
         with open("Makefile", "w") as f:
             f.write(contents)
