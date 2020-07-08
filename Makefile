@@ -38,3 +38,4 @@ tutorial:
 	zip -r tutorial.zip assign generate grade -x "*.DS_Store"; \
 	cp tutorial.zip ../_static; \
 	rm tutorial.zip
+orial.zip

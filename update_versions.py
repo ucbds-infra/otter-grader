@@ -14,8 +14,11 @@ import re
 import subprocess
 import warnings
 
-CURRENT_VERSION = "1.0.0"
+CURRENT_VERSION = "1.0.0.b1"
 NEW_VERSION = "1.0.0.b1"
+
+FROM_GIT = True
+TO_GIT = True
 
 from_beta = "b" in CURRENT_VERSION.split(".")[-1]
 to_beta = "b" in NEW_VERSION.split(".")[-1]
@@ -28,8 +31,27 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
 ]
 
 def main():
+    if TO_GIT and subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip():
+        warnings.warn(
+            "You have uncommitted changes that will not be included in this release. To include "
+            "them, commit your changes and rerun this script.",
+            UserWarning
+        )
+    
     old_version = fr"otter-grader=={CURRENT_VERSION}$"
+    if FROM_GIT:
+        old_version = r"git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@\w+"
+    
     new_version = f"otter-grader=={NEW_VERSION}"
+    if TO_GIT:
+        new_hash = (
+            subprocess
+            .run(["git", "rev-parse", "HEAD"], stdout=subprocess.PIPE)
+            .stdout
+            .decode("utf-8")
+            .strip()
+        )
+        new_version = f"git+https://github.com/ucbds-infra/otter-grader.git@{new_hash}"
 
     for file in FILES_WITH_VERSIONS:
         with open(file, "r+") as f:
@@ -43,7 +65,7 @@ def main():
             )
             f.write(contents)
 
-    if from_beta:
+    if from_beta or FROM_GIT:
         # fix Makefile
         with open("Makefile", "r+") as f:
             contents = f.read()
@@ -51,7 +73,7 @@ def main():
             contents = re.sub("ucbdsinfra/otter-grader:beta", "ucbdsinfra/otter-grader", contents, flags=re.MULTILINE)
             f.write(contents)
 
-    if to_beta:
+    if to_beta or TO_GIT:
         # fix Makefile
         with open("Makefile", "r+") as f:
             contents = f.read()
@@ -64,13 +86,17 @@ def main():
         contents = f.read()
         f.seek(0)
         contents = re.sub(
-        fr"__version__ = ['\"]{CURRENT_VERSION}['\"]",
+            fr"__version__ = ['\"]{CURRENT_VERSION}['\"]",
             f"__version__ = \"{NEW_VERSION}\"",
             contents
         )
         f.write(contents)
 
-    print(f"Versions updated. Release version is {NEW_VERSION} -- run 'make distro' to release.")
+    if TO_GIT:
+        print(f"Versions updated. Release commit hash is {new_hash} -- commit and push to release.")
+
+    else:
+        print(f"Versions updated. Release version is {NEW_VERSION} -- run 'make distro' to release.")
 
 if __name__ == "__main__":
     main()
