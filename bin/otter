@@ -22,8 +22,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if hasattr(args, 'func_str'):
-        main = eval(args.func_str)
-        main(args)
+        args.func = eval(args.func_str)
+        args.func(args)
 
     elif len(sys.argv) > 1 and sys.argv[1] == "generate":
         print(dedent("""\

@@ -26,16 +26,18 @@ class Assignment:
         "seed": None,
     }
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self):
+        self.config = type(self).defaults.copy()
 
     def __getattr__(self, attr):
         if attr in type(self).defaults:
-            return self.config.get(attr, defaults[attr])
+            return self.config.get(attr, type(self).defaults[attr])
         raise AttributeError(f"Assignment has no attribute {attr}")
 
     def __setattr__(self, attr, value):
-        if attr in type(self).defaults:
+        if attr == "config":
+            self.__dict__[attr] = value
+        elif attr in type(self).defaults:
             self.config[attr] = value
         else:
             raise AttributeError(f"Assignment has no attribute {attr}")

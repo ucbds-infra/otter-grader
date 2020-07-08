@@ -33,7 +33,7 @@ def gen_question_cell(cell, manual, need_close_export):
         source = ["<!-- BEGIN QUESTION -->", ""] + source
     if need_close_export:
         source = ["<!-- END QUESTION -->", ""] + source
-    begin_question_line = get_spec(get_source(source), "question")
+    begin_question_line = get_spec(source, "question")
     start = begin_question_line - 1
     assert source[start].strip() == BLOCK_QUOTE
     end = begin_question_line

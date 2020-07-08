@@ -8,7 +8,7 @@ from .cell_generators import (
     gen_close_export_cell, add_close_export_to_cell
 )
 from .questions import is_question_cell, read_question_metadata, gen_question_cell
-from .solutions import is_solution_cell, is_markdown_solution_cell
+from .solutions import is_markdown_solution_cell
 from .tests import is_test_cell, read_test, gen_test_cell
 from .utils import is_seed_cell, EmptyCellException
 

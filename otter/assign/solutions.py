@@ -16,7 +16,7 @@ def is_markdown_solution_cell(cell):
     if not cell['cell_type'] == 'markdown':
         return False
     source = get_source(cell)
-    return source and any([MD_SOLUTION_REGEX.match(l, flags=re.IGNORECASE) for l in source])
+    return source and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_ ]*=)(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
@@ -85,7 +85,7 @@ def replace_solutions(lines):
     
     return stripped
 
-def strip_solutions(nb):
+def strip_solutions_and_output(nb):
     """Write a notebook with solutions stripped
     
     Args:

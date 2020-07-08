@@ -21,7 +21,7 @@ def is_test_cell(cell):
     if cell['cell_type'] != 'code':
         return False
     source = get_source(cell)
-    return source and TEST_REGEX.match(source[0], flags=re.IGNORECASE)
+    return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
 
 def read_test(cell):
     """Return the contents of a test as an (input, output, hidden) tuple

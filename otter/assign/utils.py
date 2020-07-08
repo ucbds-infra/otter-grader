@@ -78,7 +78,7 @@ def is_seed_cell(cell):
     if cell['cell_type'] != 'code':
         return False
     source = get_source(cell)
-    return source and SEED_REGEX.match(source[0], flags=re.IGNORECASE)
+    return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
 
 
 #---------------------------------------------------------------------------------------------------
