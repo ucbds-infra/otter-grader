@@ -1,4 +1,10 @@
+import os
 import json
+import shutil
+
+from .notebook_converter import transform_notebook
+from .solutions import strip_solutions
+from .tests import remove_hidden_tests
 
 def gen_otter_file(master, result, assignment):
     """Creates an Otter config file
@@ -34,7 +40,7 @@ def gen_otter_file(master, result, assignment):
     with open(result / 'student' / config_name, "w+") as f:
         json.dump(config, f, indent=4)
 
-def gen_views(master_nb, result_dir, args):
+def write_output_directories(master_nb, result_dir, assignment, args):
     """Generate student and autograder views.
 
     Args:
@@ -47,11 +53,11 @@ def gen_views(master_nb, result_dir, args):
     shutil.rmtree(autograder_dir, ignore_errors=True)
     shutil.rmtree(student_dir, ignore_errors=True)
     os.makedirs(autograder_dir, exist_ok=True)
-    ok_nb_path = convert_to_ok(master_nb, autograder_dir, args)
+    ok_nb_path = transform_notebook(master_nb, autograder_dir, args)
     shutil.rmtree(student_dir, ignore_errors=True)
     shutil.copytree(autograder_dir, student_dir)
 
-    requirements = ASSIGNMENT_METADATA.get('requirements', None) or args.requirements
+    requirements = assignment.requirements or args.requirements
     if os.path.isfile(str(student_dir / os.path.split(requirements)[1])):
         os.remove(str(student_dir / os.path.split(requirements)[1]))
 

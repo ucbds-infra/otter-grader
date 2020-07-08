@@ -1,7 +1,7 @@
 import re
 
 
-from .defaults import SEED_REGEX, MD_SOLUTION_REGEX, SOLUTION_REGEX, BLOCK_QUOTE
+from .defaults import SEED_REGEX, BLOCK_QUOTE
 
 class EmptyCellException(Exception):
     """Exception for empty cells to indicate deletion"""
@@ -50,6 +50,7 @@ def get_spec(source, begin):
     
     return begins[0] if begins else None
 
+
 # TODO: update these
 #---------------------------------------------------------------------------------------------------
 # Cell Type Checkers
@@ -68,35 +69,6 @@ def is_seed_cell(cell):
         return False
     source = get_source(cell)
     return source and SEED_REGEX.match(source[0], flags=re.IGNORECASE)
-
-# TODO: are these needed??
-def is_markdown_solution_cell(cell):
-    """Whether the cell matches MD_SOLUTION_REGEX
-    
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
-    
-    Returns:
-        ``bool``: whether the current cell is a Markdown solution cell
-    """
-    source = get_source(cell)
-    return is_solution_cell and any([MD_SOLUTION_REGEX.match(l, flags=re.IGNORECASE) for l in source])
-
-def is_solution_cell(cell):
-    """Whether the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX
-    
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
-    
-    Returns:
-        ``bool``: whether the current cell is a solution cell
-    """
-    source = get_source(cell)
-    if cell['cell_type'] == 'markdown':
-        return source and any([MD_SOLUTION_REGEX.match(l, flags=re.IGNORECASE) for l in source])
-    elif cell['cell_type'] == 'code':
-        return source and SOLUTION_REGEX.match(source[0], flags=re.IGNORECASE)
-    return False
 
 
 #---------------------------------------------------------------------------------------------------
@@ -122,3 +94,31 @@ def lock(cell):
     m = cell['metadata']
     m["editable"] = False
     m["deletable"] = False
+
+
+#---------------------------------------------------------------------------------------------------
+# Miscellaneous
+#---------------------------------------------------------------------------------------------------
+
+def str_to_doctest(code_lines, lines):
+    """
+    Converts a list of lines of Python code ``code_lines`` to a list of doctest-formatted lines ``lines``
+
+    Args:
+        code_lines (``list``): list of lines of python code
+        lines (``list``): set of characters used to create function name
+    
+    Returns:
+        ``list`` of ``str``: doctest formatted list of lines
+    """
+    if len(code_lines) == 0:
+        return lines
+    line = code_lines.pop(0)
+    if line.startswith(" ") or line.startswith("\t"):
+        return str_to_doctest(code_lines, lines + ["... " + line])
+    elif line.startswith("except:") or line.startswith("elif ") or line.startswith("else:") or line.startswith("finally:"):
+        return str_to_doctest(code_lines, lines + ["... " + line])
+    elif len(lines) > 0 and lines[-1].strip().endswith("\\"):
+        return str_to_doctest(code_lines, lines + ["... " + line])
+    else:
+        return str_to_doctest(code_lines, lines + [">>> " + line])

@@ -1,5 +1,7 @@
 import nbformat
 
+from .utils import get_source, lock
+
 def gen_init_cell():
     """Generates a cell to initialize Otter in the notebook
     
@@ -9,6 +11,9 @@ def gen_init_cell():
     cell = nbformat.v4.new_code_cell("# Initialize Otter\nimport otter\ngrader = otter.Notebook()")
     lock(cell)
     return cell
+
+def gen_markdown_response_cell():
+    return nbformat.v4.new_markdown_cell("_Type your answer here, replacing this text._")
 
 def gen_export_cells(instruction_text, pdf=True, filtering=True):
     """Generates export cells
@@ -61,7 +66,6 @@ def gen_check_all_cell():
 
     return [instructions, check_all]
 
-
 def gen_close_export_cell():
     """Returns a new cell to end question export
     
@@ -72,7 +76,7 @@ def gen_close_export_cell():
     lock(cell)
     return cell
 
-
+# TODO: make this return a new cell
 def add_close_export_to_cell(cell):
     """Adds an export close to the top of the cell. Mutates the original cell
     

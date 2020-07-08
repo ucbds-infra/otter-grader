@@ -1,4 +1,20 @@
 
+import os
+import pprint
+import pathlib
+import subprocess
+import nb2pdf
+
+from glob import glob
+
+from .assignment import Assignment
+from .output import write_output_directories, gen_otter_file
+
+from ..execute import grade_notebook
+from ..export import export_notebook
+from ..generate.token import APIClient
+from ..utils import get_relpath, block_print
+
 def run_tests(nb_path, debug=False, seed=None):
     """
     Runs tests in the autograder version of the notebook
@@ -10,8 +26,10 @@ def run_tests(nb_path, debug=False, seed=None):
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
-    results = grade_notebook(nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
-    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed)
+    results = grade_notebook(
+        nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
+    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed
+    )
     assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
     os.chdir(curr_dir)
 
@@ -37,7 +55,7 @@ def main(args):
     # if args.jassign:
     #     jassign_views(master, result, args)
     # else:
-    gen_views(master, result, assignment, args)
+    write_output_directories(master, result, assignment, args)
 
     # check that we have a seed if needed
     if assignment.seed_required:

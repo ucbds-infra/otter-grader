@@ -1,24 +1,12 @@
+import copy
+import yaml
+
+from .defaults import BLOCK_QUOTE, ALLOWED_NAME
+from .utils import get_source, lock, get_spec, EmptyCellException
+
 class Question:
     """
     """
-
-def find_question_spec(source):
-    """Return line number of the BEGIN QUESTION line or None
-    
-    Args:
-        source (``list`` of ``str``): cell source as a list of lines of text
-    
-    Returns:
-        ``int``: line number of BEGIN QUESTION, if present
-        ``None``: if BEGIN QUESTION not present in the cell
-    """
-    block_quotes = [i for i, line in enumerate(source) if
-                    line[:3] == BLOCK_QUOTE]
-    assert len(block_quotes) % 2 == 0, 'cannot parse ' + str(source)
-    begins = [block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) if
-              source[block_quotes[i]+1].strip(' ') == 'BEGIN QUESTION']
-    assert len(begins) <= 1, 'multiple questions defined in ' + str(source)
-    return begins[0] if begins else None
 
 def is_question_cell(cell):
     """Whether cell contains BEGIN QUESTION in a block quote
@@ -32,7 +20,7 @@ def is_question_cell(cell):
     """
     if cell['cell_type'] != 'markdown':
         return False
-    return find_question_spec(get_source(cell)) is not None
+    return get_spec(get_source(cell), "question") is not None
 
 def gen_question_cell(cell, manual, format, need_close_export):
     """Return a locked question cell with metadata hidden in an HTML comment
@@ -49,7 +37,7 @@ def gen_question_cell(cell, manual, format, need_close_export):
         source = ["<!-- BEGIN QUESTION -->", ""] + source
     if need_close_export:
         source = ["<!-- END QUESTION -->", ""] + source
-    begin_question_line = find_question_spec(source)
+    begin_question_line = get_spec(get_source(source), "question")
     start = begin_question_line - 1
     assert source[start].strip() == BLOCK_QUOTE
     end = begin_question_line
@@ -81,7 +69,7 @@ def read_question_metadata(cell):
         ``dict``: question metadata
     """
     source = get_source(cell)
-    begin_question_line = find_question_spec(source)
+    begin_question_line = get_spec(source, "question")
     i, lines = begin_question_line + 1, []
     while source[i].strip() != BLOCK_QUOTE:
         lines.append(source[i])

@@ -1,8 +1,37 @@
 import re
 import nbformat
 
-from .defaults import NB_VERSION
+from .defaults import NB_VERSION, MD_SOLUTION_REGEX, SOLUTION_REGEX
 from .utils import get_source, is_markdown_solution_cell, remove_output
+
+# TODO: are these needed??
+def is_markdown_solution_cell(cell):
+    """Whether the cell matches MD_SOLUTION_REGEX
+    
+    Args:
+        cell (``nbformat.NotebookNode``): notebook cell
+    
+    Returns:
+        ``bool``: whether the current cell is a Markdown solution cell
+    """
+    source = get_source(cell)
+    return is_solution_cell and any([MD_SOLUTION_REGEX.match(l, flags=re.IGNORECASE) for l in source])
+
+def is_solution_cell(cell):
+    """Whether the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX
+    
+    Args:
+        cell (``nbformat.NotebookNode``): notebook cell
+    
+    Returns:
+        ``bool``: whether the current cell is a solution cell
+    """
+    source = get_source(cell)
+    if cell['cell_type'] == 'markdown':
+        return source and any([MD_SOLUTION_REGEX.match(l, flags=re.IGNORECASE) for l in source])
+    elif cell['cell_type'] == 'code':
+        return source and SOLUTION_REGEX.match(source[0], flags=re.IGNORECASE)
+    return False
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_ ]*=)(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):

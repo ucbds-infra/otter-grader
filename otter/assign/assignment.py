@@ -22,7 +22,8 @@ class Assignment:
         "ignore_modules": [],
         "init_cell": True,
         "check_all_cell": True,
-        "export_cell": True
+        "export_cell": True,
+        "seed": None,
     }
 
     def __init__(self, config):
@@ -38,6 +39,9 @@ class Assignment:
             self.config[attr] = value
         else:
             raise AttributeError(f"Assignment has no attribute {attr}")
+
+    def update(self, config):
+        self.config.update(config)
 
 def read_assignment_metadata(cell):
     """Return assignment metadata from an assignment cell

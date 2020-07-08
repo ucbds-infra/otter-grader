@@ -1,3 +1,13 @@
+import re
+import pprint
+import nbformat
+
+from collections import namedtuple
+
+from .defaults import TEST_REGEX
+from .utils import get_source, lock, str_to_doctest
+
+Test = namedtuple('Test', ['input', 'output', 'hidden'])
 
 def is_test_cell(cell):
     """Return whether the current cell is a test cell
@@ -11,11 +21,7 @@ def is_test_cell(cell):
     if cell['cell_type'] != 'code':
         return False
     source = get_source(cell)
-    return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
-
-
-Test = namedtuple('Test', ['input', 'output', 'hidden'])
-
+    return source and TEST_REGEX.match(source[0], flags=re.IGNORECASE)
 
 def read_test(cell):
     """Return the contents of a test as an (input, output, hidden) tuple
@@ -37,7 +43,6 @@ def read_test(cell):
             output += results
     return Test('\n'.join(get_source(cell)[1:]), output, hidden)
 
-
 def write_test(path, test):
     """Write an OK test file
     
@@ -49,7 +54,7 @@ def write_test(path, test):
         f.write('test = ')
         pprint.pprint(test, f, indent=4, width=200, depth=None)
 
-
+# TODO: make this _not_ write file
 def gen_test_cell(question, tests, tests_dir):
     """Write test files to tests directory
     
@@ -76,7 +81,6 @@ def gen_test_cell(question, tests, tests_dir):
     lock(cell)
     return cell
 
-
 def gen_suite(tests):
     """Generate an OK test suite for a test
     
@@ -94,7 +98,6 @@ def gen_suite(tests):
       'teardown': '',
       'type': 'doctest'
     }
-
 
 def gen_case(test):
     """Generate an OK test case for a test

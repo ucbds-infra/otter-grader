@@ -1,9 +1,21 @@
 import os
 import shutil
+import pathlib
 import nbformat
 
+from .assignment import is_assignment_cell, read_assignment_metadata
+from .cell_generators import (
+    gen_init_cell, gen_markdown_response_cell, gen_export_cells, gen_check_all_cell, 
+    gen_close_export_cell, add_close_export_to_cell
+)
+from .defaults import NB_VERSION
+from .questions import is_question_cell, read_question_metadata, gen_question_cell
+from .solutions import is_solution_cell, is_markdown_solution_cell
+from .tests import is_test_cell, read_test, gen_test_cell
+from .utils import is_seed_cell, EmptyCellException
+
 # TODO: move file writing to another file
-def convert_to_ok(nb_path, dir, assignment, args):
+def transform_notebook(nb_path, dir, assignment, args):
     """Converts a master notebook to an Otter-formatted solutions notebook and tests directory
 
     Args:
@@ -25,7 +37,7 @@ def convert_to_ok(nb_path, dir, assignment, args):
 
     with open(nb_path) as f:
         nb = nbformat.read(f, NB_VERSION)
-    ok_cells = gen_ok_cells(nb['cells'], tests_dir)
+    ok_cells = get_transformed_cells(nb['cells'], tests_dir)
 
     # copy files
     for file in assignment.files or args.files:
@@ -66,7 +78,7 @@ def convert_to_ok(nb_path, dir, assignment, args):
         nbformat.write(nb, f, NB_VERSION)
     return ok_nb_path
 
-def gen_ok_cells(cells, tests_dir):
+def get_transformed_cells(cells, tests_dir, assignment):
     """Generate notebook cells for the Otter version of a master notebook
 
     Args:
@@ -76,7 +88,7 @@ def gen_ok_cells(cells, tests_dir):
     Returns:
         ``list`` of ``nbformat.NotebookNode``: cleaned notebook cells
     """
-    global SEED_REQUIRED, ASSIGNMENT_METADATA
+    # global SEED_REQUIRED, ASSIGNMENT_METADATA
     ok_cells = []
     question = {}
     processed_response = False
@@ -101,14 +113,14 @@ def gen_ok_cells(cells, tests_dir):
             
             # if there is no prompt, add a prompt cell
             elif is_markdown_solution_cell(cell) and not md_has_prompt:
-                ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
+                ok_cells.append(gen_markdown_response_cell())
 
             elif is_test_cell(cell):
                 no_solution = True
                 gen_test_cell(question, tests, tests_dir)
 
             elif is_seed_cell(cell):
-                SEED_REQUIRED = True
+                assignment.seed_required = True
                 continue
 
             if not no_solution:
@@ -127,7 +139,7 @@ def gen_ok_cells(cells, tests_dir):
         # if this is a solution cell, append. if manual question and no prompt, also append prompt cell
         elif question and processed_response and is_solution_cell(cell):
             if is_markdown_solution_cell(cell) and not md_has_prompt:
-                ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
+                ok_cells.append(gen_markdown_response_cell())
             ok_cells.append(cell)
 
         else:
@@ -149,8 +161,8 @@ def gen_ok_cells(cells, tests_dir):
                 question, processed_response, tests, md_has_prompt, no_solution = {}, False, [], False, False
 
             if is_assignment_cell(cell):
-                assert not ASSIGNMENT_METADATA, "Two assignment metadata cells found"
-                ASSIGNMENT_METADATA = read_assignment_metadata(cell)
+                # assert not ASSIGNMENT_METADATA, "Two assignment metadata cells found"
+                assignment.update(read_assignment_metadata(cell))
 
             elif is_question_cell(cell):
                 question = read_question_metadata(cell)
@@ -171,7 +183,7 @@ def gen_ok_cells(cells, tests_dir):
 
             elif is_solution_cell(cell):
                 if is_markdown_solution_cell(cell):
-                    ok_cells.append(nbformat.v4.new_markdown_cell(MD_ANSWER_CELL_TEMPLATE))
+                    ok_cells.append(gen_markdown_response_cell())
                 ok_cells.append(cell)
 
             else:
