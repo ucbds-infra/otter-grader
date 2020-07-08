@@ -437,6 +437,9 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         else:
             global_env = {}
 
+        # add display from IPython
+        global_env["display"] = display
+
         source = ""
         # if gradescope:
         #     source = "import sys\nsys.path.append(\"/autograder/submission\")\n"

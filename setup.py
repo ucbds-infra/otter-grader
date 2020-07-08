@@ -3,9 +3,15 @@ import setuptools
 with open("README.md", "r") as fh:
 	long_description = fh.read()
 
+# get version
+env = {}
+with open("otter/version.py") as f:
+	exec(f.read(), env)
+version = env["__version__"]
+
 setuptools.setup(
 	name = "otter-grader",
-	version = "1.0.0",
+	version = version,
 	author = "Chris Pyles",
 	author_email = "cpyles@berkeley.edu",
 	description = "Python and Jupyter Notebook autograder",
