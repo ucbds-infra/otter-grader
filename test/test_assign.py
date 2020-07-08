@@ -12,10 +12,12 @@ import contextlib
 from io import StringIO
 from subprocess import PIPE
 from glob import glob
-from unittest import mock
+from unittest.mock import patch
 
 from otter.argparser import get_parser
 from otter.utils import block_print
+from otter.generate.token import APIClient
+
 
 parser = get_parser()
 
@@ -136,7 +138,7 @@ class TestAssign(unittest.TestCase):
         # block stdout while running
         output = StringIO()
         with contextlib.redirect_stdout(output):
-            with mock.patch("otter.assign.block_print"):
+            with patch("otter.assign.block_print"):
                 args.func(args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "otter-correct")
@@ -171,3 +173,36 @@ class TestAssign(unittest.TestCase):
         # cleanup
         if os.path.exists(TEST_FILES_PATH + "output"):
             shutil.rmtree(TEST_FILES_PATH + "output")
+    
+    @patch.object(APIClient,"get_token")
+    def test_gradescope_example(self, mocked_client):
+
+        """
+        Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs.
+        Additionally, includes testing Gradescope integration.
+        """
+
+        mocked_client.return_value = 'token'
+        
+        run_gradescope_args = [
+            "assign", "--no-run-tests", "--no-check-all", TEST_FILES_PATH + "generate-gradescope.ipynb", 
+            TEST_FILES_PATH + "output", "data.csv"
+        ]
+        args = parser.parse_args(run_gradescope_args)
+
+        output = StringIO()
+        with block_print():
+            args.func(args)
+        
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
+
+        # check gradescope zip file
+        self.check_gradescope_zipfile(
+            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "gs-correct/autograder/autograder.zip",
+            {},  ["q1.py","q3.py","q8.py"], ["data.csv"]
+        )
+
+        # cleanup
+        if os.path.exists(TEST_FILES_PATH + "output"):
+            shutil.rmtree(TEST_FILES_PATH + "output")
+        
