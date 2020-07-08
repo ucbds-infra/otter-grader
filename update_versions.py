@@ -17,7 +17,7 @@ import warnings
 CURRENT_VERSION = "1.0.0.b1"
 NEW_VERSION = "1.0.0.b1"
 
-FROM_GIT = True
+FROM_GIT = False
 TO_GIT = True
 
 from_beta = "b" in CURRENT_VERSION.split(".")[-1]
