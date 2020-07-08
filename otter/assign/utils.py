@@ -80,6 +80,9 @@ def is_seed_cell(cell):
     source = get_source(cell)
     return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
 
+def is_markdown_cell(cell):
+    return cell['cell_type'] == 'markdown'
+
 
 #---------------------------------------------------------------------------------------------------
 # Cell Reformatters

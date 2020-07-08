@@ -25,8 +25,9 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     transformed_nb, test_files = transform_notebook(nb, assignment, args)
 
     # write notebook
-    with open(output_nb_path) as f:
-        nbformat.write(transformed_nb, f)
+    # with open(output_nb_path) as f:
+    # nbformat.write(transformed_nb, )
+    nbformat.write(transformed_nb, str(output_nb_path))
 
     # write tests
     for test_name, test_file in test_files.items():
@@ -67,7 +68,7 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
 
     nb = strip_solutions_and_output(nb)
 
-    with open(student_nb_path) as f:
+    with open(student_nb_path, "w") as f:
         nbformat.write(nb, f)
 
     # remove hidden tests from student directory

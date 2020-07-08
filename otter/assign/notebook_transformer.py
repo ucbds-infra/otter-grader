@@ -1,4 +1,5 @@
 import os
+import copy
 import pathlib
 import nbformat
 
@@ -10,7 +11,7 @@ from .cell_generators import (
 from .questions import is_question_cell, read_question_metadata, gen_question_cell
 from .solutions import is_markdown_solution_cell
 from .tests import is_test_cell, read_test, gen_test_cell
-from .utils import is_seed_cell, EmptyCellException
+from .utils import is_seed_cell, is_markdown_cell, EmptyCellException
 
 def transform_notebook(nb, assignment, args):
     """Converts a master notebook to an Otter-formatted solutions notebook and tests directory
@@ -43,7 +44,7 @@ def transform_notebook(nb, assignment, args):
             filtering = export_cell.get('filtering', True)
         )
 
-    transformed_nb = nbformat.v4.new_notebook()
+    transformed_nb = copy.deepcopy(nb)
     transformed_nb['cells'] = transformed_cells
 
     return transformed_nb, test_files
@@ -69,8 +70,14 @@ def get_transformed_cells(cells, assignment):
         if question_metadata and not processed_solution:
             assert not is_question_cell(cell), f"Found question cell before end of previous question cell: {cell}"
 
-            # if this isn't a MD solution cell but in a manual question, it has a prompt
-            if not is_markdown_solution_cell(cell) and question_metadata.get('manual', False):
+            # if this isn't a MD solution cell but in a manual question, it has a Markdown prompt
+            if question_metadata.get('manual', False) and is_markdown_cell(cell) and not is_markdown_solution_cell(cell):
+                md_has_prompt = True
+                transformed_cells.append(cell)
+                continue
+            
+            # if this a manual question but not MD solution, it has a code solution cell
+            elif question_metadata.get('manual', False) and not is_markdown_solution_cell(cell):
                 md_has_prompt = True
             
             # if there is no prompt, add a prompt cell
@@ -104,7 +111,8 @@ def get_transformed_cells(cells, assignment):
         #     transformed_cells.append(cell)
 
         else:
-            # the question is over -- we've seen the question and solution and any tests
+            # the question is over -- we've seen the question and solution and any tests and now we 
+            # need to get ready to process the next question which *could be this cell*
             if question_metadata and processed_solution:
 
                 # create a Notebook.check cell
@@ -124,7 +132,7 @@ def get_transformed_cells(cells, assignment):
                 question_metadata, processed_solution, test_cases, md_has_prompt, no_solution = {}, False, [], False, False
 
             # update assignment config if present; don't add cell to output nb
-            elif is_assignment_cell(cell):
+            if is_assignment_cell(cell):
                 assignment.update(read_assignment_metadata(cell))
 
             # if a question cell, parse metadata, comment out question metadata, and append to nb

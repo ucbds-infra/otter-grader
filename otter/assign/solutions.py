@@ -49,7 +49,6 @@ def replace_solutions(lines):
     stripped = []
     solution = False
     for line in lines:
-        line = line.strip()
 
         # ...
         if any(line.endswith(s) for s in skip_suffixes):
