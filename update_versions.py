@@ -16,11 +16,11 @@ import re
 import subprocess
 import warnings
 
-CURRENT_VERSION = "0.4.7"
-NEW_VERSION = "1.0.0"
+CURRENT_VERSION = "1.0.0"
+NEW_VERSION = "1.0.0.b1"
 
 FROM_GIT = True
-TO_GIT = True
+TO_GIT = False
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "Dockerfile",
@@ -104,18 +104,18 @@ def main():
         with open("Makefile", "w") as f:
             f.write(contents)
     
-    # else:
-    with open("setup.py") as f:
-        contents = f.read()
+    # # else:
+    # with open("setup.py") as f:
+    #     contents = f.read()
 
-    contents = re.sub(
-        "version = \"{}\",".format(CURRENT_VERSION),
-        "version = \"{}\",".format(NEW_VERSION),
-        contents
-    )
+    # contents = re.sub(
+    #     "version = \"{}\",".format(CURRENT_VERSION),
+    #     "version = \"{}\",".format(NEW_VERSION),
+    #     contents
+    # )
 
-    with open("setup.py", "w") as f:
-        f.write(contents)
+    # with open("setup.py", "w") as f:
+    #     f.write(contents)
 
     with open("otter/version.py") as f:
         contents = f.read()
