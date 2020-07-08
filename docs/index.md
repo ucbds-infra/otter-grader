@@ -44,7 +44,7 @@ pip install otter-grader
 To install the **beta** version, you must specify a semantic version, as pip won't install pre-release versions by default:
 
 ```
-pip install git+https://github.com/ucbds-infra/otter-grader.git@32e4814bee592bbf9713cddd98e2f59329185c45
+pip install git+https://github.com/ucbds-infra/otter-grader.git@9d1d5fe22d97eaf6e76e326e0b5589bf3034bf70
 ```
 
 ### Docker

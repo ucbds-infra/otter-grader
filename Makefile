@@ -39,3 +39,4 @@ tutorial:
 	cp tutorial.zip ../_static; \
 	rm tutorial.zip
 orial.zip
+orial.zip
