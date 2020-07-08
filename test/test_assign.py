@@ -170,7 +170,7 @@ class TestAssign(unittest.TestCase):
             {
                 "seed": 42,
                 "show_stdout_on_release": True,
-                "show_hidden_on_release": True,
+                "show_hidden_tests_on_release": True,
             },  ["q1.py","q3.py","q8.py"], ["data.csv"]
         )
 
