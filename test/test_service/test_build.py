@@ -12,7 +12,9 @@ from contextlib import redirect_stdout
 from psycopg2 import connect, extensions
 from psycopg2.errors import DuplicateTable
 
-from otter.service.build import write_assignment_info, write_class_info, main
+from otter.service.build import write_assignment_info, write_class_info
+from otter.service.build import main as build
+from otter.service.create import main as create
 from otter.utils import block_print
 
 TEST_FILES_PATH = "test/test_service/test-build/"
@@ -29,12 +31,14 @@ class TestBuild(unittest.TestCase):
         cls.conn = connect(**cls.postgresql.dsn())
         cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
 
-        with block_print():
-            args = parser.parse_args(["service", "create"])
-            args.func(args, conn=cls.conn, close_conn=False)
+        # with block_print():
+        args = parser.parse_args(["service", "create"])
+        args.func = create
+        args.func(args, conn=cls.conn, close_conn=False)
 
-            args = parser.parse_args(["service", "build", TEST_FILES_PATH, "-q"])
-            args.func(args, conn=cls.conn, close_conn=False) # Function has built-in assert statement for error-checking
+        args = parser.parse_args(["service", "build", TEST_FILES_PATH, "-q"])
+        args.build = build
+        args.func(args, conn=cls.conn, close_conn=False) # Function has built-in assert statement for error-checking
 
         cls.cursor = cls.conn.cursor()
         cls.cursor.execute("""INSERT INTO classes (class_id, class_name)

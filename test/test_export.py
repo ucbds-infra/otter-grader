@@ -23,6 +23,7 @@ from glob import glob
 from textwrap import dedent
 
 from otter.export import export_notebook
+from otter.export import main as export
 
 # read in argument parser
 bin_globals = {}
@@ -45,6 +46,7 @@ class TestExport(unittest.TestCase):
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
         args = parser.parse_args(grade_command)
+        args.func = export
         args.func(args)
 
         # check existence of pdf and tex
@@ -66,6 +68,7 @@ class TestExport(unittest.TestCase):
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
         args = parser.parse_args(grade_command)
+        args.func = export
         args.func(args)
 
         # check existence of pdf and tex
@@ -93,6 +96,7 @@ class TestExport(unittest.TestCase):
         ]
 
         args = parser.parse_args(grade_command)
+        args.func = export
 
         actual_output = StringIO()
         with contextlib.redirect_stdout(actual_output):
@@ -113,6 +117,7 @@ class TestExport(unittest.TestCase):
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
         args = parser.parse_args(grade_command)
+        args.func = export
         args.func(args)
 
         # check existence of pdf and tex

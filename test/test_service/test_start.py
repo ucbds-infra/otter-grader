@@ -20,6 +20,7 @@ from psycopg2 import connect, extensions
 from collections import namedtuple
 
 from otter.service import start
+from otter.service.create import main as create
 from otter.utils import block_print
 
 TEST_FILES_PATH = "test/test_service/test-start/"
@@ -40,6 +41,7 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
         start.CONN = cls.conn
 
         args = parser.parse_args(["service", "create"])
+        args.func = create
         args.func(args, conn=cls.conn, close_conn=False)
 
         cls.cursor = cls.conn.cursor()
@@ -188,6 +190,7 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         # start.ARGS = namedtuple("Args", )
 
         args = parser.parse_args(["service", "create"])
+        args.func = create
         args.func(args, conn=cls.conn, close_conn=False)
 
         cls.cursor = cls.conn.cursor()

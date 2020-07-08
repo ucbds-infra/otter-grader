@@ -15,6 +15,7 @@ from unittest import mock
 from subprocess import PIPE
 from glob import glob
 
+from otter.grade import main as grade
 from otter.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 
 # read in argument parser
@@ -178,6 +179,7 @@ class TestGrade(unittest.TestCase):
             "-v"
         ]
         args = parser.parse_args(grade_command)
+        args.func = grade
         with contextlib.redirect_stdout(StringIO()):
             args.func(args)
 
@@ -226,6 +228,7 @@ class TestGrade(unittest.TestCase):
             "--image", "otter-test"
         ]
         args = parser.parse_args(grade_command)
+        args.func = grade
         args.func(args)
 
         # check that we have PDFs
@@ -253,6 +256,7 @@ class TestGrade(unittest.TestCase):
             "--image", "otter-test"
         ]
         args = parser.parse_args(grade_command)
+        args.func = grade
         args.func(args)
 
         # read the output and expected output
@@ -270,6 +274,7 @@ class TestGrade(unittest.TestCase):
         # grade the 100 scripts
         
         # args = parser.parse_args(grade_command)
+        # args.func = grade
         # args.func(args)
 
         # # read the output and expected output

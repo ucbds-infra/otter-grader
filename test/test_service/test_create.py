@@ -14,6 +14,7 @@ from psycopg2 import connect, extensions
 from psycopg2.errors import DuplicateTable
 
 from otter.service.create import create_users, remove_users
+from otter.service.create import main as create
 
 TEST_FILES_PATH = "test/test_service/test-create/"
 
@@ -30,6 +31,7 @@ class TestBuild(unittest.TestCase):
         cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
 
         args = parser.parse_args(["service", "create"])
+        args.func = create
         args.func(args, conn=cls.conn)
 
         cls.conn = connect(**cls.postgresql.dsn())
