@@ -31,11 +31,7 @@ jupytext
 rpy2
 numpy==1.16.0
 tornado==5.1.1
-<<<<<<< HEAD
 git+https://github.com/ucbds-infra/otter-grader.git@83f3720d77c320323c7611bb275fec557fc9184d{% endif %}{% if other_requirements %}
-=======
-git+https://github.com/ucbds-infra/otter-grader.git@845915dc1a24e5f9d37b1590e8775ab1f73a26bf{% endif %}{% if other_requirements %}
->>>>>>> beta
 {{ other_requirements }}{% endif %}
 """)
 
@@ -60,6 +56,10 @@ SETUP_SH = Template("""#!/usr/bin/env bash
 
 apt-get update
 apt-get install -y python3.7 python3-pip python3.7-dev r-base
+apt-get install -y libcurl4-openssl-dev
+apt-get install -y libssl-dev
+apt-get install -y libcurl4-gnutls-dev
+apt-get install -y libxml2-dev
 
 # apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \\
 #        libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \\
@@ -74,7 +74,7 @@ apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recom
 
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
-pip3 install -r /autograder/source/requirements.txt{% if language == "r" %}
+pip3 install -r /autograder/source/requirements.txt{% if lang == "r" %}
 R --no-save < /autograder/source/requirements.r{% endif %}
 """)
 
@@ -96,7 +96,7 @@ config = {
     "assignment_id": '{{ assignment_id }}',
     "filtering": {{ filtering }},
     "pagebreaks": {{ pagebreaks }},
-    "language": '{{ language }}',
+    "lang": '{{ lang }}',
 }
 
 run_autograder(config)
@@ -136,12 +136,12 @@ def main(args):
         grade_from_log = str(args.grade_from_log),
         serialized_variables = str(args.serialized_variables),
         public_multiplier = str(args.public_multiplier),
-        language = str(args.lang.lower())
+        lang = str(args.lang.lower())
     )
 
     # format setup.sh
     setup_sh = SETUP_SH.render(
-        language = str(args.lang.lower())
+        lang = str(args.lang.lower())
     )
 
     # create tmp directory to zip inside
