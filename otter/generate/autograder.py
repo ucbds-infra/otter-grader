@@ -31,7 +31,12 @@ jupytext
 rpy2
 numpy==1.16.0
 tornado==5.1.1
+<<<<<<< HEAD
 git+https://github.com/ucbds-infra/otter-grader.git@83f3720d77c320323c7611bb275fec557fc9184d{% endif %}{% if other_requirements %}
+=======
+otter-grader==1.0.0.b1
+{% endif %}{% if other_requirements %}
+>>>>>>> beta
 {{ other_requirements }}{% endif %}
 """)
 
