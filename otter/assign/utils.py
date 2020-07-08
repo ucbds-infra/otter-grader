@@ -1,3 +1,7 @@
+######################################
+##### Utilities for Otter Assign #####
+######################################
+
 import re
 import os
 import json
@@ -6,7 +10,7 @@ import pathlib
 
 from glob import glob
 
-from .defaults import SEED_REGEX, BLOCK_QUOTE
+from .constants import SEED_REGEX, BLOCK_QUOTE
 
 from ..argparser import get_parser
 from ..execute import grade_notebook
@@ -15,7 +19,9 @@ from ..generate.token import APIClient
 from ..utils import get_relpath
 
 class EmptyCellException(Exception):
-    """Exception for empty cells to indicate deletion"""
+    """
+    Exception for empty cells to indicate deletion
+    """
 
 
 #---------------------------------------------------------------------------------------------------
@@ -23,13 +29,14 @@ class EmptyCellException(Exception):
 #---------------------------------------------------------------------------------------------------
 
 def get_source(cell):
-    """Get the source code of a cell in a way that works for both nbformat and JSON
+    """
+    Returns the source code of a cell in a way that works for both nbformat and JSON
     
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
     
     Returns:
-        ``list`` of ``str``: each line of the cell source
+        ``list`` of ``str``: each line of the cell source stripped of ending line breaks
     """
     source = cell['source']
     if isinstance(source, str):
@@ -39,10 +46,14 @@ def get_source(cell):
     assert 'unknown source type', type(source)
 
 def get_spec(source, begin):
-    """Return line number of the BEGIN ASSIGNMENT line or None
+    """
+    Returns the line number of the spec begin line or ``None``. Converts ``begin`` to an uppercase 
+    string and looks for a line matching ``f"BEGIN {begin.upper()}"``. Used for finding question and
+    assignment metadata, which match ``BEGIN QUESTION`` and ``BEGIN ASSIGNMENT``, resp.
     
     Args:
         source (``list`` of ``str``): cell source as a list of lines of text
+        begin (``str``): the spec to look for
     
     Returns:
         ``int``: line number of BEGIN ASSIGNMENT, if present
@@ -67,13 +78,14 @@ def get_spec(source, begin):
 #---------------------------------------------------------------------------------------------------
 
 def is_seed_cell(cell):
-    """Whether cell is seed cell
+    """
+    Returns whether ``cell`` is seed cell
     
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
     
     Returns:
-        ``bool``: whether the current cell is a seed cell
+        ``bool``: whether the cell is a seed cell
     """
     if cell['cell_type'] != 'code':
         return False
@@ -81,6 +93,15 @@ def is_seed_cell(cell):
     return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
 
 def is_markdown_cell(cell):
+    """
+    Returns whether ``cell`` is Markdown cell
+    
+    Args:
+        cell (``nbformat.NotebookNode``): notebook cell
+    
+    Returns:
+        ``bool``: whether the cell is a Markdown cell
+    """
     return cell['cell_type'] == 'markdown'
 
 
@@ -89,7 +110,8 @@ def is_markdown_cell(cell):
 #---------------------------------------------------------------------------------------------------
 
 def remove_output(nb):
-    """Remove all outputs from a notebook
+    """
+    Removes all outputs from a notebook in-place
     
     Args:
         nb (``nbformat.NotebookNode``): a notebook
@@ -99,7 +121,8 @@ def remove_output(nb):
             cell['outputs'] = []
 
 def lock(cell):
-    """Makes a cell non-editable and non-deletable
+    """
+    Makes a cell non-editable and non-deletable in-place
 
     Args:
         cell (``nbformat.NotebookNode``): cell to be locked
@@ -141,9 +164,9 @@ def run_tests(nb_path, debug=False, seed=None):
     Runs tests in the autograder version of the notebook
     
     Args:
-        nb_path (``pathlib.Path``): Path to iPython notebooks
+        nb_path (``pathlib.Path``): path to iPython notebooks
         debug (``bool``, optional): ``True`` if errors should not be ignored
-        seed (``int``, optional): Random seed for notebook execution
+        seed (``int``, optional): random seed for notebook execution
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
@@ -155,14 +178,15 @@ def run_tests(nb_path, debug=False, seed=None):
     os.chdir(curr_dir)
 
 def write_otter_config_file(master, result, assignment):
-    """Creates an Otter config file
-
-    Uses ``ASSIGNMENT_METADATA`` to generate a ``.otter`` file to configure student use of Otter tools, 
-    including saving environments and submission to an Otter Service deployment
+    """
+    Creates an Otter configuration file (a ``.otter`` file) for students to use Otter tools, including
+    saving environments and submitting to an Otter Service deployment, using assignment configurations.
+    Writes the resulting file to the ``autograder`` and ``student`` subdirectories of ``result``.
 
     Args:
         master (``pathlib.Path``): path to master notebook
         result (``pathlib.Path``): path to result directory
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     """
     config = {}
 
@@ -189,6 +213,15 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
 
 def run_generate_autograder(result, assignment, args):
+    """
+    Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
+    configurations in ``assignment.generate`` and ``args``.
+
+    Args:
+        result (``pathlib.Path``): the path to the result directory
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        args (``argparse.Namespace``): parsed command line arguments
+    """
     generate_args = assignment.generate
     if generate_args is True:
         generate_args = {}

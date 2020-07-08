@@ -1,23 +1,66 @@
+##################################################
+##### Misc. Cell Generators for Otter Assign #####
+##################################################
+
 import copy
 import nbformat
 
 from .utils import get_source, lock
 
 def gen_init_cell():
-    """Generates a cell to initialize Otter in the notebook
+    """
+    Generates a cell to initialize Otter in the notebook. The code cell has the following contents:
+
+    .. code-block:: python
+
+        # Initialize Otter
+        import otter
+        grader = otter.Notebook()
     
     Returns:
-        cell (``nbformat.NotebookNode``): new code cell
+        ``nbformat.NotebookNode``: the init cell
     """
     cell = nbformat.v4.new_code_cell("# Initialize Otter\nimport otter\ngrader = otter.Notebook()")
     lock(cell)
     return cell
 
 def gen_markdown_response_cell():
+    """
+    Generates a Markdown response cell with the following contents:
+
+    .. code-block:: markdown
+
+        _Type your answer here, replacing this text._
+
+    Returns:
+        ``nbformat.NotebookNode``: the response cell
+    """
     return nbformat.v4.new_markdown_cell("_Type your answer here, replacing this text._")
 
 def gen_export_cells(instruction_text, pdf=True, filtering=True):
-    """Generates export cells
+    """
+    Generates export cells that instruct the student the run a code cell calling 
+    ``otter.Notebook.export`` to generate and download their submission. The Markdown cell contains:
+
+    .. code-block:: markdown
+
+        ## Submission
+        
+        Make sure you have run all cells in your notebook in order before running the cell below, so 
+        that all images/graphs appear in the output. The cell below will generate a zipfile for you 
+        to submit. **Please save before exporting!**
+
+    Additional instructions can be appended to this cell by passing a string to ``instruction_text``.
+
+    The code cell contains:
+
+    .. code-block:: python
+
+        # Save your notebook first, then run this cell to export your submission.
+        grader.export()
+    
+    The call to ``grader.export()`` contains different arguments based on the values passed to ``pdf``
+    and ``filtering``. 
     
     Args:
         instruction_text (``str``): extra instructions for students when exporting
@@ -26,7 +69,6 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True):
     
     Returns:
         ``list`` of ``nbformat.NotebookNode``: generated export cells
-
     """
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before \
@@ -52,7 +94,21 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True):
     return [instructions, export, nbformat.v4.new_markdown_cell(" ")]     # last cell is buffer
 
 def gen_check_all_cell():
-    """Generates an ``otter.Notebook.check_all`` cell
+    """
+    Generates a check-all cell and a Markdown cell with instructions to run all tests in the notebook. 
+    The Markdown cell has the following contents:
+
+    .. code-block:: markdown
+
+        ---
+        
+        To double-check your work, the cell below will rerun all of the autograder tests.
+
+    The code cell has the following contents:
+
+    .. code-block:: python
+
+        grader.check_all()
     
     Returns:
         ``list`` of ``nbformat.NotebookNode``: generated check-all cells
@@ -68,7 +124,12 @@ def gen_check_all_cell():
     return [instructions, check_all]
 
 def gen_close_export_cell():
-    """Returns a new cell to end question export
+    """
+    Generates a Markdown cell to end question export for PDF filtering. The cell contains:
+
+    .. code-block:: markdown
+
+        <!-- END QUESTION -->
     
     Returns:
         ``nbformat.NotebookNode``: new Markdown cell with ``<!-- END QUESTION -->``
@@ -78,10 +139,14 @@ def gen_close_export_cell():
     return cell
 
 def add_close_export_to_cell(cell):
-    """Adds an export close to the top of the cell. Mutates the original cell
+    """Adds an HTML comment to close question export for PDF filtering to the top of ``cell``. ``cell``
+    should be a Markdown cell. This adds ``<!-- END QUESTION-->`` as the first line of the cell.
     
     Args:
         cell (``nbformat.NotebookNode``): the cell to add the close export to
+
+    Returns:
+        ``nbformat.NotebookNode``: the cell with the close export comment at the top
     """
     cell = copy.deepcopy(cell)
     source = get_source(cell)

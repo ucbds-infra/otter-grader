@@ -1,25 +1,30 @@
+####################################################
+##### Question Configurations for Otter Assign #####
+####################################################
+
 import copy
 import yaml
 
-from .defaults import BLOCK_QUOTE, ALLOWED_NAME
+from .constants import BLOCK_QUOTE, ALLOWED_NAME
 from .utils import get_source, lock, get_spec, EmptyCellException
 
 def is_question_cell(cell):
-    """Whether cell contains BEGIN QUESTION in a block quote
+    """
+    Returns whether cell contains BEGIN QUESTION in a block quote
     
     Args:
-        cell (``nbformat.NotebookNode``): notebook cell
+        cell (``nbformat.NotebookNode``): a notebook cell
     
     Returns:
         ``bool``: whether the current cell is a question definition cell
-
     """
     if cell['cell_type'] != 'markdown':
         return False
     return get_spec(get_source(cell), "question") is not None
 
 def gen_question_cell(cell, manual, need_close_export):
-    """Return a locked question cell with metadata hidden in an HTML comment
+    """
+    Returns a locked question cell with metadata hidden in an HTML comment
     
     Args:
         cell (``nbformat.NotebookNode``): the original question cell
@@ -56,7 +61,8 @@ def gen_question_cell(cell, manual, need_close_export):
     return cell
 
 def read_question_metadata(cell):
-    """Return question metadata from a question cell
+    """
+    Returns parsed question metadata from a question cell
     
     Args:
         cell (``nbformat.NotebookNode``): the question cell

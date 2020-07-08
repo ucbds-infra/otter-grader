@@ -1,11 +1,16 @@
+#############################################
+##### Solution Removal for Otter Assign #####
+#############################################
+
 import re
 import nbformat
 
-from .defaults import MD_SOLUTION_REGEX
+from .constants import MD_SOLUTION_REGEX
 from .utils import get_source, remove_output
 
 def is_markdown_solution_cell(cell):
-    """Whether the cell matches MD_SOLUTION_REGEX
+    """
+    Returns whether any line of the cell matches MD_SOLUTION_REGEX
     
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
@@ -20,11 +25,15 @@ def is_markdown_solution_cell(cell):
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_ ]*=)(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
+    """
+    """
     prefix = match.group(1)
     return prefix + ' ...'
 
 solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
 def solution_line_sub(match):
+    """
+    """
     prefix = match.group(1)
     return prefix + '...'
 
@@ -36,9 +45,10 @@ SUBSTITUTIONS = [
     (solution_line_regex, solution_line_sub),
 ]
 
-# TODO: comments
+# TODO: comments, docstrings
 def replace_solutions(lines):
-    """Replace solutions in lines, a list of strings
+    """
+    Replaces solutions in ``lines``
     
     Args:
         lines (``list`` of ``str``): solutions as a list of strings

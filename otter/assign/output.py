@@ -1,15 +1,27 @@
+###########################################
+##### Output Writing for Otter Assign #####
+###########################################
+
 import os
 import shutil
 import pathlib
 import nbformat
 
-from .defaults import NB_VERSION
+from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
 from .solutions import strip_solutions_and_output
 from .tests import write_test, remove_hidden_tests_from_dir
 
 def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     """
+    Converts a master notebook to a solutions notebook and writes this notebook to the output directory,
+    copying support files and writing tests as needed.
+
+    Args:
+        nb_path (``pathlib.Path``): path to master notebook
+        output_nb_path (``pathlib.Path``): path to output directory
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        args (``argparse.Namespace``): parsed command line arguments
     """
     with open(nb_path) as f:
         nb = nbformat.read(f, as_version=NB_VERSION)
@@ -51,6 +63,15 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
 
 def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
     """
+    Copies the autograder (solutions) directory and removes extraneous files, strips solutions from
+    the notebook, and removes hidden tests from the tests directory.
+
+    Args:
+        nb_name (``str``): the master notebook name
+        autograder_dir (``pathlib.Path``): the path to the autograder directory
+        student_dir (``pathlib.Path``): the path to the student directory
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        args (``argparse.Namespace``): parsed command line arguments
     """
     # copy autograder dir
     shutil.copytree(autograder_dir, student_dir)
@@ -75,11 +96,14 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
     remove_hidden_tests_from_dir(student_dir / 'tests')
 
 def write_output_directories(master_nb_path, result_dir, assignment, args):
-    """Generate student and autograder views.
+    """
+    Converts a master notebook to an autograder and student directory based on configurations in 
+    ``assignment`` and ``args``.
 
     Args:
-        master_nb (``nbformat.NotebookNode``): the master notebook
+        master_nb_path (``nbformat.NotebookNode``): the master notebook path
         result_dir (``pathlib.Path``): path to the result directory
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         args (``argparse.Namespace``): parsed command line arguments
     """
     # create directories

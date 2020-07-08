@@ -1,16 +1,21 @@
+#########################################################
+##### OK-Test Parsers and Builders for Otter Assign #####
+#########################################################
+
 import re
 import pprint
 import nbformat
 
 from collections import namedtuple
 
-from .defaults import TEST_REGEX
+from .constants import TEST_REGEX
 from .utils import get_source, lock, str_to_doctest
 
 Test = namedtuple('Test', ['input', 'output', 'hidden'])
 
 def is_test_cell(cell):
-    """Return whether the current cell is a test cell
+    """
+    Returns whether the current cell is a test cell
     
     Args:
         cell (``nbformat.NotebookNode``): a notebook cell
@@ -24,7 +29,8 @@ def is_test_cell(cell):
     return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
 
 def read_test(cell):
-    """Return the contents of a test as an (input, output, hidden) tuple
+    """
+    Returns the contents of a test as an ``(input, output, hidden)`` named tuple
     
     Args:
         cell (``nbformat.NotebookNode``): a test cell
@@ -44,15 +50,18 @@ def read_test(cell):
     return Test('\n'.join(get_source(cell)[1:]), output, hidden)
 
 def gen_test_cell(question, tests, tests_dict):
-    """Write test files to tests directory
+    """
+    Parses a list of test named tuples and creates a single test file. Adds this test file as a value
+    to ``tests_dict`` with a key corresponding to the test's name, taken from ``question``. Returns
+    a code cell that runs the check on this test.
     
     Args:
         question (``dict``): question metadata
         tests (``list`` of ``otter.assign.Test``): tests to be written
-        tests_dir (``pathlib.Path``): path to tests directory
+        tests_dict (``dict``): the tests for this assignment
 
     Returns:
-        cell: code cell object with test
+        ``nbformat.NotebookNode``: code cell calling ``otter.Notebook.check`` on this test
     """
     cell = nbformat.v4.new_code_cell()
     cell.source = ['grader.check("{}")'.format(question['name'])]
@@ -70,7 +79,8 @@ def gen_test_cell(question, tests, tests_dict):
     return cell
 
 def gen_suite(tests):
-    """Generate an OK test suite for a test
+    """
+    Generates an OK test suite for a list of tests as named tuples
     
     Args:
         tests (``list`` of ``otter.assign.Test``): test cases
@@ -88,7 +98,8 @@ def gen_suite(tests):
     }
 
 def gen_case(test):
-    """Generate an OK test case for a test
+    """
+    Generates an OK test case for a test named tuple
     
     Args:
         test (``otter.assign.Test``): OK test for this test case
@@ -111,7 +122,8 @@ def gen_case(test):
     }
 
 def write_test(path, test):
-    """Write an OK test file
+    """
+    Writes an OK test file
     
     Args:
         path (``str``): path of file to be written
@@ -122,7 +134,8 @@ def write_test(path, test):
         pprint.pprint(test, f, indent=4, width=200, depth=None)
 
 def remove_hidden_tests_from_dir(test_dir):
-    """Rewrite test files to remove hidden tests
+    """
+    Rewrites test files in a directory to remove hidden tests
     
     Args:
         test_dir (``pathlib.Path``): path to test files directory

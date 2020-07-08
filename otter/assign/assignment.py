@@ -1,11 +1,39 @@
+######################################################
+##### Assignment Configurations for Otter Assign #####
+######################################################
+
 import yaml
 
-from .defaults import BLOCK_QUOTE
+from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
 
 class Assignment:
     """
-    Kinda like an AttrDict but with defaults
+    A class that houses configurations for an assignment. Contains a dictionary of default arguments
+    that can be updated in an instance using the ``update()`` method. Functions similarly to an 
+    ``AttrDict`` in that keys of the configuration can be accessed as ``assignment.<key>``.
+
+    To access a configuration value, use the dot syntax. For example, to access the ``generate`` key
+    of an ``Assignment`` instance ``assignment``:
+    
+    .. code-block::python
+        
+        assignment.generate
+    
+    If ``generate`` is present in ``assignment.config``, then the value in that dictionary will be 
+    returned. If it is not, the value in ``Assignment.defaults`` will be returned instead. Configurations
+    can also be updated using dot syntax:
+    
+    .. code-block:: python
+        
+        assignment.generate = True
+
+    If a key not present in ``Assignment.defaults`` is attempted to be accessed or set, an 
+    ``AttributeError`` will be thrown.
+
+    Attributes:
+        config (``dict``): the configurations specific to this assignment; keys in this dictionary
+            are used before the defaults if present.
     """
     defaults = {
         "generate": {},
@@ -43,10 +71,18 @@ class Assignment:
             raise AttributeError(f"Assignment has no attribute {attr}")
 
     def update(self, config):
+        """
+        Updates the configuration stored in this assignment using keys and values in the dictionary
+        ``config``
+
+        Args:
+            config (``dict``): new configurations
+        """
         self.config.update(config)
 
 def read_assignment_metadata(cell):
-    """Return assignment metadata from an assignment cell
+    """
+    Return assignment metadata from an assignment cell
     
     Args:
         cell (``nbformat.NotebookNode``): the assignment cell
@@ -64,7 +100,8 @@ def read_assignment_metadata(cell):
     return metadata
 
 def is_assignment_cell(cell):
-    """Whether cell contains BEGIN ASSIGNMENT in a block quote
+    """
+    Returns whether cell contains BEGIN ASSIGNMENT in a block quote
     
     Args:
         cell (``nbformat.NotebookNode``): notebook cell

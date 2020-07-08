@@ -1,3 +1,7 @@
+###############################################################
+##### Master Notebook Parser/Transformer for Otter Assign #####
+###############################################################
+
 import os
 import copy
 import pathlib
@@ -14,15 +18,18 @@ from .tests import is_test_cell, read_test, gen_test_cell
 from .utils import is_seed_cell, is_markdown_cell, EmptyCellException
 
 def transform_notebook(nb, assignment, args):
-    """Converts a master notebook to an Otter-formatted solutions notebook and tests directory
+    """
+    Converts a master notebook to an Otter-formatted solutions notebook, parsing test cells into
+    dictionaries ready to be written as OK test files.
 
     Args:
-        nb_path (``pathlib.Path``): path to master notebook
-        dir (``pathlib.Path``): output directory
+        nb (``nbformat.NotebookNode``): the master notebook
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         args (``argparse.Namespace``): parsed command line arguments
 
     Returns:
-        ``str``: path to the solutions notebook
+        ``tuple(nbformat.NotebookNode, dict)``: the transformed notebook and a dictionary mapping 
+            test names to their parsed contents
 
     """
     transformed_cells, test_files = get_transformed_cells(nb['cells'], assignment)
@@ -50,14 +57,19 @@ def transform_notebook(nb, assignment, args):
     return transformed_nb, test_files
 
 def get_transformed_cells(cells, assignment):
-    """Generate notebook cells for the Otter version of a master notebook
+    """
+    Takes in a list of cells from the master notebook and returns a list of cells for the solutions
+    notebook. Replaces test cells with a cell calling ``otter.Notebook.check``, inserts Markdown
+    response cells for manual questions with Markdown solutions, and comments out question metadata 
+    in question cells, among other things.
 
     Args:
         cells (``list`` of ``nbformat.NotebookNode``): original code cells
-        tests_dir (``str``): path to directory of tests
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     
     Returns:
-        ``list`` of ``nbformat.NotebookNode``: cleaned notebook cells
+        ``tuple(list, dict)``: list of cleaned notebook cells and a dictionary mapping test names to 
+            their parsed contents
     """
     # global SEED_REQUIRED, ASSIGNMENT_METADATA
     transformed_cells, test_files = [], {}
