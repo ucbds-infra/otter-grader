@@ -37,7 +37,7 @@ class TestBuild(unittest.TestCase):
         args.func(args, conn=cls.conn, close_conn=False)
 
         args = parser.parse_args(["service", "build", TEST_FILES_PATH, "-q"])
-        args.build = build
+        args.func = build
         args.func(args, conn=cls.conn, close_conn=False) # Function has built-in assert statement for error-checking
 
         cls.cursor = cls.conn.cursor()
