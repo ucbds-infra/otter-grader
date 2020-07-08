@@ -1,3 +1,4 @@
+import copy
 import nbformat
 
 from .utils import get_source, lock
@@ -76,14 +77,15 @@ def gen_close_export_cell():
     lock(cell)
     return cell
 
-# TODO: make this return a new cell
 def add_close_export_to_cell(cell):
     """Adds an export close to the top of the cell. Mutates the original cell
     
     Args:
         cell (``nbformat.NotebookNode``): the cell to add the close export to
     """
+    cell = copy.deepcopy(cell)
     source = get_source(cell)
     source = ["<!-- END QUESTION -->\n", "\n"] + source
     cell['source'] = "\n".join(source)
+    return cell
 

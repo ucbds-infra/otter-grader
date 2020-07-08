@@ -43,19 +43,7 @@ def read_test(cell):
             output += results
     return Test('\n'.join(get_source(cell)[1:]), output, hidden)
 
-def write_test(path, test):
-    """Write an OK test file
-    
-    Args:
-        path (``str``): path of file to be written
-        test (``dict``): OK test to be written
-    """
-    with open(path, 'w') as f:
-        f.write('test = ')
-        pprint.pprint(test, f, indent=4, width=200, depth=None)
-
-# TODO: make this _not_ write file
-def gen_test_cell(question, tests, tests_dir):
+def gen_test_cell(question, tests, tests_dict):
     """Write test files to tests directory
     
     Args:
@@ -76,8 +64,8 @@ def gen_test_cell(question, tests, tests_dir):
         'points': points,
         'suites': suites,
     }
+    tests_dict[question['name']] = test
 
-    write_test(tests_dir / (question['name'] + '.py'), test)
     lock(cell)
     return cell
 
@@ -122,7 +110,18 @@ def gen_case(test):
         'locked': False
     }
 
-def remove_hidden_tests(test_dir):
+def write_test(path, test):
+    """Write an OK test file
+    
+    Args:
+        path (``str``): path of file to be written
+        test (``dict``): OK test to be written
+    """
+    with open(path, 'w') as f:
+        f.write('test = ')
+        pprint.pprint(test, f, indent=4, width=200, depth=None)
+
+def remove_hidden_tests_from_dir(test_dir):
     """Rewrite test files to remove hidden tests
     
     Args:

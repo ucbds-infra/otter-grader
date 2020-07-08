@@ -4,10 +4,6 @@ import yaml
 from .defaults import BLOCK_QUOTE, ALLOWED_NAME
 from .utils import get_source, lock, get_spec, EmptyCellException
 
-class Question:
-    """
-    """
-
 def is_question_cell(cell):
     """Whether cell contains BEGIN QUESTION in a block quote
     
@@ -22,7 +18,7 @@ def is_question_cell(cell):
         return False
     return get_spec(get_source(cell), "question") is not None
 
-def gen_question_cell(cell, manual, format, need_close_export):
+def gen_question_cell(cell, manual, need_close_export):
     """Return a locked question cell with metadata hidden in an HTML comment
     
     Args:
@@ -47,7 +43,7 @@ def gen_question_cell(cell, manual, format, need_close_export):
     source[end] = "-->"
     cell['source'] = '\n'.join(source)
 
-    # checkf or empty cell
+    # check if cell is empty, and if so, throw error
     cell_text = source[:start]
     try:
         cell_text += source[end+1:]

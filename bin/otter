@@ -9,24 +9,35 @@ import sys
 from textwrap import dedent
 from otter.argparser import get_parser
 
+from otter import assign
+from otter import check
+from otter import export
+from otter import generate
+from otter import grade
+from otter import service
+
 parser = get_parser()
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    if hasattr(args, 'func'):
-        args.func(args)
+    if hasattr(args, 'func_str'):
+        main = eval(args.func_str)
+        main(args)
+
     elif len(sys.argv) > 1 and sys.argv[1] == "generate":
         print(dedent("""\
         You must specify a command for Otter Generate:
             autograder
             token"""))
+
     elif len(sys.argv) > 1 and sys.argv[1] == "service":
         print(dedent("""\
         You must specify a command for Otter Service:
             build
             create
             start"""))
+
     else:
         print(dedent("""\
         You must specify a command for Otter:

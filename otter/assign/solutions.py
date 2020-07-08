@@ -1,10 +1,9 @@
 import re
 import nbformat
 
-from .defaults import NB_VERSION, MD_SOLUTION_REGEX, SOLUTION_REGEX
-from .utils import get_source, is_markdown_solution_cell, remove_output
+from .defaults import MD_SOLUTION_REGEX
+from .utils import get_source, remove_output
 
-# TODO: are these needed??
 def is_markdown_solution_cell(cell):
     """Whether the cell matches MD_SOLUTION_REGEX
     
@@ -14,24 +13,10 @@ def is_markdown_solution_cell(cell):
     Returns:
         ``bool``: whether the current cell is a Markdown solution cell
     """
+    if not cell['cell_type'] == 'markdown':
+        return False
     source = get_source(cell)
-    return is_solution_cell and any([MD_SOLUTION_REGEX.match(l, flags=re.IGNORECASE) for l in source])
-
-def is_solution_cell(cell):
-    """Whether the cell matches SOLUTION_REGEX or MD_SOLUTION_REGEX
-    
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
-    
-    Returns:
-        ``bool``: whether the current cell is a solution cell
-    """
-    source = get_source(cell)
-    if cell['cell_type'] == 'markdown':
-        return source and any([MD_SOLUTION_REGEX.match(l, flags=re.IGNORECASE) for l in source])
-    elif cell['cell_type'] == 'code':
-        return source and SOLUTION_REGEX.match(source[0], flags=re.IGNORECASE)
-    return False
+    return source and any([MD_SOLUTION_REGEX.match(l, flags=re.IGNORECASE) for l in source])
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_ ]*=)(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
@@ -100,16 +85,13 @@ def replace_solutions(lines):
     
     return stripped
 
-# TODO: make this _not_ write files
-def strip_solutions(original_nb_path, stripped_nb_path):
+def strip_solutions(nb):
     """Write a notebook with solutions stripped
     
     Args:
         original_nb_path (path-like): path to original notebook
         stripped_nb_path (path-like): path to new stripped notebook
     """
-    with open(original_nb_path) as f:
-        nb = nbformat.read(f, NB_VERSION)
     md_solutions = []
     for i, cell in enumerate(nb['cells']):
         cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
@@ -121,5 +103,5 @@ def strip_solutions(original_nb_path, stripped_nb_path):
     
     # remove output from student version
     remove_output(nb)
-    with open(stripped_nb_path, 'w') as f:
-        nbformat.write(nb, f, NB_VERSION)
+    
+    return nb
