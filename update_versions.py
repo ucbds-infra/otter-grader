@@ -24,6 +24,7 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
     "Dockerfile",
     "otter/generate/autograder.py",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
+    "docs/index.md"
 ]
 
 def main():

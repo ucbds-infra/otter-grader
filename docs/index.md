@@ -38,10 +38,10 @@ Otter is a Python package that can be installed using pip. To install the curren
 pip install otter-grader
 ```
 
-To install the **beta** version, install from git:
+To install the **beta** version, you must specify a semantic version, as pip won't install pre-release versions by default:
 
 ```
-pip install git+https://github.com/ucbds-infra/otter-grader.git@beta
+pip install otter-grader==1.0.0.b1
 ```
 
 ### Docker
