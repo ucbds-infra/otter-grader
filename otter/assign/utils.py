@@ -174,7 +174,7 @@ def run_tests(nb_path, debug=False, seed=None):
         nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed
     )
-    assert results["total"] == results["possible"], "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
+    assert results.total == results.possible, "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
     os.chdir(curr_dir)
 
 def write_otter_config_file(master, result, assignment):

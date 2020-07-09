@@ -155,12 +155,8 @@ class TestAssign(unittest.TestCase):
             "assign", "--no-run-tests", TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output", "data.csv"
         ]
         args = parser.parse_args(run_assign_args)
-
-        # block stdout while running
-
-        output = StringIO()
-        with block_print():
-            args.func(args)
+        args.func = assign
+        args.func(args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
         
@@ -193,10 +189,8 @@ class TestAssign(unittest.TestCase):
             TEST_FILES_PATH + "output", "data.csv"
         ]
         args = parser.parse_args(run_gradescope_args)
-
-        output = StringIO()
-        with block_print():
-            args.func(args)
+        args.func = assign
+        args.func(args)
         
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
 
