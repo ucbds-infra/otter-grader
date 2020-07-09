@@ -24,11 +24,7 @@ class TestBuild(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print(
-            "\n\n\n=" * 60 + "\n" +
-            f"Running {cls.__name__}\n" +
-            "=\n" * 60
-        )
+        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
 
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())

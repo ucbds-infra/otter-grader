@@ -30,11 +30,7 @@ class TestGrade(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
-        print(
-            "\n\n\n=" * 60 + "\n" +
-            f"Running {cls.__name__}\n" +
-            "=\n" * 60
-        )
+        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
 
         create_image_cmd = ["make", "docker-test"]
         create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)

@@ -30,11 +30,7 @@ class TestCheck(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print(
-            "\n\n\n=" * 60 + "\n" +
-            f"Running {cls.__name__}\n" +
-            "=\n" * 60
-        )
+        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
 
     def test_otter_check_script(self):
         """
