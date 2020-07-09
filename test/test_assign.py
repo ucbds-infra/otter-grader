@@ -201,11 +201,19 @@ class TestAssign(unittest.TestCase):
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
 
         # check gradescope zip file
+        
         self.check_gradescope_zipfile(
             TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "gs-correct/autograder/autograder.zip",
-            {},  ["q1.py","q3.py","q8.py"], ["data.csv"]
+            {
+                "seed": 42,
+                "show_stdout_on_release": True,
+                "show_hidden_tests_on_release": True,
+                "token": 'token',
+                "course_id": '123',
+                "assignment_id": '567',
+                "filtering": True
+            },  ["q1.py","q3.py","q8.py"], ["data.csv"]
         )
-
         # cleanup
         if os.path.exists(TEST_FILES_PATH + "output"):
             shutil.rmtree(TEST_FILES_PATH + "output")
