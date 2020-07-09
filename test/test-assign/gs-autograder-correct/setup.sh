@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-apt-get install -y python3.7 python3-pip python3.7-dev
+apt-get update
+apt-get install -y python3.7 python3-pip python3.7-dev r-base
+apt-get install -y libcurl4-openssl-dev
+apt-get install -y libssl-dev
+apt-get install -y libcurl4-gnutls-dev
+apt-get install -y libxml2-dev
 
 # apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \
 #        libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \
