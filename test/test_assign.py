@@ -16,7 +16,6 @@ from unittest.mock import patch
 
 from otter.argparser import get_parser
 from otter.assign import main as assign
-from otter.utils import block_print
 from otter.generate.token import APIClient
 
 
@@ -93,12 +92,6 @@ class TestAssign(unittest.TestCase):
         args = parser.parse_args(run_assign_args)
         args.func = assign
         args.func(args)
-
-        # # block stdout while running
-        # output = StringIO()
-        # with contextlib.redirect_stdout(output):
-        #     with patch("otter.assign.block_print"):
-        #         args.func(args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "otter-correct")
 
