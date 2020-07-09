@@ -223,7 +223,7 @@ class TestGrade(unittest.TestCase):
             "-t", TEST_FILES_PATH + "tests/", 
             "-r", TEST_FILES_PATH + "requirements.txt",
             "-o", "test/",
-            "--tag-filter",
+            "--pdfs", "tags",
             "--containers", "5",
             "--image", "otter-test"
         ]
