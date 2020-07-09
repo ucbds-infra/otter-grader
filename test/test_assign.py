@@ -7,9 +7,7 @@ import sys
 import os
 import shutil
 import subprocess
-import contextlib
 
-from io import StringIO
 from subprocess import PIPE
 from glob import glob
 from unittest.mock import patch
@@ -24,6 +22,10 @@ parser = get_parser()
 TEST_FILES_PATH = "test/test-assign/"
 
 class TestAssign(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
 
     def check_gradescope_zipfile(self, path, correct_dir_path, config, tests=[], files=[]):
         # unzip the zipfile

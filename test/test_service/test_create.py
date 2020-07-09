@@ -9,7 +9,6 @@ import datetime
 import testing.postgresql
 
 from unittest import mock
-# from pyembedpg import PyEmbedPg
 from psycopg2 import connect, extensions
 from psycopg2.errors import DuplicateTable
 
@@ -26,6 +25,8 @@ class TestBuild(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
+
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
         cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)

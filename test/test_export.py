@@ -39,6 +39,10 @@ TEST_FILES_PATH = "test/test-export/"
 
 class TestExport(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
+
     def test_success_HTML(self):
         """
         Tests a successful export with filtering and no pagebreaks
