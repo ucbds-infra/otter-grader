@@ -27,7 +27,9 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
     "Dockerfile",
     "otter/generate/autograder.py",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
-    "docs/index.md"
+    "docs/index.md",
+    "test/test-assign/gs-autograder-correct/requirements.txt",
+    "test/test-assign/pdf-autograder-correct/requirements.txt",
 ]
 
 def main():
@@ -54,42 +56,50 @@ def main():
         new_version = f"git+https://github.com/ucbds-infra/otter-grader.git@{new_hash}"
 
     for file in FILES_WITH_VERSIONS:
-        with open(file, "r+") as f:
+        with open(file) as f:
             contents = f.read()
-            f.seek(0)
-            contents = re.sub(
-                old_version, 
-                new_version, 
-                contents,
-                flags=re.MULTILINE
-            )
+
+        contents = re.sub(
+            old_version, 
+            new_version, 
+            contents,
+            flags=re.MULTILINE
+        )
+
+        with open(file, "w") as f:
             f.write(contents)
 
     if from_beta or FROM_GIT:
         # fix Makefile
-        with open("Makefile", "r+") as f:
+        with open("Makefile") as f:
             contents = f.read()
-            f.seek(0)
-            contents = re.sub("ucbdsinfra/otter-grader:beta", "ucbdsinfra/otter-grader", contents, flags=re.MULTILINE)
+        
+        contents = re.sub("ucbdsinfra/otter-grader:beta", "ucbdsinfra/otter-grader", contents, flags=re.MULTILINE)
+
+        with open("Makefile", "w") as f:
             f.write(contents)
 
     if to_beta or TO_GIT:
         # fix Makefile
         with open("Makefile", "r+") as f:
             contents = f.read()
-            f.seek(0)
-            contents = re.sub(r"ucbdsinfra/otter-grader$", "ucbdsinfra/otter-grader:beta", contents, flags=re.MULTILINE)
+
+        contents = re.sub(r"ucbdsinfra/otter-grader$", "ucbdsinfra/otter-grader:beta", contents, flags=re.MULTILINE)
+
+        with open("Makefile", "w") as f:
             f.write(contents)
 
     # fix otter.__version__
-    with open("otter/version.py", "r+") as f:
+    with open("otter/version.py") as f:
         contents = f.read()
-        f.seek(0)
-        contents = re.sub(
-            fr"__version__ = ['\"]{CURRENT_VERSION}['\"]",
-            f"__version__ = \"{NEW_VERSION}\"",
-            contents
-        )
+
+    contents = re.sub(
+        fr"__version__ = ['\"]{CURRENT_VERSION}['\"]",
+        f"__version__ = \"{NEW_VERSION}\"",
+        contents
+    )
+
+    with open("otter/version.py", "w") as f:
         f.write(contents)
 
     if TO_GIT:

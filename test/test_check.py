@@ -14,6 +14,7 @@ from io import StringIO
 from unittest import mock
 
 from otter import Notebook
+from otter.check import main as check
 
 # read in argument parser
 bin_globals = {}
@@ -39,6 +40,7 @@ class TestCheck(unittest.TestCase):
                 "-t", os.path.split(file)[0]
             ]
             args = parser.parse_args(check_command)
+            args.func = check
 
             # capture stdout
             output = StringIO()
@@ -60,6 +62,7 @@ class TestCheck(unittest.TestCase):
             "-t", TEST_FILES_PATH + "tests"
         ]
         args = parser.parse_args(check_command)
+        args.func = check
 
         # capture stdout
         output = StringIO()
@@ -110,6 +113,7 @@ class TestCheck(unittest.TestCase):
                 "-t", os.path.split(file)[0]
             ]
             args = parser.parse_args(check_command)
+            args.func = check
 
             # capture stdout
             output = StringIO()
@@ -131,6 +135,7 @@ class TestCheck(unittest.TestCase):
             "-t", TEST_FILES_PATH + "tests"
         ]
         args = parser.parse_args(check_command)
+        args.func = check
 
         # capture stdout
         output = StringIO()

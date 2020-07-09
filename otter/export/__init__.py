@@ -4,6 +4,7 @@
 ###########################################
 
 import os
+import warnings
 import nbformat
 import nbconvert
 import pkg_resources
@@ -23,6 +24,8 @@ def notebook_to_pdf(nb, dest, templating="test.tplx", save_tex=False, debug=Fals
         save_tex (``bool``, optional): whether to save the LaTeX file as well
         debug (``bool``, optional): whether to run export in debug mode
     """
+    warnings.filterwarnings("ignore", r"invalid escape sequence '\\c'", DeprecationWarning)
+
     if save_tex:
         latex_exporter = nbconvert.LatexExporter()
 

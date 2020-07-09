@@ -4,12 +4,12 @@
 
 import argparse
 
-from . import assign
-from . import check
-from . import export
-from . import generate
-from . import grade
-from . import service
+# from . import assign
+# from . import check
+# from . import export
+# from . import generate
+# from . import grade
+# from . import service
 
 def get_parser():
     """Creates and returns the argument parser for Otter
@@ -52,7 +52,7 @@ def get_parser():
 
     assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
 
-    assign_parser.set_defaults(func=assign.main)
+    assign_parser.set_defaults(func_str="assign.main")
 
 
     ##### PARSER FOR otter check #####
@@ -62,7 +62,7 @@ def get_parser():
     check_parser.add_argument("-t", "--tests-path", default="tests", help="Path to test files")
     check_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
 
-    check_parser.set_defaults(func=check.main)
+    check_parser.set_defaults(func_str="check.main")
 
 
     ##### PARSER FOR otter export #####
@@ -74,7 +74,7 @@ def get_parser():
     export_parser.add_argument("-s", "--save-tex", default=False, action="store_true", help="Save PDF LaTeX file as well")
     export_parser.add_argument("--debug", default=False, action="store_true", help="Export in debug mode")
 
-    export_parser.set_defaults(func=export.main)
+    export_parser.set_defaults(func_str="export.main")
 
 
     ##### PARSER FOR otter generate #####
@@ -104,13 +104,13 @@ def get_parser():
     generate_autograder_parser.add_argument("--public-multiplier", nargs="?", default=0, type=float, help="Percentage of points to award for passing all public tests")
     generate_autograder_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
-    generate_autograder_parser.set_defaults(func=generate.autograder.main)
+    generate_autograder_parser.set_defaults(func_str="generate.autograder.main")
 
 
     ##### PARSER FOR otter generate token #####
     generate_token_parser = generate_subparsers.add_parser("token", description="Get a Gradescope token")
 
-    generate_token_parser.set_defaults(func=generate.token.main)
+    generate_token_parser.set_defaults(func_str="generate.token.main")
 
 
     ##### PARSER FOR otter grade #####
@@ -132,9 +132,10 @@ def get_parser():
     grade_parser.add_argument("-z", "--zips", action="store_true", default=False, help="Whether submissions are zip files from Notebook.export")
 
     # PDF export options
-    grade_parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
-    grade_parser.add_argument("--tag-filter", action="store_true", default=False, help="Create a tag-filtered PDF for manual grading")
-    grade_parser.add_argument("--html-filter", action="store_true", default=False, help="Create an HTML comment-filtered PDF for manual grading")
+    grade_parser.add_argument("--pdfs", default=False, const="unfiltered", choices=["unfiltered", "tags", "html"], nargs="?")
+    # grade_parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
+    # grade_parser.add_argument("--tag-filter", action="store_true", default=False, help="Create a tag-filtered PDF for manual grading")
+    # grade_parser.add_argument("--html-filter", action="store_true", default=False, help="Create an HTML comment-filtered PDF for manual grading")
 
     # other settings and optional arguments
     grade_parser.add_argument("-f", "--files", nargs="+", help="Specify support files needed to execute code (e.g. utils, data files)")
@@ -146,7 +147,7 @@ def get_parser():
     grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
     grade_parser.add_argument("--debug", action="store_true", default=False, help="Print stdout/stderr from grading for debugging")
 
-    grade_parser.set_defaults(func=grade.main)
+    grade_parser.set_defaults(func_str="grade.main")
 
 
     
@@ -165,7 +166,7 @@ def get_parser():
     service_build_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Based image for grading containers")
     service_build_parser.add_argument("-q", "--quiet", default=False, action="store_true", help="Build images without writing Docker messages to stdout")
 
-    service_build_parser.set_defaults(func=service.build.main)
+    service_build_parser.set_defaults(func_str="service.build.main")
 
 
     ##### PARSER FOR otter service create #####
@@ -175,7 +176,7 @@ def get_parser():
     service_create_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
     service_create_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
 
-    service_create_parser.set_defaults(func=service.create.main)
+    service_create_parser.set_defaults(func_str="service.create.main")
 
 
     ##### PARSER FOR otter service start #####
@@ -191,7 +192,7 @@ def get_parser():
     service_start_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
     service_start_parser.add_argument("-l", "--rate-limit", default=120, type=int, help="Rate limit for submissions in seconds")
 
-    service_start_parser.set_defaults(func=service.start.main)
+    service_start_parser.set_defaults(func_str="service.start.main")
 
 
     return parser

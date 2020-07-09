@@ -15,6 +15,7 @@ nbconvert
 nbformat
 dill
 jupytext
+attrdict
 
 # otter service requirements
 psycopg2

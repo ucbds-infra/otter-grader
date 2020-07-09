@@ -14,9 +14,9 @@ from concurrent.futures import ThreadPoolExecutor, wait
 
 from .metadata import GradescopeParser
 
-def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfiltered_pdfs=False, 
-    tag_filter=False, html_filter=False, reqs=None, num_containers=None, image="ucbdsinfra/otter-grader", 
-    scripts=False, no_kill=False, output_path="./", debug=False, seed=None, zips=False, meta_parser=None):
+def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=None, reqs=None, 
+    num_containers=None, image="ucbdsinfra/otter-grader", scripts=False, no_kill=False, output_path="./", 
+    debug=False, seed=None, zips=False, meta_parser=None):
     """Grades notebooks in parallel docker containers
 
     This function runs ``num_containers`` docker containers in parallel to grade the student submissions
@@ -27,11 +27,9 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
         tests_dir (``str``): path to directory of tests
         notebooks_dir (``str``): path to directory of student submissions to be graded
         verbose (``bool``, optional): whether status messages should be printed to the command line
-        unfiltered_pdfs (``bool``, optional): whether **unfiltered** PDFs of notebooks should be generated
-        tag_filter (``bool``, optional): whether **cell tag-filtered** PDFs of notebooks should be 
-            generated
-        html_filter (``bool``, optional): whether **HTML comment-filtered** PDFs of notebooks should be 
-            generated
+        pdfs (``str``, optional): string indicating what type of PDF to generate; defaults to ``None``
+            indicating no PDFS but can be one of ``["unfiltered", "tags", "html"]`` corresponding to
+            the type of cell filtering to perform upon generation
         reqs (``str``, optional): Path to requirements.txt file with non-standard packages needed
         num_containers (``int``, optional): The number of parallel containers that will be run
         image (``str``, optional): a docker image tag to be used for grading environment
@@ -99,9 +97,10 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
                 dirs[i], 
                 str(i), 
                 verbose=verbose, 
-                unfiltered_pdfs=unfiltered_pdfs, 
-                tag_filter=tag_filter,
-                html_filter=html_filter,
+                pdfs=pdfs,
+                # unfiltered_pdfs=unfiltered_pdfs, 
+                # tag_filter=tag_filter,
+                # html_filter=html_filter,
                 reqs=reqs,
                 image=image,
                 scripts=scripts,
@@ -129,10 +128,8 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, unfilter
     # return list of dataframes
     return [df.result() for df in finished_futures[0]]
 
-
 def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
-    unfiltered_pdfs=False, tag_filter=False, html_filter=False, reqs=None, scripts=False, no_kill=False, 
-    output_path="./", debug=False, seed=None, zips=False):
+    pdfs=False, reqs=None, scripts=False, no_kill=False, output_path="./", debug=False, seed=None, zips=False):
     """
     Grades multiple assignments in a directory using a single docker container. If no PDF assignment is 
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
@@ -143,11 +140,9 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         id (``int``): grading container index
         image (``str``, optional): a docker image tag to be used for grading environment
         verbose (``bool``, optional): whether status messages should be printed to the command line
-        unfiltered_pdfs (``bool``, optional): whether **unfiltered** PDFs of notebooks should be generated
-        tag_filter (``bool``, optional): whether **cell tag-filtered** PDFs of notebooks should be 
-            generated
-        html_filter (``bool``, optional): whether **HTML comment-filtered** PDFs of notebooks should be 
-            generated
+        pdfs (``str``, optional): string indicating what type of PDF to generate; defaults to ``None``
+            indicating no PDFS but can be one of ``["unfiltered", "tags", "html"]`` corresponding to
+            the type of cell filtering to perform upon generation
         reqs (``str``, optional): Path to requirements.txt file with non-standard packages needed
         scripts (``bool``, optional): whether student submissions are Python scripts rather than
             Jupyter notebooks
@@ -204,12 +199,14 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     ]
 
     # if we want PDF output, add the necessary flag
-    if unfiltered_pdfs:
-        grade_command += ["--pdf"]
-    elif tag_filter:
-        grade_command += ["--pdf", "tags"]
-    elif html_filter:
-        grade_command += ["--pdf", "html"]
+    # if unfiltered_pdfs:
+    #     grade_command += ["--pdf"]
+    # elif tag_filter:
+    #     grade_command += ["--pdf", "tags"]
+    # elif html_filter:
+    #     grade_command += ["--pdf", "html"]
+    if pdfs:
+        grade_command += ["--pdf", pdfs]
     
     # seed
     if seed is not None:
@@ -256,7 +253,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
         df = pd.read_csv(f"./grades{id}.csv")
 
-        if unfiltered_pdfs or tag_filter or html_filter:
+        if pdfs:
             pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
             os.makedirs(pdf_folder, exist_ok=True)
             
@@ -289,7 +286,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
 
         # delete the submission PDFs on failure
-        if unfiltered_pdfs or tag_filter or html_filter:
+        if pdfs:
             csv_cleanup_command = ["rm", "-rf", os.path.join(output_path, "submission_pdfs")]
             csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
 

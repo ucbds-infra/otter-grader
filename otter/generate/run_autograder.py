@@ -164,7 +164,8 @@ def main(config):
         for file in os.listdir("/autograder/source/files"):
             fp = os.path.join("/autograder/source/files", file)
             if os.path.isdir(fp):
-                shutil.copytree(fp, os.path.join("/autograder/submission", os.path.basename(fp)))
+                if not os.path.exists(os.path.join("/autograder/submission", os.path.basename(fp))):
+                    shutil.copytree(fp, os.path.join("/autograder/submission", os.path.basename(fp)))
             else:
                 shutil.copy(fp, "/autograder/submission")
 
@@ -269,55 +270,57 @@ def main(config):
             print("\n\n")
             warnings.warn("PDF generation or submission failed", RuntimeWarning)
 
-    # hidden visibility determined by SHOW_HIDDEN_TESTS_ON_RELEASE
-    hidden_test_visibility = ("hidden", "after_published")[config.get("show_hidden_tests_on_release", False)]
+    output = scores.to_gradescope_dict(config)
 
-    output = {"tests" : []}
-    for key in scores:
-        if key != "total" and key != "possible":
-            hidden, incorrect = scores[key].get("hidden", False), "hint" in scores[key]
-            score, possible = scores[key]["score"], scores[key]["possible"]
-            public_score, hidden_score = score * config.get("public_multiplier", 0), score * (1 - config.get("public_multiplier", 0))
-            public_possible, hidden_possible = possible * config.get("public_multiplier", 0), possible * (1 - config.get("public_multiplier", 0))
+    # # hidden visibility determined by show_hidden_tests_on_release
+    # hidden_test_visibility = ("hidden", "after_published")[config.get("show_hidden_tests_on_release", False)]
 
-            if hidden and incorrect:
-                public_score, hidden_score = possible * config.get("public_multiplier", 0), 0
-            elif not hidden and incorrect:
-                public_score, hidden_score = 0, 0
-                public_possible = possible
+    # output = {"tests" : []}
+    # for key in scores:
+    #     if key != "total" and key != "possible":
+    #         hidden, incorrect = scores[key].get("hidden", False), "hint" in scores[key]
+    #         score, possible = scores[key]["score"], scores[key]["possible"]
+    #         public_score, hidden_score = score * config.get("public_multiplier", 0), score * (1 - config.get("public_multiplier", 0))
+    #         public_possible, hidden_possible = possible * config.get("public_multiplier", 0), possible * (1 - config.get("public_multiplier", 0))
+
+    #         if hidden and incorrect:
+    #             public_score, hidden_score = possible * config.get("public_multiplier", 0), 0
+    #         elif not hidden and incorrect:
+    #             public_score, hidden_score = 0, 0
+    #             public_possible = possible
             
-            output["tests"] += [{
-                "name" : key + " - Public",
-                "score" : public_score,
-                "max_score": public_possible,
-                "visibility": "visible",
-                "output": repr(scores[key]["test"]) if not hidden and incorrect else "All tests passed!",
-            }]
-            # if not hidden and incorrect:
-            #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
+    #         output["tests"] += [{
+    #             "name" : key + " - Public",
+    #             "score" : public_score,
+    #             "max_score": public_possible,
+    #             "visibility": "visible",
+    #             "output": repr(scores[key]["test"]) if not hidden and incorrect else "All tests passed!",
+    #         }]
+    #         # if not hidden and incorrect:
+    #         #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
             
-            if not (not hidden and incorrect):
-                output["tests"] += [{
-                    "name" : key + " - Hidden",
-                    "score" : hidden_score,
-                    "max_score": hidden_possible,
-                    "visibility": hidden_test_visibility,
-                    "output": repr(scores[key]["test"]) if incorrect else "All tests passed!"
-                }]
-                # if hidden and incorrect:
-                #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
+    #         if not (not hidden and incorrect):
+    #             output["tests"] += [{
+    #                 "name" : key + " - Hidden",
+    #                 "score" : hidden_score,
+    #                 "max_score": hidden_possible,
+    #                 "visibility": hidden_test_visibility,
+    #                 "output": repr(scores[key]["test"]) if incorrect else "All tests passed!"
+    #             }]
+    #             # if hidden and incorrect:
+    #             #     output["tests"][-1]["output"] = repr(scores[key]["hint"])
     
-    if config.get("show_stdout_on_release", False):
-        output["stdout_visibility"] = "after_published"
+    # if config.get("show_stdout_on_release", False):
+    #     output["stdout_visibility"] = "after_published"
 
-    if config.get("points_possible", None) is not None:
-        output["score"] = scores["total"] / scores["possible"] * config.get("points_possible", None)
+    # if config.get("points_possible", None) is not None:
+    #     output["score"] = scores["total"] / scores["possible"] * config.get("points_possible", None)
 
-    if config.get("score_threshold", None) is not None:
-        if scores["total"] / scores["possible"] >= config["score_threshold"]:
-            output["score"] = config.get("points_possible", None) or scores["possible"]
-        else:
-            output["score"] = 0
+    # if config.get("score_threshold", None) is not None:
+    #     if scores["total"] / scores["possible"] >= config["score_threshold"]:
+    #         output["score"] = config.get("points_possible", None) or scores["possible"]
+    #     else:
+    #         output["score"] = 0
 
     with open("/autograder/results/results.json", "w+") as f:
         json.dump(output, f, indent=4)

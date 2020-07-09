@@ -11,6 +11,8 @@ from subprocess import PIPE
 from glob import glob
 from unittest import mock
 
+from otter.generate.autograder import main as autograder
+
 # read in argument parser
 bin_globals = {}
 
@@ -64,6 +66,7 @@ class TestAutograder(unittest.TestCase):
             TEST_FILES_PATH + "data/test-df.csv"
         ]
         args = parser.parse_args(generate_command)
+        args.func = autograder
         args.func(args)
 
         # unzip the zipfile
@@ -105,6 +108,7 @@ class TestAutograder(unittest.TestCase):
             TEST_FILES_PATH + "data/test-df.csv"
         ]
         args = parser.parse_args(generate_command)
+        args.func = autograder
         args.func(args)
 
         # build the docker image
