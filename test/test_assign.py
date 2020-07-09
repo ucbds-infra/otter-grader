@@ -26,58 +26,17 @@ TEST_FILES_PATH = "test/test-assign/"
 
 class TestAssign(unittest.TestCase):
 
-    def check_gradescope_zipfile(self, path, correctPath, config, tests=[], files=[]):
+    def check_gradescope_zipfile(self, path, correct_dir_path, config, tests=[], files=[]):
         # unzip the zipfile
         unzip_command = ["unzip", "-o", path, "-d", TEST_FILES_PATH + "autograder"]
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(len(unzip.stderr), 0, unzip.stderr)
+        self.assertEqual(len(unzip.stderr), 0, unzip.stderr.decode("utf-8"))
 
-        expected_files = ["run_autograder", "setup.sh", "requirements.txt"]
-        expected_directories = ["tests", "files"]
-
-        # # go through files and ensure that they all exist
-        # for file in expected_files:
-        #     fp = TEST_FILES_PATH + "autograder/" + file
-        #     self.assertTrue(os.path.isfile(fp), f"File {fp} does not exist")
-        
-        # for drct in expected_directories:
-        #     dp = TEST_FILES_PATH + "autograder/" + drct
-        #     self.assertTrue(os.path.isdir(dp), f"Directory {dp} does not exist")
-        
-        # for file in files:
-        #     fp = TEST_FILES_PATH + "autograder/files/" + file
-        #     self.assertTrue(os.path.isfile(fp), f"Support file {fp} does not exist")
-        
-        # for test in tests:
-        #     tp = TEST_FILES_PATH + "autograder/tests/" + test
-        #     self.assertTrue(os.path.isfile(tp), f"Test file {tp} does not exist")
-
-        # check configurations in autograder/run_autograder
-        with open(TEST_FILES_PATH + "autograder/run_autograder") as f:
-            run_autograder = f.read()
-
-        # exec with __name__ not __main__ so that the grading doesn't occur and it only loads globals
-        run_autograder_globals = {"__name__": "__not_main__"}
-        exec(run_autograder, run_autograder_globals)
-
-        for k, v in config.items():
-            self.assertEqual(run_autograder_globals["config"][k], v, 
-                f"Expected config value for {k} ({v}) does not match actual value ({run_autograder_globals['config'][k]})"
-            )
-        
-        # assumed correct dir checking
-
-        unzip_command = ["unzip", "-o", correctPath, "-d", TEST_FILES_PATH + "autograder-correct"]
-        unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(len(unzip.stderr), 0, unzip.stderr)
-
-        self.assertDirsEqual(TEST_FILES_PATH + "autograder",TEST_FILES_PATH + "autograder-correct", ignore_ext=[])
+        self.assertDirsEqual(TEST_FILES_PATH + "autograder", correct_dir_path, ignore_ext=[])
 
         # cleanup
         if os.path.exists(TEST_FILES_PATH + "autograder"):
             shutil.rmtree(TEST_FILES_PATH + "autograder")
-        if os.path.exists(TEST_FILES_PATH + "autograder-correct"):
-            shutil.rmtree(TEST_FILES_PATH + "autograder-correct")
 
     def assertFilesEqual(self, p1, p2):
         try:
@@ -162,7 +121,7 @@ class TestAssign(unittest.TestCase):
         
         # check gradescope zip file
         self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "pdf-correct/autograder/autograder.zip",
+            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "pdf-autograder-correct",
             {
                 "seed": 42,
                 "show_stdout_on_release": True,
@@ -197,7 +156,7 @@ class TestAssign(unittest.TestCase):
         # check gradescope zip file
         
         self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "gs-correct/autograder/autograder.zip",
+            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "gs-autograder-correct",
             {
                 "seed": 42,
                 "show_stdout_on_release": True,

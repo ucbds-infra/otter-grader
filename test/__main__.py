@@ -25,4 +25,4 @@ else:
         test_name = f"Test{sys.argv[2].capitalize()}.test_{sys.argv[3]}"
 
 if __name__ == "__main__":
-    unittest.main(module=module, argv=[__file__], defaultTest=test_name)
+    unittest.main(module=module, argv=[__file__], defaultTest=test_name, verbosity=0)
