@@ -8,8 +8,6 @@ import otter.service.create
 import queries
 import json
 
-from contextlib import redirect_stdout, redirect_stderr
-from io import StringIO
 from unittest import mock
 from tornado.testing import AsyncHTTPTestCase, AsyncTestCase, gen_test
 from tornado.web import Application
@@ -21,7 +19,6 @@ from collections import namedtuple
 
 from otter.service import start
 from otter.service.create import main as create
-from otter.utils import block_print
 
 TEST_FILES_PATH = "test/test_service/test-start/"
 
@@ -33,6 +30,12 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
 
     @classmethod
     def setUpClass(cls):
+        print(
+            "\n\n\n=" * 60 + "\n" +
+            f"Running {cls.__name__}\n" +
+            "=\n" * 60
+        )
+
         # setup test database
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
@@ -99,9 +102,8 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
     @mock.patch.object(start.os, 'urandom', autospec=True)
     def test_google_auth(self, mock_urandom, mock_jwt_decode, mock_getarg, mock_get_user):
         mock_urandom.side_effect = [str(i).encode() for i in range(4)]
-        with redirect_stdout(StringIO()):
-            resp1 = self.fetch('/auth/google')
-            resp2 = self.fetch('/auth/google')
+        resp1 = self.fetch('/auth/google')
+        resp2 = self.fetch('/auth/google')
         self.assertEqual(resp1.code, 200, resp1.body)
         self.assertEqual(resp2.code, 200, resp2.body)
 
@@ -124,10 +126,9 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
         mock_hash.side_effect = self.hash_side_effect
         mock_urandom.side_effect = [str(i).encode() for i in range(4)]
 
-        with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
-            resp1 = self.fetch('/auth?username={}&password={}'.format('user1', 'invalid_pass'))
-            resp2 = self.fetch('/auth?username={}&password={}'.format('user2', 'invalid_pass'))
-            resp3 = self.fetch('/auth?username={}&password={}'.format('invalid_user', 'pass1'))
+        resp1 = self.fetch('/auth?username={}&password={}'.format('user1', 'invalid_pass'))
+        resp2 = self.fetch('/auth?username={}&password={}'.format('user2', 'invalid_pass'))
+        resp3 = self.fetch('/auth?username={}&password={}'.format('invalid_user', 'pass1'))
         self.assertEqual(resp1.code, 401)
         self.assertEqual(resp2.code, 401)
         self.assertEqual(resp3.code, 401)
@@ -150,11 +151,10 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
         mock_hash.side_effect = self.hash_side_effect
         mock_urandom.side_effect = [str(i).encode() for i in range(4)]
         
-        with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
-            resp1 = self.fetch('/auth?username={}&password={}'.format('user1', 'pass1'))
-            resp2 = self.fetch('/auth?username={}&password={}'.format('user2', 'pass2'))
-            resp3 = self.fetch('/auth?username={}&password={}'.format('user1', 'pass1'))
-            resp4 = self.fetch('/auth?username={}&password={}'.format('user2', 'pass2'))
+        resp1 = self.fetch('/auth?username={}&password={}'.format('user1', 'pass1'))
+        resp2 = self.fetch('/auth?username={}&password={}'.format('user2', 'pass2'))
+        resp3 = self.fetch('/auth?username={}&password={}'.format('user1', 'pass1'))
+        resp4 = self.fetch('/auth?username={}&password={}'.format('user2', 'pass2'))
         self.assertEqual(resp1.code, 200)
         self.assertEqual(resp2.code, 200)
         self.assertEqual(resp3.code, 200)
@@ -228,22 +228,21 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         return SubmissionApplication()
 
     def test_submission_fail(self):
-        with redirect_stdout(StringIO()):
-            self.reset_timestamps()
-            with open(TEST_FILES_PATH + 'notebooks/invalid/passesAll.ipynb') as f:
-                data = json.load(f)
-            request = {'api_key': 'key1', 'nb': data}
-            resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
+        self.reset_timestamps()
+        with open(TEST_FILES_PATH + 'notebooks/invalid/passesAll.ipynb') as f:
+            data = json.load(f)
+        request = {'api_key': 'key1', 'nb': data}
+        resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
 
-            self.reset_timestamps()
-            with open(TEST_FILES_PATH + 'notebooks/valid/passesAll.ipynb') as f:
-                data = json.load(f)
-            request = {'api_key': 'invalid_key', 'nb': data}
-            resp2 = self.fetch('/submit', method='POST', body=json.dumps(request))
+        self.reset_timestamps()
+        with open(TEST_FILES_PATH + 'notebooks/valid/passesAll.ipynb') as f:
+            data = json.load(f)
+        request = {'api_key': 'invalid_key', 'nb': data}
+        resp2 = self.fetch('/submit', method='POST', body=json.dumps(request))
 
-            self.reset_timestamps()
-            request = {'api_key': 'key1', 'nb': {}}
-            resp3 = self.fetch('/submit', method='POST', body=json.dumps(request))
+        self.reset_timestamps()
+        request = {'api_key': 'key1', 'nb': {}}
+        resp3 = self.fetch('/submit', method='POST', body=json.dumps(request))
 
         self.assertEqual(resp1.code, 200)
         self.assertEqual(resp2.code, 200)
@@ -260,9 +259,8 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         data["metadata"]["assignment_id"] = "1"
         data["metadata"]["class_id"] = "1"
 
-        with block_print():
-            request = {'api_key': 'key1', 'nb': data}
-            resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
+        request = {'api_key': 'key1', 'nb': data}
+        resp1 = self.fetch('/submit', method='POST', body=json.dumps(request))
 
         self.assertEqual(resp1.code, 200)
 
@@ -287,17 +285,16 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase):
         data["metadata"]["assignment_id"] = "1"
         data["metadata"]["class_id"] = "1"
         
-        with block_print():
-            user1_request = {'api_key': 'key1', 'nb': data}
-            resp1 = self.fetch('/submit', method='POST', body=json.dumps(user1_request))
-            user3_request = {'api_key': 'key4', 'nb': data}
-            resp2 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
-            user2_request = {'api_key': 'key2', 'nb': data}
-            resp4 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
-            self.reset_timestamps()
-            resp3 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
-            user2_request = {'api_key': 'key3', 'nb': data}
-            resp5 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
+        user1_request = {'api_key': 'key1', 'nb': data}
+        resp1 = self.fetch('/submit', method='POST', body=json.dumps(user1_request))
+        user3_request = {'api_key': 'key4', 'nb': data}
+        resp2 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
+        user2_request = {'api_key': 'key2', 'nb': data}
+        resp4 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
+        self.reset_timestamps()
+        resp3 = self.fetch('/submit', method='POST', body=json.dumps(user3_request))
+        user2_request = {'api_key': 'key3', 'nb': data}
+        resp5 = self.fetch('/submit', method='POST', body=json.dumps(user2_request))
 
         self.assertEqual(resp1.code, 200)
         self.assertEqual(resp2.code, 200)

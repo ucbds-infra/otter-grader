@@ -25,6 +25,14 @@ TEST_FILES_PATH = "test/test_generate/test-autograder/"
 
 class TestAutograder(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print(
+            "\n\n\n=" * 60 + "\n" +
+            f"Running {cls.__name__}\n" +
+            "=\n" * 60
+        )
+
     def assertFilesEqual(self, p1, p2):
         with open(p1) as f1:
             with open(p2) as f2:

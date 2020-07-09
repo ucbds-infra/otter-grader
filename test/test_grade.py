@@ -7,10 +7,8 @@ import unittest
 import subprocess
 import json
 import re
-import contextlib
 import pandas as pd
 
-from io import StringIO
 from unittest import mock
 from subprocess import PIPE
 from glob import glob
@@ -32,10 +30,15 @@ class TestGrade(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
+        print(
+            "\n\n\n=" * 60 + "\n" +
+            f"Running {cls.__name__}\n" +
+            "=\n" * 60
+        )
+
         create_image_cmd = ["make", "docker-test"]
         create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
         assert not create_image.stderr, create_image.stderr.decode("utf-8")
-
     
     def setUp(self):
         """
@@ -180,8 +183,7 @@ class TestGrade(unittest.TestCase):
         ]
         args = parser.parse_args(grade_command)
         args.func = grade
-        with contextlib.redirect_stdout(StringIO()):
-            args.func(args)
+        args.func(args)
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv")

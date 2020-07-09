@@ -28,6 +28,14 @@ TEST_FILES_PATH = "test/test-check/"
 
 class TestCheck(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        print(
+            "\n\n\n=" * 60 + "\n" +
+            f"Running {cls.__name__}\n" +
+            "=\n" * 60
+        )
+
     def test_otter_check_script(self):
         """
         Checks that the script checker works

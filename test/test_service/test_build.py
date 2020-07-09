@@ -7,15 +7,12 @@ import os
 import shutil
 import testing.postgresql
 
-from io import StringIO
-from contextlib import redirect_stdout
 from psycopg2 import connect, extensions
 from psycopg2.errors import DuplicateTable
 
 from otter.service.build import write_assignment_info, write_class_info
 from otter.service.build import main as build
 from otter.service.create import main as create
-from otter.utils import block_print
 
 TEST_FILES_PATH = "test/test_service/test-build/"
 
@@ -27,11 +24,16 @@ class TestBuild(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        print(
+            "\n\n\n=" * 60 + "\n" +
+            f"Running {cls.__name__}\n" +
+            "=\n" * 60
+        )
+
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
         cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
 
-        # with block_print():
         args = parser.parse_args(["service", "create"])
         args.func = create
         args.func(args, conn=cls.conn, close_conn=False)
