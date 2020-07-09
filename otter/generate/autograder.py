@@ -73,7 +73,8 @@ config = {
     "pagebreaks": {{ pagebreaks }}
 }
 
-run_autograder(config)
+if __name__ == "__main__":
+    run_autograder(config)
 """)
 
 def main(args):

@@ -15,6 +15,7 @@ import re
 import contextlib
 import nbconvert
 import filecmp
+import nbformat
 
 from io import StringIO
 from unittest import mock
@@ -24,6 +25,7 @@ from textwrap import dedent
 
 from otter.export import export_notebook
 from otter.export import main as export
+from otter.export.filter import load_notebook
 
 # read in argument parser
 bin_globals = {}
@@ -125,6 +127,25 @@ class TestExport(unittest.TestCase):
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".tex"))
 
         # cleanup
+
         cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(cleanup.returncode, 0,"Error in cleanup:" + str(cleanup.stderr))
+
+    def test_load_notebook(self):
+        """
+        Tests a successful load_notebook
+        """
+        test_file = "successful-html-test"
+        node = load_notebook(TEST_FILES_PATH + test_file + ".ipynb")
+
+        nbformat.write(node, TEST_FILES_PATH + test_file)
+
+        # check existence of file
+        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file))
+        self.assertTrue(filecmp.cmp(TEST_FILES_PATH + test_file, TEST_FILES_PATH + "correct/" + test_file))
+        
+        # cleanup
+        cleanup_command = ["rm", TEST_FILES_PATH + test_file]
+        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
+        self.assertEqual(cleanup.returncode, 0,"Error in cleanup: " + str(cleanup.stderr))
