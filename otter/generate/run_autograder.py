@@ -14,14 +14,15 @@ import pandas as pd
 from glob import glob
 from textwrap import dedent
 
+from .token import APIClient
+from .utils import replace_notebook_instances
+
 from ..execute import grade_notebook
 from ..export import export_notebook
-from .token import APIClient
 from ..logs import Log, QuestionNotInLogException
 from ..notebook import _OTTER_LOG_FILENAME
 from ..version import LOGO_WITH_VERSION
 
-NOTEBOOK_INSTANCE_REGEX = r"otter.Notebook\(.+\)"
 
 def main(config):
     """
@@ -66,22 +67,24 @@ def main(config):
 
     nb_path = glob("*.ipynb")[0]
 
-    # fix utils import
-    try:
-        with open(nb_path) as f:
-            contents = f.read()
-    except UnicodeDecodeError:
-        with open(nb_path, "r", encoding="utf-8") as f:
-            contents = f.read()
-    
-    contents = re.sub(NOTEBOOK_INSTANCE_REGEX, "otter.Notebook()", contents)
+    replace_notebook_instances(nb_path)
 
-    try:
-        with open(nb_path, "w") as f:
-            f.write(contents)
-    except UnicodeEncodeError:
-        with open(nb_path, "w", encoding="utf-8") as f:
-            f.write(contents)
+    # # fix utils import
+    # try:
+    #     with open(nb_path) as f:
+    #         contents = f.read()
+    # except UnicodeDecodeError:
+    #     with open(nb_path, "r", encoding="utf-8") as f:
+    #         contents = f.read()
+    
+    # contents = re.sub(NOTEBOOK_INSTANCE_REGEX, "otter.Notebook()", contents)
+
+    # try:
+    #     with open(nb_path, "w") as f:
+    #         f.write(contents)
+    # except UnicodeEncodeError:
+    #     with open(nb_path, "w", encoding="utf-8") as f:
+    #         f.write(contents)
 
     os.makedirs("/autograder/submission/tests", exist_ok=True)
     tests_glob = glob("/autograder/source/tests/*.py")
@@ -109,7 +112,7 @@ def main(config):
         name="submission", 
         cwd="/autograder/submission", 
         test_dir="/autograder/submission/tests",
-        ignore_errors=True, 
+        ignore_errors=not config.get("debug", False), 
         seed=config.get("seed", None),
         log=log if config.get("grade_from_log", False) else None,
         variables=config.get("serialized_variables", None)

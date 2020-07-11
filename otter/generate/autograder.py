@@ -70,7 +70,8 @@ config = {
     "course_id": '{{ course_id }}',
     "assignment_id": '{{ assignment_id }}',
     "filtering": {{ filtering }},
-    "pagebreaks": {{ pagebreaks }}
+    "pagebreaks": {{ pagebreaks }},
+    "debug": False,
 }
 
 if __name__ == "__main__":
