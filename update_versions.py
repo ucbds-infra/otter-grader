@@ -13,12 +13,13 @@
 import re
 import subprocess
 import warnings
+import argparse
+
+PARSER = argparse.ArgumentParser()
+PARSER.add_argument("--git", action="store_true", help="Indicates that new release should be installed via git")
 
 CURRENT_VERSION = "1.0.0.b1"
 NEW_VERSION = "1.0.0.b1"
-
-FROM_GIT = True
-TO_GIT = True
 
 from_beta = "b" in CURRENT_VERSION.split(".")[-1]
 to_beta = "b" in NEW_VERSION.split(".")[-1]
@@ -32,7 +33,15 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
     "test/test-assign/pdf-autograder-correct/requirements.txt",
 ]
 
-def main():
+with open(FILES_WITH_VERSIONS) as f:
+    FROM_GIT = bool(re.search(r"https://github.com/ucbds-infra/otter-grader.git@"))
+
+TO_GIT = False
+
+def main(args):
+    global TO_GIT
+    TO_GIT = bool(args.git)
+
     if TO_GIT and subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip():
         warnings.warn(
             "You have uncommitted changes that will not be included in this release. To include "
@@ -109,4 +118,5 @@ def main():
         print(f"Versions updated. Release version is {NEW_VERSION} -- run 'make distro' to release.")
 
 if __name__ == "__main__":
-    main()
+    args = PARSER.parse_args()
+    main(args)
