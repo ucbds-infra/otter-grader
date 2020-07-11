@@ -34,7 +34,7 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
 ]
 
 with open(FILES_WITH_VERSIONS[0]) as f:
-    FROM_GIT = bool(re.search(r"https://github.com/ucbds-infra/otter-grader.git@"))
+    FROM_GIT = bool(re.search(r"https://github.com/ucbds-infra/otter-grader\.git@", f.read()))
 
 TO_GIT = False
 
