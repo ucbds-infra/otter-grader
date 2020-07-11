@@ -28,7 +28,7 @@ nbformat
 dill
 numpy==1.16.0
 tornado==5.1.1
-otter-grader==1.0.0.b3
+git+https://github.com/ucbds-infra/otter-grader.git@aa012b79a296d3a790a9b6f1d70c519f850ea2bb
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
