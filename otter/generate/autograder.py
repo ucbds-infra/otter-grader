@@ -151,7 +151,7 @@ def main(args):
             for file in args.files:
                 # if a directory, copy the entire dir
                 if os.path.isdir(file):
-                    shutil.copytree(file, str(dir / os.path.basename(file)))
+                    shutil.copytree(file, str(os.path.join("tmp", "files", os.path.basename(file))))
                 else:
                     # check that file is in subdir
                     file = os.path.abspath(file)
