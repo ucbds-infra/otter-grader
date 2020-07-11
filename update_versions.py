@@ -33,7 +33,7 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
     "test/test-assign/pdf-autograder-correct/requirements.txt",
 ]
 
-with open(FILES_WITH_VERSIONS) as f:
+with open(FILES_WITH_VERSIONS[0]) as f:
     FROM_GIT = bool(re.search(r"https://github.com/ucbds-infra/otter-grader.git@"))
 
 TO_GIT = False
