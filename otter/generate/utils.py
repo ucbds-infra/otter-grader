@@ -10,7 +10,7 @@ def replace_notebook_instances(nb_path):
     for cell in nb['cells']:
         source = get_source(cell)
         for i, line in enumerate(source):
-            line = re.sub(instance_regex, line)
+            line = re.sub(instance_regex, "otter.Notebook()", line)
             source[i] = line
         cell['source'] = "\n".join(source)
 
