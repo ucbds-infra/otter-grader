@@ -15,7 +15,8 @@ config = {
     "course_id": '123',
     "assignment_id": '567',
     "filtering": True,
-    "pagebreaks": True
+    "pagebreaks": True,
+    "debug": False,
 }
 
 if __name__ == "__main__":
