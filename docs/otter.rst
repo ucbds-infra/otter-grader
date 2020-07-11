@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+   otter.assign
    otter.export
    otter.generate
    otter.service
@@ -17,14 +18,6 @@ otter.argparser module
 ----------------------
 
 .. automodule:: otter.argparser
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.assign module
--------------------
-
-.. automodule:: otter.assign
    :members:
    :undoc-members:
    :show-inheritance:
