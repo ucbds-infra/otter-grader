@@ -1,9 +1,20 @@
+#############################################
+##### Utilities for Otter on Gradescope #####
+#############################################
+
 import re
 import nbformat
 
 from ..assign.utils import get_source
 
 def replace_notebook_instances(nb_path):
+    """
+    Replaces the creation of ``otter.Notebook`` instances in a notebook at ``nb_path`` that have custom 
+    test paths with the default for Gradescope.
+
+    Args:
+        nb_path (``str``): path to the notebook
+    """
     nb = nbformat.read(nb_path, as_version=nbformat.NO_CONVERT)
 
     instance_regex = r"otter.Notebook\([\"'].+[\"']\)"
