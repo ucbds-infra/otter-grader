@@ -2,7 +2,7 @@
 ##### Otter-Grader Version #####
 ################################
 
-__version__ = "1.0.0.b3"
+__version__ = "1.0.0.b4"
 
 LOGO_WITH_VERSION = fr"""
   _________        __          __               
