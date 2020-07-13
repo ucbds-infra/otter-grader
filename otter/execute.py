@@ -9,6 +9,7 @@ import ast
 import math
 import itertools
 import inspect
+import pprint
 
 from collections import namedtuple
 from unittest import mock
@@ -85,6 +86,9 @@ class GradingResults:
         self.total = total_score
         self.possible = points_possible
     
+    def __repr__(self):
+        return pprint.pformat(self.to_dict(), indent=2)
+
     @property
     def tests(self):
         return list(self.results.keys())
@@ -133,7 +137,7 @@ class GradingResults:
             return result.possible
         else:
             return result.score
-    
+
     def verify_against_log(self, log, ignore_hidden=True):
         """
         Verifies these scores against the results stored in this log using the results returned by 
