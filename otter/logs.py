@@ -13,6 +13,7 @@ import numpy as np
 from enum import Enum, auto
 from glob import glob
 
+from .execute import GradingResults
 
 class QuestionNotInLogException(Exception):
     """Exception that indicates that a specific question was not found in any entry in the log"""
@@ -101,6 +102,14 @@ class LogEntry:
         if isinstance(self.results, list):
             return self.results[0]
         return self.results
+
+    def get_score_perc(self):
+        """Returns the percentage score for the results of this entry
+
+        Returns:
+            ``float``: the percentage score
+        """
+        return self.get_results().grade
 
     def raise_error(self):
         """Raises the error stored in this entry
@@ -433,7 +442,7 @@ class Log:
         """
         return self.get_question_entry(question).get_results()
     
-    def verify_scores(self, score_mapping):
+    def verify_scores(self, scores):
         """
         Verifies scores in ``score_mapping`` (a ``dict`` of the structure returned by 
         ``otter.execute.grade_notebook``) against the results stored in this log using the results 
@@ -448,6 +457,7 @@ class Log:
             ``bool``: whether a discrepancy was found
         """
         found_discrepancy = False
+        score_mapping = scores.to_dict()
         for test in score_mapping:
             if test == "total" or test == "possible":
                 continue
