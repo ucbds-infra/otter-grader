@@ -20,6 +20,7 @@ try:
 except ImportError:
     raise ImportError('IPython needs to be installed for notebook grading')
 
+from .logs import QuestionNotInLogException
 from .ok_parser import OKTests, CheckCallWrapper
 from .utils import hide_outputs, id_generator
 
@@ -99,6 +100,72 @@ class GradingResults:
             ``TestResult``: the results of that test
         """
         return self.results[test_name]
+
+    def get_score(self, test_name):
+        """
+        Returns the score of a test tracked by these results
+
+        Args:
+            test_name (``str``): the name of the test
+        
+        Returns:
+            ``int`` or ``float``: the score
+        """
+        result = self.results[test_name]
+        return result.score
+
+    def get_public_score(self, test_name):
+        """
+        Returns the score of a question based on only public tests. Assumes that all public tests in
+        a test file occur before the first hidden tests (because test execution stops at the first
+        failed test).
+
+        Args:
+            test_name (``str``): the name of the test
+        
+        Returns:
+            ``int`` or ``float``: the score based only on public tests
+        """
+        result = self.results[test_name]
+        if not result.incorrect:
+            return result.possible
+        elif result.hidden:
+            return result.possible
+        else:
+            return result.score
+    
+    def verify_against_log(self, log, ignore_hidden=True):
+        """
+        Verifies these scores against the results stored in this log using the results returned by 
+        ``Log.get_results`` for comparison. Prints a message if the scores differ by more than the 
+        default tolerance of ``math.isclose``. If ``ignore_hidden`` is ``True``, hidden tests are
+        ignored when verifying scores.
+
+        Args:
+            log (``otter.logs.Log``): the log to verify against
+            ignore_hidden  (``bool``, optional): whether to ignore hidden tests during verification
+
+        Returns:
+            ``bool``: whether a discrepancy was found
+        """
+        found_discrepancy = False
+        for test_name in  self.tests:
+            if ignore_hidden:
+                score = self.get_public_score(test_name)
+            else:
+                score = self.get_score(test_name)
+            try:
+                result = log.get_results(test_name)
+                logged_score = result.grade * result.tests[0].value
+                if not math.isclose(score, logged_score):
+                    print("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
+                        test_name, score, logged_score
+                    ))
+                    found_discrepancy = True
+            except QuestionNotInLogException:
+                print(f"No score for {test_name} found in this log")
+                found_discrepancy = True
+        return found_discrepancy
 
     def to_dict(self):
         """

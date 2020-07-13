@@ -122,7 +122,7 @@ def main(config):
     print("\n\n")
     if log is not None:
         try:
-            found_discrepancy = log.verify_scores(scores)
+            found_discrepancy = scores.verify_against_log(log)
             if not found_discrepancy:
                 print("No discrepancies found while verifying scores against the log.")
         except BaseException as e:

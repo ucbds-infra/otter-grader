@@ -441,40 +441,6 @@ class Log:
             ``otter.logs.QuestionNotInLogException``: if the question is not found
         """
         return self.get_question_entry(question).get_results()
-    
-    def verify_scores(self, scores):
-        """
-        Verifies scores in ``score_mapping`` (a ``dict`` of the structure returned by 
-        ``otter.execute.grade_notebook``) against the results stored in this log using the results 
-        returned by ``Log.get_results`` for comparison. Prints a message if the scores differ
-        by more than the default tolerance of ``numpy.isclose``.
-
-        Args:
-            score_mapping (``dict``): the score mapping from ``otter.execute.grade_notebook`` to verify
-                against this log
-
-        Returns:
-            ``bool``: whether a discrepancy was found
-        """
-        found_discrepancy = False
-        score_mapping = scores.to_dict()
-        for test in score_mapping:
-            if test == "total" or test == "possible":
-                continue
-            score = score_mapping[test]["score"]
-            try:
-                result = self.get_results(test)
-                grade = result.grade * result.tests[0].value
-                if not np.isclose(score, grade):
-                    print("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
-                        test, score, grade
-                    ))
-                    found_discrepancy = True
-            except QuestionNotInLogException:
-                print(f"No score for {test} found in this log")
-                found_discrepancy = True
-        return found_discrepancy
-
 
 class QuestionLogIterator:
     """
