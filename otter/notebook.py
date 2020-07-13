@@ -189,29 +189,32 @@ class Notebook:
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
-    def _save_notebook(self):
-        """
-        Runs Jupyter JS to force-save a notebook for use before beginning an export
-        """
-        if self._notebook is None:
-            assert len(glob("*.ipynb")) == 1, "Too many notebooks to infer notebook name"
-            nb = glob("*.ipynb")[0]
-        else:
-            nb = self._notebook
+    # def _save_notebook(self):
+    #     """
+    #     Runs Jupyter JS to force-save a notebook for use before beginning an export
+    #     """
+    #     if self._notebook is None:
+    #         assert len(glob("*.ipynb")) == 1, "Too many notebooks to infer notebook name"
+    #         nb = glob("*.ipynb")[0]
+    #     else:
+    #         nb = self._notebook
         
-        if get_ipython() is not None:
-            display(Javascript("""
-                require(["base/js/namespace"], function() {
-                    Jupyter.notebook.save_checkpoint();
-                    Jupyter.notebook.save_notebook();
-                });
-            """))
-            saved = wait_for_save(nb)
-            if not saved:
-                print(
-                    f"File {nb} was not saved before timeout. Please save and checkpoint "
-                    "this notebook and rerun this cell."
-                )
+    #     if get_ipython() is not None:
+    #         display(Javascript("""
+    #             require(["base/js/namespace"], function() {
+    #                 if ($("span.autosave_status").text().includes("unsaved")) {
+    #                     Jupyter.notebook.kernel.execute("_UNSAVED_CHANGES = True");
+    #                 } else {
+    #                     Jupyter.notebook.kernel.execute("_UNSAVED_CHANGES = False");
+    #                 }
+    #             });
+    #         """))
+    #         saved = wait_for_save(nb)
+    #         if not saved:
+    #             print(
+    #                 f"File {nb} was not saved before timeout. Please save and checkpoint "
+    #                 "this notebook and rerun this cell."
+    #             )
 
     # def _restart_kernel(self):
     #     """
@@ -273,7 +276,7 @@ class Notebook:
             pagebreaks (``bool``, optional): If true, pagebreaks are included between questions
             display_link (``bool``, optional): Whether or not to display a download link
         """
-        self._save_notebook()
+        # self._save_notebook()
         try:
             if nb_path is None and self._notebook is not None:
                 nb_path = self._notebook
@@ -322,7 +325,7 @@ class Notebook:
             display_link (``bool``, optional): whether or not to display a download link
         """
         self._log_event(EventType.BEGIN_EXPORT)
-        self._save_notebook()
+        # self._save_notebook()
 
         try:
             if nb_path is None and self._notebook is not None:
@@ -335,6 +338,16 @@ class Notebook:
 
             elif nb_path is None:
                 raise ValueError("nb_path is None and no otter-service config is available")
+
+            try:
+                with open(nb_path) as f:
+                    assert len(f.read().strip()) > 0, \
+                        f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
+            
+            except UnicodeDecodeError:
+                with open(nb_path, "r", encoding="utf-8") as f:
+                    assert len(f.read().strip()) > 0, \
+                        f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
 
             if export_path is None:
                 zip_path = ".".join(nb_path.split(".")[:-1]) + ".zip"
