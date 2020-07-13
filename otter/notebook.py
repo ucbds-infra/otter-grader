@@ -341,11 +341,13 @@ class Notebook:
 
             try:
                 with open(nb_path) as f:
-                    assert len(f.read().strip()) > 0, f"Notebook {nb_path} is empty"
+                    assert len(f.read().strip()) > 0, \
+                        f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
             
             except UnicodeDecodeError:
                 with open(nb_path, "r", encoding="utf-8") as f:
-                    assert len(f.read().strip()) > 0, f"Notebook {nb_path} is empty"
+                    assert len(f.read().strip()) > 0, \
+                        f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
 
             if export_path is None:
                 zip_path = ".".join(nb_path.split(".")[:-1]) + ".zip"
