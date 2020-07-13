@@ -13,8 +13,6 @@ import numpy as np
 from enum import Enum, auto
 from glob import glob
 
-from .execute import GradingResults
-
 class QuestionNotInLogException(Exception):
     """Exception that indicates that a specific question was not found in any entry in the log"""
 
