@@ -28,7 +28,7 @@ nbformat
 dill
 numpy==1.16.0
 tornado==5.1.1
-otter-grader==1.0.0.b5
+otter-grader==1.0.0.b6
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)

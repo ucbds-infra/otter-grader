@@ -18,8 +18,8 @@ import argparse
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("--git", action="store_true", help="Indicates that new release should be installed via git")
 
-CURRENT_VERSION = "1.0.0.b4"
-NEW_VERSION = "1.0.0.b5"
+CURRENT_VERSION = "1.0.0.b5"
+NEW_VERSION = "1.0.0.b6"
 
 from_beta = "b" in CURRENT_VERSION.split(".")[-1]
 to_beta = "b" in NEW_VERSION.split(".")[-1]
