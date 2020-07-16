@@ -22,7 +22,7 @@ seaborn
 sklearn
 jinja2
 nb2pdf
-tornado==5.1.1
+tornado>=5.1.1
 otter-grader==0.4.7{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)

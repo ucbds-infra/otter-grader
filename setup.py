@@ -21,7 +21,7 @@ setuptools.setup(
 	],
 	install_requires=[
 		"nb2pdf",
-		"tornado==5.1.1"
+		"tornado>=5.1.1"
 	],
 	scripts=["bin/otter"]
 )
