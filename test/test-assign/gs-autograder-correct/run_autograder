@@ -17,6 +17,7 @@ config = {
     "filtering": True,
     "pagebreaks": True,
     "debug": False,
+    "autograder_dir": '/autograder',
 }
 
 if __name__ == "__main__":

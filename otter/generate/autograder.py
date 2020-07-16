@@ -72,6 +72,7 @@ config = {
     "filtering": {{ filtering }},
     "pagebreaks": {{ pagebreaks }},
     "debug": False,
+    "autograder_dir": '{{ autograder_dir }}',
 }
 
 if __name__ == "__main__":
@@ -108,7 +109,8 @@ def main(args):
         pagebreaks = str(not args.no_pagebreaks),
         grade_from_log = str(args.grade_from_log),
         serialized_variables = str(args.serialized_variables),
-        public_multiplier = str(args.public_multiplier)
+        public_multiplier = str(args.public_multiplier),
+        autograder_dir = str(args.autograder_dir),
     )
 
     # create tmp directory to zip inside
