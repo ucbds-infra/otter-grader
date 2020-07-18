@@ -14,7 +14,7 @@ from .cell_generators import (
 )
 from .questions import is_question_cell, read_question_metadata, gen_question_cell
 from .solutions import is_markdown_solution_cell
-from .tests import is_test_cell, read_test, gen_test_cell
+from .tests import is_test_cell, any_public_tests, read_test, gen_test_cell
 from .utils import is_seed_cell, is_markdown_cell, EmptyCellException
 
 def transform_notebook(nb, assignment, args):
@@ -100,7 +100,8 @@ def get_transformed_cells(cells, assignment):
             # include it in the output notebook but we need a test file
             elif is_test_cell(cell):
                 no_solution = True
-                gen_test_cell(question_metadata, test_cases, test_files)
+                test = read_test(cell)
+                test_cases.append(test)
 
             elif is_seed_cell(cell):
                 assignment.seed_required = True
@@ -131,8 +132,8 @@ def get_transformed_cells(cells, assignment):
                 if test_cases:
                     check_cell = gen_test_cell(question_metadata, test_cases, test_files)
 
-                    # only add to notebook if there's a response cell
-                    if not no_solution:
+                    # only add to notebook if there's a response cell or if there are public tests
+                    if not no_solution or any_public_tests(test_cases):
                         transformed_cells.append(check_cell)
 
                 # add a cell with <!-- END QUESTION --> if a manually graded question
@@ -176,7 +177,7 @@ def get_transformed_cells(cells, assignment):
 
     if test_cases:
         check_cell = gen_test_cell(question_metadata, test_cases, test_files)
-        if not no_solution:
+        if not no_solution or any_public_tests(test_cases):
             transformed_cells.append(check_cell)
 
     return transformed_cells, test_files
