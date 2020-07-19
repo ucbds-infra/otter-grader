@@ -26,8 +26,8 @@ try:
     from tornado.queues import Queue
     from concurrent.futures import ThreadPoolExecutor
 
-    from ..containers import grade_assignments
-    from ..utils import connect_db
+    from .utils import connect_db
+    from ..grade.containers import grade_assignments
 
     OTTER_SERVICE_DIR = "/otter-service"
     ARGS = None

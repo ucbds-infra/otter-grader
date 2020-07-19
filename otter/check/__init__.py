@@ -7,10 +7,10 @@ import os
 from glob import glob
 from jinja2 import Template
 
-from .execute import grade_notebook, check
-from .logs import LogEntry, EventType
 from .notebook import _OTTER_LOG_FILENAME
-from .utils import block_print
+from ..execute import grade_notebook, check
+from ..logs import LogEntry, EventType
+from ..utils import block_print
 
 
 RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ tests|length }} tests passed

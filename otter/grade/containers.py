@@ -7,12 +7,14 @@ import re
 import os
 import shutil
 import tempfile
+import docker
 import pandas as pd
 
 from subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor, wait
 
 from .metadata import GradescopeParser
+from .utils import simple_tar, get_container_file
 
 def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=None, reqs=None, 
     num_containers=None, image="ucbdsinfra/otter-grader", scripts=False, no_kill=False, output_path="./", 
@@ -157,45 +159,71 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     Returns:
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
-    # launch our docker conainer
-    launch_command = ["docker", "run", "-d","-it", image]
-    launch = subprocess.run(launch_command, stdout=PIPE, stderr=PIPE)
+    client = docker.from_env()
+
+    # # launch our docker conainer
+    # launch_command = ["docker", "run", "-d","-it", image]
+    # launch = subprocess.run(launch_command, stdout=PIPE, stderr=PIPE)
+
+    container = client.containers.run(image, detach=True, tty=True)
     
     # print(launch.stderr)
-    container_id = launch.stdout.decode('utf-8')[:-1]
+    # container_id = launch.stdout.decode('utf-8')[:-1]
+    container_id = container.id[:12]
 
     if verbose:
-        print(f"Launched container {container_id[:12]}...")
+        print(f"Launched container {container_id}...")
     
     # copy the notebook files to the container
-    copy_command = ["docker", "cp", notebooks_dir, f"{container_id}:/home/notebooks/"]
-    copy = subprocess.run(copy_command, stdout=PIPE, stderr=PIPE)
+    # copy_command = ["docker", "cp", notebooks_dir, f"{container_id}:/home/notebooks/"]
+    # copy = subprocess.run(copy_command, stdout=PIPE, stderr=PIPE)
+
+    with simple_tar(notebooks_dir) as tarf:
+        # container.exec_run("mkdir /home")
+        container.put_archive("/home", tarf)
+        container.exec_run(f"mv /home/{os.path.basename(notebooks_dir)} /home/notebooks")
     
     # copy the test files to the container
     if tests_dir is not None:
-        tests_command = ["docker", "cp", tests_dir, f"{container_id}:/home/tests/"]
-        tests = subprocess.run(tests_command, stdout=PIPE, stderr=PIPE)
+        # tests_command = ["docker", "cp", tests_dir, f"{container_id}:/home/tests/"]
+        # tests = subprocess.run(tests_command, stdout=PIPE, stderr=PIPE)
+
+        with simple_tar(tests_dir) as tarf:
+            # container.put_archive("/home/tests", tarf)
+            container.put_archive("/home", tarf)
+            container.exec_run(f"mv /home/{os.path.basename(tests_dir)} /home/tests")
 
     # copy the requirements file to the container
     if reqs:
         if verbose:
-            print(f"Installing requirements in container {container_id[:12]}...")
-        reqs_command = ["docker", "cp", reqs, f"{container_id}:/home"]
-        requirements = subprocess.run(reqs_command, stdout=PIPE, stderr=PIPE)
+            print(f"Installing requirements in container {container_id}...")
+        # reqs_command = ["docker", "cp", reqs, f"{container_id}:/home"]
+        # requirements = subprocess.run(reqs_command, stdout=PIPE, stderr=PIPE)
+        with simple_tar(reqs) as tarf:
+            container.put_archive("/home", tarf)
 
         # install requirements
-        install_command = [
-            "docker", "exec", "-t", container_id, "pip3", "install", "-r", "/home/requirements.txt"
-        ]
-        install = subprocess.run(install_command, stdout=PIPE, stderr=PIPE)
+        # install_command = [
+        #     "docker", "exec", "-t", container_id, "pip3", "install", "-r", "/home/requirements.txt"
+        # ]
+        # install = subprocess.run(install_command, stdout=PIPE, stderr=PIPE)
+
+        exit_code, output = container.exec_run("pip3 install -r /home/requirements.txt")
+        assert exit_code == 0, f"Container {container_id} failed to install requirements:\n{output.decode('utf-8')}"
+
+        if debug:
+            print(output.decode("utf-8"))
 
     if verbose:
-        print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container_id[:12]}...")
+        print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container_id}...")
     
     # Now we have the notebooks in home/notebooks, we should tell the container to execute the 
     # grade command...
+    # grade_command = [
+    #     "docker", "exec", "-t", container_id, "python3", "-m", "otter", "/home/notebooks"
+    # ]
     grade_command = [
-        "docker", "exec", "-t", container_id, "python3", "-m", "otter", "/home/notebooks"
+        "python3", "-m", "otter", "/home/notebooks"
     ]
 
     # if we want PDF output, add the necessary flag
@@ -222,107 +250,124 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     if zips:
         grade_command += ["--zips"]
 
-    grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
-    
+    # grade = subprocess.run(grade_command, stdout=PIPE, stderr=PIPE)
+    exit_code, output = container.exec_run(grade_command)
+    assert exit_code == 0, f"Container {container_id} failed with output:\n{output.decode('utf-8')}"
+
     if debug:
-        print(grade.stdout.decode("utf-8"))
-        print(grade.stderr.decode("utf-8"))
+        print(output.decode("utf-8"))
+    
+    # if debug:
+    #     print(grade.stdout.decode("utf-8"))
+    #     print(grade.stderr.decode("utf-8"))
 
-    all_commands = [launch, copy, grade]
-    try: 
-        all_commands += [tests]
-    except UnboundLocalError:
-        pass
-    try:
-        all_commands += [requirements, install]
-    except UnboundLocalError:
-        pass
+    # all_commands = [launch, copy, grade]
+    # try: 
+    #     all_commands += [tests]
+    # except UnboundLocalError:
+    #     pass
+    # try:
+    #     all_commands += [requirements, install]
+    # except UnboundLocalError:
+    #     pass
 
     try:
-        for command in all_commands:
-            if command.stderr.decode('utf-8') != '':
-                raise Exception(f"Error running {command}; failed with error:\n{command.stderr.decode('utf-8')}")
+        # for command in all_commands:
+        #     if command.stderr.decode('utf-8') != '':
+        #         raise Exception(f"Error running {command}; failed with error:\n{command.stderr.decode('utf-8')}")
 
         if verbose:
-            print(f"Copying grades from container {container_id[:12]}...")
+            print(f"Copying grades from container {container_id}...")
 
         # get the grades back from the container and read to date frame so we can merge later
-        csv_command = [
-            "docker", "cp", f"{container_id}:/home/notebooks/grades.csv", f"./grades{id}.csv"
-        ]
-        csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
-        df = pd.read_csv(f"./grades{id}.csv")
+        # csv_command = [
+        #     "docker", "cp", f"{container_id}:/home/notebooks/grades.csv", f"./grades{id}.csv"
+        # ]
+        # csv = subprocess.run(csv_command, stdout=PIPE, stderr=PIPE)
+        with get_container_file(container, "/home/notebooks/grades.csv") as f:
+            df = pd.read_csv(f)
 
+        # TODO: fix this
         if pdfs:
             pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
             os.makedirs(pdf_folder, exist_ok=True)
             
             # copy out manual submissions
             for pdf in df["manual"]:
-                copy_cmd = [
-                    "docker", "cp", f"{container_id}:{pdf}", os.path.join(pdf_folder, os.path.basename(pdf))
-                ]
-                copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
+                local_pdf_path = os.path.join(pdf_folder, os.path.basename(pdf))
+                # copy_cmd = [
+                #     "docker", "cp", f"{container_id}:{pdf}", os.path.join(pdf_folder, os.path.basename(pdf))
+                # ]
+                # copy = subprocess.run(copy_cmd, stdout=PIPE, stderr=PIPE)
+                with get_container_file(container, pdf) as pdf_file, open(local_pdf_path, "wb+") as f:
+                    f.write(pdf_file.read())
 
-            df["manual"] = df["manual"].str.replace("/home/notebooks", "submission_pdfs")
+            df["manual"] = df["manual"].str.replace("/home/notebooks", os.path.basename(pdf_folder))
         
-        # delete the file we just read
-        csv_cleanup_command = ["rm", f"./grades{id}.csv"]
-        csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
+        # # delete the file we just read
+        # csv_cleanup_command = ["rm", f"./grades{id}.csv"]
+        # csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
 
         if not no_kill:
             if verbose:
-                print(f"Stopping container {container_id[:12]}...")
+                print(f"Stopping container {container_id}...")
 
-            # cleanup the docker container
-            stop_command = ["docker", "stop", container_id]
-            stop = subprocess.run(stop_command, stdout=PIPE, stderr=PIPE)
-            remove_command = ["docker", "rm", container_id]
-            remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
+            # # cleanup the docker container
+            # stop_command = ["docker", "stop", container_id]
+            # stop = subprocess.run(stop_command, stdout=PIPE, stderr=PIPE)
+            # remove_command = ["docker", "rm", container_id]
+            # remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
+            container.stop()
+            container.remove()
+
 
     except:
-        # delete the file we just read
-        csv_cleanup_command = ["rm", f"./grades{id}.csv"]
-        csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
+        # # delete the file we just read
+        # csv_cleanup_command = ["rm", f"./grades{id}.csv"]
+        # csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
 
+        # TODO: fix this
         # delete the submission PDFs on failure
         if pdfs:
-            csv_cleanup_command = ["rm", "-rf", os.path.join(output_path, "submission_pdfs")]
-            csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
+            # csv_cleanup_command = ["rm", "-rf", os.path.join(output_path, "submission_pdfs")]
+            # csv_cleanup = subprocess.run(csv_cleanup_command, stdout=PIPE, stderr=PIPE)
+            shutil.rmtree(pdf_folder)
 
         if not no_kill:
             if verbose:
-                print(f"Stopping container {container_id[:12]}...")
+                print(f"Stopping container {container_id}...")
 
-            # cleanup the docker container
-            stop_command = ["docker", "stop", container_id]
-            stop = subprocess.run(stop_command, stdout=PIPE, stderr=PIPE)
-            remove_command = ["docker", "rm", container_id]
-            remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
+            # # cleanup the docker container
+            # stop_command = ["docker", "stop", container_id]
+            # stop = subprocess.run(stop_command, stdout=PIPE, stderr=PIPE)
+            # remove_command = ["docker", "rm", container_id]
+            # remove = subprocess.run(remove_command, stdout=PIPE, stderr=PIPE)
+            container.stop()
+            container.remove()
         
         raise
     
-    # check that no commands errored, if they did rais an informative exception
-    all_commands = [launch, copy, grade, csv, csv_cleanup]
+    # # check that no commands errored, if they did rais an informative exception
+    # all_commands = [launch, copy, grade, csv, csv_cleanup]
 
-    try:
-        all_commands += [stop, remove]
-    except UnboundLocalError:
-        pass
+    # try:
+    #     all_commands += [stop, remove]
+    # except UnboundLocalError:
+    #     pass
 
-    try:
-        all_commands += [tests]
-    except UnboundLocalError:
-        pass
+    # try:
+    #     all_commands += [tests]
+    # except UnboundLocalError:
+    #     pass
 
-    try:
-        all_commands += [requirements, install]
-    except UnboundLocalError:
-        pass
+    # try:
+    #     all_commands += [requirements, install]
+    # except UnboundLocalError:
+    #     pass
 
-    for command in all_commands:
-        for command in all_commands:
-            if command.stderr.decode('utf-8') != '':
-                raise Exception(f"Error running {command}; failed with error:\n{command.stderr.decode('utf-8')}")
+    # for command in all_commands:
+    #     for command in all_commands:
+    #         if command.stderr.decode('utf-8') != '':
+    #             raise Exception(f"Error running {command}; failed with error:\n{command.stderr.decode('utf-8')}")
     
     return df

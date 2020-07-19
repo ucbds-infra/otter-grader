@@ -14,7 +14,7 @@ try:
     from psycopg2 import connect, extensions, sql
     from psycopg2.errors import DuplicateTable
 
-    from ..utils import connect_db
+    from .utils import connect_db
 
 except ImportError:
     # don't need requirements to use otter without otter service

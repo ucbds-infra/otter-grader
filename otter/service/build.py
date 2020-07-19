@@ -15,7 +15,7 @@ try:
     from jinja2 import Template
     from psycopg2.errors import UniqueViolation
 
-    from ..utils import connect_db
+    from .utils import connect_db
 
 except ImportError:
     MISSING_PACKAGES = True
