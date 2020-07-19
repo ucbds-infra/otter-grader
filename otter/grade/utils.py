@@ -38,6 +38,9 @@ def get_container_file(container, path):
     file_contents = tar.extractfile(members[0])
     
     f.write(file_contents.read())
+    tar.close()
+    tarf.close()
+    
     f.seek(0)
 
     yield f

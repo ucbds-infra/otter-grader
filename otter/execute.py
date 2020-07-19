@@ -16,13 +16,10 @@ from unittest import mock
 from contextlib import redirect_stdout, redirect_stderr
 from IPython import get_ipython
 from IPython.display import display
-try:
-    from IPython.core.inputsplitter import IPythonInputSplitter
-except ImportError:
-    raise ImportError('IPython needs to be installed for notebook grading')
+from IPython.core.inputsplitter import IPythonInputSplitter
 
 from .logs import QuestionNotInLogException
-from .ok_parser import OKTests, CheckCallWrapper
+from .test_files import TestCollection, OKTestFile
 from .utils import hide_outputs, id_generator
 
 TestResult = namedtuple("TestResult", ["name", "score", "possible", "test", "hidden", "incorrect"])
@@ -276,7 +273,7 @@ def check(test_file_path, global_env=None):
         ``otter.ok_parser.OKTestsResult``: result of running the tests in the given global environment
 
     """
-    tests = OKTests([test_file_path])
+    tests = TestCollection([test_file_path], OKTestFile)
 
     if global_env is None:
         # Get the global env of our callers - one level below us in the stack
@@ -356,43 +353,9 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 if tested in t:     # e.g. if 'tests/q1.py' is in /srv/repo/lab01/tests/q1.py'
                     include = False
             if include:
-                extra_tests.append(OKTests([t]))
+                extra_tests.append(TestCollection([t], OKTestFile))
         extra_results = [t.run(global_env, include_grade=False) for t in extra_tests]
         test_results += extra_results
-
-    # score_mapping = {}
-    # points_possible, total_score = 0, 0
-    # for r in test_results:
-    #     try:
-    #         for test in r.tests:
-    #             test_name = os.path.split(test.name)[1][:-3]
-    #             score_mapping[test_name] = {
-    #                 "score": r.grade * test.value,
-    #                 "possible": test.value,
-    #                 "test": test,
-    #                 # "hidden": test.hidden
-    #             }
-    #             total_score += r.grade * test.value
-    #             points_possible += test.value
-    #         for tup in r.failed_tests:
-    #             test_name = os.path.split(tup[0].name)[1][:-3]
-    #             if test_name in score_mapping:
-    #                 score_mapping[test_name]["hint"] = tup[1]#.__repr__()
-    #                 score_mapping[test_name]["hidden"] = tup[1].failed_test_hidden
-    #             else:
-    #                 score_mapping[test_name] = {
-    #                     "hint": tup[1],#.__repr__()
-    #                     "hidden": tup[1].failed_test_hidden,
-    #                     "test": tup[0],
-    #                 }
-    #     except IndexError:
-    #         pass
-
-    # # add in total score and avoid divide by zero error if there are no tests
-    # score_mapping["total"] = total_score
-    # score_mapping["possible"] = points_possible
-
-    # return score_mapping
 
     return GradingResults(test_results)
 
@@ -679,3 +642,123 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
             if not ignore_errors:
                 raise
         return global_env
+
+class CheckCallWrapper(ast.NodeTransformer):
+    """Visits and replaces nodes in an abstract syntax tree in-place.
+    
+    Tracks import syntax and instances of ``otter.Notebook`` in an AST. Wraps calls to 
+    ``otter.Notebook.check`` in calls to ``list.append`` to collect results of execution. Removes calls
+    to ``otter.Notebook.check_all``, `otter.Notebook.export``, and ``otter.Notebook.to_pdf``.
+    
+    Args:
+        secret (``str``): random digits string that prevents check function from being modified
+    
+    Attributes:
+        secret (``str``): random digits string that prevents check function from being modified
+    """
+    OTTER_IMPORT_SYNTAX = "import"
+    OTTER_IMPORT_NAME = "otter"
+    OTTER_CLASS_NAME = "Notebook"
+    OTTER_INSTANCE_NAME = "grader"
+
+    def __init__(self, secret):
+        self.secret = secret
+
+    def check_node_constructor(self, expression):
+        """Creates node that wraps expression in a list (``check_results_XX``) append call
+        
+        Args:
+            expression (``ast.Name``): name for check function
+
+        Returns:
+            ``ast.Call``: function call object from calling check
+
+        """
+        args = [expression]
+        func = ast.Attribute(
+            attr='append',
+            value=ast.Name(id='check_results_{}'.format(self.secret), ctx=ast.Load()),
+            ctx=ast.Load(),
+            keywords=[]
+        )
+        return ast.Call(func=func, args=args, keywords=[])
+
+    def visit_ImportFrom(self, node):
+        """
+        Visits ``from ... import ...`` nodes and tracks the import syntax and alias of ``otter.Notebook``
+
+        Args:
+            node (``ast.ImportFrom``): the import node
+
+        Returns:
+            ``ast.ImportFrom``: the original node
+        """
+        if node.module == "otter" and "Notebook" in [n.name for n in node.names]:
+            CheckCallWrapper.OTTER_IMPORT_SYNTAX = "from"
+            nb_asname = [n.asname for n in node.names if n.name == "Notebook"][0]
+            if nb_asname is not None:
+                CheckCallWrapper.OTTER_CLASS_NAME = nb_asname
+        return node
+
+    def visit_Import(self, node):
+        """
+        Visits ``import ...`` nodes and tracks the import syntax and alias of ``otter``
+
+        Args:
+            node (``ast.Import``): the import node
+
+        Returns:
+            ``ast.Import``: the original node
+        """
+        if "otter" in [n.name for n in node.names]:
+            CheckCallWrapper.OTTER_IMPORT_SYNTAX = "import"
+            otter_asname = [n.asname for n in node.names if n.name == "otter"][0]
+            if otter_asname is not None:
+                CheckCallWrapper.OTTER_IMPORT_NAME = otter_asname
+        return node
+
+    def visit_Assign(self, node):
+        """
+        Visits assignment nodes to determine the name assigned to the instance of ``otter.Notebook``
+        created.
+
+        Args:
+            node (``ast.Assign``): the assignment node
+
+        Returns:
+            ``ast.Assign``: the original node
+        """
+        if isinstance(node.value, ast.Call):
+            if isinstance(node.value.func, ast.Attribute) and CheckCallWrapper.OTTER_IMPORT_SYNTAX == "import":
+                if node.value.func.attr == "Notebook" and isinstance(node.value.func.value, ast.Name):
+                    if node.value.func.value.id == CheckCallWrapper.OTTER_IMPORT_NAME:
+                        assert len(node.targets) == 1, "error parsing otter.Notebook instance in ast"
+                        CheckCallWrapper.OTTER_INSTANCE_NAME = node.targets[0].id
+            elif isinstance(node.value.func, ast.Name) and CheckCallWrapper.OTTER_IMPORT_SYNTAX == "from":
+                if node.value.func.id == CheckCallWrapper.OTTER_CLASS_NAME:
+                    assert len(node.targets) == 1, "error parsing otter.Notebook instance in ast"
+                    CheckCallWrapper.OTTER_INSTANCE_NAME = node.targets[0].id
+        return node
+
+    def visit_Expr(self, node):
+        """
+        Visits expression nodes and removes them if they are calls to ``otter.Notebook.check_all``,
+        ``otter.Notebook.export``, or ``otter.Notebook.to_pdf`` or wraps them using 
+        ``CheckCallWrapper.check_node_constructor`` if they are calls to ``otter.Notebook.check``.
+
+        Args:
+            node (``ast.Expr``): the expression node
+
+        Returns:
+            ``ast.Expr``: the transformed node
+            ``None``: if the node was a removed call
+        """
+        if isinstance(node.value, ast.Call):
+            call_node = node.value
+            if isinstance(call_node.func, ast.Attribute):
+                if isinstance(call_node.func.value, ast.Name) and call_node.func.value.id == CheckCallWrapper.OTTER_INSTANCE_NAME:
+                    if call_node.func.attr in ["check_all", "export", "to_pdf"]:
+                        return None
+                    elif call_node.func.attr == "check":
+                        node.value = self.check_node_constructor(call_node)
+        return node
