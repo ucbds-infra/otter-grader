@@ -1,6 +1,6 @@
-#################################################
-##### Gradescope Generator for Otter-Grader #####
-#################################################
+"""
+Gradescope autograder configuration generator for Otter Generate
+"""
 
 import os
 import shutil

@@ -1,6 +1,6 @@
-########################################
-##### Run Autograder on Gradescope #####
-########################################
+"""
+Gradescope autograding internals
+"""
 
 import json
 import os
