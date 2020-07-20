@@ -1,7 +1,6 @@
-#######################################################
-##### Cell Filtering for Jupyter Notebook Exports #####
-#####       forked from nb2pdf and gsExport       #####
-#######################################################
+"""
+Cell filtering for IPython notebook exports forked from nb2pdf and gsExport
+"""
 
 import re
 import nbformat
@@ -10,9 +9,7 @@ NBFORMAT_VERSION = 4
 BEGIN_QUESTION_REGEX = r"<!--\s*BEGIN QUESTION\s*-->"
 END_QUESTION_REGEX = r"<!--\s*END QUESTION\s*-->"
 NEW_PAGE_REGEX = r"<!--\s*NEW PAGE\s*-->"
-# NEW_PAGE_CELL_SOURCE = "\\\\newpage"
 NEW_PAGE_CELL_SOURCE = "<!-- #newpage -->"
-
 
 def load_notebook(nb_path, filtering=True, pagebreaks=False):
     """
@@ -34,9 +31,9 @@ def load_notebook(nb_path, filtering=True, pagebreaks=False):
         notebook = filter_notebook_cells_by_comments(notebook, pagebreaks=pagebreaks)
     return notebook
 
-
 def has_begin(line):
-    """Returns whether a string contains a begin question comment
+    """
+    Returns whether a string contains a begin question comment
 
     A begin question comment is an HTML comment on a single line that denotes the beginning of an 
     export block. The begin question comment looks like:
@@ -54,7 +51,8 @@ def has_begin(line):
     return bool(re.search(BEGIN_QUESTION_REGEX, line, flags=re.IGNORECASE))
 
 def has_end(line):
-    """Returns whether a string contains an end question comment
+    """
+    Returns whether a string contains an end question comment
 
     An end question comment is an HTML comment on a single line that denotes the end of an export 
     block. The begin question comment looks like:
@@ -71,14 +69,9 @@ def has_end(line):
     """
     return bool(re.search(END_QUESTION_REGEX, line, flags=re.IGNORECASE))
 
-# def create_new_page_cell(line):
-#     """
-
-#     """
-#     return nbformat.v4.new_markdown_cell(source=NEW_PAGE_CELL_SOURCE)
-
 def sub_end_for_new_page(line):
-    """Subsitutes an end question comment for a newpage comment
+    """
+    Subsitutes an end question comment for a newpage comment
 
     The end question HTML comment (cf. ``otter.export.filter.has_end``) is replaced with the following
     HTML comment to indicate a pagebreak in the LaTeX template.
@@ -94,7 +87,6 @@ def sub_end_for_new_page(line):
         ``str``: the line with the end question match substituted for the newpage comment
     """
     return re.sub(END_QUESTION_REGEX, NEW_PAGE_CELL_SOURCE, line)
-
 
 def filter_notebook_cells_by_comments(notebook, pagebreaks=False):
     """
