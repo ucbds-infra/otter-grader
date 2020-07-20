@@ -1,6 +1,6 @@
-########################################################
-##### Docker Container Management for Otter-Grader #####
-########################################################
+"""
+Docker container management for Otter Grade
+"""
 
 import subprocess
 import re

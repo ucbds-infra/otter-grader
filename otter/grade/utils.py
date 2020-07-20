@@ -1,3 +1,7 @@
+"""
+Utilities for Otter Grade
+"""
+
 import tempfile
 import tarfile
 import os
