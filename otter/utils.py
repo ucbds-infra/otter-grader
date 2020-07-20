@@ -1,6 +1,6 @@
-######################################
-##### Utilities for Otter-Grader #####
-######################################
+"""
+Utilities for Otter-Grader
+"""
 
 MISSING_PACKAGES = False
 

@@ -1,6 +1,6 @@
-####################################
-##### Logging for Otter-Grader #####
-####################################
+"""
+Logging for Otter Check
+"""
 
 import os
 import pickle

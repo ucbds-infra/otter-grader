@@ -1,6 +1,6 @@
-############################################
-##### Argument Parser for Otter Grader #####
-############################################
+"""
+Argument parser for Otter command-line tools
+"""
 
 import argparse
 

@@ -1,6 +1,6 @@
-###########################################
-##### Direct Grading for Otter-Grader #####
-###########################################
+"""
+In-container grading interface for Otter Grader
+"""
 
 import argparse
 import os
