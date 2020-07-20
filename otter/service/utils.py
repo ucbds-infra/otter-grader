@@ -19,7 +19,7 @@ def connect_db(host="localhost", username="admin", password="", port="5432", db=
         port (``str``, optional): port on which Postgres is running
 
     Returns:
-        ``connection``: connection object for executing SQL commands on Postgres database
+        ``psycopg2.connection``: connection object for executing SQL commands on Postgres database
 
     Raises:
         ``ImportError``: if psycopg2 is not installed

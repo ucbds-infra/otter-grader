@@ -32,14 +32,16 @@ ADD {{ file }} /home/notebooks{% endfor %}
 """)
 
 def write_class_info(class_id, class_name, conn):
-    """Writes the given class_name to the database, auto-generating a class_id
+    """
+    Writes the given ``class_name`` to the database
 
     Args:
-        class_name (str): Name of new class to add to the database
-        conn (Connection): Connection object for database
+        class_id (``str``): the class id for the database
+        class_name (``str``): name of new class to add to the database
+        conn (``psycopg2.connection``): connection object for database
     
     Returns:
-        class_id: Class ID for newly added class.
+        ``str``: class id for newly added class
     """
     cursor = conn.cursor()
     insert_command = "INSERT INTO classes (class_id, class_name) \
@@ -53,14 +55,15 @@ def write_class_info(class_id, class_name, conn):
     return class_id
 
 def write_assignment_info(assignment_id, class_id, assignment_name, seed, conn):
-    """Inserts/Updates assignment class_id and assignment_name in database. Inserts if assignment_id
-        is not present. Updates if assignment_id is present.
+    """
+    Inserts or updates an assignment with p-key ``(class_id, assignment_id)`` in the ``assignments`` 
+    table of the database.
 
     Args:
-        assignment_id (str): Assignment id which will be created or updated
-        class_id (str): Class id to insert/update
-        assignment_name (str): Assignment name to insert/update
-        conn (Connection): Connection object for database
+        assignment_id (``str``): assignment id which will be created or updated
+        class_id (``str``): class id of the assignment
+        assignment_name (``str``): assignment name to insert/update
+        conn (``psycopg2.connection``): connection object for database
     """
     cursor = conn.cursor()
     find_sql_command = """SELECT * FROM assignments
@@ -90,6 +93,16 @@ def write_assignment_info(assignment_id, class_id, assignment_name, seed, conn):
     cursor.close()
 
 def main(args, conn=None, close_conn=True):
+    """
+    Inserts/updates assignment records in the database and builds Docker images from configuration
+    repository based on a YAML configuation file.
+
+    Args:
+        args (``argparse.Namespace``): parsed command-line arguments
+        conn (``psycopg2.connection``, optional): Postgres connection
+        close_conn (``bool``, optional): whether to close the databse connection after running; 
+            default ``True``
+    """
     if MISSING_PACKAGES:
         raise ImportError(
             "Missing some packages required for otter service. "

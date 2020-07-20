@@ -38,20 +38,22 @@ try:
     class BaseHandler(tornado.web.RequestHandler):
         """Base login handler"""
         def get_current_user(self):
-            """Gets secure user cookie for personal authentication
+            """
+            Gets secure user cookie for personal authentication
             """
             return self.get_secure_cookie("user")
     
 
     class LoginHandler(BaseHandler):
-        """Default auth handler
+        """
+        Default auth handler
         
-        A login handler that requires instructors to setup users and passwords in database
-        beforehand, allowing students to auth within the notebook.
+        A login handler that requires instructors to setup users and passwords in database beforehand, 
+        allowing students to auth within the notebook.
         """
         async def get(self):
             """
-            Get request for personal/default authentication login
+            GET request handler for personal/default authentication login
             """
             username = self.get_argument('username', True)
             password = self.get_argument('password', True)
@@ -91,7 +93,8 @@ try:
 
     class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):
         async def get(self):
-            """Google OAuth login handler
+            """
+            GET request handler for Google OAuth
 
             Handler for authenticating users with Google OAuth. Requires that user sets environment
             variables containing their client key and secret. Provides users with an API key that they
@@ -133,19 +136,24 @@ try:
     
 
     class SubmissionHandler(RequestHandler):
-        """Processes and validations student submission
+        """
+        Processes and validates student submission
 
         Handler for processing and validating a student's submission. Ensure that notebook is present
         and valid, checks API key, and implements rate limiting to prevent spamming the autograder.
-        Queues submission for grading by EXECUTOR.
+        Queues submission for grading by ``EXECUTOR``.
         """
         async def get(self):
-            """Route to warn users that this is a POST-only route"""
+            """
+            GET request handler. Route warns users that this is a POST-only route.
+            """
             self.write("This is a POST-only route; you probably shouldn't be here.")
             self.finish()
 
         async def post(self):
-            """Post request function for handling python notebook submissions"""
+            """
+            POST request handler. Validates JSON params and queues submission for grading.
+            """
             self.submission_id = None
             try:
                 # check request params
@@ -167,15 +175,16 @@ try:
                 SUBMISSION_QUEUE.put(self.submission_id)
 
         async def validate(self, notebook, api_key):
-            """Ensures a submision is valid by checking user credentials, submission frequency, and
+            """
+            Ensures a submision is valid by checking user credentials, submission frequency, and
             validity of notebook file.
 
             Arguments:
-                notebook (json): notebook in json form
-                api_key (str): API Key generated during submission
+                notebook (``dict``): notebook in JSON form
+                api_key (``str``): API key generated during submission
 
             Returns:
-                tuple: submission information
+                ``tuple``: submission information
             """
             # authenticate user with api_key
             results = await self.db.query("SELECT user_id, username, email FROM users WHERE %s=ANY(api_keys) LIMIT 1", [api_key])
@@ -221,12 +230,13 @@ try:
             return (user_id, username, assignment['class_id'], assignment_id, assignment['assignment_name'])
 
         async def submit(self, notebook, api_key):
-            """If valid submission, inserts notebook into submissions table in database and queues 
-                it for grading.
+            """
+            If valid submission, inserts notebook into submissions table in database and queues it 
+            for grading.
 
             Arguments:
-                notebook (json): notebook in json form
-                api_key (str): API Key generated during submission
+                notebook (``dict``): notebook in JSON form
+                api_key (``str``): API key generated during submission
             """
             try:
                 user_id, username, class_id, assignment_id, assignment_name = await self.validate(notebook, api_key)
@@ -275,6 +285,13 @@ try:
             return self.application.db
 
         def write_error(self, status_code, **kwargs):
+            """
+            Writes an error message to response
+
+            Args:
+                status_code (``int``): the response status
+                message (``str``): message to include in the response
+            """
             if 'message' in kwargs:
                 self.write('Submission failed: {}'.format(kwargs['message']))
             else:
@@ -282,13 +299,14 @@ try:
 
 
     def grade_submission(submission_id):
-        """Grades a single submission with id SUBMISSION_ID
+        """
+        Grades a single submission with id ``submission_id``
 
         Args:
-            submission_id (str): the id of the submission to grade
+            submission_id (``str``): the id of the submission to grade
 
         Returns:
-            tuple: grading message and results dataframe for printing
+            ``tuple``: grading message and results dataframe for printing
         """
         global CONN
         cursor = CONN.cursor()
@@ -379,11 +397,12 @@ try:
 
 
     async def start_grading_queue(shutdown=False):
-        """Pops submission ids off SUBMISSION_QUEUE and sending them into EXECUTOR to be graded
+        """
+        Pops submission ids off ``SUBMISSION_QUEUE`` and sending them into ``EXECUTOR`` to be graded
         
         Args:
-            shutdown (bool): default `False`; whether or not to shutdown EXECUTOR after processing
-                queue
+            shutdown (``bool``): whether or not to shutdown EXECUTOR after processing queue; default 
+                ``False``
         """
         global SUBMISSION_QUEUE
 
@@ -402,8 +421,13 @@ try:
 
 
     class Application(tornado.web.Application):
+        """
+        Otter Service tornado application
+        """
         def __init__(self):
-            """Initialize tornado server for receiving/grading submissions"""
+            """
+            Initialize tornado server for receiving/grading submissions
+            """
             endpoint = ARGS.endpoint or os.environ.get("OTTER_ENDPOINT", None)
             assert endpoint is not None, "no endpoint address provided"
             assert os.path.isdir(OTTER_SERVICE_DIR), "{} does not exist".format(OTTER_SERVICE_DIR)
@@ -437,6 +461,12 @@ except ImportError:
     MISSING_PACKAGES = True
 
 def main(cli_args):
+    """
+    Starts Otter Service tornado server
+
+    Args:
+        cli_args (``argparse.Namespace``): parsed command-line arguments
+    """
     if MISSING_PACKAGES:
         raise ImportError(
             "Missing some packages required for otter service. "
