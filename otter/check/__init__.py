@@ -24,12 +24,13 @@ Tests failed:
 """)
 
 def _log_event(event_type, results=[], question=None, success=True, error=None):
-	"""Logs an event
+	"""
+	Logs an event
 
 	Args:
 		event_type (``otter.logs.EventType``): the type of event
-		results (``list`` of ``otter.ok_parser.OKTestsResult``, optional): the results of any checks
-			recorded by the entry
+		results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the 
+			results of any checks recorded by the entry
 		question (``str``, optional): the question name for this check
 		success (``bool``, optional): whether the operation was successful
 		error (``Exception``, optional): the exception thrown by the operation, if applicable
@@ -43,7 +44,8 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 	).flush_to_file(_OTTER_LOG_FILENAME)
 
 def main(args):
-	"""Runs Otter Check
+	"""
+	Runs Otter Check
 
 	Args:
 		args (``argparse.Namespace``): parsed command line arguments
