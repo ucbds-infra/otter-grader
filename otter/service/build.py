@@ -1,6 +1,6 @@
-#################################################
-##### Cointainer Building for Otter Service #####
-#################################################
+"""
+Docker image building for Otter Service
+"""
 
 MISSING_PACKAGES = False
 

@@ -1,6 +1,6 @@
-###############################
-##### Start Otter Service #####
-###############################
+"""
+Otter Service tornado server
+"""
 
 MISSING_PACKAGES = False
 

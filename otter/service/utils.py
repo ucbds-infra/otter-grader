@@ -1,3 +1,7 @@
+"""
+Utilities for Otter Service
+"""
+
 MISSING_PACKAGES = False
 
 try:

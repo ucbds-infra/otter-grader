@@ -1,6 +1,6 @@
-#############################################
-##### Create Database for Otter Service #####
-#############################################
+"""
+Database creation and setup for Otter Service
+"""
 
 MISSING_PACKAGES = False
 
