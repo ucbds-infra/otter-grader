@@ -1,3 +1,7 @@
+"""
+Execution of a submission through log deserialization
+"""
+
 import re
 
 from unittest import mock

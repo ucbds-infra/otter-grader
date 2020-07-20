@@ -1,6 +1,6 @@
-########################################################
-##### Notebook and File Execution for Otter-Grader #####
-########################################################
+"""
+Execution and grading internals for Otter-Grader
+"""
 
 import json
 import itertools
@@ -30,7 +30,8 @@ def check(test_file_path, global_env=None):
             of a python script or notebook
 
     Returns:
-        ``otter.ok_parser.OKTestsResult``: result of running the tests in the given global environment
+        ``otter.test_files.abstract_test.TestCollectionResults``: result of running the tests in the 
+            given global environment
 
     """
     tests = TestCollection([test_file_path], OKTestFile)
@@ -67,7 +68,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
 
     Returns:
-        ``GradingResults``: the results of grading
+        ``otter.execute.results.GradingResults``: the results of grading
     """
     # ensure this is not being executed inside a notebook
     assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"

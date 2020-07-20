@@ -1,7 +1,12 @@
+"""
+Test result collection via abstract syntax tree transformation
+"""
+
 import ast
 
 class CheckCallWrapper(ast.NodeTransformer):
-    """Visits and replaces nodes in an abstract syntax tree in-place.
+    """
+    Visits and replaces nodes in an abstract syntax tree in-place.
     
     Tracks import syntax and instances of ``otter.Notebook`` in an AST. Wraps calls to 
     ``otter.Notebook.check`` in calls to ``list.append`` to collect results of execution. Removes calls
@@ -22,7 +27,8 @@ class CheckCallWrapper(ast.NodeTransformer):
         self.secret = secret
 
     def check_node_constructor(self, expression):
-        """Creates node that wraps expression in a list (``check_results_XX``) append call
+        """
+        Creates node that wraps expression in a list (``check_results_XX``) append call
         
         Args:
             expression (``ast.Name``): name for check function

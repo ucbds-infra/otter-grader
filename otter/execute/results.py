@@ -1,3 +1,7 @@
+"""
+Grading results from submission execution
+"""
+
 import os
 import math
 import pprint
@@ -8,16 +12,20 @@ TestResult = namedtuple("TestResult", ["name", "score", "possible", "test", "hid
 
 class GradingResults:
     """
-    Stores and wrangles test result objects. Initialize with a list of ``otter.ok_parser.OKTestsResult``
-    objects and this class will store the results as named tuples so that they can be accessed/manipulated
-    easily. Also contains methods to put the results into a nice ``dict`` format or into the correct
-    format for Gradescope.
+    Stores and wrangles test result objects.
+    
+    Initialize with a list of ``otter.test_files.abstract_test.TestCollectionResults`` objects and 
+    this class will store the results as named tuples so that they can be accessed/manipulated easily. 
+    Also contains methods to put the results into a nice ``dict`` format or into the correct format 
+    for Gradescope.
 
     Args:
-        results (``list`` of ``otter.ok_parser.OKTestsResult``): the list of grading results
+        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``): the list of 
+            grading results
     
     Attributes:
-        raw_results (``list`` of ``otter.ok_parser.OKTestsResult``): the results passed to the constructor
+        raw_results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``): the 
+            results passed to the constructor
         results (``dict``): maps test names to ``TestResult`` named tuples containing the test result
             information
         total (numeric): the total points earned by the submission

@@ -1,3 +1,7 @@
+"""
+Execution of a Python script
+"""
+
 import os
 import re
 import ast

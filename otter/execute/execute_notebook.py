@@ -1,3 +1,7 @@
+"""
+Execution of an IPython notebook
+"""
+
 import os
 import re
 import ast
