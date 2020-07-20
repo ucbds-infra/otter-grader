@@ -32,6 +32,8 @@ class TestGrade(TestCase):
     
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+        
         create_image_cmd = ["make", "docker-test"]
         create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
         assert not create_image.stderr, create_image.stderr.decode("utf-8")

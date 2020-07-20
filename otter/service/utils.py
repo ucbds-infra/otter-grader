@@ -2,12 +2,7 @@
 Utilities for Otter Service
 """
 
-MISSING_PACKAGES = False
-
-try:
-    from psycopg2 import connect, extensions
-except ImportError:
-    MISSING_PACKAGES = True
+from psycopg2 import connect, extensions
 
 def connect_db(host="localhost", username="admin", password="", port="5432", db="otter_db"):
     """Connects to a specific Postgres database with provided parameters/credentials
@@ -24,13 +19,7 @@ def connect_db(host="localhost", username="admin", password="", port="5432", db=
     Raises:
         ``ImportError``: if psycopg2 is not installed
     """
-    if MISSING_PACKAGES:
-        raise ImportError(
-            "Missing some packages required for otter service. "
-            "Please install all requirements at "
-            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
-        )
-        
+    
     conn = connect(dbname=db,
                user=username,
                host=host,

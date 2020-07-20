@@ -32,6 +32,8 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase, TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+        
         # setup test database
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
@@ -177,6 +179,8 @@ class TestServiceSubmissionHandler(AsyncHTTPTestCase, TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         # set up test database
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())

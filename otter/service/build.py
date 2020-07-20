@@ -2,23 +2,17 @@
 Docker image building for Otter Service
 """
 
-MISSING_PACKAGES = False
+import subprocess
+import shutil
+import os
+import yaml
 
-try:
-    import subprocess
-    import shutil
-    import os
-    import yaml
+from subprocess import PIPE, DEVNULL
+from io import BytesIO
+from jinja2 import Template
+from psycopg2.errors import UniqueViolation
 
-    from subprocess import PIPE, DEVNULL
-    from io import BytesIO
-    from jinja2 import Template
-    from psycopg2.errors import UniqueViolation
-
-    from .utils import connect_db
-
-except ImportError:
-    MISSING_PACKAGES = True
+from .utils import connect_db
 
 DOCKERFILE_TEMPLATE = Template("""
 FROM {{ image }}
@@ -103,12 +97,12 @@ def main(args, conn=None, close_conn=True):
         close_conn (``bool``, optional): whether to close the databse connection after running; 
             default ``True``
     """
-    if MISSING_PACKAGES:
-        raise ImportError(
-            "Missing some packages required for otter service. "
-            "Please install all requirements at "
-            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
-        )
+    # if args.missing_packages:
+    #     raise ImportError(
+    #         "Missing some packages required for otter service. "
+    #         "Please install all requirements at "
+    #         "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+    #     )
 
     repo_path = args.repo_path
     assert os.path.exists(repo_path) and os.path.isdir(repo_path), "{} does not exist or is not a directory".format(repo_path)

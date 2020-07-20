@@ -7,8 +7,13 @@ class TestCase(unittest.TestCase):
     assert methods.
     """
 
+    @classmethod
+    def setUpClass(cls):
+        print("\n" + ("=" * 70) + f"\nRunning Test Case {cls.__module__}.{cls.__name__}\n" + ("=" * 70))
+        return super().setUpClass()
+
     def setUp(self):
-        print("\n" + ("=" * 80) + f"\nRunning {self.id()}\n" + ("=" * 80))
+        print("\n" + ("-" * 70) + f"\nRunning {self.id()}\n" + ("-" * 70))
         return super().setUp()
 
     def assertFilesEqual(self, p1, p2):

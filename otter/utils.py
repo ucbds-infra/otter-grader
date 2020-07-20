@@ -2,8 +2,6 @@
 Utilities for Otter-Grader
 """
 
-MISSING_PACKAGES = False
-
 import os
 import sys
 import pathlib

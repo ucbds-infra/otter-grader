@@ -2,23 +2,16 @@
 Database creation and setup for Otter Service
 """
 
-MISSING_PACKAGES = False
+import yaml
+import csv
+import psycopg2
+import hashlib
+import os
 
-try:
-    import yaml
-    import csv
-    import psycopg2
-    import hashlib
-    import os
+from psycopg2 import connect, extensions, sql
+from psycopg2.errors import DuplicateTable
 
-    from psycopg2 import connect, extensions, sql
-    from psycopg2.errors import DuplicateTable
-
-    from .utils import connect_db
-
-except ImportError:
-    # don't need requirements to use otter without otter service
-    MISSING_PACKAGES = True
+from .utils import connect_db
 
 def create_users(filepath, host=None, username=None, password=None, conn=None):
     """
@@ -87,12 +80,12 @@ def main(args, conn=None, close_conn=True):
         close_conn (``bool``, optional): whether to close the databse connection after running; 
             default ``True``
     """
-    if MISSING_PACKAGES:
-        raise ImportError(
-            "Missing some packages required for otter service. "
-            "Please install all requirements at "
-            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
-        )
+    # if args.missing_packages:
+    #     raise ImportError(
+    #         "Missing some packages required for otter service. "
+    #         "Please install all requirements at "
+    #         "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+    #     )
     
     pgconn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port, db='postgres')
 

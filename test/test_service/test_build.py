@@ -26,6 +26,8 @@ class TestBuild(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+        
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
         cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
