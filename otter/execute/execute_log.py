@@ -19,7 +19,7 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
 
     Args:
         nb (``dict``): JSON representation of a notebook
-        log (``otter.logs.Log``): log from notebook execution
+        log (``otter.check.logs.Log``): log from notebook execution
         secret (``str``, optional): randomly generated integer used to rebind check function
         initial_env (``str``, optional): name of initial environment
         ignore_errors (``bool``, optional): whether exceptions should be ignored

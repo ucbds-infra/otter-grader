@@ -17,10 +17,10 @@ from textwrap import dedent
 from .token import APIClient
 from .utils import replace_notebook_instances
 
+from ..check.logs import Log, QuestionNotInLogException
 from ..check.notebook import _OTTER_LOG_FILENAME
 from ..execute import grade_notebook
 from ..export import export_notebook
-from ..logs import Log, QuestionNotInLogException
 from ..version import LOGO_WITH_VERSION
 
 

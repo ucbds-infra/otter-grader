@@ -17,9 +17,9 @@ from glob import glob
 from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 
+from .logs import LogEntry, EventType, Log
 from ..execute import check
 from ..export import export_notebook
-from ..logs import LogEntry, EventType, Log
 # from .utils import wait_for_save
 
 _API_KEY = None

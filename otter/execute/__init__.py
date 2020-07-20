@@ -63,7 +63,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             grading environment
         test_dir (``str``, optional): path to directory of tests in grading environment
         seed (``int``, optional): random seed for intercell seeding
-        log (``otter.logs.Log``, optional): log from which to grade questions
+        log (``otter.check.logs.Log``, optional): log from which to grade questions
         variables (``dict``, optional): map of variable names -> type string to check type of deserialized
             object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
 
