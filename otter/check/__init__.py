@@ -1,6 +1,6 @@
-########################################################
-##### Command Line Script Checker for Otter-Grader #####
-########################################################
+"""
+Otter Check command-line utility
+"""
 
 import os
 

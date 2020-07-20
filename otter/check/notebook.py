@@ -1,6 +1,6 @@
-###############################################
-##### In-Notebook Checks for Otter-Grader #####
-###############################################
+"""
+IPython notebook API for Otter Check
+"""
 
 import inspect
 import requests

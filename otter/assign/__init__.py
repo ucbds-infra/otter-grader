@@ -1,5 +1,5 @@
 """
-Otter Assign command-line utility. This module contains the main method that runs Otter Assign.
+Otter Assign command-line utility
 """
 
 import os
