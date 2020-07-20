@@ -1,6 +1,6 @@
-###############################################################
-##### Master Notebook Parser/Transformer for Otter Assign #####
-###############################################################
+"""
+Master notebook parser and transformer for Otter Assign
+"""
 
 import os
 import copy

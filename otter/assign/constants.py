@@ -1,6 +1,6 @@
-######################################
-##### Constants for Otter Assign #####
-######################################
+"""
+Constants (global variables) for Otter Assign
+"""
 
 import re
 

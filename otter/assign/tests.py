@@ -1,6 +1,6 @@
-#########################################################
-##### OK-Test Parsers and Builders for Otter Assign #####
-#########################################################
+"""
+OK-formatted test parsers and builders for Otter Assign
+"""
 
 import re
 import pprint

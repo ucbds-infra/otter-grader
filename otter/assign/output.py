@@ -1,6 +1,6 @@
-###########################################
-##### Output Writing for Otter Assign #####
-###########################################
+"""
+Output writing for Otter Assign
+"""
 
 import os
 import shutil
