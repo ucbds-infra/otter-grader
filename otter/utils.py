@@ -10,7 +10,7 @@ import pathlib
 import random
 import string
 
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
 
 @contextmanager
@@ -18,15 +18,8 @@ def block_print():
     """
     Context manager that disables printing to stdout.
     """
-    sys.stdout = open(os.devnull, 'w')
-    try:
+    with open(os.devnull, "w") as f, redirect_stdout(f):
         yield
-    finally:
-        try:
-            sys.stdout.close()
-        except:
-            pass
-        sys.stdout = sys.__stdout__
 
 def flush_inline_matplotlib_plots():
     """

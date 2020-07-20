@@ -14,18 +14,18 @@ from otter.service.build import write_assignment_info, write_class_info
 from otter.service.build import main as build
 from otter.service.create import main as create
 
+from .. import TestCase
+
 TEST_FILES_PATH = "test/test_service/test-build/"
 
 parser = None
 with open("bin/otter") as f:
     exec(f.read())
 
-class TestBuild(unittest.TestCase):
+class TestBuild(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
-
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
         cls.conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)

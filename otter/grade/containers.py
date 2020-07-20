@@ -255,7 +255,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     except:
 
         # delete the submission PDFs on failure
-        if pdfs:
+        if pdfs and "pdf_folder" in locals():
             shutil.rmtree(pdf_folder)
 
         if not no_kill:

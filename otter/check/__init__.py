@@ -89,6 +89,7 @@ def main(args):
 
 	except Exception as e:
 		_log_event(EventType.CHECK, success=False, error=e)
+		raise e
 			
 	else:
 		_log_event(EventType.CHECK, results=results)

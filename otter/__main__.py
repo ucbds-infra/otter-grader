@@ -131,12 +131,6 @@ def main(args=None):
             gradeables = glob(os.path.join(grading_dir, ("*.py", "*.ipynb")[not args.scripts]))
             assert len(gradeables) == 1, f"Wrong number of gradeable files in submission {fname}"
             fpath = gradeables[0]
-        
-        print(os.getcwd())
-        print(fname)
-        print(fpath)
-        print(os.listdir("/home/notebooks"))
-        print(os.listdir())
 
         # grade the submission
         score = grade(

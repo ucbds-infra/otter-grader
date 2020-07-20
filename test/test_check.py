@@ -16,6 +16,8 @@ from unittest import mock
 from otter import Notebook
 from otter.check import main as check
 
+from . import TestCase
+
 # read in argument parser
 bin_globals = {}
 
@@ -26,11 +28,7 @@ parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test-check/"
 
-class TestCheck(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
+class TestCheck(TestCase):
 
     def test_otter_check_script(self):
         """
