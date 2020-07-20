@@ -1,7 +1,6 @@
-###########################################
-##### OK Test Parser for Otter-Grader #####
-#####     forked from Gofer-Grader    #####
-###########################################
+"""
+Support for OK-formatted test files
+"""
 
 import os
 import io

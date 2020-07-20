@@ -1,3 +1,8 @@
+"""
+Abstract base classes for working with test files and classes to represent collections of test and 
+their results
+"""
+
 from abc import ABC, abstractmethod
 from textwrap import dedent
 from typing import Tuple, List, Dict, Any
@@ -103,7 +108,7 @@ class TestCollection:
             grade, self.paths, self.tests, passed_tests, failed_tests, include_grade
         )
 
-class TestCollectionResults(ABC):
+class TestCollectionResults:
     html_result_template = Template("""
     {% if include_grade %}
     <strong>Grade: {{ grade }}</strong>
