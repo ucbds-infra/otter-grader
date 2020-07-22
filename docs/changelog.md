@@ -16,6 +16,7 @@
 * Fixed `otter.ok_parser.CheckCallWrapper` finding and patching instances of `otter.Notebook`
 * Changed behavior of hidden test cases to use individual case `"hidden"` key instead of global `"hidden"` key
 * Made use of metadata files in `otter grade` optional
+* Added `otter_ignore` cell tag to flag a cell to be ignored during notebook execution
 * _Deprecated in v1.0.0:_ the global `test["hidden"]` key in writing OK tests for Otter
 
 **v0.4.8:**
