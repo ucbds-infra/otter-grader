@@ -1,6 +1,6 @@
-#################################################
-##### Gradescope Generator for Otter-Grader #####
-#################################################
+"""
+Gradescope autograder configuration generator for Otter Generate
+"""
 
 import os
 import shutil
@@ -31,7 +31,7 @@ jupytext
 rpy2
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@99008144d0e86319201103fba6c0e45a861e3032
+otter-grader==1.0.0.b7
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
 """)
@@ -97,6 +97,8 @@ config = {
     "filtering": {{ filtering }},
     "pagebreaks": {{ pagebreaks }},
     "lang": '{{ lang }}',
+    "debug": False,
+    "autograder_dir": '{{ autograder_dir }}',
 }
 
 if __name__ == "__main__":
@@ -137,12 +139,16 @@ def main(args):
         grade_from_log = str(args.grade_from_log),
         serialized_variables = str(args.serialized_variables),
         public_multiplier = str(args.public_multiplier),
+<<<<<<< HEAD
         lang = str(args.lang.lower())
     )
 
     # format setup.sh
     setup_sh = SETUP_SH.render(
         lang = str(args.lang.lower())
+=======
+        autograder_dir = str(args.autograder_dir),
+>>>>>>> beta
     )
 
     # create tmp directory to zip inside
@@ -217,7 +223,7 @@ def main(args):
             for file in args.files:
                 # if a directory, copy the entire dir
                 if os.path.isdir(file):
-                    shutil.copytree(file, str(dir / os.path.basename(file)))
+                    shutil.copytree(file, str(os.path.join("tmp", "files", os.path.basename(file))))
                 else:
                     # check that file is in subdir
                     file = os.path.abspath(file)

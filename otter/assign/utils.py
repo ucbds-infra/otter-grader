@@ -1,6 +1,6 @@
-######################################
-##### Utilities for Otter Assign #####
-######################################
+"""
+Utilities for Otter Assign
+"""
 
 import re
 import os
@@ -231,10 +231,10 @@ def run_generate_autograder(result, assignment, args):
     generate_cmd = ["generate", "autograder"]
 
     if generate_args.get('points', None) is not None:
-        generate_cmd += ["--points", generate_args.get('points', None)]
+        generate_cmd += ["--points", str(generate_args.get('points', None))]
     
     if generate_args.get('threshold', None) is not None:
-        generate_cmd += ["--threshold", generate_args.get('threshold', None)]
+        generate_cmd += ["--threshold", str(generate_args.get('threshold', None))]
     
     if generate_args.get('show_stdout', False):
         generate_cmd += ["--show-stdout"]
@@ -264,7 +264,7 @@ def run_generate_autograder(result, assignment, args):
     requirements = assignment.requirements or args.requirements
     requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))
     if os.path.isfile(requirements):
-        generate_cmd += ["-r", requirements]
+        generate_cmd += ["-r", str(requirements)]
         if assignment.overwrite_requirements or args.overwrite_requirements:
             generate_cmd += ["--overwrite-requirements"]
     

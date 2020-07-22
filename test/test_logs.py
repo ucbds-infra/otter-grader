@@ -4,6 +4,8 @@
 
 import unittest
 
+from . import TestCase
+
 # read in argument parser
 bin_globals = {}
 
@@ -14,11 +16,7 @@ parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test-logs/"
 
-class TestLogs(unittest.TestCase):
+class TestLogs(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
-    
     def test_something(self):
         pass

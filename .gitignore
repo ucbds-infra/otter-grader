@@ -14,3 +14,5 @@ docs/_build
 .Rproj.user
 .Rhistory
 .ionide
+gs-testing-stuff
+.mypy.cache

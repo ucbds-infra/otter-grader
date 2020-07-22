@@ -1,16 +1,16 @@
-########################################################
-##### Command Line Script Checker for Otter-Grader #####
-########################################################
+"""
+Otter Check command-line utility
+"""
 
 import os
 
 from glob import glob
 from jinja2 import Template
 
-from .execute import grade_notebook, check
 from .logs import LogEntry, EventType
 from .notebook import _OTTER_LOG_FILENAME
-from .utils import block_print
+from ..execute import grade_notebook, check
+from ..utils import block_print
 
 
 RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ tests|length }} tests passed
@@ -24,12 +24,13 @@ Tests failed:
 """)
 
 def _log_event(event_type, results=[], question=None, success=True, error=None):
-	"""Logs an event
+	"""
+	Logs an event
 
 	Args:
 		event_type (``otter.logs.EventType``): the type of event
-		results (``list`` of ``otter.ok_parser.OKTestsResult``, optional): the results of any checks
-			recorded by the entry
+		results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the 
+			results of any checks recorded by the entry
 		question (``str``, optional): the question name for this check
 		success (``bool``, optional): whether the operation was successful
 		error (``Exception``, optional): the exception thrown by the operation, if applicable
@@ -43,7 +44,8 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 	).flush_to_file(_OTTER_LOG_FILENAME)
 
 def main(args):
-	"""Runs Otter Check
+	"""
+	Runs Otter Check
 
 	Args:
 		args (``argparse.Namespace``): parsed command line arguments
@@ -89,6 +91,7 @@ def main(args):
 
 	except Exception as e:
 		_log_event(EventType.CHECK, success=False, error=e)
+		raise e
 			
 	else:
 		_log_event(EventType.CHECK, results=results)

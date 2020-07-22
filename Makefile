@@ -4,7 +4,7 @@ distro:
 	python3 setup.py sdist bdist_wheel
 
 git-distro:
-	python3 update_versions.py
+	python3 update_versions.py --git
 
 pypi:
 	rm dist/*

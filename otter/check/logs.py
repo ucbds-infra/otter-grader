@@ -1,6 +1,6 @@
-####################################
-##### Logging for Otter-Grader #####
-####################################
+"""
+Logging for Otter Check
+"""
 
 import os
 import pickle
@@ -12,7 +12,6 @@ import numpy as np
 
 from enum import Enum, auto
 from glob import glob
-
 
 class QuestionNotInLogException(Exception):
     """Exception that indicates that a specific question was not found in any entry in the log"""
@@ -45,24 +44,25 @@ class EventType(Enum):
 
 
 class LogEntry:
-    """An entry in Otter's log. Tracks event type, grading results, success of operation, and errors
+    """
+    An entry in Otter's log. Tracks event type, grading results, success of operation, and errors
     thrown.
 
     Args:
-        event_type (``otter.logs.EventType``): the type of event for this entry
-        results (``list`` of ``otter.ok_parser.OKTestsResult``, optional): the results of grading if 
-            this is an ``otter.logs.EventType.CHECK`` record
-        question (``str``, optional): the question name for an EventType.CHECK record
+        event_type (``EventType``): the type of event for this entry
+        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the 
+            results of grading if this is an ``EventType.CHECK`` record
+        question (``str``, optional): the question name for an ``EventType.CHECK`` record
         success (``bool``, optional): whether the operation was successful
         error (``Exception``, optional): an error thrown by the process being logged if any
 
     Attributes:
-        event_type (``otter.logs.EventType``): the entry type
+        event_type (``EventType``): the entry type
         shelf (``bytes``): a pickled environment stored as a bytes string
         unshelved (``list`` of ``str``): a list of variable names that were unable to be pickled during
             shelving
-        results (``list`` of ``otter.ok_parser.OKTestsResult``): grading results if this is a check
-            entry
+        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``): grading results 
+            if this is an ``EventType.CHECK`` entry
         question (``str``): question name if this is a check entry
         success (``bool``): whether the operation tracked by this entry was successful
         error (``Exception``): an error thrown by the tracked process if applicable
@@ -91,19 +91,30 @@ class LogEntry:
         )
 
     def get_results(self):
-        """Get the results stored in this log entry
+        """
+        Get the results stored in this log entry
         
         Returns:
-            ``list`` of ``otter.ok_parser.OKTestsResult``: the results at this entry if this is an 
-                ``otter.logs.EventType.CHECK`` record
+            ``list`` of ``otter.test_files.abstract_test.TestCollectionResults``: the results at this 
+                entry if this is an ``EventType.CHECK`` record
         """
         assert self.event_type is EventType.CHECK, "this record type has no results"
         if isinstance(self.results, list):
             return self.results[0]
         return self.results
 
+    def get_score_perc(self):
+        """
+        Returns the percentage score for the results of this entry
+
+        Returns:
+            ``float``: the percentage score
+        """
+        return self.get_results().grade
+
     def raise_error(self):
-        """Raises the error stored in this entry
+        """
+        Raises the error stored in this entry
 
         Raises:
             ``Exception``: the error stored at this entry, if present
@@ -112,7 +123,8 @@ class LogEntry:
             raise self.error
 
     def flush_to_file(self, filename):
-        """Appends this log entry (pickled) to a file
+        """
+        Appends this log entry (pickled) to a file
         
         Args:
             filename (``str``): the path to the file to append this entry
@@ -143,7 +155,7 @@ class LogEntry:
                 variables to include (all variables not in this dictionary will be ignored)
 
         Returns:
-            ``otter.logs.LogEntry``: this entry
+            ``LogEntry``: this entry
         """
         # delete old entry without reading entire log
         if delete:
@@ -221,15 +233,16 @@ class LogEntry:
 
     @staticmethod
     def sort_log(log, ascending=True):
-        """Sorts a list of log entries by timestamp
+        """
+        Sorts a list of log entries by timestamp
         
         Args:
-            log (``list`` of ``otter.logs.LogEntry``): the log to sort
+            log (``list`` of ``LogEntry``): the log to sort
             ascending (``bool``, optional): whether the log should be sorted in ascending (chronological) 
                 order; default ``True``
 
         Returns:
-            ``list`` of ``otter.logs.LogEntry``: the sorted log
+            ``list`` of ``LogEntry``: the sorted log
         """
         if ascending:
             return list(sorted(log, key = lambda l: l.timestamp))
@@ -237,7 +250,8 @@ class LogEntry:
 
     @staticmethod
     def log_from_file(filename, ascending=True):
-        """Reads a log file and returns a sorted list of the log entries pickled in that file
+        """
+        Reads a log file and returns a sorted list of the log entries pickled in that file
         
         Args:
             filename (``str``): the path to the log
@@ -245,7 +259,7 @@ class LogEntry:
                 order; default ``True``
 
         Returns:
-            ``list`` of ``otter.logs.LogEntry``: the sorted log
+            ``list`` of ``LogEntry``: the sorted log
         """
         try:
             file = open(filename, "rb")
@@ -332,12 +346,12 @@ class Log:
     and supports integer indexing. *Does not support editing the log file.*
 
     Args:
-        entries (``list`` of ``otter.logs.LogEntry``): the list of entries for this log
+        entries (``list`` of ``LogEntry``): the list of entries for this log
         ascending (``bool``, optional): whether the log is sorted in ascending (chronological) order;
             default ``True``
 
     Attributes:
-        entries (``list`` of ``otter.logs.LogEntry``): the list of log entries in this log
+        entries (``list`` of ``LogEntry``): the list of log entries in this log
         ascending (``bool``): whether ``entries`` is sorted chronologically; ``False`` indicates reverse-
             chronological order
     """
@@ -360,13 +374,13 @@ class Log:
         Returns an iterator over the most recent entries for each question.
 
         Returns:
-            ``otter.logs.QuestionLogIterator``: the iterator
+            ``QuestionLogIterator``: the iterator
         """
         return QuestionLogIterator(self)
 
     def sort(self, ascending=True):
         """
-        Sorts this logs entries by timestmap using ``otter.logs.LogEntry.sort_log``.
+        Sorts this logs entries by timestmap using ``LogEntry.sort_log``.
 
         Args:
             ascending (``bool``, optional): whether to sort the log chronologically; defaults to ``True``
@@ -386,7 +400,8 @@ class Log:
 
     @classmethod
     def from_file(cls, filename, ascending=True):
-        """Loads and sorts a log from a file.
+        """
+        Loads and sorts a log from a file.
 
         Args:
             filename (``str``): the path to the log
@@ -394,7 +409,7 @@ class Log:
                 order; default ``True``
 
         Returns:
-            ``otter.logs.Log``: the ``Log`` instance created from the file
+            ``Log``: the ``Log`` instance created from the file
         """
         return cls(entries=LogEntry.log_from_file(filename, ascending=ascending), ascending=ascending)
 
@@ -406,10 +421,10 @@ class Log:
             question (``str``): the question to get
 
         Returns:
-            ``otter.logs.LogEntry``: the most recent log entry for ``question``
+            ``LogEntry``: the most recent log entry for ``question``
         
         Raises:
-            ``otter.logs.QuestionNotInLogException``: if the question is not in the log
+            ``QuestionNotInLogException``: if the question is not in the log
         """
         if self.ascending:
             self.entries = LogEntry.sort_log(self.entries, ascending=False)
@@ -426,45 +441,12 @@ class Log:
             question (``str``): the question name to look up
 
         Returns:
-            ``otter.ok_parser.OKTestsResult``: the most recent result for the question
+            ``otter.test_files.abstract_test.TestCollectionResults``: the most recent result for the question
 
         Raises:
-            ``otter.logs.QuestionNotInLogException``: if the question is not found
+            ``QuestionNotInLogException``: if the question is not found
         """
         return self.get_question_entry(question).get_results()
-    
-    def verify_scores(self, score_mapping):
-        """
-        Verifies scores in ``score_mapping`` (a ``dict`` of the structure returned by 
-        ``otter.execute.grade_notebook``) against the results stored in this log using the results 
-        returned by ``Log.get_results`` for comparison. Prints a message if the scores differ
-        by more than the default tolerance of ``numpy.isclose``.
-
-        Args:
-            score_mapping (``dict``): the score mapping from ``otter.execute.grade_notebook`` to verify
-                against this log
-
-        Returns:
-            ``bool``: whether a discrepancy was found
-        """
-        found_discrepancy = False
-        for test in score_mapping:
-            if test == "total" or test == "possible":
-                continue
-            score = score_mapping[test]["score"]
-            try:
-                result = self.get_results(test)
-                grade = result.grade * result.tests[0].value
-                if not np.isclose(score, grade):
-                    print("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
-                        test, score, grade
-                    ))
-                    found_discrepancy = True
-            except QuestionNotInLogException:
-                print(f"No score for {test} found in this log")
-                found_discrepancy = True
-        return found_discrepancy
-
 
 class QuestionLogIterator:
     """
@@ -472,10 +454,10 @@ class QuestionLogIterator:
     and uses `Log.get_questions` to retrieve the list of questions.
 
     Args:
-        log (``otter.logs.Log``): the log over which to iterate
+        log (``Log``): the log over which to iterate
 
     Attributes:
-        log (``otter.logs.Log``): the log being iterated over
+        log (``Log``): the log being iterated over
         questions (``list`` of ``str``): the list of question names
         curr_idx (``int``): the integer index of the next question in  ``questions``
     """

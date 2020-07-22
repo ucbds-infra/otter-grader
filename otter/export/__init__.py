@@ -1,7 +1,6 @@
-###########################################
-#####  Jupyter Notebook PDF Exporter  #####
-##### forked from nb2pdf and gsExport #####
-###########################################
+"""
+IPython notebook PDF Exporter forked from nb2pdf and gsExport
+"""
 
 import os
 import warnings
@@ -10,7 +9,6 @@ import nbconvert
 import pkg_resources
 
 from .filter import load_notebook
-
 
 def notebook_to_pdf(nb, dest, templating="test.tplx", save_tex=False, debug=False):
     """
@@ -52,7 +50,6 @@ def notebook_to_pdf(nb, dest, templating="test.tplx", save_tex=False, debug=Fals
         print(output)
         print("=" * 60)
 
-
 def export_notebook(nb_path, dest=None, filtering=False, pagebreaks=False, save_tex=False, debug=False):
     """
     Exports a notebook file at ``nb_path`` to a PDF with optional filtering and pagebreaks
@@ -74,9 +71,9 @@ def export_notebook(nb_path, dest=None, filtering=False, pagebreaks=False, save_
         
     notebook_to_pdf(notebook, pdf_name, save_tex=save_tex, debug=debug)
 
-
 def main(args):
-    """Runs Otter Export
+    """
+    Runs Otter Export
 
     Args:
         args (``argparse.Namespace``): parsed command line arguments

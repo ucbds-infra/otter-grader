@@ -13,6 +13,8 @@ from unittest import mock
 
 from otter.generate.autograder import main as autograder
 
+from .. import TestCase
+
 # read in argument parser
 bin_globals = {}
 
@@ -23,29 +25,7 @@ parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test_generate/test-autograder/"
 
-class TestAutograder(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
-
-    def assertFilesEqual(self, p1, p2):
-        with open(p1) as f1:
-            with open(p2) as f2:
-                self.assertEqual(f1.read(), f2.read(), f"Contents of {p1} did not equal contents of {p2}")
-
-    def assertDirsEqual(self, dir1, dir2):
-        self.assertTrue(os.path.exists(dir1), f"{dir1} does not exist")
-        self.assertTrue(os.path.exists(dir2), f"{dir2} does not exist")
-        self.assertTrue(os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type")
-
-        if os.path.isfile(dir1):
-            self.assertFilesEqual(dir1, dir2)
-        else:
-            self.assertEqual(os.listdir(dir1), os.listdir(dir2), f"{dir1} and {dir2} have different contents")
-            for f1, f2 in zip(os.listdir(dir1), os.listdir(dir2)):
-                f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
-                self.assertDirsEqual(f1, f2)
+class TestAutograder(TestCase):
     
     def create_docker_image(self):
         create_image_cmd = ["make", "docker-test"]
