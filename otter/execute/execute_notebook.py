@@ -5,6 +5,7 @@ Execution of an IPython notebook
 import os
 import re
 import ast
+import copy
 
 from unittest import mock
 from contextlib import redirect_stdout, redirect_stderr
@@ -13,6 +14,30 @@ from IPython.core.inputsplitter import IPythonInputSplitter
 
 from .check_wrapper import CheckCallWrapper
 from ..utils import hide_outputs
+
+IGNORE_CELL_TAG = "otter_ignore"
+
+def filter_ignored_cells(nb):
+    """
+    Filters out all cells in the notebook ``nb`` that are tagged with ``otter_ignore``. Returns a copy
+    of the original notebook.
+
+    Args:
+        nb (``dict``): JSON representation of a notebook
+
+    Returns:
+        ``dict``: the notebook with cells removed
+    """
+    nb = copy.deepcopy(nb)
+
+    for i, cell in enumerate(nb['cells']):
+        metadata = cell.get("metadata", {})
+        tags = metadata.get("tags", [])
+
+        if IGNORE_CELL_TAG in tags:
+            del nb['cells'][i]
+    
+    return nb
 
 def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None, seed=None):
     """
