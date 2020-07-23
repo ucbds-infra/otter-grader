@@ -23,24 +23,24 @@ TEST_FILES_PATH = "test/test-logs/"
 class TestLogs(TestCase):
 
     grading_results = {}
+    test_directory = TEST_FILES_PATH + "tests"
 
     def setUp(self):
         super().setUp()
+        self.grading_results = {}
 
-        test_files_path = TEST_FILES_PATH + "tests"
-
-        grader = Notebook(test_files_path)
+    def test_Notebook_check(self):
+        grader = Notebook(self.test_directory)
 
         def square(x):
             return x**2
 
-        for test_file in os.listdir(test_files_path):
+        for test_file in os.listdir(self.test_directory):
             if os.path.splitext(test_file)[1] != ".py":
                 continue
             test_name = os.path.splitext(test_file)[0]
             self.grading_results[test_name] = grader.check(test_name)
 
-    def test_something(self):
         log = Log.from_file(_OTTER_LOG_FILENAME)
 
         for question in log.get_questions():
