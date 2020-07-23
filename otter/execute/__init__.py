@@ -9,7 +9,7 @@ import inspect
 from IPython import get_ipython
 
 from .execute_log import execute_log
-from .execute_notebook import execute_notebook
+from .execute_notebook import execute_notebook, filter_ignored_cells
 from .execute_script import execute_script
 from .results import GradingResults
 from ..test_files import TestCollection, OKTestFile
@@ -83,6 +83,10 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     else:
         with open(notebook_path) as f:
             nb = f.read()
+
+    # remove any ignored cells from the notebook
+    if not script:
+        nb = filter_ignored_cells(nb)
 
     secret = id_generator()
     results_array = "check_results_{}".format(secret)
