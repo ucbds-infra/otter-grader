@@ -27,6 +27,8 @@ from otter.export import export_notebook
 from otter.export import main as export
 from otter.export.filter import load_notebook
 
+from . import TestCase
+
 # read in argument parser
 bin_globals = {}
 
@@ -37,11 +39,7 @@ parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test-export/"
 
-class TestExport(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
+class TestExport(TestCase):
 
     def test_success_HTML(self):
         """

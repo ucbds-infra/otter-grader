@@ -1,6 +1,6 @@
-##########################################
-##### Local Grading for Otter-Grader #####
-##########################################
+"""
+Otter Grade command-line utility. Provides local grading of submissions in parallel Docker containers.
+"""
 
 import os
 import pandas as pd

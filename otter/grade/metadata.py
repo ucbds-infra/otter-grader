@@ -1,6 +1,6 @@
-#############################################
-##### Metadata Parsers for Otter-Grader #####
-#############################################
+"""
+Metadata parsers for Otter Grade
+"""
 
 import yaml
 import json

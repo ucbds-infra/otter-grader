@@ -16,16 +16,13 @@ from otter.argparser import get_parser
 from otter.assign import main as assign
 from otter.generate.token import APIClient
 
+from . import TestCase
 
 parser = get_parser()
 
 TEST_FILES_PATH = "test/test-assign/"
 
-class TestAssign(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
+class TestAssign(TestCase):
 
     def check_gradescope_zipfile(self, path, correct_dir_path, config, tests=[], files=[]):
         # unzip the zipfile
@@ -39,32 +36,6 @@ class TestAssign(unittest.TestCase):
         if os.path.exists(TEST_FILES_PATH + "autograder"):
             shutil.rmtree(TEST_FILES_PATH + "autograder")
 
-    def assertFilesEqual(self, p1, p2):
-        try:
-            with open(p1) as f1:
-                with open(p2) as f2:
-                    self.assertEqual(f1.read(), f2.read(), f"Contents of {p1} did not equal contents of {p2}")
-        
-        except UnicodeDecodeError:
-            with open(p1, "rb") as f1:
-                with open(p2, "rb") as f2:
-                    self.assertEqual(f1.read(), f2.read(), f"Contents of {p1} did not equal contents of {p2}")
-
-    def assertDirsEqual(self, dir1, dir2, ignore_ext=[]):
-        self.assertTrue(os.path.exists(dir1), f"{dir1} does not exist")
-        self.assertTrue(os.path.exists(dir2), f"{dir2} does not exist")
-        self.assertTrue(os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type")
-
-        if os.path.isfile(dir1):
-            if os.path.splitext(dir1)[1] not in ignore_ext:
-                self.assertFilesEqual(dir1, dir2)
-
-        else:
-            self.assertEqual(os.listdir(dir1), os.listdir(dir2), f"{dir1} and {dir2} have different contents")
-            for f1, f2 in zip(os.listdir(dir1), os.listdir(dir2)):
-                f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
-                self.assertDirsEqual(f1, f2, ignore_ext=ignore_ext)
-    
     def test_convert_example(self):
         """
         Checks that otter assign filters and outputs correctly

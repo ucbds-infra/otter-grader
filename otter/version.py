@@ -1,6 +1,6 @@
-################################
-##### Otter-Grader Version #####
-################################
+"""
+Otter-Grader version and printable logo
+"""
 
 __version__ = "1.0.0.b7"
 

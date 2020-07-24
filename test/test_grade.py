@@ -14,7 +14,9 @@ from subprocess import PIPE
 from glob import glob
 
 from otter.grade import main as grade
-from otter.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
+from otter.grade.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
+
+from . import TestCase
 
 # read in argument parser
 bin_globals = {}
@@ -26,12 +28,12 @@ parser = bin_globals["parser"]
 
 TEST_FILES_PATH = "test/test-grade/"
 
-class TestGrade(unittest.TestCase):
+class TestGrade(TestCase):
     
     @classmethod
     def setUpClass(cls):
-        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
-
+        super().setUpClass()
+        
         create_image_cmd = ["make", "docker-test"]
         create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
         assert not create_image.stderr, create_image.stderr.decode("utf-8")
@@ -46,6 +48,7 @@ class TestGrade(unittest.TestCase):
             with open(test_file) as f:
                 exec(f.read(), env)
             self.test_points[env['test']['name']] = env['test']['points']
+        return super().setUp()
 
 
     def test_docker(self):

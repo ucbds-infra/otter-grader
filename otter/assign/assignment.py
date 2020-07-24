@@ -1,6 +1,6 @@
-######################################################
-##### Assignment Configurations for Otter Assign #####
-######################################################
+"""
+Assignment configurations for Otter Assign
+"""
 
 import yaml
 

@@ -1,6 +1,6 @@
-#########################################################
-##### OK-Test Parsers and Builders for Otter Assign #####
-#########################################################
+"""
+OK-formatted test parsers and builders for Otter Assign
+"""
 
 import re
 import pprint
@@ -27,6 +27,18 @@ def is_test_cell(cell):
         return False
     source = get_source(cell)
     return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
+
+def any_public_tests(test_cases):
+    """
+    Returns whether any of the ``Test`` named tuples in ``test_cases`` are public tests.
+
+    Args:
+        test_cases (``list`` of ``Test``): list of test cases
+    
+    Returns:
+        ``bool``: whether any of the tests are public
+    """
+    return any(not test.hidden for test in test_cases)
 
 def read_test(cell):
     """

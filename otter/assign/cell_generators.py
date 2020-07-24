@@ -1,6 +1,6 @@
-##################################################
-##### Misc. Cell Generators for Otter Assign #####
-##################################################
+"""
+Miscellaneous cell generators for Otter Assign
+"""
 
 import copy
 import nbformat
