@@ -53,30 +53,8 @@ class TestAutograder(TestCase):
         args.func = autograder
         args.func(args)
 
-        # unzip the zipfile
-        unzip_command = ["unzip", "-o", TEST_FILES_PATH + "autograder.zip", "-d", TEST_FILES_PATH + "autograder"]
-        unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(len(unzip.stderr), 0, unzip.stderr)
-
-        # # go through files and ensure that they are correct
-        # for file in glob(TEST_FILES_PATH + "autograder/*"):
-        #     if os.path.isfile(file):
-        #         correct_file_path = os.path.join(TEST_FILES_PATH + "autograder-correct", os.path.split(file)[1])
-        #         with open(file) as f:
-        #             with open(correct_file_path) as g:
-        #                 self.assertEqual(f.read(), g.read(), "{} does not match {}".format(file, correct_file_path))
-        #     else:
-        #         for subfile in glob(os.path.join(file, "*")):
-        #             correct_file_path = os.path.join(TEST_FILES_PATH + "autograder-correct", os.path.split(file)[1], os.path.split(subfile)[1])
-        #             with open(subfile) as f:
-        #                 with open(correct_file_path) as g:
-        #                     self.assertEqual(f.read(), g.read(), "{} does not match {}".format(subfile, correct_file_path))
-        self.assertDirsEqual(TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder-correct")
-
-        # cleanup files
-        cleanup_command = ["rm", "-rf", TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder.zip"]
-        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
+        with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
+            self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-correct")
 
     def test_gradescope(self):
         """

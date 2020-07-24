@@ -174,32 +174,6 @@ class TestCheck(TestCase):
                             True"""), 
                     "Did not pass correct tests"
                 )
-
-
-    def test_notebook_class(self):
-        """
-        Checks that the otter.Notebook class works correctly
-        """
-        grader = Notebook(TEST_FILES_PATH + "tests")
-
-        def square(x):
-            return x**2
-
-        def negate(x):
-            return not x
-
-        global_env = {
-            "square" : square,
-            "negate" : negate
-        }
-
-        for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
-            q = os.path.split(q_path)[1][:-3]
-            result = grader.check(q, global_env=global_env)
-            if q != "q2":
-                self.assertEqual(result.grade, 1, "Test {} failed".format(q))
-            else:
-                self.assertEqual(result.grade, 0, "Test {} passed".format(q))
     
     @classmethod
     def tearDownClass(cls):

@@ -1,5 +1,10 @@
 import os
+import zipfile
+import tempfile
+import shutil
 import unittest
+
+from contextlib import contextmanager
 
 class TestCase(unittest.TestCase):
     """
@@ -15,6 +20,19 @@ class TestCase(unittest.TestCase):
     def setUp(self):
         print("\n" + ("-" * 70) + f"\nRunning {self.id()}\n" + ("-" * 70))
         return super().setUp()
+
+    @contextmanager
+    def unzip_to_temp(self, zf_path, delete=False):
+        tempdir = tempfile.mkdtemp()
+        zf = zipfile.ZipFile(zf_path)
+        zf.extractall(path=tempdir)
+        zf.close()
+
+        yield tempdir
+
+        shutil.rmtree(tempdir)
+        if delete:
+            os.remove(zf_path)
 
     def assertFilesEqual(self, p1, p2):
         try:
