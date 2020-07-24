@@ -26,7 +26,8 @@ tornado
 stdio-proxy
 
 # testing requirements
-testing.postgresql
+# testing.postgresql
+git+https://github.com/tk0miya/testing.postgresql.git@c81ded434d00ec8424de0f9e1f4063c778c6aaa8
 
 # documentation requirements
 recommonmark

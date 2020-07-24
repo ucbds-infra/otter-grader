@@ -170,6 +170,7 @@ def run_tests(nb_path, debug=False, seed=None):
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
+    # print(os.getcwd())
     results = grade_notebook(
         nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed

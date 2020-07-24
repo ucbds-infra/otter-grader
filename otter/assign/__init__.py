@@ -10,8 +10,13 @@ from .assignment import Assignment
 from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
+from .. import _WINDOWS
 from ..export import export_notebook
 from ..utils import get_relpath, block_print
+
+# for now can't use nb2pdf on Windows b/c of pyppeteer - this may be due to my
+# local install, requires further debugging
+TO_PDF_FN = (nb2pdf.convert, export_notebook)[_WINDOWS]
 
 def main(args):
     """
@@ -44,7 +49,7 @@ def main(args):
         if assignment.solutions_pdf:
             print("Generating solutions PDF...")
             filtering = assignment.solutions_pdf == 'filtered'
-            nb2pdf.convert(
+            TO_PDF_FN(
                 str(result / 'autograder' / master.name),
                 dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
                 filtering=filtering
