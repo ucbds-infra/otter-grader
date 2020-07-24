@@ -14,8 +14,15 @@ from unittest.mock import patch
 from otter.logs import LogEntry, EventType, Log
 
 from otter import Notebook
+from otter.notebook import _OTTER_LOG_FILENAME
 
 TEST_FILES_PATH = "test/test-notebook/"
+
+def square(x):
+    return x**2
+
+def negate(x):
+    return not x
 
 class TestNotebook(unittest.TestCase):
 # https://otter-grader.readthedocs.io/en/beta/otter_check.html notebook
@@ -70,11 +77,7 @@ class TestNotebook(unittest.TestCase):
         """
         grader = Notebook(TEST_FILES_PATH + "tests")
 
-        def square(x):
-            return x**2
-
-        def negate(x):
-            return not x
+        
 
         #global_env = {
         #    "square" : square,
@@ -85,13 +88,9 @@ class TestNotebook(unittest.TestCase):
             q = os.path.split(q_path)[1][:-3]
             result = grader.check(q) #global_env=global_env)
             if q != "q2":
-                self.assertEqual(result.grade, 1, "Test {} failed".format(q))
+                self.assertEqual(result.grade, 1, f"Test {q} expected to pass but failed:\n{result}")
             else:
-                self.assertEqual(result.grade, 0, "Test {} passed".format(q))
-
-        #remove log
-        cleanup_command = ["rm", ".OTTER_LOG"]
-        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
+                self.assertEqual(result.grade, 0, f"Test {q} expected to fail but passed:\n{result}")
     
     def test_checkall_repr(self):
         """
@@ -117,11 +116,7 @@ class TestNotebook(unittest.TestCase):
             #'q5:\n\n    \n    0 of 1 tests passed'
         ]
         for result in output_lst:
-            self.assertTrue(output.count(result)==1)
-
-        #remove log
-        cleanup_command = ["rm", ".OTTER_LOG"]
-        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
+            self.assertTrue(output.count(result) == 1)
 
     def test_export(self):
         """
@@ -149,21 +144,12 @@ class TestNotebook(unittest.TestCase):
         grader = Notebook(TEST_FILES_PATH + "tests")
         output = grader.check_all()
 
-        f = open("demofile2.txt", "a")
-        f.write("\n" + os.getcwd() + "nb_log:\n")
-        f.close()
+        # f = open("demofile2.txt", "a")
+        # f.write("\n" + os.getcwd() + "nb_log:\n")
+        # f.close()
 
         self.assertTrue(os.path.isfile(".OTTER_LOG"))
-
-        cleanup_command = ["rm", ".OTTER_LOG"]
-        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
-
-
-
-
-        
-
-
     
-
-            
+    def tearDown(self):
+        if os.path.isfile(_OTTER_LOG_FILENAME):
+            os.remove(_OTTER_LOG_FILENAME)
