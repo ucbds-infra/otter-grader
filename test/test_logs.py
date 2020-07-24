@@ -20,5 +20,23 @@ class TestLogs(unittest.TestCase):
     def setUpClass(cls):
         print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
     
-    def test_something(self):
-        pass
+    def test_get_results(self):
+        entry = LogEntry(
+            event_type,
+            results=results,
+            question=question, 
+            success=success, 
+            error=error
+        )
+        results = entry.get_results()
+        for test_file in glob(TEST_FILES_PATH + "tests/*.py"):
+
+            args = parser.parse_args(log_command)
+            args.func = export
+            args.func(args)
+
+
+        self.assertNotNull(results)
+        self.assertEqual(results, entry.results)
+
+        
