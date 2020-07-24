@@ -1,6 +1,6 @@
-######################################
-##### Utilities for Otter Assign #####
-######################################
+"""
+Utilities for Otter Assign
+"""
 
 import re
 import os

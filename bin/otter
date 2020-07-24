@@ -14,7 +14,13 @@ from otter import check
 from otter import export
 from otter import generate
 from otter import grade
-from otter import service
+
+MISSING_PACKAGES = False
+try:
+    from otter import service
+except ImportError:
+    MISSING_PACKAGES = True
+
 
 parser = get_parser()
 
@@ -22,6 +28,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if hasattr(args, 'func_str'):
+        if args.func_str.startswith("service") and MISSING_PACKAGES:
+            raise ImportError(
+                "Missing some packages required for otter service. "
+                "Please install all requirements at "
+                "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+            )
+
         args.func = eval(args.func_str)
         args.func(args)
 

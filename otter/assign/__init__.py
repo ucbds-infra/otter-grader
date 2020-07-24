@@ -1,6 +1,6 @@
-########################
-##### Otter Assign #####
-########################
+"""
+Otter Assign command-line utility
+"""
 
 import os
 import pathlib

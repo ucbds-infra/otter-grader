@@ -1,35 +1,27 @@
-#############################################
-##### Create Database for Otter Service #####
-#############################################
+"""
+Database creation and setup for Otter Service
+"""
 
-MISSING_PACKAGES = False
+import yaml
+import csv
+import psycopg2
+import hashlib
+import os
 
-try:
-    import yaml
-    import csv
-    import psycopg2
-    import hashlib
-    import os
+from psycopg2 import connect, extensions, sql
+from psycopg2.errors import DuplicateTable
 
-    from psycopg2 import connect, extensions, sql
-    from psycopg2.errors import DuplicateTable
-
-    from ..utils import connect_db
-
-except ImportError:
-    # don't need requirements to use otter without otter service
-    MISSING_PACKAGES = True
+from .utils import connect_db
 
 def create_users(filepath, host=None, username=None, password=None, conn=None):
     """
-    Inserts usernames from filepath into db
+    Inserts usernames from ``filepath`` into Otter Service's database
 
     Args:
-        filepath (str): Path to CSV files with usernames in first column, 
-            passwords in second
-        host (str, optional): Hostname where postgresql is running
-        username (str, optional): Username for writing to postgres database
-        password (str, optional): Password corresponding to provided username
+        filepath (``str``): Path to CSV files with usernames in first column, passwords in second
+        host (``str``, optional): Hostname where Postgres is running
+        username (``str``, optional): Username for writing to Postgres database
+        password (``str``, optional): Password corresponding to provided username
     """
     with open(filepath, newline='') as csvfile:
         filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
@@ -51,14 +43,14 @@ def create_users(filepath, host=None, username=None, password=None, conn=None):
             cursor.execute(insert_command)
 
 def remove_users(filepath, host=None, username=None, password=None, conn=None):
-    """Removes users specified in file FILEPATH
+    """
+    Removes users specified in file ``filepath``
     
     Args:
-        filepath (str): Path to CSV files with usernames in first column, 
-            passwords in second
-        host (str, optional): Hostname where postgresql is running
-        username (str, optional): Username for writing to postgres database
-        password (str, optional): Password corresponding to provided username
+        filepath (``str``): Path to CSV files with usernames in first column, passwords in second
+        host (``str``, optional): Hostname where Postgres is running
+        username (``str``, optional): Username for writing to Postgres database
+        password (``str``, optional): Password corresponding to provided username
     """
     with open(filepath, newline='') as csvfile:
         filereader = csv.reader(csvfile, delimiter=',', quotechar='|')
@@ -80,26 +72,21 @@ def remove_users(filepath, host=None, username=None, password=None, conn=None):
 
 def main(args, conn=None, close_conn=True):
     """
-    conn is arg to pre-made db connection
-    """
-    if MISSING_PACKAGES:
-        raise ImportError(
-            "Missing some packages required for otter service. "
-            "Please install all requirements at "
-            "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
-        )
+    Creates Otter Service database and tables
 
-    # # # TODO: can't assume we're in directory with conf.yml
-    # # with open("conf.yml") as f:
-    # #     config = yaml.safe_load(f)
-    # try:
-    #     assert os.path.isfile("conf.yml"), "conf.yml does not exist"
-    #     with open("conf.yml") as f:
-    #         config = yaml.safe_load(f)
-    # except AssertionError:
-    #     conf_path = input("What is the path of your config file?")
-    #     with open(conf_path) as f:
-    #         config = yaml.safe_load(f)
+    Args:
+        args (``argparse.Namespace``): parse command-line arguments
+        conn (``psycopg2.connection``, optional): Postgres connection
+        close_conn (``bool``, optional): whether to close the databse connection after running; 
+            default ``True``
+    """
+    # if args.missing_packages:
+    #     raise ImportError(
+    #         "Missing some packages required for otter service. "
+    #         "Please install all requirements at "
+    #         "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
+    #     )
+    
     pgconn = connect_db(args.db_host, args.db_user, args.db_pass, args.db_port, db='postgres')
 
     try:

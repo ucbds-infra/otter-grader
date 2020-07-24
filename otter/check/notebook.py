@@ -1,6 +1,6 @@
-###############################################
-##### In-Notebook Checks for Otter-Grader #####
-###############################################
+"""
+IPython notebook API for Otter Check
+"""
 
 import inspect
 import requests
@@ -17,22 +17,22 @@ from glob import glob
 from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 
-from .execute import check
-from .export import export_notebook
 from .logs import LogEntry, EventType, Log
-from .utils import wait_for_save
+from ..execute import check
+from ..export import export_notebook
+# from .utils import wait_for_save
 
 _API_KEY = None
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
 
-class OKTestsDisplay:
+class TestsDisplay:
     """
-    Class for stitching together OKTestsResult objects and displaying them in HTML and plaintext
+    Class for stitching together TestCollectionResults objects and displaying them in HTML and plaintext
 
     Args:
-        results (``list`` of ``tuple(str, OKTestsResult)``): the test names and results for each test
+        results (``list`` of ``tuple(str, TestCollectionResults)``): the test names and results for each test
             to be displayed
     """
     def __init__(self, results):
@@ -52,7 +52,8 @@ class OKTestsDisplay:
         return ret
 
 class Notebook:
-    """Notebook class for in-notebook autograding
+    """
+    Notebook class for in-notebook autograding
     
     Args:
         test_dir (``str``, optional): path to tests directory
@@ -160,12 +161,13 @@ class Notebook:
 
         
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
-        """Logs an event
+        """
+        Logs an event
 
         Args:
             event_type (``otter.logs.EventType``): the type of event
-            results (``list`` of ``otter.ok_parser.OKTestsResult``, optional): the results of any checks
-                recorded by the entry
+            results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): 
+                the results of any checks recorded by the entry
             question (``str``, optional): the question name for this check
             success (``bool``, optional): whether the operation was successful
             error (``Exception``, optional): the exception thrown by the operation, if applicable
@@ -189,45 +191,6 @@ class Notebook:
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
-    # def _save_notebook(self):
-    #     """
-    #     Runs Jupyter JS to force-save a notebook for use before beginning an export
-    #     """
-    #     if self._notebook is None:
-    #         assert len(glob("*.ipynb")) == 1, "Too many notebooks to infer notebook name"
-    #         nb = glob("*.ipynb")[0]
-    #     else:
-    #         nb = self._notebook
-        
-    #     if get_ipython() is not None:
-    #         display(Javascript("""
-    #             require(["base/js/namespace"], function() {
-    #                 if ($("span.autosave_status").text().includes("unsaved")) {
-    #                     Jupyter.notebook.kernel.execute("_UNSAVED_CHANGES = True");
-    #                 } else {
-    #                     Jupyter.notebook.kernel.execute("_UNSAVED_CHANGES = False");
-    #                 }
-    #             });
-    #         """))
-    #         saved = wait_for_save(nb)
-    #         if not saved:
-    #             print(
-    #                 f"File {nb} was not saved before timeout. Please save and checkpoint "
-    #                 "this notebook and rerun this cell."
-    #             )
-
-    # def _restart_kernel(self):
-    #     """
-    #     Runs Jupyter JS to force-save a notebook for use before beginning an export
-    #     """
-    #     if get_ipython() is not None:
-    #         display(Javascript("""
-    #             require(["base/js/namespace"], function() {
-    #                 Jupyter.notebook.kernel.restart();
-    #             });
-    #         """))
-    #         time.sleep(0.75)
-
     def check(self, question, global_env=None):
         """
         Runs tests for a specific question against a global environment. If no global environment 
@@ -239,7 +202,7 @@ class Notebook:
                 notebook 
 
         Returns:
-            ``otter.ok_parser.OKTestsResult``: the grade for the question
+            ``otter.test_files.abstract_test.TestCollectionResults``: the grade for the question
         """
         try:
             test_path = os.path.join(self._path, question + ".py")
@@ -265,10 +228,9 @@ class Notebook:
 
     # @staticmethod
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True):
-        """Exports a notebook to a PDF
-
-        ``filter_type`` can be ``"html"`` or ``"tags"`` if filtering by HTML comments or cell tags,
-        respectively. 
+        """
+        Exports a notebook to a PDF. ``filter_type`` can be ``"html"`` or ``"tags"`` if filtering by 
+        HTML comments or cell tags, respectively. 
         
         Args:
             nb_path (``str``): Path to iPython notebook we want to export
@@ -309,10 +271,9 @@ class Notebook:
 
 
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], display_link=True):
-        """Exports a submission to a zipfile
-
-        Creates a submission zipfile from a notebook at ``nb_path``, optionally including a PDF export
-        of the notebook and any files in ``files``.
+        """
+        Exports a submission to a zipfile. Creates a submission zipfile from a notebook at ``nb_path``, 
+        optionally including a PDF export of the notebook and any files in ``files``.
         
         Args:
             nb_path (``str``): path to notebook we want to export
@@ -429,10 +390,11 @@ class Notebook:
         else:
             self._log_event(EventType.END_CHECK_ALL)
         
-        return OKTestsDisplay(results)
+        return TestsDisplay(results)
 
     def submit(self):
-        """Submits this notebook to an Otter Service instance if Otter Service is configured
+        """
+        Submits this notebook to an Otter Service instance if Otter Service is configured
 
         Raises:
             ``AssertionError``: if this notebook is not configured for Otter Service

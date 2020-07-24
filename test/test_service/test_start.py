@@ -20,18 +20,20 @@ from collections import namedtuple
 from otter.service import start
 from otter.service.create import main as create
 
+from .. import TestCase
+
 TEST_FILES_PATH = "test/test_service/test-start/"
 
 parser = None
 with open("bin/otter") as f:
     exec(f.read())
 
-class TestServiceAuthHandlers(AsyncHTTPTestCase):
+class TestServiceAuthHandlers(AsyncHTTPTestCase, TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print("\n\n\n" + ("=" * 60) + f"\nRunning {__name__}.{cls.__name__}\n" + ("=" * 60) + "\n")
-
+        super().setUpClass()
+        
         # setup test database
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())
@@ -173,10 +175,12 @@ class TestServiceAuthHandlers(AsyncHTTPTestCase):
         cls.postgresql.stop()
 
 
-class TestServiceSubmissionHandler(AsyncHTTPTestCase):
+class TestServiceSubmissionHandler(AsyncHTTPTestCase, TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         # set up test database
         cls.postgresql = testing.postgresql.Postgresql()
         cls.conn = connect(**cls.postgresql.dsn())

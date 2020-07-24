@@ -1,6 +1,6 @@
-#############################################
-##### Utilities for Otter on Gradescope #####
-#############################################
+"""
+Utilities for Otter Generate
+"""
 
 import re
 import nbformat

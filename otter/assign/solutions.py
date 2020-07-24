@@ -1,6 +1,6 @@
-#############################################
-##### Solution Removal for Otter Assign #####
-#############################################
+"""
+Solution removal for Otter Assign
+"""
 
 import re
 import nbformat

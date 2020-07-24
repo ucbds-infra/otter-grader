@@ -1,7 +1,6 @@
-#######################################################
-##### Gradescope Token Generator for Otter-Grader #####
-#####    original sript provided by Gradescope    #####
-#######################################################
+"""
+Gradescope token generator; original script provided by Gradescope
+"""
 
 import requests
 import getpass

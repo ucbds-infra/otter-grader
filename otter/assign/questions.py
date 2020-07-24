@@ -1,6 +1,6 @@
-####################################################
-##### Question Configurations for Otter Assign #####
-####################################################
+"""
+Question configurations for Otter Assign
+"""
 
 import copy
 import yaml

@@ -1,6 +1,7 @@
-#########################
-##### otter Package #####
-#########################
+"""
+otter Python API
+"""
 
-from .notebook import Notebook
+from .check import logs
+from .check.notebook import Notebook
 from .version import __version__
