@@ -19,7 +19,7 @@ setuptools.setup(
 	long_description_content_type = "text/markdown",
 	url = "https://github.com/ucbds-infra/otter-grader",
 	license = "BSD-3-Clause",
-	packages = ["otter"],
+	packages = setuptools.find_packages(exclude=["test"]),
 	classifiers = [
 		"Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
