@@ -23,6 +23,7 @@ def get_parser():
     Also supports use of Gradescope's autograding service, assignment distribution with otter-assign, and public tests
     that students can run while working on assignments.
     """)
+    parser.add_argument("--version", default=False, action="store_true", help="Show version information and exit")
     subparsers = parser.add_subparsers()
 
 

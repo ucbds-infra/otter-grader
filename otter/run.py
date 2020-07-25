@@ -8,6 +8,7 @@ import sys
 from textwrap import dedent
 
 from .argparser import get_parser
+from .version import print_version_info
 
 from . import assign
 from . import check
@@ -25,6 +26,10 @@ PARSER = get_parser()
 
 def run_otter(unparsed_args=None):
     args = PARSER.parse_args(unparsed_args)
+
+    if args.version:
+        print_version_info(logo=True)
+        return
 
     if hasattr(args, 'func_str'):
         if args.func_str.startswith("service") and MISSING_PACKAGES:
