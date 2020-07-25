@@ -20,7 +20,7 @@ to grade the submissions (assuming no extra requirements, no PDF generation, and
 
 ## Metadata Files
 
-If you are not using a service like Gradescope or Canvas to collect submissions, instructors can also create a simple JSON- or YAML-formatted metadata file for their students' submissions and provide this to Otter.
+If you are not using a service like Gradescope or Canvas to collect submissions, instructors can also create a simple JSON- or YAML-formatted metadata file for their student's submissions and provide this to Otter.
 
 The strucure of the metadata is quite simple: it is a list of 2-item dictionaries, where each dictionary has a student identifier stored as the `identifier` key and the filename of the student's submission as `filename`. An example of each is provided below.
 

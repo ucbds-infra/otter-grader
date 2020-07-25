@@ -1,6 +1,6 @@
 # Test Files
 
-Otter requires OK-formatted tests to check students' work against. These have a very specific format, described in detail in the [OK documentation](https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests).
+Otter requires OK-formatted tests to check student's work against. These have a very specific format, described in detail in the [OK documentation](https://okpy.github.io/documentation/client.html#ok-client-setup-ok-tests).
 
 ## OK Format Caveats
 

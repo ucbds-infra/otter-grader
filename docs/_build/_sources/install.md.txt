@@ -8,7 +8,7 @@ pip install otter-grader
 
 ## Docker
 
-Otter uses Docker to create containers in which to run the students' submissions. Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks.
+Otter uses Docker to create containers in which to run the student's submissions. Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks.
 
 ### Pull from DockerHub
 
