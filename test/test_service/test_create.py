@@ -12,6 +12,7 @@ from unittest import mock
 from psycopg2 import connect, extensions
 from psycopg2.errors import DuplicateTable
 
+from otter.argparser import get_parser
 from otter.service.create import create_users, remove_users
 from otter.service.create import main as create
 
@@ -19,9 +20,7 @@ from .. import TestCase
 
 TEST_FILES_PATH = "test/test_service/test-create/"
 
-parser = None
-with open("bin/otter") as f:
-    exec(f.read())
+parser = get_parser()
 
 class TestBuild(TestCase):
 
