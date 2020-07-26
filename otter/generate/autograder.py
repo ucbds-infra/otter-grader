@@ -16,15 +16,19 @@ from .token import APIClient
 
 TEMPLATES_DIR = pkg_resources.resource_filename(__name__, "templates")
 SETUP_SH_PATH = os.path.join(TEMPLATES_DIR, "setup.sh")
-REQUIREMENTS_PATH = os.path.join(TEMPLATES_DIR, "requirements.txt")
+PYTHON_REQUIREMENTS_PATH = os.path.join(TEMPLATES_DIR, "requirements.txt")
+R_REQUIREMENTS_PATH = os.path.join(TEMPLATES_DIR, "requirements.r")
 RUN_AUTOGRADER_PATH = os.path.join(TEMPLATES_DIR, "run_autograder")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 
 with open(SETUP_SH_PATH) as f:
     SETUP_SH = Template(f.read())
 
-with open(REQUIREMENTS_PATH) as f:
-    REQUIREMENTS = Template(f.read())
+with open(PYTHON_REQUIREMENTS_PATH) as f:
+    PYTHON_REQUIREMENTS = Template(f.read())
+
+with open(R_REQUIREMENTS_PATH) as f:
+    R_REQUIREMENTS = Template(f.read())
 
 with open(RUN_AUTOGRADER_PATH) as f:
     RUN_AUTOGRADER = Template(f.read())
@@ -45,6 +49,10 @@ def main(args):
     # check that args.public_multiplier is valid
     assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
 
+    # check for valid language
+    args.lang = args.lang.lower()
+    assert args.lang.lower() in ["python", "r"], f"{args.lang} is not a supported language"
+
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
@@ -61,9 +69,11 @@ def main(args):
         serialized_variables = str(args.serialized_variables),
         public_multiplier = str(args.public_multiplier),
         autograder_dir = str(args.autograder_dir),
+        lang = str(args.lang.lower()),
     )
 
     setup_sh = SETUP_SH.render(
+        autograder_dir = str(args.autograder_dir),
         miniconda_install_url = MINICONDA_INSTALL_URL
     )
 
@@ -73,26 +83,40 @@ def main(args):
     try:
         # copy tests into tmp
         os.mkdir(os.path.join("tmp", "tests"))
-        for file in glob(os.path.join(args.tests_path, "*.py")):
+        pattern = ("*.py", "*.[Rr]")[args.lang.lower() == "r"]
+        for file in glob(os.path.join(args.tests_path, pattern)):
             shutil.copy(file, os.path.join("tmp", "tests"))
 
+        # open requirements if it exists
         if os.path.isfile(args.requirements):
-            with open(args.requirements) as f:
-                requirements = REQUIREMENTS.render(
-                    overwrite = args.overwrite_requirements,
-                    other_requirements = f.read()
-                )
-        elif args.requirements != "requirements.txt":
-            assert False, "requirements file {} not found".format(args.requirements)
+            f = open(args.requirements)
         else:
-            requirements = REQUIREMENTS.render(
-                overwrite = args.overwrite_requirements,
-                other_requirements = ""
-            )
+            assert args.requirements == "requirements.txt", f"requirements file {args.requirements} not found"
+            f = open(os.devnull)
+
+        # render the templates
+        python_requirements = PYTHON_REQUIREMENTS.render(
+            other_requirements = f.read() if args.lang.lower() == "python" else "",
+            overwrite_requirements = False
+        )
+
+        # reset the stream
+        f.seek(0)
+
+        r_requirements = R_REQUIREMENTS.render(
+            other_requirements = f.read() if args.lang.lower() == "r" else "",
+            overwrite = args.overwrite_requirements
+        )
+
+        # close the stream
+        f.close()
 
         # copy requirements into tmp
         with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
-            f.write(requirements)
+            f.write(python_requirements)
+
+        with open(os.path.join(os.getcwd(), "tmp", "requirements.r"), "w+") as f:
+            f.write(r_requirements)
 
         # write setup.sh and run_autograder to tmp
         with open(os.path.join(os.getcwd(), "tmp", "setup.sh"), "w+") as f:
@@ -127,7 +151,7 @@ def main(args):
         if os.path.exists(zip_path):
             os.remove(zip_path)
 
-        zip_cmd = ["zip", "-r", zip_path, "run_autograder",
+        zip_cmd = ["zip", "-r", zip_path, "run_autograder", "requirements.r",
                 "setup.sh", "requirements.txt", "tests"]
 
         if args.files:

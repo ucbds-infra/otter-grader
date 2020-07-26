@@ -18,6 +18,7 @@ config = {
     "pagebreaks": {{ pagebreaks }},
     "debug": False,
     "autograder_dir": '{{ autograder_dir }}',
+    "lang": '{{ lang }}',
 }
 
 if __name__ == "__main__":
