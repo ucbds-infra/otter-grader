@@ -19,7 +19,7 @@ setuptools.setup(
 	long_description_content_type = "text/markdown",
 	url = "https://github.com/ucbds-infra/otter-grader",
 	license = "BSD-3-Clause",
-	packages = setuptools.find_packages(),
+	packages = setuptools.find_packages(exclude=["test"]),
 	classifiers = [
 		"Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
@@ -30,5 +30,9 @@ setuptools.setup(
 		"docker", "jinja2", "dill"
 	],
 	scripts=["bin/otter"],
-	package_data={"otter.service": ["templates/*.html"], "otter.export": ["*.tplx"]},
+	package_data={
+		"otter.service": ["templates/*.html"], 
+		"otter.export": ["*.tplx"],
+		"otter.generate": ["templates/*"],
+	},
 )

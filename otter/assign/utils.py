@@ -16,7 +16,7 @@ from ..argparser import get_parser
 from ..execute import grade_notebook
 from ..generate.autograder import main as generate_autograder
 from ..generate.token import APIClient
-from ..utils import get_relpath
+from ..utils import get_relpath, get_source
 
 class EmptyCellException(Exception):
     """
@@ -27,23 +27,6 @@ class EmptyCellException(Exception):
 #---------------------------------------------------------------------------------------------------
 # Getters
 #---------------------------------------------------------------------------------------------------
-
-def get_source(cell):
-    """
-    Returns the source code of a cell in a way that works for both nbformat and JSON
-    
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
-    
-    Returns:
-        ``list`` of ``str``: each line of the cell source stripped of ending line breaks
-    """
-    source = cell['source']
-    if isinstance(source, str):
-        return cell['source'].split('\n')
-    elif isinstance(source, list):
-        return [line.strip('\n') for line in source]
-    assert 'unknown source type', type(source)
 
 def get_spec(source, begin):
     """
@@ -170,6 +153,7 @@ def run_tests(nb_path, debug=False, seed=None):
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
+    # print(os.getcwd())
     results = grade_notebook(
         nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed

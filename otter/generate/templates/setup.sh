@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-apt-get update
 apt-get install -y python3.7 python3-pip python3.7-dev
 
 # apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \\
@@ -16,10 +15,13 @@ apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recom
 
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
-wget -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-chmod +x /autograder/source/miniconda_install.sh
-/autograder/source/miniconda_install.sh -b
-printf "\nexport PATH=/root/miniconda3/bin:$PATH\n" >> /root/.bashrc
+wget -O {{ autograder_dir }}/source/miniconda_install.sh "{{ miniconda_install_url }}"
+chmod +x {{ autograder_dir }}/source/miniconda_install.sh
+{{ autograder_dir }}/source/miniconda_install.sh -b
+printf "\nexport PATH=/root/miniconda3/bin:\$PATH\n" >> /root/.bashrc
 source /root/.bashrc
 
-pip3 install -r /autograder/source/requirements.txt
+conda install --yes r-base r-essentials
+
+pip3 install -r {{ autograder_dir }}/source/requirements.txt
+Rscript {{ autograder_dir }}/source/requirements.r
