@@ -14,17 +14,12 @@ from io import StringIO
 from unittest import mock
 
 from otter import Notebook
+from otter.argparser import get_parser
 from otter.check import main as check
 
 from . import TestCase
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 TEST_FILES_PATH = "test/test-check/"
 

@@ -126,7 +126,11 @@ def main(args):
 
         os.chdir("./tmp")
 
-        zip_cmd = ["zip", "-r", os.path.join("..", args.output_path, "autograder.zip"), "run_autograder",
+        zip_path = os.path.join("..", args.output_path, "autograder.zip")
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+
+        zip_cmd = ["zip", "-r", zip_path, "run_autograder",
                 "setup.sh", "requirements.txt", "tests", "miniconda_install.sh"]
 
         if args.files:

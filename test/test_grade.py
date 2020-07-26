@@ -13,18 +13,13 @@ from unittest import mock
 from subprocess import PIPE
 from glob import glob
 
+from otter.argparser import get_parser
 from otter.grade import main as grade
 from otter.grade.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 
 from . import TestCase
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 TEST_FILES_PATH = "test/test-grade/"
 

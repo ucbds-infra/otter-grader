@@ -9,7 +9,8 @@ tqdm
 codecov
 jinja2
 docker
-nb2pdf
+git+https://github.com/chrispyles/nbpdfexport.git
+nb2pdf>=0.6.0
 requests
 nbconvert
 nbformat
@@ -26,7 +27,8 @@ tornado
 stdio-proxy
 
 # testing requirements
-testing.postgresql
+# testing.postgresql
+git+https://github.com/tk0miya/testing.postgresql.git@c81ded434d00ec8424de0f9e1f4063c778c6aaa8
 
 # documentation requirements
 recommonmark

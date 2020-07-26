@@ -11,17 +11,12 @@ from subprocess import PIPE
 from glob import glob
 from unittest import mock
 
+from otter.argparser import get_parser
 from otter.generate.autograder import main as autograder
 
 from .. import TestCase
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 TEST_FILES_PATH = "test/test_generate/test-autograder/"
 

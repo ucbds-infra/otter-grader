@@ -6,6 +6,7 @@ import os
 import io
 import doctest
 import warnings
+import pathlib
 
 from contextlib import redirect_stderr, redirect_stdout
 from textwrap import dedent
@@ -142,4 +143,7 @@ class OKTestFile(TestFile):
             tests.append(dedent(test_case['code']))
             hiddens.append(test_case.get('hidden', True))
 
-        return cls(path, tests, hiddens, test_spec.get('points', 1), test_spec.get('hidden', True))
+        # convert path into PurePosixPath for test name
+        name = str(pathlib.Path(path).as_posix())
+
+        return cls(name, tests, hiddens, test_spec.get('points', 1), test_spec.get('hidden', True))
