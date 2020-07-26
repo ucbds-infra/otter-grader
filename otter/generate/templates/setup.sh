@@ -15,8 +15,10 @@ apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recom
 
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
+wget -O /autograder/source/miniconda_install.sh "{{ miniconda_install_url }}"
 chmod +x /autograder/source/miniconda_install.sh
 /autograder/source/miniconda_install.sh -b
 printf "\nexport PATH=/root/miniconda3/bin:$PATH\n" >> /root/.bashrc
+source /root/.bashrc
 
 pip3 install -r /autograder/source/requirements.txt

@@ -66,12 +66,12 @@ def main(config):
 
     replace_notebook_instances(nb_path)
 
-    if glob("*.otter"):
-        assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
-        with open(glob("*.otter")[0]) as f:
-            otter_config = json.load(f)
-    else:
-        otter_config = None
+    # if glob("*.otter"):
+    #     assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
+    #     with open(glob("*.otter")[0]) as f:
+    #         otter_config = json.load(f)
+    # else:
+    #     otter_config = None
 
     if os.path.isfile(_OTTER_LOG_FILENAME):
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)

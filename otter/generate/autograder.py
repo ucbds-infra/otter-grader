@@ -15,10 +15,10 @@ from jinja2 import Template
 from .token import APIClient
 
 TEMPLATES_DIR = pkg_resources.resource_filename(__name__, "templates")
-MINICONDA_INSTALL_SCRIPT_PATH = os.path.join(TEMPLATES_DIR, "Miniconda3-latest-Linux-x86_64.sh")
 SETUP_SH_PATH = os.path.join(TEMPLATES_DIR, "setup.sh")
 REQUIREMENTS_PATH = os.path.join(TEMPLATES_DIR, "requirements.txt")
 RUN_AUTOGRADER_PATH = os.path.join(TEMPLATES_DIR, "run_autograder")
+MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 
 with open(SETUP_SH_PATH) as f:
     SETUP_SH = Template(f.read())
@@ -63,7 +63,9 @@ def main(args):
         autograder_dir = str(args.autograder_dir),
     )
 
-    setup_sh = SETUP_SH.render()
+    setup_sh = SETUP_SH.render(
+        miniconda_install_url = MINICONDA_INSTALL_URL
+    )
 
     # create tmp directory to zip inside
     os.mkdir("./tmp")
@@ -99,11 +101,6 @@ def main(args):
         with open(os.path.join(os.getcwd(), "tmp", "run_autograder"), "w+") as f:
             f.write(run_autograder)
 
-        # copy miniconda install script
-        with open(os.path.join(os.getcwd(), "tmp", "miniconda_install.sh"), "wb+") as f1:
-            with open(MINICONDA_INSTALL_SCRIPT_PATH, "rb") as f2:
-                f1.write(f2.read())
-
         # copy files into tmp
         if len(args.files) > 0:
             os.mkdir(os.path.join("tmp", "files"))
@@ -131,7 +128,7 @@ def main(args):
             os.remove(zip_path)
 
         zip_cmd = ["zip", "-r", zip_path, "run_autograder",
-                "setup.sh", "requirements.txt", "tests", "miniconda_install.sh"]
+                "setup.sh", "requirements.txt", "tests"]
 
         if args.files:
             zip_cmd += ["files"]

@@ -3,9 +3,10 @@ Utilities for Otter Generate
 """
 
 import re
+import urllib
 import nbformat
 
-from ..assign.utils import get_source
+from ..utils import get_source
 
 def replace_notebook_instances(nb_path):
     """
