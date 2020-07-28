@@ -23,11 +23,14 @@ TEST_FILES_PATH = "test/test-logs/"
 class TestLogs(TestCase):
 
     grading_results = {}
+    entry_results = {}
     test_directory = TEST_FILES_PATH + "tests"
 
     def setUp(self):
         super().setUp()
         self.grading_results = {}
+        self.entry_results = {}
+        self.maxDiff = None
 
     def test_Notebook_check(self):
         grader = Notebook(self.test_directory)
@@ -50,6 +53,48 @@ class TestLogs(TestCase):
             # checking repr since the results __eq__ method is not defined
             self.assertEqual(repr(logged_result), repr(actual_result), f"Logged results for {question} are not correct")
 
+    def test_grade_check(self):
+        grader = Notebook(self.test_directory)
+
+        def square(x):
+            return x**2
+        
+        for test_file in os.listdir(self.test_directory):
+            if os.path.splitext(test_file)[1] != ".py":
+                continue
+            test_name = os.path.splitext(test_file)[0]
+            self.grading_results[test_name] = grader.check(test_name)
+
+        log = Log.from_file(_OTTER_LOG_FILENAME)
+
+        for question in log.get_questions():
+            logged_grade = log.get_question_entry(question).get_score_perc()
+            actual_grade = self.grading_results[question]
+
+            # checking repr since the results __eq__ method is not defined
+            self.assertEqual(repr(logged_grade), repr(actual_grade), f"Logged results for {question} are not correct")
+
+
+    def test_question_entry(self):
+        grader = Notebook(self.test_directory)
+
+        def square(x):
+            return x**2
+
+        for test_file in os.listdir(self.test_directory):
+            if os.path.splitext(test_file)[1] != ".py":
+                continue
+            test_name = os.path.splitext(test_file)[0]
+            self.entry_results[test_name] = grader.check(test_name)
+
+        log = Log.from_file(_OTTER_LOG_FILENAME)
+
+        for question in log.get_questions():
+            logged_result = log.get_question_entry(question).get_results()
+            actual_result = self.entry_results[question]
+
+            # checking repr since the results __eq__ method is not defined
+            self.assertEqual(repr(logged_result), repr(actual_result), f"Logged results for {question} are not correct")
     def tearDown(self):
         if os.path.isfile(_OTTER_LOG_FILENAME):
             os.remove(_OTTER_LOG_FILENAME)
