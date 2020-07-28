@@ -33,6 +33,8 @@ def run_r_autograder(config):
     options = DEFAULT_OPTIONS.copy()
     options.update(config)
 
+    os.chdir(options["autograder_dir"])
+
     if options["token"] is not None:
         client = APIClient(token=options["token"])
         generate_pdf = True
@@ -40,15 +42,15 @@ def run_r_autograder(config):
         generate_pdf = False
 
     # put files into submission directory
-    if os.path.exists("/autograder/source/files"):
-        for file in os.listdir("/autograder/source/files"):
-            fp = os.path.join("/autograder/source/files", file)
+    if os.path.exists("./source/files"):
+        for file in os.listdir("./source/files"):
+            fp = os.path.join("./source/files", file)
             if os.path.isdir(fp):
-                shutil.copytree(fp, os.path.join("/autograder/submission", os.path.basename(fp)))
+                shutil.copytree(fp, os.path.join("./submission", os.path.basename(fp)))
             else:
-                shutil.copy(fp, "/autograder/submission")
+                shutil.copy(fp, "./submission")
 
-    os.chdir("/autograder/submission")
+    os.chdir("./submission")
 
     # convert ipynb files to Rmd files
     if glob("*.ipynb"):
@@ -65,17 +67,10 @@ def run_r_autograder(config):
     # get the R script
     fp = glob("*.[Rr]")[0]
 
-    os.makedirs("/autograder/submission/tests", exist_ok=True)
-    tests_glob = glob("/autograder/source/tests/*.[Rr]")
+    os.makedirs("./tests", exist_ok=True)
+    tests_glob = glob("../source/tests/*.[Rr]")
     for file in tests_glob:
-        shutil.copy(file, "/autograder/submission/tests")
-
-    # if glob("*.otter"):
-    #     assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
-    #     with open(glob("*.otter")[0]) as f:
-    #         otter_config = json.load(f)
-    # else:
-    #     otter_config = None
+        shutil.copy(file, "./tests")
 
     if os.path.isfile(_OTTER_LOG_FILENAME):
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
@@ -89,45 +84,13 @@ def run_r_autograder(config):
     ottr::run_gradescope("{fp}")
     """)
     output = r(grading_script)[0]
-
-    # if generate_pdf:
-    #     try:
-    #         export_notebook(nb_path, filtering=options["filtering"), pagebreaks=options["pagebreaks"))
-    #         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
-
-    #         # get student email
-    #         with open("../submission_metadata.json") as f:
-    #             metadata = json.load(f)
-
-    #         student_emails = []
-    #         for user in metadata["users"]:
-    #             student_emails.append(user["email"])
-            
-    #         for student_email in student_emails:
-    #             client.upload_pdf_submission(config["course_id"], config["assignment_id"], student_email, pdf_path)
-
-    #         print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
-
-    #     except:
-    #         print("\n\n")
-    #         warnings.warn("PDF generation or submission failed", RuntimeWarning)
-
-    # # hidden visibility determined by SHOW_HIDDEN_TESTS_ON_RELEASE
-    # hidden_test_visibility = ("hidden", "after_published")[options["show_hidden_tests_on_release", False)]
     
     if options["show_stdout_on_release"]:
         output["stdout_visibility"] = "after_published"
 
-    # if options["points_possible", None) is not None:
-    #     output["score"] = scores["total"] / scores["possible"] * options["points_possible", None)
+    os.chdir(options["autograder_dir"])
 
-    # if options["score_threshold", None) is not None:
-    #     if scores["total"] / scores["possible"] >= config["score_threshold"]:
-    #         output["score"] = options["points_possible", None) or scores["possible"]
-    #     else:
-    #         output["score"] = 0
-
-    with open("/autograder/results/results.json", "w+") as f:
+    with open("./results/results.json", "w+") as f:
         json.dump(output, f, indent=4)
 
     print("\n\n")
