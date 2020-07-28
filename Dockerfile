@@ -52,4 +52,4 @@ RUN apt-get clean && \
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-RUN pip install git+https://github.com/ucbds-infra/otter-grader.git@7c9aede7da196f320407d8d7be5c24adcc764a9b
+RUN pip install git+https://github.com/ucbds-infra/otter-grader.git@cecbb5752f4b23621da7054843335af5c357d721
