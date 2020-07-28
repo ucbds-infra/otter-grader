@@ -22,7 +22,7 @@ TEST_FILES_PATH = "test/test_service/test-create/"
 
 parser = get_parser()
 
-class TestBuild(TestCase):
+class TestCreate(TestCase):
 
     @classmethod
     def setUpClass(cls):

@@ -22,16 +22,14 @@ TEST_FILES_PATH = "test/test_generate/test-autograder/"
 
 class TestAutograder(TestCase):
     
-    def create_docker_image(self):
+    @classmethod
+    def setUpCa(cls):
+        super().setUpClass()
+
         create_image_cmd = ["make", "docker-test"]
-        create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
-        assert not create_image.stderr, create_image.stderr.decode("utf-8")
-
-        # use docker image inspect to see that the image is installed and tagged as otter-grader
-        inspect = subprocess.run(["docker", "image", "inspect", "otter-test"], stdout=PIPE, stderr=PIPE)
-
-        # assert that it didn't fail, it will fail if it is not installed
-        self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
+        subprocess.run(create_image_cmd, check=True)
+        # create_image = subprocess.run(create_image_cmd, check=True)
+        # assert not create_image.stderr, create_image.stderr.decode("utf-8")
    
     def test_gs_generator(self):
         """

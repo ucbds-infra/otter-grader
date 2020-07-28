@@ -37,6 +37,12 @@ RUN apt-get clean && \
     apt-get update && \
     apt-get install -y chromium-browser
 
+# pandoc and xetex for otter export
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get install -y pandoc && \
+    apt-get install -y texlive-xetex texlive-fonts-recommended
+
 # Postgres
 RUN apt-get clean && \
     apt-get update && \

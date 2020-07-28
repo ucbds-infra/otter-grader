@@ -9,7 +9,7 @@ import json
 import zipfile
 import shutil
 import tempfile
-import nb2pdf
+# import nb2pdf
 import pandas as pd
 
 from glob import glob
@@ -19,6 +19,7 @@ except ImportError:
     raise ImportError('IPython needs to be installed for notebook grading')
 
 from ..execute import grade_notebook
+from ..export import export_notebook
 from ..utils import id_generator
 
 def grade(ipynb_path, pdf, script, ignore_errors=True, seed=None, cwd=None):
@@ -54,11 +55,12 @@ def grade(ipynb_path, pdf, script, ignore_errors=True, seed=None, cwd=None):
 
     # output PDF
     if pdf:
-        nb2pdf.convert(
+        export_notebook(
             ipynb_path, 
             filtering = pdf != "unfiltered", 
-            filter_type = pdf if pdf != "unfiltered" else "tags",
-            timeout=60000
+            debug=True
+            # filter_type = pdf if pdf != "unfiltered" else "tags",
+            # timeout=60000
         )
 
     return result
@@ -74,7 +76,7 @@ def main(args=None):
     # implement argparser
     parser = argparse.ArgumentParser()
     parser.add_argument('submission_directory', help="Path to submissions directory")
-    parser.add_argument("--pdfs", default=False, const="unfiltered", choices=["unfiltered", "tags", "html"], nargs="?")
+    parser.add_argument("--pdfs", default=False, const="unfiltered", choices=["unfiltered", "html"], nargs="?")
     parser.add_argument("--scripts", action="store_true", default=False)
     parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
     parser.add_argument("--zips", action="store_true", default=False, help="Whether the submissions are Notebook.export zip archives")

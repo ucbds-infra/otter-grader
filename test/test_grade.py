@@ -30,8 +30,9 @@ class TestGrade(TestCase):
         super().setUpClass()
         
         create_image_cmd = ["make", "docker-test"]
-        create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
-        assert not create_image.stderr, create_image.stderr.decode("utf-8")
+        subprocess.run(create_image_cmd, check=True)
+        # create_image = subprocess.run(create_image_cmd, check=True)
+        # assert not create_image.stderr, create_image.stderr.decode("utf-8")
     
     def setUp(self):
         """
@@ -219,7 +220,7 @@ class TestGrade(TestCase):
             "-t", TEST_FILES_PATH + "tests/", 
             "-r", TEST_FILES_PATH + "requirements.txt",
             "-o", "test/",
-            "--pdfs", "tags",
+            "--pdfs",
             "--containers", "5",
             "--image", "otter-test"
         ]
