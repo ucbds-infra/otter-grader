@@ -84,6 +84,7 @@ def run_r_autograder(config):
     #     ottr::run_gradescope("{fp}")
     # """)
     output = r(f"""ottr::run_gradescope("{fp}")""")[0]
+    output = json.loads(output)
     
     if options["show_stdout_on_release"]:
         output["stdout_visibility"] = "after_published"
