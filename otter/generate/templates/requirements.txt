@@ -11,6 +11,7 @@ jinja2
 nbconvert
 nbformat
 dill
+rpy2
 numpy==1.16.0
 tornado==5.1.1
 otter-grader==1.0.0.b7

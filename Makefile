@@ -24,7 +24,7 @@ docker:
 
 docker-test:
 	cp -r Dockerfile test-Dockerfile
-	printf "\nADD . /home/otter-grader\nRUN pip3 install /home/otter-grader" >> test-Dockerfile
+	printf "\nADD . /tmp/otter-grader\nRUN pip install /tmp/otter-grader" >> test-Dockerfile
 	docker build . -t otter-test -f test-Dockerfile
 	rm test-Dockerfile
 

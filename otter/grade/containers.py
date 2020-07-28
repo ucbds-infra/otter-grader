@@ -187,7 +187,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
                 container.put_archive("/home", tarf)
 
             # install requirements
-            exit_code, output = container.exec_run("pip3 install -r /home/requirements.txt")
+            exit_code, output = container.exec_run("pip install -r /home/requirements.txt")
             assert exit_code == 0, f"Container {container_id} failed to install requirements:\n{output.decode('utf-8')}"
 
             if debug:
@@ -197,7 +197,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
             print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container_id}...")
         
         # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command...
-        grade_command = ["python3", "-m", "otter.grade", "/home/notebooks"]
+        grade_command = ["python", "-m", "otter.grade", "/home/notebooks"]
 
         # if we want PDF output, add the necessary flag
         if pdfs:

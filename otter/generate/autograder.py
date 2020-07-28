@@ -74,12 +74,8 @@ def main(args):
     # format setup.sh
     setup_sh = SETUP_SH.render(
         autograder_dir = str(args.autograder_dir),
-        lang = str(args.lang.lower()),
-    )
-
-    setup_sh = SETUP_SH.render(
-        autograder_dir = str(args.autograder_dir),
-        miniconda_install_url = MINICONDA_INSTALL_URL
+        miniconda_install_url = MINICONDA_INSTALL_URL,
+        ottr_branch = "master",
     )
 
     # create tmp directory to zip inside
