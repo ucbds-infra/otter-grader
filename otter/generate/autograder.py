@@ -68,7 +68,8 @@ def main(args):
         grade_from_log = str(args.grade_from_log),
         serialized_variables = str(args.serialized_variables),
         public_multiplier = str(args.public_multiplier),
-        lang = str(args.lang.lower())
+        lang = str(args.lang.lower()),
+        autograder_dir = str(args.autograder_dir),
     )
 
     # format setup.sh

@@ -24,14 +24,5 @@ config = {
     "lang": '{{ lang }}',
 }
 
-def install_ottr():
-    os.environ["PATH"] = "/root/miniconda3/bin:" + os.environ.get("PATH")
-    subprocess.run(
-        [f"cd {config.get('autograder_dir')}/source/ottr && Rscript -e 'devtools::install()'"],
-        shell=True,
-        check=True
-    )
-
 if __name__ == "__main__":
-    install_ottr()
     run_autograder(config)
