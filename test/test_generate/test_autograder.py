@@ -21,16 +21,13 @@ parser = get_parser()
 TEST_FILES_PATH = "test/test_generate/test-autograder/"
 
 class TestAutograder(TestCase):
-    
-    @classmethod
-    def setUpCa(cls):
-        super().setUpClass()
 
+    def create_docker_image(self):
         create_image_cmd = ["make", "docker-test"]
         subprocess.run(create_image_cmd, check=True)
         # create_image = subprocess.run(create_image_cmd, check=True)
         # assert not create_image.stderr, create_image.stderr.decode("utf-8")
-   
+
     def test_gs_generator(self):
         """
         Check that the correct zipfile is created by gs_generator.py
