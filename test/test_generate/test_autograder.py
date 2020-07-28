@@ -86,8 +86,8 @@ class TestAutograder(TestCase):
         args.func(args)
 
         # build the docker image
-        build = subprocess.run(["docker", "build", TEST_FILES_PATH, "-t", "otter-gradescope-test"], stdout=PIPE, stderr=PIPE)
-        self.assertEqual(len(build.stderr), 0, build.stderr.decode("utf-8"))
+        subprocess.run(["docker", "build", TEST_FILES_PATH, "-t", "otter-gradescope-test"], check=True)
+        # self.assertEqual(len(build.stderr), 0, build.stderr.decode("utf-8"))
 
         # launch the container and return its container ID
         launch = subprocess.run(["docker", "run", "-dt", "otter-gradescope-test", "/autograder/run_autograder"], stdout=PIPE, stderr=PIPE)
