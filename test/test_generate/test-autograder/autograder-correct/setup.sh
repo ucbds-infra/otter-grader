@@ -30,7 +30,7 @@ conda install --yes r-devtools -c conda-forge
 
 # install requirements
 pip3 install -r /autograder/source/requirements.txt
-pip install -r {{ autograder_dir }}/source/requirements.txt
+pip install -r /autograder/source/requirements.txt
 Rscript /autograder/source/requirements.r
 
 # install ottr; not sure why it needs to happen twice but whatever
