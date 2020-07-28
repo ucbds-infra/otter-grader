@@ -20,4 +20,5 @@ DEFAULT_OPTIONS = {
     "autograder_dir": '/autograder',
     "lang": 'python',
     "miniconda_path": '/root/miniconda3',
+    "test_visibility": 'hidden',
 }
