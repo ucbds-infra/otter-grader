@@ -80,10 +80,10 @@ def run_r_autograder(config):
         assert not options["grade_from_log"], "missing log"
         log = None
 
-    grading_script = dedent(f"""\
-    ottr::run_gradescope("{fp}")
-    """)
-    output = r(grading_script)[0]
+    # grading_script = dedent(f"""\
+    #     ottr::run_gradescope("{fp}")
+    # """)
+    output = r(f"""ottr::run_gradescope("{fp}")""")[0]
     
     if options["show_stdout_on_release"]:
         output["stdout_visibility"] = "after_published"
