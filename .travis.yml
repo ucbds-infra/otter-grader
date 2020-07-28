@@ -9,6 +9,8 @@ services:
 
 before_install:
   # - docker pull ucbdsinfra/otter-grader:latest
+  - apt-get install -y r-base r-essentials
+  - Rscript -e "devtools::install_github('ucbds-infra/ottr')"
   - docker pull gradescope/auto-builds:latest
 
 before_script:
