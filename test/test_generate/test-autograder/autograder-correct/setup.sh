@@ -34,6 +34,6 @@ pip install -r /autograder/source/requirements.txt
 Rscript /autograder/source/requirements.r
 
 # install ottr; not sure why it needs to happen twice but whatever
-git clone --single-branch -b master https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
+git clone --single-branch -b stable https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
 cd /autograder/source/ottr 
 Rscript -e "devtools::install()" || Rscript -e "devtools::install()"
