@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import os
+import subprocess
+
 from otter.generate.run_autograder import main as run_autograder
 
 config = {
@@ -16,9 +19,9 @@ config = {
     "assignment_id": 'None',
     "filtering": True,
     "pagebreaks": True,
-    "lang": 'python',
     "debug": False,
     "autograder_dir": '/autograder',
+    "lang": 'python',
 }
 
 if __name__ == "__main__":
