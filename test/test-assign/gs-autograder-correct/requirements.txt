@@ -15,4 +15,4 @@ rpy2
 git+https://github.com/chrispyles/nbpdfexport
 numpy==1.16.0
 tornado==5.1.1
-otter-grader==1.0.0.b7
+git+https://github.com/ucbds-infra/otter-grader.git@3a5871f10d592057f44ef4db7dd1b36e2fb42602
