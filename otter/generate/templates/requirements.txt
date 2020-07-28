@@ -16,6 +16,6 @@ jupytext
 git+https://github.com/chrispyles/nbpdfexport
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@3b7d4082c3f77eef530f5d47ed9b22f938970f76
+git+https://github.com/ucbds-infra/otter-grader.git@84b05464a4936fa9af3e5bd714ab11be6c8ba560
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
