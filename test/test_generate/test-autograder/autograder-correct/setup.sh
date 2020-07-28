@@ -19,6 +19,7 @@ apt-get install -y install build-essential libcurl4-gnutls-dev libxml2-dev libss
 wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 chmod +x /autograder/source/miniconda_install.sh
 /autograder/source/miniconda_install.sh -b
+echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
 
 export PATH=/root/miniconda3/bin:$PATH
 export TAR="/bin/tar"
@@ -28,7 +29,7 @@ conda install --yes r-base r-essentials
 conda install --yes r-devtools -c conda-forge
 
 # install requirements
-pip3 install -r /autograder/source/requirements.txt
+pip install -r /autograder/source/requirements.txt
 Rscript /autograder/source/requirements.r
 
 # install ottr; not sure why it needs to happen twice but whatever
