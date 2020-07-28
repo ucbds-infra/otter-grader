@@ -86,8 +86,7 @@ def run_r_autograder(config):
         log = None
 
     grading_script = dedent(f"""\
-    results = ottr::run_gradescope("{fp}")
-    ottr::results_to_json(results)
+    ottr::run_gradescope("{fp}")
     """)
     output = r(grading_script)[0]
 
