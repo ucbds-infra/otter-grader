@@ -4,6 +4,7 @@ Otter Assign command-line utility
 
 import os
 import pathlib
+import warnings
 import nb2pdf
 
 from .assignment import Assignment
@@ -27,6 +28,10 @@ def main(args):
     """
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
+
+    # check language
+    args.lang = args.lang.lower()
+    assert args.lang in ["r", "python"], f"Language {args.lang} is not valid"
 
     assignment = Assignment()
     
@@ -67,7 +72,13 @@ def main(args):
 
         # generate the .otter file if needed
         if assignment.service or assignment.save_environment:
-            write_otter_config_file(master, result, assignment)
+            if args.lang == "r":
+                warnings.warn(
+                    "Otter Service and serialized environments are unsupported with R, "
+                    "configurations ignored"
+                )
+            else:
+                write_otter_config_file(master, result, assignment)
 
         # generate Gradescope autograder zipfile
         if assignment.generate:
@@ -76,7 +87,7 @@ def main(args):
             run_generate_autograder(result, assignment, args)
 
         # run tests on autograder notebook
-        if assignment.run_tests and not args.no_run_tests:
+        if assignment.run_tests and not args.no_run_tests and assignment.lang == "python":
             print("Running tests...")
             with block_print():
                 if isinstance(assignment.generate, bool):

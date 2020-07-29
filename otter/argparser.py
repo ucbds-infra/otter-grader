@@ -35,6 +35,7 @@ def get_parser():
     assign_parser = subparsers.add_parser("assign", description="Create distribution versions of otter-assign-formatted notebook")
     assign_parser.add_argument("master", help="Notebook with solutions and tests.")
     assign_parser.add_argument("result", help="Directory containing the result.")
+    assign_parser.add_argument("-l", "--lang", default="python", type=str, help="Assignment programming language; defaults to Python")
     assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
     assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
     assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")

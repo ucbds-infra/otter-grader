@@ -34,13 +34,13 @@ def transform_notebook(nb, assignment, args):
     """
     transformed_cells, test_files = get_transformed_cells(nb['cells'], assignment)
 
-    if assignment.init_cell and not args.no_init_cell:
+    if assignment.init_cell and not args.no_init_cell and assignment.lang == "python":
         transformed_cells = [gen_init_cell()] + transformed_cells
 
-    if assignment.check_all_cell and not args.no_check_all:
+    if assignment.check_all_cell and not args.no_check_all and assignment.lang == "python":
         transformed_cells += gen_check_all_cell()
     
-    if assignment.export_cell and not args.no_export_cell:
+    if assignment.export_cell and not args.no_export_cell and assignment.lang == "python":
         export_cell = assignment.export_cell
         if export_cell is True:
             export_cell = {}

@@ -29,7 +29,7 @@ def has_seed(cell):
     source = get_source(cell)
     return source and any([l.strip().endswith('# SEED') for l in source])
 
-solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_ ]*=)(.*)[ ]?#[ ]?SOLUTION")
+solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_ ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
     """
     """

@@ -60,20 +60,20 @@ def get_spec(source, begin):
 # Cell Type Checkers
 #---------------------------------------------------------------------------------------------------
 
-def is_seed_cell(cell):
-    """
-    Returns whether ``cell`` is seed cell
+# def is_seed_cell(cell):
+#     """
+#     Returns whether ``cell`` is seed cell
     
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
+#     Args:
+#         cell (``nbformat.NotebookNode``): notebook cell
     
-    Returns:
-        ``bool``: whether the cell is a seed cell
-    """
-    if cell['cell_type'] != 'code':
-        return False
-    source = get_source(cell)
-    return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
+#     Returns:
+#         ``bool``: whether the cell is a seed cell
+#     """
+#     if cell['cell_type'] != 'code':
+#         return False
+#     source = get_source(cell)
+#     return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
 
 def is_markdown_cell(cell):
     """
@@ -244,6 +244,9 @@ def run_generate_autograder(result, assignment, args):
 
         if not pdf_args.get("filtering", True):
             generate_cmd += ["--unfiltered-pdfs"]
+    
+    if assignment.lang == "r":
+        generate_cmd += ["-l", "r"]
 
     requirements = assignment.requirements or args.requirements
     requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))

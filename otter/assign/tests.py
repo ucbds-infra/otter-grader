@@ -4,14 +4,16 @@ OK-formatted test parsers and builders for Otter Assign
 
 import re
 import pprint
+import yaml
 import nbformat
 
 from collections import namedtuple
 
-from .constants import TEST_REGEX
+from .constants import TEST_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
 
 Test = namedtuple('Test', ['input', 'output', 'hidden'])
+OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
 
 def is_test_cell(cell):
     """
@@ -40,28 +42,44 @@ def any_public_tests(test_cases):
     """
     return any(not test.hidden for test in test_cases)
 
-def read_test(cell):
+def read_test(cell, question, assignment):
     """
     Returns the contents of a test as an ``(input, output, hidden)`` named tuple
     
     Args:
         cell (``nbformat.NotebookNode``): a test cell
+        question (``dict``): question metadata
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
-        ``otter.assign.Test``: test named tuple
+        ``Test`` or ``OttrTest``: test named tuple
     """
     hidden = bool(re.search("hidden", get_source(cell)[0], flags=re.IGNORECASE))
-    output = ''
-    for o in cell['outputs']:
-        output += ''.join(o.get('text', ''))
-        results = o.get('data', {}).get('text/plain')
-        if results and isinstance(results, list):
-            output += results[0]
-        elif results:
-            output += results
-    return Test('\n'.join(get_source(cell)[1:]), output, hidden)
+    if assignment.lang == "python":
+        output = ''
+        for o in cell['outputs']:
+            output += ''.join(o.get('text', ''))
+            results = o.get('data', {}).get('text/plain')
+            if results and isinstance(results, list):
+                output += results[0]
+            elif results:
+                output += results
+        return Test('\n'.join(get_source(cell)[1:]), output, hidden)
 
-def gen_test_cell(question, tests, tests_dict):
+    elif assignment.lang == "r":
+        lines = get_source(cell)[1:]
+        assert sum("test_that(" in line for line in lines) == 1, \
+            f"Too many test_that calls in test cell (max 1 allowed):\n{cell}"
+        test_name = None
+        for line in lines:
+            match = re.match(OTTR_TEST_NAME_REGEX, line)
+            if match:
+                test_name = match.group(1)
+                break
+        assert test_name is not None, f"Could not parse test name:\n{cell}"
+        return OttrTest(test_name, hidden, '\n'.join(lines))
+
+def gen_test_cell(question, tests, tests_dict, assignment):
     """
     Parses a list of test named tuples and creates a single test file. Adds this test file as a value
     to ``tests_dict`` with a key corresponding to the test's name, taken from ``question``. Returns
@@ -69,24 +87,42 @@ def gen_test_cell(question, tests, tests_dict):
     
     Args:
         question (``dict``): question metadata
-        tests (``list`` of ``otter.assign.Test``): tests to be written
+        tests (``list`` of ``Test``): tests to be written
         tests_dict (``dict``): the tests for this assignment
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
         ``nbformat.NotebookNode``: code cell calling ``otter.Notebook.check`` on this test
     """
     cell = nbformat.v4.new_code_cell()
-    cell.source = ['grader.check("{}")'.format(question['name'])]
-    suites = [gen_suite(tests)]
-    points = question.get('points', 1)
-    
-    test = {
-        'name': question['name'],
-        'points': points,
-        'suites': suites,
-    }
-    tests_dict[question['name']] = test
 
+    if assignment.lang == "python":
+        cell.source = ['grader.check("{}")'.format(question['name'])]
+
+        suites = [gen_suite(tests)]
+        points = question.get('points', 1)
+        
+        test = {
+            'name': question['name'],
+            'points': points,
+            'suites': suites,
+        }
+
+    elif assignment.lang == "r":
+        cell.source = ['. = ottr::check("{}")'.format(question['name'])]
+
+        points = question.get('points', len(tests))
+        if isinstance(points, int):
+            if points % len(tests) == 0:
+                points = [points // len(tests) for _ in range(len(tests))]
+            else:
+                points = [points / len(tests) for _ in range(len(tests))]
+        assert isinstance(points, list) and len(points) == len(tests), \
+            f"Points for question {question['name']} could not be parsed:\n{points}"
+
+        test = gen_ottr_suite(question['name'], tests, points)
+
+    tests_dict[question['name']] = test
     lock(cell)
     return cell
 
@@ -133,6 +169,23 @@ def gen_case(test):
         'locked': False
     }
 
+def gen_ottr_suite(name, tests, points):
+    metadata = {'name': name, 'cases': []}
+    cases = metadata['cases']
+    for test, p in zip(tests, points):
+        cases.append({
+            'name': test.name,
+            'points': p,
+            hidden: test.hidden
+        })
+    
+    metadata = yaml.dump(metadata)
+
+    return OTTR_TEST_FILE_TEMPLATE.render(
+        metadata = metadata,
+        tests = tests
+    )
+
 def write_test(path, test):
     """
     Writes an OK test file
@@ -142,25 +195,73 @@ def write_test(path, test):
         test (``dict``): OK test to be written
     """
     with open(path, 'w') as f:
-        f.write('test = ')
-        pprint.pprint(test, f, indent=4, width=200, depth=None)
+        if isinstance(test, dict):
+            f.write('test = ')
+            pprint.pprint(test, f, indent=4, width=200, depth=None)
+        else:
+            f.write(test)
 
-def remove_hidden_tests_from_dir(test_dir):
+def remove_hidden_tests_from_dir(test_dir, assignment):
     """
     Rewrites test files in a directory to remove hidden tests
     
     Args:
         test_dir (``pathlib.Path``): path to test files directory
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     """
-    for f in test_dir.iterdir():
-        if f.name == '__init__.py' or f.suffix != '.py':
-            continue
-        locals = {}
-        with open(f) as f2:
-            exec(f2.read(), globals(), locals)
-        test = locals['test']
-        for suite in test['suites']:
-            for i, case in list(enumerate(suite['cases']))[::-1]:
+    if assignment.lang == "python":
+        for f in test_dir.iterdir():
+            if f.name == '__init__.py' or f.suffix != '.py':
+                continue
+            locals = {}
+            with open(f) as f2:
+                exec(f2.read(), globals(), locals)
+            test = locals['test']
+            for suite in test['suites']:
+                for i, case in list(enumerate(suite['cases']))[::-1]:
+                    if case['hidden']:
+                        suite['cases'].pop(i)
+            write_test(f, test)
+
+    elif assignment.lang == "r":
+        for f in test_dir.iterdir():
+            if f.suffix != '.R':
+                continue
+
+            with open(f) as f2:
+                test = f2.read()
+            
+            metadata, in_metadata, start_lines, test_names = "", False, {}, []
+            lines = test.split("\n")
+            for i, line in enumerate(lines):
+                match = re.match(OTTR_TEST_NAME_REGEX, line)
+                if line.strip() == "test_metadata = \"":
+                    in_metadata = True
+                elif in_metadata:
+                    metadata += line + "\n"
+                elif in_metadata and line.strip() == "\"":
+                    in_metadata = False
+                elif match:
+                    test_name = match.group(1)
+                    test_names.append(test_name)
+                    start_lines[test_name] = i
+            
+            assert metadata, f"Failed to parse test metadata in {f}"
+            metadata = yaml.full_loads(metadata)
+            cases = metadata['cases']
+
+            to_remove = []
+            for case in cases:
                 if case['hidden']:
-                    suite['cases'].pop(i)
-        write_test(f, test)
+                    start_line = start_lines[case['name']]
+                    try:
+                        next_test = test_names[test_names.index(case['name']) + 1]
+                        end_line = start_lines[next_test]
+                    except IndexError:
+                        end_line = len(lines)
+                    to_remove.extend(range(start_line, end_line))
+            
+            lines = [l for i, l in enumerate(lines) if i not in set(to_remove)]
+            test = "\n".join(lines)
+            
+            write_test(f, test)

@@ -42,8 +42,9 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     nbformat.write(transformed_nb, str(output_nb_path))
 
     # write tests
+    test_ext = (".R", ".py")[assignment.lang == "python"]
     for test_name, test_file in test_files.items():
-        write_test(tests_dir / (test_name + ".py"), test_file)
+        write_test(tests_dir / (test_name + test_ext), test_file)
 
     # copy files
     for file in assignment.files or args.files:
@@ -93,7 +94,7 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
         nbformat.write(nb, f)
 
     # remove hidden tests from student directory
-    remove_hidden_tests_from_dir(student_dir / 'tests')
+    remove_hidden_tests_from_dir(student_dir / 'tests', assignment)
 
 def write_output_directories(master_nb_path, result_dir, assignment, args):
     """
