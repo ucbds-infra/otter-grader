@@ -164,7 +164,7 @@ Solution cells contain code formatted in such a way that the assign parser repla
 * A line ending in `# SOLUTION` will be replaced by `...`, properly indented. If
   that line is an assignment statement, then only the expression(s) after the
   `=` symbol will be replaced.
-* A line ending in `# SOLUTION NO PROMPT` will be removed.
+* A line ending in `# SOLUTION NO PROMPT` or `# SEED` will be removed.
 * A line `# BEGIN SOLUTION` or `# BEGIN SOLUTION NO PROMPT` must be paired with
   a later line `# END SOLUTION`. All lines in between are replaced with `...` or
   removed completely in the case of `NO PROMPT`.
@@ -236,11 +236,9 @@ print(2)
 
 #### Intercell Seeding
 
-Otter Assign maintains support for [intercell seeding](seeding.md) by allowing seed cells to be placed between question cells and solution cells. To create a seed cell, put `## Seed ##` (case insensitive) on the first line of a code cell between the two. This allows instructors to write code with deterministic output, with which hidden tests can be generated. Consider the following example:
+Otter Assign maintains support for [intercell seeding](seeding.md) by allowing seeds to be set in solution cells. To add a seed, write a line that ends with `# SEED`; when Otter runs, this line will be removed from the student version of the notebook. This allows instructors to write code with deterministic output, with which hidden tests can be generated.
 
-![](images/assign_intercell_seeding.png)
-
-Note that seed cells are removed in student and autograder outputs, so any results in those notebooks may be different from the provided tests. The intent of removing the seed from the autograder notebook is to keep the value of the seed secure, so that if this notebook is released as assignment solutions, the security of the hidden tests is maintained. However, when grading, seeds are executed between each cell, so if you are using seeds, make sure to use **the same seed** every time and that you have a seed cell before **each** code cell, to ensure that seeding before every cell won't affect your tests.
+Note that seed cells are removed in student outputs, so any results in that notebook may be different from the provided tests. However, when grading, seeds are executed between each cell, so if you are using seeds, make sure to use **the same seed** every time to ensure that seeding before every cell won't affect your tests. You will also be required to set this seed as a configuration of the `generate` key of the assignment metadata if using Otter Generate with Otter Assign.
 
 ### Manually Graded Questions
 
