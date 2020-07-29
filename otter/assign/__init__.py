@@ -34,6 +34,7 @@ def main(args):
     assert args.lang in ["r", "python"], f"Language {args.lang} is not valid"
 
     assignment = Assignment()
+    assignment.lang = args.lang
     
     # TODO: update this condition
     if True:
@@ -47,8 +48,11 @@ def main(args):
 
         # check that we have a seed if needed
         if assignment.seed_required:
-            assert not assignment.generate or assignment.generate.get('seed', None) is not None, \
-                "Seeding cell found but no seed provided"
+            generate_args = assignment.generate
+            if generate_args is True:
+                generate_args = {'seed': None}
+            assert not generate_args or generate_args.get('seed', None) is not None or \
+                args.lang != "python", "Seeding cell found but no seed provided"
         
         # generate PDF of solutions with nb2pdf
         if assignment.solutions_pdf:

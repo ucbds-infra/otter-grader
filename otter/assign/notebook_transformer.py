@@ -103,7 +103,7 @@ def get_transformed_cells(cells, assignment):
             # include it in the output notebook but we need a test file
             elif is_test_cell(cell):
                 no_solution = True
-                test = read_test(cell)
+                test = read_test(cell, question_metadata, assignment)
                 test_cases.append(test)
 
             # elif is_seed_cell(cell):
@@ -117,7 +117,7 @@ def get_transformed_cells(cells, assignment):
 
         # if this is a test cell, parse and add to test_cases
         elif question_metadata and processed_solution and is_test_cell(cell):
-            test = read_test(cell)
+            test = read_test(cell, question_metadata, assignment)
             test_cases.append(test)
 
         # # if this is a solution cell, append. if manual question and no prompt, also append prompt cell
@@ -133,7 +133,7 @@ def get_transformed_cells(cells, assignment):
 
                 # create a Notebook.check cell
                 if test_cases:
-                    check_cell = gen_test_cell(question_metadata, test_cases, test_files)
+                    check_cell = gen_test_cell(question_metadata, test_cases, test_files, assignment)
 
                     # only add to notebook if there's a response cell or if there are public tests
                     if not no_solution or any_public_tests(test_cases):
@@ -179,7 +179,7 @@ def get_transformed_cells(cells, assignment):
                 transformed_cells.append(cell)
 
     if test_cases:
-        check_cell = gen_test_cell(question_metadata, test_cases, test_files)
+        check_cell = gen_test_cell(question_metadata, test_cases, test_files, assignment)
         if not no_solution or any_public_tests(test_cases):
             transformed_cells.append(check_cell)
 

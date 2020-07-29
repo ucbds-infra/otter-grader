@@ -109,7 +109,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         }
 
     elif assignment.lang == "r":
-        cell.source = ['. = ottr::check("{}")'.format(question['name'])]
+        cell.source = ['. = ottr::check("tests/{}.R")'.format(question['name'])]
 
         points = question.get('points', len(tests))
         if isinstance(points, int):
@@ -176,7 +176,7 @@ def gen_ottr_suite(name, tests, points):
         cases.append({
             'name': test.name,
             'points': p,
-            hidden: test.hidden
+            'hidden': test.hidden
         })
     
     metadata = yaml.dump(metadata)
@@ -237,17 +237,17 @@ def remove_hidden_tests_from_dir(test_dir, assignment):
                 match = re.match(OTTR_TEST_NAME_REGEX, line)
                 if line.strip() == "test_metadata = \"":
                     in_metadata = True
-                elif in_metadata:
-                    metadata += line + "\n"
                 elif in_metadata and line.strip() == "\"":
                     in_metadata = False
+                elif in_metadata:
+                    metadata += line + "\n"
                 elif match:
                     test_name = match.group(1)
                     test_names.append(test_name)
                     start_lines[test_name] = i
             
             assert metadata, f"Failed to parse test metadata in {f}"
-            metadata = yaml.full_loads(metadata)
+            metadata = yaml.full_load(metadata)
             cases = metadata['cases']
 
             to_remove = []
@@ -263,5 +263,5 @@ def remove_hidden_tests_from_dir(test_dir, assignment):
             
             lines = [l for i, l in enumerate(lines) if i not in set(to_remove)]
             test = "\n".join(lines)
-            
+
             write_test(f, test)
