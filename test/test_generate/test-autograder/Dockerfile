@@ -7,6 +7,7 @@ RUN cp /autograder/source/run_autograder /autograder/run_autograder
 RUN dos2unix /autograder/run_autograder /autograder/source/setup.sh
 RUN chmod +x /autograder/run_autograder
 RUN apt-get update && bash /autograder/source/setup.sh && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ENV PATH="/root/miniconda3/bin:${PATH}"
 RUN mkdir -p /autograder/submission
 ADD fails2and6H.ipynb /autograder/submission/fails2and6H.ipynb
 RUN mkdir -p /autograder/results
