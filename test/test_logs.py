@@ -68,7 +68,7 @@ class TestLogs(TestCase):
         log = Log.from_file(_OTTER_LOG_FILENAME)
 
         for question in log.get_questions():
-            logged_grade = log.get_question_entry(question).get_score_perc()
+            logged_grade = log.get_question_entry(question).get_results()
             actual_grade = self.grading_results[question]
 
             # checking repr since the results __eq__ method is not defined
