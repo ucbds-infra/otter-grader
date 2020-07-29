@@ -1,4 +1,4 @@
-# Distributing Assignments
+# Creating Assignments
 
 <!-- The documentation for Otter Assign is forked from the docs for jassign: https://github.com/okpy/jassign/blob/master/docs/notebook-format.md -->
 
