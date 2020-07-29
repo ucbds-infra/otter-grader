@@ -23,6 +23,12 @@ def is_markdown_solution_cell(cell):
     source = get_source(cell)
     return source and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
 
+def has_seed(cell):
+    if not cell['cell_type'] == 'code':
+        return False
+    source = get_source(cell)
+    return source and any([re.search(r'#\s*seed', l, flags=re.IGNORECASE) for l in source])
+
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_ ]*=)(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
     """
@@ -38,7 +44,7 @@ def solution_line_sub(match):
     return prefix + '...'
 
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
-skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT']
+skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT', '# SEED']
 
 SUBSTITUTIONS = [
     (solution_assignment_regex, solution_assignment_sub),
