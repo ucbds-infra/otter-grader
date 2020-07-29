@@ -72,7 +72,7 @@ class TestLogs(TestCase):
             actual_grade = self.grading_results[question].grade
 
             # checking repr since the results __eq__ method is not defined
-            self.assertEqual(repr(logged_grade), repr(actual_grade), f"Logged results for {question} are not correct")
+            self.assertEqual(logged_grade, actual_grade, f"Logged results for {question} are not correct")
 
 
     def test_question_entry(self):
