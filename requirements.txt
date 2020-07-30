@@ -9,6 +9,7 @@ tqdm
 codecov
 jinja2
 docker
+git+https://github.com/chrispyles/nbpdfexport
 nb2pdf
 requests
 nbconvert
