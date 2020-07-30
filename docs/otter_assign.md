@@ -35,7 +35,6 @@ export_cell:                   # include an export cell at the end of the notebo
   pdf: true                    # include a PDF in the export zip file
   filtering: true              # whether the PDF in the export should be filtered
   instructions: ''             # additional instructions for submission included above export cell
-solutions_pdf: false           # whether to generate a PDF of the autograder notebook for solutions
 template_pdf: false            # whether to generate a manual question template PDF for Gradescope
 generate:                      # configurations for running Otter Generate; defaults to false
   points: null                 # number of points to scale assignment to on Gradescope
