@@ -232,26 +232,30 @@ def remove_hidden_tests_from_dir(test_dir, assignment):
                 test = f2.read()
             
             metadata, in_metadata, start_lines, test_names = "", False, {}, []
+            metadata_start, metadata_end = -1, -1
             lines = test.split("\n")
             for i, line in enumerate(lines):
                 match = re.match(OTTR_TEST_NAME_REGEX, line)
                 if line.strip() == "test_metadata = \"":
                     in_metadata = True
+                    metadata_start = i
                 elif in_metadata and line.strip() == "\"":
                     in_metadata = False
+                    metadata_end = i
                 elif in_metadata:
                     metadata += line + "\n"
                 elif match:
                     test_name = match.group(1)
                     test_names.append(test_name)
                     start_lines[test_name] = i
-            
-            assert metadata, f"Failed to parse test metadata in {f}"
+
+            assert metadata and metadata_start != -1 and metadata_end != -1, \
+                f"Failed to parse test metadata in {f}"
             metadata = yaml.full_load(metadata)
             cases = metadata['cases']
 
-            to_remove = []
-            for case in cases:
+            lines_to_remove, cases_to_remove = [], []
+            for i, case in enumerate(cases):
                 if case['hidden']:
                     start_line = start_lines[case['name']]
                     try:
@@ -259,9 +263,13 @@ def remove_hidden_tests_from_dir(test_dir, assignment):
                         end_line = start_lines[next_test]
                     except IndexError:
                         end_line = len(lines)
-                    to_remove.extend(range(start_line, end_line))
-            
-            lines = [l for i, l in enumerate(lines) if i not in set(to_remove)]
+                    lines_to_remove.extend(range(start_line, end_line))
+                    cases_to_remove.append(i)
+
+            metadata['cases'] = [c for i, c in enumerate(cases) if i not in set(cases_to_remove)]
+            lines = [l for i, l in enumerate(lines) if i not in set(lines_to_remove)]
+            lines[metadata_start:metadata_end + 1] = ["test_metadata = \""] + \
+                yaml.dump(metadata).split("\n") + ["\""]
             test = "\n".join(lines)
 
             write_test(f, test)
