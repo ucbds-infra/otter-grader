@@ -28,6 +28,14 @@ otter.service.start module
    :undoc-members:
    :show-inheritance:
 
+otter.service.utils module
+--------------------------
+
+.. automodule:: otter.service.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

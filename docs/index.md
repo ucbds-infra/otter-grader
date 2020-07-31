@@ -3,7 +3,7 @@
 ```eval_rst
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: Autograding Python:
    :hidden:
 
    tutorial
@@ -18,6 +18,13 @@
    seeding
    logging
    changelog
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Autograding R:
+   :hidden:
+   
+   ottr
 ```
 
 **This is the documentation for the current beta version of Otter Grader. For the last stable release, visit [https://otter-grader.readthedocs.io/en/stable/](https://otter-grader.readthedocs.io/en/stable/).**
