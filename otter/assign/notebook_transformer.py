@@ -47,6 +47,7 @@ def transform_notebook(nb, assignment, args):
 
         transformed_cells += gen_export_cells(
             export_cell.get('instructions', ''), 
+            assignment,
             pdf = export_cell.get('pdf', True),
             filtering = export_cell.get('filtering', True)
         )

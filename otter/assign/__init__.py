@@ -43,6 +43,8 @@ def main(args):
         os.chdir(master.parent)
         master = pathlib.Path(master.name)
     
+    assignment.master, assignment.result = master, result
+    
     try:
         write_output_directories(master, result, assignment, args)
 
