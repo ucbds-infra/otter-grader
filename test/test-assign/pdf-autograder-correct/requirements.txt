@@ -13,4 +13,4 @@ nbformat
 dill
 numpy==1.16.0
 tornado==5.1.1
-otter-grader==1.0.0.b7
+otter-grader==1.0.0.b8
