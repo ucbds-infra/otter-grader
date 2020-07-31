@@ -36,6 +36,8 @@ class Assignment:
             are used before the defaults if present.
     """
     defaults = {
+        "master": None,
+        "result": None,
         "generate": {},
         "solutions_pdf": False,
         "template_pdf": False,
