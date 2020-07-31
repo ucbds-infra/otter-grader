@@ -10,7 +10,7 @@ codecov
 jinja2
 docker
 git+https://github.com/chrispyles/nbpdfexport.git
-nb2pdf>=0.6.0
+nb2pdf<0.6.0
 requests
 nbconvert
 nbformat
