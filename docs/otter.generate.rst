@@ -28,6 +28,14 @@ otter.generate.token module
    :undoc-members:
    :show-inheritance:
 
+otter.generate.utils module
+---------------------------
+
+.. automodule:: otter.generate.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
