@@ -26,7 +26,7 @@ to_beta = "b" in NEW_VERSION.split(".")[-1]
 
 FILES_WITH_VERSIONS = [        # do not include setup.py
     "Dockerfile",
-    "otter/generate/autograder.py",
+    "otter/generate/templates/requirements.txt",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
     "docs/index.md",
     "test/test-assign/gs-autograder-correct/requirements.txt",

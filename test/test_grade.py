@@ -219,7 +219,7 @@ class TestGrade(TestCase):
             "-t", TEST_FILES_PATH + "tests/", 
             "-r", TEST_FILES_PATH + "requirements.txt",
             "-o", "test/",
-            "--pdfs", "tags",
+            "--pdfs", 
             "--containers", "5",
             "--image", "otter-test"
         ]
