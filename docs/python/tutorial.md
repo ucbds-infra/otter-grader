@@ -1,6 +1,6 @@
 # Tutorial
 
-This tutorial can help you to verify that you have installed Otter correctly and introduce you to the general Otter workflow. Once you have [installed](index.md) Otter, download [this zip file](_static/tutorial.zip) and unzip it into some directory on your machine; you should have the following directory structure:
+This tutorial can help you to verify that you have installed Otter correctly and introduce you to the general Otter workflow. Once you have [installed](index.md) Otter, download [this zip file](../_static/tutorial.zip) and unzip it into some directory on your machine; you should have the following directory structure:
 
 ```
 | tutorial
