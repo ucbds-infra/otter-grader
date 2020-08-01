@@ -14,6 +14,7 @@
    otter_grade
    otter_generate
    otter_service
+   execution
    pdfs
    seeding
    logging
