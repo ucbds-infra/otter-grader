@@ -15,10 +15,12 @@ requests
 nbconvert
 nbformat
 dill
-jupytext
-attrdict
-jupytext
+pdfkit
+PyPDF2
+
+# ottr requirements
 rpy2
+jupytext
 
 # otter service requirements
 psycopg2

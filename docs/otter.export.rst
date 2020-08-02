@@ -1,17 +1,13 @@
 otter.export package
 ====================
 
-Submodules
-----------
+Subpackages
+-----------
 
-otter.export.filter module
---------------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: otter.export.filter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+   otter.export.exporters
 
 Module contents
 ---------------

@@ -166,7 +166,7 @@ Got:
 ### `otter.Notebook`
 
 ```eval_rst
-.. autoclass:: Notebook
+.. autoclass:: otter.check.notebook.Notebook
     :members:
 ```
 

@@ -32,16 +32,15 @@ RUN apt-get clean && \
     conda install -c r r-irkernel r-essentials -c conda-forge && \
     rm -rf /var/lib/apt/lists/*
 
-# chromium for nb2pdf
-RUN apt-get clean && \
-    apt-get update && \
-    apt-get install -y chromium-browser
-
-# pandoc and xetex for otter export
+# pandoc, xetex for otter export
 RUN apt-get clean && \
     apt-get update && \
     apt-get install -y pandoc && \
     apt-get install -y texlive-xetex texlive-fonts-recommended
+
+# install wkhtmltopdf for otter export
+RUN wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb && \
+    apt-get install -y /tmp/wkhtmltopdf.deb
 
 # Postgres
 RUN apt-get clean && \
