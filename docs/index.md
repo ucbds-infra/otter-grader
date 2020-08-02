@@ -25,7 +25,7 @@ Otter is managed by a command-line tool organized into six basic commands: `assi
 
 ## Installation
 
-Otter is a Python package that can be installed using pip. To install the current stable version, install with
+Otter is a Python package that is compatible with Python 3.6+. The PDF export internals require either LaTeX and Pandoc or wkhtmltopdf to be installed. Docker is also required to grade assignments locally, and Postgres only if you're using Otter Service. Otter's Python package can be installed using pip. To install the current stable version, install with
 
 ```
 pip install otter-grader
