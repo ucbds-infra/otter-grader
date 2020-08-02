@@ -5,33 +5,9 @@
    :maxdepth: 1
    :hidden:
 
+   Autograding Python <python/index>
+   Autograding R <R/index>
    changelog
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Autograding Python:
-   :hidden:
-
-   python/tutorial
-   python/test_files
-   python/otter_assign
-   python/otter_check
-   python/dot_otter_files
-   python/otter_grade
-   python/otter_generate
-   python/otter_service
-   python/execution
-   python/pdfs
-   python/seeding
-   python/logging
-   python/
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Autograding R:
-   :hidden:
-   
-   R/ottr
 ```
 
 **This is the documentation for the current beta version of Otter Grader. For the last stable release, visit [https://otter-grader.readthedocs.io/en/stable/](https://otter-grader.readthedocs.io/en/stable/).**
