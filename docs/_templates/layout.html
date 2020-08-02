@@ -1,0 +1,8 @@
+{% extends "!layout.html" %}
+
+{% block extrahead %}
+{{ super() }}
+{% if pagename == "test_files/index" %}
+    <meta http-equiv="Refresh" content="0; url=ok_format.html" />
+{% endif %}
+{% endblock %}

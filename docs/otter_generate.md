@@ -6,7 +6,7 @@ Otter-Grader also allows instructors to use Gradescope's autograding system to c
 
 The tests that are used by the Gradescope autograder are the same as those used in other uses of Otter, but there is one important field that is relevant to Gradescope that is not pertinent to any other uses.
 
-As noted in the second bullet [here](test_files.html#ok-format-caveats), the `"hidden"` key of each test case indicates the visibility of that specific test case. If a student passes all tests, they are shown a successful check. If they pass all public tests but fail hidden tests, they are shown a successful check but a second output is shown below that for instructors only, showing the output of the failed test. If students fail a public test, students are shown the output of the failed test and there is no second box.
+As noted in the second bullet [here](test_files/ok_format.html#caveats), the `"hidden"` key of each test case indicates the visibility of that specific test case. If a student passes all tests, they are shown a successful check. If they pass all public tests but fail hidden tests, they are shown a successful check but a second output is shown below that for instructors only, showing the output of the failed test. If students fail a public test, students are shown the output of the failed test and there is no second box.
 
 For more information on how tests are displayed to students, see [below](#gradescope-results).
 
@@ -16,7 +16,7 @@ To use Otter with Gradescope's autograder, you must first generate a zipfile tha
 
 ### Before Using Otter Generate
 
-Before using Otter Generate, you should already have written [tests](test_files.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](otter_grade.html#requirements)). (Note: these default requirements can be overwritten by your requirements by passing the `--overwrite-requirements` flag.)
+Before using Otter Generate, you should already have written [tests](test_files/index.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](otter_grade.html#requirements)). (Note: these default requirements can be overwritten by your requirements by passing the `--overwrite-requirements` flag.)
 
 ### Directory Structure
 
@@ -205,7 +205,7 @@ Note that these examples award points with a public test multiplier of 0.5; if i
 
 ### Student View
 
-On submission, students will only be able to see the results of those test cases for which `test["suites"][0]["cases"][<int>]["hidden"]` evaluates to `True` (see [Test Files](test_files.md) for more info). If `test["suites"][0]["cases"][<int>]["hidden"]` is `False` or not specified, then that test case is hidden.
+On submission, students will only be able to see the results of those test cases for which `test["suites"][0]["cases"][<int>]["hidden"]` evaluates to `True` (see [Test Files](test_files/index.md) for more info). If `test["suites"][0]["cases"][<int>]["hidden"]` is `False` or not specified, then that test case is hidden.
 
 If `--show-stdout` was specified when constructing the autograder zipfile, then the autograder output from above will be shown to students _after grades are published on Gradescope_. Students will **not** be able to see the results of hidden tests nor the tests themselves, but they will see that they failed some hidden test in the printed DataFrame from the stdout. If `--show-hidden` was passed, students will also see the failed otput of the failed hidden tests (again, once grades are published).
 

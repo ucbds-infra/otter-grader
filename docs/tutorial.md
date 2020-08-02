@@ -1,6 +1,6 @@
 # Tutorial
 
-This tutorial can help you to verify that you have installed Otter correctly and introduce you to the general Otter workflow. Once you have [installed](index.md) Otter, download [this zip file](../_static/tutorial.zip) and unzip it into some directory on your machine; you should have the following directory structure:
+This tutorial can help you to verify that you have installed Otter correctly and introduce you to the general Otter workflow. Once you have [installed](index.md) Otter, download [this zip file](_static/tutorial.zip) and unzip it into some directory on your machine; you should have the following directory structure:
 
 ```
 | tutorial
@@ -167,7 +167,7 @@ Now that you have verified that your isntallation is working, let's learn more a
 
 ### Local Grading
 
-Get started by creating some [test cases](test_files.md) and creating a requirements.txt file (if necessary).
+Get started by creating some [test cases](test_files/index.md) and creating a requirements.txt file (if necessary).
 
 #### Collecting Student Submissions
 
@@ -253,7 +253,7 @@ You can find more information about `otter grade` [here](otter_grade.md).
 
 ### Gradescope
 
-To get started using Otter with Gradescope, create some [test cases](test_files.md) and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:
+To get started using Otter with Gradescope, create some [test cases](test_files/index.md) and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:
 
 ```
 | gradescope
