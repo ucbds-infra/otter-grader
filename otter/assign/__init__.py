@@ -74,7 +74,8 @@ def main(args):
                 str(result / 'autograder' / master.name),
                 dest=str(result / 'autograder' / (master.stem + '-template.pdf')), 
                 filtering=True, 
-                pagebreaks=True
+                pagebreaks=True, 
+                exporter_type="latex"
             )
 
         # generate the .otter file if needed

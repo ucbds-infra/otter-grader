@@ -2,6 +2,8 @@
 PDF via LaTeX exporter
 """
 
+import warnings
+import pkg_resources
 import nbconvert
 
 from .base_exporter import BaseExporter
