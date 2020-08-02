@@ -77,7 +77,8 @@ def get_parser():
     export_parser.add_argument("dest", nargs='?', default=None, help="Path to write PDF")
     export_parser.add_argument("--filtering", default=False, action="store_true", help="Whether the PDF should be filtered")
     export_parser.add_argument("--pagebreaks", default=False, action="store_true", help="Whether the PDF should have pagebreaks between questions")
-    export_parser.add_argument("-s", "--save-tex", default=False, action="store_true", help="Save PDF LaTeX file as well")
+    export_parser.add_argument("-s", "--save", default=False, action="store_true", help="Save intermediate file(s) as well")
+    export_parser.add_argument("-e", "--exporter", default=None, choices=["latex", "html"], nargs="?", help="Type of PDF exporter to use")
     export_parser.add_argument("--debug", default=False, action="store_true", help="Export in debug mode")
 
     export_parser.set_defaults(func_str="export.main")

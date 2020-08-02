@@ -2,6 +2,7 @@
 PDF via LaTeX exporter
 """
 
+import os
 import warnings
 import pkg_resources
 import nbconvert

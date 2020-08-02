@@ -26,7 +26,7 @@ from textwrap import dedent
 from otter.argparser import get_parser
 from otter.export import export_notebook
 from otter.export import main as export
-from otter.export.filter import load_notebook
+from otter.export.exporters.base_exporter import BaseExporter
 
 from . import TestCase
 
@@ -41,7 +41,7 @@ class TestExport(TestCase):
         Tests a successful export with filtering and no pagebreaks
         """
         test_file = "successful-html-test"
-        grade_command = ["export", "--filtering", "-s",
+        grade_command = ["export", "--filtering", "-s", "-e", "latex",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
         args = parser.parse_args(grade_command)
@@ -62,7 +62,7 @@ class TestExport(TestCase):
         Tests a successful filter with pagebreaks
         """
         test_file = "success-pagebreak-test"
-        grade_command = ["export", "--filtering",
+        grade_command = ["export", "--filtering", "-e", "latex",
             "--pagebreaks", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
@@ -84,7 +84,7 @@ class TestExport(TestCase):
         Tests a filtered export without an opening comment
         """
         test_file = "no-open-tag-test"
-        grade_command = ["export", "--filtering",
+        grade_command = ["export", "--filtering", "-e", "latex",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
 
@@ -111,7 +111,7 @@ class TestExport(TestCase):
         Tests a filtered export without a closing comment
         """
         test_file = "no-close-tag-test"
-        grade_command = ["export", "--filtering",
+        grade_command = ["export", "--filtering", "-e", "latex",
             "--pagebreaks", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
@@ -134,7 +134,7 @@ class TestExport(TestCase):
         Tests a successful load_notebook
         """
         test_file = "successful-html-test"
-        node = load_notebook(TEST_FILES_PATH + test_file + ".ipynb")
+        node = BaseExporter.load_notebook(TEST_FILES_PATH + test_file + ".ipynb", filtering=True)
 
         nbformat.write(node, TEST_FILES_PATH + test_file)
 

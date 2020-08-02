@@ -57,9 +57,6 @@ def export_notebook(nb_path, dest=None, debug=False, exporter_type=None, **kwarg
     Args:
         nb_path (``str``): path to notebook
         dest (``str``, optional): path to write PDF
-        filtering (``bool``, optional): whether the PDF should be filtered with HTML comments
-        pagebreaks (``bool``, optional): whether there should be pagebreaks after questions in the PDF
-        save_tex (``bool``, optional): whether to save the LaTeX file as well
         debug (``bool``, optional): whether to run export in debug mode
     """
     # notebook = load_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
@@ -83,8 +80,10 @@ def main(args):
     export_notebook(
         args.source,
         dest = args.dest,
+        exporter_type = args.exporter,
         filtering = args.filtering,
         pagebreaks = args.pagebreaks,
-        save_tex = args.save_tex,
+        save_tex = args.save,
+        save_html = args.save,
         debug = args.debug
     )
