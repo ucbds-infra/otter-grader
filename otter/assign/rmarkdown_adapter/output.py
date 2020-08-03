@@ -11,9 +11,7 @@ import nbformat
 from .notebook_transformer import transform_notebook
 from .solutions import strip_solutions_and_output
 
-from ..constants import NB_VERSION
 from ..r_adapter.tests import remove_hidden_tests_from_dir
-# from .solutions import strip_solutions_and_output
 from ..tests import write_test
 
 def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
@@ -70,10 +68,10 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
             
         else:
             # check that file is in subdir
-            assert os.path.abspath(nb_path.parent) in os.path.abspath(file), \
+            assert os.path.abspath(rmd_path.parent) in os.path.abspath(file), \
                 f"{file} is not in a subdirectory of the master notebook directory"
             file_path = pathlib.Path(file)
-            rel_path = file_path.parent.relative_to(nb_path.parent)
+            rel_path = file_path.parent.relative_to(rmd_path.parent)
             os.makedirs(output_dir / rel_path, exist_ok=True)
             shutil.copy(file, str(output_dir / rel_path))
 

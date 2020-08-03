@@ -113,7 +113,7 @@ class TestAssign(TestCase):
         Checks that otter assign works for R notebooks correctly
         """
         run_assign_args = [
-            "assign", "--no-run-tests", TEST_FILES_PATH + "r-example.ipynb", 
+            "assign", TEST_FILES_PATH + "r-example.ipynb", 
             TEST_FILES_PATH + "output", "data.csv"
         ]
         args = parser.parse_args(run_assign_args)
@@ -125,6 +125,25 @@ class TestAssign(TestCase):
         # check gradescope zip file
         self.check_gradescope_zipfile(
             TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "r-autograder-correct",
+        )
+
+    def test_rmd_example(self):
+        """
+        Checks that otter assign works for Rmd files
+        """
+        run_assign_args = [
+            "assign", TEST_FILES_PATH + "rmd-example.Rmd", 
+            TEST_FILES_PATH + "output", "data.csv"
+        ]
+        args = parser.parse_args(run_assign_args)
+        args.func = assign
+        args.func(args)
+
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", ignore_ext=[".zip"])
+        
+        # check gradescope zip file
+        self.check_gradescope_zipfile(
+            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "rmd-autograder-correct",
         )
 
     def tearDown(self):
