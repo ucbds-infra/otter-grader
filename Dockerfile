@@ -5,7 +5,7 @@ FROM ubuntu:20.10
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get update && \
-    apt-get upgrade -y && \
+    apt-get upgrade -y --fix-missing && \
     apt-get install -y tzdata software-properties-common git vim wget libssl-dev nano && \
     rm -rf /var/lib/apt/lists/*
 
