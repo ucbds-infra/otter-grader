@@ -54,7 +54,7 @@ class Assignment:
         "check_all_cell": True,
         "export_cell": True,
         "seed": None,
-        "lang": "python",
+        "lang": None,
     }
 
     def __init__(self):

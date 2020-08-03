@@ -29,12 +29,13 @@ def main(args):
     master, result = pathlib.Path(args.master), pathlib.Path(args.result)
     print("Generating views...")
 
-    # check language
-    args.lang = args.lang.lower()
-    assert args.lang in ["r", "python"], f"Language {args.lang} is not valid"
-
     assignment = Assignment()
-    assignment.lang = args.lang
+
+    # check language
+    if args.lang is not None:
+        args.lang = args.lang.lower()
+        assert args.lang in ["r", "python"], f"Language {args.lang} is not valid"
+        assignment.lang = args.lang
     
     # TODO: update this condition
     if True:
@@ -54,7 +55,7 @@ def main(args):
             if generate_args is True:
                 generate_args = {'seed': None}
             assert not generate_args or generate_args.get('seed', None) is not None or \
-                args.lang != "python", "Seeding cell found but no seed provided"
+                not assignment.is_python, "Seeding cell found but no seed provided"
         
         # generate PDF of solutions with nb2pdf -- DEPRECATED
         if assignment.solutions_pdf:
@@ -80,7 +81,7 @@ def main(args):
 
         # generate the .otter file if needed
         if assignment.service or assignment.save_environment:
-            if args.lang == "r":
+            if assignment.is_r:
                 warnings.warn(
                     "Otter Service and serialized environments are unsupported with R, "
                     "configurations ignored"
@@ -95,7 +96,7 @@ def main(args):
             run_generate_autograder(result, assignment, args)
 
         # run tests on autograder notebook
-        if assignment.run_tests and not args.no_run_tests and assignment.lang == "python":
+        if assignment.run_tests and not args.no_run_tests and assignment.is_python:
             print("Running tests...")
             with block_print():
                 if isinstance(assignment.generate, bool):

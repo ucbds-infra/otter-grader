@@ -113,7 +113,7 @@ class TestAssign(TestCase):
         Checks that otter assign works for R notebooks correctly
         """
         run_assign_args = [
-            "assign", "--no-run-tests", "-l", "r", TEST_FILES_PATH + "r-example.ipynb", 
+            "assign", "--no-run-tests", TEST_FILES_PATH + "r-example.ipynb", 
             TEST_FILES_PATH + "output", "data.csv"
         ]
         args = parser.parse_args(run_assign_args)

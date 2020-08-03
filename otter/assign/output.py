@@ -5,6 +5,7 @@ Output writing for Otter Assign
 import os
 import shutil
 import pathlib
+import warnings
 import nbformat
 
 from .constants import NB_VERSION
@@ -25,6 +26,14 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     """
     with open(nb_path) as f:
         nb = nbformat.read(f, as_version=NB_VERSION)
+
+    if assignment.lang is None:
+        try:
+            lang = nb["metadata"]["kernelspec"]["language"].lower()
+            assignment.lang = lang
+        except IndexError:
+            warnings.warn("Could not auto-parse kernelspec from notebook")
+            assignment.lang = "python"
 
     output_dir = output_nb_path.parent
     tests_dir = output_dir / 'tests'
