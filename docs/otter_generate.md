@@ -164,7 +164,7 @@ The [next section](#gradescope-results) details more about how output on Gradesc
 
 #### Generating with Otter Assign
 
-Otter Assign comes with an option to generate this zip file automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](otter_assign.md) for more details.
+Otter Assign comes with an option to generate this zip file automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](otter_assign/index.md) for more details.
 
 ## Gradescope Results
 

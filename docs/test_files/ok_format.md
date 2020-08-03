@@ -1,4 +1,4 @@
-# Python OK Format
+# Python: OK Format
 
 Otter has different test file formats depending on which language you are grading. Python test files follow the OK format, a legacy of the OkPy autograder that Otter inherits from. R test files are more like unit tests and rely on the testthat library to run tests with expectations.
 
@@ -13,7 +13,7 @@ While Otter uses OK format, there are a few caveats to the tests when using them
 
 ## Writing OK Tests
 
-We recommend that you develop assignments using [Otter Assign](../otter_assign.md), a tool which will generate these test files for you. If you already have assignments or would prefer to write them yourself, you can find an online [OK test generator](https://oktests.chrispyles.io) that will assist you in generating these test files without using Otter Assign.
+We recommend that you develop assignments using [Otter Assign](../otter_assign/index.md), a tool which will generate these test files for you. If you already have assignments or would prefer to write them yourself, you can find an online [OK test generator](https://oktests.chrispyles.io) that will assist you in generating these test files without using Otter Assign.
 
 ## Sample Test
 

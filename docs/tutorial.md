@@ -73,7 +73,7 @@ Otter Assign should create a `dist` subdirectory which contains two further subd
       | - q3.py
 ```
 
-For more information about the configurations for Otter Assign and its output format, see [Distributing Assignments](otter_assign.md).
+For more information about the configurations for Otter Assign and its output format, see [Distributing Assignments](otter_assign/index.md).
 
 ### Otter Generate
 

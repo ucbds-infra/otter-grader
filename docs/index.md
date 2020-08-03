@@ -7,7 +7,7 @@
 
    tutorial
    test_files/index
-   otter_assign
+   otter_assign/index
    otter_check
    dot_otter_files
    otter_grade
@@ -26,7 +26,7 @@ Otter Grader is a light-weight, modular open-source autograder developed by the 
 
 Otter is managed by a command-line tool organized into six basic commands: `assign`, `check`, `export`, `generate`, `grade`, and `service`. These commands provide functionality that allows instructors to create, distribute, and grade assignments locally or using a variety of LMS integrations. Otter also allows students to run publically distributed tests while working through assignments.
 
-* [Otter Assign](otter_assign.md) is an assignment development and distribution tool that allows instructors to create assignments with prompts, solutions, and tests in a simple notebook format that it then converts into santized versions for distribution to students and autograders.
+* [Otter Assign](otter_assign/index.md) is an assignment development and distribution tool that allows instructors to create assignments with prompts, solutions, and tests in a simple notebook format that it then converts into santized versions for distribution to students and autograders.
 * [Otter Check](otter_check.md) allows students to run publically distributed tests written by instructors against their solutions as they work through assignments to verify their thought processes and design implementations.
 * [Otter Export](pdfs.md) generates PDFs with optional filtering of Jupyter notebooks for manually grading portions of assignments.
 * [Otter Generate](otter_generate.md) creates the necessary files so that instructors can autograde assignments using Gradescope's autograding platform.
@@ -58,6 +58,8 @@ The R integrations with the Otter package are currently only supported out of th
 ```
 pip install git+https://github.com/ucbds-infra/otter-grader.git@ottr
 ```
+
+Installing the Python package will install the `otter` binary so that Otter can be called from the command line. **If you are running Otter on Windows,** this binary will not work. Instead, call Otter as a Python module: `python3 -m otter`. This will have _the same_ commands, arguments, and behaviors as all calls to `otter` that are shown in the documentation. 
 
 ### Docker
 

@@ -1,8 +1,15 @@
 {% extends "!layout.html" %}
 
 {% block extrahead %}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
 {{ super() }}
 {% if pagename == "test_files/index" %}
     <meta http-equiv="Refresh" content="0; url=ok_format.html" />
+{% elif pagename == "otter_assign/index" %}
+    <meta http-equiv="Refresh" content="0; url=python_notebook_format.html" />
 {% endif %}
 {% endblock %}

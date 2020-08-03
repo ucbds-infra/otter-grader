@@ -1,4 +1,4 @@
-# R `testthat` Format
+# R: `testthat` Format
 
 Ottr tests rely on the testthat library to run tests on students' submissions. Because of this, ottr's tests look like unit tests with a couple of important caveats. The main different is that a global `test_metadata` variable is required, which is a multiline YAML-formatted string that contains configurations for each test case (e.g. point values, whether the test case is hidden). Each call to `testthat::test_that` in the test file must have a corresponding entry in the test metadata and these are linked together by the description of the test. An example test file would be:
 
