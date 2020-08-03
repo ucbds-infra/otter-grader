@@ -10,7 +10,7 @@ import nbformat
 from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
 from .solutions import strip_solutions_and_output
-from .tests import write_test, remove_hidden_tests_from_dir
+from .tests import write_test
 
 def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     """
@@ -42,7 +42,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     nbformat.write(transformed_nb, str(output_nb_path))
 
     # write tests
-    test_ext = (".R", ".py")[assignment.lang == "python"]
+    test_ext = (".R", ".py")[assignment.is_python]
     for test_name, test_file in test_files.items():
         write_test(tests_dir / (test_name + test_ext), test_file)
 
@@ -74,6 +74,11 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         args (``argparse.Namespace``): parsed command line arguments
     """
+    if assignment.is_r:
+        from .r_adapter.tests import remove_hidden_tests_from_dir
+    else:
+        from .tests import remove_hidden_tests_from_dir
+
     # copy autograder dir
     shutil.copytree(autograder_dir, student_dir)
 

@@ -83,6 +83,14 @@ class Assignment:
         """
         self.config.update(config)
 
+    @property
+    def is_r(self):
+        return self.lang == "r"
+    
+    @property
+    def is_python(self):
+        return self.lang == "python"
+
 def read_assignment_metadata(cell):
     """
     Return assignment metadata from an assignment cell

@@ -245,7 +245,7 @@ def run_generate_autograder(result, assignment, args):
         if not pdf_args.get("filtering", True):
             generate_cmd += ["--unfiltered-pdfs"]
     
-    if assignment.lang == "r":
+    if assignment.is_r:
         generate_cmd += ["-l", "r"]
 
     requirements = assignment.requirements or args.requirements
