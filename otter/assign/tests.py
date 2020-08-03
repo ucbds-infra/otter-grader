@@ -25,7 +25,7 @@ def is_test_cell(cell):
     Returns:
         ``bool``: whether the cell is a test cell
     """
-    if cell['cell_type'] != 'code':
+    if cell.cell_type != 'code':
         return False
     source = get_source(cell)
     return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)

@@ -91,6 +91,10 @@ class Assignment:
     def is_python(self):
         return self.lang == "python"
 
+    @property
+    def is_rmd(self):
+        return self.master.suffix.lower() == ".rmd"
+
 def read_assignment_metadata(cell):
     """
     Return assignment metadata from an assignment cell
@@ -120,6 +124,6 @@ def is_assignment_cell(cell):
     Returns:
         ``bool``: whether the current cell is an assignment definition cell
     """
-    if cell['cell_type'] != 'markdown':
+    if cell.cell_type != 'markdown':
         return False
     return get_spec(get_source(cell), "assignment") is not None

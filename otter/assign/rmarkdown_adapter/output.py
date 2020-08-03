@@ -8,50 +8,56 @@ import pathlib
 import warnings
 import nbformat
 
-from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
 from .solutions import strip_solutions_and_output
-from .tests import write_test
 
-def write_autograder_dir(nb_path, output_nb_path, assignment, args):
+from ..constants import NB_VERSION
+from ..r_adapter.tests import remove_hidden_tests_from_dir
+# from .solutions import strip_solutions_and_output
+from ..tests import write_test
+
+def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
     """
     Converts a master notebook to a solutions notebook and writes this notebook to the output directory,
     copying support files and writing tests as needed.
 
     Args:
-        nb_path (``pathlib.Path``): path to master notebook
-        output_nb_path (``pathlib.Path``): path to output file
+        rmd_path (``pathlib.Path``): path to master Rmd file
+        output_rmd_path (``pathlib.Path``): path to output Rmd file
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         args (``argparse.Namespace``): parsed command line arguments
     """
-    with open(nb_path) as f:
-        nb = nbformat.read(f, as_version=NB_VERSION)
+    with open(rmd_path) as f:
+        rmd_string = f.read()
 
     if assignment.lang is None:
-        try:
-            lang = nb["metadata"]["kernelspec"]["language"].lower()
-            assignment.lang = lang
-        except IndexError:
-            warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
-            assignment.lang = "python"
+        # try:
+        #     lang = nb["metadata"]["kernelspec"]["language"].lower()
+        #     assignment.lang = lang
+        # except IndexError:
+        #     warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
+        #     assignment.lang = "python"
+        assignment.lang = "r"
 
-    output_dir = output_nb_path.parent
+    output_dir = output_rmd_path.parent
     tests_dir = output_dir / 'tests'
     os.makedirs(tests_dir, exist_ok=True)
 
     requirements = assignment.requirements or args.requirements
     if os.path.isfile(requirements):
-        shutil.copy(requirements, str(output_dir / 'requirements.txt'))
+        shutil.copy(requirements, str(output_dir / 'requirements.R'))
 
-    transformed_nb, test_files = transform_notebook(nb, assignment, args)
+    transformed_rmd_string, test_files = transform_notebook(rmd_string, assignment, args)
 
     # write notebook
     # with open(output_nb_path) as f:
     # nbformat.write(transformed_nb, )
-    nbformat.write(transformed_nb, str(output_nb_path))
+    # nbformat.write(transformed_nb, str(output_nb_path))
+    with open(output_rmd_path, "w+") as f:
+        f.write(transformed_rmd_string)
 
     # write tests
-    test_ext = (".R", ".py")[assignment.is_python]
+    test_ext =".R"
     for test_name, test_file in test_files.items():
         write_test(tests_dir / (test_name + test_ext), test_file)
 
@@ -71,23 +77,18 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
             os.makedirs(output_dir / rel_path, exist_ok=True)
             shutil.copy(file, str(output_dir / rel_path))
 
-def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
+def write_student_dir(rmd_name, autograder_dir, student_dir, assignment, args):
     """
     Copies the autograder (solutions) directory and removes extraneous files, strips solutions from
     the notebook, and removes hidden tests from the tests directory.
 
     Args:
-        nb_name (``str``): the master notebook name
+        rmd_name (``str``): the master Rmd file name
         autograder_dir (``pathlib.Path``): the path to the autograder directory
         student_dir (``pathlib.Path``): the path to the student directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         args (``argparse.Namespace``): parsed command line arguments
     """
-    if assignment.is_r:
-        from .r_adapter.tests import remove_hidden_tests_from_dir
-    else:
-        from .tests import remove_hidden_tests_from_dir
-
     # copy autograder dir
     shutil.copytree(autograder_dir, student_dir)
 
@@ -98,25 +99,26 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
         os.remove(requirements)
 
     # strip solutions from student version
-    student_nb_path = student_dir / nb_name
-    with open(student_nb_path) as f:
-        nb = nbformat.read(f, as_version=NB_VERSION)
+    student_rmd_path = student_dir / rmd_name
+    with open(student_rmd_path) as f:
+        # nb = nbformat.read(f, as_version=NB_VERSION)
+        rmd_string = f.read()
 
-    nb = strip_solutions_and_output(nb)
+    rmd_string = strip_solutions_and_output(rmd_string)
 
-    with open(student_nb_path, "w") as f:
-        nbformat.write(nb, f)
+    with open(student_rmd_path, "w") as f:
+        f.write(rmd_string)
 
     # remove hidden tests from student directory
     remove_hidden_tests_from_dir(student_dir / 'tests', assignment)
 
-def write_output_directories(master_nb_path, result_dir, assignment, args):
+def write_output_directories(master_rmd_path, result_dir, assignment, args):
     """
     Converts a master notebook to an autograder and student directory based on configurations in 
     ``assignment`` and ``args``.
 
     Args:
-        master_nb_path (``nbformat.NotebookNode``): the master notebook path
+        master_rmd_path (``nbformat.NotebookNode``): the master Rmd path
         result_dir (``pathlib.Path``): path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         args (``argparse.Namespace``): parsed command line arguments
@@ -129,8 +131,8 @@ def write_output_directories(master_nb_path, result_dir, assignment, args):
     os.makedirs(autograder_dir, exist_ok=True)
 
     # write autograder directory
-    output_nb_path = autograder_dir / master_nb_path.name
-    write_autograder_dir(master_nb_path, output_nb_path, assignment, args)
+    output_rmd_path = autograder_dir / master_rmd_path.name
+    write_autograder_dir(master_rmd_path, output_rmd_path, assignment, args)
 
     # write student dir
-    write_student_dir(master_nb_path.name, autograder_dir, student_dir, assignment, args)
+    write_student_dir(master_rmd_path.name, autograder_dir, student_dir, assignment, args)

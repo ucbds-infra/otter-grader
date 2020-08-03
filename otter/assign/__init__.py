@@ -8,7 +8,6 @@ import warnings
 # import nb2pdf
 
 from .assignment import Assignment
-from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
 # from .. import _WINDOWS
@@ -45,6 +44,11 @@ def main(args):
         master = pathlib.Path(master.name)
     
     assignment.master, assignment.result = master, result
+
+    if assignment.is_rmd:
+        from .rmarkdown_adapter.output import write_output_directories
+    else:
+        from .output import write_output_directories
     
     try:
         write_output_directories(master, result, assignment, args)
@@ -69,7 +73,7 @@ def main(args):
             warnings.warn("The solutions_pdf configuration is deprecated and will be ignored")
 
         # generate a tempalte PDF for Gradescope
-        if assignment.template_pdf:
+        if not assignment.is_rmd and assignment.template_pdf:
             print("Generating template PDF...")
             export_notebook(
                 str(result / 'autograder' / master.name),
@@ -80,7 +84,7 @@ def main(args):
             )
 
         # generate the .otter file if needed
-        if assignment.service or assignment.save_environment:
+        if not assignment.is_rmd and assignment.service or assignment.save_environment:
             if assignment.is_r:
                 warnings.warn(
                     "Otter Service and serialized environments are unsupported with R, "

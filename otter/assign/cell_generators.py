@@ -5,6 +5,7 @@ Miscellaneous cell generators for Otter Assign
 import copy
 import nbformat
 
+from .constants import MD_RESPONSE_CELL_SOURCE
 from .utils import get_source, lock
 
 def gen_init_cell():
@@ -35,7 +36,7 @@ def gen_markdown_response_cell():
     Returns:
         ``nbformat.NotebookNode``: the response cell
     """
-    return nbformat.v4.new_markdown_cell("_Type your answer here, replacing this text._")
+    return nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)
 
 def gen_export_cells(instruction_text, assignment, pdf=True, filtering=True):
     """

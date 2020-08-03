@@ -3,17 +3,18 @@ Solution removal for Otter Assign
 """
 
 import re
-import nbformat
 
-from .constants import MD_SOLUTION_REGEX
-from .utils import get_source, remove_output
+from .utils import rmd_to_cells, collapse_empty_cells
+
+from ..constants import MD_RESPONSE_CELL_SOURCE
+from ..utils import get_source
 
 def is_markdown_solution_cell(cell):
     """
-    Returns whether any line of the cell matches MD_SOLUTION_REGEX
+    Returns whether any line of the cell matches `<!-- BEGIN SOLUTION -->`
     
     Args:
-        cell (``nbformat.NotebookNode``): notebook cell
+        cell (``otter.assign.rmarkdown_adapter.utils.Cell``): notebook cell
     
     Returns:
         ``bool``: whether the current cell is a Markdown solution cell
@@ -21,13 +22,7 @@ def is_markdown_solution_cell(cell):
     if not cell.cell_type == 'markdown':
         return False
     source = get_source(cell)
-    return source and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
-
-def has_seed(cell):
-    if not cell.cell_type == 'code':
-        return False
-    source = get_source(cell)
-    return source and any([l.strip().endswith('# SEED') for l in source])
+    return source and any([re.match(r"\s*<!-- BEGIN SOLUTION -->\s*", l, flags=re.IGNORECASE) for l in source])
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
@@ -44,7 +39,12 @@ def solution_line_sub(match):
     return prefix + '...'
 
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
-skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT', '# SEED']
+skip_suffixes = [
+    '# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT', '# SEED', '<!-- BEGIN PROMPT -->',
+    '<!-- END PROMPT -->'
+]
+
+begin_md_solution_regex = re.compile(r"(\s*)<!--\s*BEGIN SOLUTION( NO PROMPT)?\s*-->")
 
 SUBSTITUTIONS = [
     (solution_assignment_regex, solution_assignment_sub),
@@ -71,11 +71,11 @@ def replace_solutions(lines):
             continue
 
         # ...
-        if solution and not line.endswith('# END SOLUTION'):
+        if solution and not (line.endswith('# END SOLUTION') or line.rstrip().endswith("<!-- END SOLUTION -->")):
             continue
 
         # ...
-        if line.endswith('# END SOLUTION'):
+        if line.endswith('# END SOLUTION') or line.rstrip().endswith("<!-- END SOLUTION -->"):
             assert solution, f"END SOLUTION without BEGIN SOLUTION in {lines}"
             solution = False
             continue
@@ -89,6 +89,16 @@ def replace_solutions(lines):
                 line = begin_solution.group(1) + '...'
             else:
                 continue
+        
+        begin_solution = begin_md_solution_regex.match(line)
+        if begin_solution:
+            assert not solution, f"Nested BEGIN SOLUTION in {lines}"
+            solution = True
+            if not begin_solution.group(2):
+                line = begin_solution.group(1) + MD_RESPONSE_CELL_SOURCE
+            else:
+                continue
+        
         for exp, sub in SUBSTITUTIONS:
             m = exp.match(line)
             if m:
@@ -100,7 +110,7 @@ def replace_solutions(lines):
     
     return stripped
 
-def strip_solutions_and_output(nb):
+def strip_solutions_and_output(rmd_string):
     """Write a notebook with solutions stripped
     
     Args:
@@ -108,15 +118,9 @@ def strip_solutions_and_output(nb):
         stripped_nb_path (path-like): path to new stripped notebook
     """
     md_solutions = []
-    for i, cell in enumerate(nb['cells']):
-        cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
-        if is_markdown_solution_cell(cell):
-            md_solutions.append(i)
-    md_solutions.reverse()
-    for i in md_solutions:
-        del nb['cells'][i]
-    
-    # remove output from student version
-    remove_output(nb)
-    
-    return nb
+    cells = rmd_to_cells(rmd_string)
+    for i, cell in enumerate(cells):
+        cells[i] = cell._replace(source='\n'.join(replace_solutions(get_source(cell))))
+    collapse_empty_cells(cells)
+    rmd_string = "\n".join([c.source for c in cells])    
+    return rmd_string

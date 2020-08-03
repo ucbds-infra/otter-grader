@@ -1,5 +1,5 @@
 """
-OK-formatted test parsers and builders for Otter Assign
+ottr test adapters for Otter Assign
 """
 
 import re
@@ -15,7 +15,7 @@ from ..utils import get_source, lock
 
 Test = namedtuple('Test', ['name', 'hidden', 'body'])
 
-def read_test(cell, question, assignment):
+def read_test(cell, question, assignment, rmd=False):
     """
     Returns the contents of a test as an ``(input, output, hidden)`` named tuple
     
@@ -23,12 +23,18 @@ def read_test(cell, question, assignment):
         cell (``nbformat.NotebookNode``): a test cell
         question (``dict``): question metadata
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        rmd (``bool``, optional): whether the cell is from an Rmd file; if true, the first and last
+            lines of ``cell``'s source are trimmed, since they should be backtick delimeters
 
     Returns:
         ``Test`` or ``OttrTest``: test named tuple
     """
-    hidden = bool(re.search("hidden", get_source(cell)[0], flags=re.IGNORECASE))
-    lines = get_source(cell)[1:]
+    if rmd:
+        source = get_source(cell)[1:-1]
+    else:
+        source = get_source(cell)
+    hidden = bool(re.search("hidden", source[0], flags=re.IGNORECASE))
+    lines = source[1:]
     assert sum("test_that(" in line for line in lines) == 1, \
         f"Too many test_that calls in test cell (max 1 allowed):\n{cell}"
     test_name = None

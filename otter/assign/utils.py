@@ -51,7 +51,7 @@ def get_spec(source, begin):
         block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) 
         if source[block_quotes[i]+1].strip(' ') == f"BEGIN {begin.upper()}"
     ]
-    assert len(begins) <= 1, f'multiple BEGIN blocks defined in {source}'
+    assert len(begins) <= 1, f'multiple BEGIN {begin.upper()} blocks defined in {source}'
     
     return begins[0] if begins else None
 
@@ -85,7 +85,7 @@ def is_markdown_cell(cell):
     Returns:
         ``bool``: whether the cell is a Markdown cell
     """
-    return cell['cell_type'] == 'markdown'
+    return cell.cell_type == 'markdown'
 
 
 #---------------------------------------------------------------------------------------------------

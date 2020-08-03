@@ -18,7 +18,7 @@ def is_question_cell(cell):
     Returns:
         ``bool``: whether the current cell is a question definition cell
     """
-    if cell['cell_type'] != 'markdown':
+    if cell.cell_type != 'markdown':
         return False
     return get_spec(get_source(cell), "question") is not None
 
