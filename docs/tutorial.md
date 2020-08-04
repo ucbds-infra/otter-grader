@@ -83,7 +83,7 @@ Start by `cd`ing into `tutorial/generate`. We have provided premade tests and a 
 otter generate autograder
 ```
 
-Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](otter_generate.md).
+Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](otter_generate/index.md).
 
 ### Otter Grade
 
@@ -290,4 +290,4 @@ After this command finishes running, you should have a file called `autograder.z
 
 To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
 
-You can find more information about Gradescope usage [here](otter_generate.md).
+You can find more information about Gradescope usage [here](otter_generate/index.md).

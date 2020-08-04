@@ -11,7 +11,7 @@
    otter_check
    dot_otter_files
    otter_grade
-   otter_generate
+   otter_generate/index
    otter_service
    execution
    pdfs
@@ -30,7 +30,7 @@ Otter is managed by a command-line tool organized into six basic commands: `assi
 * [Otter Assign](otter_assign/index.md) is an assignment development and distribution tool that allows instructors to create assignments with prompts, solutions, and tests in a simple notebook format that it then converts into santized versions for distribution to students and autograders.
 * [Otter Check](otter_check.md) allows students to run publically distributed tests written by instructors against their solutions as they work through assignments to verify their thought processes and design implementations.
 * [Otter Export](pdfs.md) generates PDFs with optional filtering of Jupyter notebooks for manually grading portions of assignments.
-* [Otter Generate](otter_generate.md) creates the necessary files so that instructors can autograde assignments using Gradescope's autograding platform.
+* [Otter Generate](otter_generate/index.md) creates the necessary files so that instructors can autograde assignments using Gradescope's autograding platform.
 * [Otter Grade](otter_grade.md) grades students' assignments locally on the instructor's machine in parallel Docker containers, returning grade breakdowns as a CSV file.
 * [Otter Service](otter_service.md) is a deployable grading server that students can submit their work to which grades these submissions and can optionally upload PDFs of these submission to Gradescope for manual grading.
 
