@@ -6,7 +6,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get dist-upgrade -y && \
+    apt-get install -y -f &&\
     apt-get install -y tzdata software-properties-common git vim wget libssl-dev nano && \
     rm -rf /var/lib/apt/lists/*
 
