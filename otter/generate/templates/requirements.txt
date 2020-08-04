@@ -15,6 +15,6 @@ rpy2
 jupytext
 numpy==1.16.0
 tornado==5.1.1
-git+https://github.com/ucbds-infra/otter-grader.git@cecbb5752f4b23621da7054843335af5c357d721
+git+https://github.com/ucbds-infra/otter-grader.git@4be8f7a4f8d83df5e2fa8b933402b4165a5b5671
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
