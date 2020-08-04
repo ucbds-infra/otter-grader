@@ -29,8 +29,8 @@ RUN apt-get clean && \
 RUN apt-get clean && \
     apt-get update && \
     apt-get update && \
-    apt-get install -y r-base && \
-    conda install -c r r-irkernel r-essentials -c conda-forge && \
+    conda install -y r-base r-essentials && \
+    conda install -c r r-irkernel r-essentials r-devtools -c conda-forge && \
     rm -rf /var/lib/apt/lists/*
 
 # pandoc, xetex for otter export
