@@ -141,7 +141,7 @@ For code questions, a question is a description *Markdown* cell, followed by a s
 The rest of the code block within the description cell must be YAML-formatted with the following fields (in any order):
 
 * `name` (required) - a string identifier that is a legal file name (without an extension)
-* `manual` (optional) - a boolean (default `False`); whether to include the response cell in a PDF for manual grading
+* `manual` (optional) - a boolean (default `false`); whether to include the response cell in a PDF for manual grading
 * `points` (optional) - a number (default `1`); how many points the question is worth
 
 As an example, the question metadata below indicates an autograded question `q1` worth 1 point.

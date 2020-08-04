@@ -18,7 +18,6 @@ export_cell: true
 This cell is removed from both output notebooks. Any unspecified keys will keep their default values. For more information about many of these arguments, see [Usage and Output](usage.md). The YAML block below lists all configurations **supported with R** and their defaults. Any keys that appear in the Python section but not below will be ignored when using Otter Assign with R.
 
 ```yaml
-run_tests: true                # whether to run tests on the resulting autograder directory
 requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
 overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
 template_pdf: false            # whether to generate a manual question template PDF for Gradescope
@@ -41,7 +40,7 @@ For code questions, a question is a description *Markdown* cell, followed by a s
 The rest of the code block within the description cell must be YAML-formatted with the following fields (in any order):
 
 * `name` (required) - a string identifier that is a legal file name (without an extension)
-* `manual` (optional) - a boolean (default `False`); whether to include the response cell in a PDF for manual grading
+* `manual` (optional) - a boolean (default `false`); whether to include the response cell in a PDF for manual grading
 * `points` (optional) - a number or list of numbers for the point values of each question. If a list of values, each case gets its corresponding value. If a single value, the number is divided by the number of cases so that a question with \\(n\\) cases has test cases worth \\(\frac{\text{points}}{n}\\) points.
 
 As an example, the question metadata below indicates an autograded question `q1` with 3 subparts worth 1, 2, and 1 points, resp.

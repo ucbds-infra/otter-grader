@@ -1,6 +1,6 @@
 # Usage and Output
 
-Otter Assign is called using the `otter assign` command. This command takes in two required arguments. The first is `master`, the path to the master notebook (the one formatted as described above), and the second is `result`, the path at which output shoud be written. The optional `files` argument takes an arbitrary number of paths to files that should be shipped with notebooks (e.g. data files, images, Python executables). _To use Otter Assign for R, add the `-l r` flag to indicate that the notebook language is R._
+Otter Assign is called using the `otter assign` command. This command takes in two required arguments. The first is `master`, the path to the master notebook (the one formatted as described above), and the second is `result`, the path at which output shoud be written. The optional `files` argument takes an arbitrary number of paths to files that should be shipped with notebooks (e.g. data files, images, Python executables). **Otter Assign will automatically recognize the language of the notebook** by looking at the kernel metadata; similarly, if using an Rmd file, it will automatically choose the language as R. This behavior can be overridden using the `-l` flag which takes the name of the language as its argument.
 
 **Note:** The path to the master notebook and to the result directory should be relative to the _working_ directory, but any paths in `files` should be relative to the parent directory of the master notebook. To clarify, the following directory structure:
 
@@ -102,10 +102,10 @@ To generate the distribution versions of `hw00.ipynb` (after `cd`ing into `hw00`
 otter assign hw00.ipynb dist
 ```
 
-If it was an R-formatted notebook, I would run
+If it was an Rmd file instead, I would run
 
 ```
-otter assign hw00.ipynb dist -l r
+otter assign hw00.Rmd dist
 ```
 
 This will create a new folder called `dist` with `autograder` and `student` as subdirectories, as described above.
@@ -158,7 +158,7 @@ In generating the distribution versions, I can prevent Otter Assign from rerunni
 otter assign --no-run-tests hw00.ipynb dist data.csv
 ```
 
-Because tests are not run on R notebooks, the above configuration would be ignored if `-l r` was passed.s
+Because tests are not run on R notebooks, the above configuration would be ignored if `hw00.ipynb` had an R kernel.
 
 If I wanted no initialization cell and no cell filtering in the export cell, I would run
 

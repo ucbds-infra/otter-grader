@@ -9,6 +9,7 @@
 
    python_notebook_format
    r_notebook_format
+   rmd_format
    usage
    cli_reference
 ```

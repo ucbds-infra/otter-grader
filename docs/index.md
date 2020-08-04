@@ -17,6 +17,7 @@
    pdfs
    seeding
    logging
+   resources
    changelog
 ```
 
