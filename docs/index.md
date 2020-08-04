@@ -44,7 +44,7 @@ pip install otter-grader
 To install the **beta** version, you must specify a semantic version, as pip won't install pre-release versions by default:
 
 ```
-pip install git+https://github.com/ucbds-infra/otter-grader.git@4be8f7a4f8d83df5e2fa8b933402b4165a5b5671
+pip install git+https://github.com/ucbds-infra/otter-grader.git@50d2a283b6f768c4436fb2dc399e958e2e07b83d
 ```
 
 If you are going to be autograding R, you must also install the R package using `devtools::install_github`:
@@ -56,7 +56,7 @@ devtools::install_github("ucbds-infra/ottr@1.0.0.b1")
 The R integrations with the Otter package are currently only supported out of the `ottr` branch of the Otter main repo, so you will need to reinstall the Python package with
 
 ```
-pip install git+https://github.com/ucbds-infra/otter-grader.git@4be8f7a4f8d83df5e2fa8b933402b4165a5b5671
+pip install git+https://github.com/ucbds-infra/otter-grader.git@50d2a283b6f768c4436fb2dc399e958e2e07b83d
 ```
 
 Installing the Python package will install the `otter` binary so that Otter can be called from the command line. **If you are running Otter on Windows,** this binary will not work. Instead, call Otter as a Python module: `python3 -m otter`. This will have _the same_ commands, arguments, and behaviors as all calls to `otter` that are shown in the documentation. 
