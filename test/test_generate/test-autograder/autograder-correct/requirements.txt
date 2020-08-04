@@ -13,7 +13,6 @@ nbformat
 dill
 rpy2
 jupytext
-git+https://github.com/chrispyles/nbpdfexport
 numpy==1.16.0
 tornado==5.1.1
 git+https://github.com/ucbds-infra/otter-grader.git@cecbb5752f4b23621da7054843335af5c357d721
