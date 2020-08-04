@@ -8,7 +8,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y tzdata software-properties-common git vim wget && \
+    apt-get install -y tzdata software-properties-common git vim wget libssl-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # miniconda
