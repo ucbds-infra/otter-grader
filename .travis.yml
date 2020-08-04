@@ -29,7 +29,6 @@ install:
   - conda install r-devtools -c conda-forge
   - pip install -r requirements.txt
   - Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
-  - pyppeteer-install
   - sudo apt-get update
   - sudo apt-get install -y pandoc
   - sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended texlive-generic-extra
