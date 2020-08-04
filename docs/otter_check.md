@@ -39,29 +39,24 @@ grader.check_all()
 
 This will rerun all tests against the current global environment and display the results for each tests concatenated into a single HTML output. It is recommended that this cell is put at the end of a notebook for students to run before they submit so that students can ensure that there are no variable name collisions, propagating errors, or other things that would cause the autograder to fail a test they should be passing.
 
-Students can also use the `Notebook` class to generate their own PDFs for manual grading using the static method `Notebook.to_pdf`. `Notebook.to_pdf` has a required positional argument of the path to the notebook to be exported (usually the notebook that students are working through). There are also two optional arguments related to filtering cells: `filtering` indicates whether or not to filter notebooks and defaults to `True`, and `filter_type` indicates the filter type (`"tags"` or `"html"`) to use and defaults to `"html"`. You can find more information about PDF generation [here](pdfs.md).
+<!-- TODO: fix this section -->
+### Exporting Submissions
 
-<!-- Because `Notebook.export` is a static method, it can be called either from the class as `otter.Notebook.export()` or from the grader instance as `grader.export()`. We use the latter convetion in the examples below. -->
+Students can also use the `Notebook` class to generate their own PDFs for manual grading using the method `Notebook.export`. This function takes an optional argument of the path to the notebook; if unspecified, it will infer the path by trying to read the config file (if present), using the path of the only notebook in the working directory if there is only one, or it will raise an error telling you to provide the path. This method creates a submission zip file that includes the notebook file, the log, and, optionally, a PDF of the notebook (set `pdf=False` to disable this last).
 
-As an example, if I wanted to export `hw01.ipynb` with HTML comment filtering, my call would be
-
-```python
-grader.to_pdf("hw01.ipynb")
-```
-
-as filtering is by defult on and the default filtering behavior is HTML comments. If I instead wanted to filter with cell tags, I would call
+As an example, if I wanted to export `hw01.ipynb` with cell filtering, my call would be
 
 ```python
-grader.export("hw01.ipynb", filter_type="tags")
+grader.export("hw01.ipynb")
 ```
 
-Lastly, if I wanted to generate a PDF with no filtering, I would use
+as filtering is by defult on. If I instead wanted no filtering, I would use
 
 ```python
 grader.export("hw01.ipynb", filtering=False)
 ```
 
-We don't need to specify a `filter_type` argument here because it would be ignored by the fact that `filtering=False`.
+To generate just a PDF of the notebook, use `Notebook.to_pdf`.
 
 ## Command Line Script Checker
 
