@@ -37,7 +37,7 @@ RUN apt-get clean && \
 RUN apt-get clean && \
     apt-get update && \
     apt-get install -y pandoc && \
-    apt-get install -y texlive-xetex texlive-fonts-recommended
+    apt-get install -y -f texlive-xetex texlive-fonts-recommended
 
 # install wkhtmltopdf for otter export
 RUN wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb && \
