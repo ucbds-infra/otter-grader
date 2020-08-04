@@ -8,7 +8,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y tzdata software-properties-common git && \
+    apt-get install -y tzdata software-properties-common git vim && \
     rm -rf /var/lib/apt/lists/*
 
 # miniconda
