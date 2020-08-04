@@ -2,11 +2,13 @@
 FROM ubuntu:20.10
 
 RUN ldconfig 
+
 # common packages
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get update && \
     apt-get upgrade -y && \
+    dpkg --configure -a && \
     # apt-get build-dep -y tzdata software-properties-common git vim wget libssl-dev nano && \
     apt-get install -y tzdata software-properties-common git vim wget libssl-dev nano && \
     rm -rf /var/lib/apt/lists/*
