@@ -1,14 +1,12 @@
 # Dockerfile forked from https://github.com/jeffheaton/docker-jupyter-python-r/blob/master/Dockerfile
 FROM ubuntu:20.10
 
-RUN ldconfig 
-
 # common packages
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y tzdata software-properties-common git vim wget libssl-dev && \
+    apt-get install -y tzdata git vim wget libssl-dev nano && \
     rm -rf /var/lib/apt/lists/*
 
 # miniconda
