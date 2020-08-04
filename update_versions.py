@@ -32,6 +32,7 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
     "test/test-assign/gs-autograder-correct/requirements.txt",
     "test/test-assign/pdf-autograder-correct/requirements.txt",
     "test/test-assign/r-autograder-correct/requirements.txt",
+    "test/test-assign/rmd-autograder-correct/requirements.txt",
 ]
 
 with open(FILES_WITH_VERSIONS[0]) as f:
