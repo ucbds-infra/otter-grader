@@ -1,5 +1,5 @@
 # Dockerfile forked from https://github.com/jeffheaton/docker-jupyter-python-r/blob/master/Dockerfile
-FROM ubuntu:20.10
+FROM ubuntu:20.04
 
 # common packages
 RUN export DEBIAN_FRONTEND=noninteractive && \
