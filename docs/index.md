@@ -51,7 +51,7 @@ pip install git+https://github.com/ucbds-infra/otter-grader.git@bc58bf5a8d13df97
 If you are going to be autograding R, you must also install the R package using `devtools::install_github`:
 
 ```r
-devtools::install_github("ucbds-infra/ottr@1.0.0.b1")
+devtools::install_github("ucbds-infra/ottr@0.0.0.b1")
 ```
 
 The R integrations with the Otter package are currently only supported out of the `ottr` branch of the Otter main repo, so you will need to reinstall the Python package with
