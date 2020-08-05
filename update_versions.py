@@ -28,8 +28,6 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
     "Dockerfile",
     "otter/generate/templates/requirements.txt",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
-    "docs/index.md",
-    "docs/otter_generate/container_image.md",
     "test/test-assign/gs-autograder-correct/requirements.txt",
     "test/test-assign/pdf-autograder-correct/requirements.txt",
     "test/test-assign/r-autograder-correct/requirements.txt",
