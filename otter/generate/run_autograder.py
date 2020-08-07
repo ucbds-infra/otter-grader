@@ -32,8 +32,10 @@ def main(config):
         config (``dict``): configurations for autograder
     """
     print(LOGO_WITH_VERSION, "\n")
-    
-    os.chdir(config.get("autograder_dir", "/autograder"))
+    orig_path = os.getcwd()
+
+    abs_path = os.path.abspath(config.get("autograder_dir", "/autograder"))
+    os.chdir(abs_path)
 
     if config.get("token", None) is not None:
         client = APIClient(token=config.get("token", None))
@@ -129,7 +131,7 @@ def main(config):
 
     output = scores.to_gradescope_dict(config)
 
-    os.chdir(config.get("autograder_dir", "/autograder"))
+    os.chdir(abs_path)
 
     with open("./results/results.json", "w+") as f:
         json.dump(output, f, indent=4)
@@ -140,3 +142,5 @@ def main(config):
         df.drop(columns=["output"], inplace=True)
     # df.drop(columns=["hidden"], inplace=True)
     print(df)
+    
+    os.chdir(orig_path)
