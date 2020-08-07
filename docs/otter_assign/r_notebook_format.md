@@ -89,6 +89,8 @@ test_that("q1a", {
 })
 ```
 
+The removal behavior regarding questions with no solution provided holds for R notebooks.
+
 ## Manually Graded Questions
 
 Otter Assign also supports manually-graded questions using a similar specification to the one described above. The behavior for manually graded questions in R is exactly the same as it is in [Python](python_notebook_format.html#manually-graded-questions).

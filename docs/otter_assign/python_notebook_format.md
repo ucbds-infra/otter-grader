@@ -231,6 +231,8 @@ print(1)
 print(2)
 ```
 
+**If a question has no solution cell provided**, the question will either be removed from the output notebook entirely if it has only hidden tests or will be replaced with an unprompted `Notebook.check` cell that runs those tests. In either case, the test files are written, but this provides a way of defining additional test cases that do not have public versions. Note, however, that the lack of a `Notebook.check` cell for questions with only hidden tests means that the tests are run _at the end of execution_, and therefore are not robust to variable name collisions.
+
 ### Intercell Seeding
 
 Otter Assign maintains support for [intercell seeding](../seeding.md) by allowing seeds to be set in solution cells. To add a seed, write a line that ends with `# SEED`; when Otter runs, this line will be removed from the student version of the notebook. This allows instructors to write code with deterministic output, with which hidden tests can be generated.
