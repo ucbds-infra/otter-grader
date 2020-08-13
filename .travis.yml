@@ -22,11 +22,15 @@ before_install:
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - conda info -a
   - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION
   - source activate test-env
   - export TAR="/bin/tar"
   - docker pull gradescope/auto-builds:latest
+
+after_install:
+  - docker version
+  - docker-compose version
+  - conda info -a
 
 before_script:
   - psql -c "create user root createdb password 'root';" -U postgres
