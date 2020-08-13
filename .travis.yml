@@ -31,12 +31,10 @@ before_install:
   - export TAR="/bin/tar"
   - docker pull gradescope/auto-builds:latest
 
-after_install:
+before_script:
   - docker version
   - docker-compose version
   - conda info -a
-
-before_script:
   - psql -c "create user root createdb password 'root';" -U postgres
 
 install:
