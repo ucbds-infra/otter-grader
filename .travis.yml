@@ -7,6 +7,11 @@ services:
   - docker
   - postgresql
 
+addons:
+  apt:
+    packages:
+      - docker-ce
+
 before_install:
   # - docker pull ucbdsinfra/otter-grader:latest
   - docker version
