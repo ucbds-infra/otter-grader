@@ -52,16 +52,16 @@ class TestRunAutograder(TestCase):
         args.func(args)
 
         # first unzip and check output
-        unzip_command = ["unzip", "-o", TEST_FILES_PATH + "autograder.zip", "-d", TEST_FILES_PATH + "autograder"]
+        os.mkdir(TEST_FILES_PATH + "autograder")
+        unzip_command = ["unzip", "-o", TEST_FILES_PATH + "autograder.zip", "-d", TEST_FILES_PATH + "autograder/source"]
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(unzip.stderr), 0, unzip.stderr.decode("utf-8"))
 
         # copy submission tests and notebook, 
         # note: also changed some pathing in the run_autograder.py to pass the test
-        os.mkdir(TEST_FILES_PATH+"autograder/submission")
-        os.mkdir(TEST_FILES_PATH+"autograder/results")
-        shutil.copytree(TEST_FILES_PATH+"tests", TEST_FILES_PATH+"autograder/submission/tests")
-        copyfile(TEST_FILES_PATH+"fails2and6H.ipynb", TEST_FILES_PATH+"autograder/submission/fails2and6H.ipynb")
+        os.mkdir(TEST_FILES_PATH + "autograder/submission")
+        os.mkdir(TEST_FILES_PATH + "autograder/results")
+        copyfile(TEST_FILES_PATH + "fails2and6H.ipynb", TEST_FILES_PATH + "autograder/submission/fails2and6H.ipynb")
         
         
         run_autograder(self.config)
