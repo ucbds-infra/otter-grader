@@ -159,7 +159,11 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
     Returns:
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
-    client = docker.from_env()
+    # this is a fix for travis -- allows overriding docker client version
+    if os.environ.get("OTTER_DOCKER_CLIENT_VERSION", None) is not None:
+        client = docker.from_env(version=os.environ.get("OTTER_DOCKER_CLIENT_VERSION"))
+    else:
+        client = docker.from_env()
     container = client.containers.run(image, detach=True, tty=True)
 
     try:        

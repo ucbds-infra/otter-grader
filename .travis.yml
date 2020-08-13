@@ -7,6 +7,10 @@ services:
   - docker
   - postgresql
 
+# setting this to use in otter grade for docker version
+env:
+  - OTTER_DOCKER_CLIENT_VERSION=1.38
+
 addons:
   apt:
     packages:
