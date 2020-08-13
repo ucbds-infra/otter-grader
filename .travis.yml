@@ -9,18 +9,31 @@ services:
 
 before_install:
   # - docker pull ucbdsinfra/otter-grader:latest
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION
+  - source activate test-env
+  - export TAR="/bin/tar"
   - docker pull gradescope/auto-builds:latest
 
 before_script:
   - psql -c "create user root createdb password 'root';" -U postgres
 
 install:
+  - conda install r-base r-essentials
+  - conda install r-devtools -c conda-forge
   - pip install -r requirements.txt
-  - pyppeteer-install
+  - Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
   - sudo apt-get update
   - sudo apt-get install -y pandoc
   - sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended texlive-generic-extra
   - sudo apt-get install fonts-lmodern
+  - make docker-test
 
 script:
   # runs test.__main__

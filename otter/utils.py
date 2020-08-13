@@ -120,9 +120,9 @@ def get_source(cell):
     Returns:
         ``list`` of ``str``: each line of the cell source stripped of ending line breaks
     """
-    source = cell['source']
+    source = cell.source
     if isinstance(source, str):
-        return cell['source'].split('\n')
+        return source.split('\n')
     elif isinstance(source, list):
         return [line.strip('\n') for line in source]
-    assert 'unknown source type', type(source)
+    raise ValueError(f'unknown source type: {type(source)}')

@@ -13,9 +13,9 @@ from .cell_generators import (
     gen_close_export_cell, add_close_export_to_cell
 )
 from .questions import is_question_cell, read_question_metadata, gen_question_cell
-from .solutions import is_markdown_solution_cell
-from .tests import is_test_cell, any_public_tests, read_test, gen_test_cell
-from .utils import is_seed_cell, is_markdown_cell, EmptyCellException
+from .solutions import is_markdown_solution_cell, has_seed
+from .tests import is_test_cell, any_public_tests
+from .utils import is_markdown_cell, EmptyCellException
 
 def transform_notebook(nb, assignment, args):
     """
@@ -34,13 +34,13 @@ def transform_notebook(nb, assignment, args):
     """
     transformed_cells, test_files = get_transformed_cells(nb['cells'], assignment)
 
-    if assignment.init_cell and not args.no_init_cell:
+    if assignment.init_cell and not args.no_init_cell and assignment.is_python:
         transformed_cells = [gen_init_cell()] + transformed_cells
 
-    if assignment.check_all_cell and not args.no_check_all:
+    if assignment.check_all_cell and not args.no_check_all and assignment.is_python:
         transformed_cells += gen_check_all_cell()
     
-    if assignment.export_cell and not args.no_export_cell:
+    if assignment.export_cell and not args.no_export_cell and assignment.is_python:
         export_cell = assignment.export_cell
         if export_cell is True:
             export_cell = {}
@@ -72,12 +72,20 @@ def get_transformed_cells(cells, assignment):
         ``tuple(list, dict)``: list of cleaned notebook cells and a dictionary mapping test names to 
             their parsed contents
     """
+    if assignment.is_r:
+        from .r_adapter.tests import read_test, gen_test_cell
+    else:
+        from .tests import read_test, gen_test_cell
+    
     # global SEED_REQUIRED, ASSIGNMENT_METADATA
     transformed_cells, test_files = [], {}
     question_metadata, test_cases, processed_solution, md_has_prompt = {}, [], False, False
     need_close_export, no_solution = False, False
 
     for cell in cells:
+
+        if has_seed(cell):
+            assignment.seed_required = True            
 
         # this is the prompt cell or if a manual question then the solution cell
         if question_metadata and not processed_solution:
@@ -101,12 +109,12 @@ def get_transformed_cells(cells, assignment):
             # include it in the output notebook but we need a test file
             elif is_test_cell(cell):
                 no_solution = True
-                test = read_test(cell)
+                test = read_test(cell, question_metadata, assignment)
                 test_cases.append(test)
 
-            elif is_seed_cell(cell):
-                assignment.seed_required = True
-                continue
+            # elif is_seed_cell(cell):
+            #     assignment.seed_required = True
+            #     continue
 
             if not no_solution:
                 transformed_cells.append(cell)
@@ -115,7 +123,7 @@ def get_transformed_cells(cells, assignment):
 
         # if this is a test cell, parse and add to test_cases
         elif question_metadata and processed_solution and is_test_cell(cell):
-            test = read_test(cell)
+            test = read_test(cell, question_metadata, assignment)
             test_cases.append(test)
 
         # # if this is a solution cell, append. if manual question and no prompt, also append prompt cell
@@ -131,7 +139,7 @@ def get_transformed_cells(cells, assignment):
 
                 # create a Notebook.check cell
                 if test_cases:
-                    check_cell = gen_test_cell(question_metadata, test_cases, test_files)
+                    check_cell = gen_test_cell(question_metadata, test_cases, test_files, assignment)
 
                     # only add to notebook if there's a response cell or if there are public tests
                     if not no_solution or any_public_tests(test_cases):
@@ -177,7 +185,7 @@ def get_transformed_cells(cells, assignment):
                 transformed_cells.append(cell)
 
     if test_cases:
-        check_cell = gen_test_cell(question_metadata, test_cases, test_files)
+        check_cell = gen_test_cell(question_metadata, test_cases, test_files, assignment)
         if not no_solution or any_public_tests(test_cases):
             transformed_cells.append(check_cell)
 

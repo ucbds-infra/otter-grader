@@ -11,6 +11,8 @@ jinja2
 nbconvert
 nbformat
 dill
+rpy2
+jupytext
 numpy==1.16.0
 tornado==5.1.1
-otter-grader==1.0.0.b9
+git+https://github.com/ucbds-infra/otter-grader.git@bc58bf5a8d13df97e43935c262dd4f2a5c16e075

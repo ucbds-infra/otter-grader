@@ -18,8 +18,8 @@ import argparse
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("--git", action="store_true", help="Indicates that new release should be installed via git")
 
-CURRENT_VERSION = "1.0.0.b8"
-NEW_VERSION = "1.0.0.b9"
+CURRENT_VERSION = "1.0.0.b7"
+NEW_VERSION = "1.0.0.b7"
 
 from_beta = "b" in CURRENT_VERSION.split(".")[-1]
 to_beta = "b" in NEW_VERSION.split(".")[-1]
@@ -28,9 +28,10 @@ FILES_WITH_VERSIONS = [        # do not include setup.py
     "Dockerfile",
     "otter/generate/templates/requirements.txt",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
-    "docs/index.md",
     "test/test-assign/gs-autograder-correct/requirements.txt",
     "test/test-assign/pdf-autograder-correct/requirements.txt",
+    "test/test-assign/r-autograder-correct/requirements.txt",
+    "test/test-assign/rmd-autograder-correct/requirements.txt",
 ]
 
 with open(FILES_WITH_VERSIONS[0]) as f:

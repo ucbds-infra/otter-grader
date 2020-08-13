@@ -27,6 +27,14 @@ otter.argparser module
    :undoc-members:
    :show-inheritance:
 
+otter.run module
+----------------
+
+.. automodule:: otter.run
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 otter.utils module
 ------------------
 

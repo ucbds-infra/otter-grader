@@ -56,8 +56,11 @@ def grade(ipynb_path, pdf, script, ignore_errors=True, seed=None, cwd=None):
     # output PDF
     if pdf:
         export_notebook(
-            ipynb_path,
-            filtering = pdf != "unfiltered"
+            ipynb_path, 
+            filtering = pdf != "unfiltered", 
+            debug=True
+            # filter_type = pdf if pdf != "unfiltered" else "tags",
+            # timeout=60000
         )
         # nb2pdf.convert(
         #     ipynb_path, 

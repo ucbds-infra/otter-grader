@@ -9,13 +9,18 @@ tqdm
 codecov
 jinja2
 docker
-git+https://github.com/chrispyles/nbpdfexport.git
-nb2pdf<0.6.0
+# git+https://github.com/chrispyles/nbpdfexport.git
+# nb2pdf<0.6.0
 requests
 nbconvert
 nbformat
 dill
-attrdict
+pdfkit
+PyPDF2
+
+# ottr requirements
+rpy2
+jupytext
 
 # otter service requirements
 psycopg2
