@@ -58,7 +58,7 @@ Installing the Python package will install the `otter` binary so that Otter can 
 
 ### Docker
 
-Otter uses Docker to create containers in which to run the students' submissions. Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks. We have the current beta version of Otter installed on the `beta` release of the image. To get the Docker image, run
+Otter uses Docker to create containers in which to run the students' submissions. **Docker and our Docker image are only required if using Otter Grade or Otter Service.** Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks. We have the current beta version of Otter installed on the `beta` release of the image. To get the Docker image, run
 
 ```
 docker pull ucbdsinfra/otter-grader:beta
