@@ -61,10 +61,10 @@ class TestRunAutograder(TestCase):
 
         run_autograder(self.config)
 
-        # TODO: check that results are correct??
+        self.assertDirsEqual(TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder-correct", ignore_ext=[".pdf",".zip"])
 
     def tearDown(self):
-        for p in [TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder.zip", "test/results.json"]:
+        for p in [TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder.zip", "test/results.json", TEST_FILES_PATH + "autograder-correct/__pycache__"]:
             if os.path.isdir(p):
                 shutil.rmtree(p)
             elif os.path.isfile(p):
