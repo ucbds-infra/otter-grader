@@ -11,10 +11,10 @@ services:
 env:
   - OTTER_DOCKER_CLIENT_VERSION=1.38
 
-addons:
-  apt:
-    packages:
-      - docker-ce
+# addons:
+#   apt:
+#     packages:
+#       - docker-ce
 
 before_install:
   # - docker pull ucbdsinfra/otter-grader:latest
