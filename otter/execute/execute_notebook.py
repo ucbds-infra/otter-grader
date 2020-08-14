@@ -74,7 +74,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         #     source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
         # el
         if cwd:
-            source = f"import sys\nsys.path.append(\"{cwd}\")\n"
+            source = f"import sys\nsys.path.append(r\"{cwd}\")\n"
             exec(source, global_env)
         if seed is not None:
             # source += "import numpy as np\nimport random\n"

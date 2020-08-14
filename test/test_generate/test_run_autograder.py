@@ -12,19 +12,14 @@ from glob import glob
 from unittest import mock
 from shutil import copyfile
 
+from otter.argparser import get_parser
 from otter.generate.autograder import main as autograder
 from otter.generate.run_autograder import main as run_autograder
 from otter.generate.autograder import main as autograder
 
 from .. import TestCase
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 TEST_FILES_PATH = "test/test_generate/test-run-autograder/"
 
@@ -57,14 +52,20 @@ class TestRunAutograder(TestCase):
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(unzip.stderr), 0, unzip.stderr.decode("utf-8"))
 
+        self.config["autograder_dir"] = TEST_FILES_PATH + "autograder"
+
         # copy submission tests and notebook, 
-        # note: also changed some pathing in the run_autograder.py to pass the test
         os.mkdir(TEST_FILES_PATH + "autograder/submission")
         os.mkdir(TEST_FILES_PATH + "autograder/results")
         copyfile(TEST_FILES_PATH + "fails2and6H.ipynb", TEST_FILES_PATH + "autograder/submission/fails2and6H.ipynb")
-        
-        
+
         run_autograder(self.config)
-        # cleanup files
-        cleanup = subprocess.run(["rm", "-rf", TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder.zip", "test/results.json"], stdout=PIPE, stderr=PIPE)
-        self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
+
+        # TODO: check that results are correct??
+
+    def tearDown(self):
+        for p in [TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder.zip", "test/results.json"]:
+            if os.path.isdir(p):
+                shutil.rmtree(p)
+            elif os.path.isfile(p):
+                os.remove(p)

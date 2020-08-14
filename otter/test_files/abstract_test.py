@@ -60,6 +60,7 @@ class TestFile(ABC):
         self.passed = None
         self.failed_test = None
         self.failed_test_hidden = None
+        self.result = None
 
     @classmethod
     @abstractmethod

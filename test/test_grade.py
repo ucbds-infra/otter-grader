@@ -13,18 +13,13 @@ from unittest import mock
 from subprocess import PIPE
 from glob import glob
 
+from otter.argparser import get_parser
 from otter.grade import main as grade
 from otter.grade.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 
 from . import TestCase
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 TEST_FILES_PATH = "test/test-grade/"
 
@@ -35,8 +30,9 @@ class TestGrade(TestCase):
         super().setUpClass()
         
         create_image_cmd = ["make", "docker-test"]
-        create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
-        assert not create_image.stderr, create_image.stderr.decode("utf-8")
+        subprocess.run(create_image_cmd, check=True)
+        # create_image = subprocess.run(create_image_cmd, check=True)
+        # assert not create_image.stderr, create_image.stderr.decode("utf-8")
     
     def setUp(self):
         """
@@ -224,7 +220,7 @@ class TestGrade(TestCase):
             "-t", TEST_FILES_PATH + "tests/", 
             "-r", TEST_FILES_PATH + "requirements.txt",
             "-o", "test/",
-            "--pdfs", "tags",
+            "--pdfs",
             "--containers", "5",
             "--image", "otter-test"
         ]

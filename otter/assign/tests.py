@@ -4,14 +4,16 @@ OK-formatted test parsers and builders for Otter Assign
 
 import re
 import pprint
+import yaml
 import nbformat
 
 from collections import namedtuple
 
-from .constants import TEST_REGEX
+from .constants import TEST_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
 
 Test = namedtuple('Test', ['input', 'output', 'hidden'])
+OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
 
 def is_test_cell(cell):
     """
@@ -23,7 +25,7 @@ def is_test_cell(cell):
     Returns:
         ``bool``: whether the cell is a test cell
     """
-    if cell['cell_type'] != 'code':
+    if cell.cell_type != 'code':
         return False
     source = get_source(cell)
     return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
@@ -40,15 +42,17 @@ def any_public_tests(test_cases):
     """
     return any(not test.hidden for test in test_cases)
 
-def read_test(cell):
+def read_test(cell, question, assignment):
     """
     Returns the contents of a test as an ``(input, output, hidden)`` named tuple
     
     Args:
         cell (``nbformat.NotebookNode``): a test cell
+        question (``dict``): question metadata
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
-        ``otter.assign.Test``: test named tuple
+        ``Test`` or ``OttrTest``: test named tuple
     """
     hidden = bool(re.search("hidden", get_source(cell)[0], flags=re.IGNORECASE))
     output = ''
@@ -61,7 +65,7 @@ def read_test(cell):
             output += results
     return Test('\n'.join(get_source(cell)[1:]), output, hidden)
 
-def gen_test_cell(question, tests, tests_dict):
+def gen_test_cell(question, tests, tests_dict, assignment):
     """
     Parses a list of test named tuples and creates a single test file. Adds this test file as a value
     to ``tests_dict`` with a key corresponding to the test's name, taken from ``question``. Returns
@@ -69,14 +73,17 @@ def gen_test_cell(question, tests, tests_dict):
     
     Args:
         question (``dict``): question metadata
-        tests (``list`` of ``otter.assign.Test``): tests to be written
+        tests (``list`` of ``Test``): tests to be written
         tests_dict (``dict``): the tests for this assignment
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
         ``nbformat.NotebookNode``: code cell calling ``otter.Notebook.check`` on this test
     """
     cell = nbformat.v4.new_code_cell()
+
     cell.source = ['grader.check("{}")'.format(question['name'])]
+
     suites = [gen_suite(tests)]
     points = question.get('points', 1)
     
@@ -85,8 +92,8 @@ def gen_test_cell(question, tests, tests_dict):
         'points': points,
         'suites': suites,
     }
-    tests_dict[question['name']] = test
 
+    tests_dict[question['name']] = test
     lock(cell)
     return cell
 
@@ -142,15 +149,19 @@ def write_test(path, test):
         test (``dict``): OK test to be written
     """
     with open(path, 'w') as f:
-        f.write('test = ')
-        pprint.pprint(test, f, indent=4, width=200, depth=None)
+        if isinstance(test, dict):
+            f.write('test = ')
+            pprint.pprint(test, f, indent=4, width=200, depth=None)
+        else:
+            f.write(test)
 
-def remove_hidden_tests_from_dir(test_dir):
+def remove_hidden_tests_from_dir(test_dir, assignment):
     """
     Rewrites test files in a directory to remove hidden tests
     
     Args:
         test_dir (``pathlib.Path``): path to test files directory
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     """
     for f in test_dir.iterdir():
         if f.name == '__init__.py' or f.suffix != '.py':

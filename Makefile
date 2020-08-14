@@ -1,5 +1,5 @@
 distro:
-	rm dist/*
+	rm dist/* || :
 	python3 update_versions.py
 	python3 setup.py sdist bdist_wheel
 
@@ -7,13 +7,13 @@ git-distro:
 	python3 update_versions.py --git
 
 pypi:
-	rm dist/*
+	rm dist/* || :
 	python3 update_versions.py
 	python3 setup.py sdist bdist_wheel
 	python3 -m twine upload dist/*
 
 test-pypi:
-	rm dist/*
+	rm dist/* || :
 	python3 update_versions.py
 	python3 setup.py sdist bdist_wheel
 	python3 -m twine upload dist/* --repository-url https://test.pypi.org/legacy/
@@ -24,7 +24,7 @@ docker:
 
 docker-test:
 	cp -r Dockerfile test-Dockerfile
-	printf "\nADD . /home/otter-grader\nRUN pip3 install /home/otter-grader" >> test-Dockerfile
+	printf "\nADD . /tmp/otter-grader\nRUN pip install /tmp/otter-grader" >> test-Dockerfile
 	docker build . -t otter-test -f test-Dockerfile
 	rm test-Dockerfile
 

@@ -3,20 +3,20 @@
 **v1.0.0:**
 
 * Changed structure of CLI into six main commands: `otter assign`, `otter check`, `otter export`, `otter generate`, `otter grade`, and `otter service`
+* Added R autograding integrations with autograding package [ottr](https://github.com/ucbds-infra/ottr)
 * Added Otter Assign, a forked version of [jassign](https://github.com/okpy/jassign) that works with Otter
 * Added Otter Export, a forked version of [nb2pdf](https://github.com/ucbds-infra/nb2pdf) and [gsExport](https://github.com/dibyaghosh/gsExport) for generating PDFs of notebooks
 * Added Otter Service, a deployable grading service that students can POST their submissions to
-* Added logging to `otter.Notebook` and Otter Check
-* Added saving environments in log for grading
+* Added logging to `otter.Notebook` and Otter Check, incl. environment serialization for grading
 * Changed filenames inside the package so that names match commands (e.g. `otter/cli.py` is now `otter/grade.py`)
 * Added intercell seeding
-* Moved all argparse calls into `otter.argparser`
+* Moved all argparse calls into `otter.argparser` and the logic for routing Otter commands to `otter.run`
 * Made several fixes to `otter check`, incl. ability to grade notebooks with it
 * `otter generate` and `otter grade` now remove tmp directories on failure
 * Fixed `otter.ok_parser.CheckCallWrapper` finding and patching instances of `otter.Notebook`
 * Changed behavior of hidden test cases to use individual case `"hidden"` key instead of global `"hidden"` key
 * Made use of metadata files in `otter grade` optional
-* _Deprecated in v1.0.0:_ the global `test["hidden"]` key in writing OK tests for Otter
+* Added `otter_ignore` cell tag to flag a cell to be ignored during notebook execution
 
 **v0.4.8:**
 

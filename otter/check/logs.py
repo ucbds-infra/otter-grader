@@ -133,8 +133,15 @@ class LogEntry:
             file = open(filename, "ab+")
             pickle.dump(self, file)
 
+        except OSError:
+            raise Exception(
+                "Could not create the log file as the file system is read-only. Please contact your "
+                "instructor before continuing on this assignment."
+            )
+
         finally:
-            file.close()
+            if "file" in locals():
+                file.close()
 
     def shelve(self, env, delete=False, filename=None, ignore_modules=[], variables=None):
         """

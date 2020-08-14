@@ -4,14 +4,19 @@ Otter Assign command-line utility
 
 import os
 import pathlib
-import nb2pdf
+import warnings
+# import nb2pdf
 
 from .assignment import Assignment
-from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
+# from .. import _WINDOWS
 from ..export import export_notebook
 from ..utils import get_relpath, block_print
+
+# for now can't use nb2pdf on Windows b/c of pyppeteer - this may be due to my
+# local install, requires further debugging
+# TO_PDF_FN = (nb2pdf.convert, export_notebook)[_WINDOWS]
 
 def main(args):
     """
@@ -24,6 +29,12 @@ def main(args):
     print("Generating views...")
 
     assignment = Assignment()
+
+    # check language
+    if args.lang is not None:
+        args.lang = args.lang.lower()
+        assert args.lang in ["r", "python"], f"Language {args.lang} is not valid"
+        assignment.lang = args.lang
     
     # TODO: update this condition
     if True:
@@ -32,37 +43,55 @@ def main(args):
         os.chdir(master.parent)
         master = pathlib.Path(master.name)
     
+    assignment.master, assignment.result = master, result
+
+    if assignment.is_rmd:
+        from .rmarkdown_adapter.output import write_output_directories
+    else:
+        from .output import write_output_directories
+    
     try:
         write_output_directories(master, result, assignment, args)
 
         # check that we have a seed if needed
         if assignment.seed_required:
-            assert not assignment.generate or assignment.generate.get('seed', None) is not None, \
-                "Seeding cell found but no seed provided"
+            generate_args = assignment.generate
+            if generate_args is True:
+                generate_args = {'seed': None}
+            assert not generate_args or generate_args.get('seed', None) is not None or \
+                not assignment.is_python, "Seeding cell found but no seed provided"
         
-        # generate PDF of solutions with nb2pdf
+        # generate PDF of solutions with nb2pdf -- DEPRECATED
         if assignment.solutions_pdf:
-            print("Generating solutions PDF...")
-            filtering = assignment.solutions_pdf == 'filtered'
-            nb2pdf.convert(
-                str(result / 'autograder' / master.name),
-                dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
-                filtering=filtering
-            )
+            # print("Generating solutions PDF...")
+            # filtering = assignment.solutions_pdf == 'filtered'
+            # TO_PDF_FN(
+            #     str(result / 'autograder' / master.name),
+            #     dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
+            #     filtering=filtering
+            # )
+            warnings.warn("The solutions_pdf configuration is deprecated and will be ignored")
 
         # generate a tempalte PDF for Gradescope
-        if assignment.template_pdf:
+        if not assignment.is_rmd and assignment.template_pdf:
             print("Generating template PDF...")
             export_notebook(
                 str(result / 'autograder' / master.name),
                 dest=str(result / 'autograder' / (master.stem + '-template.pdf')), 
                 filtering=True, 
-                pagebreaks=True
+                pagebreaks=True, 
+                exporter_type="latex"
             )
 
         # generate the .otter file if needed
-        if assignment.service or assignment.save_environment:
-            write_otter_config_file(master, result, assignment)
+        if not assignment.is_rmd and assignment.service or assignment.save_environment:
+            if assignment.is_r:
+                warnings.warn(
+                    "Otter Service and serialized environments are unsupported with R, "
+                    "configurations ignored"
+                )
+            else:
+                write_otter_config_file(master, result, assignment)
 
         # generate Gradescope autograder zipfile
         if assignment.generate:
@@ -71,7 +100,7 @@ def main(args):
             run_generate_autograder(result, assignment, args)
 
         # run tests on autograder notebook
-        if assignment.run_tests and not args.no_run_tests:
+        if assignment.run_tests and not args.no_run_tests and assignment.is_python:
             print("Running tests...")
             with block_print():
                 if isinstance(assignment.generate, bool):

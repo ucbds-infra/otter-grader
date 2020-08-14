@@ -19,7 +19,7 @@
             "score": 0,
             "max_score": 2,
             "visibility": "visible",
-            "output": "   ./tests/q2.py\n\nTest result:\nTrying:\n    negate(True)\nExpecting:\n    False\n**********************************************************************\nLine 2, in ./tests/q2.py 0\nFailed example:\n    negate(True)\nExpected:\n    False\nGot:\n    True\n"
+            "output": "   tests/q2.py\n\nTest result:\nTrying:\n    negate(True)\nExpecting:\n    False\n**********************************************************************\nLine 2, in tests/q2.py 0\nFailed example:\n    negate(True)\nExpected:\n    False\nGot:\n    True\n"
         },
         {
             "name": "q3 - Public",
@@ -61,7 +61,7 @@
             "score": 0,
             "max_score": 5,
             "visibility": "hidden",
-            "output": "   ./tests/q6.py\n\nTest result:\nTrying:\n    fib = fiberator()\nExpecting nothing\nok\nTrying:\n    for _ in range(10):\n        print(next(fib))\nExpecting:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\n**********************************************************************\nLine 3, in ./tests/q6.py 1\nFailed example:\n    for _ in range(10):\n        print(next(fib))\nExpected:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\nGot:\n    0\n    1\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n"
+            "output": "   tests/q6.py\n\nTest result:\nTrying:\n    fib = fiberator()\nExpecting nothing\nok\nTrying:\n    for _ in range(10):\n        print(next(fib))\nExpecting:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\n**********************************************************************\nLine 3, in tests/q6.py 1\nFailed example:\n    for _ in range(10):\n        print(next(fib))\nExpected:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\nGot:\n    0\n    1\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n"
         },
         {
             "name": "q7 - Public",
