@@ -14,6 +14,7 @@ from glob import glob
 from unittest.mock import patch, mock_open
 from shutil import copyfile
 
+from otter.argparser import get_parser
 from otter.generate.autograder import main as autograder
 from otter.generate.run_autograder import main as run_autograder
 from otter.generate.autograder import main as autograder
@@ -21,13 +22,7 @@ from otter.generate.token import APIClient
 
 from .. import TestCase
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 client = APIClient('token1')
 
