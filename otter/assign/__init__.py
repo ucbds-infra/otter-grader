@@ -5,18 +5,13 @@ Otter Assign command-line utility
 import os
 import pathlib
 import warnings
-# import nb2pdf
 
 from .assignment import Assignment
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
-# from .. import _WINDOWS
 from ..export import export_notebook
+from ..export.exporters import WkhtmltopdfNotFoundError
 from ..utils import get_relpath, block_print
-
-# for now can't use nb2pdf on Windows b/c of pyppeteer - this may be due to my
-# local install, requires further debugging
-# TO_PDF_FN = (nb2pdf.convert, export_notebook)[_WINDOWS]
 
 def main(args):
     """
@@ -61,16 +56,26 @@ def main(args):
             assert not generate_args or generate_args.get('seed', None) is not None or \
                 not assignment.is_python, "Seeding cell found but no seed provided"
         
-        # generate PDF of solutions with nb2pdf -- DEPRECATED
+        # generate PDF of solutions
         if assignment.solutions_pdf:
-            # print("Generating solutions PDF...")
-            # filtering = assignment.solutions_pdf == 'filtered'
-            # TO_PDF_FN(
-            #     str(result / 'autograder' / master.name),
-            #     dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
-            #     filtering=filtering
-            # )
-            warnings.warn("The solutions_pdf configuration is deprecated and will be ignored")
+            print("Generating solutions PDF...")
+            filtering = assignment.solutions_pdf == 'filtered'
+
+            try:
+                export_notebook(
+                    str(result / 'autograder' / master.name),
+                    dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
+                    filtering=filtering,
+                    pagebreaks=filtering,
+                    exporter_type="html",
+                )
+            except WkhtmltopdfNotFoundError:
+                export_notebook(
+                    str(result / 'autograder' / master.name),
+                    dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
+                    filtering=filtering,
+                    pagebreaks=filtering,
+                )
 
         # generate a tempalte PDF for Gradescope
         if not assignment.is_rmd and assignment.template_pdf:
@@ -80,7 +85,7 @@ def main(args):
                 dest=str(result / 'autograder' / (master.stem + '-template.pdf')), 
                 filtering=True, 
                 pagebreaks=True, 
-                exporter_type="latex"
+                exporter_type="latex",
             )
 
         # generate the .otter file if needed
