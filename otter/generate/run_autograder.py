@@ -9,11 +9,13 @@ import subprocess
 import re
 import pickle
 import warnings
+import jupytext
 import pandas as pd
 
 from glob import glob
 from textwrap import dedent
 
+from .constants import DEFAULT_OPTIONS
 from .token import APIClient
 from .utils import replace_notebook_instances
 
@@ -23,6 +25,87 @@ from ..execute import grade_notebook
 from ..export import export_notebook
 from ..version import LOGO_WITH_VERSION
 
+def run_r_autograder(config):
+    """
+    """
+    from rpy2.robjects import r
+
+    options = DEFAULT_OPTIONS.copy()
+    options.update(config)
+
+    os.chdir(options["autograder_dir"])
+
+    if options["token"] is not None:
+        client = APIClient(token=options["token"])
+        generate_pdf = True
+    else:
+        generate_pdf = False
+
+    # put files into submission directory
+    if os.path.exists("./source/files"):
+        for file in os.listdir("./source/files"):
+            fp = os.path.join("./source/files", file)
+            if os.path.isdir(fp):
+                shutil.copytree(fp, os.path.join("./submission", os.path.basename(fp)))
+            else:
+                shutil.copy(fp, "./submission")
+
+    os.chdir("./submission")
+
+    # convert ipynb files to Rmd files
+    if glob("*.ipynb"):
+        fp = glob("*.ipynb")[0]
+        nb = jupytext.read(fp)
+        jupytext.write(nb, os.path.splitext(fp)[0] + ".Rmd")
+    
+    # convert Rmd files to R files
+    if glob("*.Rmd"):
+        fp = glob("*.Rmd")[0]
+        fp, wp = os.path.abspath(fp), os.path.abspath(os.path.splitext(fp)[0] + ".r")
+        r(f"knitr::purl('{fp}', '{wp}')")
+
+    # get the R script
+    fp = glob("*.[Rr]")[0]
+
+    os.makedirs("./tests", exist_ok=True)
+    tests_glob = glob("../source/tests/*.[Rr]")
+    for file in tests_glob:
+        shutil.copy(file, "./tests")
+
+    if os.path.isfile(_OTTER_LOG_FILENAME):
+        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+        if options["grade_from_log"]:
+            print("\n\n")     # for logging in otter.execute.execute_log
+    else:
+        assert not options["grade_from_log"], "missing log"
+        log = None
+
+    # grading_script = dedent(f"""\
+    #     ottr::run_gradescope("{fp}")
+    # """)
+    output = r(f"""ottr::run_gradescope("{fp}")""")[0]
+    output = json.loads(output)
+    
+    if options["show_stdout_on_release"]:
+        output["stdout_visibility"] = "after_published"
+
+    os.chdir(options["autograder_dir"])
+
+    with open("./results/results.json", "w+") as f:
+        json.dump(output, f, indent=4)
+
+    print("\n\n")
+    print(dedent("""\
+    Test scores are summarized in the table below. Passed tests appear as a single cell with no output.
+    Failed public tests appear as a single cell with the output of the failed test. Failed hidden tests
+    appear as two cells, one with no output (the public tests) and another with the output of the failed
+    (hidden) test that is not visible to the student.
+    """))
+    df = pd.DataFrame(output["tests"])
+    if "output" in df.columns:
+        df.drop(columns=["output"], inplace=True)
+    # df.drop(columns=["hidden"], inplace=True)
+    print(df)
 
 def main(config):
     """
@@ -32,13 +115,24 @@ def main(config):
         config (``dict``): configurations for autograder
     """
     print(LOGO_WITH_VERSION, "\n")
+
+    options = DEFAULT_OPTIONS.copy()
+    options.update(config)
+
     orig_path = os.getcwd()
 
-    abs_path = os.path.abspath(config.get("autograder_dir", "/autograder"))
-    os.chdir(abs_path)
+    autograder_dir_path = os.path.abspath(options["autograder_dir"])
+    os.chdir(autograder_dir_path)
 
-    if config.get("token", None) is not None:
-        client = APIClient(token=config.get("token", None))
+    # add miniconda back to path
+    os.environ["PATH"] = os.pathsep.join([f"{options['miniconda_path']}/bin", os.environ.get("PATH")])
+
+    if options["lang"] == "r":
+        run_r_autograder(config)
+        return
+
+    if options["token"] is not None:
+        client = APIClient(token=options["token"])
         generate_pdf = True
     else:
         generate_pdf = False
@@ -68,19 +162,19 @@ def main(config):
 
     replace_notebook_instances(nb_path)
 
-    if glob("*.otter"):
-        assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
-        with open(glob("*.otter")[0]) as f:
-            otter_config = json.load(f)
-    else:
-        otter_config = None
+    # if glob("*.otter"):
+    #     assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
+    #     with open(glob("*.otter")[0]) as f:
+    #         otter_config = json.load(f)
+    # else:
+    #     otter_config = None
 
     if os.path.isfile(_OTTER_LOG_FILENAME):
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-        if config.get("grade_from_log", False):
+        if options["grade_from_log"]:
             print("\n\n")     # for logging in otter.execute.execute_log
     else:
-        assert not config.get("grade_from_log", False), "missing log"
+        assert not options["grade_from_log"], "missing log"
         log = None
 
     scores = grade_notebook(
@@ -89,10 +183,10 @@ def main(config):
         name="submission", 
         cwd=".", 
         test_dir="./tests",
-        ignore_errors=not config.get("debug", False), 
-        seed=config.get("seed", None),
-        log=log if config.get("grade_from_log", False) else None,
-        variables=config.get("serialized_variables", None)
+        ignore_errors=not options["debug"], 
+        seed=options["seed"],
+        log=log if options["grade_from_log"] else None,
+        variables=options["serialized_variables"]
     )
 
     # verify the scores against the log
@@ -109,7 +203,7 @@ def main(config):
 
     if generate_pdf:
         try:
-            export_notebook(nb_path, filtering=config.get("filtering"), pagebreaks=config.get("pagebreaks"))
+            export_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
             pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
 
             # get student email
@@ -121,7 +215,7 @@ def main(config):
                 student_emails.append(user["email"])
             
             for student_email in student_emails:
-                client.upload_pdf_submission(config["course_id"], config["assignment_id"], student_email, pdf_path)
+                client.upload_pdf_submission(options["course_id"], options["assignment_id"], student_email, pdf_path)
 
             print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
 
@@ -131,7 +225,7 @@ def main(config):
 
     output = scores.to_gradescope_dict(config)
 
-    os.chdir(abs_path)
+    os.chdir(autograder_dir_path)
 
     with open("./results/results.json", "w+") as f:
         json.dump(output, f, indent=4)

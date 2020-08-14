@@ -5,11 +5,16 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
    otter.assign
+   otter.check
+   otter.execute
    otter.export
    otter.generate
+   otter.grade
    otter.service
+   otter.test_files
 
 Submodules
 ----------
@@ -22,74 +27,10 @@ otter.argparser module
    :undoc-members:
    :show-inheritance:
 
-otter.check module
-------------------
+otter.run module
+----------------
 
-.. automodule:: otter.check
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.containers module
------------------------
-
-.. automodule:: otter.containers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.execute module
---------------------
-
-.. automodule:: otter.execute
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.grade module
-------------------
-
-.. automodule:: otter.grade
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.jassign module
---------------------
-
-.. automodule:: otter.jassign
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.logs module
------------------
-
-.. automodule:: otter.logs
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.metadata module
----------------------
-
-.. automodule:: otter.metadata
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.notebook module
----------------------
-
-.. automodule:: otter.notebook
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.ok\_parser module
------------------------
-
-.. automodule:: otter.ok_parser
+.. automodule:: otter.run
    :members:
    :undoc-members:
    :show-inheritance:

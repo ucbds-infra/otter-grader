@@ -6,6 +6,7 @@ import os
 import shutil
 import subprocess
 import pathlib
+import pkg_resources
 
 from glob import glob
 from subprocess import PIPE
@@ -13,71 +14,24 @@ from jinja2 import Template
 
 from .token import APIClient
 
-REQUIREMENTS = Template("""{% if not overwrite %}datascience
-jupyter_client
-ipykernel
-matplotlib
-pandas
-ipywidgets
-scipy
-seaborn
-sklearn
-jinja2
-nbconvert
-nbformat
-dill
-numpy==1.16.0
-tornado==5.1.1
-otter-grader==1.0.0.b7
-{% endif %}{% if other_requirements %}
-{{ other_requirements }}{% endif %}
-""")
+TEMPLATES_DIR = pkg_resources.resource_filename(__name__, "templates")
+SETUP_SH_PATH = os.path.join(TEMPLATES_DIR, "setup.sh")
+PYTHON_REQUIREMENTS_PATH = os.path.join(TEMPLATES_DIR, "requirements.txt")
+R_REQUIREMENTS_PATH = os.path.join(TEMPLATES_DIR, "requirements.r")
+RUN_AUTOGRADER_PATH = os.path.join(TEMPLATES_DIR, "run_autograder")
+MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 
-SETUP_SH = """#!/usr/bin/env bash
+with open(SETUP_SH_PATH) as f:
+    SETUP_SH = Template(f.read())
 
-apt-get install -y python3.7 python3-pip python3.7-dev
+with open(PYTHON_REQUIREMENTS_PATH) as f:
+    PYTHON_REQUIREMENTS = Template(f.read())
 
-# apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \\
-#        libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \\
-#        libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \\
-#        libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \\
-#        libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation \\
-#        libappindicator1 libnss3 lsb-release xdg-utils wget
+with open(R_REQUIREMENTS_PATH) as f:
+    R_REQUIREMENTS = Template(f.read())
 
-apt-get update
-apt-get install -y pandoc
-apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended
-
-update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
-
-pip3 install -r /autograder/source/requirements.txt
-"""
-
-RUN_AUTOGRADER = Template("""#!/usr/bin/env python3
-
-from otter.generate.run_autograder import main as run_autograder
-
-config = {
-    "score_threshold": {{ threshold }},
-    "points_possible": {{ points }},
-    "show_stdout_on_release": {{ show_stdout }},
-    "show_hidden_tests_on_release": {{ show_hidden }},
-    "seed": {{ seed }},
-    "grade_from_log": {{ grade_from_log }},
-    "serialized_variables": {{ serialized_variables }},
-    "public_multiplier": {{ public_multiplier }},
-    "token": {% if token %}'{{ token }}'{% else %}None{% endif %},
-    "course_id": '{{ course_id }}',
-    "assignment_id": '{{ assignment_id }}',
-    "filtering": {{ filtering }},
-    "pagebreaks": {{ pagebreaks }},
-    "debug": False,
-    "autograder_dir": '{{ autograder_dir }}',
-}
-
-if __name__ == "__main__":
-    run_autograder(config)
-""")
+with open(RUN_AUTOGRADER_PATH) as f:
+    RUN_AUTOGRADER = Template(f.read())
 
 def main(args):
     """
@@ -95,6 +49,10 @@ def main(args):
     # check that args.public_multiplier is valid
     assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
 
+    # check for valid language
+    args.lang = args.lang.lower()
+    assert args.lang.lower() in ["python", "r"], f"{args.lang} is not a supported language"
+
     # format run_autograder
     run_autograder = RUN_AUTOGRADER.render(
         threshold = str(args.threshold),
@@ -110,7 +68,15 @@ def main(args):
         grade_from_log = str(args.grade_from_log),
         serialized_variables = str(args.serialized_variables),
         public_multiplier = str(args.public_multiplier),
+        lang = str(args.lang.lower()),
         autograder_dir = str(args.autograder_dir),
+    )
+
+    # format setup.sh
+    setup_sh = SETUP_SH.render(
+        autograder_dir = str(args.autograder_dir),
+        miniconda_install_url = MINICONDA_INSTALL_URL,
+        ottr_branch = "stable",
     )
 
     # create tmp directory to zip inside
@@ -119,30 +85,48 @@ def main(args):
     try:
         # copy tests into tmp
         os.mkdir(os.path.join("tmp", "tests"))
-        for file in glob(os.path.join(args.tests_path, "*.py")):
+        pattern = ("*.py", "*.[Rr]")[args.lang.lower() == "r"]
+        for file in glob(os.path.join(args.tests_path, pattern)):
             shutil.copy(file, os.path.join("tmp", "tests"))
 
+        # open requirements if it exists
         if os.path.isfile(args.requirements):
-            with open(args.requirements) as f:
-                requirements = REQUIREMENTS.render(
-                    overwrite = args.overwrite_requirements,
-                    other_requirements = f.read()
-                )
-        elif args.requirements != "requirements.txt":
-            assert False, "requirements file {} not found".format(args.requirements)
+            f = open(args.requirements)
         else:
-            requirements = REQUIREMENTS.render(
-                overwrite = args.overwrite_requirements,
-                other_requirements = ""
-            )
+            assert args.requirements == "requirements.txt", f"requirements file {args.requirements} not found"
+            f = open(os.devnull)
 
+        # render the templates
+        python_requirements = PYTHON_REQUIREMENTS.render(
+            other_requirements = f.read() if args.lang.lower() == "python" else "",
+            overwrite_requirements = False
+        )
+
+        # reset the stream
+        f.seek(0)
+
+        r_requirements = R_REQUIREMENTS.render(
+            other_requirements = f.read() if args.lang.lower() == "r" else "",
+            overwrite = args.overwrite_requirements
+        )
+
+        # close the stream
+        f.close()
+        
         # copy requirements into tmp
         with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
-            f.write(requirements)
+            f.write(python_requirements)
+
+        with open(os.path.join(os.getcwd(), "tmp", "requirements.r"), "w+") as f:
+            f.write(r_requirements)
+
+        if r_requirements:
+            with open(os.path.join(os.getcwd(), "tmp", "requirements.r"), "w+") as f:
+                f.write(r_requirements)
 
         # write setup.sh and run_autograder to tmp
         with open(os.path.join(os.getcwd(), "tmp", "setup.sh"), "w+") as f:
-            f.write(SETUP_SH)
+            f.write(setup_sh)
 
         with open(os.path.join(os.getcwd(), "tmp", "run_autograder"), "w+") as f:
             f.write(run_autograder)
@@ -169,8 +153,15 @@ def main(args):
 
         os.chdir("./tmp")
 
-        zip_cmd = ["zip", "-r", os.path.join("..", args.output_path, "autograder.zip"), "run_autograder",
+        zip_path = os.path.join("..", args.output_path, "autograder.zip")
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+
+        zip_cmd = ["zip", "-r", zip_path, "run_autograder", "requirements.r",
                 "setup.sh", "requirements.txt", "tests"]
+        
+        if r_requirements:
+            zip_cmd += ["requirements.r"]
 
         if args.files:
             zip_cmd += ["files"]

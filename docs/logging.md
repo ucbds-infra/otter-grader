@@ -58,7 +58,7 @@ entry = LogEntry()
 entry.shelve(globals(), variables=variables)
 ```
 
-If you are grading from the log and are utilizing `variables`, you **must** include this dictionary as a JSON string in your configuration, otherwise the autograder will deserialize anything that the student submits. This configuration is set in two places: in the [Otter configuration file](dot_otter_files.md) that you distribute with your notebook and in the autograder. Both of these are handled for you if you use [Otter Assign](otter_assign.md) to generate your distribution files.
+If you are grading from the log and are utilizing `variables`, you **must** include this dictionary as a JSON string in your configuration, otherwise the autograder will deserialize anything that the student submits. This configuration is set in two places: in the [Otter configuration file](dot_otter_files.md) that you distribute with your notebook and in the autograder. Both of these are handled for you if you use [Otter Assign](otter_assign/index.md) to generate your distribution files.
 
 To retrieve a shelved environment from an entry, use the `LogEntry.unshelve` method. During the process of unshelving, all functions have their `__globals__` updated to include everything in the unshelved environment and, optionally, anything in the environment passed to `global_env`.
 

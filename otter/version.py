@@ -2,7 +2,11 @@
 Otter-Grader version and printable logo
 """
 
-__version__ = "1.0.0.b7"
+import sys
+
+from textwrap import dedent
+
+__version__ = "1.0.0.b10"
 
 LOGO_WITH_VERSION = fr"""
   _________        __          __               
@@ -15,3 +19,11 @@ LOGO_WITH_VERSION = fr"""
  \_________/       \ __|       \ __|    \______|  |__|
                                                 v{__version__}
 """
+
+def print_version_info(logo=False):
+    if logo:
+        print(LOGO_WITH_VERSION + "\n")
+    print(dedent(f"""\
+        Python version: {".".join(str(v) for v in sys.version_info[:3])}
+        Otter-Grader version: {__version__}
+    """))

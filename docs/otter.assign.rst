@@ -1,6 +1,15 @@
 otter.assign package
 ====================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   otter.assign.r_adapter
+   otter.assign.rmarkdown_adapter
+
 Submodules
 ----------
 

@@ -73,7 +73,7 @@ Otter Assign should create a `dist` subdirectory which contains two further subd
       | - q3.py
 ```
 
-For more information about the configurations for Otter Assign and its output format, see [Distributing Assignments](otter_assign.md).
+For more information about the configurations for Otter Assign and its output format, see [Distributing Assignments](otter_assign/index.md).
 
 ### Otter Generate
 
@@ -83,7 +83,7 @@ Start by `cd`ing into `tutorial/generate`. We have provided premade tests and a 
 otter generate autograder
 ```
 
-Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](otter_generate.md).
+Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](otter_generate/index.md).
 
 ### Otter Grade
 
@@ -167,7 +167,7 @@ Now that you have verified that your isntallation is working, let's learn more a
 
 ### Local Grading
 
-Get started by creating some [test cases](test_files.md) and creating a requirements.txt file (if necessary).
+Get started by creating some [test cases](test_files/index.md) and creating a requirements.txt file (if necessary).
 
 #### Collecting Student Submissions
 
@@ -253,7 +253,7 @@ You can find more information about `otter grade` [here](otter_grade.md).
 
 ### Gradescope
 
-To get started using Otter with Gradescope, create some [test cases](test_files.md) and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:
+To get started using Otter with Gradescope, create some [test cases](test_files/index.md) and a requirements.txt file (if necessary). Once you have these pieces in place, put them into a directory along with any additional files that your notebook requires (e.g. data files), for example:
 
 ```
 | gradescope
@@ -290,4 +290,4 @@ After this command finishes running, you should have a file called `autograder.z
 
 To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
 
-You can find more information about Gradescope usage [here](otter_generate.md).
+You can find more information about Gradescope usage [here](otter_generate/index.md).

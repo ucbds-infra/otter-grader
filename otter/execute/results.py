@@ -8,6 +8,8 @@ import pprint
 
 from collections import namedtuple
 
+from ..generate.constants import DEFAULT_OPTIONS
+
 TestResult = namedtuple("TestResult", ["name", "score", "possible", "test", "hidden", "incorrect"])
 
 class GradingResults:
@@ -184,27 +186,30 @@ class GradingResults:
         Returns:
             ``dict``: the results formatted for Gradescope
         """
+        options = DEFAULT_OPTIONS.copy()
+        options.update(config)
+
         output = {"tests": []}
 
         # hidden visibility determined by show_hidden_tests_on_release
-        hidden_test_visibility = ("hidden", "after_published")[config.get("show_hidden_tests_on_release", False)]
-        no_separate_visibility = config.get("test_visibility", "hidden")
+        hidden_test_visibility = ("hidden", "after_published")[options["show_hidden_tests_on_release"]]
+        no_separate_visibility = options["test_visibility"]
         assert no_separate_visibility in ["hidden", "visible", "after_published"]
 
         for test_name in self.tests:
             result = self.get_result(test_name)
             hidden, incorrect = result.hidden, result.incorrect
             score, possible = result.score, result.possible
-            public_score, hidden_score = score * config.get("public_multiplier", 0), score * (1 - config.get("public_multiplier", 0))
-            public_possible, hidden_possible = possible * config.get("public_multiplier", 0), possible * (1 - config.get("public_multiplier", 0))
+            public_score, hidden_score = score * options["public_multiplier"], score * (1 - options["public_multiplier"])
+            public_possible, hidden_possible = possible * options["public_multiplier"], possible * (1 - options["public_multiplier"])
         
             if hidden and incorrect:
-                public_score, hidden_score = possible * config.get("public_multiplier", 0), 0
+                public_score, hidden_score = possible * options["public_multiplier"], 0
             elif not hidden and incorrect:
                 public_score, hidden_score = 0, 0
                 public_possible = possible
             
-            if config.get("separate_tests", True):
+            if options["separate_tests"]:
                 output["tests"].append({
                     "name": result.name + " - Public",
                     "score": public_score,
@@ -231,15 +236,15 @@ class GradingResults:
                     "output": repr(result.test) if not hidden and incorrect else "All tests passed!"
                 })
         
-        if config.get("show_stdout_on_release", False):
+        if options["show_stdout_on_release"]:
             output["stdout_visibility"] = "after_published"
 
-        if config.get("points_possible", None) is not None:
-            output["score"] = self.total / self.possible * config.get("points_possible", None)
+        if options["points_possible"] is not None:
+            output["score"] = self.total / self.possible * options["points_possible"]
 
-        if config.get("score_threshold", None) is not None:
+        if options["score_threshold"] is not None:
             if self.total / self.possible >= config["score_threshold"]:
-                output["score"] = config.get("points_possible", None) or self.possible
+                output["score"] = options["points_possible"] or self.possible
             else:
                 output["score"] = 0
         
