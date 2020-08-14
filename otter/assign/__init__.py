@@ -57,7 +57,7 @@ def main(args):
                 not assignment.is_python, "Seeding cell found but no seed provided"
         
         # generate PDF of solutions
-        if assignment.solutions_pdf:
+        if assignment.solutions_pdf and not assignment.is_rmd:
             print("Generating solutions PDF...")
             filtering = assignment.solutions_pdf == 'filtered'
 
