@@ -60,7 +60,7 @@ class TestCase(unittest.TestCase):
                 [f for f in os.listdir(dir2) if f not in ignore_dirs or not os.path.isdir(os.path.join(dir2, f))]
             )
             self.assertEqual(dir1_contents, dir2_contents, f"{dir1} and {dir2} have different contents")
-            for f1, f2 in zip(os.listdir(dir1), os.listdir(dir2)):
+            for f1, f2 in zip(dir1_contents, dir2_contents):
                 f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
                 self.assertDirsEqual(f1, f2, ignore_ext=ignore_ext)
     
