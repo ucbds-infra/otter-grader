@@ -39,7 +39,7 @@ def prepare_files():
     for file in tests_glob:
         shutil.copy(file, "./submission/tests")
 
-def write_and_submit_pdf(client, nb_path, filtering, pagebreaks):
+def write_and_submit_pdf(client, nb_path, filtering, pagebreaks, course_id, assignment_id):
     try:
         export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
@@ -53,7 +53,7 @@ def write_and_submit_pdf(client, nb_path, filtering, pagebreaks):
             student_emails.append(user["email"])
         
         for student_email in student_emails:
-            client.upload_pdf_submission(options["course_id"], options["assignment_id"], student_email, pdf_path)
+            client.upload_pdf_submission(course_id, assignment_id, student_email, pdf_path)
 
         print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
 
