@@ -75,6 +75,11 @@ class TestLogs(TestCase):
         for question in log.get_questions():
             logged_grade = log.get_question_entry(question).get_score_perc()
             actual_grade = self.grading_results[question].grade
+<<<<<<< HEAD
+=======
+
+            # checking repr since the results __eq__ method is not defined
+>>>>>>> cd5d569a47f3087b6423bc8932818631b7c2b92f
             self.assertEqual(logged_grade, actual_grade, f"Logged results for {question} are not correct")
 
 
