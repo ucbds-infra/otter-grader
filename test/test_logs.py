@@ -75,11 +75,8 @@ class TestLogs(TestCase):
         for question in log.get_questions():
             logged_grade = log.get_question_entry(question).get_score_perc()
             actual_grade = self.grading_results[question].grade
-<<<<<<< HEAD
-=======
 
             # checking repr since the results __eq__ method is not defined
->>>>>>> cd5d569a47f3087b6423bc8932818631b7c2b92f
             self.assertEqual(logged_grade, actual_grade, f"Logged results for {question} are not correct")
 
 
@@ -109,9 +106,12 @@ class TestLogs(TestCase):
 
         def square(x):
             return x**2
-        env = {"num": 5, "func": square, "model": LinearRegression(), "module": sys}
 
-        #from otter.logs import LogEntry
+        import calendar 
+
+        env = {"num": 5, "func": square, "model": LinearRegression(), "module": sys, "ignored_func": calendar.setfirstweekday}
+
+     
         entry = LogEntry(
             event_type=EventType.AUTH,
             results=[],
@@ -119,13 +119,11 @@ class TestLogs(TestCase):
             success=True, 
             error=None
         )
-
-        #ignore modules test
  
 
-        entry.shelve(env, delete=True, filename = _OTTER_LOG_FILENAME)
+        entry.shelve(env, delete=True, filename = _OTTER_LOG_FILENAME, ignore_modules=['calendar'])
         self.assertTrue(entry.shelf)
-        self.assertEqual(entry.unshelved, ["module"])
+        self.assertEqual(entry.unshelved, ["module", "ignored_func"])
 
         entry.flush_to_file(_OTTER_LOG_FILENAME) 
 
@@ -136,8 +134,8 @@ class TestLogs(TestCase):
         self.assertEqual([*env], ["num", "func", "model"])
 
         env_with_factorial = entry.unshelve(dict(factorial = factorial ))
-        self.assertTrue("factorial" in env_with_factorial["square"].__globals__)
-        self.assertTrue(factorial is env_with_factorial["square"].__globals__["factorial"])
+        self.assertTrue("factorial" in env_with_factorial["func"].__globals__)
+        self.assertTrue(factorial is env_with_factorial["func"].__globals__["factorial"])
 
 
     
