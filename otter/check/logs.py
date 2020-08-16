@@ -144,7 +144,7 @@ class LogEntry:
 
         If ``delete`` is ``True``, old environments in the log at ``filename`` for this question are
         cleared before writing ``env``. Any module names in ``ignore_modules`` will have their functions
-        ignored during pickling.
+        ignored during pickling. 
 
         Args:
             env (``dict``): the environment to pickle
@@ -378,7 +378,7 @@ class Log:
         """
         return QuestionLogIterator(self)
 
-    def sort(self, ascending=True):
+    def sort(self,):
         """
         Sorts this logs entries by timestmap using ``LogEntry.sort_log``.
 
