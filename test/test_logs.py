@@ -141,20 +141,25 @@ class TestLogs(TestCase):
     
     
     # def test_Log_getItem(self):
-    #     entry = LogEntry(
-
+    #     entry1 = LogEntry(
+    #         event_type=EventType.AUTH,
+    #         results=[],
+    #         question=None, 
+    #         success=True, 
+    #         error=None
     #     )
-    #     #log = Log.from_file(_OTTER_LOG_FILENAME)
 
-    #     assertEqual(log.__repr__(), "otter.logs.Log([\n  {}\n])".format(",\n  ".join([repr(e) for e in self.entries])))
+    #     entry1.flush_to_file(_OTTER_LOG_FILENAME) 
+
+    #     #assertEqual(log.__repr__(), "otter.logs.Log([\n  {}\n])".format(",\n  ".join([repr(e) for e in self.entries])))
 
     #     def square(x):
     #         return x**2
 
     #     log = Log.from_file(_OTTER_LOG_FILENAME)
 
-    #     entry1 = log.__getitem__(0)
-    #     #assert entry1 == 
+    #     self.assertEqual(log.__getitem__(0), entry1)
+        #assert entry1 == 
 
     # def test_Log_iter(self):
     #     #log = Log.from_file(_OTTER_LOG_FILENAME, ascending = True)
