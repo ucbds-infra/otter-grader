@@ -123,7 +123,10 @@ def run_autograder(config):
         print("No log found with which to verify student scores")
 
     if generate_pdf:
-        write_and_submit_pdf(client, nb_path, options['filtering'], options['pagebreaks'])
+        write_and_submit_pdf(
+            client, nb_path, options['filtering'], options['pagebreaks'], options['course_id'], 
+            options['assignment_id']
+        )
 
     output = scores.to_gradescope_dict(config)
 
