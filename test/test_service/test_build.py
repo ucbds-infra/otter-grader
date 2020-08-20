@@ -10,6 +10,7 @@ import testing.postgresql
 from psycopg2 import connect, extensions
 from psycopg2.errors import DuplicateTable
 
+from otter.argparser import get_parser
 from otter.service.build import write_assignment_info, write_class_info
 from otter.service.build import main as build
 from otter.service.create import main as create
@@ -18,9 +19,7 @@ from .. import TestCase
 
 TEST_FILES_PATH = "test/test_service/test-build/"
 
-parser = None
-with open("bin/otter") as f:
-    exec(f.read())
+parser = get_parser()
 
 class TestBuild(TestCase):
 

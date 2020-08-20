@@ -16,7 +16,7 @@ from ..argparser import get_parser
 from ..execute import grade_notebook
 from ..generate.autograder import main as generate_autograder
 from ..generate.token import APIClient
-from ..utils import get_relpath
+from ..utils import get_relpath, get_source
 
 class EmptyCellException(Exception):
     """
@@ -27,23 +27,6 @@ class EmptyCellException(Exception):
 #---------------------------------------------------------------------------------------------------
 # Getters
 #---------------------------------------------------------------------------------------------------
-
-def get_source(cell):
-    """
-    Returns the source code of a cell in a way that works for both nbformat and JSON
-    
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
-    
-    Returns:
-        ``list`` of ``str``: each line of the cell source stripped of ending line breaks
-    """
-    source = cell['source']
-    if isinstance(source, str):
-        return cell['source'].split('\n')
-    elif isinstance(source, list):
-        return [line.strip('\n') for line in source]
-    assert 'unknown source type', type(source)
 
 def get_spec(source, begin):
     """
@@ -68,7 +51,7 @@ def get_spec(source, begin):
         block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) 
         if source[block_quotes[i]+1].strip(' ') == f"BEGIN {begin.upper()}"
     ]
-    assert len(begins) <= 1, f'multiple BEGIN blocks defined in {source}'
+    assert len(begins) <= 1, f'multiple BEGIN {begin.upper()} blocks defined in {source}'
     
     return begins[0] if begins else None
 
@@ -77,20 +60,20 @@ def get_spec(source, begin):
 # Cell Type Checkers
 #---------------------------------------------------------------------------------------------------
 
-def is_seed_cell(cell):
-    """
-    Returns whether ``cell`` is seed cell
+# def is_seed_cell(cell):
+#     """
+#     Returns whether ``cell`` is seed cell
     
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
+#     Args:
+#         cell (``nbformat.NotebookNode``): notebook cell
     
-    Returns:
-        ``bool``: whether the cell is a seed cell
-    """
-    if cell['cell_type'] != 'code':
-        return False
-    source = get_source(cell)
-    return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
+#     Returns:
+#         ``bool``: whether the cell is a seed cell
+#     """
+#     if cell['cell_type'] != 'code':
+#         return False
+#     source = get_source(cell)
+#     return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
 
 def is_markdown_cell(cell):
     """
@@ -102,7 +85,7 @@ def is_markdown_cell(cell):
     Returns:
         ``bool``: whether the cell is a Markdown cell
     """
-    return cell['cell_type'] == 'markdown'
+    return cell.cell_type == 'markdown'
 
 
 #---------------------------------------------------------------------------------------------------
@@ -170,6 +153,7 @@ def run_tests(nb_path, debug=False, seed=None):
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
+    # print(os.getcwd())
     results = grade_notebook(
         nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed
@@ -260,6 +244,9 @@ def run_generate_autograder(result, assignment, args):
 
         if not pdf_args.get("filtering", True):
             generate_cmd += ["--unfiltered-pdfs"]
+    
+    if assignment.is_r:
+        generate_cmd += ["-l", "r"]
 
     requirements = assignment.requirements or args.requirements
     requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))

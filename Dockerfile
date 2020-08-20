@@ -1,13 +1,55 @@
-FROM python:3.7
-ADD requirements.txt /home/otter-grader-requirements.txt
-RUN pip3 install -r /home/otter-grader-requirements.txt
-RUN apt-get clean
-RUN apt-get update
-RUN apt-get install nano -y
-RUN apt install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 \
-       libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 \
-       libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 \
-       libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
-       libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation \
-       libappindicator1 libnss3 lsb-release xdg-utils wget
-RUN pip3 install otter-grader==1.0.0.b7
+# Dockerfile forked from https://github.com/jeffheaton/docker-jupyter-python-r/blob/master/Dockerfile
+FROM ubuntu:20.04
+
+# common packages
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y tzdata git vim wget libssl-dev nano && \
+    rm -rf /var/lib/apt/lists/*
+
+# miniconda
+RUN echo 'export PATH=/opt/conda/bin:$PATH' >> /root/.bashrc && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    rm ~/miniconda.sh && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV PATH /opt/conda/bin:$PATH
+
+# R pre-reqs
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends fonts-dejavu gfortran \
+    gcc && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# R
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get update && \
+    conda install -y r-base r-essentials && \
+    conda install -c r r-irkernel r-essentials r-devtools -c conda-forge && \
+    rm -rf /var/lib/apt/lists/*
+
+# pandoc, xetex for otter export
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get install -y pandoc && \
+    apt-get install -y -f texlive-xetex texlive-fonts-recommended
+
+# install wkhtmltopdf for otter export
+RUN wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb && \
+    apt-get install -y /tmp/wkhtmltopdf.deb
+
+# Postgres
+RUN apt-get clean && \
+    apt-get update && \
+    apt-get install -y postgresql postgresql-client libpq-dev
+
+# Python requirements
+ADD requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
+
+RUN pip install otter-grader==1.0.0.b12

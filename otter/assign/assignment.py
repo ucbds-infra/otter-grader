@@ -36,6 +36,8 @@ class Assignment:
             are used before the defaults if present.
     """
     defaults = {
+        "master": None,
+        "result": None,
         "generate": {},
         "solutions_pdf": False,
         "template_pdf": False,
@@ -52,6 +54,7 @@ class Assignment:
         "check_all_cell": True,
         "export_cell": True,
         "seed": None,
+        "lang": None,
     }
 
     def __init__(self):
@@ -79,6 +82,18 @@ class Assignment:
             config (``dict``): new configurations
         """
         self.config.update(config)
+
+    @property
+    def is_r(self):
+        return self.lang == "r"
+    
+    @property
+    def is_python(self):
+        return self.lang == "python"
+
+    @property
+    def is_rmd(self):
+        return self.master.suffix.lower() == ".rmd"
 
 def read_assignment_metadata(cell):
     """
@@ -109,6 +124,6 @@ def is_assignment_cell(cell):
     Returns:
         ``bool``: whether the current cell is an assignment definition cell
     """
-    if cell['cell_type'] != 'markdown':
+    if cell.cell_type != 'markdown':
         return False
     return get_spec(get_source(cell), "assignment") is not None

@@ -10,13 +10,18 @@ tqdm
 codecov
 jinja2
 docker
-git+https://github.com/chrispyles/nbpdfexport
-nb2pdf
+# git+https://github.com/chrispyles/nbpdfexport.git
+# nb2pdf<0.6.0
 requests
 nbconvert
 nbformat
 dill
-attrdict
+pdfkit
+PyPDF2
+
+# ottr requirements
+rpy2
+jupytext
 
 # otter service requirements
 psycopg2
@@ -28,7 +33,8 @@ tornado
 stdio-proxy
 
 # testing requirements
-testing.postgresql
+# testing.postgresql
+git+https://github.com/tk0miya/testing.postgresql.git@c81ded434d00ec8424de0f9e1f4063c778c6aaa8
 
 # documentation requirements
 recommonmark

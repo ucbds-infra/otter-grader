@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from psycopg2 import connect, extensions
 from collections import namedtuple
 
+from otter.argparser import get_parser
 from otter.service import start
 from otter.service.create import main as create
 
@@ -24,9 +25,7 @@ from .. import TestCase
 
 TEST_FILES_PATH = "test/test_service/test-start/"
 
-parser = None
-with open("bin/otter") as f:
-    exec(f.read())
+parser = get_parser()
 
 class TestServiceAuthHandlers(AsyncHTTPTestCase, TestCase):
 

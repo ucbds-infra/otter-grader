@@ -99,7 +99,7 @@ def get_relpath(src, dst):
     Returns:
         ``pathlib.Path``: the relative path
     """
-    osrc = src
+    # osrc = src
     ups = 0
     while True:
         try:
@@ -109,3 +109,20 @@ def get_relpath(src, dst):
             src = src.parent
             ups += 1
     return pathlib.Path(("../" * ups) / dst.relative_to(src))
+
+def get_source(cell):
+    """
+    Returns the source code of a cell in a way that works for both nbformat and JSON
+    
+    Args:
+        cell (``nbformat.NotebookNode``): notebook cell
+    
+    Returns:
+        ``list`` of ``str``: each line of the cell source stripped of ending line breaks
+    """
+    source = cell.source
+    if isinstance(source, str):
+        return source.split('\n')
+    elif isinstance(source, list):
+        return [line.strip('\n') for line in source]
+    raise ValueError(f'unknown source type: {type(source)}')

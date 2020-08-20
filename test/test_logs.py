@@ -5,6 +5,7 @@
 import os
 import unittest
 
+from otter.argparser import get_parser
 from otter.check.logs import Log
 from otter.check.notebook import Notebook, _OTTER_LOG_FILENAME
 from otter.check.logs import LogEntry, EventType, Log
@@ -14,13 +15,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import sys
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 TEST_FILES_PATH = "test/test-logs/"
 
@@ -202,10 +197,6 @@ class TestLogs(TestCase):
 
         self.assertEqual(nextLogEntry.question, entry3.question)
 
-
-
- 
-    @classmethod
     def tearDown(self):
         if os.path.isfile(_OTTER_LOG_FILENAME):
             os.remove(_OTTER_LOG_FILENAME)

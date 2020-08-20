@@ -11,33 +11,23 @@ from subprocess import PIPE
 from glob import glob
 from unittest import mock
 
+from otter.argparser import get_parser
 from otter.generate.autograder import main as autograder
 
 from .. import TestCase
 
-# read in argument parser
-bin_globals = {}
-
-with open("bin/otter") as f:
-    exec(f.read(), bin_globals)
-
-parser = bin_globals["parser"]
+parser = get_parser()
 
 TEST_FILES_PATH = "test/test_generate/test-autograder/"
 
 class TestAutograder(TestCase):
-    
+
     def create_docker_image(self):
         create_image_cmd = ["make", "docker-test"]
-        create_image = subprocess.run(create_image_cmd, stdout=PIPE, stderr=PIPE)
-        assert not create_image.stderr, create_image.stderr.decode("utf-8")
+        subprocess.run(create_image_cmd, check=True)
+        # create_image = subprocess.run(create_image_cmd, check=True)
+        # assert not create_image.stderr, create_image.stderr.decode("utf-8")
 
-        # use docker image inspect to see that the image is installed and tagged as otter-grader
-        inspect = subprocess.run(["docker", "image", "inspect", "otter-test"], stdout=PIPE, stderr=PIPE)
-
-        # assert that it didn't fail, it will fail if it is not installed
-        self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
-   
     def test_gs_generator(self):
         """
         Check that the correct zipfile is created by gs_generator.py
@@ -96,8 +86,8 @@ class TestAutograder(TestCase):
         args.func(args)
 
         # build the docker image
-        build = subprocess.run(["docker", "build", TEST_FILES_PATH, "-t", "otter-gradescope-test"], stdout=PIPE, stderr=PIPE)
-        self.assertEqual(len(build.stderr), 0, build.stderr.decode("utf-8"))
+        subprocess.run(["docker", "build", TEST_FILES_PATH, "-t", "otter-gradescope-test"], check=True)
+        # self.assertEqual(len(build.stderr), 0, build.stderr.decode("utf-8"))
 
         # launch the container and return its container ID
         launch = subprocess.run(["docker", "run", "-dt", "otter-gradescope-test", "/autograder/run_autograder"], stdout=PIPE, stderr=PIPE)

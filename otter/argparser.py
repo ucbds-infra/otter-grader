@@ -2,7 +2,11 @@
 Argument parser for Otter command-line tools
 """
 
+import sys
 import argparse
+
+INVOKED_FROM_PYTHON = "__main__.py" in sys.argv[0]
+PROG = ("otter", "python3 -m otter")[INVOKED_FROM_PYTHON]
 
 # from . import assign
 # from . import check
@@ -18,11 +22,12 @@ def get_parser():
         ``argparse.ArgumentParser``: the argument parser for Otter command-line tools
     """
 
-    parser = argparse.ArgumentParser(description="""
+    parser = argparse.ArgumentParser(prog=PROG, description="""
     A Python-based autograder for Jupyter Notebooks and Python scripts that runs locally on the instructors machine.
     Also supports use of Gradescope's autograding service, assignment distribution with otter-assign, and public tests
     that students can run while working on assignments.
     """)
+    parser.add_argument("--version", default=False, action="store_true", help="Show version information and exit")
     subparsers = parser.add_subparsers()
 
 
@@ -30,6 +35,7 @@ def get_parser():
     assign_parser = subparsers.add_parser("assign", description="Create distribution versions of otter-assign-formatted notebook")
     assign_parser.add_argument("master", help="Notebook with solutions and tests.")
     assign_parser.add_argument("result", help="Directory containing the result.")
+    assign_parser.add_argument("-l", "--lang", default=None, choices=["python", "r"], nargs="?", help="Assignment programming language; defaults to Python")
     assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
     assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
     assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")
@@ -71,7 +77,8 @@ def get_parser():
     export_parser.add_argument("dest", nargs='?', default=None, help="Path to write PDF")
     export_parser.add_argument("--filtering", default=False, action="store_true", help="Whether the PDF should be filtered")
     export_parser.add_argument("--pagebreaks", default=False, action="store_true", help="Whether the PDF should have pagebreaks between questions")
-    export_parser.add_argument("-s", "--save-tex", default=False, action="store_true", help="Save PDF LaTeX file as well")
+    export_parser.add_argument("-s", "--save", default=False, action="store_true", help="Save intermediate file(s) as well")
+    export_parser.add_argument("-e", "--exporter", default=None, choices=["latex", "html"], nargs="?", help="Type of PDF exporter to use")
     export_parser.add_argument("--debug", default=False, action="store_true", help="Export in debug mode")
 
     export_parser.set_defaults(func_str="export.main")
@@ -88,6 +95,7 @@ def get_parser():
     generate_autograder_parser.add_argument("-o", "--output-path", nargs='?', type=str, default="./", help="Path to which to write zipfile")
     generate_autograder_parser.add_argument("-r", "--requirements", nargs='?', default="requirements.txt", type=str, help="Path to requirements.txt file; ./requirements.txt automatically checked")
     generate_autograder_parser.add_argument("--overwrite-requirements", default=False, action="store_true", help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
+    generate_autograder_parser.add_argument("-l", "--lang", default="python", type=str, help="Assignment programming language; defaults to Python")
     generate_autograder_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
     generate_autograder_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
     generate_autograder_parser.add_argument("--show-stdout", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
@@ -132,7 +140,7 @@ def get_parser():
     grade_parser.add_argument("-z", "--zips", action="store_true", default=False, help="Whether submissions are zip files from Notebook.export")
 
     # PDF export options
-    grade_parser.add_argument("--pdfs", default=False, const="unfiltered", choices=["unfiltered", "tags", "html"], nargs="?")
+    grade_parser.add_argument("--pdfs", default=False, const="unfiltered", choices=["unfiltered", "html"], nargs="?")
     # grade_parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
     # grade_parser.add_argument("--tag-filter", action="store_true", default=False, help="Create a tag-filtered PDF for manual grading")
     # grade_parser.add_argument("--html-filter", action="store_true", default=False, help="Create an HTML comment-filtered PDF for manual grading")
