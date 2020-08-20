@@ -385,16 +385,16 @@ class Log:
         """
         return QuestionLogIterator(self)
 
-    def sort(self,):
+    def sort(self, ascending=True):
         """
         Sorts this logs entries by timestmap using ``LogEntry.sort_log``.
 
         Args:
             ascending (``bool``, optional): whether to sort the log chronologically; defaults to ``True``
         """
-        #self.entries = LogEntry.sort_log(self.entries, ascending=ascending)
-        self.entries = LogEntry.sort_log(self.entries)
-        #self.ascending = ascending
+        self.entries = LogEntry.sort_log(self.entries, ascending=ascending)
+        # self.entries = LogEntry.sort_log(self.entries)
+        self.ascending = ascending
 
     def get_questions(self):
         """
@@ -470,7 +470,7 @@ class QuestionLogIterator:
         curr_idx (``int``): the integer index of the next question in  ``questions``
     """
     def __init__(self, log):
-        #log.sort(ascending=False)
+        log.sort(ascending=False)
         log.sort()
         self.log = log
         self.questions = self.log.get_questions()
