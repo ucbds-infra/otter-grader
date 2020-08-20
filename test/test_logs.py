@@ -140,49 +140,72 @@ class TestLogs(TestCase):
 
     
     
-    # def test_Log_getItem(self):
-    #     entry1 = LogEntry(
-    #         event_type=EventType.AUTH,
-    #         results=[],
-    #         question=None, 
-    #         success=True, 
-    #         error=None
-    #     )
+    def test_Log_getItem(self):
+        entry1 = LogEntry(
+            event_type=EventType.AUTH,
+            results=[],
+            question=None, 
+            success=True, 
+            error=None
+        )
 
-    #     entry1.flush_to_file(_OTTER_LOG_FILENAME) 
+        entry1.flush_to_file(_OTTER_LOG_FILENAME)
 
-    #     #assertEqual(log.__repr__(), "otter.logs.Log([\n  {}\n])".format(",\n  ".join([repr(e) for e in self.entries])))
+        log = Log.from_file(_OTTER_LOG_FILENAME)
 
-    #     def square(x):
-    #         return x**2
+        self.assertEqual(log.__getitem__(0).event_type, entry1.event_type)
+        
 
-    #     log = Log.from_file(_OTTER_LOG_FILENAME)
+    def test_Log_iter(self):
+        #log = Log.from_file(_OTTER_LOG_FILENAME, ascending = True)
+        #list of entries
+        #logIter = log.iter()
 
-    #     self.assertEqual(log.__getitem__(0), entry1)
-        #assert entry1 == 
+        entry1 = LogEntry(
+            event_type=EventType.CHECK,
+            results=[],
+            question= "q1", 
+            success=True, 
+            error=None
+        )
 
-    # def test_Log_iter(self):
-    #     #log = Log.from_file(_OTTER_LOG_FILENAME, ascending = True)
-    #     #list of entries
-    #     #logIter = log.iter()
-    #     logIter = log.question_iterator() #most recent entries / question
-    #     nextLog = next(logIter) 
-    #     #assert nextLog == 
+        entry2 = LogEntry(
+            event_type=EventType.CHECK,
+            results=[],
+            question= "q1", 
+            success=True, 
+            error=None
+        )
+
+        entry3 = LogEntry(
+            event_type=EventType.CHECK,
+            results=[],
+            question= "q2", 
+            success=True, 
+            error=None
+        )
+
+        entry1.flush_to_file(_OTTER_LOG_FILENAME)
+        entry2.flush_to_file(_OTTER_LOG_FILENAME)
+        entry3.flush_to_file(_OTTER_LOG_FILENAME)
+
+        log = Log.from_file(_OTTER_LOG_FILENAME)
+
+        logIter = log.question_iterator() #most recent entries / question
+        self.assertEqual(logIter.questions , ["q1", "q2"])
+
+        nextLogEntry = next(logIter)
+
+        self.assertEqual(nextLogEntry.question, entry2.question)
+
+        nextLogEntry = next(logIter)
+
+        self.assertEqual(nextLogEntry.question, entry3.question)
 
 
 
-
-    # def test_shelve_environment(self):
-    #     env = 
-    #     entry = LogEntry()
-    #     picled_env = entry.shelve_environment(env)[0]
-    #     enshelved = entry.shelve_environment(env)[1]
-
-
-# log.questions_iterator
-
-#repr, sort, 
-
+ 
+    @classmethod
     def tearDown(self):
         if os.path.isfile(_OTTER_LOG_FILENAME):
             os.remove(_OTTER_LOG_FILENAME)
