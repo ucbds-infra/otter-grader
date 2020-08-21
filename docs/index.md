@@ -1,4 +1,4 @@
-# Otter-Grader Documentation -- Beta Version
+# Otter-Grader Documentation
 
 ```eval_rst
 .. toctree::
@@ -21,7 +21,7 @@
    changelog
 ```
 
-**This is the documentation for the current beta version of Otter Grader. For the last stable release, visit [https://otter-grader.readthedocs.io/en/stable/](https://otter-grader.readthedocs.io/en/stable/).**
+**This is the documentation for the development version of Otter Grader. For the last stable release, visit [https://otter-grader.readthedocs.io/en/stable/](https://otter-grader.readthedocs.io/en/stable/).**
 
 Otter Grader is a light-weight, modular open-source autograder developed by the Data Science Education Program at UC Berkeley. It is designed to grade Python and R assignments for classes at any scale by abstracting away the autograding internals in a way that is compatible with any instructor's assignment distribution and collection pipeline. Otter supports local grading through parallel Docker containers, grading using the autograder platforms of 3rd-party learning management systems (LMSs), the deployment of an Otter-managed grading virtual machine, and a client package that allows students to run public checks on their own machines. Otter is designed to grade executabeles, Jupyter Notebooks, and RMarkdown documents and is compatible with a few different LMSs, including Canvas and Gradescope.
 
@@ -42,24 +42,18 @@ Otter is a Python package that is compatible with Python 3.6+. The PDF export in
 pip install otter-grader
 ```
 
-To install the **beta** version, you must specify a semantic version, as pip won't install pre-release versions by default:
-
-```
-pip install otter-grader==1.0.0.b10
-```
-
 If you are going to be autograding R, you must also install the R package using `devtools::install_github`:
 
 ```r
-devtools::install_github("ucbds-infra/ottr@0.0.0.b1")
+devtools::install_github("ucbds-infra/ottr@0.0.1")
 ```
 
 Installing the Python package will install the `otter` binary so that Otter can be called from the command line. **If you are running Otter on Windows,** this binary will not work. Instead, call Otter as a Python module: `python3 -m otter`. This will have _the same_ commands, arguments, and behaviors as all calls to `otter` that are shown in the documentation. 
 
 ### Docker
 
-Otter uses Docker to create containers in which to run the students' submissions. **Docker and our Docker image are only required if using Otter Grade or Otter Service.** Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks. We have the current beta version of Otter installed on the `beta` release of the image. To get the Docker image, run
+Otter uses Docker to create containers in which to run the students' submissions. **Docker and our Docker image are only required if using Otter Grade or Otter Service.** Please make sure that you install Docker and pull our Docker image, which is used to grade the notebooks. To get the Docker image, run
 
 ```
-docker pull ucbdsinfra/otter-grader:beta
+docker pull ucbdsinfra/otter-grader
 ```
