@@ -1,0 +1,20 @@
+{% if not overwrite %}datascience
+jupyter_client
+ipykernel
+matplotlib
+pandas
+ipywidgets
+scipy
+seaborn
+sklearn
+jinja2
+nbconvert
+nbformat
+dill
+rpy2
+jupytext
+numpy==1.16.0
+tornado==5.1.1
+otter-grader==1.0.0.b12
+{% endif %}{% if other_requirements %}
+{{ other_requirements }}{% endif %}

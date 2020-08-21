@@ -1,3 +1,12 @@
-from .notebook import Notebook
+"""
+otter Python API
+"""
 
-__version__ = "0.4.7"
+import platform
+
+from .check import logs
+from .check.notebook import Notebook
+from .version import __version__
+
+# whether Otter is running on Window
+_WINDOWS = platform.system() == "Windows"

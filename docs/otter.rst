@@ -1,86 +1,61 @@
 otter package
 =============
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   otter.assign
+   otter.check
+   otter.execute
+   otter.export
+   otter.generate
+   otter.grade
+   otter.service
+   otter.test_files
+
 Submodules
 ----------
 
-otter.cli module
+otter.argparser module
+----------------------
+
+.. automodule:: otter.argparser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+otter.run module
 ----------------
 
-.. automodule:: otter.cli
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-otter.containers module
------------------------
-
-.. automodule:: otter.containers
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-otter.gofer module
-------------------
-
-.. automodule:: otter.gofer
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-otter.grade module
-------------------
-
-.. automodule:: otter.grade
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-otter.gs\_generator module
---------------------------
-
-.. automodule:: otter.gs_generator
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-otter.metadata module
----------------------
-
-.. automodule:: otter.metadata
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-otter.notebook module
----------------------
-
-.. automodule:: otter.notebook
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-otter.script module
--------------------
-
-.. automodule:: otter.script
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. automodule:: otter.run
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 otter.utils module
 ------------------
 
 .. automodule:: otter.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+otter.version module
+--------------------
+
+.. automodule:: otter.version
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 
 Module contents
 ---------------
 
 .. automodule:: otter
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
