@@ -16,47 +16,47 @@ from otter.test_files.ok_test import OKTestFile
 
 class TestResults(TestCase):
 
-    """
-    results:
-    get_score
-    _repr_
-    to_dict
-    get_public_score
-    """
-    """
-    input to grading the class is a list of testCollection objects that are in the docstirng
-    """
     def testGetScore(self):
+
+        """
+        Tests happy path for get_score
+        """
+
         tests = [OKTestFile("test1", ["t1","t2"],[True,False]), OKTestFile("test2", ["t1","t2"],[True,False],value=0.9,hidden=True)]
         testRes = TestCollectionResults(grade=0.9,paths="test/",tests=tests,passed_tests=tests,failed_tests=[],include_grade=True)
         g = GradingResults([testRes])
         self.assertEqual(g.get_score("test1"), 0.9)
 
     def testRepr(self):
+
+        """
+        Tests repr styling of results
+        """
+
         tests = [OKTestFile("test1", ["t1","t2"],[True,False]), OKTestFile("test2", ["t1","t2"],[True,False],value=0.9,hidden=True)]
         testRes = TestCollectionResults(grade=0.9,paths="test/",tests=tests,passed_tests=tests,failed_tests=[],include_grade=True)
         g = GradingResults([testRes])
-        f = open("demofile2.txt", "a")
-        f.write("repr:\n")
-        f.write(repr(g))
-        f.write("m\nm\nm\n")
-        f.close()
         str = "{ 'test1': { 'hidden': False,\n             'incorrect': False,\n             'name': 'test1',\n             'possible': 1,\n             'score': 0.9,\n             'test':    test1\n\nTest result:\nNone},\n  'test2': { 'hidden': False,\n             'incorrect': False,\n             'name': 'test2',\n             'possible': 0.9,\n             'score': 0.81,\n             'test':    test2\n\nTest result:\nNone}}"
         self.assertEqual(repr(g),str)
 
     def testDict(self):
+
+        """
+        Tests dictionary representation of results
+        """
+
         tests = [OKTestFile("test1", ["t1","t2"],[True,False]), OKTestFile("test2", ["t1","t2"],[True,False],value=0.9,hidden=False)]
         testRes = TestCollectionResults(grade=0.9,paths="test/",tests=tests,passed_tests=tests,failed_tests=[],include_grade=True)
         g = GradingResults([testRes])
-        f = open("demofile2.txt", "a")
-        f.write("dict:\n")
-        f.write(str(g.to_dict()))
-        f.write("m\nm\nm\n")
-        f.close()
         d = "{'test1': {'name': 'test1', 'score': 0.9, 'possible': 1, 'test':    test1\n\nTest result:\nNone, 'hidden': False, 'incorrect': False}, 'test2': {'name': 'test2', 'score': 0.81, 'possible': 0.9, 'test':    test2\n\nTest result:\nNone, 'hidden': False, 'incorrect': False}}"
         self.assertEqual(str(g.to_dict()),d)
 
     def getPublicScore(self):
+
+        """
+        Tests public scoring of results
+        """
+
         tests = [OKTestFile("test1", ["t1","t2"],[True,False]), OKTestFile("test2", ["t1","t2"],[True,False],value=0.9,hidden=False)]
         testRes = TestCollectionResults(grade=0.9,paths="test/",tests=tests,passed_tests=tests,failed_tests=[],include_grade=True)
         g = GradingResults([testRes])
@@ -64,6 +64,11 @@ class TestResults(TestCase):
         self.assertEqual(g.get_public_score("test2"), 0.9)
 
     def testGradescopeDict(self):
+
+        """
+        Tests gradescope config edge cases for gradescope dict 
+        """
+
         tests = [OKTestFile("test1", ["t1","t2"],[True,False]), OKTestFile("test2", ["t1","t2"],[True,False],value=0.9,hidden=False)]
         testRes = TestCollectionResults(grade=0.9,paths="test/",tests=tests,passed_tests=tests,failed_tests=[],include_grade=True)
         g = GradingResults([testRes])
