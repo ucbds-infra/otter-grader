@@ -74,7 +74,8 @@ def run_autograder(config):
     # add miniconda back to path
     os.environ["PATH"] = f"{options['miniconda_path']}/bin:" + os.environ.get("PATH")
     
-    os.chdir(options["autograder_dir"])
+    abs_ag_path = os.abspath(options["autograder_dir"])
+    os.chdir(abs_ag_path)
 
     if options["token"] is not None:
         client = APIClient(token=options["token"])
@@ -130,6 +131,6 @@ def run_autograder(config):
 
     output = scores.to_gradescope_dict(config)
 
-    os.chdir(options["autograder_dir"])
+    os.chdir(abs_ag_path)
 
     return output
