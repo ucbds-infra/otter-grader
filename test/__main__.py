@@ -15,7 +15,7 @@ else:
 
     # extract next prog if applicable
     if len(sys.argv) >= 3:
-        if sys.argv[1] in ["generate", "service"]:
+        if sys.argv[1] in ["generate", "service", "execute"]:
             module += f".test_{sys.argv[2]}"
         else:
             test_name = f"Test{sys.argv[1].capitalize()}.test_{sys.argv[2]}"
