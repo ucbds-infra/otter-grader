@@ -18,7 +18,7 @@ def run_autograder(config):
     options = DEFAULT_OPTIONS.copy()
     options.update(config)
 
-    abs_ag_path = os.abspath(options["autograder_dir"])
+    abs_ag_path = os.path.abspath(options["autograder_dir"])
     os.chdir(abs_ag_path)
 
     # put files into submission directory

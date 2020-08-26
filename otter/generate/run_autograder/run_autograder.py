@@ -74,7 +74,7 @@ def run_autograder(config):
     # add miniconda back to path
     os.environ["PATH"] = f"{options['miniconda_path']}/bin:" + os.environ.get("PATH")
     
-    abs_ag_path = os.abspath(options["autograder_dir"])
+    abs_ag_path = os.path.abspath(options["autograder_dir"])
     os.chdir(abs_ag_path)
 
     if options["token"] is not None:
