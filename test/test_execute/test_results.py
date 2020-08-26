@@ -8,7 +8,6 @@ import json
 import shutil
 
 from .. import TestCase
-TestCase.maxDiff = None
 from ast import literal_eval
 from otter.execute.results import GradingResults
 from otter.test_files.abstract_test import TestCollectionResults, TestFile
@@ -51,7 +50,7 @@ class TestResults(TestCase):
         d = "{'test1': {'name': 'test1', 'score': 0.9, 'possible': 1, 'test':    test1\n\nTest result:\nNone, 'hidden': False, 'incorrect': False}, 'test2': {'name': 'test2', 'score': 0.81, 'possible': 0.9, 'test':    test2\n\nTest result:\nNone, 'hidden': False, 'incorrect': False}}"
         self.assertEqual(str(g.to_dict()),d)
 
-    def getPublicScore(self):
+    def testPublicScore(self):
 
         """
         Tests public scoring of results
