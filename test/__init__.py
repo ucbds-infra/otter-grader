@@ -14,11 +14,11 @@ class TestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print("\n" + ("=" * 70) + f"\nRunning Test Case {cls.__module__}.{cls.__name__}\n" + ("=" * 70))
+        print("\n" + ("=" * 70) + f"\nRunning Test Case {cls.__module__}.{cls.__name__}\ncwd: {os.getcwd()}\n" + ("=" * 70))
         return super().setUpClass()
 
     def setUp(self):
-        print("\n" + ("-" * 70) + f"\nRunning {self.id()}\n" + ("-" * 70))
+        print("\n" + ("-" * 70) + f"\nRunning {self.id()}\ncwd: {os.getcwd()}\n" + ("-" * 70))
         return super().setUp()
 
     @contextmanager
