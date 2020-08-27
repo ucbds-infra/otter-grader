@@ -2,6 +2,7 @@
 Gradescope autograding internals
 """
 
+import os
 import json
 import pandas as pd
 
@@ -15,6 +16,8 @@ def main(config):
         config (``dict``): configurations for autograder
     """
     print(LOGO_WITH_VERSION, "\n")
+
+    curr_dir = os.getcwd()
 
     if "lang" in config and config["lang"].lower() == "r":
         from .r_adapter.run_autograder import run_autograder
@@ -34,3 +37,5 @@ def main(config):
         df.drop(columns=["output"], inplace=True)
 
     print(df)
+
+    os.chdir(curr_dir)
