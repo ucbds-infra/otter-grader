@@ -1,26 +1,26 @@
-distro:
-	rm dist/* || :
-	python3 update_versions.py
-	python3 setup.py sdist bdist_wheel
+# distro:
+# 	rm dist/* || :
+# 	python3 update_versions.py
+# 	python3 setup.py sdist bdist_wheel
 
-git-distro:
-	python3 update_versions.py --git
+# git-distro:
+# 	python3 update_versions.py --git
 
-pypi:
-	rm dist/* || :
-	python3 update_versions.py
-	python3 setup.py sdist bdist_wheel
-	python3 -m twine upload dist/*
+# pypi:
+# 	rm dist/* || :
+# 	python3 update_versions.py
+# 	python3 setup.py sdist bdist_wheel
+# 	python3 -m twine upload dist/*
 
-test-pypi:
-	rm dist/* || :
-	python3 update_versions.py
-	python3 setup.py sdist bdist_wheel
-	python3 -m twine upload dist/* --repository-url https://test.pypi.org/legacy/
+# test-pypi:
+# 	rm dist/* || :
+# 	python3 update_versions.py
+# 	python3 setup.py sdist bdist_wheel
+# 	python3 -m twine upload dist/* --repository-url https://test.pypi.org/legacy/
 
-docker:
-	docker build . -t ucbdsinfra/otter-grader
-	docker push ucbdsinfra/otter-grader
+# docker:
+# 	docker build . -t ucbdsinfra/otter-grader
+# 	docker push ucbdsinfra/otter-grader
 
 docker-test:
 	cp -r Dockerfile test-Dockerfile
