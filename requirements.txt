@@ -5,6 +5,7 @@ matplotlib
 pandas
 ipywidgets
 scipy
+scikit-learn
 tqdm
 codecov
 jinja2
