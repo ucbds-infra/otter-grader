@@ -19,8 +19,8 @@ test-pypi:
 	python3 -m twine upload dist/* --repository-url https://test.pypi.org/legacy/
 
 docker:
-	docker build . -t ucbdsinfra/otter-grader:beta
-	docker push ucbdsinfra/otter-grader:beta
+	docker build . -t ucbdsinfra/otter-grader
+	docker push ucbdsinfra/otter-grader
 
 docker-test:
 	cp -r Dockerfile test-Dockerfile
