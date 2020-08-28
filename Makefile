@@ -1,40 +1,40 @@
-distro:
-	rm dist/*
-	python3 update_versions.py
-	python3 setup.py sdist bdist_wheel
+# distro:
+# 	rm dist/* || :
+# 	python3 update_versions.py
+# 	python3 setup.py sdist bdist_wheel
 
-pypi:
-	rm dist/*
-	python3 update_versions.py
-	python3 setup.py sdist bdist_wheel
-	python3 -m twine upload dist/*
+# git-distro:
+# 	python3 update_versions.py --git
 
-test-pypi:
-	rm dist/*
-	python3 update_versions.py
-	python3 setup.py sdist bdist_wheel
-	python3 -m twine upload dist/* --repository-url https://test.pypi.org/legacy/
+# pypi:
+# 	rm dist/* || :
+# 	python3 update_versions.py
+# 	python3 setup.py sdist bdist_wheel
+# 	python3 -m twine upload dist/*
 
-docker-image:
-	docker build ./docker -t ucbdsinfra/otter-grader
-	docker push ucbdsinfra/otter-grader
+# test-pypi:
+# 	rm dist/* || :
+# 	python3 update_versions.py
+# 	python3 setup.py sdist bdist_wheel
+# 	python3 -m twine upload dist/* --repository-url https://test.pypi.org/legacy/
+
+# docker:
+# 	docker build . -t ucbdsinfra/otter-grader
+# 	docker push ucbdsinfra/otter-grader
 
 docker-test:
-	cp -r ./docker test-docker
-	cp -r ./otter test-docker
-	cp setup.py test-docker
-	cp README.md test-docker
-	cp -r ./bin test-docker
-	printf "\nADD . /home/otter-grader\nRUN pip3 install /home/otter-grader" >> ./test-docker/Dockerfile
-	docker build ./test-docker -t otter-test
-	rm -rf ./test-docker
+	cp -r Dockerfile test-Dockerfile
+	printf "\nADD . /tmp/otter-grader\nRUN pip install /tmp/otter-grader" >> test-Dockerfile
+	docker build . -t otter-test -f test-Dockerfile
+	rm test-Dockerfile
 
 documentation:
-	sphinx-apidoc -fo docs otter
+	# sphinx-apidoc -fo docs otter
 	sphinx-build -b html docs docs/_build -aEv
 
-tutorial-zip:
+tutorial:
 	# rm docs/tutorial/tutorial.zip
 	cd docs/tutorial; \
-	zip -r tutorial.zip hidden-tests tests demo-* meta.json -x "*.DS_Store"; \
-	cp tutorial.zip ../_static
+	zip -r tutorial.zip assign generate grade -x "*.DS_Store"; \
+	cp tutorial.zip ../_static; \
+	rm tutorial.zip

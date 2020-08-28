@@ -8,3 +8,11 @@ test/test-grading-notebook.ipynb
 test/tests
 .coverage
 .vscode
+test/output
+.sos
+docs/_build
+.Rproj.user
+.Rhistory
+.ionide
+gs-testing-stuff
+.mypy.cache

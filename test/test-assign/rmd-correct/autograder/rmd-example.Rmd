@@ -1,0 +1,134 @@
+---
+title: "Otter Assign for Rmd Test"
+author: "Chris Pyles"
+date: "8/3/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Otter Assign for Rmd
+
+```{r}
+library(testthat)
+library(ggplot2)
+```
+
+**Question 1.** Assign x to the smallest prime number.
+
+```{r}
+x <- 2 # SOLUTION
+```
+
+```{r}
+. = ottr::check("tests/q1.R")
+```
+
+**Question 2.** Visualize the answer
+
+```{r}
+set.seed(123) # SEED
+# BEGIN SOLUTION NO PROMPT
+x <- runif(100)
+y <- rnorm(100)
+data = data.frame(x, y)
+ggplot(data, aes(x=x, y=y)) +
+    geom_point()
+# END SOLUTION
+. = " # BEGIN PROMPT
+plt.plot(...);
+"; # END PROMPT
+```
+
+This cell is not part of a question.
+
+```{r}
+y = 3
+```
+
+**Question 3.** Define `square` and assign `nine` to 3 squared.
+
+```{r}
+square = function(x) {
+    y = x * x # SOLUTION
+    return(y) # SOLUTION
+}
+
+nine = square(3) # SOLUTION
+```
+
+```{r}
+. = ottr::check("tests/q3.R")
+```
+
+**Question 4.** What does equilateral mean?
+
+<!-- BEGIN SOLUTION -->
+Having equal side lengths.
+<!-- END SOLUTION -->
+
+```{r}
+# this isn't part of a question
+# it's here to make sure that we get a MD cell above to close the export
+# of question 4
+```
+
+**Question 5.** Approximate the area and circumference of a circle with radius 3.
+
+```{r}
+pi = 3.14
+if (TRUE) {
+    # BEGIN SOLUTION
+    radius = 3
+    area = radius * pi * pi
+    # END SOLUTION
+    print(paste0('A circle with radius', radius, 'has area', area))
+}
+
+circumference = function(r) {
+    # BEGIN SOLUTION NO PROMPT
+    return(2 * pi * r)
+    # END SOLUTION
+    " # BEGIN PROMPT
+    # Next, define a circumference function.
+    "; # END PROMPT
+}
+```
+
+```{r}
+# This question has no tests.
+```
+
+**Question 6.** Write something
+
+_This question has a custom prompt below, so that prompt should be in the output. It also has no solution!_
+
+<!-- BEGIN PROMPT -->
+_Write your thing here._
+<!-- END PROMPT -->
+
+<!-- BEGIN SOLUTION NO PROMPT -->
+some thing
+<!-- END SOLUTION -->
+
+**Question 7:** What is the answer?
+
+<!-- BEGIN SOLUTION -->
+42
+<!-- END SOLUTION -->
+
+**Question 8:** Test intercell seeding by generating 10 random $N(4,2)$ numbers.
+
+```{r}
+set.seed(42) # SEED
+z = rnorm(10, 4, 2) # SOLUTION
+z
+```
+
+```{r}
+. = ottr::check("tests/q8.R")
+```
+
+**You're done!**

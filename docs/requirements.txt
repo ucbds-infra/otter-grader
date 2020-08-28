@@ -1,4 +1,0 @@
-recommonmark
-# napoleon
-sphinx_markdown_tables
-sphinx-rtd-theme==0.3.1

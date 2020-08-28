@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <body>
+    <div class="col-lg-6 offset-lg-3 align-self-center text-center">
+      <p class="lead">Copy and paste the API key into your Jupyter notebook to authenticate your submission.</p>
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" id="api-key" value="{{ key }}" readonly>
+        <div class="input-group-append">
+          <button class="btn btn-primary" id="copy" type="button">Copy</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+  }
+</style>
+
+<script>
+  function copy() {
+    var copyText = document.querySelector("#api-key");
+    copyText.select();
+    document.execCommand("copy");
+  }
+
+  document.querySelector("#copy").addEventListener("click", copy);
+</script>

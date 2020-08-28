@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 
-from otter import cli
-from otter import gs_generator
-from otter import script
-import sys
+from otter.run import run_otter
 
 if __name__ == "__main__":
-	if sys.argv[1] == "gen":
-		del sys.argv[1]
-		gs_generator.main()
-	elif sys.argv[1] == "check":
-		del sys.argv[1]
-		script.main()
-	else:
-		cli.main()
+    run_otter()

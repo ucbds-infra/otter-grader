@@ -1,43 +1,39 @@
 # Otter-Grader
 
+[![PyPI](https://img.shields.io/pypi/v/otter-grader.svg)](https://pypi.org/project/otter-grader/)
 [![Build Status](https://travis-ci.org/ucbds-infra/otter-grader.svg?branch=master)](https://travis-ci.org/ucbds-infra/otter-grader)
 [![codecov](https://codecov.io/gh/ucbds-infra/otter-grader/branch/master/graph/badge.svg)](https://codecov.io/gh/ucbds-infra/otter-grader)
 [![Documentation Status](https://readthedocs.org/projects/otter-grader/badge/?version=latest)](https://otter-grader.readthedocs.io/en/latest/?badge=latest)
-[![Custom badge](https://img.shields.io/endpoint?logo=slack&url=https%3A%2F%2Fraw.githubusercontent.com%2Fucbds-infra%2Fotter-grader%2Fmaster%2Fslack-shields.json)](https://join.slack.com/t/otter-grader/shared_invite/enQtOTM5MTQ0MzkwMTk0LTBiNWIzZTYxNDA2NDZmM2JkMzcwZjA4YWViNDM4ZTgyNDVhNDgwOTQ0NjNlZjcwNmY5YzJiZjZhZGNhNzc5MjA)
+[![Slack](https://img.shields.io/endpoint?logo=slack&url=https%3A%2F%2Fraw.githubusercontent.com%2Fucbds-infra%2Fotter-grader%2Fmaster%2Fslack-shields.json)](https://join.slack.com/t/otter-grader/shared_invite/enQtOTM5MTQ0MzkwMTk0LTBiNWIzZTYxNDA2NDZmM2JkMzcwZjA4YWViNDM4ZTgyNDVhNDgwOTQ0NjNlZjcwNmY5YzJiZjZhZGNhNzc5MjA)
 
-Otter-grader is a new, open-source, local grader from the Division of Data Science, External Pedagogy Infrastructure at UC Berkeley. It is designed to be a scalable grader that utilizes temporal docker containers in order to remove the traditional overhead requirement of a live server. 
+Otter Grader is a light-weight, modular open-source autograder developed by the Data Science Education Program at UC Berkeley. It is designed to work with classes at any scale by abstracting away the autograding internals in a way that is compatible with any instructor's assignment distribution and collection pipeline. Otter supports local grading through parallel Docker containers, grading using the autograder platforms of 3rd party learning management systems (LMSs), the deployment of an Otter-managed grading virtual machine, and a client package that allows students to run public checks on their own machines. Otter is designed to grade Python scripts and Jupyter Notebooks, and is compatible with a few different LMSs, including Canvas and Gradescope.
 
 ## Documentation
 
 The documentation for Otter can be found [here](https://otter-grader.rtfd.io).
 
+## Contributing
+
+PRs are welcome! Please submit a PR to the master branch with any updates. Make sure to update the changelog in the docs with any information about the contribution.
+
+To set up the testing environment, install the requirements in `requirements.txt` and run the `test` directory as a module to execute the tests:
+
+```
+python3 -m test
+```
+
+To run the tests for a specific tool, add the command-line path for that tool to the command. For example, to run the tests for `otter generate autograder`, run
+
+```
+python3 -m test generate autograder
+```
+
+or to run all tests for commands under `otter generate`, run
+
+```
+python3 -m test generate
+```
+
 ## Changelog
 
-**v0.4.8:**
-
-* added import of `IPython.display.display` to [otter/grade.py](otter/grade.py)
-* patched Gradescope metadata parser for group submissions
-
-**v0.4.7:**
-
-* fix relative import issue on Gradescope (again, *sigh*)
-
-**v0.4.6:** re-release of v0.4.5
-
-**v0.4.5:**
-
-* added missing patch of `otter.Notebook.export` in [otter/grade.py](otter/grade.py)
-* added `__version__` global in [otter/__init__.py](otter/__init__.py)
-* fixed relative import issue when running on Gradescope
-* fixed not finding/rerunning tests on Gradescope with `otter.Notebook.check`
-
-**v0.4.4:**
-
-* fixed template escape bug in [otter/gs_generator.py](otter/gs_generator.py)
-
-**v0.4.3:**
-
-* fixed dead link in [docs/gradescope.md](docs/gradescope.md)
-* updated to Python 3.7 in setup.sh for Gradescope
-* made `otter` and `otter gen` CLIs find `./requirements.txt` automatically if it exists
-* fix bug where GS generator fails if no `-r` flag specified
+The changelog can be found in the [documentation](https://otter-grader.rtfd.io).

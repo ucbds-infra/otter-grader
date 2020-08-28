@@ -1,0 +1,256 @@
+---
+title: "Otter Assign for Rmd Test"
+author: "Chris Pyles"
+date: "8/3/2020"
+output: pdf_document
+---
+
+```
+BEGIN ASSIGNMENT
+generate: true
+template_pdf: true
+solutions_pdf: true
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Otter Assign for Rmd
+
+```{r}
+library(testthat)
+library(ggplot2)
+```
+
+**Question 1.** Assign x to the smallest prime number.
+
+```
+BEGIN QUESTION
+name: q1
+points:
+    - 1
+    - 1
+    - 1
+    - 2
+```
+
+```{r}
+x <- 2 # SOLUTION
+```
+
+```{r}
+## Test ##
+test_that("q1a", {
+    expect_true(is.numeric(x))
+})
+```
+
+```{r}
+## test ##
+test_that("q1b", {
+    expect_true(0 < x)
+    expect_true(x < 100)
+})
+```
+
+```{r}
+# hidden test
+test_that("q1c", {
+    expect_equal(x, 2)
+})
+```
+
+```{r}
+## HIDDEN test ##
+test_that("q1d", {
+    expect_equal(as.character(x), "2")
+})
+```
+
+**Question 2.** Visualize the answer
+
+```
+BEGIN QUESTION
+name: q2
+manual: true
+```
+
+```{r}
+set.seed(123) # SEED
+# BEGIN SOLUTION NO PROMPT
+x <- runif(100)
+y <- rnorm(100)
+data = data.frame(x, y)
+ggplot(data, aes(x=x, y=y)) +
+    geom_point()
+# END SOLUTION
+. = " # BEGIN PROMPT
+plt.plot(...);
+"; # END PROMPT
+```
+
+This cell is not part of a question.
+
+```{r}
+y = 3
+```
+
+**Question 3.** Define `square` and assign `nine` to 3 squared.
+
+```
+BEGIN QUESTION
+name: q3
+points: 2
+```
+
+```{r}
+square = function(x) {
+    y = x * x # SOLUTION
+    return(y) # SOLUTION
+}
+
+nine = square(3) # SOLUTION
+```
+
+```{r}
+# test
+test_that("q3a", {
+    expect_equal(nine, 9)
+})
+```
+
+```{r}
+# test
+test_that("q3b", {
+    expect_equal(square(16), 256)
+})
+```
+
+```{r}
+# hidden test
+test_that("q3c", {
+    expect_equal(square(1), 1)
+})
+```
+
+**Question 4.** What does equilateral mean?
+
+```
+BEGIN QUESTION
+name: q4
+points: 2
+manual: True
+```
+
+<!-- BEGIN SOLUTION -->
+Having equal side lengths.
+<!-- END SOLUTION -->
+
+```{r}
+# this isn't part of a question
+# it's here to make sure that we get a MD cell above to close the export
+# of question 4
+```
+
+**Question 5.** Approximate the area and circumference of a circle with radius 3.
+
+```
+BEGIN QUESTION
+name: question5
+```
+
+```{r}
+pi = 3.14
+if (TRUE) {
+    # BEGIN SOLUTION
+    radius = 3
+    area = radius * pi * pi
+    # END SOLUTION
+    print(paste0('A circle with radius', radius, 'has area', area))
+}
+
+circumference = function(r) {
+    # BEGIN SOLUTION NO PROMPT
+    return(2 * pi * r)
+    # END SOLUTION
+    " # BEGIN PROMPT
+    # Next, define a circumference function.
+    "; # END PROMPT
+}
+```
+
+```{r}
+# This question has no tests.
+```
+
+**Question 6.** Write something
+
+_This question has a custom prompt below, so that prompt should be in the output. It also has no solution!_
+
+```
+BEGIN QUESTION
+name: question6
+manual: true
+```
+
+<!-- BEGIN PROMPT -->
+_Write your thing here._
+<!-- END PROMPT -->
+
+<!-- BEGIN SOLUTION NO PROMPT -->
+some thing
+<!-- END SOLUTION -->
+
+**Question 7:** What is the answer?
+
+```
+BEGIN QUESTION
+name: q7
+manual: true
+```
+
+<!-- BEGIN SOLUTION -->
+42
+<!-- END SOLUTION -->
+
+**Question 8:** Test intercell seeding by generating 10 random $N(4,2)$ numbers.
+
+```
+BEGIN QUESTION
+name: q8
+```
+
+```{r}
+set.seed(42) # SEED
+z = rnorm(10, 4, 2) # SOLUTION
+z
+```
+
+```{r}
+## Test ##
+test_that("q8a", {
+    expect_equal(length(z), 10)
+})
+```
+
+```{r}
+## Hidden Test ##
+test_that("q8b", {
+    actual = c(
+        6.74191689429334,
+        2.87060365720782,
+        4.72625682267468,
+        5.26572520992208, 
+        4.808536646282, 
+        3.78775096781703, 
+        7.02304399487788, 
+        3.8106819231738, 
+        8.03684742775408, 
+        3.87457180189516
+    )
+    expect_equal(actual, z)
+})
+```
+
+**You're done!**

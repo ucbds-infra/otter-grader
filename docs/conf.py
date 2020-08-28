@@ -26,8 +26,8 @@ from recommonmark.transform import AutoStructify
 # -- Project information -----------------------------------------------------
 
 project = 'Otter-Grader'
-copyright = '2020, UC Berkeley Division of Data Science and Information'
-author = 'UCBDS Infrastructure Team'
+copyright = '2020, UC Berkeley Data Science Education Program'
+author = 'UC Berkeley Data Science Education Program Infrastructure Team'
 
 # The short X.Y version
 version = ''
@@ -51,8 +51,18 @@ extensions = [
     # 'sphinx.ext.autodoc', 
     'sphinx.ext.coverage', 
     'sphinx.ext.napoleon',
-    'sphinx_markdown_tables'
+    'sphinx_markdown_tables',
+    'sphinx.ext.autosummary',
+    'sphinxcontrib.apidoc',
+    'sphinxarg.ext',
 ]
+
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+
+apidoc_module_dir = '../otter'
+apidoc_output_dir = '.'
+apidoc_excluded_paths = []
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -82,7 +92,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'modules.rst']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'modules.rst', 'otter*.rst', 'modules.rst']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -93,23 +103,12 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
+html_logo = '../logo/otter-logo-smaller.png'
 
 html_theme_options = {
-    'canonical_url': '',
-    # 'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
-    'logo_only': False,
-    'display_version': True,
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
-    'vcs_pageview_mode': '',
-    'style_nav_header_background': 'white',
-    # Toc options
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'navigation_depth': 2,
-    'includehidden': True,
-    'titles_only': False,
+    'github_url': 'https://github.com/ucbds-infra/otter-grader',
+    'repository_url': 'https://github.com/ucbds-infra/otter-grader'
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -122,6 +121,8 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+html_css_files = ['style.css']
+html_favicon = '_static/favicon.ico'
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.

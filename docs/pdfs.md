@@ -1,25 +1,25 @@
 # PDF Generation and Filtering
 
-When exporting IPython notebooks as PDFs, Otter uses the library nb2pdf that relies on nbpdfexport and chromium to export notebooks without pandoc or LaTeX. This requires that chromium be installed both in the Docker container being used for grading and on the JupyterHub distribution on which students export their notebooks from the `Notebook` API. 
+Otter includes a tool for generating PDFs of notebooks that optionally incorporates notebook filtering for generating PDFs for manual grading. There are two options for exporting PDFs:
 
-The `Notebook.export` function encapsulates PDF generation on the student end, and by default filtering is turned on. To generate unfiltered PDFs with `Notebook.export`, set `filtering=False` in your call. To generate unfiltered PDFs from the command line, use the `--pdf` flag when calling `otter`.
+* **PDF via LaTeX:** this uses nbconvert, pandoc, and LaTeX to generate PDFs from TeX files
+* **PDF via HTML:** this uses wkhtmltopdf and the Python packages pdfkit and PyPDF2 to generate PDFs from HTML files
+
+Otter Export is used by Otter Assign to generate Gradescope PDF templates and solutions, in the Gradescope autograder to generate the PDFs of notebooks, by `otter.Notebook` to generate PDFs. and in Otter Grade when PDFs are requested.
 
 ## Cell Filtering
 
-nb2pdf supports two different formats for filtering cells when exporting notebooks: using cell tags and using HTML comments. 
+Otter Export uses HTML comments in Markdown cells to perform cell filtering. Filtering is the default behavior of most exporter implementations, but not of the exporter itself.
 
-### Cell Tag Filtering
+You can place HTML comments in Markdown cells to capture everything in between them in the output. To start a filtering group, place the comment `<!-- BEGIN QUESTION -->` whereever you want to start exporting and place `<!-- END QUESTION -->` at the end of the filtering group. Everything capture between these comments will be exported, and everything outside them removed. You can have multiple filtering groups in a notebook. When using Otter Export, you can also optionally add page breaks after an `<!-- END QUESTION -->` by setting `pagebreaks=True` in `otter.export.export_notebook` or using the corresponding flags/arguments in whichever utility is calling Otter Export.
 
-When generating the PDF (if filtering is indicated by the `--tag-filter` flag or by setting `filter_type="tags"` in `Notebook.export`), the following cells will be **included** in the export:
+## Otter Export Reference
 
-* All Markdown cells
-* Code cells that have an image in their output
-* All cells tagged with `include`
-
-If you would like to override the behavior above, tag a cell with `ignore` and it will not be included.
-
-### HTML Comment Filtering
-
-Alternatively, you can place HTML comments in Markdown cells to capture everything in between them in the output. To start a filtering group, place the comment `<!-- BEGIN QUESTION -->` whereever you want to start exporting and place `<!-- END QUESTION -->` at the end of the filtering group. Everything capture between these comments will be exported, and everything outside them removed. You can have multiple filtering groups in a notebook.
-
-This filtering behavior is triggered with the `--html-filter` flag or in the default behavior of `Notebook.export` (as the `filter_type` argument defaults to `"html"`).
+```eval_rst
+.. argparse::
+   :module: otter.argparser
+   :func: get_parser
+   :prog: otter
+   :path: export
+   :nodefaultconst:
+```

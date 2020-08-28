@@ -1,0 +1,14 @@
+- {filename: passesAll.py, identifier: passesAll}
+- {filename: fails1H.py, identifier: fails1H}
+- {filename: fails2and4.py, identifier: fails2and4}
+- {filename: fails1and3and6.py, identifier: fails1and3and6}
+- {filename: fails3and4.py, identifier: fails3and4}
+- {filename: fails2.py, identifier: fails2}
+- {filename: fails2and3and6H.py, identifier: fails2and3and6H}
+- {filename: fails4.py, identifier: fails4}
+- {filename: fails6.py, identifier: fails6}
+- {filename: fails2and6H.py, identifier: fails2and6H}
+- {filename: fails1.py, identifier: fails1}
+- {filename: fails3.py, identifier: fails3}
+- {filename: fails6H.py, identifier: fails6H}
+- {filename: fails1and4.py, identifier: fails1and4}
