@@ -99,7 +99,7 @@ def main(args):
         # render the templates
         python_requirements = PYTHON_REQUIREMENTS.render(
             other_requirements = f.read() if args.lang.lower() == "python" else "",
-            overwrite_requirements = False
+            overwrite_requirements = args.lang.lower() == "python" and args.overwrite_requirements
         )
 
         # reset the stream
@@ -107,7 +107,8 @@ def main(args):
 
         r_requirements = R_REQUIREMENTS.render(
             other_requirements = f.read() if args.lang.lower() == "r" else "",
-            overwrite = args.overwrite_requirements
+            overwrite_requirements = args.lang.lower() == "python" and args.overwrite_requirements
+
         )
 
         # close the stream

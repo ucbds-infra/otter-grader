@@ -10,6 +10,7 @@ FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "Dockerfile",
     "otter/generate/templates/requirements.txt",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
+    "test/test_generate/test-run-autograder/autograder-correct/source/requirements.txt",
     "test/test-assign/gs-autograder-correct/requirements.txt",
     "test/test-assign/pdf-autograder-correct/requirements.txt",
     "test/test-assign/r-autograder-correct/requirements.txt",
@@ -32,7 +33,8 @@ def run_release_commands(test, beta, new_version):
         f"docker build . -t ucbdsinfra/otter-grader{':beta' if beta else ''}",
         f"docker push ucbdsinfra/otter-grader{':beta' if beta else ''}",
         "make tutorial",
-        f"hub release create -a dist -m v{new_version}{' -p' if beta else ''} {new_version}",
+        f"git commit -am 'release v{new_version}'",
+        f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}{' -p' if beta else ''}' {new_version}",
     ]
 
     for cmd in commands:
@@ -67,11 +69,11 @@ if __name__ == "__main__":
     from_git = bool(re.search(r"https://github.com/ucbds-infra/otter-grader\.git@", contents))
     from_beta = bool(re.search(r"otter-grader==\d+\.\d+\.\d+\.b\d+", contents))
 
-    if to_git and subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip():
-        warnings.warn(
-            "You have uncommitted changes that will not be included in this release. To include "
-            "them, commit your changes and rerun this script.",
-            UserWarning
+    if subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip() and not args.dry_run:
+        # throw error because this will commit everything when you make a release
+        raise RuntimeError(
+            "You have uncommitted changes. Please add and commit these changes before pushing "
+            "a release." 
         )
 
     if to_git:
