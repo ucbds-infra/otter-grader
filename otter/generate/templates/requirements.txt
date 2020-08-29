@@ -1,4 +1,4 @@
-{% if not overwrite %}datascience
+{% if not overwrite_requirements %}datascience
 jupyter_client
 ipykernel
 matplotlib
