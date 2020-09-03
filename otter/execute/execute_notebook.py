@@ -13,9 +13,11 @@ from IPython.display import display
 from IPython.core.inputsplitter import IPythonInputSplitter
 
 from .check_wrapper import CheckCallWrapper
+
 from ..utils import hide_outputs
 
 IGNORE_CELL_TAG = "otter_ignore"
+CELL_METADATA_KEY = "otter"
 
 def filter_ignored_cells(nb):
     """
@@ -34,7 +36,7 @@ def filter_ignored_cells(nb):
         metadata = cell.get("metadata", {})
         tags = metadata.get("tags", [])
 
-        if IGNORE_CELL_TAG in tags:
+        if IGNORE_CELL_TAG in tags or metadata.get(CELL_METADATA_KEY, {}).get("ignore", False):
             del nb['cells'][i]
     
     return nb
@@ -69,10 +71,14 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         # add display from IPython
         global_env["display"] = display
 
+        # add dummy Notebook class so that we can collect results w/out altering how the CheckCallWrapper
+        # needs to function
+        from ..check.notebook import Notebook
+        notebook_class_name = f"Notebook_{secret}"
+        global_env[notebook_class_name] = Notebook
+
         source = ""
-        # if gradescope:
-        #     source = "import sys\nsys.path.append(\"/autograder/submission\")\n"
-        # el
+
         if cwd:
             source = f"import sys\nsys.path.append(r\"{cwd}\")\n"
             exec(source, global_env)
@@ -82,6 +88,9 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
             import random
             global_env["np"] = np
             global_env["random"] = random
+
+        if test_dir is None:
+            test_dir = "/home/tests"
 
         # Before rewriting AST, find cells of code that generate errors.
         # One round of execution is done beforehand to mimic the Jupyter notebook style of running
@@ -115,10 +124,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                                 # if gradescope:
                                 #     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
                                 # el
-                                if test_dir:
-                                    line = re.sub(r"otter\.Notebook\(.*?\)", f"otter.Notebook(\"{test_dir}\")", line)
-                                else:
-                                    line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/home/tests\")", line)
+                                line = re.sub(r"otter\.Notebook\(.*?\)", f"otter.Notebook(\"{test_dir}\")", line)
                                 code_lines.append(line)
                                 if source_is_str_bool:
                                     code_lines.append('\n')
@@ -136,6 +142,15 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                 except:
                     if not ignore_errors:
                         raise
+
+            # add checks from metadata
+            otter_config = cell.get("metadata", {}).get(CELL_METADATA_KEY, {})
+            check_results_list_name = f"check_results_{secret}"
+            if otter_config.get("tests", []):
+                tests = otter_config.get("tests", [])
+                for test in tests:
+                    source += f"\n{check_results_list_name}.append({notebook_class_name}('{test_dir}').check('{test}'))\n"
+
 
         tree = ast.parse(source)
         # # CODE BELOW COMMENTED OUT BECAUSE the only check function is within the Notebook class

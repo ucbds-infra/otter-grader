@@ -8,7 +8,7 @@ test = {
 				{
 					"code": r"""
 					>>> negate([])
-					Trues
+					True
 					""",
 					"hidden": False,
 					"locked": False,
