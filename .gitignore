@@ -16,3 +16,4 @@ docs/_build
 .ionide
 gs-testing-stuff
 .mypy.cache
+.OTTER_LOG
