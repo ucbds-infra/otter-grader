@@ -25,14 +25,14 @@ def run_release_commands(test, beta, new_version):
     commands = [
         "rm dist/* || :",
         "python3 setup.py sdist bdist_wheel",
-        # f"python3 -m twine upload dist/*{' --repository-url https://test.pypi.org/legacy/' if test else ''}",
+        f"python3 -m twine upload dist/*{' --repository-url https://test.pypi.org/legacy/' if test else ''}",
         f"docker build . -t ucbdsinfra/otter-grader:{new_version}",
         f"docker push ucbdsinfra/otter-grader:{new_version}",
         f"docker build . -t ucbdsinfra/otter-grader{':beta' if beta else ''}",
         f"docker push ucbdsinfra/otter-grader{':beta' if beta else ''}",
         "make tutorial",
         f"git commit -am 'release v{new_version}'",
-        f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}{' -p' if beta else ''}' {new_version}",
+        f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}' {' -p' if beta else ''} {new_version}",
     ]
 
     for cmd in commands:
