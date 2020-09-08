@@ -77,10 +77,10 @@ class TestAssign(TestCase):
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
         
-        # check gradescope zip file
-        self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "pdf-autograder-correct",
-        )
+        # # check gradescope zip file
+        # self.check_gradescope_zipfile(
+        #     TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "pdf-autograder-correct",
+        # )
     
     @patch.object(APIClient,"get_token")
     def test_gradescope_example(self, mocked_client):
@@ -103,7 +103,6 @@ class TestAssign(TestCase):
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
 
         # check gradescope zip file
-        
         self.check_gradescope_zipfile(
             TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "gs-autograder-correct",
         )
@@ -122,10 +121,10 @@ class TestAssign(TestCase):
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", ignore_ext=[".pdf",".zip"])
         
-        # check gradescope zip file
-        self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "r-autograder-correct",
-        )
+        # # check gradescope zip file
+        # self.check_gradescope_zipfile(
+        #     TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "r-autograder-correct",
+        # )
 
     def test_rmd_example(self):
         """
@@ -146,8 +145,8 @@ class TestAssign(TestCase):
             TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "rmd-autograder-correct",
         )
 
-    # def tearDown(self):
-    #     # cleanup
-    #     if os.path.exists(TEST_FILES_PATH + "output"):
-    #         shutil.rmtree(TEST_FILES_PATH + "output")
+    def tearDown(self):
+        # cleanup
+        if os.path.exists(TEST_FILES_PATH + "output"):
+            shutil.rmtree(TEST_FILES_PATH + "output")
         

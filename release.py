@@ -12,8 +12,6 @@ FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
     "test/test_generate/test-run-autograder/autograder-correct/source/requirements.txt",
     "test/test-assign/gs-autograder-correct/requirements.txt",
-    "test/test-assign/pdf-autograder-correct/requirements.txt",
-    "test/test-assign/r-autograder-correct/requirements.txt",
     "test/test-assign/rmd-autograder-correct/requirements.txt",
 ]
 
