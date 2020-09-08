@@ -12,13 +12,11 @@ FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
     "test/test_generate/test-run-autograder/autograder-correct/source/requirements.txt",
     "test/test-assign/gs-autograder-correct/requirements.txt",
-    "test/test-assign/pdf-autograder-correct/requirements.txt",
-    "test/test-assign/r-autograder-correct/requirements.txt",
     "test/test-assign/rmd-autograder-correct/requirements.txt",
 ]
 
 
-def run_release_commands(test, beta, new_version):
+def run_release_commands(test, beta, new_version, no_twine=False):
     assert shutil.which("hub") is not None, (
         "You must have the GitHub CLI installed to use this script. Please see "
         "https://github.com/github/hub to install it."
@@ -34,8 +32,11 @@ def run_release_commands(test, beta, new_version):
         f"docker push ucbdsinfra/otter-grader{':beta' if beta else ''}",
         "make tutorial",
         f"git commit -am 'release v{new_version}'",
-        f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}{' -p' if beta else ''}' {new_version}",
+        f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}' {' -p' if beta else ''} {new_version}",
     ]
+
+    if no_twine:
+        del commands[2]
 
     for cmd in commands:
         subprocess.run(cmd, shell=True, check=True)
@@ -48,6 +49,8 @@ PARSER.add_argument("new_version", nargs="?", default=None, help="Old version fo
 PARSER.add_argument("--dry-run", action="store_true", default=False, help="Update files only but do not push release")
 PARSER.add_argument("--git", action="store_true", default=False, help="Indicates that new release should be installed via git")
 PARSER.add_argument("--test", action="store_true", default=False, help="Indicates that new release should be pushed to test PyPI")
+PARSER.add_argument("--no-twine", action="store_true", default=False, help="Don't upload the release to PyPI")
+PARSER.add_argument("-f", "--force", action="store_true", default=False, help="Force run (ignore uncommitted changes)")
 
 
 OLD_VERSION_REGEX = r"(otter-grader==\d+\.\d+\.\d+(?:\.\w+)?$|git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@[\w\.]+)$"
@@ -69,7 +72,7 @@ if __name__ == "__main__":
     from_git = bool(re.search(r"https://github.com/ucbds-infra/otter-grader\.git@", contents))
     from_beta = bool(re.search(r"otter-grader==\d+\.\d+\.\d+\.b\d+", contents))
 
-    if subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip() and not args.dry_run:
+    if subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip() and not args.dry_run and not args.force:
         # throw error because this will commit everything when you make a release
         raise RuntimeError(
             "You have uncommitted changes. Please add and commit these changes before pushing "
@@ -125,4 +128,4 @@ if __name__ == "__main__":
     if args.dry_run:
         sys.exit()
         
-    run_release_commands(args.test, to_beta, new_version_number)
+    run_release_commands(args.test, to_beta, new_version_number, no_twine=args.no_twine)
