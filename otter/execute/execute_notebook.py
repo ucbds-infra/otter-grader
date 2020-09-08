@@ -139,6 +139,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                     with mock.patch('otter.Notebook.export', m), mock.patch("otter.Notebook._log_event", m):
                         exec(cell_source, global_env)
                     source += cell_source
+
                 except:
                     if not ignore_errors:
                         raise
@@ -163,8 +164,8 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         tree = transformer.visit(tree)
         ast.fix_missing_locations(tree)
 
-        cleaned_source = compile(tree, filename="nb-ast", mode="exec")
         try:
+            cleaned_source = compile(tree, filename="nb-ast", mode="exec")
             with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
                 # patch otter.Notebook.export so that we don't create PDFs in notebooks
                 m = mock.mock_open()
@@ -173,4 +174,5 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         except:
             if not ignore_errors:
                 raise
+
         return global_env

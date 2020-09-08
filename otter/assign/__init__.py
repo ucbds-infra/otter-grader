@@ -107,12 +107,12 @@ def main(args):
         # run tests on autograder notebook
         if assignment.run_tests and not args.no_run_tests and assignment.is_python:
             print("Running tests...")
-            with block_print():
-                if isinstance(assignment.generate, bool):
-                    seed = None
-                else:
-                    seed = assignment.generate.get('seed', None)
-                run_tests(result / 'autograder' / master.name, debug=args.debug, seed=seed)
+            # with block_print():
+            if isinstance(assignment.generate, bool):
+                seed = None
+            else:
+                seed = assignment.generate.get('seed', None)
+            run_tests(result / 'autograder' / master.name, debug=args.debug, seed=seed)
             print("All tests passed!")
     
     # for tests

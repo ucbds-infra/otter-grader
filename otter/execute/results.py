@@ -8,6 +8,7 @@ import pprint
 
 from collections import namedtuple
 
+from ..check.logs import QuestionNotInLogException
 from ..generate.constants import DEFAULT_OPTIONS
 
 TestResult = namedtuple("TestResult", ["name", "score", "possible", "test", "hidden", "incorrect"])
