@@ -25,7 +25,7 @@ def run_release_commands(test, beta, new_version):
     commands = [
         "rm dist/* || :",
         "python3 setup.py sdist bdist_wheel",
-        f"python3 -m twine upload dist/*{' --repository-url https://test.pypi.org/legacy/' if test else ''}",
+        # f"python3 -m twine upload dist/*{' --repository-url https://test.pypi.org/legacy/' if test else ''}",
         f"docker build . -t ucbdsinfra/otter-grader:{new_version}",
         f"docker push ucbdsinfra/otter-grader:{new_version}",
         f"docker build . -t ucbdsinfra/otter-grader{':beta' if beta else ''}",
@@ -46,6 +46,7 @@ PARSER.add_argument("new_version", nargs="?", default=None, help="Old version fo
 PARSER.add_argument("--dry-run", action="store_true", default=False, help="Update files only but do not push release")
 PARSER.add_argument("--git", action="store_true", default=False, help="Indicates that new release should be installed via git")
 PARSER.add_argument("--test", action="store_true", default=False, help="Indicates that new release should be pushed to test PyPI")
+PARSER.add_argument("-f", "--force", action="store_true", default=False, help="Force run (ignore uncommitted changes)")
 
 
 OLD_VERSION_REGEX = r"(otter-grader==\d+\.\d+\.\d+(?:\.\w+)?$|git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@[\w\.]+)$"
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     from_git = bool(re.search(r"https://github.com/ucbds-infra/otter-grader\.git@", contents))
     from_beta = bool(re.search(r"otter-grader==\d+\.\d+\.\d+\.b\d+", contents))
 
-    if subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip() and not args.dry_run:
+    if subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip() and not args.dry_run and not args.force:
         # throw error because this will commit everything when you make a release
         raise RuntimeError(
             "You have uncommitted changes. Please add and commit these changes before pushing "
