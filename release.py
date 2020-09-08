@@ -16,7 +16,7 @@ FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
 ]
 
 
-def run_release_commands(test, beta, new_version):
+def run_release_commands(test, beta, new_version, no_twine=False):
     assert shutil.which("hub") is not None, (
         "You must have the GitHub CLI installed to use this script. Please see "
         "https://github.com/github/hub to install it."
@@ -35,6 +35,9 @@ def run_release_commands(test, beta, new_version):
         f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}' {' -p' if beta else ''} {new_version}",
     ]
 
+    if no_twine:
+        del commands[2]
+
     for cmd in commands:
         subprocess.run(cmd, shell=True, check=True)
 
@@ -46,6 +49,7 @@ PARSER.add_argument("new_version", nargs="?", default=None, help="Old version fo
 PARSER.add_argument("--dry-run", action="store_true", default=False, help="Update files only but do not push release")
 PARSER.add_argument("--git", action="store_true", default=False, help="Indicates that new release should be installed via git")
 PARSER.add_argument("--test", action="store_true", default=False, help="Indicates that new release should be pushed to test PyPI")
+PARSER.add_argument("--no-twine", action="store_true", default=False, help="Don't upload the release to PyPI")
 PARSER.add_argument("-f", "--force", action="store_true", default=False, help="Force run (ignore uncommitted changes)")
 
 
@@ -124,4 +128,4 @@ if __name__ == "__main__":
     if args.dry_run:
         sys.exit()
         
-    run_release_commands(args.test, to_beta, new_version_number)
+    run_release_commands(args.test, to_beta, new_version_number, no_twine=args.no_twine)
