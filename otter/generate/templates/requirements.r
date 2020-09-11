@@ -1,4 +1,4 @@
-{% if not overwrite %}
+{% if not overwrite_requirements %}
 install.packages(c(
     "usethis",
     "testthat",

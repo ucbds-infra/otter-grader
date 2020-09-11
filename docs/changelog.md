@@ -1,5 +1,19 @@
 # Changelog
 
+**v1.1.1:**
+
+* Fixed handling variable name collisions with already-tested test files
+* Added `--no-pdfs` flag to Otter Assign
+
+**v1.1.0:**
+
+* Moved Gradescope grading to inside conda env within container due to change in Gradescope's grading image
+* Added ability to specify additional tests to be run in cell metadata without need of explicit `Notebook.check` cells
+
+**v1.0.1:**
+
+* Fixed bug with specification of overwriting requirements in Otter Generate
+
 **v1.0.0:**
 
 * Changed structure of CLI into six main commands: `otter assign`, `otter check`, `otter export`, `otter generate`, `otter grade`, and `otter service`

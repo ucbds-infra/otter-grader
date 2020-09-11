@@ -40,6 +40,7 @@ def get_parser():
     assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
     assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")
     assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
+    assign_parser.add_argument("--no-pdfs", help="Don't generate PDFs; overrides assignment config", default=False, action="store_true")
     # assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
     # assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
     # assign_parser.add_argument("--jassign", default=False, action="store_true", help="Use jassign output notebook format")

@@ -57,7 +57,7 @@ def main(args):
                 not assignment.is_python, "Seeding cell found but no seed provided"
         
         # generate PDF of solutions
-        if assignment.solutions_pdf and not assignment.is_rmd:
+        if assignment.solutions_pdf and not assignment.is_rmd and not args.no_pdfs:
             print("Generating solutions PDF...")
             filtering = assignment.solutions_pdf == 'filtered'
 
@@ -78,7 +78,7 @@ def main(args):
                 )
 
         # generate a tempalte PDF for Gradescope
-        if not assignment.is_rmd and assignment.template_pdf:
+        if not assignment.is_rmd and assignment.template_pdf and not args.no_pdfs:
             print("Generating template PDF...")
             export_notebook(
                 str(result / 'autograder' / master.name),
@@ -107,12 +107,12 @@ def main(args):
         # run tests on autograder notebook
         if assignment.run_tests and not args.no_run_tests and assignment.is_python:
             print("Running tests...")
-            with block_print():
-                if isinstance(assignment.generate, bool):
-                    seed = None
-                else:
-                    seed = assignment.generate.get('seed', None)
-                run_tests(result / 'autograder' / master.name, debug=args.debug, seed=seed)
+            # with block_print():
+            if isinstance(assignment.generate, bool):
+                seed = None
+            else:
+                seed = assignment.generate.get('seed', None)
+            run_tests(result / 'autograder' / master.name, debug=args.debug, seed=seed)
             print("All tests passed!")
     
     # for tests

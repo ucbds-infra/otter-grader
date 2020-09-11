@@ -115,11 +115,11 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         for t in sorted(tests_glob):
             include = True
             for tested in tested_set:
-                if tested in t:     # e.g. if 'tests/q1.py' is in /srv/repo/lab01/tests/q1.py'
+                if tested in t or t in tested:     # e.g. if 'tests/q1.py' is in /srv/repo/lab01/tests/q1.py
                     include = False
             if include:
                 extra_tests.append(TestCollection([t], OKTestFile))
         extra_results = [t.run(global_env, include_grade=False) for t in extra_tests]
         test_results += extra_results
-
+    
     return GradingResults(test_results)

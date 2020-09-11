@@ -15,23 +15,16 @@ from jinja2 import Template
 from .token import APIClient
 
 TEMPLATES_DIR = pkg_resources.resource_filename(__name__, "templates")
-SETUP_SH_PATH = os.path.join(TEMPLATES_DIR, "setup.sh")
-PYTHON_REQUIREMENTS_PATH = os.path.join(TEMPLATES_DIR, "requirements.txt")
-R_REQUIREMENTS_PATH = os.path.join(TEMPLATES_DIR, "requirements.r")
-RUN_AUTOGRADER_PATH = os.path.join(TEMPLATES_DIR, "run_autograder")
-MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-
-with open(SETUP_SH_PATH) as f:
-    SETUP_SH = Template(f.read())
-
-with open(PYTHON_REQUIREMENTS_PATH) as f:
-    PYTHON_REQUIREMENTS = Template(f.read())
-
-with open(R_REQUIREMENTS_PATH) as f:
-    R_REQUIREMENTS = Template(f.read())
-
-with open(RUN_AUTOGRADER_PATH) as f:
-    RUN_AUTOGRADER = Template(f.read())
+MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
+OTTER_ENV_NAME = "otter-gradescope-env"
+TEMPLATE_FILE_PATHS = {
+    "setup.sh": os.path.join(TEMPLATES_DIR, "setup.sh"),
+    "requirements.txt": os.path.join(TEMPLATES_DIR, "requirements.txt"),
+    "requirements.r": os.path.join(TEMPLATES_DIR, "requirements.r"),
+    "run_autograder": os.path.join(TEMPLATES_DIR, "run_autograder"),
+    "run_otter.py": os.path.join(TEMPLATES_DIR, "run_otter.py"),
+    "environment.yml":  os.path.join(TEMPLATES_DIR, "environment.yml"),
+}
 
 def main(args):
     """
@@ -53,8 +46,13 @@ def main(args):
     args.lang = args.lang.lower()
     assert args.lang.lower() in ["python", "r"], f"{args.lang} is not a supported language"
 
+    templates = {}
+    for fn, fp in TEMPLATE_FILE_PATHS.items():
+        with open(fp) as f:
+            templates[fn] = Template(f.read())
+
     # format run_autograder
-    run_autograder = RUN_AUTOGRADER.render(
+    run_otter_py = templates["run_otter.py"].render(
         threshold = str(args.threshold),
         points = str(args.points),
         show_stdout = str(args.show_stdout),
@@ -72,11 +70,20 @@ def main(args):
         autograder_dir = str(args.autograder_dir),
     )
 
+    run_autograder = templates["run_autograder"].render(
+        autograder_dir = str(args.autograder_dir),
+    )
+
     # format setup.sh
-    setup_sh = SETUP_SH.render(
+    setup_sh = templates["setup.sh"].render(
         autograder_dir = str(args.autograder_dir),
         miniconda_install_url = MINICONDA_INSTALL_URL,
         ottr_branch = "stable",
+        otter_env_name = OTTER_ENV_NAME,
+    )
+
+    environment_yml = templates["environment.yml"].render(
+        otter_env_name = OTTER_ENV_NAME,
     )
 
     # create tmp directory to zip inside
@@ -97,17 +104,18 @@ def main(args):
             f = open(os.devnull)
 
         # render the templates
-        python_requirements = PYTHON_REQUIREMENTS.render(
+        python_requirements = templates["requirements.txt"].render(
             other_requirements = f.read() if args.lang.lower() == "python" else "",
-            overwrite_requirements = False
+            overwrite_requirements = args.lang.lower() == "python" and args.overwrite_requirements
         )
 
         # reset the stream
         f.seek(0)
 
-        r_requirements = R_REQUIREMENTS.render(
+        r_requirements = templates["requirements.r"].render(
             other_requirements = f.read() if args.lang.lower() == "r" else "",
-            overwrite = args.overwrite_requirements
+            overwrite_requirements = args.lang.lower() == "python" and args.overwrite_requirements
+
         )
 
         # close the stream
@@ -130,6 +138,12 @@ def main(args):
 
         with open(os.path.join(os.getcwd(), "tmp", "run_autograder"), "w+") as f:
             f.write(run_autograder)
+
+        with open(os.path.join(os.getcwd(), "tmp", "run_otter.py"), "w+") as f:
+            f.write(run_otter_py)
+
+        with open(os.path.join(os.getcwd(), "tmp", "environment.yml"), "w+") as f:
+            f.write(environment_yml)
 
         # copy files into tmp
         if len(args.files) > 0:
@@ -157,8 +171,8 @@ def main(args):
         if os.path.exists(zip_path):
             os.remove(zip_path)
 
-        zip_cmd = ["zip", "-r", zip_path, "run_autograder", "requirements.r",
-                "setup.sh", "requirements.txt", "tests"]
+        zip_cmd = ["zip", "-r", zip_path, "run_autograder", "run_otter.py", "requirements.r",
+                "setup.sh", "requirements.txt", "environment.yml", "tests"]
         
         if r_requirements:
             zip_cmd += ["requirements.r"]

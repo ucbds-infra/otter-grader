@@ -1,4 +1,4 @@
-{% if not overwrite %}datascience
+{% if not overwrite_requirements %}datascience
 jupyter_client
 ipykernel
 matplotlib
@@ -15,6 +15,6 @@ rpy2
 jupytext
 numpy==1.16.0
 tornado==5.1.1
-otter-grader==1.0.0
+otter-grader==1.1.1
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
