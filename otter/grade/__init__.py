@@ -50,13 +50,20 @@ def main(args):
         meta_parser = None
 
     # check that reqs file is valid
-    if not os.path.isfile(args.requirements):
-        
-        # if user-specified requirements not found, fail with AssertionError
-        assert args.requirements == "requirements.txt", f"requirements file {args.requirements} does not exist"
+    requirements = args.requirements
+    if requirements is None and os.path.isfile("requirements.txt"):
+        requirements = "requirements.txt"
+    
+    if requirements:
+            assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
 
-        # else just set to None and reqs are ignored
-        args.requirements = None
+    # if not os.path.isfile(args.requirements):
+        
+    #     # if user-specified requirements not found, fail with AssertionError
+    #     assert args.requirements == "requirements.txt", f"requirements file {args.requirements} does not exist"
+
+    #     # else just set to None and reqs are ignored
+    #     args.requirements = None
 
     if verbose:
         print("Launching docker containers...")
@@ -69,7 +76,8 @@ def main(args):
         # unfiltered_pdfs=args.pdf, 
         # tag_filter=args.tag_filter,
         # html_filter=args.html_filter,
-        reqs=args.requirements,
+        # reqs=args.requirements,
+        reqs=requirements,
         num_containers=args.containers,
         image=args.image,
         scripts=args.scripts,

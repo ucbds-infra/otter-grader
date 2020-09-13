@@ -44,7 +44,7 @@ class Assignment:
         "seed_required": False,
         "service": {},
         "save_environment": False,
-        "requirements": "requirements.txt",
+        "requirements": None,
         "overwrite_requirements": False,
         "files": [],
         "variables": {},

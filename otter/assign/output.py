@@ -40,7 +40,10 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     os.makedirs(tests_dir, exist_ok=True)
 
     requirements = assignment.requirements or args.requirements
-    if os.path.isfile(requirements):
+    if requirements is None and os.path.isfile("requirements.txt"):
+        requirements = "requirements.txt"
+    if requirements:
+        assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
         shutil.copy(requirements, str(output_dir / 'requirements.txt'))
 
     transformed_nb, test_files = transform_notebook(nb, assignment, args)
