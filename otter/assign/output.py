@@ -39,7 +39,8 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     tests_dir = output_dir / 'tests'
     os.makedirs(tests_dir, exist_ok=True)
 
-    shutil.copy(assignment.requirements, str(output_dir / 'requirements.txt'))
+    if assignment.requirements:
+        shutil.copy(assignment.requirements, str(output_dir / 'requirements.txt'))
 
     transformed_nb, test_files = transform_notebook(nb, assignment, args)
 

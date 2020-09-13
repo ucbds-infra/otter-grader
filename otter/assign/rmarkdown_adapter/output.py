@@ -48,7 +48,8 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
         assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
         assignment.requirements = requirements
 
-    shutil.copy(requirements, str(output_dir / 'requirements.R'))
+    if assignment.requirements:
+        shutil.copy(requirements, str(output_dir / 'requirements.R'))
 
     transformed_rmd_string, test_files = transform_notebook(rmd_string, assignment, args)
 
