@@ -1,5 +1,9 @@
 # Changelog
 
+**v1.1.2:**
+
+* Made requirements specification always throw an error if a user-specified path is not found
+
 **v1.1.1:**
 
 * Fixed handling variable name collisions with already-tested test files
