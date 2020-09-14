@@ -57,9 +57,9 @@ def write_and_submit_pdf(client, nb_path, filtering, pagebreaks, course_id, assi
 
         print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
 
-    except:
-        print("\n\n")
-        warnings.warn("PDF generation or submission failed", RuntimeWarning)
+    except Exception as e:
+        print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
+        # warnings.warn("PDF generation or submission failed", RuntimeWarning)
 
 def run_autograder(config):
     """

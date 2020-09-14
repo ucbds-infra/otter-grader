@@ -32,7 +32,7 @@ class PDFViaHTMLExporter(BaseExporter):
     default_options = BaseExporter.default_options.copy()
     default_options.update({
         "save_html": False,
-        "template": "templates/via_html.tpl"
+        "template": "templates/html_template.html.j2"
     })
 
     @classmethod
@@ -45,7 +45,7 @@ class PDFViaHTMLExporter(BaseExporter):
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
         exporter = nbconvert.HTMLExporter()
-        exporter.template_file = pkg_resources.resource_filename(__name__, options["template"])
+        exporter.template_name = pkg_resources.resource_filename(__name__, options["template"])
 
         if options["save_html"]:
             html, _ = export(exporter, nb)
