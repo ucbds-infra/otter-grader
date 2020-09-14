@@ -13,7 +13,7 @@ docker
 # git+https://github.com/chrispyles/nbpdfexport.git
 # nb2pdf<0.6.0
 requests
-nbconvert
+nbconvert>=6.0.0
 nbformat
 dill
 pdfkit
