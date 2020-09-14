@@ -3,6 +3,7 @@
 **v1.1.2:**
 
 * Made requirements specification always throw an error if a user-specified path is not found
+* Fixed specification of HTML/LaTeX template filenames in Otter Export
 
 **v1.1.1:**
 
