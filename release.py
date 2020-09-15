@@ -26,6 +26,7 @@ def run_release_commands(test, beta, new_version, no_twine=False):
         "rm dist/* || :",
         "python3 setup.py sdist bdist_wheel",
         f"python3 -m twine upload dist/*{' --repository-url https://test.pypi.org/legacy/' if test else ''}",
+        "sleep 10", # this allows time for PyPI to update before we try to install the new version
         f"docker build . -t ucbdsinfra/otter-grader:{new_version}",
         f"docker push ucbdsinfra/otter-grader:{new_version}",
         f"docker build . -t ucbdsinfra/otter-grader{':beta' if beta else ''}",

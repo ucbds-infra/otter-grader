@@ -44,6 +44,14 @@ def main(args):
         from .rmarkdown_adapter.output import write_output_directories
     else:
         from .output import write_output_directories
+
+    # update requirements
+    requirements = args.requirements
+    if requirements is None and os.path.isfile("requirements.txt"):
+        requirements = "requirements.txt"
+    if requirements:
+        assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
+    assignment.requirements = requirements
     
     try:
         write_output_directories(master, result, assignment, args)
