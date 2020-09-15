@@ -3,7 +3,7 @@
 **v1.1.2:**
 
 * Made requirements specification always throw an error if a user-specified path is not found
-* Fixed specification of HTML/LaTeX template filenames in Otter Export
+* Pinned `nbconvert<6.0.0` as a temporary measure due to new templating issues in that release
 
 **v1.1.1:**
 
