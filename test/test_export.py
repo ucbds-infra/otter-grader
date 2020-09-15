@@ -104,7 +104,7 @@ class TestExport(TestCase):
         for s in should_contain:
             self.assertIn(s, actual_output.getvalue(), 
                 f"Empty Tex did not contain substring: {s}\n\n"
-                f"Output:\n\n{actual_output.getvalue()}")
+                "Output:\n\n{actual_output.getvalue()}")
 
     def test_no_close(self):
         """
