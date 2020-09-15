@@ -8,7 +8,7 @@ scipy
 seaborn
 sklearn
 jinja2
-nbconvert
+nbconvert<6.0.0
 nbformat
 dill
 rpy2
