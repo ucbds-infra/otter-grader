@@ -248,9 +248,10 @@ def run_generate_autograder(result, assignment, args):
     if assignment.is_r:
         generate_cmd += ["-l", "r"]
 
-    requirements = assignment.requirements or args.requirements
-    requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))
-    if os.path.isfile(requirements):
+    # requirements = assignment.requirements or args.requirements
+    # requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))
+    if assignment.requirements:
+        requirements = get_relpath(result / 'autograder', pathlib.Path(assignment.requirements))
         generate_cmd += ["-r", str(requirements)]
         if assignment.overwrite_requirements or args.overwrite_requirements:
             generate_cmd += ["--overwrite-requirements"]

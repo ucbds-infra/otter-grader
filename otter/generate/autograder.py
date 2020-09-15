@@ -97,10 +97,15 @@ def main(args):
             shutil.copy(file, os.path.join("tmp", "tests"))
 
         # open requirements if it exists
-        if os.path.isfile(args.requirements):
-            f = open(args.requirements)
+        requirements = args.requirements
+        reqs_filename = f"requirements.{'R' if args.lang.lower() == 'r' else 'txt'}"
+        if requirements is None and os.path.isfile(reqs_filename):
+            requirements = reqs_filename
+        
+        if requirements:
+            assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
+            f = open(requirements)
         else:
-            assert args.requirements == "requirements.txt", f"requirements file {args.requirements} not found"
             f = open(os.devnull)
 
         # render the templates
