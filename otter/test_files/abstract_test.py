@@ -20,7 +20,7 @@ class TestFile(ABC):
 
     html_result_fail_template = Template("""
     <p><strong style='color: red;'>{{ name }}</strong></p>
-    <p><strong>Test code:</strong><pre>{{test_code}}</pre></p>
+    <!-- <p><strong>Test code:</strong><pre>{{test_code}}</pre></p> -->
     <p><strong>Test result:</strong><pre>{{test_result}}</pre></p>
     """)
 
@@ -51,7 +51,7 @@ class TestFile(ABC):
             )
 
     # @abstractmethod
-    def __init__(self, name, tests, hiddens, value=1, hidden=True):
+    def __init__(self, name, tests, hiddens, value=1, hidden=True, all_or_nothing=True):
         self.name = name
         self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
         self.hidden_tests = [t for t, h in zip(tests, hiddens) if h]
@@ -61,6 +61,7 @@ class TestFile(ABC):
         self.failed_test = None
         self.failed_test_hidden = None
         self.result = None
+        self.all_or_nothing = all_or_nothing
 
     @classmethod
     @abstractmethod
@@ -93,9 +94,9 @@ class TestCollection:
         total = 0
         for t in self.tests:
             total += t.value
-            passed, test_obj = t.run(global_environment)
+            passed, score, test_obj = t.run(global_environment)
+            grade += t.value * score
             if passed:
-                grade += t.value
                 passed_tests.append(t)
             else:
                 failed_tests.append((t, test_obj))

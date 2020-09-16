@@ -71,6 +71,8 @@ class OKTestFile(TestFile):
         hiddens (``list`` of ``bool``): visibility of each tests in ``tests``
         value (``int``, optional): point value of this test, defaults to 1
         hidden (``bool``, optional): wheter this test is hidden
+        all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
+            cases
     """
 
     def run(self, global_environment):
@@ -80,19 +82,29 @@ class OKTestFile(TestFile):
             ``global_environment`` (``dict``): result of executing a Python notebook/script
         
         Returns:
-            ``tuple`` of (``bool``, ``otter.ok_parser.OKTest``): whether the test passed and a pointer 
-                to the current ``otter.ok_parser.OKTest`` object
+            ``tuple`` of (``bool``, ``float`` ``otter.ok_parser.OKTest``): whether the test passed,
+                the percentage score on this test, and a pointer to the current ``otter.ok_parser.OKTest`` object
         """
+        n_passed, passed_all, result_string = 0, True, ""
         for i, t in enumerate(self.public_tests + self.hidden_tests):
             passed, result = run_doctest(self.name + ' ' + str(i), t, global_environment)
             if not passed:
-                self.passed = False
+                passed_all = False
                 self.failed_test = t
                 self.failed_test_hidden = i >= len(self.public_tests)
-                self.result = result
-                return False, self
-        self.passed = True
-        return True, self
+                result_string += result + "\n"
+                # return False, self
+            else:
+                n_passed += 1
+        self.passed = passed_all
+        self.result = result_string
+
+        if self.all_or_nothing and not self.passed:
+            return False, 0, self
+        elif not self.all_or_nothing and not self.passed:
+            return False, n_passed / len(self.public_tests + self.hidden_tests), self
+        else:
+            return True, 1, self
 
     @classmethod
     def from_file(cls, path):
@@ -146,4 +158,7 @@ class OKTestFile(TestFile):
         # convert path into PurePosixPath for test name
         name = str(pathlib.Path(path).as_posix())
 
-        return cls(name, tests, hiddens, test_spec.get('points', 1), test_spec.get('hidden', True))
+        # grab whether the tests are all-or-nothing
+        all_or_nothing = test_spec.get('all_or_nothing', True)
+
+        return cls(name, tests, hiddens, test_spec.get('points', 1), test_spec.get('hidden', True), all_or_nothing)
