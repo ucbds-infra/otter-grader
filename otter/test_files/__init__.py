@@ -61,7 +61,7 @@ class GradingResults:
                 )
                 self.results[name] = tr
 
-                total_score += pts_per_case * test_case_result.passed,
+                total_score += pts_per_case * test_case_result.passed
                 points_possible += pts_per_case
 
             # for test, test_obj in result.failed_tests:
