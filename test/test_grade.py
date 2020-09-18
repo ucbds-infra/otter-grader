@@ -188,6 +188,11 @@ class TestGrade(TestCase):
         df_test = df_test.sort_values("file").reset_index(drop=True)
         df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
 
+        # add score sum cols for tests
+        for test in self.test_points:
+            test_cols = [l for l in df_test.columns if bool(re.search(fr"\b{test}\b", l))]
+            df_test[test] = df_test[test_cols].sum(axis=1)
+
         # check point values
         for _, row in df_test.iterrows():
             for test in self.test_points:
@@ -263,6 +268,11 @@ class TestGrade(TestCase):
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv").sort_values("identifier").reset_index(drop=True)
         df_test["failures"] = df_test["identifier"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
+
+        # add score sum cols for tests
+        for test in self.test_points:
+            test_cols = [l for l in df_test.columns if bool(re.search(fr"\b{test}\b", l))]
+            df_test[test] = df_test[test_cols].sum(axis=1)
 
         # check point values
         for _, row in df_test.iterrows():
