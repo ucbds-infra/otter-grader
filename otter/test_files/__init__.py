@@ -7,7 +7,7 @@ import pprint
 
 from collections import namedtuple
 
-from .abstract_test import TestCollection
+# from .abstract_test import TestCollection
 from .ok_test import OKTestFile
 
 from ..check.logs import QuestionNotInLogException

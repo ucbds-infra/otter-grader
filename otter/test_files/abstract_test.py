@@ -3,8 +3,6 @@ Abstract base classes for working with test files and classes to represent colle
 their results
 """
 
-import Crypto.Math._modexp
-
 from abc import ABC, abstractmethod
 from collections import namedtuple
 from textwrap import dedent
@@ -51,9 +49,8 @@ class TestFile(ABC):
     """)
 
     plain_result_fail_template = Template(dedent("""\
-       {{ name }}
-
-    Test results:{% for test_case_result in test_case_results %}{% if not test_case_result.test_case.hidden and not test_case_result.passed %}
+    {{ name }} results:
+    {% for test_case_result in test_case_results %}{% if not test_case_result.passed %}
     {{ test_case_result.message }}{% endif %}{% endfor %}"""))
 
     def _repr_html_(self):

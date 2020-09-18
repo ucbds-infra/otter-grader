@@ -102,9 +102,9 @@ class OKTestFile(TestFile):
         self.passed_all = passed_all
         self.test_case_results = test_case_results
 
-        if self.all_or_nothing and not self.passed:
+        if self.all_or_nothing and not self.passed_all:
             self.grade = 0
-        elif not self.all_or_nothing and not self.passed:
+        elif not self.all_or_nothing and not self.passed_all:
             self.grade = n_passed / len(self.test_case_results)
         else:
             self.grade = 1
