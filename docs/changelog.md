@@ -1,5 +1,9 @@
 # Changelog
 
+**v1.2.0:**
+
+* Changed granularity of results to be test case-by-test case rather than by file
+
 **v1.1.2:**
 
 * Made requirements specification always throw an error if a user-specified path is not found
