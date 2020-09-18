@@ -42,13 +42,13 @@ class TestsDisplay:
     def __repr__(self):
         ret = ""
         for name, result in zip(self.test_names, self.results):
-            ret += f"{name}:\n{repr(result)}\n\n"
+            ret += f"{repr(result)}\n\n"
         return ret
 
     def _repr_html_(self):
         ret = ""
         for name, result in zip(self.test_names, self.results):
-            ret += f"<p><strong>{name}:</strong></p>\n{result._repr_html_()}\n\n"
+            ret += f"{result._repr_html_()}\n\n"
         return ret
 
 class Notebook:

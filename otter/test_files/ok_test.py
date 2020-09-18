@@ -11,7 +11,7 @@ import pathlib
 from contextlib import redirect_stderr, redirect_stdout
 from textwrap import dedent
 
-from .abstract_test import TestFile
+from .abstract_test import TestFile, TestCase, TestCaseResult
 from ..utils import hide_outputs
 
 def run_doctest(name, doctest_string, global_environment):
@@ -66,11 +66,10 @@ class OKTestFile(TestFile):
     The last 2 attributes (``passed``, ``failed_test``) are set after calling ``run()``.
 
     Args:
+        path (``str``): path of the test
         name (``str``): name of test
-        tests (``list`` of ``str``): ;ist of docstring tests to be run
-        hiddens (``list`` of ``bool``): visibility of each tests in ``tests``
+        test_cases (``list`` of ``TestCase``): list of docstring tests to be run
         value (``int``, optional): point value of this test, defaults to 1
-        hidden (``bool``, optional): wheter this test is hidden
         all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
             cases
     """
@@ -85,26 +84,30 @@ class OKTestFile(TestFile):
             ``tuple`` of (``bool``, ``float`` ``otter.ok_parser.OKTest``): whether the test passed,
                 the percentage score on this test, and a pointer to the current ``otter.ok_parser.OKTest`` object
         """
-        n_passed, passed_all, result_string = 0, True, ""
-        for i, t in enumerate(self.public_tests + self.hidden_tests):
-            passed, result = run_doctest(self.name + ' ' + str(i), t, global_environment)
+        n_passed, passed_all, test_case_results = 0, True, []
+        for i, test_case in enumerate(self.test_cases):
+            passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
             if not passed:
                 passed_all = False
-                self.failed_test = t
-                self.failed_test_hidden = i >= len(self.public_tests)
-                result_string += result + "\n"
-                # return False, self
             else:
                 n_passed += 1
-        self.passed = passed_all
-        self.result = result_string
+                result = 'Test case passed!'
+
+            test_case_results.append(TestCaseResult(
+                test_case = test_case,
+                message = result,
+                passed = passed
+            ))
+
+        self.passed_all = passed_all
+        self.test_case_results = test_case_results
 
         if self.all_or_nothing and not self.passed:
-            return False, 0, self
+            self.grade = 0
         elif not self.all_or_nothing and not self.passed:
-            return False, n_passed / len(self.public_tests + self.hidden_tests), self
+            self.grade = n_passed / len(self.test_case_results)
         else:
-            return True, 1, self
+            self.grade = 1
 
     @classmethod
     def from_file(cls, path):
@@ -148,17 +151,22 @@ class OKTestFile(TestFile):
                 FutureWarning
             )
 
-        tests = []
-        hiddens = []
+        test_cases = []
+        # hiddens = []
 
-        for _, test_case in enumerate(test_spec['suites'][0]['cases']):
-            tests.append(dedent(test_case['code']))
-            hiddens.append(test_case.get('hidden', True))
+        for i, test_case in enumerate(test_spec['suites'][0]['cases']):
+            test_cases.append(TestCase(
+                name = test_case.get('name', f"{test_spec['name']} - {i + 1}"),
+                body = dedent(test_case['code']), 
+                hidden = test_case.get('hidden', True)
+            ))
+            # tests.append(dedent(test_case['code']))
+            # hiddens.append(test_case.get('hidden', True))
 
         # convert path into PurePosixPath for test name
-        name = str(pathlib.Path(path).as_posix())
+        path = str(pathlib.Path(path).as_posix())
 
         # grab whether the tests are all-or-nothing
         all_or_nothing = test_spec.get('all_or_nothing', True)
 
-        return cls(name, tests, hiddens, test_spec.get('points', 1), test_spec.get('hidden', True), all_or_nothing)
+        return cls(test_spec['name'], path, test_cases, test_spec.get('points', 1), all_or_nothing)
