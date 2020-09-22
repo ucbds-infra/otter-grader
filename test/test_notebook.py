@@ -7,8 +7,8 @@ import sys
 import os
 import shutil
 import subprocess
-import responses
-
+from unittest.mock import patch
+from unittest import mock
 
 from subprocess import PIPE
 from glob import glob
@@ -108,6 +108,30 @@ class TestNotebook(TestCase):
         for result in output_lst:
             self.assertTrue(output.count(result) == 1)
 
+    def test_check_all_save_environment(self):
+        """
+        Checks for correctness of check_all method when
+        we want to save/serialize the environment.
+        This happens when a .otter file exists in the working
+        directory with a "save_environment" parameter set to true
+        """
+        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader._SHELVE = True
+
+        output = str(grader.check_all())
+
+        # checks each question substring
+        output_lst = [
+            'q1:\n\n    All tests passed!\n',
+            'q2:\n\n    \n    0 of 1 tests passed\n',
+            'q3:\n\n    All tests passed!\n',
+            'q4:\n\n    All tests passed!\n',
+            'q5:\n\n    All tests passed!\n'
+        ]
+
+        for result in output_lst:
+            self.assertTrue(output.count(result) == 1)
+
     def test_to_pdf_with_nb_path(self):
         """
         Checks for existence of notebook PDF
@@ -120,14 +144,13 @@ class TestNotebook(TestCase):
         # cleanup
         os.remove(TEST_FILES_PATH + "test-nb.pdf")
 
-    def test_to_pdf_without_nb_path_case1_pass(self):
+    @mock.patch('builtins.input', return_value='fakekey')
+    def test_to_pdf_without_nb_path_case1_pass(self, key):
         """
         Checks for the existence of notebook PDF
         This test is for the case where notebook path is not defined,
-        but there exists a .otter file specifing the IPYNB notebook name
+        but there exists a .otter file specifying the IPYNB notebook name
         """
-        responses.add(responses.GET, 'http://some.url/auth/google',
-                      json={'Key': '1234125'}, status=404)
         grader = Notebook(TEST_FILES_PATH + "tests")
         grader.to_pdf(nb_path = None, filtering=False)
         self.assertTrue(os.path.exists("test-nb.pdf"))
@@ -166,9 +189,30 @@ class TestNotebook(TestCase):
         self.assertRaises(ValueError,
                           lambda: grader.to_pdf(nb_path=None, filtering=False))
 
+    @mock.patch('builtins.input', return_value='fakekey')
+    def test_export_without_nb_path_case1_pass(self, key):
+        """
+        Checks for correct scenario for export method
+        This test is for when nb_path is set to None and
+        there is a .otter file specifying the IPYNB notebook name
+        """
+        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader.export(nb_path=None, filtering=False)
+        self.assertTrue(os.path.exists("test-nb.pdf"))
+        with self.unzip_to_temp("test-nb.zip") as unzipped_dir:
+            # breakpoint()
+            self.assertDirsEqual(
+                unzipped_dir,
+                TEST_FILES_PATH + "export-correct/test/test-notebook",
+                ignore_ext=[".pdf", ""]  # second ignores .OTTER_LOG files
+            )
+        # cleanup
+        os.remove("test-nb.pdf")
+        os.remove("test-nb.zip")
+
     def test_export_without_nb_path_case2_pass(self):
         """
-        Checks for correct error scenario for export method
+        Checks for correct scenario for export method
         This test is for when nb_path is set to None and
         there is only 1 IPYNB notebook in working directory
         """
