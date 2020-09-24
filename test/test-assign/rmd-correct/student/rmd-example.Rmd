@@ -19,7 +19,7 @@ library(ggplot2)
 **Question 1.** Assign x to the smallest prime number.
 
 ```{r}
-x <- ...
+x <- NULL # YOUR CODE HERE
 ```
 
 ```{r}
@@ -42,11 +42,11 @@ y = 3
 
 ```{r}
 square = function(x) {
-    y = ...
-    ...
+    y = NULL # YOUR CODE HERE
+    # YOUR CODE HERE
 }
 
-nine = ...
+nine = NULL # YOUR CODE HERE
 ```
 
 ```{r}
@@ -68,7 +68,7 @@ _Type your answer here, replacing this text._
 ```{r}
 pi = 3.14
 if (TRUE) {
-    ...
+    # YOUR CODE HERE
     print(paste0('A circle with radius', radius, 'has area', area))
 }
 
@@ -94,7 +94,7 @@ _Type your answer here, replacing this text._
 **Question 8:** Test intercell seeding by generating 10 random $N(4,2)$ numbers.
 
 ```{r}
-z = ...
+z = NULL # YOUR CODE HERE
 z
 ```
 
