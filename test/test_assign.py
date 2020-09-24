@@ -145,8 +145,8 @@ class TestAssign(TestCase):
             TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "rmd-autograder-correct",
         )
 
-    # def tearDown(self):
-    #     # cleanup
-    #     if os.path.exists(TEST_FILES_PATH + "output"):
-    #         shutil.rmtree(TEST_FILES_PATH + "output")
+    def tearDown(self):
+        # cleanup
+        if os.path.exists(TEST_FILES_PATH + "output"):
+            shutil.rmtree(TEST_FILES_PATH + "output")
         
