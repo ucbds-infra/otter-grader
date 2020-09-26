@@ -11,6 +11,8 @@ from ..abstract_plugin import AbstractOtterPlugin
 
 
 class GoogleSheetsGradeOverride(AbstractOtterPlugin):
+    """
+    """
 
     PLUGIN_CONFIG_KEY = "google_sheets_grade_override"
 
