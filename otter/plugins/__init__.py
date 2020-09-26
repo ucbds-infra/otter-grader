@@ -19,6 +19,7 @@ class PluginCollection:
 
     def _load_plugins(self, submission_metadata, plugin_config):
         plugins = []
+        # TODO: logging to stdout
         for plg in self._plugin_names:
             module, class_ = ".".join(plg.split(".")[:-1]), plg.split(".")[-1]
             module = importlib.import_module(module)

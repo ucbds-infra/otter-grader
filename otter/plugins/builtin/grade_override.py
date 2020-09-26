@@ -1,3 +1,7 @@
+"""
+Plugin for using Google Sheets to override scores for test cases
+"""
+
 import json
 import tempfile
 import gspread
@@ -14,6 +18,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         oauth_json = self.plugin_config["service_account_credentials"]
         with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as ntf:
             json.dump(oauth_json, ntf)
+            ntf.seek(0)
 
             gc = gspread.service_account(filename=ntf.name)
         
@@ -33,9 +38,9 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     def after_grading(self, results):
         df = self._load_df()
         df = df[
-            df["Email"].isin([user["email"] for user in self.submission_metadata["users"] & \
-            df["Assignment ID"] == self.submission_metadata["assignment"]["id"]
-        ])]
+            df["Email"].isin([user["email"] for user in self.submission_metadata["users"]]) & \
+            (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
+        ]
         for _, row in df.iterrows():
             results.update_result(row["Test Case"], score=row["Points"])
 
