@@ -5,8 +5,8 @@ Default configurations for Gradescope autograding
 DEFAULT_OPTIONS = {
     "score_threshold": None,
     "points_possible": None,
-    "show_stdout_on_release": False,
-    "show_hidden_tests_on_release": False,
+    "show_stdout": False,
+    "show_hidden": False,
     "seed": None,
     "grade_from_log": False,
     "serialized_variables": {},

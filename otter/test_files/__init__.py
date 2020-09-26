@@ -224,7 +224,7 @@ class GradingResults:
         output = {"tests": []}
 
         # hidden visibility determined by show_hidden_tests_on_release
-        hidden_test_visibility = ("hidden", "after_published")[options["show_hidden_tests_on_release"]]
+        hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
         # no_separate_visibility = options["test_visibility"]
         # assert no_separate_visibility in ["hidden", "visible", "after_published"]
 
@@ -277,7 +277,7 @@ class GradingResults:
             #         "output": repr(result.test) if not hidden and incorrect else "All tests passed!"
             #     })
         
-        if options["show_stdout_on_release"]:
+        if options["show_stdout"]:
             output["stdout_visibility"] = "after_published"
 
         if options["points_possible"] is not None:
