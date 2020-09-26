@@ -110,11 +110,12 @@ if __name__ == "__main__":
     with open("otter/version.py") as f:
         contents = f.read()
 
-    contents = re.sub(
-        r"__version__\s*=\s*['\"]\d+\.\d+\.\d+(?:\.\w+)?['\"]",
-        f"__version__ = \"{new_version_number}\"",
-        contents
-    )
+    if args.new_version is not None:
+        contents = re.sub(
+            r"__version__\s*=\s*['\"]\d+\.\d+\.\d+(?:\.\w+)?['\"]",
+            f"__version__ = \"{new_version_number}\"",
+            contents
+        )
 
     with open("otter/version.py", "w") as f:
         f.write(contents)
