@@ -27,7 +27,7 @@ class PluginCollection:
             # get the config key for the plugin
             plugin_cfg = plugin_config.get(class_.PLUGIN_CONFIG_KEY, {})
             plugin = class_(submission_metadata, plugin_cfg)
-            plugins.append()
+            plugins.append(plugin)
 
         self._plugins = plugins
 
@@ -37,6 +37,6 @@ class PluginCollection:
         for plugin in self._plugins:
             try:
                 if hasattr(plugin, event):
-                    getattr(plugin, event)(plugin, *args, **kwargs)
+                    getattr(plugin, event)(*args, **kwargs)
             except PluginEventNotSupportedException:
                 pass

@@ -2,4 +2,4 @@
 Builtin Otter plugins
 """
 
-from .grade_override import GoogleSheetGradeOverridePlugin
+from .grade_override import GoogleSheetsGradeOverride

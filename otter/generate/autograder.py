@@ -32,21 +32,21 @@ def main(args):
     """
     Runs ``otter generate autograder``
     """
-    assert args.threshold is None or 0 <= args.threshold <= 1, "{} is not a valid threshold".format(
-        args.threshold
-    )
+    # assert args.threshold is None or 0 <= args.threshold <= 1, "{} is not a valid threshold".format(
+    #     args.threshold
+    # )
 
-    if args.course_id or args.assignment_id:
-        assert args.course_id and args.assignment_id, "Either course ID or assignment ID unspecified for PDF submissions"
-        if not args.token:
-            args.token = APIClient.get_token()
+    # if args.course_id or args.assignment_id:
+    #     assert args.course_id and args.assignment_id, "Either course ID or assignment ID unspecified for PDF submissions"
+    #     if not args.token:
+    #         args.token = APIClient.get_token()
 
-    # check that args.public_multiplier is valid
-    assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
+    # # check that args.public_multiplier is valid
+    # assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
 
-    # check for valid language
-    args.lang = args.lang.lower()
-    assert args.lang.lower() in ["python", "r"], f"{args.lang} is not a supported language"
+    # # check for valid language
+    # args.lang = args.lang.lower()
+    # assert args.lang.lower() in ["python", "r"], f"{args.lang} is not a supported language"
 
     templates = {}
     for fn, fp in TEMPLATE_FILE_PATHS.items():
@@ -168,7 +168,7 @@ def main(args):
             f.write(environment_yml)
 
         with open(os.path.join(os.getcwd(), "tmp", "otter_config.json"), "w+") as f:
-            json.dump(otter_config_json)
+            json.dump(otter_config_json, f, indent=2)
 
         # copy files into tmp
         if len(args.files) > 0:
@@ -197,7 +197,7 @@ def main(args):
             os.remove(zip_path)
 
         zip_cmd = ["zip", "-r", zip_path, "run_autograder", "run_otter.py", "requirements.r",
-                "setup.sh", "requirements.txt", "environment.yml", "tests", "otter_config_json"]
+                "setup.sh", "requirements.txt", "environment.yml", "tests", "otter_config.json"]
         
         if r_requirements:
             zip_cmd += ["requirements.r"]

@@ -6,9 +6,9 @@ import pandas as pd
 from ..abstract_plugin import AbstractOtterPlugin
 
 
-class GoogleSheetGradeOverridePlugin(AbstractOtterPlugin):
+class GoogleSheetsGradeOverride(AbstractOtterPlugin):
 
-    PLUGIN_CONFIG_KEY = "regrade_google_sheets"
+    PLUGIN_CONFIG_KEY = "google_sheets_grade_override"
 
     def _load_df(self):
         oauth_json = self.plugin_config["service_account_credentials"]

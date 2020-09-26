@@ -97,7 +97,7 @@ def get_parser():
     generate_autograder_parser.add_argument("-c", "--config", nargs='?', default=None, help="Path to otter configuration file; ./otter_config.json automatically checked")
     generate_autograder_parser.add_argument("-r", "--requirements", nargs='?', default=None, help="Path to requirements.txt file; ./requirements.txt automatically checked")
     generate_autograder_parser.add_argument("--overwrite-requirements", default=False, action="store_true", help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
-    # generate_autograder_parser.add_argument("-l", "--lang", default="python", type=str, help="Assignment programming language; defaults to Python")
+    generate_autograder_parser.add_argument("-l", "--lang", default="python", type=str, help="Assignment programming language; defaults to Python")
     # generate_autograder_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold")
     # generate_autograder_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points")
     # generate_autograder_parser.add_argument("--show-stdout", action="store_true", default=False, help="Show autograder test results (P/F only, no hints) after publishing grades (incl. hidden tests)")
@@ -111,7 +111,7 @@ def get_parser():
     # generate_autograder_parser.add_argument("--grade-from-log", default=False, action="store_true", help="Whether to grade assignments based on the logged environments")
     # generate_autograder_parser.add_argument("--serialized-variables", default="{}", help="String representation of Python dict mapping variable names to full types for verification when deserializing log")
     # generate_autograder_parser.add_argument("--public-multiplier", nargs="?", default=0, type=float, help="Percentage of points to award for passing all public tests")
-    # generate_autograder_parser.add_argument("--autograder-dir", nargs="?", default="/autograder", help="Root autograding directory inside grading container")
+    generate_autograder_parser.add_argument("--autograder-dir", nargs="?", default="/autograder", help="Root autograding directory inside grading container")
     generate_autograder_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
     generate_autograder_parser.set_defaults(func_str="generate.autograder.main")
