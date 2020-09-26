@@ -116,6 +116,11 @@ class GradingResults:
         result = self.results[test_name]
         return result.score
 
+    def update_result(self, test_name, **kwargs):
+        """
+        """
+        self.results[test_name] = self.results[test_name]._replace(**kwargs)
+
     # def get_public_score(self, test_name):
     #     """
     #     Returns the score of a question based on only public tests. Assumes that all public tests in

@@ -49,7 +49,7 @@ def check(test_file_path, global_env=None):
     return test
 
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    cwd=None, test_dir=None, seed=None, log=None, variables=None):
+    cwd=None, test_dir=None, seed=None, log=None, variables=None, plugin_collection=None):
     """
     Grade a notebook file & return grade information
 
@@ -107,6 +107,9 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     else:
         global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, seed=seed)
 
+    if plugin_collection is not None:
+        plugin_collection.run("after_execution", global_env)
+
     tests_run = global_env[results_array]
 
     # Check for tests which were not included in the notebook and specified by tests_globs
@@ -125,5 +128,10 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 extra_tests[-1].run(global_env)
         # extra_results = [t.run(global_env, include_grade=False) for t in extra_tests]
         tests_run += extra_tests
+
+    results = GradingResults(tests_run)
+
+    if plugin_collection is not None:
+        plugin_collection.run("after_grading", results)
     
-    return GradingResults(tests_run)
+    return results

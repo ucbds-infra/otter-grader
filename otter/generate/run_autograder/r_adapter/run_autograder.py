@@ -12,11 +12,11 @@ from rpy2.robjects import r
 
 from ...constants import DEFAULT_OPTIONS
 
-def run_autograder(config):
+def run_autograder(options):
     """
     """
-    options = DEFAULT_OPTIONS.copy()
-    options.update(config)
+    # options = DEFAULT_OPTIONS.copy()
+    # options.update(config)
 
     abs_ag_path = os.path.abspath(options["autograder_dir"])
     os.chdir(abs_ag_path)

@@ -22,4 +22,6 @@ DEFAULT_OPTIONS = {
     "miniconda_path": '/root/miniconda3',
     "test_visibility": 'hidden',
     "separate_tests": True,
+    "plugins": [],
+    "plugin_config": {},
 }

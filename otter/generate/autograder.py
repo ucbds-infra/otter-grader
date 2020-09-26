@@ -3,6 +3,7 @@ Gradescope autograder configuration generator for Otter Generate
 """
 
 import os
+import json
 import shutil
 import subprocess
 import pathlib
@@ -13,6 +14,7 @@ from subprocess import PIPE
 from jinja2 import Template
 
 from .token import APIClient
+from ..plugins import PluginCollection
 
 TEMPLATES_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
@@ -53,20 +55,20 @@ def main(args):
 
     # format run_autograder
     run_otter_py = templates["run_otter.py"].render(
-        threshold = str(args.threshold),
-        points = str(args.points),
-        show_stdout = str(args.show_stdout),
-        show_hidden = str(args.show_hidden),
-        seed = str(args.seed),
-        token = str(args.token),
-        course_id = str(args.course_id),
-        assignment_id = str(args.assignment_id),
-        filtering = str(not args.unfiltered_pdfs),
-        pagebreaks = str(not args.no_pagebreaks),
-        grade_from_log = str(args.grade_from_log),
-        serialized_variables = str(args.serialized_variables),
-        public_multiplier = str(args.public_multiplier),
-        lang = str(args.lang.lower()),
+        # threshold = str(args.threshold),
+        # points = str(args.points),
+        # show_stdout = str(args.show_stdout),
+        # show_hidden = str(args.show_hidden),
+        # seed = str(args.seed),
+        # token = str(args.token),
+        # course_id = str(args.course_id),
+        # assignment_id = str(args.assignment_id),
+        # filtering = str(not args.unfiltered_pdfs),
+        # pagebreaks = str(not args.no_pagebreaks),
+        # grade_from_log = str(args.grade_from_log),
+        # serialized_variables = str(args.serialized_variables),
+        # public_multiplier = str(args.public_multiplier),
+        # lang = str(args.lang.lower()),
         autograder_dir = str(args.autograder_dir),
     )
 
@@ -85,6 +87,21 @@ def main(args):
     environment_yml = templates["environment.yml"].render(
         otter_env_name = OTTER_ENV_NAME,
     )
+
+    # read in otter_config.json
+    if args.config is None and os.path.isfile("otter_config.json"):
+        args.config = "otter_config.json"
+
+    assert args.config is None or os.path.isfile(args.config), f"Could not find otter configuration file {args.config}"
+
+    if args.config:
+        with open(args.config) as f:
+            otter_config_json = json.load(f)
+    else:
+        otter_config_json = {}
+
+    plugins = PluginCollection(otter_config_json.get("plugins", []), {}, otter_config_json.get("plugin_config", {}))
+    plugins.run("during_generate", otter_config_json)
 
     # create tmp directory to zip inside
     os.mkdir("./tmp")
@@ -150,6 +167,9 @@ def main(args):
         with open(os.path.join(os.getcwd(), "tmp", "environment.yml"), "w+") as f:
             f.write(environment_yml)
 
+        with open(os.path.join(os.getcwd(), "tmp", "otter_config.json"), "w+") as f:
+            json.dump(otter_config_json)
+
         # copy files into tmp
         if len(args.files) > 0:
             os.mkdir(os.path.join("tmp", "files"))
@@ -177,7 +197,7 @@ def main(args):
             os.remove(zip_path)
 
         zip_cmd = ["zip", "-r", zip_path, "run_autograder", "run_otter.py", "requirements.r",
-                "setup.sh", "requirements.txt", "environment.yml", "tests"]
+                "setup.sh", "requirements.txt", "environment.yml", "tests", "otter_config_json"]
         
         if r_requirements:
             zip_cmd += ["requirements.r"]
