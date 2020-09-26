@@ -271,8 +271,9 @@ def run_generate_autograder(result, assignment, args):
         # generate_cmd += ["--serialized-variables", str(assignment.variables)]
         generate_args['serialized_variables'] = str(assignment.variables)
 
-    with open("otter_config.json", "w+") as f:
-        json.dump(generate_args, f)
+    if generate_args:
+        with open("otter_config.json", "w+") as f:
+            json.dump(generate_args, f, indent=2)
     
     # TODO: change this to import and direct call
     parser = get_parser()
