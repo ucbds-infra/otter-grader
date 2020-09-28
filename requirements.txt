@@ -20,7 +20,7 @@ pdfkit
 PyPDF2
 
 # plugins
-gpspread
+gspread
 
 # ottr requirements
 rpy2
