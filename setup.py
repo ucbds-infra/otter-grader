@@ -26,7 +26,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
 	],
 	install_requires=[
-		"pyyaml", "nbformat", "ipython", "nbconvert", "tqdm", "setuptools", "pandas", "tornado",
+		"pyyaml", "nbformat", "ipython", "nbconvert<6.0.0", "tqdm", "setuptools", "pandas", "tornado",
 		"docker", "jinja2", "dill", "pdfkit", "PyPDF2"
 	],
 	scripts=["bin/otter"],
