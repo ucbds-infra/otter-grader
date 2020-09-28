@@ -82,12 +82,16 @@ def run_autograder(options):
     # load plugins
     plugins = options["plugins"]
 
-    with open("./submission_metadata.json") as f:
-        submission_metadata = json.load(f)
+    if plugins:
+        with open("./submission_metadata.json") as f:
+            submission_metadata = json.load(f)
 
-    plugin_config = options["plugin_config"]
+        plugin_config = options["plugin_config"]
+        
+        plugin_collection = PluginCollection(plugins, submission_metadata, plugin_config)
     
-    plugin_collection = PluginCollection(plugins, submission_metadata, plugin_config)
+    else:
+        plugin_collection = None
 
     if options["token"] is not None:
         client = APIClient(token=options["token"])

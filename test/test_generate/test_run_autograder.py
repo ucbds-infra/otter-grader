@@ -174,7 +174,6 @@ class TestRunAutograder(TestCase):
         self.deletePaths([
             TEST_FILES_PATH + "autograder/results/results.json",
             TEST_FILES_PATH + "autograder/__init__.py",
-            TEST_FILES_PATH + "autograder/",
             TEST_FILES_PATH + "autograder/submission/test",
             TEST_FILES_PATH + "autograder/submission/tests",
             TEST_FILES_PATH + "autograder/submission/__init__.py",
