@@ -42,7 +42,13 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
     os.makedirs(tests_dir, exist_ok=True)
 
     requirements = assignment.requirements or args.requirements
-    if os.path.isfile(requirements):
+    if requirements is None and os.path.isfile("requirements.R"):
+        requirements = "requirements.R"
+    if requirements:
+        assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
+        assignment.requirements = requirements
+
+    if assignment.requirements:
         shutil.copy(requirements, str(output_dir / 'requirements.R'))
 
     transformed_rmd_string, test_files = transform_notebook(rmd_string, assignment, args)
@@ -91,8 +97,7 @@ def write_student_dir(rmd_name, autograder_dir, student_dir, assignment, args):
     shutil.copytree(autograder_dir, student_dir)
 
     # remove requirements from student dir if present
-    requirements = assignment.requirements or args.requirements
-    requirements = str(student_dir / os.path.split(requirements)[1])
+    requirements = str(student_dir / 'requirements.R')
     if os.path.isfile(requirements):
         os.remove(requirements)
 

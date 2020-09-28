@@ -63,11 +63,9 @@ def mock_auth_get():
             self.status_code = status_code
 
         def content(self):
-            print('hssdhfs')
             return self
 
         def decode(self, type):
-            print('aaaawe')
             return "fakekey"
 
     str = "fakekey"
@@ -702,6 +700,7 @@ class TestNotebook(TestCase):
                 unzipped_dir,
                 TEST_FILES_PATH + "export-correct",
                 ignore_ext=[".pdf", ""] # second ignores .OTTER_LOG files
+
             )
 
         # cleanup

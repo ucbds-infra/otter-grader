@@ -1,5 +1,10 @@
 # Changelog
 
+**v1.1.2:**
+
+* Made requirements specification always throw an error if a user-specified path is not found
+* Pinned `nbconvert<6.0.0` as a temporary measure due to new templating issues in that release
+
 **v1.1.1:**
 
 * Fixed handling variable name collisions with already-tested test files
