@@ -8,13 +8,13 @@ scipy
 seaborn
 sklearn
 jinja2
-nbconvert
+nbconvert<6.0.0
 nbformat
 dill
 rpy2
 jupytext
 numpy==1.16.0
 tornado==5.1.1
-otter-grader==1.1.1
+otter-grader==1.1.2
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
