@@ -12,6 +12,12 @@ from ..abstract_plugin import AbstractOtterPlugin
 
 class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     """
+    Otter plugin for overriding test case scores with values in a Google Sheet on Gradescope. Uses 
+    provided Google Service Account credentials to pull in the spreadsheet as a dataframe and edits
+    test case scores by matching on the Gradescope assignment ID, student email, and test case name.
+
+    Implements the ``during_generate`` and ``after_grading`` events. For plugin configurations, use
+    key ``google_sheets_grade_override``.
     """
 
     PLUGIN_CONFIG_KEY = "google_sheets_grade_override"
