@@ -14,6 +14,7 @@ import datetime as dt
 
 from getpass import getpass
 from glob import glob
+from urllib.parse import urljoin
 from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 
@@ -97,9 +98,9 @@ class Notebook:
                     if "auth" not in self._config:
                         self._config["auth"] = "google"
 
-                    self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
-                    self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
-                    self._submit_url = os.path.join(self._config["endpoint"], "submit")
+                    self._google_auth_url = urljoin(self._config["endpoint"], "auth/google")
+                    self._default_auth_url = urljoin(self._config["endpoint"], "auth")
+                    self._submit_url = urljoin(self._config["endpoint"], "submit")
 
                     self._auth()
 

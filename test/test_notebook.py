@@ -9,15 +9,12 @@ import shutil
 import subprocess
 import json
 import requests
+import nbformat
 
-
-from subprocess import PIPE
 from glob import glob
+from subprocess import PIPE
 from unittest.mock import patch
 from unittest import mock
-
-import notebook
-import nbformat
 
 from otter import Notebook
 from otter.check.logs import LogEntry, EventType, Log
@@ -33,7 +30,6 @@ TEST_FILES_PATH = "test/test-notebook/"
 def square(x):
     return x ** 2
 
-
 def negate(x):
     return not x
 
@@ -43,10 +39,8 @@ def mocked_requests_get(*args, **kwargs):
             self.text = json_data
             self.status_code = status_code
 
-
         def json(self):
             return self.json_data
-
 
     if args[0] == "http://some.url/auth/google":
         return MockResponse({"text": "value1"}, 200)
@@ -54,7 +48,6 @@ def mocked_requests_get(*args, **kwargs):
         return MockResponse({"text": "this is the fake post response"}, 200)
 
     return MockResponse(None, 404)
-
 
 def mock_auth_get():
     class AuthResponse:
@@ -75,25 +68,9 @@ def mock_auth_get():
     return response
 
 
-
 class TestNotebook(TestCase):
     """
     Test cases for the ``Notebook`` class
-    """
-
-    #from otter.check import notebook
-    #notebook._API_KEY = none
-    # def setUp(self):
-    #     super().setUp()
-    #     global _API_KEY
-    #     _API_KEY = None
-    #
-    #     print('hi')
-
-
-
-    """
-    Checks that the otter.Notebook class init works correctly
     """
 
     def test_init_1(self):
@@ -109,7 +86,7 @@ class TestNotebook(TestCase):
         }
 
         config = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "endpoint": "http://some.url", # dont include this when testing service enabled stuff
             "assignment_id": "hw00",
             "class_id": "some_class",
@@ -117,23 +94,21 @@ class TestNotebook(TestCase):
             "save_environment": False,
             "ignore_modules": [],
             "variables": variables
-            }
+        }
 
         # Make new otter config file, put it in direcotry
-        f = open("demofile2.otter", "a")
+        f = open("demofile2.otter", "w+")
         f.write(json.dumps(config))
         f.close()
 
         # Instance of Notebook class
         grader = Notebook(TEST_FILES_PATH + "tests")
 
-
         # Delete otter_config file
         if os.path.exists("demofile2.otter"):
             os.remove("demofile2.otter")
         else:
             print("The file does not exist")
-
 
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
             q = os.path.split(q_path)[1][:-3]
@@ -144,16 +119,8 @@ class TestNotebook(TestCase):
             self.assertEqual(grader._vars_to_store, config['variables'], "Test {} init (variables) failed".format(q))
             self.assertEqual(grader._notebook, config['notebook'], "Test {} init (notebook) failed".format(q))
             self.assertEqual(grader._config['auth'], config['auth'], "Test {} init (auth) failed".format(q))
-            #self.assertEqual("http://some.url/auth/google", grader._google_auth_url, "Test {} init (google auth url) failed".format(q))
-            #self.assertEqual(grader._default_auth_url, "http://some.url/auth", "Test {} init (default auth url) failed".format(q))
-            #self.assertEqual(grader._submit_url, "http://some.url/submit", "Test {} init (submit url) failed".format(q))
-
-
-
-
 
     def test_init_2(self):
-
         """
         otter_configs exists, _service_enabled = True, auth does not exist
         """
@@ -163,14 +130,14 @@ class TestNotebook(TestCase):
         }
 
         config2 = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "endpoint": "http://some.url", # dont include this when testing service enabled stuff
             "assignment_id": "hw00",
             "class_id": "some_class",
             "save_environment": False,
             "ignore_modules": [],
             "variables": variables
-            }
+        }
 
         # Make new otter config file, put it in direcotry
         f = open("demofile3.otter", "a")
@@ -198,10 +165,7 @@ class TestNotebook(TestCase):
             self.assertEqual(grader._default_auth_url, "http://some.url/auth", "Test {} init (default auth url) failed".format(q))
             self.assertEqual(grader._submit_url, "http://some.url/submit", "Test {} init (submit url) failed".format(q))
 
-
-
     def test_init_3(self):
-
         """
         More than 1 otter_config
         """
@@ -211,14 +175,14 @@ class TestNotebook(TestCase):
         }
 
         config2 = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "endpoint": "http://some.url", # dont include this when testing service enabled stuff
             "assignment_id": "hw00",
             "class_id": "some_class",
             "save_environment": False,
             "ignore_modules": [],
             "variables": variables
-            }
+        }
 
         f = open("demofile4.otter", "a")
         f.write(json.dumps(config2))
@@ -239,30 +203,21 @@ class TestNotebook(TestCase):
         else:
             print("The file does not exist")
 
-
-
-
-    """
-    These tests check to see that auth correctly authorizes a student, based off
-    the student-inputted config file
-    """
-
-
+    # These tests check to see that auth correctly authorizes a student, based off
+    # the student-inputted config file
     @mock.patch('builtins.input', return_value='fakekey')
     def test_auth_1(self, mock_get):
-
         """
         otter_configs exists, _service_enabled = True, auth exists but incorrect
         and should throw an exception (case where auth does not exist covered in init)
         """
-
         variables = {
             "arr": "numpy.ndarray"
         }
 
 
         config = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "endpoint": "http://some.url", # dont include this when testing service enabled stuff
             "assignment_id": "hw00",
             "class_id": "some_class",
@@ -270,7 +225,7 @@ class TestNotebook(TestCase):
             "save_environment": False,
             "ignore_modules": [],
             "variables": variables
-            }
+        }
 
         # Make new otter config file, put it in direcotry
         f = open("demofile6.otter", "a")
@@ -287,18 +242,12 @@ class TestNotebook(TestCase):
         else:
             print("The file does not exist")
 
-
-
-
-
     @mock.patch('builtins.input')
     def test_auth_2(self, mock_input):
-
         """
         otter_configs exists, _service_enabled = True, auth is google
         and not should throw an exception (goes into google if statement)
         """
-
         # set up mock input
         mock_input.return_value = "fakekey"
 
@@ -307,7 +256,7 @@ class TestNotebook(TestCase):
         }
 
         config = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "endpoint": "http://some.url", # dont include this when testing service enabled stuff
             "assignment_id": "hw00",
             "class_id": "some_class",
@@ -333,18 +282,12 @@ class TestNotebook(TestCase):
         else:
             print("The file does not exist")
 
-
-
-
-
     @mock.patch('builtins.input')
     def test_auth_3(self, mock_input):
-
         """
         otter_configs exists, _service_enabled = True, auth is automatically set
         and not should throw an exception, _API_KEY exists from test_auth_2
         """
-
         # set up mock input
         mock_input.return_value='fake input'
 
@@ -354,7 +297,7 @@ class TestNotebook(TestCase):
         }
 
         config = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "endpoint": "http://some.url", # dont include this when testing service enabled stuff
             "assignment_id": "hw00",
             "class_id": "some_class",
@@ -380,18 +323,14 @@ class TestNotebook(TestCase):
         else:
             print("The file does not exist")
 
-
-
     @mock.patch('otter.check.notebook.requests.get')
     @mock.patch('otter.check.notebook.getpass')
     @mock.patch('otter.check.notebook.input')
     def test_auth_4(self, mock_input, mock_pass, mock_get):
-
         """
         otter_configs exists, _service_enabled = True, auth is automatically set
         and not should throw an exception, _API_KEY exists from test_auth_2
         """
-
         # sets api_key to none to avoid first if statement in notebook.auth()
         notebook._API_KEY = None
 
@@ -406,7 +345,7 @@ class TestNotebook(TestCase):
 
 
         config = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "endpoint": "http://some.url",
             "assignment_id": "hw00",
             "class_id": "some_class",
@@ -432,19 +371,12 @@ class TestNotebook(TestCase):
         else:
             print("The file does not exist")
 
-
-
-
-    """
-    These tests check to see that notebook.submit() correctly posts an assignment
-    """
+    # These tests check to see that notebook.submit() correctly posts an assignment
 
     def test_submit_1(self):
-
         """
         _service_enabled = False, should raise an exception
         """
-
         variables = {
             "arr": "numpy.ndarray"
         }
@@ -454,20 +386,17 @@ class TestNotebook(TestCase):
             grader = Notebook(TEST_FILES_PATH + "tests")
             grader.submit()
 
-
     @mock.patch('otter.check.notebook.requests.post', side_effect=mocked_requests_get)
     def test_submit_2(self, mock_get):
-
         """
         otter_configs exists, _service_enabled = True, should go into auth and run as it should
         """
-
         variables = {
             "arr": "numpy.ndarray"
         }
 
         config = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "assignment_id": "hw00",
             "class_id": "some_class",
             "auth": "google",
@@ -481,7 +410,6 @@ class TestNotebook(TestCase):
         f.write(json.dumps(config))
         f.close()
 
-
         grader = Notebook(TEST_FILES_PATH + "tests")
         grader.submit()
 
@@ -494,8 +422,6 @@ class TestNotebook(TestCase):
             os.remove("demofile6.otter")
         else:
             print("The file does not exist")
-
-
 
     @mock.patch('builtins.input', return_value='fakekey')
     def test_check(self, mock_input):
@@ -691,7 +617,7 @@ class TestNotebook(TestCase):
         multiple .otter files.
         """
         config = {
-            "notebook": "hw00.ipynb",
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
             "assignment_id": "hw00",
             "class_id": "some_class",
             "auth": "google",
