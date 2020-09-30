@@ -81,17 +81,6 @@ class TestNotebook(TestCase):
     Test cases for the ``Notebook`` class
     """
 
-    #from otter.check import notebook
-    #notebook._API_KEY = none
-    # def setUp(self):
-    #     super().setUp()
-    #     global _API_KEY
-    #     _API_KEY = None
-    #
-    #     print('hi')
-
-
-
     """
     Checks that the otter.Notebook class init works correctly
     """
@@ -109,7 +98,7 @@ class TestNotebook(TestCase):
 
         config = {
             "notebook": "hw00.ipynb",
-            "endpoint": "http://some.url", # dont include this when testing service enabled stuff
+            "endpoint": "http://some.url",
             "assignment_id": "hw00",
             "class_id": "some_class",
             "auth": "google",
@@ -124,7 +113,9 @@ class TestNotebook(TestCase):
         f.close()
 
         # Instance of Notebook class
+        print('before grader')
         grader = Notebook(TEST_FILES_PATH + "tests")
+        print('after grader')
 
 
         # Delete otter_config file
@@ -211,7 +202,7 @@ class TestNotebook(TestCase):
 
         config2 = {
             "notebook": "hw00.ipynb",
-            "endpoint": "http://some.url", # dont include this when testing service enabled stuff
+            "endpoint": "http://some.url",
             "assignment_id": "hw00",
             "class_id": "some_class",
             "save_environment": False,
@@ -262,7 +253,7 @@ class TestNotebook(TestCase):
 
         config = {
             "notebook": "hw00.ipynb",
-            "endpoint": "http://some.url", # dont include this when testing service enabled stuff
+            "endpoint": "http://some.url",
             "assignment_id": "hw00",
             "class_id": "some_class",
             "auth": "googe",
@@ -307,7 +298,7 @@ class TestNotebook(TestCase):
 
         config = {
             "notebook": "hw00.ipynb",
-            "endpoint": "http://some.url", # dont include this when testing service enabled stuff
+            "endpoint": "http://some.url",
             "assignment_id": "hw00",
             "class_id": "some_class",
             "auth": "google",
@@ -354,7 +345,7 @@ class TestNotebook(TestCase):
 
         config = {
             "notebook": "hw00.ipynb",
-            "endpoint": "http://some.url", # dont include this when testing service enabled stuff
+            "endpoint": "http://some.url",
             "assignment_id": "hw00",
             "class_id": "some_class",
             "auth": "default",
@@ -391,7 +382,7 @@ class TestNotebook(TestCase):
         and not should throw an exception, _API_KEY exists from test_auth_2
         """
 
-        # sets api_key to none to avoid first if statement in notebook.auth()
+        # sets api_key to None to avoid first if statement in notebook.auth()
         notebook._API_KEY = None
 
         # sets up methods to mock

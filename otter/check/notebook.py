@@ -86,6 +86,9 @@ class Notebook:
                 self._ignore_modules = self._config.get("ignore_modules", [])
                 self._vars_to_store = self._config.get("variables", None)
 
+                print('_service_enabled', self._service_enabled)
+
+
 
                 # if "notebook" not in self._config:
                 #     assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
@@ -127,21 +130,24 @@ class Notebook:
             assert self._service_enabled, 'notebook not configured for otter service'
             assert self._config["auth"] in ["google", "default"], "invalid auth provider"
 
+            print(_API_KEY)
             if _API_KEY is not None:
                 self._api_key = _API_KEY
                 return
 
             # have users authenticate with OAuth
             if self._config["auth"] == "google":
+                    print("before display html")
 
                     # send them to google login page
                     display(HTML(f"""
                     <p>Please <a href="{self._google_auth_url}" target="_blank">log in</a> to Otter Service
                     and enter your API key below.</p>
                     """))
+                    print('after display html')
 
                     self._api_key = input()
-
+                    print('after input')
             # else have them auth with default auth
             else:
                 print("Please enter a username and password.")
