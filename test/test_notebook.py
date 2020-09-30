@@ -9,8 +9,6 @@ import shutil
 import subprocess
 import json
 import requests
-import responses
-
 
 
 from subprocess import PIPE
