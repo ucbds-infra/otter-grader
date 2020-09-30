@@ -9,21 +9,103 @@ import shutil
 import tempfile
 import docker
 import pandas as pd
+import tarfile
 
-from subprocess import PIPE
+from subprocess import PIPE, DEVNULL
 from concurrent.futures import ThreadPoolExecutor, wait
+from hashlib import md5
+#TODO: uncomment this out
+# from .metadata import GradescopeParser
+# from .utils import simple_tar, get_container_file
 
-from .metadata import GradescopeParser
-from .utils import simple_tar, get_container_file
+def build_image(zip_path, zip_hash):
+    tag = "otter_grade:" + zip_hash
+    build_out = subprocess.Popen(
+        ["docker", "build","--build-arg", "ZIPPATH=" + zip_path, ".", "-f", "otter/grade/Dockerfile", "-t", tag],
+    )
+    build_out.wait()
+    return tag
 
-def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=None, reqs=None, 
-    num_containers=None, image="ucbdsinfra/otter-grader", scripts=False, no_kill=False, output_path="./", 
+# def new_create_container(test_folder_path, zip_hash):
+#     dockerfile = BytesIO()
+#     dockerfile_str = """
+#         FROM gradescope/auto-builds
+#         RUN apt-get update && apt-get install -y curl unzip dos2unix && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#         RUN mkdir -p /autograder/source
+#         ADD {test_folder_path} /tmp/autograder.zip
+#         RUN unzip -d /autograder/source /tmp/autograder.zip
+#         RUN cp /autograder/source/run_autograder /autograder/run_autograder
+#         RUN dos2unix /autograder/run_autograder /autograder/source/setup.sh
+#         RUN chmod +x /autograder/run_autograder
+#         RUN apt-get update && bash /autograder/source/setup.sh && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#         RUN mkdir -p /autograder/submission
+#         RUN mkdir -p /autograder/results
+#     """.format(test_folder_path=test_folder_path).encode("utf-8")
+#
+#     dockerfile.write(dockerfile_str)
+#
+#     # print(dockerfile_str)
+#
+#     # dockerfile_tar_info = tarfile.TarInfo("Dockerfile")
+#     # dockerfile_tar_info.size = len(dockerfile_str)
+#     #
+#     # tar.addfile(dockerfile_tar_info, BytesIO(dockerfile_str))
+#
+#     client = docker.from_env()
+#     client.images.build(fileobj=dockerfile,
+#                         custom_context=False,
+#                         # dockerfile="Dockerfile",
+#                         tag=zip_hash,
+#                         encoding="utf-8")
+#     client.close()
+
+def launch_grade(gradescope_zip_path, verbose=False, pdfs=None, reqs=None, num_containers=None,
+    scripts=False, no_kill=False, output_path="./", debug=False, seed=None, zips=False,
+    meta_parser=None):
+
+    #TODO: GET THIS WORKING
+    # gradezip_zip_hash =""
+    # m = md5()
+    # with open(gradescope_zip_path, "rb") as f:
+    #     data = f.read() #read file in chunk and call update on each chunk if file is large.
+    #     m.update(data)
+    #     gradezip_zip_hash = m.hexdigest()
+    # print('GRADESCOPE ZIP HASH: ' + gradescope_zip_path)
+
+    pool = ThreadPoolExecutor(num_containers)
+    futures = []
+    futures += [pool.submit(grade_assignments,
+        tests_dir='/autograder/source/tests',
+        notebooks_dir='/autograder/source/files',
+        id='1',
+        verbose=verbose,
+        pdfs=pdfs,
+        reqs=reqs,
+        image=build_image(gradescope_zip_path, "5678"),
+        scripts=scripts,
+        no_kill=no_kill,
+        output_path=output_path,
+        debug=debug,
+        seed=seed,
+        zips=zips
+    )]
+
+    # stop execution while containers are running
+    finished_futures = wait(futures)
+    # return list of dataframes
+    return [df.result() for df in finished_futures[0]]
+
+
+
+
+def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=None, reqs=None,
+    num_containers=None, image="ucbdsinfra/otter-grader", scripts=False, no_kill=False, output_path="./",
     debug=False, seed=None, zips=False, meta_parser=None):
     """Grades notebooks in parallel docker containers
 
     This function runs ``num_containers`` docker containers in parallel to grade the student submissions
     in ``notebooks_dir`` using the tests in ``tests_dir``. It can additionally generate PDFs for the parts
-    of the assignment needing manual grading. 
+    of the assignment needing manual grading.
 
     Args:
         tests_dir (``str``): path to directory of tests
@@ -40,7 +122,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Non
         no_kill (``bool``, optional): whether the grading containers should be kept running after
             grading finishes
         output_path (``str``, optional): path at which to write grades CSVs copied from the container
-        debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR 
+        debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR
             from each container to the command line)
         seed (``int``, optional): a random seed to use for intercell seeding during grading
         zips (``bool``, False): whether the submissions are zip files formatted from ``Notebook.export``
@@ -83,7 +165,7 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Non
                 fp = os.path.join(dir_path, file)
                 if os.path.isfile(fp) and os.path.splitext(fp)[1] != file_extension:
                     shutil.copy(fp, dirs[i])
-                elif os.path.isdir(fp) and fp not in ignore_folders:                    
+                elif os.path.isdir(fp) and fp not in ignore_folders:
                     shutil.copytree(fp, os.path.join(dirs[i], file))
 
         # copy notebooks in tmp directories
@@ -94,13 +176,13 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Non
         pool = ThreadPoolExecutor(num_containers)
         futures = []
         for i in range(num_containers):
-            futures += [pool.submit(grade_assignments, 
-                tests_dir, 
-                dirs[i], 
-                str(i), 
-                verbose=verbose, 
+            futures += [pool.submit(grade_assignments,
+                tests_dir,
+                dirs[i],
+                str(i),
+                verbose=verbose,
                 pdfs=pdfs,
-                # unfiltered_pdfs=unfiltered_pdfs, 
+                # unfiltered_pdfs=unfiltered_pdfs,
                 # tag_filter=tag_filter,
                 # html_filter=html_filter,
                 reqs=reqs,
@@ -115,13 +197,13 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Non
 
         # stop execution while containers are running
         finished_futures = wait(futures)
-    
+
     # cleanup temp directories on failure
     except:
         for i in range(num_containers):
             shutil.rmtree(dirs[i], ignore_errors=True)
         raise
-    
+
     # cleanup temp directories
     else:
         for i in range(num_containers):
@@ -130,10 +212,10 @@ def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=Non
     # return list of dataframes
     return [df.result() for df in finished_futures[0]]
 
-def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False, 
+def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grader", verbose=False,
     pdfs=False, reqs=None, scripts=False, no_kill=False, output_path="./", debug=False, seed=None, zips=False):
     """
-    Grades multiple assignments in a directory using a single docker container. If no PDF assignment is 
+    Grades multiple submissions in a directory using a single docker container. If no PDF assignment is
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
 
     Args:
@@ -151,7 +233,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         no_kill (``bool``, optional): whether the grading containers should be kept running after
             grading finishes
         output_path (``str``, optional): path at which to write grades CSVs copied from the container
-        debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR 
+        debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR
             from each container to the command line)
         seed (``int``, optional): a random seed to use for intercell seeding during grading
         zips (``bool``, False): whether the submissions are zip files formatted from ``Notebook.export``
@@ -166,7 +248,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         client = docker.from_env()
     container = client.containers.run(image, detach=True, tty=True)
 
-    try:        
+    try:
         container_id = container.id[:12]
 
         if verbose:
@@ -175,7 +257,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         with simple_tar(notebooks_dir) as tarf:
             container.put_archive("/home", tarf)
             container.exec_run(f"mv /home/{os.path.basename(notebooks_dir)} /home/notebooks")
-        
+
         # copy the test files to the container
         if tests_dir is not None:
             with simple_tar(tests_dir) as tarf:
@@ -186,7 +268,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         if reqs:
             if verbose:
                 print(f"Installing requirements in container {container_id}...")
-            
+
             with simple_tar(reqs) as tarf:
                 container.put_archive("/home", tarf)
 
@@ -199,14 +281,14 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
 
         if verbose:
             print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container_id}...")
-        
+
         # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command...
         grade_command = ["python3", "-m", "otter.grade", "/home/notebooks"]
 
         # if we want PDF output, add the necessary flag
         if pdfs:
             grade_command += ["--pdf", pdfs]
-        
+
         # seed
         if seed is not None:
             grade_command += ["--seed", str(seed)]
@@ -214,7 +296,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         # if we are grading scripts, add the --script flag
         if scripts:
             grade_command += ["--scripts"]
-        
+
         if debug:
             grade_command += ["--verbose"]
 
@@ -226,7 +308,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
 
         if debug:
             print(output.decode("utf-8"))
-        
+
         if verbose:
             print(f"Copying grades from container {container_id}...")
 
@@ -237,7 +319,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
         if pdfs:
             pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
             os.makedirs(pdf_folder, exist_ok=True)
-            
+
             # copy out manual submissions
             for pdf in df["manual"]:
                 local_pdf_path = os.path.join(pdf_folder, os.path.basename(pdf))
@@ -253,7 +335,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
             # cleanup the docker container
             container.stop()
             container.remove()
-        
+
         client.close()
 
     except:
@@ -269,9 +351,14 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
             # cleanup the docker container
             container.stop()
             container.remove()
-        
+
         client.close()
-        
+
         raise
-    
+
     return df
+
+#TODO: DELETE THIS MAIN METHOD
+if __name__ == "__main__":
+    # create_container('test/test-assign/r-correct/autograder/autograder.zip', "1234")
+    launch_grade('test/test-assign/r-correct/autograder/autograder.zip')
