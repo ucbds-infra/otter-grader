@@ -644,3 +644,7 @@ class TestNotebook(TestCase):
                 os.remove(file)
         if os.path.isfile(_OTTER_LOG_FILENAME):
             os.remove(_OTTER_LOG_FILENAME)
+        if os.path.exists("hw00.pdf"):
+            os.remove("hw00.pdf")
+        if os.path.exists("hw00.zip"):
+            os.remove("hw00.zip")
