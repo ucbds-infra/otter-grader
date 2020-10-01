@@ -16,7 +16,6 @@ from subprocess import PIPE
 from unittest.mock import patch
 from unittest import mock
 
-import notebook
 from otter import Notebook
 from otter.check.logs import LogEntry, EventType, Log
 from otter.check.notebook import _OTTER_LOG_FILENAME
@@ -212,7 +211,6 @@ class TestNotebook(TestCase):
         variables = {
             "arr": "numpy.ndarray"
         }
-
 
         config = {
             "notebook": TEST_FILES_PATH + "hw00.ipynb",
