@@ -14,9 +14,9 @@ import tarfile
 from subprocess import PIPE, DEVNULL
 from concurrent.futures import ThreadPoolExecutor, wait
 from hashlib import md5
-#TODO: uncomment this out
-# from .metadata import GradescopeParser
-# from .utils import simple_tar, get_container_file
+#TODO: comment this out when running locally
+from .metadata import GradescopeParser
+from .utils import simple_tar, get_container_file
 
 def build_image(zip_path, zip_hash):
     tag = "otter_grade:" + zip_hash
@@ -59,44 +59,45 @@ def build_image(zip_path, zip_hash):
 #                         encoding="utf-8")
 #     client.close()
 
+def generate_hash(path):
+    zip_hash =""
+    m = md5()
+    with open(path, "rb") as f:
+        data = f.read() #read file in chunk and call update on each chunk if file is large.
+        m.update(data)
+        zip_hash = m.hexdigest()
+    return zip_hash
+
 def launch_grade(gradescope_zip_path, verbose=False, pdfs=None, reqs=None, num_containers=None,
     scripts=False, no_kill=False, output_path="./", debug=False, seed=None, zips=False,
     meta_parser=None):
 
-    #TODO: GET THIS WORKING
-    # gradezip_zip_hash =""
-    # m = md5()
-    # with open(gradescope_zip_path, "rb") as f:
-    #     data = f.read() #read file in chunk and call update on each chunk if file is large.
-    #     m.update(data)
-    #     gradezip_zip_hash = m.hexdigest()
-    # print('GRADESCOPE ZIP HASH: ' + gradescope_zip_path)
+    if not num_containers:
+        num_containers = 4
 
     pool = ThreadPoolExecutor(num_containers)
     futures = []
-    futures += [pool.submit(grade_assignments,
-        tests_dir='/autograder/source/tests',
-        notebooks_dir='/autograder/source/files',
-        id='1',
-        verbose=verbose,
-        pdfs=pdfs,
-        reqs=reqs,
-        image=build_image(gradescope_zip_path, "5678"),
-        scripts=scripts,
-        no_kill=no_kill,
-        output_path=output_path,
-        debug=debug,
-        seed=seed,
-        zips=zips
-    )]
+    for i in range(num_containers):
+        futures += [pool.submit(grade_assignments,
+            tests_dir='/autograder/source/tests',
+            notebooks_dir='/autograder/source/files',
+            id='1',
+            verbose=verbose,
+            pdfs=pdfs,
+            reqs=reqs,
+            image=build_image(gradescope_zip_path, generate_hash(gradescope_zip_path)),
+            scripts=scripts,
+            no_kill=no_kill,
+            output_path=output_path,
+            debug=debug,
+            seed=seed,
+            zips=zips
+        )]
 
     # stop execution while containers are running
     finished_futures = wait(futures)
     # return list of dataframes
     return [df.result() for df in finished_futures[0]]
-
-
-
 
 def launch_parallel_containers(tests_dir, notebooks_dir, verbose=False, pdfs=None, reqs=None,
     num_containers=None, image="ucbdsinfra/otter-grader", scripts=False, no_kill=False, output_path="./",
@@ -358,7 +359,7 @@ def grade_assignments(tests_dir, notebooks_dir, id, image="ucbdsinfra/otter-grad
 
     return df
 
-#TODO: DELETE THIS MAIN METHOD
-if __name__ == "__main__":
-    # create_container('test/test-assign/r-correct/autograder/autograder.zip', "1234")
-    launch_grade('test/test-assign/r-correct/autograder/autograder.zip')
+#TODO: DELETE THIS MAIN METHOD. Used for testing only
+# if __name__ == "__main__":
+#     # create_container('test/test-assign/r-correct/autograder/autograder.zip', "1234")
+#     launch_grade('test/test-assign/r-correct/autograder/autograder.zip')
