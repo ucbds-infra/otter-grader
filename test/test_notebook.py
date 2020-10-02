@@ -73,12 +73,14 @@ class TestNotebook(TestCase):
     Test cases for the ``Notebook`` class
     """
 
+
+    # Checks that the otter.Notebook class init works correctly
     def test_init_1(self):
 
         """
         otter_configs exists, _service_enabled = True, auth exists
         """
-        notebook._API_KEY = 'hello'
+        notebook._API_KEY = 'fakekey'
 
         # Set up otter_config file
         variables = {
@@ -104,12 +106,6 @@ class TestNotebook(TestCase):
         # Instance of Notebook class
         grader = Notebook(TEST_FILES_PATH + "tests")
 
-        # Delete otter_config file
-        if os.path.exists("demofile2.otter"):
-            os.remove("demofile2.otter")
-        else:
-            print("The file does not exist")
-
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
             q = os.path.split(q_path)[1][:-3]
 
@@ -120,10 +116,21 @@ class TestNotebook(TestCase):
             self.assertEqual(grader._notebook, config['notebook'], "Test {} init (notebook) failed".format(q))
             self.assertEqual(grader._config['auth'], config['auth'], "Test {} init (auth) failed".format(q))
 
+            self.assertEqual(grader._google_auth_url, "http://some.url/auth/google", "Test {} init (google auth url) failed".format(q))
+            self.assertEqual(grader._default_auth_url, "http://some.url/auth", "Test {} init (default auth url) failed".format(q))
+            self.assertEqual(grader._submit_url, "http://some.url/submit", "Test {} init (submit url) failed".format(q))
+
+
+
+
+
     def test_init_2(self):
         """
         otter_configs exists, _service_enabled = True, auth does not exist
         """
+
+        notebook._API_KEY = 'fakekey'
+
 
         variables = {
             "arr": "numpy.ndarray"
@@ -146,12 +153,6 @@ class TestNotebook(TestCase):
 
         # Instance of Notebook class
         grader = Notebook(TEST_FILES_PATH + "tests")
-
-        # Delete otter_config file
-        if os.path.exists("demofile3.otter"):
-            os.remove("demofile3.otter")
-        else:
-            print("The file does not exist")
 
 
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
@@ -196,12 +197,6 @@ class TestNotebook(TestCase):
         with self.assertRaises(Exception):
             Notebook(TEST_FILES_PATH + "tests")
 
-        # Delete otter_config file
-        if os.path.exists("demofile4.otter"):
-            os.remove("demofile4.otter")
-            os.remove("demofile5.otter")
-        else:
-            print("The file does not exist")
 
     # These tests check to see that auth correctly authorizes a student, based off
     # the student-inputted config file
@@ -211,10 +206,11 @@ class TestNotebook(TestCase):
         otter_configs exists, _service_enabled = True, auth exists but incorrect
         and should throw an exception (case where auth does not exist covered in init)
         """
+        notebook._API_KEY = None
+
         variables = {
             "arr": "numpy.ndarray"
         }
-
 
         config = {
             "notebook": TEST_FILES_PATH + "hw00.ipynb",
@@ -236,11 +232,6 @@ class TestNotebook(TestCase):
         with self.assertRaises(Exception):
             Notebook(TEST_FILES_PATH + "tests")
 
-        # Delete otter_config file
-        if os.path.exists("demofile6.otter"):
-            os.remove("demofile6.otter")
-        else:
-            print("The file does not exist")
 
     @mock.patch('builtins.input')
     def test_auth_2(self, mock_input):
@@ -248,6 +239,7 @@ class TestNotebook(TestCase):
         otter_configs exists, _service_enabled = True, auth is google
         and not should throw an exception (goes into google if statement)
         """
+        notebook._API_KEY = None
         # set up mock input
         mock_input.return_value = "fakekey"
 
@@ -276,11 +268,6 @@ class TestNotebook(TestCase):
 
         self.assertEqual(grader._api_key, "fakekey")
 
-        # Delete otter_config file
-        if os.path.exists("demofile6.otter"):
-            os.remove("demofile6.otter")
-        else:
-            print("The file does not exist")
 
     @mock.patch('builtins.input')
     def test_auth_3(self, mock_input):
@@ -316,12 +303,6 @@ class TestNotebook(TestCase):
         grader = Notebook(TEST_FILES_PATH + "tests")
 
         self.assertEqual(grader._api_key, "fakekey")
-
-        # Delete otter_config file
-        if os.path.exists("demofile6.otter"):
-            os.remove("demofile6.otter")
-        else:
-            print("The file does not exist")
 
     @mock.patch('otter.check.notebook.requests.get')
     @mock.patch('otter.check.notebook.getpass')
@@ -365,14 +346,7 @@ class TestNotebook(TestCase):
 
         self.assertEqual(grader._api_key, "fakekey")
 
-
-        if os.path.exists("demofile6.otter"):
-            os.remove("demofile6.otter")
-        else:
-            print("The file does not exist")
-
     # These tests check to see that notebook.submit() correctly posts an assignment
-
     def test_submit_1(self):
         """
         _service_enabled = False, should raise an exception
@@ -417,11 +391,6 @@ class TestNotebook(TestCase):
         args, kwargs = mock_get.call_args
         self.assertEqual(config['endpoint'] + '/submit', args[0])
 
-        # Delete otter_config file
-        if os.path.exists("demofile6.otter"):
-            os.remove("demofile6.otter")
-        else:
-            print("The file does not exist")
 
     @mock.patch('builtins.input', return_value='fakekey')
     def test_check(self, mock_input):
@@ -645,6 +614,17 @@ class TestNotebook(TestCase):
         os.remove(TEST_FILES_PATH + "demofile2.otter")
         os.remove(TEST_FILES_PATH + "test-nb.ipynb")
 
+    def test_export_multiple_otter_error(self):
+        """
+        Checks export for error scenario for export method
+        This test should pass when export successfully raises an
+        AssertionError for the case when the directory contains
+        multiple .otter files.
+        """
+        grader = Notebook(TEST_FILES_PATH + "tests")
+        self.assertRaises(ValueError,
+                          lambda: grader.export(nb_path=None, filtering=False))
+
     @patch.object(LogEntry, "shelve")
     def test_nb_log(self, mock_log):
         """
@@ -664,3 +644,7 @@ class TestNotebook(TestCase):
                 os.remove(file)
         if os.path.isfile(_OTTER_LOG_FILENAME):
             os.remove(_OTTER_LOG_FILENAME)
+        if os.path.exists("hw00.pdf"):
+            os.remove("hw00.pdf")
+        if os.path.exists("hw00.zip"):
+            os.remove("hw00.zip")
