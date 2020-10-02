@@ -14,6 +14,7 @@ import datetime as dt
 
 from getpass import getpass
 from glob import glob
+from urllib.parse import urljoin
 from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 
@@ -38,7 +39,7 @@ class TestsDisplay:
     def __init__(self, results):
         self.test_names = [r[0] for r in results]
         self.results = [r[1] for r in results]
-    
+
     def __repr__(self):
         ret = ""
         for name, result in zip(self.test_names, self.results):
@@ -51,10 +52,12 @@ class TestsDisplay:
             ret += f"{result._repr_html_()}\n\n"
         return ret
 
+
+
 class Notebook:
     """
     Notebook class for in-notebook autograding
-    
+
     Args:
         test_dir (``str``, optional): path to tests directory
     """
@@ -63,11 +66,12 @@ class Notebook:
         try:
             global _API_KEY, _SHELVE
             # assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
-            
+
             self._path = test_dir
             self._service_enabled = False
             self._notebook = None
-            
+
+
             # assume using otter service if there is a .otter file
             otter_configs = glob("*.otter")
             if otter_configs:
@@ -77,16 +81,18 @@ class Notebook:
                 # load in config file
                 with open(otter_configs[0]) as f:
                     self._config = json.load(f)
-                
+
                 _SHELVE = self._config.get("save_environment", False)
                 self._service_enabled = "endpoint" in self._config
                 self._ignore_modules = self._config.get("ignore_modules", [])
                 self._vars_to_store = self._config.get("variables", None)
 
+
+
                 # if "notebook" not in self._config:
                 #     assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
                 #     self._notebook = glob("*.ipynb")[0]
-                    
+
                 # else:
                 self._notebook = self._config["notebook"]
 
@@ -97,9 +103,9 @@ class Notebook:
                     if "auth" not in self._config:
                         self._config["auth"] = "google"
 
-                    self._google_auth_url = os.path.join(self._config["endpoint"], "auth/google")
-                    self._default_auth_url = os.path.join(self._config["endpoint"], "auth")
-                    self._submit_url = os.path.join(self._config["endpoint"], "submit")
+                    self._google_auth_url = urljoin(self._config["endpoint"], "auth/google")
+                    self._default_auth_url = urljoin(self._config["endpoint"], "auth")
+                    self._submit_url = urljoin(self._config["endpoint"], "submit")
 
                     self._auth()
 
@@ -129,14 +135,14 @@ class Notebook:
 
             # have users authenticate with OAuth
             if self._config["auth"] == "google":
+
                     # send them to google login page
                     display(HTML(f"""
-                    <p>Please <a href="{self._google_auth_url}" target="_blank">log in</a> to Otter Service 
+                    <p>Please <a href="{self._google_auth_url}" target="_blank">log in</a> to Otter Service
                     and enter your API key below.</p>
                     """))
 
                     self._api_key = input()
-
             # else have them auth with default auth
             else:
                 print("Please enter a username and password.")
@@ -149,7 +155,7 @@ class Notebook:
                 # print("Your API Key is {}\n".format())
                 # print("Paste this in and hit enter")
                 # self._api_key = input()
-            
+
             # store API key so we don't re-auth every time
             _API_KEY = self._api_key
 
@@ -159,14 +165,14 @@ class Notebook:
         else:
             self._log_event(EventType.AUTH)
 
-        
+
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
         Logs an event
 
         Args:
             event_type (``otter.logs.EventType``): the type of event
-            results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): 
+            results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional):
                 the results of any checks recorded by the entry
             question (``str``, optional): the question name for this check
             success (``bool``, optional): whether the operation was successful
@@ -175,16 +181,16 @@ class Notebook:
         entry = LogEntry(
             event_type,
             results=results,
-            question=question, 
-            success=success, 
+            question=question,
+            success=success,
             error=error
         )
 
         if _SHELVE and event_type == EventType.CHECK:
             entry.shelve(
-                shelve_env, 
-                delete=True, 
-                filename=_OTTER_LOG_FILENAME, 
+                shelve_env,
+                delete=True,
+                filename=_OTTER_LOG_FILENAME,
                 ignore_modules=self._ignore_modules,
                 variables=self._vars_to_store
             )
@@ -193,13 +199,13 @@ class Notebook:
 
     def check(self, question, global_env=None):
         """
-        Runs tests for a specific question against a global environment. If no global environment 
+        Runs tests for a specific question against a global environment. If no global environment
         is provided, the test is run against the calling frame's environment.
-        
+
         Args:
             question (``str``): name of question being graded
-            global_env (``dict``, optional): global environment resulting from execution of a single 
-                notebook 
+            global_env (``dict``, optional): global environment resulting from execution of a single
+                notebook
 
         Returns:
             ``otter.test_files.abstract_test.TestCollectionResults``: the grade for the question
@@ -209,14 +215,14 @@ class Notebook:
 
             # ensure that desired test exists
             assert os.path.isfile(test_path), "Test {} does not exist".format(question)
-            
+
             # pass the correct global environment
             if global_env is None:
                 global_env = inspect.currentframe().f_back.f_globals
 
             # run the check
             result = check(test_path, global_env)
-        
+
         except Exception as e:
             self._log_event(EventType.CHECK, question=question, success=False, error=e, shelve_env=global_env)
             raise e
@@ -229,9 +235,9 @@ class Notebook:
     # @staticmethod
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True):
         """
-        Exports a notebook to a PDF. ``filter_type`` can be ``"html"`` or ``"tags"`` if filtering by 
-        HTML comments or cell tags, respectively. 
-        
+        Exports a notebook to a PDF. ``filter_type`` can be ``"html"`` or ``"tags"`` if filtering by
+        HTML comments or cell tags, respectively.
+
         Args:
             nb_path (``str``): Path to iPython notebook we want to export
             filtering (``bool``, optional): Set true if only exporting a subset of nb cells to PDF
@@ -257,10 +263,10 @@ class Notebook:
             if display_link:
                 # create and display output HTML
                 out_html = """
-                <p>Your file has been exported. Download it by right-clicking 
+                <p>Your file has been exported. Download it by right-clicking
                 <a href="{}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
                 """.format(nb_path[:-5] + "pdf")
-                
+
                 display(HTML(out_html))
 
         except Exception as e:
@@ -272,9 +278,9 @@ class Notebook:
 
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], display_link=True):
         """
-        Exports a submission to a zipfile. Creates a submission zipfile from a notebook at ``nb_path``, 
+        Exports a submission to a zipfile. Creates a submission zipfile from a notebook at ``nb_path``,
         optionally including a PDF export of the notebook and any files in ``files``.
-        
+
         Args:
             nb_path (``str``): path to notebook we want to export
             export_path (``str``, optional): path at which to write zipfile
@@ -304,7 +310,7 @@ class Notebook:
                 with open(nb_path) as f:
                     assert len(f.read().strip()) > 0, \
                         f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
-            
+
             except UnicodeDecodeError:
                 with open(nb_path, "r", encoding="utf-8") as f:
                     assert len(f.read().strip()) > 0, \
@@ -339,10 +345,10 @@ class Notebook:
             if display_link:
                 # create and display output HTML
                 out_html = """
-                <p>Your submission has been exported. Click <a href="{}" target="_blank">here</a> 
+                <p>Your submission has been exported. Click <a href="{}" target="_blank">here</a>
                 to download the zip file.</p>
                 """.format(zip_path)
-                
+
                 display(HTML(out_html))
 
         except Exception as e:
@@ -375,12 +381,12 @@ class Notebook:
                 for file in sorted(tests):
                     if "__init__.py" not in file:
                         test_name = os.path.splitext(os.path.split(file)[1])[0]
-                        
+
                         entry = log.get_question_entry(test_name)
                         env = entry.unshelve()
                         global_env.update(env)
                         del locals()["env"]
-                        
+
                         result = self.check(test_name, global_env)
                         results.append((test_name, result))
 
@@ -389,7 +395,7 @@ class Notebook:
             raise e
         else:
             self._log_event(EventType.END_CHECK_ALL)
-        
+
         return TestsDisplay(results)
 
     def submit(self):
@@ -400,7 +406,7 @@ class Notebook:
             ``AssertionError``: if this notebook is not configured for Otter Service
         """
         assert self._service_enabled, 'notebook not configured for otter service'
-        
+
         try:
             if not hasattr(self, '_api_key'):
                 self._auth()
@@ -415,7 +421,7 @@ class Notebook:
 
             notebook_data["metadata"]["assignment_id"] = self._config["assignment_id"]
             notebook_data["metadata"]["class_id"] = self._config["class_id"]
-            
+
             print("Submitting notebook to server...")
 
             response = requests.post(self._submit_url, json.dumps({
@@ -423,7 +429,6 @@ class Notebook:
                 "nb": notebook_data,
             }))
 
-            print(response.text)
         except Exception as e:
             self._log_event(EventType.SUBMIT, success=False, error=e)
             raise e
