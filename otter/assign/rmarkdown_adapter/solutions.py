@@ -29,14 +29,14 @@ def solution_assignment_sub(match):
     """
     """
     prefix = match.group(1)
-    return prefix + ' ...'
+    return prefix + ' NULL # YOUR CODE HERE'
 
 solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
 def solution_line_sub(match):
     """
     """
     prefix = match.group(1)
-    return prefix + '...'
+    return prefix + '# YOUR CODE HERE'
 
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
 skip_suffixes = [
@@ -86,7 +86,7 @@ def replace_solutions(lines):
             assert not solution, f"Nested BEGIN SOLUTION in {lines}"
             solution = True
             if not begin_solution.group(2):
-                line = begin_solution.group(1) + '...'
+                line = begin_solution.group(1) + '# YOUR CODE HERE'
             else:
                 continue
         
