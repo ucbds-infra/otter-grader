@@ -542,6 +542,40 @@ class TestNotebook(TestCase):
         os.remove('test-nb1.ipynb')
         os.remove('test-nb2.ipynb')
 
+    def test_export_pass(self):
+        """
+        Checks export contents for existence of PDF and equality of zip
+        """
+        nb = nbformat.v4.new_notebook()
+        text = """\
+                        This is an auto-generated notebook."""
+        nb['cells'] = [nbformat.v4.new_markdown_cell(text)]
+        with open(TEST_FILES_PATH + 'test-nb.ipynb', "w") as f:
+            nbformat.write(nb, f)
+        correct_directory = TEST_FILES_PATH + 'export-correct/'
+        os.mkdir(correct_directory)
+        with open(correct_directory + 'test-nb.ipynb', "w") as f:
+            nbformat.write(nb, f)
+        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader.export(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
+
+        self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
+        with self.unzip_to_temp(TEST_FILES_PATH + "test-nb.zip") as unzipped_dir:
+            # breakpoint()
+            os.remove(unzipped_dir + '/test/test-notebook/test-nb.pdf')
+            self.assertDirsEqual(
+                unzipped_dir + '/test/test-notebook/',
+                TEST_FILES_PATH + "export-correct",
+                ignore_ext=[".pdf"]
+            )
+
+        # cleanup
+        os.remove(correct_directory + "test-nb.ipynb")
+        os.rmdir(correct_directory)
+        os.remove(TEST_FILES_PATH + "test-nb.ipynb")
+        os.remove(TEST_FILES_PATH + "test-nb.pdf")
+        os.remove(TEST_FILES_PATH + "test-nb.zip")
+
     def test_export_without_nb_path_case2_fail(self):
         """
         Checks for correct error scenario for export method
