@@ -26,6 +26,8 @@ class TestRunAutograder(TestCase):
     def setUp(self):
         super().setUp()
 
+        self.cwd = os.getcwd()
+
         # env = {"__name__": "__not_main__"}
         with open(TEST_FILES_PATH + "autograder/source/otter_config.json") as f:
             self.config = json.load(f)
@@ -171,6 +173,7 @@ class TestRunAutograder(TestCase):
         # self.assertDirsEqual(TEST_FILES_PATH + "autograder", TEST_FILES_PATH + "autograder-correct", ignore_ext=[".pdf",".zip"], ignore_dirs=["__pycache__"])
 
     def tearDown(self):
+        os.chdir(self.cwd)
         self.deletePaths([
             TEST_FILES_PATH + "autograder/results/results.json",
             TEST_FILES_PATH + "autograder/__init__.py",
