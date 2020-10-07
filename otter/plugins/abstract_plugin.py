@@ -78,6 +78,19 @@ class AbstractOtterPlugin(ABC):
         """
         raise PluginEventNotSupportedException()
 
+    def before_grading(self, options):
+        """
+        Plugin event run before the execution of the submission which can modify the dictionary of
+        grading configurations.
+
+        Args:
+            options (``dict``): the dictionary of Otter configurations for grading
+
+        Raises:
+            ``PluginEventNotSupportedException``: if the event is not supported by this plugin
+        """
+        raise PluginEventNotSupportedException()
+
     def after_execution(self, global_env):
         """
         Plugin event run after the execution of the submission which can modify the resulting global
