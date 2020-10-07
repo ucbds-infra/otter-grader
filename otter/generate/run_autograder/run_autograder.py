@@ -93,7 +93,8 @@ def run_autograder(options):
     else:
         plugin_collection = None
 
-    plugin_collection.run("before_grading", options)
+    if plugin_collection:
+        plugin_collection.run("before_grading", options)
 
     if options["token"] is not None:
         client = APIClient(token=options["token"])
