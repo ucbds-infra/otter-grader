@@ -71,7 +71,7 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
 
     Returns:
-        ``otter.execute.results.GradingResults``: the results of grading
+        ``otter.test_files.GradingResults``: the results of grading
     """
     # ensure this is not being executed inside a notebook
     assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"
