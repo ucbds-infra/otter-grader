@@ -28,6 +28,32 @@ TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed"]
 
 # TODO: fix reprs
 class TestFile(ABC):
+    """
+    A (abstract) single test file for Otter. This ABC defines how test results are represented and sets
+    up the instance variables tracked by tests. Subclasses should implement the abstract class method
+    ``from_file`` and the abstract instance method ``run``.
+
+    Args:
+        name (``str``): the name of test file
+        path (``str``): the path to the test file
+        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
+        value (``int``, optional): the point value of this test, defaults to 1
+        all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
+            cases
+
+    Attributes:
+        name (``str``): the name of test file
+        path (``str``): the path to the test file
+        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
+        value (``int``): the point value of this test, defaults to 1
+        all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
+            cases
+        passed_all (``bool``): whether all of the test cases were passed
+        test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
+            ``test_cases``
+        grade (``float``): the percentage of ``points`` earned for this test file as a decimal
+    """
+
     html_result_pass_template = Template("""
     <p><strong>{{ name }}</strong> passed!</p>
     """)

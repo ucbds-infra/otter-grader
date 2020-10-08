@@ -56,22 +56,27 @@ def run_doctest(name, doctest_string, global_environment):
 
 class OKTestFile(TestFile):
     """
-    A single test (set of doctests) for Otter.
-    
-    Instances of this class are callable. When called, it takes a ``global_environment`` dict, and returns 
-    an ``otter.ok_parser.OKTestsResult`` object. We only take a global_environment, *not* a 
-    ``local_environment``. This makes tests not useful inside functions, methods or other scopes with 
-    local variables. This is a limitation of doctest, so we roll with it.
-
-    The last 2 attributes (``passed``, ``failed_test``) are set after calling ``run()``.
+    A single OK-formatted test file for Otter.
 
     Args:
-        path (``str``): path of the test
-        name (``str``): name of test
-        test_cases (``list`` of ``TestCase``): list of docstring tests to be run
-        value (``int``, optional): point value of this test, defaults to 1
+        name (``str``): the name of test file
+        path (``str``): the path to the test file
+        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
+        value (``int``, optional): the point value of this test, defaults to 1
         all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
             cases
+
+    Attributes:
+        name (``str``): the name of test file
+        path (``str``): the path to the test file
+        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
+        value (``int``): the point value of this test, defaults to 1
+        all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
+            cases
+        passed_all (``bool``): whether all of the test cases were passed
+        test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
+            ``test_cases``
+        grade (``float``): the percentage of ``points`` earned for this test file as a decimal
     """
 
     def run(self, global_environment):

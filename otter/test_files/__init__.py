@@ -14,27 +14,28 @@ from ..check.logs import QuestionNotInLogException
 from ..generate.constants import DEFAULT_OPTIONS
 
 
-TestResult = namedtuple("TestResult", ["name", "score", "possible", "hidden", "incorrect", "test_case_result"])
+GradingTestCaseResult = namedtuple(
+    "GradingTestCaseResult", 
+    ["name", "score", "possible", "hidden", "incorrect", "test_case_result"]
+)
 
 
 class GradingResults:
     """
     Stores and wrangles test result objects.
     
-    Initialize with a list of ``otter.test_files.abstract_test.TestCollectionResults`` objects and 
+    Initialize with a list of ``otter.test_files.abstract_test.TestFile`` subclass objects and 
     this class will store the results as named tuples so that they can be accessed/manipulated easily. 
     Also contains methods to put the results into a nice ``dict`` format or into the correct format 
     for Gradescope.
 
     Args:
-        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``): the list of 
-            grading results
+        results (``list`` of ``TestFile``): the list of test file objects summarized in this grade
     
     Attributes:
-        raw_results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``): the 
-            results passed to the constructor
-        results (``dict``): maps test names to ``TestResult`` named tuples containing the test result
-            information
+        test_files (``list`` of ``TestFile``): the test files passed to the constructor
+        results (``dict``): maps test names to ``GradingTestCaseResult`` named tuples containing the 
+            test result information
         total (numeric): the total points earned by the submission
         possible (numeric): the total points possible based on the tests
         tests (``list`` of ``str``): list of test names according to the keys of ``results``
@@ -48,7 +49,7 @@ class GradingResults:
             pts_per_case = test_file.value / len(test_file.test_case_results)
             for test_case_result in test_file.test_case_results:
                 name = test_case_result.test_case.name
-                tr = TestResult(
+                tr = GradingTestCaseResult(
                     name = test_case_result.test_case.name,
                     # the score is the number of points earned for the file divided by the number of tests in the file
                     # times 0 if the test case failed and 1 if it passed
@@ -93,13 +94,13 @@ class GradingResults:
     
     def get_result(self, test_name):
         """
-        Returns the ``TestResult`` named tuple corresponding to the test with name ``test_name``
+        Returns the ``GradingTestCaseResult`` named tuple corresponding to the test with name ``test_name``
 
         Args:
             test_name (``str``): the name of the desired test
         
         Returns:
-            ``TestResult``: the results of that test
+            ``GradingTestCaseResult``: the results of that test
         """
         return self.results[test_name]
 
@@ -118,6 +119,12 @@ class GradingResults:
 
     def update_result(self, test_name, **kwargs):
         """
+        Updates the values in the ``GradingTestCaseResult`` object stored in ``self.results[test_name]`` 
+        with the key-value pairs in ``kwargs``.
+
+        Args:
+            test_name (``str``): the name of the test
+            kwargs: key-value pairs for updating the ``GradingTestCaseResult`` object
         """
         self.results[test_name] = self.results[test_name]._replace(**kwargs)
 
