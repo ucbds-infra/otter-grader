@@ -20,7 +20,7 @@ def main(args):
     Args:
         ``argparse.Namespace``: parsed command line arguments
     """
-    master, result = pathlib.Path(args.master), pathlib.Path(args.result)
+    master, result = pathlib.Path(os.path.abspath(args.master)), pathlib.Path(os.path.abspath(args.result))
     print("Generating views...")
 
     assignment = Assignment()
