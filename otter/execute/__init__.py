@@ -73,8 +73,8 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     Returns:
         ``otter.test_files.GradingResults``: the results of grading
     """
-    # ensure this is not being executed inside a notebook
-    assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"
+    # # ensure this is not being executed inside a notebook
+    # assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"
 
     if not script:
         try:
