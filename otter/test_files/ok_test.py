@@ -11,7 +11,7 @@ import pathlib
 from contextlib import redirect_stderr, redirect_stdout
 from textwrap import dedent
 
-from .abstract_test import TestFile
+from .abstract_test import TestFile, TestCase, TestCaseResult
 from ..utils import hide_outputs
 
 def run_doctest(name, doctest_string, global_environment):
@@ -56,21 +56,27 @@ def run_doctest(name, doctest_string, global_environment):
 
 class OKTestFile(TestFile):
     """
-    A single test (set of doctests) for Otter.
-    
-    Instances of this class are callable. When called, it takes a ``global_environment`` dict, and returns 
-    an ``otter.ok_parser.OKTestsResult`` object. We only take a global_environment, *not* a 
-    ``local_environment``. This makes tests not useful inside functions, methods or other scopes with 
-    local variables. This is a limitation of doctest, so we roll with it.
-
-    The last 2 attributes (``passed``, ``failed_test``) are set after calling ``run()``.
+    A single OK-formatted test file for Otter.
 
     Args:
-        name (``str``): name of test
-        tests (``list`` of ``str``): ;ist of docstring tests to be run
-        hiddens (``list`` of ``bool``): visibility of each tests in ``tests``
-        value (``int``, optional): point value of this test, defaults to 1
-        hidden (``bool``, optional): wheter this test is hidden
+        name (``str``): the name of test file
+        path (``str``): the path to the test file
+        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
+        value (``int``, optional): the point value of this test, defaults to 1
+        all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
+            cases
+
+    Attributes:
+        name (``str``): the name of test file
+        path (``str``): the path to the test file
+        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
+        value (``int``): the point value of this test, defaults to 1
+        all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
+            cases
+        passed_all (``bool``): whether all of the test cases were passed
+        test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
+            ``test_cases``
+        grade (``float``): the percentage of ``points`` earned for this test file as a decimal
     """
 
     def run(self, global_environment):
@@ -80,19 +86,33 @@ class OKTestFile(TestFile):
             ``global_environment`` (``dict``): result of executing a Python notebook/script
         
         Returns:
-            ``tuple`` of (``bool``, ``otter.ok_parser.OKTest``): whether the test passed and a pointer 
-                to the current ``otter.ok_parser.OKTest`` object
+            ``tuple`` of (``bool``, ``float`` ``otter.ok_parser.OKTest``): whether the test passed,
+                the percentage score on this test, and a pointer to the current ``otter.ok_parser.OKTest`` object
         """
-        for i, t in enumerate(self.public_tests + self.hidden_tests):
-            passed, result = run_doctest(self.name + ' ' + str(i), t, global_environment)
+        n_passed, passed_all, test_case_results = 0, True, []
+        for i, test_case in enumerate(self.test_cases):
+            passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
             if not passed:
-                self.passed = False
-                self.failed_test = t
-                self.failed_test_hidden = i >= len(self.public_tests)
-                self.result = result
-                return False, self
-        self.passed = True
-        return True, self
+                passed_all = False
+            else:
+                n_passed += 1
+                result = 'Test case passed!'
+
+            test_case_results.append(TestCaseResult(
+                test_case = test_case,
+                message = result,
+                passed = passed
+            ))
+
+        self.passed_all = passed_all
+        self.test_case_results = test_case_results
+
+        if self.all_or_nothing and not self.passed_all:
+            self.grade = 0
+        elif not self.all_or_nothing and not self.passed_all:
+            self.grade = n_passed / len(self.test_case_results)
+        else:
+            self.grade = 1
 
     @classmethod
     def from_file(cls, path):
@@ -136,14 +156,22 @@ class OKTestFile(TestFile):
                 FutureWarning
             )
 
-        tests = []
-        hiddens = []
+        test_cases = []
+        # hiddens = []
 
-        for _, test_case in enumerate(test_spec['suites'][0]['cases']):
-            tests.append(dedent(test_case['code']))
-            hiddens.append(test_case.get('hidden', True))
+        for i, test_case in enumerate(test_spec['suites'][0]['cases']):
+            test_cases.append(TestCase(
+                name = test_case.get('name', f"{test_spec['name']} - {i + 1}"),
+                body = dedent(test_case['code']), 
+                hidden = test_case.get('hidden', True)
+            ))
+            # tests.append(dedent(test_case['code']))
+            # hiddens.append(test_case.get('hidden', True))
 
         # convert path into PurePosixPath for test name
-        name = str(pathlib.Path(path).as_posix())
+        path = str(pathlib.Path(path).as_posix())
 
-        return cls(name, tests, hiddens, test_spec.get('points', 1), test_spec.get('hidden', True))
+        # grab whether the tests are all-or-nothing
+        all_or_nothing = test_spec.get('all_or_nothing', True)
+
+        return cls(test_spec['name'], path, test_cases, test_spec.get('points', 1), all_or_nothing)

@@ -19,6 +19,9 @@ dill
 pdfkit
 PyPDF2
 
+# plugins
+gspread
+
 # ottr requirements
 rpy2
 jupytext

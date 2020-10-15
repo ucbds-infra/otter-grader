@@ -6,9 +6,10 @@ import os
 import json
 import pandas as pd
 
+from ..constants import DEFAULT_OPTIONS
 from ...version import LOGO_WITH_VERSION
 
-def main(config):
+def main(autograder_dir):
     """
     Runs autograder on Gradescope based on predefined configurations.
 
@@ -17,15 +18,25 @@ def main(config):
     """
     print(LOGO_WITH_VERSION, "\n")
 
+    config_fp = os.path.join(autograder_dir, "source", "otter_config.json")
+    if os.path.isfile(config_fp):
+        with open(config_fp) as f:
+            config = json.load(f)
+    else:
+        config = {}
+
+    options = DEFAULT_OPTIONS.copy()
+    options.update(config)
+
     curr_dir = os.getcwd()
 
-    if "lang" in config and config["lang"].lower() == "r":
+    if options["lang"].lower() == "r":
         from .r_adapter.run_autograder import run_autograder
     
     else:
         from .run_autograder import run_autograder
     
-    output = run_autograder(config)
+    output = run_autograder(options)
 
     with open("./results/results.json", "w+") as f:
         json.dump(output, f, indent=4)

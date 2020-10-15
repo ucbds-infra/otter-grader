@@ -7,24 +7,24 @@ import subprocess
 
 from otter.generate.run_autograder import main as run_autograder
 
-config = {
-    "score_threshold": None,
-    "points_possible": None,
-    "show_stdout_on_release": False,
-    "show_hidden_tests_on_release": False,
-    "seed": None,
-    "grade_from_log": False,
-    "serialized_variables": {},
-    "public_multiplier": 0,
-    "token": None,
-    "course_id": 'None',
-    "assignment_id": 'None',
-    "filtering": True,
-    "pagebreaks": True,
-    "debug": False,
-    "autograder_dir": '/autograder',
-    "lang": 'python',
-}
+# config = {
+#     "score_threshold": ,
+#     "points_possible": ,
+#     "show_stdout_on_release": ,
+#     "show_hidden_tests_on_release": ,
+#     "seed": ,
+#     "grade_from_log": ,
+#     "serialized_variables": ,
+#     "public_multiplier": ,
+#     "token": None,
+#     "course_id": '',
+#     "assignment_id": '',
+#     "filtering": ,
+#     "pagebreaks": ,
+#     "debug": False,
+#     "autograder_dir": '/autograder',
+#     "lang": '',
+# }
 
 if __name__ == "__main__":
-    run_autograder(config)
+    run_autograder('/autograder')
