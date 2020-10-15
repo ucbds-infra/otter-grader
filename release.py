@@ -10,7 +10,7 @@ FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "Dockerfile",
     "otter/generate/templates/requirements.txt",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
-    "test/test_generate/test-run-autograder/autograder-correct/source/requirements.txt",
+    "test/test_generate/test-run-autograder/autograder/source/requirements.txt",
     "test/test-assign/gs-autograder-correct/requirements.txt",
     "test/test-assign/rmd-autograder-correct/requirements.txt",
 ]
