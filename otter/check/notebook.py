@@ -411,6 +411,7 @@ class Notebook:
             if not hasattr(self, '_api_key'):
                 self._auth()
 
+
             notebook_path = os.path.join(os.getcwd(), self._notebook)
 
             assert os.path.exists(notebook_path) and os.path.isfile(notebook_path), \

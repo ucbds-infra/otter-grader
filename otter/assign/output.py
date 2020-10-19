@@ -31,7 +31,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
         try:
             lang = nb["metadata"]["kernelspec"]["language"].lower()
             assignment.lang = lang
-        except IndexError:
+        except KeyError:
             warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
             assignment.lang = "python"
 

@@ -20,6 +20,7 @@ from otter import Notebook
 from otter.check.logs import LogEntry, EventType, Log
 from otter.check.notebook import _OTTER_LOG_FILENAME
 from otter.check import notebook
+# from otter import TestsDisplay
 
 from . import TestCase
 
@@ -363,7 +364,8 @@ class TestNotebook(TestCase):
     @mock.patch('otter.check.notebook.requests.post', side_effect=mocked_requests_get)
     def test_submit_2(self, mock_get):
         """
-        otter_configs exists, _service_enabled = True, should go into auth and run as it should
+        otter_configs exists, _service_enabled = True, should go not into auth
+        and run as it should
         """
         variables = {
             "arr": "numpy.ndarray"
@@ -390,6 +392,77 @@ class TestNotebook(TestCase):
         #check to see if the right file was used
         args, kwargs = mock_get.call_args
         self.assertEqual(config['endpoint'] + '/submit', args[0])
+
+    def test_submit_3(self):
+        notebook._API_KEY = "fakekey for submit"
+        config = {
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
+            "assignment_id": "hw00",
+            "class_id": "some_class",
+            "save_environment": False,
+            "ignore_modules": [],
+            "variables": variables,
+            "endpoint": "http://some.url",
+                    }
+        """
+        otter_configs exists, _service_enabled = True, should go into auth if statement
+        """
+
+    @mock.patch('otter.check.notebook.hasattr')
+    @mock.patch('otter.check.notebook.requests.post', side_effect=mocked_requests_get)
+    def test_submit_3(self, mock_get, mock_hasattr):
+        # mock_get.side_effect=mocked_requests_get
+        mock_hasattr.return_value = None
+
+
+
+        """
+        otter_configs exists, _service_enabled = True, should go not into auth
+        and run as it should
+        """
+        variables = {
+            "arr": "numpy.ndarray"
+        }
+
+        config = {
+            "notebook": TEST_FILES_PATH + "hw00.ipynb",
+            "assignment_id": "hw00",
+            "class_id": "some_class",
+            "save_environment": False,
+            "ignore_modules": [],
+            "variables": variables,
+            "endpoint": "http://some.url",
+                    }
+
+        f = open("demofile6.otter", "a")
+        f.write(json.dumps(config))
+        f.close()
+
+        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader.submit()
+
+        #check to see if the right file was used
+        args, kwargs = mock_get.call_args
+        self.assertEqual(config['endpoint'] + '/submit', args[0])
+
+
+    def test_repr(self):
+
+        #class to mock TestCollectionResults
+        class FakeTestCollectionResult:
+
+            def _repr_html_(self):
+                return "Fake test collection result"
+
+        #result variable
+        test = [("t1", FakeTestCollectionResult()), ("t2", FakeTestCollectionResult())]
+        
+        try:
+            a = notebook.TestsDisplay(test)
+            a._repr_html_()
+        except Exception:
+            self.fail("test_repr failed")
+
 
 
     @mock.patch('builtins.input', return_value='fakekey')
@@ -542,6 +615,40 @@ class TestNotebook(TestCase):
                           lambda: grader.to_pdf(nb_path=None, filtering=False))
         os.remove('test-nb1.ipynb')
         os.remove('test-nb2.ipynb')
+
+    def test_export_pass(self):
+        """
+        Checks export contents for existence of PDF and equality of zip
+        """
+        nb = nbformat.v4.new_notebook()
+        text = """\
+                        This is an auto-generated notebook."""
+        nb['cells'] = [nbformat.v4.new_markdown_cell(text)]
+        with open(TEST_FILES_PATH + 'test-nb.ipynb', "w") as f:
+            nbformat.write(nb, f)
+        correct_directory = TEST_FILES_PATH + 'export-correct/'
+        os.mkdir(correct_directory)
+        with open(correct_directory + 'test-nb.ipynb', "w") as f:
+            nbformat.write(nb, f)
+        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader.export(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
+
+        self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
+        with self.unzip_to_temp(TEST_FILES_PATH + "test-nb.zip") as unzipped_dir:
+            # breakpoint()
+            os.remove(unzipped_dir + '/test/test-notebook/test-nb.pdf')
+            self.assertDirsEqual(
+                unzipped_dir + '/test/test-notebook/',
+                TEST_FILES_PATH + "export-correct",
+                ignore_ext=[".pdf"]
+            )
+
+        # cleanup
+        os.remove(correct_directory + "test-nb.ipynb")
+        os.rmdir(correct_directory)
+        os.remove(TEST_FILES_PATH + "test-nb.ipynb")
+        os.remove(TEST_FILES_PATH + "test-nb.pdf")
+        os.remove(TEST_FILES_PATH + "test-nb.zip")
 
     def test_export_without_nb_path_case2_fail(self):
         """

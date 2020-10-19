@@ -5,6 +5,10 @@
 * Changed granularity of results to be test case-by-test case rather than by file
 * Added ability to list requirements directly in assignment metadata w/out requirements.txt file
 
+**v1.1.4:**
+
+* Fixed `KeyError` when kernelspec unparsable from notebook in Otter Assign
+
 **v1.1.3:** 
 
 * Changed Rmd code prompt to `NULL # YOUR CODE HERE` for assignment statements and `# YOUR CODE HERE` for whole-line and block removal
