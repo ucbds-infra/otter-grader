@@ -19,6 +19,7 @@ from hashlib import md5
 from .metadata import GradescopeParser
 from .utils import simple_tar, get_container_file
 
+# TODO: add docstring. see launch_grade and grade_assignment for format
 def build_image(zip_path, zip_hash):
     tag = "otter_grade:" + zip_hash
     dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
@@ -61,6 +62,7 @@ def build_image(zip_path, zip_hash):
 #                         encoding="utf-8")
 #     client.close()
 
+# TODO: add docstring. see launch_grade and grade_assignment for format
 def generate_hash(path):
     zip_hash =""
     m = md5()
@@ -104,6 +106,10 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
     pool = ThreadPoolExecutor(num_containers)
     futures = []
     img =  build_image(gradescope_zip_path, generate_hash(gradescope_zip_path))
+
+    # TODO: here we should be iterating through all notebooks in notebooks_dir, so that we call
+    #       grade_assignments on the path to each notebook, and end up with several contains in the 
+    #       pool with num_containers being run at any given moment
     for i in range(num_containers):
         futures += [pool.submit(grade_assignments,
             notebooks_dir=notebooks_dir,
@@ -236,6 +242,8 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
 #     # return list of dataframes
 #     return [df.result() for df in finished_futures[0]]
 
+# TODO: these arguments need to be updated. replace notebooks_dir with the path to the notebook that
+# this container will be grading
 def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=False,
     scripts=False, no_kill=False, output_path="./", debug=False, zips=False):
     """
@@ -266,60 +274,26 @@ def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=Fa
         client = docker.from_env()
     container = client.containers.run(image, detach=True, tty=True)
 
+    notebooks_dir = os.path.abspath(notebooks_dir)
+
     try:
         container_id = container.id[:12]
 
         if verbose:
             print(f"Launched container {container_id}...")
 
+        # TODO: remember 1 subm per container, so we will use this content manager to put the
+        #       notebook at /autograder/{notebook name}.ipynb
         with simple_tar(notebooks_dir) as tarf:
             container.put_archive("/home", tarf)
-            container.exec_run(f"mv /home/{os.path.basename(notebooks_dir)} /home/notebooks")
-
-        # # copy the test files to the container
-        # if tests_dir is not None:
-        #     with simple_tar(tests_dir) as tarf:
-        #         container.put_archive("/home", tarf)
-        #         container.exec_run(f"mv /home/{os.path.basename(tests_dir)} /home/tests")
-        #
-        # # copy the requirements file to the container
-        # if reqs:
-        #     if verbose:
-        #         print(f"Installing requirements in container {container_id}...")
-        #
-        #     with simple_tar(reqs) as tarf:
-        #         container.put_archive("/home", tarf)
-        #
-        #     # install requirements
-        #     exit_code, output = container.exec_run("pip install -r /home/requirements.txt")
-        #     assert exit_code == 0, f"Container {container_id} failed to install requirements:\n{output.decode('utf-8')}"
-        #
-        #     if debug:
-        #         print(output.decode("utf-8"))
+            exit_code, output = container.exec_run(f"mv /home/{os.path.basename(notebooks_dir)} /home/notebooks")
+            assert exit_code == 0, f"Container {container_id} failed with output:\n{output.decode('utf-8')}"
 
         if verbose:
             print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container_id}...")
 
         # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command...
         grade_command = ["/autograder/run_autograder"]
-
-        # # if we want PDF output, add the necessary flag
-        # if pdfs:
-        #     grade_command += ["--pdf", pdfs]
-
-        # # seed
-        # if seed is not None:
-        #     grade_command += ["--seed", str(seed)]
-
-        # if we are grading scripts, add the --script flag
-        # if scripts:
-        #     grade_command += ["--scripts"]
-        #
-        # if debug:
-        #     grade_command += ["--verbose"]
-        #
-        # if zips:
-        #     grade_command += ["--zips"]
 
         exit_code, output = container.exec_run(grade_command)
         assert exit_code == 0, f"Container {container_id} failed with output:\n{output.decode('utf-8')}"
@@ -330,10 +304,14 @@ def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=Fa
         if verbose:
             print(f"Copying grades from container {container_id}...")
 
+        # TODO: this needs to be updated to parse the JSON, found at path /autograder/results/results.json,
+        #       into the existing CSV format so that this function returns a 1-row dataframe
         # get the grades back from the container and read to date frame so we can merge later
         with get_container_file(container, "/home/notebooks/grades.csv") as f:
             df = pd.read_csv(f)
 
+        # TODO: PDFs still need to work, so this code needs to be adapted to get the PDF of the notebook
+        #       at path /autograder/submission/{notebook name}.pdf
         # if pdfs:
         #     pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
         #     os.makedirs(pdf_folder, exist_ok=True)
@@ -375,8 +353,3 @@ def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=Fa
         raise
 
     return df
-
-# #TODO: DELETE THIS MAIN METHOD. Used for testing only
-# if __name__ == "__main__":
-#     # create_container('test/test-assign/r-correct/autograder/autograder.zip', "1234")
-#     launch_grade('test/test-assign/r-correct/autograder/autograder.zip')

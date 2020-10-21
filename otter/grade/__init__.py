@@ -85,7 +85,7 @@ def main(args):
         print("Combining grades and saving...")
 
     # Merge Dataframes
-    output_df = merge_csv(grades_dfs)
+    output_df = merge_csv(grade_dfs)
 
     def map_files_to_ids(row):
         """Returns the identifier for the filename in the specified row"""
