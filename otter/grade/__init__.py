@@ -70,6 +70,7 @@ def main(args):
 
     #Docker
     grade_dfs = launch_grade(args.gradescope_path,
+        notebooks_dir=args.path,
         verbose=verbose,
         num_containers=args.containers,
         scripts=args.scripts,

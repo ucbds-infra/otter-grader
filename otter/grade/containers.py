@@ -70,7 +70,7 @@ def generate_hash(path):
         zip_hash = m.hexdigest()
     return zip_hash
 
-def launch_grade(gradescope_zip_path, verbose=False, num_containers=None,
+def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containers=None,
     scripts=False, no_kill=False, output_path="./", debug=False, zips=False,
     meta_parser=None):
     """Grades notebooks in parallel docker containers
@@ -80,7 +80,6 @@ def launch_grade(gradescope_zip_path, verbose=False, num_containers=None,
     of the assignment needing manual grading.
 
     Args:
-        tests_dir (``str``): path to directory of tests
         notebooks_dir (``str``): path to directory of student submissions to be graded
         verbose (``bool``, optional): whether status messages should be printed to the command line
         num_containers (``int``, optional): The number of parallel containers that will be run
@@ -104,12 +103,13 @@ def launch_grade(gradescope_zip_path, verbose=False, num_containers=None,
 
     pool = ThreadPoolExecutor(num_containers)
     futures = []
+    img =  build_image(gradescope_zip_path, generate_hash(gradescope_zip_path))
     for i in range(num_containers):
         futures += [pool.submit(grade_assignments,
-            notebooks_dir="",
+            notebooks_dir=notebooks_dir,
             verbose=verbose,
             #TODO:check if path is not default for generate hash
-            image=build_image(gradescope_zip_path, generate_hash(gradescope_zip_path)),
+            image=img,
             scripts=scripts,
             no_kill=no_kill,
             output_path=output_path,
@@ -301,7 +301,7 @@ def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=Fa
             print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container_id}...")
 
         # Now we have the notebooks in home/notebooks, we should tell the container to execute the grade command...
-        grade_command = ["python3", "-m", "otter.grade", "/home/notebooks"]
+        grade_command = ["/autograder/run_autograder"]
 
         # # if we want PDF output, add the necessary flag
         # if pdfs:
@@ -312,14 +312,14 @@ def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=Fa
         #     grade_command += ["--seed", str(seed)]
 
         # if we are grading scripts, add the --script flag
-        if scripts:
-            grade_command += ["--scripts"]
-
-        if debug:
-            grade_command += ["--verbose"]
-
-        if zips:
-            grade_command += ["--zips"]
+        # if scripts:
+        #     grade_command += ["--scripts"]
+        #
+        # if debug:
+        #     grade_command += ["--verbose"]
+        #
+        # if zips:
+        #     grade_command += ["--zips"]
 
         exit_code, output = container.exec_run(grade_command)
         assert exit_code == 0, f"Container {container_id} failed with output:\n{output.decode('utf-8')}"
