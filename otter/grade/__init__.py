@@ -6,7 +6,7 @@ import os
 import pandas as pd
 
 from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
-from .containers import launch_parallel_containers
+from .containers import launch_grade
 from .utils import merge_csv
 
 def main(args):
@@ -17,9 +17,9 @@ def main(args):
     """
     # Asserts that exactly one metadata flag is provided
     assert sum([meta != False for meta in [
-        args.gradescope, 
-        args.canvas, 
-        args.json, 
+        args.gradescope,
+        args.canvas,
+        args.json,
         args.yaml
     ]]) <= 1, "You can specify at most one metadata flag (-g, -j, -y, -c)"
 
@@ -50,15 +50,15 @@ def main(args):
         meta_parser = None
 
     # check that reqs file is valid
-    requirements = args.requirements
-    if requirements is None and os.path.isfile("requirements.txt"):
-        requirements = "requirements.txt"
-    
-    if requirements:
-            assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
+    # requirements = args.requirements
+    # if requirements is None and os.path.isfile("requirements.txt"):
+    #     requirements = "requirements.txt"
+    #
+    # if requirements:
+    #         assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
 
     # if not os.path.isfile(args.requirements):
-        
+
     #     # if user-specified requirements not found, fail with AssertionError
     #     assert args.requirements == "requirements.txt", f"requirements file {args.requirements} does not exist"
 
@@ -68,23 +68,15 @@ def main(args):
     if verbose:
         print("Launching docker containers...")
 
-    # Docker
-    grades_dfs = launch_parallel_containers(args.tests_path, 
-        args.path, 
-        verbose=verbose, 
-        pdfs=args.pdfs,
-        # unfiltered_pdfs=args.pdf, 
-        # tag_filter=args.tag_filter,
-        # html_filter=args.html_filter,
-        # reqs=args.requirements,
-        reqs=requirements,
+    #Docker
+    grade_dfs = launch_grade(args.gradescope_path,
+        notebooks_dir=args.path,
+        verbose=verbose,
         num_containers=args.containers,
-        image=args.image,
         scripts=args.scripts,
         no_kill=args.no_kill,
         output_path=args.output_path,
         debug=args.debug,
-        seed=args.seed,
         zips=args.zips,
         meta_parser=meta_parser
     )
