@@ -19,15 +19,24 @@ from hashlib import md5
 from .metadata import GradescopeParser
 from .utils import simple_tar, get_container_file
 
-# TODO: add docstring. see launch_grade and grade_assignment for format
-def build_image(zip_path, zip_hash):
-    tag = "otter_grade:" + zip_hash
+def build_image(zip_path, tag):
+    """Creates a new image based on the autograder zip file and attaches a tag.
+
+    Args:
+        zip_path (``str``): path to the autograder zip file
+        tag (``str``): tag value to be added when creating the image
+
+
+    Returns:
+        ``str``: the string value of the newly built image
+    """
+    image = "otter_grade:" + tag
     dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
     build_out = subprocess.Popen(
-        ["docker", "build","--build-arg", "ZIPPATH=" + zip_path, ".", "-f", dockerfile, "-t", tag],
+        ["docker", "build","--build-arg", "ZIPPATH=" + zip_path, ".", "-f", dockerfile, "-t", image],
     )
     build_out.wait()
-    return tag
+    return image
 
 # def new_create_container(test_folder_path, zip_hash):
 #     dockerfile = BytesIO()
@@ -62,9 +71,17 @@ def build_image(zip_path, zip_hash):
 #                         encoding="utf-8")
 #     client.close()
 
-# TODO: add docstring. see launch_grade and grade_assignment for format
 def generate_hash(path):
-    zip_hash =""
+    """Reads in a files content and returns a hash value string based
+    on the file's content.
+
+    Args:
+        path (``str``): path to the file that will be read in and hashed
+
+    Returns:
+        ``str``: the hash value of the read in zip file
+    """
+    zip_hash = ""
     m = md5()
     with open(path, "rb") as f:
         data = f.read() #read file in chunk and call update on each chunk if file is large.
@@ -78,10 +95,11 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
     """Grades notebooks in parallel docker containers
 
     This function runs ``num_containers`` docker containers in parallel to grade the student submissions
-    in ``notebooks_dir`` using the tests in ``tests_dir``. It can additionally generate PDFs for the parts
+    in ``notebooks_dir`` using the tests in ``gradescope_zip_path``. It can additionally generate PDFs for the parts
     of the assignment needing manual grading.
 
     Args:
+        gradescope_zip_path(``str``): path to zip file used to set up container
         notebooks_dir (``str``): path to directory of student submissions to be graded
         verbose (``bool``, optional): whether status messages should be printed to the command line
         num_containers (``int``, optional): The number of parallel containers that will be run
@@ -108,7 +126,7 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
     img =  build_image(gradescope_zip_path, generate_hash(gradescope_zip_path))
 
     # TODO: here we should be iterating through all notebooks in notebooks_dir, so that we call
-    #       grade_assignments on the path to each notebook, and end up with several contains in the 
+    #       grade_assignments on the path to each notebook, and end up with several contains in the
     #       pool with num_containers being run at any given moment
     for i in range(num_containers):
         futures += [pool.submit(grade_assignments,
@@ -252,7 +270,6 @@ def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=Fa
 
     Args:
         notebooks_dir (``str``): path to directory of student submissions to be graded
-        id (``int``): grading container index
         image (``str``, optional): a docker image tag to be used for grading environment
         verbose (``bool``, optional): whether status messages should be printed to the command line
         scripts (``bool``, optional): whether student submissions are Python scripts rather than
