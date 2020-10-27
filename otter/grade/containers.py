@@ -11,6 +11,7 @@ import docker
 import pandas as pd
 import tarfile
 import pkg_resources
+import glob
 
 from subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor, wait
@@ -127,10 +128,14 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
 
     # TODO: here we should be iterating through all notebooks in notebooks_dir, so that we call
     #       grade_assignments on the path to each notebook, and end up with several contains in the
-    #       pool with num_containers being run at any given moment
-    for i in range(num_containers):
+    #       pool with num_containers being run at any given moment    
+    notebooks = []
+    for f in glob.glob(os.path.join(notebooks_dir, "*.ipynb")):
+        notebooks.append(f)
+
+    for i in range(len(notebooks)):
         futures += [pool.submit(grade_assignments,
-            notebooks_dir=notebooks_dir,
+            notebook_dir=notebooks[i],
             verbose=verbose,
             #TODO:check if path is not default for generate hash
             image=img,
@@ -140,7 +145,7 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
             debug=debug,
             zips=zips
         )]
-
+    
     # stop execution while containers are running
     finished_futures = wait(futures)
     # return list of dataframes
@@ -262,14 +267,14 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
 
 # TODO: these arguments need to be updated. replace notebooks_dir with the path to the notebook that
 # this container will be grading
-def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=False,
+def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=False,
     scripts=False, no_kill=False, output_path="./", debug=False, zips=False):
     """
     Grades multiple submissions in a directory using a single docker container. If no PDF assignment is
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
 
     Args:
-        notebooks_dir (``str``): path to directory of student submissions to be graded
+        notebook_dir (``str``): path to directory of student submission to be graded
         image (``str``, optional): a docker image tag to be used for grading environment
         verbose (``bool``, optional): whether status messages should be printed to the command line
         scripts (``bool``, optional): whether student submissions are Python scripts rather than
@@ -291,7 +296,7 @@ def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=Fa
         client = docker.from_env()
     container = client.containers.run(image, detach=True, tty=True)
 
-    notebooks_dir = os.path.abspath(notebooks_dir)
+    notebook_dir = os.path.abspath(notebook_dir)
 
     try:
         container_id = container.id[:12]
@@ -301,9 +306,9 @@ def grade_assignments(notebooks_dir, image="ucbdsinfra/otter-grader", verbose=Fa
 
         # TODO: remember 1 subm per container, so we will use this content manager to put the
         #       notebook at /autograder/{notebook name}.ipynb
-        with simple_tar(notebooks_dir) as tarf:
+        with simple_tar(notebook_dir) as tarf:
             container.put_archive("/home", tarf)
-            exit_code, output = container.exec_run(f"mv /home/{os.path.basename(notebooks_dir)} /home/notebooks")
+            exit_code, output = container.exec_run(f"mv /home/{os.path.basename(notebook_dir)} /home/notebooks")
             assert exit_code == 0, f"Container {container_id} failed with output:\n{output.decode('utf-8')}"
 
         if verbose:
