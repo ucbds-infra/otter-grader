@@ -305,11 +305,15 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
             print(f"Launched container {container_id}...")
 
         # TODO: remember 1 subm per container, so we will use this content manager to put the
-        #       notebook at /autograder/{notebook name}.ipynb
+        #       notebook at /autograder/submission/{notebook name}.ipynb
+
+        # should be fixed @Edward
         with simple_tar(notebook_dir) as tarf:
             container.put_archive("/home", tarf)
-            exit_code, output = container.exec_run(f"mv /home/{os.path.basename(notebook_dir)} /home/notebooks")
-            assert exit_code == 0, f"Container {container_id} failed with output:\n{output.decode('utf-8')}"
+            container.put_archive("/autograder/submission", tarf)
+            #exit_code, output = container.exec_run(f"mv /home/{os.path.basename(notebook_dir)} /home/notebooks")
+            # exit_code, output = container.exec_run(f"mv /home/{os.path.basename(notebook_dir)} /autograder")
+            # assert exit_code == 0, f"Container {container_id} failed with output:\n{output.decode('utf-8')}"
 
         if verbose:
             print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container_id}...")
@@ -329,22 +333,29 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
         # TODO: this needs to be updated to parse the JSON, found at path /autograder/results/results.json,
         #       into the existing CSV format so that this function returns a 1-row dataframe
         # get the grades back from the container and read to date frame so we can merge later
-        with get_container_file(container, "/home/notebooks/grades.csv") as f:
-            df = pd.read_csv(f)
+        
+        # with get_container_file(container, "/home/notebooks/grades.csv") as f:
+        #     df = pd.read_csv(f)
+        
+        #should be fixed @Edward
+        with get_container_file(container, "/autograder/results/results.json") as f:
+            df = pd.read_json(f)
 
         # TODO: PDFs still need to work, so this code needs to be adapted to get the PDF of the notebook
         #       at path /autograder/submission/{notebook name}.pdf
-        # if pdfs:
-        #     pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
-        #     os.makedirs(pdf_folder, exist_ok=True)
-        #
-        #     # copy out manual submissions
-        #     for pdf in df["manual"]:
-        #         local_pdf_path = os.path.join(pdf_folder, os.path.basename(pdf))
-        #         with get_container_file(container, pdf) as pdf_file, open(local_pdf_path, "wb+") as f:
-        #             f.write(pdf_file.read())
-        #
-        #     df["manual"] = df["manual"].str.replace("/home/notebooks", os.path.basename(pdf_folder))
+
+        #not fixed yet @Edward
+        if pdfs:
+            pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
+            os.makedirs(pdf_folder, exist_ok=True)
+        
+            # copy out manual submissions
+            for pdf in df["manual"]:
+                local_pdf_path = os.path.join(pdf_folder, os.path.basename(pdf))
+                with get_container_file(container, pdf) as pdf_file, open(local_pdf_path, "wb+") as f:
+                    f.write(pdf_file.read())
+        
+            df["manual"] = df["manual"].str.replace("/home/notebooks", os.path.basename(pdf_folder))
 
         if not no_kill:
             if verbose:
