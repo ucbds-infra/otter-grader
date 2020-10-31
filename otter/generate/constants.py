@@ -11,7 +11,7 @@ DEFAULT_OPTIONS = {
     "grade_from_log": False,
     "serialized_variables": {},
     "public_multiplier": 0,
-    "pdfs": False,
+    "pdf": False,
     "token": None,
     "course_id": 'None',
     "assignment_id": 'None',
