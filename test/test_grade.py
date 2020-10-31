@@ -16,6 +16,7 @@ from glob import glob
 from otter.argparser import get_parser
 from otter.grade import main as grade
 from otter.grade.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
+from otter.run import run_otter
 
 from . import TestCase
 
@@ -33,7 +34,7 @@ class TestGrade(TestCase):
         subprocess.run(create_image_cmd, check=True)
         # create_image = subprocess.run(create_image_cmd, check=True)
         # assert not create_image.stderr, create_image.stderr.decode("utf-8")
-    
+        
     def setUp(self):
         """
         Load in point values
@@ -46,6 +47,14 @@ class TestGrade(TestCase):
             self.test_points[env['test']['name']] = env['test']['points']
         return super().setUp()
 
+    def generate_autograder_zip(self, pdfs=False):
+        cmd = [
+            "generate", "autograder", "-t", TEST_FILES_PATH + "tests", "-r", 
+            TEST_FILES_PATH + "requirements.txt", "-o", TEST_FILES_PATH
+        ]
+        if pdfs:
+            cmd += ["-c", TEST_FILES_PATH + "otter_config.json"]
+        run_otter(cmd)
 
     def test_docker(self):
         """
@@ -170,8 +179,9 @@ class TestGrade(TestCase):
             # NO METADATA PASSED, test case when no metadata provided
             # "-y", TEST_FILES_PATH + "notebooks/meta.yml", 
             "-p", TEST_FILES_PATH + "notebooks/", 
-            "-t", TEST_FILES_PATH + "tests/", 
-            "-r", TEST_FILES_PATH + "requirements.txt",
+            # "-t", TEST_FILES_PATH + "tests/", 
+            # "-r", TEST_FILES_PATH + "requirements.txt",
+            "-f", TEST_FILES_PATH + "autograder.zip"
             "-o", "test/",
             "--image", "otter-test",
             "-v"
@@ -225,11 +235,12 @@ class TestGrade(TestCase):
         # grade the 100 notebooks
         grade_command = ["grade",
             "-y", TEST_FILES_PATH + "notebooks/meta.yml", 
-            "-p", TEST_FILES_PATH + "notebooks/", 
-            "-t", TEST_FILES_PATH + "tests/", 
-            "-r", TEST_FILES_PATH + "requirements.txt",
+            # "-p", TEST_FILES_PATH + "notebooks/", 
+            # "-t", TEST_FILES_PATH + "tests/", 
+            # "-r", TEST_FILES_PATH + "requirements.txt",
             "-o", "test/",
-            "--pdfs",
+            # "--pdfs",
+            "-f", TEST_FILES_PATH + "autograder.zip",
             "--containers", "5",
             "--image", "otter-test"
         ]

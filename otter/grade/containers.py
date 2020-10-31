@@ -349,7 +349,9 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
             scores = pickle.load(f)
 
         # TODO: wrangle results
-        scores = {t : scores[t]["score"] if type(scores[t]) == dict else scores[t] for t in scores}
+        scores = scores.to_dict()
+        scores = {t : [scores[t]["score"]] if type(scores[t]) == dict else scores[t] for t in scores}
+        scores["file"] = os.path.split(notebook_dir)[1]
         df = pd.DataFrame(scores)
 
         # TODO: PDFs still need to work, so this code needs to be adapted to get the PDF of the notebook
