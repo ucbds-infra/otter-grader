@@ -39,10 +39,15 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     tests_dir = output_dir / 'tests'
     os.makedirs(tests_dir, exist_ok=True)
 
-    if assignment.requirements:
-        shutil.copy(assignment.requirements, str(output_dir / 'requirements.txt'))
-
     transformed_nb, test_files = transform_notebook(nb, assignment, args)
+
+    if assignment.requirements:
+        if isinstance(assignment.requirements, list):
+            with open(str(output_dir / 'requirements.txt'), "w+") as f:
+                f.write("\n".join(assignment.requirements))
+            assignment.requirements = str(output_dir / 'requirements.txt')
+        else:
+            shutil.copy(assignment.requirements, str(output_dir / 'requirements.txt'))
 
     # write notebook
     # with open(output_nb_path) as f:

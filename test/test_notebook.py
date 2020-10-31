@@ -527,18 +527,19 @@ class TestNotebook(TestCase):
         grader = Notebook(TEST_FILES_PATH + "tests")
 
         output = str(grader.check_all())
+        output2 = grader.check_all()
 
         # checks each question substring
         output_lst = [
-            'q1:\n\n    All tests passed!\n',
-            'q2:\n\n    \n    0 of 1 tests passed\n',
-            'q3:\n\n    All tests passed!\n',
-            'q4:\n\n    All tests passed!\n',
-            'q5:\n\n    All tests passed!\n'
+            'q1 passed!\n',
+            'q2 results:\n\nTrying:\n    1 == 1',
+            'q3 passed!\n',
+            'q4 passed!\n',
+            'q5 passed!\n'
         ]
 
         for result in output_lst:
-            self.assertTrue(output.count(result) == 1)
+            self.assertTrue(output.count(result) == 1, f"Expected output to contain '{result}':\n{output}")
 
     def test_to_pdf_with_nb_path(self):
         """

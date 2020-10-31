@@ -12,5 +12,4 @@ RUN mkdir -p /autograder/submission
 ADD fails2and6H.ipynb /autograder/submission/fails2and6H.ipynb
 RUN mkdir -p /autograder/results
 COPY --from=otter-test /tmp/otter-grader /tmp/otter-grader
-RUN pip3 install /tmp/otter-grader
-RUN pip install /tmp/otter-grader
+RUN conda run -n otter-gradescope-env pip install /tmp/otter-grader

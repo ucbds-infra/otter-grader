@@ -11,8 +11,9 @@ from IPython import get_ipython
 from .execute_log import execute_log
 from .execute_notebook import execute_notebook, filter_ignored_cells
 from .execute_script import execute_script
-from .results import GradingResults
-from ..test_files import TestCollection, OKTestFile
+# from .results import GradingResults
+
+from ..test_files import OKTestFile, GradingResults
 from ..utils import id_generator
 
 def check(test_file_path, global_env=None):
@@ -30,11 +31,11 @@ def check(test_file_path, global_env=None):
             of a python script or notebook
 
     Returns:
-        ``otter.test_files.abstract_test.TestCollectionResults``: result of running the tests in the 
+        ``otter.test_files.ok_test.OKTestFile``: result of running the tests in the 
             given global environment
 
     """
-    tests = TestCollection([test_file_path], OKTestFile)
+    test = OKTestFile.from_file(test_file_path)
 
     if global_env is None:
         # Get the global env of our callers - one level below us in the stack
@@ -43,10 +44,12 @@ def check(test_file_path, global_env=None):
         # inspect trick to pass in its parents' global env.
         global_env = inspect.currentframe().f_back.f_globals
 
-    return tests.run(global_env, include_grade=False)
+    test.run(global_env)
+
+    return test
 
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    cwd=None, test_dir=None, seed=None, log=None, variables=None):
+    cwd=None, test_dir=None, seed=None, log=None, variables=None, plugin_collection=None):
     """
     Grade a notebook file & return grade information
 
@@ -68,10 +71,10 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
             object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
 
     Returns:
-        ``otter.execute.results.GradingResults``: the results of grading
+        ``otter.test_files.GradingResults``: the results of grading
     """
-    # ensure this is not being executed inside a notebook
-    assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"
+    # # ensure this is not being executed inside a notebook
+    # assert get_ipython() is None, "Cannot execute inside Jupyter Notebook"
 
     if not script:
         try:
@@ -104,13 +107,16 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     else:
         global_env = execute_notebook(nb, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, seed=seed)
 
-    test_results = global_env[results_array]
+    if plugin_collection is not None:
+        plugin_collection.run("after_execution", global_env)
+
+    tests_run = global_env[results_array]
 
     # Check for tests which were not included in the notebook and specified by tests_globs
     # Allows instructors to run notebooks with additional tests not accessible to user
     if tests_glob:
         # unpack list of paths into a single list
-        tested_set = list(itertools.chain(*[r.paths for r in test_results]))
+        tested_set = [test.path for test in tests_run]
         extra_tests = []
         for t in sorted(tests_glob):
             include = True
@@ -118,8 +124,14 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
                 if tested in t or t in tested:     # e.g. if 'tests/q1.py' is in /srv/repo/lab01/tests/q1.py
                     include = False
             if include:
-                extra_tests.append(TestCollection([t], OKTestFile))
-        extra_results = [t.run(global_env, include_grade=False) for t in extra_tests]
-        test_results += extra_results
+                extra_tests.append(OKTestFile.from_file(t))
+                extra_tests[-1].run(global_env)
+        # extra_results = [t.run(global_env, include_grade=False) for t in extra_tests]
+        tests_run += extra_tests
+
+    results = GradingResults(tests_run)
+
+    if plugin_collection is not None:
+        plugin_collection.run("after_grading", results)
     
-    return GradingResults(test_results)
+    return results

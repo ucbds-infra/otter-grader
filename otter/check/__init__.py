@@ -13,15 +13,15 @@ from ..execute import grade_notebook, check
 from ..utils import block_print
 
 
-RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ tests|length }} tests passed
-{% if passed_tests %}
-Tests passed:
-    {% for passed_test in passed_tests %}{{ passed_test }} {% endfor %}
-{% endif %}
-{% if failed_tests %}
-Tests failed: 
-{% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
-""")
+# RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ tests|length }} tests passed
+# {% if passed_tests %}
+# Tests passed:
+#     {% for passed_test in passed_tests %}{{ passed_test }} {% endfor %}
+# {% endif %}
+# {% if failed_tests %}
+# Tests failed: 
+# {% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
+# """)
 
 def _log_event(event_type, results=[], question=None, success=True, error=None):
 	"""
@@ -72,20 +72,18 @@ def main(args):
 				seed=args.seed
 			)
 
-		passed_tests = [
-			results.get_result(test_name).name for test_name in results.tests if not results.get_result(test_name).incorrect
-			# test for test in results if test not in ["possible", "total"] and "hint" not in results[test]
-		]
-		failed_tests = [
-			repr(results.get_result(test_name).test) for test_name in results.tests if results.get_result(test_name).incorrect
-		]
+		# passed_tests = [
+		# 	results.get_result(test_name).name for test_name in results.tests if not results.get_result(test_name).incorrect
+		# 	# test for test in results if test not in ["possible", "total"] and "hint" not in results[test]
+		# ]
+		# failed_tests = [
+		# 	results.get_result(test_name).test_case_result.message for test_name in results.tests if results.get_result(test_name).incorrect
+		# ]
 
-		output = RESULT_TEMPLATE.render(
-			grade=results.total / results.possible,
-			passed_tests=passed_tests,
-			failed_tests=failed_tests,
-			tests=results.tests
-		)
+		if results.total / results.possible == 1:
+			output = "All tests passed!"
+		else:
+			output = "\n".join(repr(test_file) for test_file in results.test_files)
 
 		print(output)
 

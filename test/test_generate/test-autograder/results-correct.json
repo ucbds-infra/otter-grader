@@ -1,81 +1,102 @@
 {
     "tests": [
         {
-            "name": "q1 - Public",
-            "score": 0,
-            "max_score": 0,
-            "visibility": "visible",
-            "output": "All tests passed!"
-        },
-        {
-            "name": "q1 - Hidden",
-            "score": 0,
-            "max_score": 0,
-            "visibility": "hidden",
-            "output": "All tests passed!"
-        },
-        {
-            "name": "q2 - Public",
-            "score": 0,
-            "max_score": 2,
-            "visibility": "visible",
-            "output": "   tests/q2.py\n\nTest result:\nTrying:\n    negate(True)\nExpecting:\n    False\n**********************************************************************\nLine 2, in tests/q2.py 0\nFailed example:\n    negate(True)\nExpected:\n    False\nGot:\n    True\n"
-        },
-        {
-            "name": "q3 - Public",
+            "name": "q1 - 1",
             "score": 0.0,
-            "max_score": 0,
+            "max_score": 0.0,
             "visibility": "visible",
-            "output": "All tests passed!"
+            "output": "Test case passed!"
         },
         {
-            "name": "q3 - Hidden",
-            "score": 2.0,
-            "max_score": 2,
-            "visibility": "hidden",
-            "output": "All tests passed!"
-        },
-        {
-            "name": "q4 - Public",
+            "name": "q1 - 2",
             "score": 0.0,
-            "max_score": 0,
+            "max_score": 0.0,
             "visibility": "visible",
-            "output": "All tests passed!"
+            "output": "Test case passed!"
         },
         {
-            "name": "q4 - Hidden",
+            "name": "q1 - 3",
+            "score": 0.0,
+            "max_score": 0.0,
+            "visibility": "hidden",
+            "output": "Test case passed!"
+        },
+        {
+            "name": "q1 - 4",
+            "score": 0.0,
+            "max_score": 0.0,
+            "visibility": "hidden",
+            "output": "Test case passed!"
+        },
+        {
+            "name": "q2 - 1",
+            "score": 0.0,
+            "max_score": 0.5,
+            "visibility": "visible",
+            "output": "Trying:\n    negate(True)\nExpecting:\n    False\n**********************************************************************\nLine 2, in q2 0\nFailed example:\n    negate(True)\nExpected:\n    False\nGot:\n    True\n"
+        },
+        {
+            "name": "q2 - 2",
+            "score": 0.0,
+            "max_score": 0.5,
+            "visibility": "visible",
+            "output": "Trying:\n    negate(False)\nExpecting:\n    True\n**********************************************************************\nLine 2, in q2 1\nFailed example:\n    negate(False)\nExpected:\n    True\nGot:\n    False\n"
+        },
+        {
+            "name": "q2 - 3",
+            "score": 0.0,
+            "max_score": 0.5,
+            "visibility": "hidden",
+            "output": "Trying:\n    negate(\"\")\nExpecting:\n    True\n**********************************************************************\nLine 2, in q2 2\nFailed example:\n    negate(\"\")\nExpected:\n    True\nGot:\n    ''\n"
+        },
+        {
+            "name": "q2 - 4",
+            "score": 0.0,
+            "max_score": 0.5,
+            "visibility": "hidden",
+            "output": "Trying:\n    negate(1)\nExpecting:\n    False\n**********************************************************************\nLine 2, in q2 3\nFailed example:\n    negate(1)\nExpected:\n    False\nGot:\n    1\n"
+        },
+        {
+            "name": "q3 - 1",
             "score": 1.0,
-            "max_score": 1,
-            "visibility": "hidden",
-            "output": "All tests passed!"
-        },
-        {
-            "name": "q6 - Public",
-            "score": 0,
-            "max_score": 0,
+            "max_score": 1.0,
             "visibility": "visible",
-            "output": "All tests passed!"
+            "output": "Test case passed!"
         },
         {
-            "name": "q6 - Hidden",
-            "score": 0,
-            "max_score": 5,
-            "visibility": "hidden",
-            "output": "   tests/q6.py\n\nTest result:\nTrying:\n    fib = fiberator()\nExpecting nothing\nok\nTrying:\n    for _ in range(10):\n        print(next(fib))\nExpecting:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\n**********************************************************************\nLine 3, in tests/q6.py 1\nFailed example:\n    for _ in range(10):\n        print(next(fib))\nExpected:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\nGot:\n    0\n    1\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n"
-        },
-        {
-            "name": "q7 - Public",
-            "score": 0.0,
-            "max_score": 0,
-            "visibility": "visible",
-            "output": "All tests passed!"
-        },
-        {
-            "name": "q7 - Hidden",
+            "name": "q3 - 2",
             "score": 1.0,
-            "max_score": 1,
+            "max_score": 1.0,
             "visibility": "hidden",
-            "output": "All tests passed!"
+            "output": "Test case passed!"
+        },
+        {
+            "name": "q4 - 1",
+            "score": 1.0,
+            "max_score": 1.0,
+            "visibility": "hidden",
+            "output": "Test case passed!"
+        },
+        {
+            "name": "q6 - 1",
+            "score": 2.5,
+            "max_score": 2.5,
+            "visibility": "visible",
+            "output": "Test case passed!"
+        },
+        {
+            "name": "q6 - 2",
+            "score": 0.0,
+            "max_score": 2.5,
+            "visibility": "hidden",
+            "output": "Trying:\n    fib = fiberator()\nExpecting nothing\nok\nTrying:\n    for _ in range(10):\n        print(next(fib))\nExpecting:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\n**********************************************************************\nLine 3, in q6 1\nFailed example:\n    for _ in range(10):\n        print(next(fib))\nExpected:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\nGot:\n    0\n    1\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n"
+        },
+        {
+            "name": "q7 - 1",
+            "score": 1.0,
+            "max_score": 1.0,
+            "visibility": "visible",
+            "output": "Test case passed!"
         }
     ]
 }

@@ -11,7 +11,7 @@ import warnings
 
 from glob import glob
 
-from ..constants import DEFAULT_OPTIONS
+# from ..constants import DEFAULT_OPTIONS
 from ..token import APIClient
 from ..utils import replace_notebook_instances
 
@@ -19,6 +19,7 @@ from ...check.logs import Log, QuestionNotInLogException
 from ...check.notebook import _OTTER_LOG_FILENAME
 from ...execute import grade_notebook
 from ...export import export_notebook
+from ...plugins import PluginCollection
 
 def prepare_files():
     # put files into submission directory
@@ -63,21 +64,38 @@ def write_and_submit_pdf(client, nb_path, filtering, pagebreaks, course_id, assi
         # warnings.warn("PDF generation or submission failed", RuntimeWarning)
         print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
 
-def run_autograder(config):
+def run_autograder(options):
     """
     Runs autograder on Gradescope based on predefined configurations.
 
     Args:
         config (``dict``): configurations for autograder
     """
-    options = DEFAULT_OPTIONS.copy()
-    options.update(config)
+    # options = DEFAULT_OPTIONS.copy()
+    # options.update(config)
 
     # add miniconda back to path
     os.environ["PATH"] = f"{options['miniconda_path']}/bin:" + os.environ.get("PATH")
     
     abs_ag_path = os.path.abspath(options["autograder_dir"])
     os.chdir(abs_ag_path)
+
+    # load plugins
+    plugins = options["plugins"]
+
+    if plugins:
+        with open("./submission_metadata.json") as f:
+            submission_metadata = json.load(f)
+
+        plugin_config = options["plugin_config"]
+        
+        plugin_collection = PluginCollection(plugins, submission_metadata, plugin_config)
+    
+    else:
+        plugin_collection = None
+
+    if plugin_collection:
+        plugin_collection.run("before_grading", options)
 
     if options["token"] is not None:
         client = APIClient(token=options["token"])
@@ -110,7 +128,8 @@ def run_autograder(config):
         ignore_errors=not options["debug"], 
         seed=options["seed"],
         log=log if options["grade_from_log"] else None,
-        variables=options["serialized_variables"]
+        variables=options["serialized_variables"],
+        plugin_collection=plugin_collection
     )
 
     # verify the scores against the log
@@ -131,7 +150,7 @@ def run_autograder(config):
             options['assignment_id']
         )
 
-    output = scores.to_gradescope_dict(config)
+    output = scores.to_gradescope_dict(options)
 
     os.chdir(abs_ag_path)
 
