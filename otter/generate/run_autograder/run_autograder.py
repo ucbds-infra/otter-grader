@@ -5,6 +5,7 @@ Gradescope autograding internals for Python
 import os
 import json
 import shutil
+import pickle
 import subprocess
 import warnings
 
@@ -133,5 +134,8 @@ def run_autograder(config):
     output = scores.to_gradescope_dict(config)
 
     os.chdir(abs_ag_path)
+
+    with open("results/results.pkl", "wb+") as f:
+        pickle.dump(scores, f)
 
     return output

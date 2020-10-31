@@ -2,6 +2,7 @@
 Docker container management for Otter Grade
 """
 
+import json
 import subprocess
 import re
 import os
@@ -12,11 +13,13 @@ import pandas as pd
 import tarfile
 import pkg_resources
 import glob
+import pickle
 
 from subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor, wait
 from hashlib import md5
 
+# from .test_files import Grad
 from .metadata import GradescopeParser
 from .utils import simple_tar, get_container_file
 
@@ -309,7 +312,7 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
 
         # should be fixed @Edward
         with simple_tar(notebook_dir) as tarf:
-            container.put_archive("/home", tarf)
+            # container.put_archive("/home", tarf)
             container.put_archive("/autograder/submission", tarf)
             #exit_code, output = container.exec_run(f"mv /home/{os.path.basename(notebook_dir)} /home/notebooks")
             # exit_code, output = container.exec_run(f"mv /home/{os.path.basename(notebook_dir)} /autograder")
@@ -338,13 +341,17 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
         #     df = pd.read_csv(f)
         
         #should be fixed @Edward
-        with get_container_file(container, "/autograder/results/results.json") as f:
-            df = pd.read_json(f)
+        with get_container_file(container, "/autograder/results/results.pkl") as f:
+            scores = pickle.load(f)
+
+        # TODO: wrangle results
+
 
         # TODO: PDFs still need to work, so this code needs to be adapted to get the PDF of the notebook
         #       at path /autograder/submission/{notebook name}.pdf
 
         #not fixed yet @Edward
+
         if pdfs:
             pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
             os.makedirs(pdf_folder, exist_ok=True)
