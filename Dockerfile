@@ -59,4 +59,4 @@ RUN mkdir /autograder
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-RUN pip install git+https://github.com/ucbds-infra/otter-grader.git@31f12dbcdba792269abf47e8285f586371e39526
+RUN pip install git+https://github.com/ucbds-infra/otter-grader.git@85a07816319e2eac4231ec0a0502cb562021db7f
