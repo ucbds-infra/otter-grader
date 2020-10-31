@@ -48,6 +48,13 @@ RUN apt-get clean && \
     apt-get update && \
     apt-get install -y postgresql postgresql-client libpq-dev
 
+# Set the locale to UTF-8 to ensure that Unicode output is encoded correctly
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+# create dir for autograder
+RUN mkdir /autograder
+
 # Python requirements
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt

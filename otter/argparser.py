@@ -154,7 +154,7 @@ def get_parser():
     # grade_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
     # grade_parser.add_argument("-r", "--requirements", default="requirements.txt", type=str, help="Flag for Python requirements file path; ./requirements.txt automatically checked")
     grade_parser.add_argument("--containers", type=int, help="Specify number of containers to run in parallel")
-    # grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
+    grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
     grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
     grade_parser.add_argument("--debug", action="store_true", default=False, help="Print stdout/stderr from grading for debugging")
 

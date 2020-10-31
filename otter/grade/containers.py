@@ -19,11 +19,13 @@ from subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor, wait
 from hashlib import md5
 
-# from .test_files import Grad
 from .metadata import GradescopeParser
 from .utils import simple_tar, get_container_file
 
-def build_image(zip_path, tag):
+from ..test_files import GradingResults
+
+# TODO: docstring
+def build_image(zip_path, base_image, tag):
     """Creates a new image based on the autograder zip file and attaches a tag.
 
     Args:
@@ -37,7 +39,8 @@ def build_image(zip_path, tag):
     image = "otter_grade:" + tag
     dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
     build_out = subprocess.Popen(
-        ["docker", "build","--build-arg", "ZIPPATH=" + zip_path, ".", "-f", dockerfile, "-t", image],
+        ["docker", "build","--build-arg", "ZIPPATH=" + zip_path, "--build-arg", "BASE_IMAGE=" + base_image,
+         ".", "-f", dockerfile, "-t", image],
     )
     build_out.wait()
     return image
@@ -94,7 +97,7 @@ def generate_hash(path):
     return zip_hash
 
 def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containers=None,
-    scripts=False, no_kill=False, output_path="./", debug=False, zips=False,
+    scripts=False, no_kill=False, output_path="./", debug=False, zips=False, image="ucbdsinfra/otter-grader",
     meta_parser=None):
     """Grades notebooks in parallel docker containers
 
@@ -127,7 +130,7 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
 
     pool = ThreadPoolExecutor(num_containers)
     futures = []
-    img =  build_image(gradescope_zip_path, generate_hash(gradescope_zip_path))
+    img =  build_image(gradescope_zip_path, image, generate_hash(gradescope_zip_path))
 
     # TODO: here we should be iterating through all notebooks in notebooks_dir, so that we call
     #       grade_assignments on the path to each notebook, and end up with several contains in the
@@ -300,6 +303,7 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
     container = client.containers.run(image, detach=True, tty=True)
 
     notebook_dir = os.path.abspath(notebook_dir)
+    nb_name = os.path.splitext(os.path.split(notebook_dir)[1])[0]
 
     try:
         container_id = container.id[:12]
@@ -345,24 +349,30 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
             scores = pickle.load(f)
 
         # TODO: wrangle results
-
+        scores = {t : scores[t]["score"] if type(scores[t]) == dict else scores[t] for t in scores}
+        df = pd.DataFrame(scores)
 
         # TODO: PDFs still need to work, so this code needs to be adapted to get the PDF of the notebook
         #       at path /autograder/submission/{notebook name}.pdf
 
         #not fixed yet @Edward
 
-        if pdfs:
-            pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
-            os.makedirs(pdf_folder, exist_ok=True)
-        
-            # copy out manual submissions
-            for pdf in df["manual"]:
-                local_pdf_path = os.path.join(pdf_folder, os.path.basename(pdf))
-                with get_container_file(container, pdf) as pdf_file, open(local_pdf_path, "wb+") as f:
+        try:
+            with get_container_file(container, f"/autograder/submission/{nb_name}.pdf") as pdf_file:
+                pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
+                # os.makedirs(pdf_folder, exist_ok=True)
+            
+                # # copy out manual submissions
+                # for pdf in df["manual"]:
+                local_pdf_path = os.path.join(pdf_folder, f"{nb_name}.pdf")
+                with open(local_pdf_path, "wb+") as f:
                     f.write(pdf_file.read())
         
-            df["manual"] = df["manual"].str.replace("/home/notebooks", os.path.basename(pdf_folder))
+            # df["manual"] = df["manual"].str.replace("/home/notebooks", os.path.basename(pdf_folder))
+
+        except:
+            # don't fail if no PDF found
+            pass
 
         if not no_kill:
             if verbose:

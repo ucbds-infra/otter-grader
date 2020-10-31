@@ -78,6 +78,7 @@ def main(args):
         output_path=args.output_path,
         debug=args.debug,
         zips=args.zips,
+        image=args.image,
         meta_parser=meta_parser
     )
 
