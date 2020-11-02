@@ -20,7 +20,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 from hashlib import md5
 
 from .metadata import GradescopeParser
-from .utils import simple_tar, get_container_file
+from .utils import simple_tar, get_container_file, OTTER_DOCKER_IMAGE_TAG
 
 from ..test_files import GradingResults
 
@@ -36,7 +36,7 @@ def build_image(zip_path, base_image, tag):
     Returns:
         ``str``: the string value of the newly built image
     """
-    image = "otter_grade:" + tag
+    image = OTTER_DOCKER_IMAGE_TAG + ":" + tag
     dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
     build_out = subprocess.Popen(
         ["docker", "build","--build-arg", "ZIPPATH=" + zip_path, "--build-arg", "BASE_IMAGE=" + base_image,
@@ -156,7 +156,7 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
     
     # stop execution while containers are running
     finished_futures = wait(futures)
-    
+
     # return list of dataframes
     return [df.result() for df in finished_futures[0]]
 
@@ -365,7 +365,7 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
         if pdfs:
             with get_container_file(container, f"/autograder/submission/{nb_name}.pdf") as pdf_file:
                 pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
-                # os.makedirs(pdf_folder, exist_ok=True)
+                os.makedirs(pdf_folder, exist_ok=True)
             
                 # # copy out manual submissions
                 # for pdf in df["manual"]:

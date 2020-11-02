@@ -129,7 +129,7 @@ def get_parser():
     # necessary path arguments
     grade_parser.add_argument("-p", "--path", type=str, default="./", help="Path to directory of submissions")
     # grade_parser.add_argument("-t", "--tests-path", type=str, default="./tests/", help="Path to directory of tests")
-    grade_parser.add_argument("-f", "--gradescope-path", type=str, default="./", help="Path to gradescope zip structure")
+    grade_parser.add_argument("-a", "--autograder-path", type=str, default="./", help="Path to autograder zip file")
     grade_parser.add_argument("-o", "--output-path", type=str, default="./", help="Path to which to write output")
 
     # metadata parser arguments
@@ -157,6 +157,9 @@ def get_parser():
     grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
     grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
     grade_parser.add_argument("--debug", action="store_true", default=False, help="Print stdout/stderr from grading for debugging")
+
+    grade_parser.add_argument("--prune", action="store_true", default=False, help="Prune all of Otter's grading images")
+    grade_parser.add_argument("-f", "--force", action="store_true", default=False, help="Force action (don't ask for confirmation)")
 
     grade_parser.set_defaults(func_str="grade.main")
 

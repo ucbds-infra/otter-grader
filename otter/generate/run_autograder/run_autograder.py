@@ -105,6 +105,7 @@ def run_autograder(options):
     else:
         generate_pdf = options["pdf"]
         has_token = False
+        client = None
 
     prepare_files()
 

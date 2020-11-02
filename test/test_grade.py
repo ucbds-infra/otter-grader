@@ -258,9 +258,10 @@ class TestGrade(TestCase):
             # "-r", TEST_FILES_PATH + "requirements.txt",
             "-o", "test/",
             # "--pdfs",
-            "-f", TEST_FILES_PATH + "autograder.zip",
+            "-a", TEST_FILES_PATH + "autograder.zip",
             "--containers", "5",
-            "--image", "otter-test"
+            "--image", "otter-test",
+            "--pdfs"
         ]
         args = parser.parse_args(grade_command)
         args.func = grade
@@ -268,11 +269,11 @@ class TestGrade(TestCase):
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv")
-        self.assertTrue("identifier" not in df_test.columns, "did not drop identifier column when no metadata passed")
+        # self.assertTrue("identifier" not in df_test.columns, "did not drop identifier column when no metadata passed")
 
         # sort by filename
-        df_test = df_test.sort_values("file").reset_index(drop=True)
-        df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
+        df_test = df_test.sort_values("identifier").reset_index(drop=True)
+        df_test["failures"] = df_test["identifier"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
 
         # add score sum cols for tests
         for test in self.test_points:
@@ -284,12 +285,12 @@ class TestGrade(TestCase):
             for test in self.test_points:
                 if int(re.sub(r"\D", "", test)) in row["failures"]:
                     # q6.py has all_or_nothing set to False, so if the hidden tests fail you should get 2.5 points
-                    if "6H" in row["file"] and "q6" == test:
-                        self.assertEqual(row[test], 2.5, "{} supposed to fail {} but passed".format(row["file"], test))
+                    if "6H" in row["identifier"] and "q6" == test:
+                        self.assertEqual(row[test], 2.5, "{} supposed to fail {} but passed".format(row["identifier"], test))
                     else:
-                        self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["file"], test))
+                        self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["identifier"], test))
                 else:
-                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["file"], test))
+                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["identifier"], test))
 
         # df_correct = pd.read_csv(TEST_FILES_PATH + "final_grades_correct_notebooks.csv").sort_values("identifier").reset_index(drop=True)
 
@@ -315,11 +316,11 @@ class TestGrade(TestCase):
         self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
 
 
-    def test_scripts(self):
-        """
-        Check that the example of 100 scripts runs correctely locally.
-        """
-        return
+    # def test_scripts(self):
+    #     """
+    #     Check that the example of 100 scripts runs correctely locally.
+    #     """
+    #     return
         # grade_command = ["grade",
         #     "-sy", TEST_FILES_PATH + "scripts/meta.yml", 
         #     "-p", TEST_FILES_PATH + "scripts/", 
@@ -381,3 +382,6 @@ class TestGrade(TestCase):
         if os.path.exists("otter/grade/old-Dockerfile"):
             os.remove("otter/grade/Dockerfile")
             shutil.move("otter/grade/old-Dockerfile", "otter/grade/Dockerfile")
+        
+        # prune images
+        run_otter(["grade", "--prune", "-f"])

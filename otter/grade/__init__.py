@@ -2,12 +2,13 @@
 Otter Grade command-line utility. Provides local grading of submissions in parallel Docker containers.
 """
 
+import re
 import os
 import pandas as pd
 
 from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .containers import launch_grade
-from .utils import merge_csv
+from .utils import merge_csv, prune_images
 
 def main(args):
     """Runs Otter Grade
@@ -15,6 +16,19 @@ def main(args):
     Args:
         args (``argparse.Namespace``): parsed command line arguments
     """
+    # prune images
+    if args.prune:
+        if not args.force:
+            sure = input("Are you sure you want to prune Otter's grading images? This action cannot be undone [y/N]")
+            sure = bool(re.match(sure, r"ye?s?", flags=re.IGNORECASE))
+        else:
+            sure = True
+        
+        if sure:
+            prune_images()
+        
+        return
+
     # Asserts that exactly one metadata flag is provided
     assert sum([meta != False for meta in [
         args.gradescope,
@@ -69,7 +83,7 @@ def main(args):
         print("Launching docker containers...")
 
     #Docker
-    grade_dfs = launch_grade(args.gradescope_path,
+    grade_dfs = launch_grade(args.autograder_path,
         notebooks_dir=args.path,
         verbose=verbose,
         num_containers=args.containers,
@@ -82,8 +96,6 @@ def main(args):
         meta_parser=meta_parser,
         pdfs=args.pdfs
     )
-
-    breakpoint()
 
     if verbose:
         print("Combining grades and saving...")
