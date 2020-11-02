@@ -103,7 +103,7 @@ def run_autograder(options):
         generate_pdf = True
         has_token = True
     else:
-        generate_pdf = options["pdfs"]
+        generate_pdf = options["pdf"]
         has_token = False
 
     prepare_files()

@@ -98,7 +98,7 @@ def generate_hash(path):
 
 def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containers=None,
     scripts=False, no_kill=False, output_path="./", debug=False, zips=False, image="ucbdsinfra/otter-grader",
-    meta_parser=None):
+    meta_parser=None, pdfs=False):
     """Grades notebooks in parallel docker containers
 
     This function runs ``num_containers`` docker containers in parallel to grade the student submissions
@@ -135,13 +135,14 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
     # TODO: here we should be iterating through all notebooks in notebooks_dir, so that we call
     #       grade_assignments on the path to each notebook, and end up with several contains in the
     #       pool with num_containers being run at any given moment    
-    notebooks = []
-    for f in glob.glob(os.path.join(notebooks_dir, "*.ipynb")):
-        notebooks.append(f)
+    # notebooks = []
+    # for f in glob.glob(os.path.join(notebooks_dir, "*.ipynb")):
+    #     notebooks.append(f)
+    notebooks = glob.glob(os.path.join(notebooks_dir, "*.ipynb"))
 
-    for i in range(len(notebooks)):
+    for nb_path in notebooks:
         futures += [pool.submit(grade_assignments,
-            notebook_dir=notebooks[i],
+            notebook_dir=nb_path,
             verbose=verbose,
             #TODO:check if path is not default for generate hash
             image=img,
@@ -149,11 +150,13 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
             no_kill=no_kill,
             output_path=output_path,
             debug=debug,
-            zips=zips
+            zips=zips,
+            pdfs=pdfs
         )]
     
     # stop execution while containers are running
     finished_futures = wait(futures)
+    
     # return list of dataframes
     return [df.result() for df in finished_futures[0]]
 
@@ -274,7 +277,7 @@ def launch_grade(gradescope_zip_path, notebooks_dir, verbose=False, num_containe
 # TODO: these arguments need to be updated. replace notebooks_dir with the path to the notebook that
 # this container will be grading
 def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=False,
-    scripts=False, no_kill=False, output_path="./", debug=False, zips=False):
+    scripts=False, no_kill=False, output_path="./", debug=False, zips=False, pdfs=False):
     """
     Grades multiple submissions in a directory using a single docker container. If no PDF assignment is
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
@@ -359,7 +362,7 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
 
         #not fixed yet @Edward
 
-        try:
+        if pdfs:
             with get_container_file(container, f"/autograder/submission/{nb_name}.pdf") as pdf_file:
                 pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
                 # os.makedirs(pdf_folder, exist_ok=True)
@@ -371,10 +374,6 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
                     f.write(pdf_file.read())
         
             # df["manual"] = df["manual"].str.replace("/home/notebooks", os.path.basename(pdf_folder))
-
-        except:
-            # don't fail if no PDF found
-            pass
 
         if not no_kill:
             if verbose:

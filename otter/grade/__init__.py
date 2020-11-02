@@ -79,8 +79,11 @@ def main(args):
         debug=args.debug,
         zips=args.zips,
         image=args.image,
-        meta_parser=meta_parser
+        meta_parser=meta_parser,
+        pdfs=args.pdfs
     )
+
+    breakpoint()
 
     if verbose:
         print("Combining grades and saving...")
