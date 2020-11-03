@@ -261,7 +261,6 @@ class TestGrade(TestCase):
             "-a", TEST_FILES_PATH + "autograder.zip",
             "--containers", "5",
             "--image", "otter-test",
-            "--pdfs"
         ]
         args = parser.parse_args(grade_command)
         args.func = grade
@@ -304,11 +303,11 @@ class TestGrade(TestCase):
         # # assert cleanup worked
         # self.assertEqual(len(cleanup.stderr), 0, "Error in cleanup")
 
-        # check that we have PDFs
-        self.assertTrue(os.path.isdir("test/submission_pdfs"))
-        for file in glob(TEST_FILES_PATH + "notebooks/*.ipynb"):
-            pdf = "test/submission_pdfs/" + os.path.split(file)[1][:-5] + "pdf"
-            self.assertTrue(os.path.isfile(pdf))
+        # # check that we have PDFs
+        # self.assertTrue(os.path.isdir("test/submission_pdfs"))
+        # for file in glob(TEST_FILES_PATH + "notebooks/*.ipynb"):
+        #     pdf = "test/submission_pdfs/" + os.path.split(file)[1][:-5] + "pdf"
+        #     self.assertTrue(os.path.isfile(pdf))
 
         # remove the extra output
         cleanup_command = ["rm", "-rf", "test/final_grades.csv", "test/submission_pdfs", "test/final_grades.csv"]

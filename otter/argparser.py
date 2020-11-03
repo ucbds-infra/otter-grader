@@ -129,7 +129,7 @@ def get_parser():
     # necessary path arguments
     grade_parser.add_argument("-p", "--path", type=str, default="./", help="Path to directory of submissions")
     # grade_parser.add_argument("-t", "--tests-path", type=str, default="./tests/", help="Path to directory of tests")
-    grade_parser.add_argument("-a", "--autograder-path", type=str, default="./", help="Path to autograder zip file")
+    grade_parser.add_argument("-a", "--autograder-path", type=str, default="./autograder.zip", help="Path to autograder zip file")
     grade_parser.add_argument("-o", "--output-path", type=str, default="./", help="Path to which to write output")
 
     # metadata parser arguments
