@@ -38,3 +38,15 @@ tutorial:
 	zip -r tutorial.zip assign generate grade -x "*.DS_Store"; \
 	cp tutorial.zip ../_static; \
 	rm tutorial.zip
+
+docker-grade-test:
+	# cp otter/grade/Dockerfile otter/grade/old-Dockerfile
+	# printf "\nADD . /tmp/otter-grader\nRUN pip install /tmp/otter-grader" >> otter/grade/Dockerfile
+	cp otter/generate/templates/setup.sh otter/generate/templates/old-setup.sh
+	printf "\nconda run -n otter-gradescope-env pip install /home/otter-grader" >> otter/generate/templates/setup.sh
+
+cleanup-docker-grade-test:
+	# rm otter/grade/Dockerfile
+	# mv otter/grade/old-Dockerfile otter/grade/Dockerfile
+	rm otter/generate/templates/setup.sh
+	mv otter/generate/templates/old-setup.sh otter/generate/templates/setup.sh

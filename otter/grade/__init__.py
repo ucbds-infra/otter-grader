@@ -2,12 +2,13 @@
 Otter Grade command-line utility. Provides local grading of submissions in parallel Docker containers.
 """
 
+import re
 import os
 import pandas as pd
 
 from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
-from .containers import launch_parallel_containers
-from .utils import merge_csv
+from .containers import launch_grade
+from .utils import merge_csv, prune_images
 
 def main(args):
     """Runs Otter Grade
@@ -15,11 +16,24 @@ def main(args):
     Args:
         args (``argparse.Namespace``): parsed command line arguments
     """
+    # prune images
+    if args.prune:
+        if not args.force:
+            sure = input("Are you sure you want to prune Otter's grading images? This action cannot be undone [y/N]")
+            sure = bool(re.match(sure, r"ye?s?", flags=re.IGNORECASE))
+        else:
+            sure = True
+        
+        if sure:
+            prune_images()
+        
+        return
+
     # Asserts that exactly one metadata flag is provided
     assert sum([meta != False for meta in [
-        args.gradescope, 
-        args.canvas, 
-        args.json, 
+        args.gradescope,
+        args.canvas,
+        args.json,
         args.yaml
     ]]) <= 1, "You can specify at most one metadata flag (-g, -j, -y, -c)"
 
@@ -50,15 +64,15 @@ def main(args):
         meta_parser = None
 
     # check that reqs file is valid
-    requirements = args.requirements
-    if requirements is None and os.path.isfile("requirements.txt"):
-        requirements = "requirements.txt"
-    
-    if requirements:
-            assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
+    # requirements = args.requirements
+    # if requirements is None and os.path.isfile("requirements.txt"):
+    #     requirements = "requirements.txt"
+    #
+    # if requirements:
+    #         assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
 
     # if not os.path.isfile(args.requirements):
-        
+
     #     # if user-specified requirements not found, fail with AssertionError
     #     assert args.requirements == "requirements.txt", f"requirements file {args.requirements} does not exist"
 
@@ -68,32 +82,26 @@ def main(args):
     if verbose:
         print("Launching docker containers...")
 
-    # Docker
-    grades_dfs = launch_parallel_containers(args.tests_path, 
-        args.path, 
-        verbose=verbose, 
-        pdfs=args.pdfs,
-        # unfiltered_pdfs=args.pdf, 
-        # tag_filter=args.tag_filter,
-        # html_filter=args.html_filter,
-        # reqs=args.requirements,
-        reqs=requirements,
+    #Docker
+    grade_dfs = launch_grade(args.autograder_path,
+        notebooks_dir=args.path,
+        verbose=verbose,
         num_containers=args.containers,
-        image=args.image,
         scripts=args.scripts,
         no_kill=args.no_kill,
         output_path=args.output_path,
         debug=args.debug,
-        seed=args.seed,
         zips=args.zips,
-        meta_parser=meta_parser
+        image=args.image,
+        meta_parser=meta_parser,
+        pdfs=args.pdfs
     )
 
     if verbose:
         print("Combining grades and saving...")
 
     # Merge Dataframes
-    output_df = merge_csv(grades_dfs)
+    output_df = merge_csv(grade_dfs)
 
     def map_files_to_ids(row):
         """Returns the identifier for the filename in the specified row"""

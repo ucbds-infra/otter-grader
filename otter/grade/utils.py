@@ -5,9 +5,12 @@ Utilities for Otter Grade
 import tempfile
 import tarfile
 import os
+import docker
 import pandas as pd
 
 from contextlib import contextmanager
+
+OTTER_DOCKER_IMAGE_TAG = "otter-grade"
 
 @contextmanager
 def simple_tar(path):
@@ -103,3 +106,18 @@ def merge_csv(dataframes):
     """
     final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
     return final_dataframe
+
+def prune_images():
+    """
+    """
+    # this is a fix for travis -- allows overriding docker client version
+    if os.environ.get("OTTER_DOCKER_CLIENT_VERSION") is not None:
+        client = docker.from_env(version=os.environ.get("OTTER_DOCKER_CLIENT_VERSION"))
+    else:
+        client = docker.from_env()
+    
+    images = client.images.list()
+
+    for img in images:
+        if any([OTTER_DOCKER_IMAGE_TAG in t for t in img.tags]):
+            client.images.remove(img.tags[0], force=True)
