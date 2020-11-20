@@ -81,7 +81,7 @@ otter generate autograder -t hidden-tests -l r data.csv
 
 #### Grading with Environments
 
-Otter can grade assignments using saved environemnts in the log in the Gradescope container. _This behavior is not supported for R assignments._ This works by unshelving the environment stored in each check entry of Otter's log and grading against it. The notebook is parsed and only its import statements are executed. For more inforamtion about saving and using environments, see [Logging](../logging.md).
+Otter can grade assignments using saved environments in the log in the Gradescope container. _This behavior is not supported for R assignments._ This works by unshelving the environment stored in each check entry of Otter's log and grading against it. The notebook is parsed and only its import statements are executed. For more inforamtion about saving and using environments, see [Logging](../logging.md).
 
 To configure this behavior, two things are required:
 
