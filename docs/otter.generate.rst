@@ -1,6 +1,14 @@
 otter.generate package
 ======================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   otter.generate.run_autograder
+
 Submodules
 ----------
 
@@ -16,14 +24,6 @@ otter.generate.constants module
 -------------------------------
 
 .. automodule:: otter.generate.constants
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-otter.generate.run\_autograder module
--------------------------------------
-
-.. automodule:: otter.generate.run_autograder
    :members:
    :undoc-members:
    :show-inheritance:

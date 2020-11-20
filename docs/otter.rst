@@ -13,6 +13,7 @@ Subpackages
    otter.export
    otter.generate
    otter.grade
+   otter.plugins
    otter.service
    otter.test_files
 

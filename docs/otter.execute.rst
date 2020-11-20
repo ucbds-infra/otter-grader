@@ -36,14 +36,6 @@ otter.execute.execute\_script module
    :undoc-members:
    :show-inheritance:
 
-otter.execute.results module
-----------------------------
-
-.. automodule:: otter.execute.results
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Module contents
 ---------------
