@@ -14,6 +14,7 @@
    otter_generate/index
    otter_service
    execution
+   plugins/index
    pdfs
    seeding
    logging
