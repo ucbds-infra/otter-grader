@@ -17,7 +17,7 @@ PROG = ("otter", "python3 -m otter")[INVOKED_FROM_PYTHON]
 
 def get_parser():
     """Creates and returns the argument parser for Otter
-    
+
     Returns:
         ``argparse.ArgumentParser``: the argument parser for Otter command-line tools
     """
@@ -128,7 +128,8 @@ def get_parser():
 
     # necessary path arguments
     grade_parser.add_argument("-p", "--path", type=str, default="./", help="Path to directory of submissions")
-    grade_parser.add_argument("-t", "--tests-path", type=str, default="./tests/", help="Path to directory of tests")
+    # grade_parser.add_argument("-t", "--tests-path", type=str, default="./tests/", help="Path to directory of tests")
+    grade_parser.add_argument("-a", "--autograder-path", type=str, default="./autograder.zip", help="Path to autograder zip file")
     grade_parser.add_argument("-o", "--output-path", type=str, default="./", help="Path to which to write output")
 
     # metadata parser arguments
@@ -142,25 +143,28 @@ def get_parser():
     grade_parser.add_argument("-z", "--zips", action="store_true", default=False, help="Whether submissions are zip files from Notebook.export")
 
     # PDF export options
-    grade_parser.add_argument("--pdfs", default=False, const="unfiltered", choices=["unfiltered", "html"], nargs="?")
+    grade_parser.add_argument("--pdfs", default=False, action="store_true", help="Whether to copy notebook PDFs out of containers")
     # grade_parser.add_argument("--pdf", action="store_true", default=False, help="Create unfiltered PDFs for manual grading")
     # grade_parser.add_argument("--tag-filter", action="store_true", default=False, help="Create a tag-filtered PDF for manual grading")
     # grade_parser.add_argument("--html-filter", action="store_true", default=False, help="Create an HTML comment-filtered PDF for manual grading")
 
     # other settings and optional arguments
-    grade_parser.add_argument("-f", "--files", nargs="+", help="Specify support files needed to execute code (e.g. utils, data files)")
+    # grade_parser.add_argument("-f", "--files", nargs="+", help="Specify support files needed to execute code (e.g. utils, data files)")
     grade_parser.add_argument("-v", "--verbose", action="store_true", help="Flag for verbose output")
-    grade_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
-    grade_parser.add_argument("-r", "--requirements", default=None, type=str, help="Flag for Python requirements file path; ./requirements.txt automatically checked")
+    # grade_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
+    # grade_parser.add_argument("-r", "--requirements", default=None, type=str, help="Flag for Python requirements file path; ./requirements.txt automatically checked")
     grade_parser.add_argument("--containers", type=int, help="Specify number of containers to run in parallel")
     grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
     grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
     grade_parser.add_argument("--debug", action="store_true", default=False, help="Print stdout/stderr from grading for debugging")
 
+    grade_parser.add_argument("--prune", action="store_true", default=False, help="Prune all of Otter's grading images")
+    grade_parser.add_argument("-f", "--force", action="store_true", default=False, help="Force action (don't ask for confirmation)")
+
     grade_parser.set_defaults(func_str="grade.main")
 
 
-    
+
     ###### PARSER FOR otter service #####
     service_parser = subparsers.add_parser("service", description="Create and manage an otter-service")
     service_subparsers = service_parser.add_subparsers()

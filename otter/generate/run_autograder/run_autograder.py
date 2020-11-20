@@ -5,6 +5,7 @@ Gradescope autograding internals for Python
 import os
 import json
 import shutil
+import pickle
 import subprocess
 import warnings
 
@@ -40,23 +41,24 @@ def prepare_files():
     for file in tests_glob:
         shutil.copy(file, "./submission/tests")
 
-def write_and_submit_pdf(client, nb_path, filtering, pagebreaks, course_id, assignment_id):
+def write_and_submit_pdf(client, nb_path, filtering, pagebreaks, course_id, assignment_id, submit=True):
     try:
         export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
 
-        # get student email
-        with open("../submission_metadata.json") as f:
-            metadata = json.load(f)
+        if submit:
+            # get student email
+            with open("../submission_metadata.json") as f:
+                metadata = json.load(f)
 
-        student_emails = []
-        for user in metadata["users"]:
-            student_emails.append(user["email"])
-        
-        for student_email in student_emails:
-            client.upload_pdf_submission(course_id, assignment_id, student_email, pdf_path)
+            student_emails = []
+            for user in metadata["users"]:
+                student_emails.append(user["email"])
+            
+            for student_email in student_emails:
+                client.upload_pdf_submission(course_id, assignment_id, student_email, pdf_path)
 
-        print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
+            print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
 
     except Exception as e:
         # print("\n\n")
@@ -99,8 +101,11 @@ def run_autograder(options):
     if options["token"] is not None:
         client = APIClient(token=options["token"])
         generate_pdf = True
+        has_token = True
     else:
-        generate_pdf = False
+        generate_pdf = options["pdf"]
+        has_token = False
+        client = None
 
     prepare_files()
 
@@ -146,11 +151,14 @@ def run_autograder(options):
     if generate_pdf:
         write_and_submit_pdf(
             client, nb_path, options['filtering'], options['pagebreaks'], options['course_id'], 
-            options['assignment_id']
+            options['assignment_id'], submit=has_token
         )
 
     output = scores.to_gradescope_dict(options)
 
     os.chdir(abs_ag_path)
+
+    with open("results/results.pkl", "wb+") as f:
+        pickle.dump(scores, f)
 
     return output

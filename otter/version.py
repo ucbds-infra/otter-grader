@@ -6,9 +6,9 @@ import sys
 
 from textwrap import dedent
 
-__version__ = "1.1.5"
+__version__ = "2.0.0.b0"
 
-LOGO_WITH_VERSION = fr"""
+LOGO_WITH_VERSION = f"""\
   _________        __          __               
  /  _____  \    __|  |__    __|  |__               
 |  /     \  |  |__    __|  |__    __|   _______    _  _____
@@ -22,8 +22,7 @@ LOGO_WITH_VERSION = fr"""
 
 def print_version_info(logo=False):
     if logo:
-        print(LOGO_WITH_VERSION + "\n")
+        print(LOGO_WITH_VERSION)
     print(dedent(f"""\
         Python version: {".".join(str(v) for v in sys.version_info[:3])}
-        Otter-Grader version: {__version__}
-    """))
+        Otter-Grader version: {__version__}"""))
