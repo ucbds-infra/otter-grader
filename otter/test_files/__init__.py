@@ -43,6 +43,7 @@ class GradingResults:
     def __init__(self, test_files):
         self.test_files = test_files
         self.results = {}
+        self.output = None
         
         total_score, points_possible = 0, 0
         for test_file in test_files:
@@ -127,6 +128,16 @@ class GradingResults:
             kwargs: key-value pairs for updating the ``GradingTestCaseResult`` object
         """
         self.results[test_name] = self.results[test_name]._replace(**kwargs)
+
+    def set_output(self, output):
+        """
+        Updates the ``output`` field of the results JSON with text relevant to the entire submission.
+        See https://gradescope-autograders.readthedocs.io/en/latest/specs/ for more information.
+
+        Args:
+            output (``str``): the output text
+        """
+        self.output = output
 
     # def get_public_score(self, test_name):
     #     """
@@ -229,6 +240,9 @@ class GradingResults:
         options.update(config)
 
         output = {"tests": []}
+
+        if self.output is not None:
+            output["output"] = self.output
 
         # hidden visibility determined by show_hidden_tests_on_release
         hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
