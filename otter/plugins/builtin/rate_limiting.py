@@ -52,6 +52,8 @@ class RateLimiting(AbstractOtterPlugin):
                 f"You have exceeded the rate limit for the autograder. Students are allowed {self.plugin_config['allowed_submissions']} "
                 f"every {self._window_to_str()}."
             )
+            results.clear_results()
+
         else:
             results.set_output(
                 f"Students are allowed {self.plugin_config['allowed_submissions']} every {self._window_to_str()}. "

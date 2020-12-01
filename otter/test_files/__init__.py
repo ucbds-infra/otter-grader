@@ -65,23 +65,6 @@ class GradingResults:
 
                 total_score += pts_per_case * test_case_result.passed
                 points_possible += pts_per_case
-
-            # for test, test_obj in result.failed_tests:
-            #     test_name = os.path.splitext(os.path.basename(test.name))[0]
-            #     if test_name in self.results:
-            #         self.results[test_name] = self.results[test_name]._replace(
-            #             hidden = test_obj.failed_test_hidden,
-            #             incorrect = True
-            #         )
-            #     else:
-            #         self.results[test_name] = TestResult(
-            #             name = test_name,
-            #             score = 0,
-            #             possible = test.value,
-            #             test = test,
-            #             hidden = test_obj.failed_test_hidden,
-            #             incorrect = True
-            #         )
         
         self.total = total_score
         self.possible = points_possible
@@ -138,6 +121,12 @@ class GradingResults:
             output (``str``): the output text
         """
         self.output = output
+
+    def clear_results(self):
+        """
+        Empties the dictionary of results.
+        """
+        self.results = {}
 
     # def get_public_score(self, test_name):
     #     """
