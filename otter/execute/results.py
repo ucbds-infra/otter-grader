@@ -241,12 +241,21 @@ class GradingResults:
             output["stdout_visibility"] = "after_published"
 
         if options["points_possible"] is not None:
-            output["score"] = self.total / self.possible * options["points_possible"]
+            try:
+                output["score"] = self.total / self.possible * options["points_possible"]
+            except ZeroDivisionError:
+                output["score"] = 0
 
         if options["score_threshold"] is not None:
-            if self.total / self.possible >= config["score_threshold"]:
-                output["score"] = options["points_possible"] or self.possible
-            else:
-                output["score"] = 0
+            try:
+                if self.total / self.possible >= config["score_threshold"]:
+                    output["score"] = options["points_possible"] or self.possible
+                else:
+                    output["score"] = 0
+            except ZeroDivisionError:
+                if 0 >= config["score_threshold"]:
+                    output["score"] = options["points_possible"] or self.possible
+                else:
+                    output["score"] = 0
         
         return output
