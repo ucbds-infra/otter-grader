@@ -30,6 +30,7 @@ docker-test:
 
 documentation:
 	# sphinx-apidoc -fo docs otter
+	# jupyter nbconvert --to html docs/_static/notebooks/*.ipynb
 	sphinx-build -b html docs docs/_build -aEv
 
 tutorial:

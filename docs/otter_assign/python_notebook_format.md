@@ -134,7 +134,9 @@ generate:
 
 Here is an example question in an Otter Assign-formatted notebook:
 
-![](images/assign_sample_question.png)
+<!-- ![](images/assign_sample_question.png) -->
+
+<iframe src="../_static/notebooks/assign-code-question.html"></iframe>
 
 For code questions, a question is a description *Markdown* cell, followed by a solution *code* cell and zero or more test *code* cells. The description cell must contain a code block (enclosed in triple backticks <code>\`\`\`</code>) that begins with `BEGIN QUESTION` on its own line, followed by YAML that defines metadata associated with the question.
 
