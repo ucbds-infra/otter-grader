@@ -1,5 +1,13 @@
 # Changelog
 
+**v1.1.4:**
+
+* Fixed `KeyError` when kernelspec unparsable from notebook in Otter Assign
+
+**v1.1.3:** 
+
+* Changed Rmd code prompt to `NULL # YOUR CODE HERE` for assignment statements and `# YOUR CODE HERE` for whole-line and block removal
+
 **v1.1.2:**
 
 * Made requirements specification always throw an error if a user-specified path is not found
