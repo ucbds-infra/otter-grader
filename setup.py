@@ -27,7 +27,7 @@ setuptools.setup(
 	],
 	install_requires=[
 		"pyyaml", "nbformat", "ipython", "nbconvert<6.0.0", "tqdm", "setuptools", "pandas", "tornado",
-		"docker", "jinja2", "dill", "pdfkit", "PyPDF2"
+		"docker", "jinja2", "dill", "pdfkit", "PyPDF2", "gspread"
 	],
 	scripts=["bin/otter"],
 	package_data={
