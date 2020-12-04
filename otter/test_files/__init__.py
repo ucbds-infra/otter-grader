@@ -43,6 +43,8 @@ class GradingResults:
     def __init__(self, test_files):
         self.test_files = test_files
         self.results = {}
+        self.output = None
+        self.all_hidden = False
         
         total_score, points_possible = 0, 0
         for test_file in test_files:
@@ -64,23 +66,6 @@ class GradingResults:
 
                 total_score += pts_per_case * test_case_result.passed
                 points_possible += pts_per_case
-
-            # for test, test_obj in result.failed_tests:
-            #     test_name = os.path.splitext(os.path.basename(test.name))[0]
-            #     if test_name in self.results:
-            #         self.results[test_name] = self.results[test_name]._replace(
-            #             hidden = test_obj.failed_test_hidden,
-            #             incorrect = True
-            #         )
-            #     else:
-            #         self.results[test_name] = TestResult(
-            #             name = test_name,
-            #             score = 0,
-            #             possible = test.value,
-            #             test = test,
-            #             hidden = test_obj.failed_test_hidden,
-            #             incorrect = True
-            #         )
         
         self.total = total_score
         self.possible = points_possible
@@ -128,25 +113,26 @@ class GradingResults:
         """
         self.results[test_name] = self.results[test_name]._replace(**kwargs)
 
-    # def get_public_score(self, test_name):
-    #     """
-    #     Returns the score of a question based on only public tests. Assumes that all public tests in
-    #     a test file occur before the first hidden tests (because test execution stops at the first
-    #     failed test).
+    def set_output(self, output):
+        """
+        Updates the ``output`` field of the results JSON with text relevant to the entire submission.
+        See https://gradescope-autograders.readthedocs.io/en/latest/specs/ for more information.
 
-    #     Args:
-    #         test_name (``str``): the name of the test
-        
-    #     Returns:
-    #         ``int`` or ``float``: the score based only on public tests
-    #     """
-    #     result = self.results[test_name]
-    #     if not result.incorrect:
-    #         return result.possible
-    #     elif result.hidden:
-    #         return result.possible
-    #     else:
-    #         return result.score
+        Args:
+            output (``str``): the output text
+        """
+        self.output = output
+
+    def clear_results(self):
+        """
+        Empties the dictionary of results.
+        """
+        self.results = {}
+
+    def hide_everything(self):
+        """
+        """
+        self.all_hidden = True
 
     def verify_against_log(self, log, ignore_hidden=True):
         """
@@ -230,6 +216,9 @@ class GradingResults:
 
         output = {"tests": []}
 
+        if self.output is not None:
+            output["output"] = self.output
+
         # hidden visibility determined by show_hidden_tests_on_release
         hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
         # no_separate_visibility = options["test_visibility"]
@@ -250,40 +239,6 @@ class GradingResults:
                 "output": result.test_case_result.message
             })
 
-        
-            # if hidden and incorrect:
-            #     public_score, hidden_score = possible * options["public_multiplier"], 0
-            # elif not hidden and incorrect:
-            #     public_score, hidden_score = 0, 0
-            #     public_possible = possible
-            
-            # if options["separate_tests"]:
-            #     output["tests"].append({
-            #         "name": result.name + " - Public",
-            #         "score": public_score,
-            #         "max_score": public_possible,
-            #         "visibility": "visible",
-            #         "output": repr(result.test) if not hidden and incorrect else "All tests passed!"
-            #     })
-
-            #     if not (not hidden and incorrect):
-            #         output["tests"].append({
-            #             "name" : result.name + " - Hidden",
-            #             "score" : hidden_score,
-            #             "max_score": hidden_possible,
-            #             "visibility": hidden_test_visibility,
-            #             "output": repr(result.test) if incorrect else "All tests passed!"
-            #         })
-            
-            # else:
-            #     output["tests"].append({
-            #         "name": result.name,
-            #         "score": score,
-            #         "max_score": possible,
-            #         "visibility": no_separate_visibility,
-            #         "output": repr(result.test) if not hidden and incorrect else "All tests passed!"
-            #     })
-        
         if options["show_stdout"]:
             output["stdout_visibility"] = "after_published"
 
@@ -295,5 +250,10 @@ class GradingResults:
                 output["score"] = options["points_possible"] or self.possible
             else:
                 output["score"] = 0
+
+        if self.all_hidden:
+            for test in output["tests"]:
+                test["visibility"]  = "hidden"
+            output["stdout_visibility"] = "hidden"
         
         return output

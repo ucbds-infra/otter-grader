@@ -16,9 +16,9 @@ jupytext
 numpy==1.16.0
 tornado==5.1.1
 <<<<<<< HEAD:test/test_generate/test-run-autograder/autograder/source/requirements.txt
-git+https://github.com/ucbds-infra/otter-grader.git@9d8edaabbbb07374b7c15993e412cbbe7950ce17
+otter-grader==2.0.0.b0
 =======
-git+https://github.com/ucbds-infra/otter-grader.git@9d8edaabbbb07374b7c15993e412cbbe7950ce17
+otter-grader==2.0.0.b0
 >>>>>>> master:test/test_generate/test-run-autograder/autograder-correct/source/requirements.txt
 
 tqdm
