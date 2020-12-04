@@ -17,6 +17,7 @@ class AbstractOtterPlugin(ABC):
 
     - ``during_generate``: run during Otter Generate while all files are in-memory and before the
       the `tmp` directory is created
+    - ``before_grading``: run before the submission is executed
     - ``after_execution``: run after the submission is executed
     - ``after_grading``: run after all tests are run and scores are assigned
     - ``generate_report``: run after results are written

@@ -12,6 +12,14 @@ otter.plugins.builtin.grade\_override module
    :undoc-members:
    :show-inheritance:
 
+otter.plugins.builtin.rate\_limiting module
+-------------------------------------------
+
+.. automodule:: otter.plugins.builtin.rate_limiting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------
