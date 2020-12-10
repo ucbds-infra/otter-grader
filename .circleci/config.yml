@@ -48,6 +48,7 @@ jobs:
           name: install nbconvert dependencies
           command: |
             sudo apt-get update
+            sudo add-apt-repository universe
             sudo apt-get install -y pandoc
             sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended texlive-generic-extra
             sudo apt-get install fonts-lmodern
