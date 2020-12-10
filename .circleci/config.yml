@@ -6,45 +6,75 @@ jobs:
     steps:
       - checkout
       - run: 
+          name: docker versions
           command: |
             docker version
             docker-compose version
+
+      - run:
+          name: install postgres
+          command: |
             sudo apt update
             sudo apt install postgresql postgresql-contrib
+
+      - run: 
+          name: install and setup conda
+          command: |
             wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
             bash miniconda.sh -b -p $HOME/miniconda
             export PATH="$HOME/miniconda/bin:$PATH"
             hash -r
+            conda init bash
             conda config --set always_yes yes --set changeps1 no
             conda update -q conda
-            conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION
+            conda create -q -n test-env python=3.7
             source activate test-env
             export TAR="/bin/tar"
+
+      - run:
+          name: pull docker images
+          command: |
             docker pull gradescope/auto-builds:latest
 
       - run: 
+          name: install Python and R packages
           command: |
             conda install r-base r-essentials
             conda install r-devtools -c conda-forge
             pip install -r requirements.txt
             Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
+
+      - run:
+          name: install nbconvert dependencies
+          command: |
             sudo apt-get update
             sudo apt-get install -y pandoc
             sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended texlive-generic-extra
             sudo apt-get install fonts-lmodern
+
+      - run:
+          name: build testing docker image
+          command: |
             make docker-test
 
       - run: 
+          name: docker, conda version info
           command: |
             docker version
             docker-compose version
             conda info -a
+
+      - run:
+          name: create postgres user
+          command: |
             psql -c "create user root createdb password 'root';" -U postgres
 
       - run: 
+          name: run tests
           command: |
             coverage run -m test
 
       - run: 
+          name: send to codecov
           command: |
             codecov
