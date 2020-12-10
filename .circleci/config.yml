@@ -1,0 +1,50 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/otter-grader
+    docker:
+      - image: circleci/python:3.6.4 # every job must define an image for the docker executor and subsequent jobs may define a different image.
+        environment:
+          OTTER_DOCKER_CLIENT_VERSION: 1.38
+      - image: circleci/postgres:9.6.2 # an example of how to specify a service container
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_DB: circle_test
+    steps:
+      - checkout
+      - run: |
+        docker version
+        docker-compose version
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+        bash miniconda.sh -b -p $HOME/miniconda
+        export PATH="$HOME/miniconda/bin:$PATH"
+        hash -r
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q conda
+        conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION
+        source activate test-env
+        export TAR="/bin/tar"
+        docker pull gradescope/auto-builds:latest
+
+      - run: |
+        conda install r-base r-essentials
+        conda install r-devtools -c conda-forge
+        pip install -r requirements.txt
+        Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
+        sudo apt-get update
+        sudo apt-get install -y pandoc
+        sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended texlive-generic-extra
+        sudo apt-get install fonts-lmodern
+        make docker-test
+
+      - run: |
+        docker version
+        docker-compose version
+        conda info -a
+        psql -c "create user root createdb password 'root';" -U postgres
+
+      - run: |
+        coverage run -m test
+
+      - run: |
+        codecov
