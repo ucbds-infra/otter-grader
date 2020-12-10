@@ -15,7 +15,7 @@ jobs:
           name: install postgres
           command: |
             sudo apt update
-            sudo apt install postgresql postgresql-contrib
+            sudo apt install postgresql postgresql-contrib libpq-dev
 
       - run: 
           name: install and setup conda
