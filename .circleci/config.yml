@@ -67,7 +67,7 @@ jobs:
       - run:
           name: create postgres user
           command: |
-            psql -c "create user root createdb password 'root';" -U postgres
+            sudo -u postgres psql-c "create user root createdb password 'root';"
 
       - run: 
           name: run tests
