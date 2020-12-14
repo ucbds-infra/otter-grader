@@ -165,6 +165,15 @@ def get_parser():
 
 
 
+    ###### PARSER FOR otter run #####
+    run_parser = subparsers.add_parser("run", description="") # TODO
+
+    run_parser.add_argument("submission")
+    run_parser.add_argument("-a", "--autograder", default="./autograder.zip")
+    run_parser.add_argument("-o", "--output-path", default="./")
+
+
+
     ###### PARSER FOR otter service #####
     service_parser = subparsers.add_parser("service", description="Create and manage an otter-service")
     service_subparsers = service_parser.add_subparsers()

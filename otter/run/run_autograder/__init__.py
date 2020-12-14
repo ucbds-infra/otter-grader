@@ -28,6 +28,8 @@ def main(autograder_dir):
     options = DEFAULT_OPTIONS.copy()
     options.update(config)
 
+    options["autograder_dir"] = autograder_dir
+
     curr_dir = os.getcwd()
 
     if options["lang"].lower() == "r":
