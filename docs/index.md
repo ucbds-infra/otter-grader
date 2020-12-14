@@ -12,11 +12,13 @@
    dot_otter_files
    otter_grade
    otter_generate/index
+   otter_run/index
    otter_service
    execution
    pdfs
    seeding
    logging
+   api_reference
    resources
    changelog
 ```
