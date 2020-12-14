@@ -154,6 +154,10 @@ def run_autograder(options):
 
     output = scores.to_gradescope_dict(options)
 
+    if plugin_collection:
+        report = plugin_collection.generate_report()
+        print(report)
+
     os.chdir(abs_ag_path)
 
     with open("results/results.pkl", "wb+") as f:
