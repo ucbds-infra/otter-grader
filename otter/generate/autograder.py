@@ -14,9 +14,9 @@ from glob import glob
 from subprocess import PIPE
 from jinja2 import Template
 
-from .constants import DEFAULT_OPTIONS
 from .token import APIClient
 from ..plugins import PluginCollection
+from ..run.run_autograder.constants import DEFAULT_OPTIONS
 
 TEMPLATES_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
@@ -91,6 +91,7 @@ def main(args):
 
     run_autograder = templates["run_autograder"].render(
         autograder_dir = options['autograder_dir'],
+        otter_env_name = OTTER_ENV_NAME,
     )
 
     # format setup.sh

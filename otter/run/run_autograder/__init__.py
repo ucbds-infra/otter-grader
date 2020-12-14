@@ -6,7 +6,7 @@ import os
 import json
 import pandas as pd
 
-from ..constants import DEFAULT_OPTIONS
+from .constants import DEFAULT_OPTIONS
 from ...version import LOGO_WITH_VERSION
 
 def main(autograder_dir):
