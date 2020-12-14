@@ -172,6 +172,8 @@ def get_parser():
     run_parser.add_argument("-a", "--autograder", default="./autograder.zip", help="Path to autograder zip file")
     run_parser.add_argument("-o", "--output-dir", default="./", help="Directory to which to write output")
 
+    run_parser.add_argument("--no-logo", action="store_true", default=False, help="Suppress Otter logo in stdout")
+
     run_parser.set_defaults(func_str="run.main")
 
 

@@ -26,7 +26,8 @@ def main(args):
 
     shutil.copy(args.submission, os.path.join(ag_dir, "submission"))
 
-    run_autograder(ag_dir)
+    logo = not args.no_logo
+    run_autograder(ag_dir, logo=logo)
 
     results_path = os.path.join(ag_dir, "results", "results.json")
     shutil.copy(results_path, args.output_dir)
