@@ -15,6 +15,7 @@ from . import check
 from . import export
 from . import generate
 from . import grade
+from . import run
 
 MISSING_PACKAGES = False
 try:

@@ -26,9 +26,7 @@ class RateLimiting(AbstractOtterPlugin):
                 result += f"{self.plugin_config.get(base, 0)} {base} "
         return result.strip()
 
-    def after_grading(self, results):
-        """
-        """
+    def _submission_allowed():
         window = dt.timedelta(
             self.plugin_config.get("days", 0),
             self.plugin_config.get("seconds", 0),
@@ -48,14 +46,22 @@ class RateLimiting(AbstractOtterPlugin):
                 prev_subms += 1
 
         if prev_subms >= self.plugin_config["allowed_submissions"]:
-            results.set_output(
-                f"You have exceeded the rate limit for the autograder. Students are allowed {self.plugin_config['allowed_submissions']} "
+            return False, \
+                f"You have exceeded the rate limit for the autograder. Students are allowed {self.plugin_config['allowed_submissions']} " + \
                 f"submissions every {self._window_to_str()}."
-            )
-            results.hide_everything()
 
         else:
-            results.set_output(
-                f"Students are allowed {self.plugin_config['allowed_submissions']} every {self._window_to_str()}. "
+            return True, \
+                f"Students are allowed {self.plugin_config['allowed_submissions']} every {self._window_to_str()}. " + \
                 f"You have {prev_subms} submissions in that period."
-            )
+
+    def after_grading(self, results):
+        """
+        """
+        allowed, output = self._submission_allowed()
+        results.set_output(output)
+        if not allowed:
+            results.hide_everything()
+
+    def generate_report(self):
+        return self._submission_allowed()[1]

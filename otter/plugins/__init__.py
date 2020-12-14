@@ -73,9 +73,42 @@ class PluginCollection:
             args, kwargs (any): arguments for the method
         """
         # TODO: logging to stdout
+        rets = []
         for plugin in self._plugins:
             try:
                 if hasattr(plugin, event):
-                    getattr(plugin, event)(*args, **kwargs)
+                    ret = getattr(plugin, event)(*args, **kwargs)
+                    rets.append(ret)
+                else:
+                    ret.append(None)
             except PluginEventNotSupportedException:
-                pass
+                rets.append(None)
+        return rets
+
+    def generate_report(self):
+        """
+        """
+        reports = self.run("generate_report")
+
+        header = "=" * 35 + " PLUGIN REPORT " + "=" * 35
+        footer = "=" * len(header)
+
+        report = header
+        for r, plg in zip(reports, self._plugin_names):
+            title = f" {plg} Report "
+            dashes = len(header) - len(title)
+            if dashes > 4:
+                if dashes % 2 == 0:
+                    ld, rd = dashes // 2, dashes // 2
+                else:
+                    ld, rd = dashes // 2, dashes // 2 + 1
+            else:
+                ld, rd = 2, 2
+
+            title = "-" * ld + title + "-" * rd
+
+            body = title + "\n" + r + "\n"
+
+            report += "\n" + body
+
+        return report

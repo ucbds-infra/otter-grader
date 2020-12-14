@@ -4,8 +4,17 @@
 
 * Changed granularity of results to be test case-by-test case rather than by file
 * Added ability to list requirements directly in assignment metadata w/out requirements.txt file
-* Updated local grading workflow to reflect Gradescope workflow
-* Added plugin support
+* Unified assignment grading workflow and converted local grading to container-per-submission
+* Exposed grading internals for non-containerized grading via `otter run` and `otter.api`
+* Added plugins for altering grades and execution, incl. built-in plugins
+
+**v1.1.6:**
+
+* Fixed `ZeroDivisionError` when an assignment has 0 points total
+
+**v1.1.5:**
+
+* Fixed error in parsing requirements when using Otter Grade
 
 **v1.1.4:**
 

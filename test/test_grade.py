@@ -17,7 +17,7 @@ from glob import glob
 from otter.argparser import get_parser
 from otter.grade import main as grade
 from otter.grade.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
-from otter.run import run_otter
+from otter.runner import run_otter
 
 from . import TestCase
 

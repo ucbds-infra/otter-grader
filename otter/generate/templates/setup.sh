@@ -17,7 +17,7 @@ apt-get install -y /tmp/wkhtmltopdf.deb
 
 apt-get clean
 apt-get update
-apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libcurl4-openssl-dev
+apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libcurl4-openssl-dev libgit2-dev
 
 # install conda
 wget -nv -O {{ autograder_dir }}/source/miniconda_install.sh "{{ miniconda_install_url }}"

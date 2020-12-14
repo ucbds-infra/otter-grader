@@ -25,4 +25,5 @@ DEFAULT_OPTIONS = {
     "separate_tests": True,
     "plugins": [],
     "plugin_config": {},
+    "logo": True,
 }
