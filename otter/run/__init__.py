@@ -29,7 +29,7 @@ def main(args):
     run_autograder(ag_dir)
 
     results_path = os.path.join(ag_dir, "results", "results.json")
-    shutil.copy(results_path, args.output_path)
+    shutil.copy(results_path, args.output_dir)
 
     results_pkl_path = os.path.join(ag_dir, "results", "results.pkl")
     with open(results_pkl_path, "rb") as f:

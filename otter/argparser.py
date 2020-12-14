@@ -130,7 +130,7 @@ def get_parser():
     grade_parser.add_argument("-p", "--path", type=str, default="./", help="Path to directory of submissions")
     # grade_parser.add_argument("-t", "--tests-path", type=str, default="./tests/", help="Path to directory of tests")
     grade_parser.add_argument("-a", "--autograder", type=str, default="./autograder.zip", help="Path to autograder zip file")
-    grade_parser.add_argument("-o", "--output-dir", type=str, default="./", help="Path to which to write output")
+    grade_parser.add_argument("-o", "--output-dir", type=str, default="./", help="Directory to which to write output")
 
     # metadata parser arguments
     grade_parser.add_argument("-g", "--gradescope", action="store_true", default=False, help="Flag for Gradescope export")
@@ -166,11 +166,13 @@ def get_parser():
 
 
     ###### PARSER FOR otter run #####
-    run_parser = subparsers.add_parser("run", description="") # TODO
+    run_parser = subparsers.add_parser("run", description="Run non-containerized Otter on a single submission") # TODO
 
-    run_parser.add_argument("submission")
-    run_parser.add_argument("-a", "--autograder", default="./autograder.zip")
-    run_parser.add_argument("-o", "--output-path", default="./")
+    run_parser.add_argument("submission", help="Path to submission to be graded")
+    run_parser.add_argument("-a", "--autograder", default="./autograder.zip", help="Path to autograder zip file")
+    run_parser.add_argument("-o", "--output-dir", default="./", help="Directory to which to write output")
+
+    run_parser.set_defaults(func_str="run.main")
 
 
 

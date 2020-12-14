@@ -2,6 +2,7 @@
 """
 
 import os
+import shutil
 import tempfile
 
 from contextlib import redirect_stdout
@@ -26,5 +27,7 @@ def grade_submission(ag_path, submission_path):
 
     with open(os.devnull, "w") as f, redirect_stdout(f):
         results = run_grader(args)
+
+    shutil.rmtree(dp)
 
     return results
