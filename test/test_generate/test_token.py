@@ -16,9 +16,9 @@ from shutil import copyfile
 
 from otter.argparser import get_parser
 from otter.generate.autograder import main as autograder
-from otter.generate.run_autograder import main as run_autograder
 from otter.generate.autograder import main as autograder
 from otter.generate.token import APIClient
+from otter.run.run_autograder import main as run_autograder
 
 from .. import TestCase
 

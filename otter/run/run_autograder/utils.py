@@ -1,29 +1,11 @@
 """
-Utilities for Otter Generate
+Utilities for Otter Run
 """
 
 import re
 import nbformat
 
-from ..utils import get_source
-
-def requirements_to_conda_env(requirements):
-    """
-    Converts a requirements.txt file string to a Pythonic environment.yml format
-
-    Args:
-        requirements (``str``): the requirements.txt contents
-    
-    Returns:
-        ``dict``: the environment.yml
-    """
-    requirements = [l for l in requirements.split("\n") if l.strip() and not l.startswith("#")]
-    conda_env = {
-        "dependencies": {
-            "pip": requirements
-        }
-    }
-    return conda_env
+from ...utils import get_source
 
 def replace_notebook_instances(nb_path):
     """

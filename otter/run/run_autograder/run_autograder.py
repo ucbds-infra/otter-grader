@@ -11,14 +11,12 @@ import warnings
 
 from glob import glob
 
-# from ..constants import DEFAULT_OPTIONS
-from ..token import APIClient
-from ..utils import replace_notebook_instances
-
+from .utils import replace_notebook_instances
 from ...check.logs import Log, QuestionNotInLogException
 from ...check.notebook import _OTTER_LOG_FILENAME
 from ...execute import grade_notebook
 from ...export import export_notebook
+from ...generate.token import APIClient
 from ...plugins import PluginCollection
 
 def prepare_files():
@@ -155,6 +153,10 @@ def run_autograder(options):
         )
 
     output = scores.to_gradescope_dict(options)
+
+    if plugin_collection:
+        report = plugin_collection.generate_report()
+        print(report)
 
     os.chdir(abs_ag_path)
 

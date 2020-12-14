@@ -11,7 +11,7 @@ from collections import namedtuple
 from .ok_test import OKTestFile
 
 from ..check.logs import QuestionNotInLogException
-from ..generate.constants import DEFAULT_OPTIONS
+from ..run.run_autograder.constants import DEFAULT_OPTIONS
 
 
 GradingTestCaseResult = namedtuple(

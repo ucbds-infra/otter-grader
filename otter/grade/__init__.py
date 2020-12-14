@@ -83,13 +83,13 @@ def main(args):
         print("Launching docker containers...")
 
     #Docker
-    grade_dfs = launch_grade(args.autograder_path,
+    grade_dfs = launch_grade(args.autograder,
         notebooks_dir=args.path,
         verbose=verbose,
         num_containers=args.containers,
         scripts=args.scripts,
         no_kill=args.no_kill,
-        output_path=args.output_path,
+        output_path=args.output_dir,
         debug=args.debug,
         zips=args.zips,
         image=args.image,
@@ -117,4 +117,4 @@ def main(args):
         output_df = output_df[cols[-1:] + cols[:-1]]
 
     # write to CSV file
-    output_df.to_csv(os.path.join(args.output_path, "final_grades.csv"), index=False)
+    output_df.to_csv(os.path.join(args.output_dir, "final_grades.csv"), index=False)

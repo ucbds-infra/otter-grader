@@ -13,11 +13,21 @@ Subpackages
    otter.export
    otter.generate
    otter.grade
+   otter.plugins
+   otter.run
    otter.service
    otter.test_files
 
 Submodules
 ----------
+
+otter.api module
+----------------
+
+.. automodule:: otter.api
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 otter.argparser module
 ----------------------
@@ -27,10 +37,10 @@ otter.argparser module
    :undoc-members:
    :show-inheritance:
 
-otter.run module
-----------------
+otter.runner module
+-------------------
 
-.. automodule:: otter.run
+.. automodule:: otter.runner
    :members:
    :undoc-members:
    :show-inheritance:

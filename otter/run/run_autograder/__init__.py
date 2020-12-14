@@ -6,17 +6,16 @@ import os
 import json
 import pandas as pd
 
-from ..constants import DEFAULT_OPTIONS
+from .constants import DEFAULT_OPTIONS
 from ...version import LOGO_WITH_VERSION
 
-def main(autograder_dir):
+def main(autograder_dir, logo=True):
     """
     Runs autograder on Gradescope based on predefined configurations.
 
     Args:
         config (``dict``): configurations for autograder
     """
-    print(LOGO_WITH_VERSION, "\n")
 
     config_fp = os.path.join(autograder_dir, "source", "otter_config.json")
     if os.path.isfile(config_fp):
@@ -27,6 +26,11 @@ def main(autograder_dir):
 
     options = DEFAULT_OPTIONS.copy()
     options.update(config)
+
+    if options["logo"] and logo:
+        print(LOGO_WITH_VERSION, "\n")
+
+    options["autograder_dir"] = autograder_dir
 
     curr_dir = os.getcwd()
 

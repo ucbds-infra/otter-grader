@@ -394,6 +394,9 @@ class TestNotebook(TestCase):
         self.assertEqual(config['endpoint'] + '/submit', args[0])
 
     def test_submit_3(self):
+        variables = {
+            "arr": "numpy.ndarray"
+        }
         notebook._API_KEY = "fakekey for submit"
         config = {
             "notebook": TEST_FILES_PATH + "hw00.ipynb",
@@ -403,7 +406,7 @@ class TestNotebook(TestCase):
             "ignore_modules": [],
             "variables": variables,
             "endpoint": "http://some.url",
-                    }
+        }
         """
         otter_configs exists, _service_enabled = True, should go into auth if statement
         """

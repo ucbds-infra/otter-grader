@@ -10,7 +10,7 @@ import jupytext
 from glob import glob
 from rpy2.robjects import r
 
-from ...constants import DEFAULT_OPTIONS
+from ..constants import DEFAULT_OPTIONS
 
 def run_autograder(options):
     """
