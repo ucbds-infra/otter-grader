@@ -1,6 +1,7 @@
-####################################
-##### Tests for otter generate #####
-####################################
+###############################
+##### Tests for otter run #####
+###############################
+
 import os
 import unittest
 import subprocess
@@ -14,13 +15,13 @@ from shutil import copyfile
 
 from otter.argparser import get_parser
 from otter.generate.autograder import main as autograder
-from otter.generate.run_autograder import main as run_autograder
+from otter.run.run_autograder import main as run_autograder
 
-from .. import TestCase
+from . import TestCase
 
 parser = get_parser()
 
-TEST_FILES_PATH = "test/test_generate/test-run-autograder/"
+TEST_FILES_PATH = "test/test-run/"
 
 class TestRunAutograder(TestCase):
     def setUp(self):
