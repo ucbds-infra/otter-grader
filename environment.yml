@@ -8,8 +8,8 @@ dependencies:
     - r-essentials
     - r-devtools
     - pip
-    - pip:
-        - -r requirements.txt
+    # - pip:
+    #     - -r requirements.txt
         # - datascience
         # - jupyter_client
         # - ipykernel
