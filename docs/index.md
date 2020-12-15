@@ -15,6 +15,7 @@
    otter_run/index
    otter_service
    execution
+   plugins/index
    pdfs
    seeding
    logging
@@ -47,7 +48,7 @@ pip install otter-grader
 If you are going to be autograding R, you must also install the R package using `devtools::install_github`:
 
 ```r
-devtools::install_github("ucbds-infra/ottr@0.0.1")
+devtools::install_github("ucbds-infra/ottr@stable")
 ```
 
 Installing the Python package will install the `otter` binary so that Otter can be called from the command line. **If you are running Otter on Windows,** this binary will not work. Instead, call Otter as a Python module: `python3 -m otter`. This will have _the same_ commands, arguments, and behaviors as all calls to `otter` that are shown in the documentation. 

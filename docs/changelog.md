@@ -1,9 +1,10 @@
 # Changelog
 
-**v2.0.0:**
+**v2.0.0.b0:**
 
 * Changed granularity of results to be test case-by-test case rather than by file
 * Added ability to list requirements directly in assignment metadata w/out requirements.txt file
+* Unified assignment grading workflow and converted local grading to container-per-submission
 * Exposed grading internals for non-containerized grading via `otter run` and `otter.api`
 * Added plugins for altering grades and execution, incl. built-in plugins
 
