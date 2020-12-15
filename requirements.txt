@@ -1,4 +1,3 @@
-numpy
 datascience
 jupyter_client
 ipykernel
