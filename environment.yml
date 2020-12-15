@@ -3,10 +3,10 @@ channels:
     - conda-forge
     - defaults
 dependencies:
+    - python>=3.6
     - r-base
     - r-essentials
     - r-devtools
-    - numpy
     - pip
     - pip:
         - -r requirements.txt
