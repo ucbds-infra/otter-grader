@@ -37,7 +37,7 @@ class AbstractOtterPlugin(ABC):
 
         {
             "plugins": [
-                "my_otter_plugin_package.MyOtterPlugin``
+                "my_otter_plugin_package.MyOtterPlugin"
             ]
             "plugin_config": {
                 "my_otter_plugin": {

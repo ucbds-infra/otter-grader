@@ -55,8 +55,8 @@ extensions = [
     'sphinx.ext.coverage', 
     'sphinx.ext.napoleon',
     'sphinx_markdown_tables',
-    'sphinx.ext.autosummary',
-    'sphinxcontrib.apidoc',
+    # 'sphinx.ext.autosummary',
+    # 'sphinxcontrib.apidoc',
     'sphinxarg.ext',
 ]
 
@@ -66,6 +66,8 @@ napoleon_numpy_docstring = False
 apidoc_module_dir = '../otter'
 apidoc_output_dir = '.'
 apidoc_excluded_paths = []
+
+autosummary_generate = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
