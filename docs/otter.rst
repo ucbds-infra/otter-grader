@@ -14,10 +14,7 @@ Subpackages
    otter.generate
    otter.grade
    otter.plugins
-<<<<<<< HEAD
-=======
    otter.run
->>>>>>> beta
    otter.service
    otter.test_files
 

@@ -20,17 +20,6 @@ otter.generate.autograder module
    :undoc-members:
    :show-inheritance:
 
-<<<<<<< HEAD
-otter.generate.constants module
--------------------------------
-
-.. automodule:: otter.generate.constants
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-=======
->>>>>>> beta
 otter.generate.token module
 ---------------------------
 
