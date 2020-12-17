@@ -1,4 +1,4 @@
-# Gradescope Results Format
+# Grading on Gradescope
 
 This section details how the autograder runs and how results are displayed to students and instructors on Gradescope. When a student submits to Gradescpe, the autograder does the following:
 
@@ -13,6 +13,14 @@ This section details how the autograder runs and how results are displayed to st
 9. Makes adjustments to the scores and visibility based on the configurations
 10. Writes the JSON to the results file
 11. Prints the results as a dataframe to stdout
+
+## Writing Tests for Gradescope
+
+The tests that are used by the Gradescope autograder are the same as those used in other uses of Otter, but there is one important field that is relevant to Gradescope that is not pertinent to any other uses.
+
+As noted in the second bullet [here](../../test_files/ok_format.html#caveats), the `"hidden"` key of each test case indicates the visibility of that specific test case. If a student passes all tests, they are shown a successful check. If they pass all public tests but fail hidden tests, they are shown a successful check but a second output is shown below that for instructors only, showing the output of the failed test. If students fail a public test, students are shown the output of the failed test and there is no second box.
+
+For more information on how tests are displayed to students, see [Grading on Gradescope](../executing_submissions/gradescope.md).
 
 ## Instructor View
 

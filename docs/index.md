@@ -10,7 +10,6 @@
    otter_assign/index
    workflow/index
    otter_check/index
-   otter_service
    execution
    plugins/index
    pdfs
