@@ -1,6 +1,6 @@
 # Changelog
 
-**v2.0.0.b0:**
+**v2.0.0:**
 
 * Changed granularity of results to be test case-by-test case rather than by file
 * Added ability to list requirements directly in assignment metadata w/out requirements.txt file
