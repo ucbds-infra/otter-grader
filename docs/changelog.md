@@ -7,6 +7,7 @@
 * Unified assignment grading workflow and converted local grading to container-per-submission
 * Exposed grading internals for non-containerized grading via `otter run` and `otter.api`
 * Added plugins for altering grades and execution, incl. built-in plugins
+* Added ignorable cells to Otter Assign
 
 **v1.1.6:**
 

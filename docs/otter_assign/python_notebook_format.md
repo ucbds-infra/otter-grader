@@ -269,3 +269,12 @@ An example of a manually-graded written question (with no prompt):
 An example of a manuall-graded written question with a custom prompt:
 
 ![](images/assign_sample_written_manual_with_prompt.png)
+
+## Ignoring Cells
+
+For any cells that you don't want to be included in _either_ of the output notebooks that are present in the master notebook, include a line at the top of the cell with the `## Ignore ##` comment (case insensitive) just like with test cells. Note that this also works for Markdown cells with the same syntax.
+
+```python
+## Ignore ##
+print("This cell won't appear in the output.")
+```
