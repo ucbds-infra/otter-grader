@@ -7,6 +7,4 @@
 
    config_files
    container_image
-   gs_results
-   cli_reference
 ```

@@ -19,7 +19,7 @@ The available keys in a `.otter` file are listed below, along with their default
 
 ## Configuring Otter Service
 
-The main use of a `.otter` file is to configure submission to an [Otter Service deployment](otter_service.md). This requires that the `endpoint`, `assignment_id`, and `class_id` keys be specified. The optional `auth` key corresponds to the name of the service's auth provider (defaulting to `google`). With these specified, students will be able to use `Notebook.submit` to send their notebook submission to the Otter Service deployment so that it can be graded. An example of this use would be:
+The main use of a `.otter` file is to configure submission to an [Otter Service deployment](../otter_service.md). This requires that the `endpoint`, `assignment_id`, and `class_id` keys be specified. The optional `auth` key corresponds to the name of the service's auth provider (defaulting to `google`). With these specified, students will be able to use `Notebook.submit` to send their notebook submission to the Otter Service deployment so that it can be graded. An example of this use would be:
 
 ```json
 {
@@ -31,7 +31,7 @@ The main use of a `.otter` file is to configure submission to an [Otter Service 
 }
 ```
 
-More information can be found in [Grading on a Deployable Service](otter_service.md)
+More information can be found in [Grading on a Deployable Service](../otter_service.md)
 
 ## Configuring the Serialization of Environments
 
@@ -64,4 +64,4 @@ The function `otter.utils.get_variable_type` when called on an object will retur
 'builtins.function'
 ```
 
-More information about grading from serialized environments can be found in [Logging](logging.md).
+More information about grading from serialized environments can be found in [Logging](../logging.md).

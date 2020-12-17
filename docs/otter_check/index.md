@@ -1,6 +1,14 @@
 # Student Usage
 
 ```eval_rst
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   dot_otter_files
+```
+
+```eval_rst
 .. currentmodule:: otter.notebook
 ```
 
@@ -64,7 +72,7 @@ Otter also features a command line tool that allows students to run checks on Py
 
 * `-t` is the path to the directory of tests. If left unspecified, it is assumed to be `./tests`
 * `-q` is the identifier of a specific question to check (the file name without the `.py` extension). If left unspecified, all tests in the tests directory are run.
-* `--seed` is an optional random seed for [execution seeding](seeding.md)
+* `--seed` is an optional random seed for [execution seeding](../seeding.md)
 
 The recommended file structure for using the checker is something like the one below:
 

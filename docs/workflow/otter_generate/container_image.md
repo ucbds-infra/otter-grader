@@ -24,7 +24,7 @@ Below are descriptions of each of the items listed above and the Jinja2 template
 This file, required by Gradescope, performs the installation of necessary software for the autograder to run. The script template looks like this:
 
 ```eval_rst
-.. literalinclude:: ../../otter/generate/templates/setup.sh
+.. literalinclude:: ../../../otter/generate/templates/setup.sh
   :language: shell
 ```
 
@@ -48,7 +48,7 @@ Currently this script is not customizable, but you can unzip the provided zip fi
 This file specifies the conda environment that Otter creates in `setup.sh`.
 
 ```eval_rst
-.. literalinclude:: ../../otter/generate/templates/environment.yml
+.. literalinclude:: ../../../otter/generate/templates/environment.yml
   :language: yaml
 ```
 
@@ -57,7 +57,7 @@ This file specifies the conda environment that Otter creates in `setup.sh`.
 This file contains the Python dependencies required to execute submissions. It is also the file that your requirements are appended to when you provided your own requirements file   for a Python assignment (unless `--overwrite-requirements` is passed). The template requirements are:
 
 ```eval_rst
-.. literalinclude:: ../../otter/generate/templates/requirements.txt
+.. literalinclude:: ../../../otter/generate/templates/requirements.txt
 ```
 
 Note that this installs the exact version of Otter that you are working from. This is important to ensure that the configurations you set locally are correctly processed and processable by the version on the Gradescope container. If you choose to overwrite the requirements, _make sure to do the same._
@@ -67,7 +67,7 @@ Note that this installs the exact version of Otter that you are working from. Th
 This file uses R functions like `install.packages` and `devtools::install_github` to install R packages. If you are creating an R assignment, it is this file (rather than `requirements.txt`) that your requirements and overwrite-requirements options are applied to. The template file contains:
 
 ```eval_rst
-.. literalinclude:: ../../otter/generate/templates/requirements.R
+.. literalinclude:: ../../../otter/generate/templates/requirements.R
   :language: r
 ```
 
@@ -76,7 +76,7 @@ This file uses R functions like `install.packages` and `devtools::install_github
 This is the file that Gradescope uses to actually run the autograder when a student submits. Otter provides this file as an executable that activates the conda environment and then calls `/autograder/source/run_otter.py`:
 
 ```eval_rst
-.. literalinclude:: ../../otter/generate/templates/run_autograder
+.. literalinclude:: ../../../otter/generate/templates/run_autograder
   :language: shell
 ```
 
@@ -85,7 +85,7 @@ This is the file that Gradescope uses to actually run the autograder when a stud
 This file contains the logic to start the grading process by importing and running `otter.run.run_autograder.main`:
 
 ```eval_rst
-.. literalinclude:: ../../otter/generate/templates/run_otter.py
+.. literalinclude:: ../../../otter/generate/templates/run_otter.py
   :language: python
 ```
 

@@ -5,15 +5,10 @@ Argument parser for Otter command-line tools
 import sys
 import argparse
 
+from textwrap import dedent
+
 INVOKED_FROM_PYTHON = "__main__.py" in sys.argv[0]
 PROG = ("otter", "python3 -m otter")[INVOKED_FROM_PYTHON]
-
-# from . import assign
-# from . import check
-# from . import export
-# from . import generate
-# from . import grade
-# from . import service
 
 def get_parser():
     """Creates and returns the argument parser for Otter
@@ -22,11 +17,11 @@ def get_parser():
         ``argparse.ArgumentParser``: the argument parser for Otter command-line tools
     """
 
-    parser = argparse.ArgumentParser(prog=PROG, description="""
-    A Python-based autograder for Jupyter Notebooks and Python scripts that runs locally on the instructors machine.
-    Also supports use of Gradescope's autograding service, assignment distribution with otter-assign, and public tests
-    that students can run while working on assignments.
-    """)
+    parser = argparse.ArgumentParser(prog=PROG, description=dedent("""\
+    Command-line utility for Otter-Grader, a Python-based autograder for Jupyter Notebooks, RMarkdown 
+    files, and Python and R scripts that runs locally on the instructors machine. For more information,
+    see https://otter-grader.readthedocs.io/
+    """))
     parser.add_argument("--version", default=False, action="store_true", help="Show version information and exit")
     subparsers = parser.add_subparsers()
 

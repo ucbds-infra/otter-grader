@@ -1,14 +1,5 @@
 # Non-containerized Grading
 
-```eval_rst
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-
-   grading_results
-   cli_reference
-```
-
 Otter supports programmatic or command-line grading of assignments without requiring the use of Docker as an intermediary. This functionality is designed to allow Otter to run in environments that do not support containerization, such as on a user's JupyterHub account. **If Docker is available, it is recommended that Otter Grade is used instead, as non-containerized grading is less secure.**
 
 To grade locally, Otter exposes the `otter run` command for the command line or the module `otter.api` for running Otter programmatically. The use of both is described in this section. Before using Otter Run, you should have generated an [autograder configuration zip file](../otter_generate/index.md).
@@ -49,3 +40,12 @@ grade_submission("autograder.zip", "hw00.ipynb")
 `grade_submission` has an optional argument `quiet` which will suppress anything printed to the console by the grading process during execution when set to `True` (default `False`).
 
 For more information about grading programmatically, see the [`otter.api` reference](../api_reference.md).
+
+### Grading Results
+
+This section describes the object that Otter uses to store and manage test case scores when grading. 
+
+```eval_rst
+.. autoclass:: otter.test_files.GradingResults
+    :members:
+```
