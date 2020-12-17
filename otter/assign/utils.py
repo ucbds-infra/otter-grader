@@ -10,7 +10,7 @@ import pathlib
 
 from glob import glob
 
-from .constants import SEED_REGEX, BLOCK_QUOTE
+from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
 from ..argparser import get_parser
 from ..execute import grade_notebook
@@ -86,6 +86,19 @@ def is_markdown_cell(cell):
         ``bool``: whether the cell is a Markdown cell
     """
     return cell.cell_type == 'markdown'
+
+def is_ignore_cell(cell):
+    """
+    Returns whether the current cell should be ignored
+    
+    Args:
+        cell (``nbformat.NotebookNode``): a notebook cell
+
+    Returns:
+        ``bool``: whether the cell is a ignored
+    """
+    source = get_source(cell)
+    return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
 
 
 #---------------------------------------------------------------------------------------------------

@@ -16,7 +16,7 @@ from ..questions import is_question_cell, read_question_metadata, gen_question_c
 from ..r_adapter.tests import read_test
 from ..solutions import has_seed
 from ..tests import any_public_tests
-from ..utils import is_markdown_cell, EmptyCellException
+from ..utils import is_ignore_cell, is_markdown_cell, EmptyCellException
 
 def transform_notebook(rmd_string, assignment, args):
     """
@@ -94,6 +94,9 @@ def get_transformed_cells(cells, assignment):
 
         if has_seed(cell):
             assignment.seed_required = True            
+
+        if is_ignore_cell(cell):
+            continue
 
         # this is the prompt cell or if a manual question then the solution cell
         if question_metadata and not processed_solution:

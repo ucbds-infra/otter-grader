@@ -15,7 +15,7 @@ from .cell_generators import (
 from .questions import is_question_cell, read_question_metadata, gen_question_cell
 from .solutions import is_markdown_solution_cell, has_seed
 from .tests import is_test_cell, any_public_tests
-from .utils import is_markdown_cell, EmptyCellException
+from .utils import is_ignore_cell, is_markdown_cell, EmptyCellException
 
 def transform_notebook(nb, assignment, args):
     """
@@ -87,6 +87,9 @@ def get_transformed_cells(cells, assignment):
         if has_seed(cell):
             assignment.seed_required = True            
 
+        if is_ignore_cell(cell):
+            continue
+        
         # this is the prompt cell or if a manual question then the solution cell
         if question_metadata and not processed_solution:
             assert not is_question_cell(cell), f"Found question cell before end of previous question cell: {cell}"
