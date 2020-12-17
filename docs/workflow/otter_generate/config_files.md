@@ -6,9 +6,9 @@ Otter-Grader also allows instructors to use Gradescope's autograding system to c
 
 The tests that are used by the Gradescope autograder are the same as those used in other uses of Otter, but there is one important field that is relevant to Gradescope that is not pertinent to any other uses.
 
-As noted in the second bullet [here](../test_files/ok_format.html#caveats), the `"hidden"` key of each test case indicates the visibility of that specific test case. If a student passes all tests, they are shown a successful check. If they pass all public tests but fail hidden tests, they are shown a successful check but a second output is shown below that for instructors only, showing the output of the failed test. If students fail a public test, students are shown the output of the failed test and there is no second box.
+As noted in the second bullet [here](../../test_files/ok_format.html#caveats), the `"hidden"` key of each test case indicates the visibility of that specific test case. If a student passes all tests, they are shown a successful check. If they pass all public tests but fail hidden tests, they are shown a successful check but a second output is shown below that for instructors only, showing the output of the failed test. If students fail a public test, students are shown the output of the failed test and there is no second box.
 
-For more information on how tests are displayed to students, see [the next section](gs_results.md).
+For more information on how tests are displayed to students, see [Grading on Gradescope](../executing_submissions/gradescope.md).
 
 ## Using the Command Line Generator
 
@@ -16,7 +16,7 @@ To use Otter with Gradescope's autograder, you must first generate a zipfile tha
 
 ### Before Using Otter Generate
 
-Before using Otter Generate, you should already have written [tests](../test_files/index.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](../otter_grade.html#requirements)). (Note: these default requirements can be overwritten by your requirements by passing the `--overwrite-requirements` flag.)
+Before using Otter Generate, you should already have written [tests](../../test_files/index.md) for the assignment, created a Gradescope autograder assignment, and collected extra requirements into a requirements.txt file (see [here](../executing_submissions/otter_grade.html#requirements)). (Note: these default requirements can be overwritten by your requirements by passing the `--overwrite-requirements` flag.)
 
 ### Directory Structure
 
@@ -43,7 +43,7 @@ Also assume that we have `cd`ed into `hw00-dev`.
 
 ### Usage
 
-The general usage of `otter generate autograder` is to create a zipfile at some output path (`-o` flag, default `./`) which you will then upload to Gradescope. Otter Generate has a few optional flags, described in the [Otter Generate Reference](cli_reference.html#otter-generate-autograder).
+The general usage of `otter generate autograder` is to create a zipfile at some output path (`-o` flag, default `./`) which you will then upload to Gradescope. Otter Generate has a few optional flags, described in the [Otter CLI Reference](../../cli_reference.md).
 
 If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts). To autograde an R assignment, pass the `-l r` flag to indicate that the language of the assignment is R.
 
@@ -81,12 +81,12 @@ otter generate autograder -t hidden-tests -l r data.csv
 
 #### Grading with Environments
 
-Otter can grade assignments using saved environments in the log in the Gradescope container. _This behavior is not supported for R assignments._ This works by unshelving the environment stored in each check entry of Otter's log and grading against it. The notebook is parsed and only its import statements are executed. For more inforamtion about saving and using environments, see [Logging](../logging.md).
+Otter can grade assignments using saved environments in the log in the Gradescope container. _This behavior is not supported for R assignments._ This works by unshelving the environment stored in each check entry of Otter's log and grading against it. The notebook is parsed and only its import statements are executed. For more inforamtion about saving and using environments, see [Logging](../../logging.md).
 
 To configure this behavior, two things are required:
 
 * the use of the `--grade-from-log` flag when generating an autograder zipfile
-* using an [Otter configuration file](../otter_check/dot_otter_files.md) with `save_environments` set to `true`
+* using an [Otter configuration file](../../otter_check/dot_otter_files.md) with `save_environments` set to `true`
 
 This will tell Otter to shelve the global environment each time a student calls `Notebook.check` (pruning the environments of old calls each time it is called on the same question). When the assignment is exported using `Notebook.export`, the log file (at `.OTTER_LOG`) is also exported with the global environments. These environments are read in in the Gradescope container and are then used for grading. Because one environment is saved for each check call, variable name collisions can be averted, since each question is graded using the global environment at the time it was checked. Note that any requirements needed for execution need to be installed in the Gradescope container, because Otter's shelving mechanism does not store module objects.
 
@@ -108,7 +108,7 @@ Otter Generate also needs the course ID and assignment ID of the assignment to w
 https://www.gradescope.com/courses/{COURSE ID}/assignments/{ASSIGNMENT ID}
 ```
 
-Currently, this action supports [HTML comment filtering](../pdfs.md), but filtering can be turned off with the `--unfiltered-pdfs` flag.
+Currently, this action supports [HTML comment filtering](../../pdfs.md), but filtering can be turned off with the `--unfiltered-pdfs` flag.
 
 #### Pass/Fail Thresholds
 
@@ -144,7 +144,7 @@ otter generate autograder --public-multiplier 0.5
 
 #### Intercell Seeding
 
-The Gradescope autograder supports intercell seeding with the use of the `--seed` flag. _This behavior is not supported for R assignments._ Passing it an integer will cause the autograder to seed NumPy and Python's `random` library between *every* pair of code cells. This is useful for writing deterministic hidden tests. More information about Otter seeding [here](../seeding.md). As an example, I can set an intercell seed of 42 with
+The Gradescope autograder supports intercell seeding with the use of the `--seed` flag. _This behavior is not supported for R assignments._ Passing it an integer will cause the autograder to seed NumPy and Python's `random` library between *every* pair of code cells. This is useful for writing deterministic hidden tests. More information about Otter seeding [here](../../seeding.md). As an example, I can set an intercell seed of 42 with
 
 ```
 otter generate autograder data.csv --seed 42
@@ -166,8 +166,8 @@ If `--show-stdout` is passed, the stdout will be made available to students _onl
 otter generate autograder --show-hidden
 ```
 
-The [next section](gs_results.md) details more about how output on Gradescope is formatted.
+The [Grading on Gradescope](../executing_submissions/gradescope.md) section details more about how output on Gradescope is formatted.
 
 #### Generating with Otter Assign
 
-Otter Assign comes with an option to generate this zip file automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](../otter_assign/index.md) for more details.
+Otter Assign comes with an option to generate this zip file automatically when the distribution notebooks are created via the `--generate` flag. See [Distributing Assignments](../../otter_assign/index.md) for more details.

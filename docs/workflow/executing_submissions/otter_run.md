@@ -24,7 +24,7 @@ otter run -a ../autograder.zip hw00.ipynb
 
 Either of the above will produce the results file at `./results.json`. 
 
-For more information on the command-line interface for Otter Run, see the [`otter run` reference](cli_reference.md).
+For more information on the command-line interface for Otter Run, see the [Otter CLI reference](../../cli_reference.md).
 
 ## Grading Programmatically
 
@@ -39,7 +39,7 @@ grade_submission("autograder.zip", "hw00.ipynb")
 
 `grade_submission` has an optional argument `quiet` which will suppress anything printed to the console by the grading process during execution when set to `True` (default `False`).
 
-For more information about grading programmatically, see the [`otter.api` reference](../api_reference.md).
+For more information about grading programmatically, see the [`otter.api` reference](../../api_reference.md).
 
 ### Grading Results
 

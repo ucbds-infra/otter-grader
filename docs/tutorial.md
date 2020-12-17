@@ -83,11 +83,11 @@ Start by `cd`ing into `tutorial/generate`. We have provided premade tests and a 
 otter generate autograder
 ```
 
-Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](otter_generate/index.md).
+Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](workflow/otter_generate/index.md).
 
 ### Otter Grade
 
-Start by `cd`ing into `tutorial/grade`. The first thing to note is that we have provided a [metadata file](otter_grade.html#metadata) that maps student identifiers to filenames in `meta.json`. Note that metadata files are optional when using Otter, but we have provided one here to demonstrate their use. This metadata file lists _only_ the files in the `ipynbs` subdirectory, so we won't use it when grading `zips`.
+Start by `cd`ing into `tutorial/grade`. The first thing to note is that we have provided a [metadata file](workflow/executing_submissions/otter_grade.html#metadata) that maps student identifiers to filenames in `meta.json`. Note that metadata files are optional when using Otter, but we have provided one here to demonstrate their use. This metadata file lists _only_ the files in the `ipynbs` subdirectory, so we won't use it when grading `zips`.
 
 ```json
 [
@@ -249,7 +249,7 @@ Otter created the `final_grades.csv` file with the grades for each student, brok
 
 **Congrats, you're done!** You can use the grades in the CSV file and the PDFs to complete grading however you want.
 
-You can find more information about `otter grade` [here](otter_grade.md).
+You can find more information about `otter grade` [here](workflow/executing_submissions/otter_grade.md).
 
 ### Gradescope
 
@@ -290,4 +290,4 @@ After this command finishes running, you should have a file called `autograder.z
 
 To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
 
-You can find more information about Gradescope usage [here](otter_generate/index.md).
+You can find more information about Gradescope usage [here](workflow/otter_generate/index.md).

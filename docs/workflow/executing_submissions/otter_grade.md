@@ -4,7 +4,7 @@ The command line interface allows instructors to grade notebooks locally by laun
 
 ## Configuration Files
 
-Otter grades students submissions in individual Docker containers that are based on a Docker image generated through the use of a configuration zip file. Before grading assignments locally, an instructor should create such a zip file by using a tool such as [Otter Assign](otter_assign/index.md) or [Otter Generate](otter_generate/index.md). This file will be used in the construction of a Docker image tagged `otter-grader:{zip file hash}`. This Docker image will then have containers spawned from it for each submission that is graded.
+Otter grades students submissions in individual Docker containers that are based on a Docker image generated through the use of a configuration zip file. Before grading assignments locally, an instructor should create such a zip file by using a tool such as [Otter Assign](../../otter_assign/index.md) or [Otter Generate](../otter_generate/index.md). This file will be used in the construction of a Docker image tagged `otter-grader:{zip file hash}`. This Docker image will then have containers spawned from it for each submission that is graded.
 
 Otter's Docker images can be pruned with `otter grade --prune`.
 
@@ -19,7 +19,7 @@ These two categories are broken down and described below.
 
 ### 3rd Party Exports
 
-If you are using a grading service like Gradescope or an LMS like Canvas to collect submissions, Otter can interpret the export format of these 3rd party services in place of a metadata file. To use a service like Gradescope or Canvas, download the submissions for an assignment, unzip the provided file, and then proceed as described in [Grading Locally](otter_grade.md) using the metadata flag corresponding to your chosen service.
+If you are using a grading service like Gradescope or an LMS like Canvas to collect submissions, Otter can interpret the export format of these 3rd party services in place of a metadata file. To use a service like Gradescope or Canvas, download the submissions for an assignment, unzip the provided file, and then proceed as described in below using the metadata flag corresponding to your chosen service.
 
 For example, if I had a Canvas export, I would unzip it, `cd` into the unzipped directory, copy my tests to `./tests`, and run
 
@@ -207,7 +207,7 @@ The four metadata flags, `-g`, `-c`, `-j`, and `-y`, correspond to different exp
 * nb2pdf
 * otter-grader -->
 
-The Docker image used for grading will be built as described in the [Otter Generatte](otter_generate/container_image.md) section. If you require any packages not listed there, or among the dependencies of any packages above, you should create a requirements.txt file _containing only those packages_ and use it when running your configuration generator. 
+The Docker image used for grading will be built as described in the [Otter Generatte](../otter_generate/container_image.md) section. If you require any packages not listed there, or among the dependencies of any packages above, you should create a requirements.txt file _containing only those packages_ and use it when running your configuration generator. 
 
 <!-- If this file is created in the working directory (i.e. `./requirements.txt`), then Otter will automatically find this file and include it. If this file is not at `./requirements.txt`, pass its path to the `-r` flag.
 
@@ -357,7 +357,7 @@ All non-notebook files in the notebooks path are copied into all of the containe
 
 ### Intercell Seeding
 
-Otter Grade also supports [intercell seeding](seeding.md). This behavior should be configured as a part of your configuration zip file.
+Otter Grade also supports [intercell seeding](../../seeding.md). This behavior should be configured as a part of your configuration zip file.
 
 <!-- Otter Grader also supports [intercell seeding](seeding.md) via the `--seed` flag. In notebooks, NumPy and Python's `random` library are both seeded between *every* pair of code cells, so that the deterministic output can be used in writing hidden tests. In scripts, NumPy and `random` are seeded before the script's execution. As an example, I can pass a seed to Otter with the above directory structure with 
 
@@ -367,7 +367,7 @@ otter grade --seed 42
 
 -->
 
-## Otter Grade Reference
+<!-- ## Otter Grade Reference
 
 ```eval_rst
 .. argparse::
@@ -376,4 +376,4 @@ otter grade --seed 42
    :prog: otter
    :path: grade
    :nodefaultconst:
-```
+``` -->
