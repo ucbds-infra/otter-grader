@@ -47,7 +47,7 @@ The `after_execution` method will be called after the student's submission is ex
 
 ### `after_grading`
 
-The `after_grading` method will be called after grading has occurred (meaning all tests have been run and the results object has been created). It will be passed the `otter.test_files.GradingResults` object that contains the results of the student's submission against the tests. Any changes made to this object will be reflected in the results returned by the autograder.
+The `after_grading` method will be called after grading has occurred (meaning all tests have been run and the results object has been created). It will be passed the `otter.test_files.GradingResults` object that contains the results of the student's submission against the tests. Any changes made to this object will be reflected in the results returned by the autograder. For more information about this object, see [Grading Results](../otter_run/grading_results.md).
 
 ### `generate_report`
 
