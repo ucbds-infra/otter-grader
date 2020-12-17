@@ -32,13 +32,19 @@ def filter_ignored_cells(nb):
     """
     nb = copy.deepcopy(nb)
 
+    to_delete = []
     for i, cell in enumerate(nb['cells']):
         metadata = cell.get("metadata", {})
         tags = metadata.get("tags", [])
 
         if IGNORE_CELL_TAG in tags or metadata.get(CELL_METADATA_KEY, {}).get("ignore", False):
-            del nb['cells'][i]
-    
+            # del nb['cells'][i]
+            to_delete.append(i)
+
+    to_delete.reverse()
+    for i in to_delete:
+        del nb['cells'][i]
+
     return nb
 
 def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None, seed=None):
