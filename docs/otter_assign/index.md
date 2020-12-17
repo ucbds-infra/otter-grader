@@ -11,5 +11,4 @@
    r_notebook_format
    rmd_format
    usage
-   cli_reference
 ```
