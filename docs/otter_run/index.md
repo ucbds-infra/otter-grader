@@ -5,6 +5,7 @@
    :maxdepth: 1
    :hidden:
 
+   grading_results
    cli_reference
 ```
 
