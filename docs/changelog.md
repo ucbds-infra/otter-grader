@@ -8,6 +8,7 @@
 * Exposed grading internals for non-containerized grading via `otter run` and `otter.api`
 * Added plugins for altering grades and execution, incl. built-in plugins
 * Added ignorable cells to Otter Assign
+* Added `autograder_files` configuration for Otter Assign
 
 **v1.1.6:**
 

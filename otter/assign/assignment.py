@@ -47,6 +47,7 @@ class Assignment:
         "requirements": None,
         "overwrite_requirements": False,
         "files": [],
+        "autograder_files": [],
         "variables": {},
         "run_tests": True,
         "ignore_modules": [],

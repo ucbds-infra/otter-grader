@@ -280,6 +280,15 @@ def run_generate_autograder(result, assignment, args):
     if assignment.files or args.files:
         generate_cmd += assignment.files or args.files
 
+    if assignment.autograder_files:
+        ag_files = []
+        res = (result / "autograder").resolve()
+        for agf in assignment.autograder_files:
+            fp = pathlib.Path(agf).resolve()
+            rp = get_relpath(res, fp)
+            ag_files.append(str(rp))
+        generate_cmd += ag_files
+
     if assignment.variables:
         # generate_cmd += ["--serialized-variables", str(assignment.variables)]
         generate_args['serialized_variables'] = str(assignment.variables)
