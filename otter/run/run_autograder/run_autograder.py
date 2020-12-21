@@ -91,7 +91,7 @@ def run_autograder(options):
     plugins = options["plugins"]
 
     if plugins:
-        with open("./submission_metadata.json") as f:
+        with open("../submission_metadata.json") as f:
             submission_metadata = json.load(f)
 
         plugin_config = options["plugin_config"]
