@@ -9,7 +9,7 @@ import pandas as pd
 from .constants import DEFAULT_OPTIONS
 from ...version import LOGO_WITH_VERSION
 
-def main(autograder_dir, logo=True):
+def main(autograder_dir, logo=True, debug=False):
     """
     Runs autograder on Gradescope based on predefined configurations.
 
@@ -29,6 +29,9 @@ def main(autograder_dir, logo=True):
 
     if options["logo"] and logo:
         print(LOGO_WITH_VERSION, "\n")
+    
+    if not options["debug"] and debug:
+        options["debug"] = True
 
     options["autograder_dir"] = autograder_dir
 

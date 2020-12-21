@@ -17,7 +17,7 @@ from .run import main as run_grader
 PARSER = get_parser()
 ARGS_STARTER = ["run"]
 
-def grade_submission(ag_path, submission_path, quiet=False):
+def grade_submission(ag_path, submission_path, quiet=False, debug=False):
     """
     Runs non-containerized grading on a single submission at ``submission_path`` using the autograder 
     configuration file at ``ag_path``. 
@@ -34,6 +34,8 @@ def grade_submission(ag_path, submission_path, quiet=False):
         submission_path (``str``): path to submission file
         quiet (``bool``, optional): whether to suppress print statements during grading; default 
             ``False``
+        debug (``bool``, optional): whether to run the submission in debug mode (without ignoring
+            errors)
 
     Returns:
         ``otter.test_files.GradingResults``: the results object produced during the grading of the
@@ -47,8 +49,11 @@ def grade_submission(ag_path, submission_path, quiet=False):
         "-a", ag_path,
         "-o", dp,
         submission_path,
-        "--no-logo"
+        "--no-logo",
     ])
+
+    if debug:
+        args_list.append("--debug")
 
     args = PARSER.parse_args(args_list)
 

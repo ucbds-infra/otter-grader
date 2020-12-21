@@ -168,6 +168,7 @@ def get_parser():
     run_parser.add_argument("-o", "--output-dir", default="./", help="Directory to which to write output")
 
     run_parser.add_argument("--no-logo", action="store_true", default=False, help="Suppress Otter logo in stdout")
+    run_parser.add_argument("--debug", default=False, action="store_true", help="Do not ignore errors when running submission")
 
     run_parser.set_defaults(func_str="run.main")
 
