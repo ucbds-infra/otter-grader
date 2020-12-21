@@ -300,6 +300,6 @@ def run_generate_autograder(result, assignment, args):
     # TODO: change this to import and direct call
     parser = get_parser()
     args = parser.parse_args(generate_cmd)
-    generate_autograder(args)
+    generate_autograder(args, assignment=assignment)
 
     os.chdir(curr_dir)

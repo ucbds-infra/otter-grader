@@ -30,7 +30,7 @@ TEMPLATE_FILE_PATHS = {
     "environment.yml":  os.path.join(TEMPLATES_DIR, "environment.yml"),
 }
 
-def main(args):
+def main(args, assignment=None):
     """
     Runs ``otter generate autograder``
     """
@@ -106,8 +106,8 @@ def main(args):
         otter_env_name = OTTER_ENV_NAME,
     )
 
-    plugins = PluginCollection(otter_config_json.get("plugins", []), {}, otter_config_json.get("plugin_config", {}))
-    plugins.run("during_generate", otter_config_json)
+    plugins = PluginCollection(otter_config_json.get("plugins", []), None, {}, otter_config_json.get("plugin_config", {}))
+    plugins.run("during_generate", otter_config_json, assignment)
 
     # create tmp directory to zip inside
     with tempfile.TemporaryDirectory() as td:

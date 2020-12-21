@@ -68,7 +68,7 @@ class AbstractOtterPlugin(ABC):
         self.submission_metadata = submission_metadata
         self.plugin_config = plugin_config
 
-    def during_generate(self, otter_config):
+    def during_generate(self, otter_config, assignment):
         """
         Plugin event run during the execution of Otter Generate that can modify the configurations
         to be written to ``otter_config.json``.
@@ -76,6 +76,9 @@ class AbstractOtterPlugin(ABC):
         Args:
             otter_config (``dict``): the dictionary of Otter configurations to be written to 
                 ``otter_config.json`` in the zip file
+            assignment (``otter.assign.assignment.Assignment``): the ``Assignment`` instance with 
+                configurations for the assignment if Otter Assign was used to generate this zip file;
+                will be set to ``None`` if Otter Assign is not being used
 
         Raises:
             ``PluginEventNotSupportedException``: if the event is not supported by this plugin

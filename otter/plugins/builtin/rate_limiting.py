@@ -26,7 +26,7 @@ class RateLimiting(AbstractOtterPlugin):
                 result += f"{self.plugin_config.get(base, 0)} {base} "
         return result.strip()
 
-    def _submission_allowed():
+    def _submission_allowed(self):
         window = dt.timedelta(
             self.plugin_config.get("days", 0),
             self.plugin_config.get("seconds", 0),

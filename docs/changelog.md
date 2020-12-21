@@ -9,6 +9,7 @@
 * Added plugins for altering grades and execution, incl. built-in plugins
 * Added ignorable cells to Otter Assign
 * Added `autograder_files` configuration for Otter Assign
+* Added passdown of assignment configurations to Otter Generate from Otter Assign
 
 **v1.1.6:**
 

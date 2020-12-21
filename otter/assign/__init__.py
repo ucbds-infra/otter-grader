@@ -36,7 +36,7 @@ def main(args):
         result = get_relpath(master.parent, result)
         orig_dir = os.getcwd()
         os.chdir(master.parent)
-        master = pathlib.Path(master.name)
+        # master = pathlib.Path(master.name)
     
     assignment.master, assignment.result = master, result
 

@@ -39,7 +39,7 @@ class PluginCollection:
         self._plugin_names = plugin_names
         self._plugins = None
 
-        self._load_plugins(submission_metadata, plugin_config)
+        self._load_plugins(submission_path, submission_metadata, plugin_config)
 
     def _load_plugins(self, submission_path, submission_metadata, plugin_config):
         """

@@ -83,11 +83,11 @@ def gen_export_cells(instruction_text, assignment, pdf=True, filtering=True):
     export = nbformat.v4.new_code_cell()
     source_lines = ["# Save your notebook first, then run this cell to export your submission."]
     if filtering and pdf:
-        source_lines.append(f"grader.export(\"{assignment.master}\")")
+        source_lines.append(f"grader.export(\"{assignment.master.name}\")")
     elif not filtering:
-        source_lines.append(f"grader.export(\"{assignment.master}\", filtering=False)")
+        source_lines.append(f"grader.export(\"{assignment.master.name}\", filtering=False)")
     else:
-        source_lines.append(f"grader.export(\"{assignment.master}\", pdf=False)")
+        source_lines.append(f"grader.export(\"{assignment.master.name}\", pdf=False)")
     export.source = "\n".join(source_lines)
 
     lock(instructions)

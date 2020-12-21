@@ -76,7 +76,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
             # check that file is in subdir
             assert os.path.abspath(rmd_path.parent) in os.path.abspath(file), \
                 f"{file} is not in a subdirectory of the master notebook directory"
-            file_path = pathlib.Path(file)
+            file_path = pathlib.Path(file).resolve()
             rel_path = file_path.parent.relative_to(rmd_path.parent)
             os.makedirs(output_dir / rel_path, exist_ok=True)
             shutil.copy(file, str(output_dir / rel_path))
