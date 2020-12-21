@@ -112,5 +112,7 @@ class PluginCollection:
             body = title + "\n" + r + "\n"
 
             report += "\n" + body
+        
+        report += "\n" + footer
 
         return report
