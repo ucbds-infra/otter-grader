@@ -47,12 +47,14 @@ class AbstractOtterPlugin(ABC):
         }
 
     Args:
+        submission_path (``str``): the absolute path to the submission being graded
         submission_metadata (``dict``): submission metadata; if on Gradescope, see
             https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/
         plugin_config (``dict``): configurations from the ``otter_config.json`` for this plugin, pulled
             from ``otter_config["plugin_config"][PLUGIN_CONFIG_KEY]``
 
     Attributes:
+        submission_path (``str``): the absolute path to the submission being graded
         submission_metadata (``dict``): submission metadata; if on Gradescope, see
             https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/
         plugin_config (``dict``): configurations from the ``otter_config.json`` for this plugin, pulled
@@ -61,7 +63,8 @@ class AbstractOtterPlugin(ABC):
 
     PLUGIN_CONFIG_KEY = None
 
-    def __init__(self, submission_metadata, plugin_config):
+    def __init__(self, submission_path, submission_metadata, plugin_config):
+        self.submission_path = submission_path
         self.submission_metadata = submission_metadata
         self.plugin_config = plugin_config
 

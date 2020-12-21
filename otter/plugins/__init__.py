@@ -30,23 +30,25 @@ class PluginCollection:
     Args:
         plugin_names (``list`` of ``str``): the importable names of plugin classes (e.g. 
             ``some_package.SomePlugin``)
+        submission_path (``str``): the absolute path to the submission being graded
         submission_metadata (``dict``): submission metadata
         plugin_config (``dict``): dictionary of configurations for all plugins
     """
 
-    def __init__(self, plugin_names, submission_metadata, plugin_config):
+    def __init__(self, plugin_names, submission_path, submission_metadata, plugin_config):
         self._plugin_names = plugin_names
         self._plugins = None
 
         self._load_plugins(submission_metadata, plugin_config)
 
-    def _load_plugins(self, submission_metadata, plugin_config):
+    def _load_plugins(self, submission_path, submission_metadata, plugin_config):
         """
         Loads each plugin in ``self._plugin_names`` by importing it with ``importlib`` and creating
         and instance with the ``submission_metadata`` and the configurations from ``plugin_config``
         for that plugin. Sets ``self._plugins`` to be the list of imported and instantiated plugins.
 
         Args:
+            submission_path (``str``): the absolute path to the submission being graded
             submission_metadata (``dict``): submission metadata
             plugin_config (``dict``): dictionary of configurations for all plugins
         """
@@ -58,7 +60,7 @@ class PluginCollection:
 
             # get the config key for the plugin
             plugin_cfg = plugin_config.get(class_.PLUGIN_CONFIG_KEY, {})
-            plugin = class_(submission_metadata, plugin_cfg)
+            plugin = class_(submission_path, submission_metadata, plugin_cfg)
             plugins.append(plugin)
 
         self._plugins = plugins

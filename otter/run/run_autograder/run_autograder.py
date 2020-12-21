@@ -79,6 +79,14 @@ def run_autograder(options):
     abs_ag_path = os.path.abspath(options["autograder_dir"])
     os.chdir(abs_ag_path)
 
+    prepare_files()
+
+    os.chdir("./submission")
+
+    nb_path = glob("*.ipynb")[0]
+
+    replace_notebook_instances(nb_path)
+
     # load plugins
     plugins = options["plugins"]
 
@@ -88,7 +96,9 @@ def run_autograder(options):
 
         plugin_config = options["plugin_config"]
         
-        plugin_collection = PluginCollection(plugins, submission_metadata, plugin_config)
+        plugin_collection = PluginCollection(
+            plugins, os.path.abspath(nb_path), submission_metadata, plugin_config
+        )
     
     else:
         plugin_collection = None
@@ -104,14 +114,6 @@ def run_autograder(options):
         generate_pdf = options["pdf"]
         has_token = False
         client = None
-
-    prepare_files()
-
-    os.chdir("./submission")
-
-    nb_path = glob("*.ipynb")[0]
-
-    replace_notebook_instances(nb_path)
 
     if os.path.isfile(_OTTER_LOG_FILENAME):
         log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
