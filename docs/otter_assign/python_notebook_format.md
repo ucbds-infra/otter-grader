@@ -279,3 +279,13 @@ For any cells that you don't want to be included in _either_ of the output noteb
 ## Ignore ##
 print("This cell won't appear in the output.")
 ```
+
+## Student-Facing Plugins
+
+Otter supports student-facing plugin events via the `otter.Notebook.run_plugin` method. To include a student-facing plugin call in the resulting versions of your master notebook, add a multiline plugin config string to a code cell of your choosing. The plugin config should be YAML-formatted as a mutliline comment-delimited string, similar to the solution and prompt blocks above. The comments `# BEGIN PLUGIN` and `# END PLUGIN` should be used on the lines with the triple-quotes to delimit the YAML's boundaries. There is one required configuration: the plugin name, which should be a fully-qualified importable string that evaluates to a plugin that inherits from `otter.plugins.AbstractOtterPlugin`. 
+
+There are two optional configurations: `args` and `kwargs`. `args` should be a list of additional arguments to pass to the plugin. These will be left unquoted as-is, so you can pass variables in the notebook to the plugin just by listing them. `kwargs` should be a dictionary that mappins keyword argument names to values; thse will also be added to the call in `key=value` format.
+
+Here is an example of plugin replacement in Otter Assign:
+
+<iframe src="../_static/notebooks/assign-plugin.html"></iframe>
