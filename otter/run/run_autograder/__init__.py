@@ -9,12 +9,15 @@ import pandas as pd
 from .constants import DEFAULT_OPTIONS
 from ...version import LOGO_WITH_VERSION
 
-def main(autograder_dir, logo=True, debug=False):
+def main(autograder_dir, **kwargs):
     """
     Runs autograder on Gradescope based on predefined configurations.
 
     Args:
         config (``dict``): configurations for autograder
+        **kwargs: keyword arguments for updating configurations in the default configurations 
+            ``otter.run.run_autograder.constants.DEFAULT_OPTIONS``; these values override anything
+            present in ``otter_config.json``
     """
 
     config_fp = os.path.join(autograder_dir, "source", "otter_config.json")
@@ -26,12 +29,10 @@ def main(autograder_dir, logo=True, debug=False):
 
     options = DEFAULT_OPTIONS.copy()
     options.update(config)
+    options.update(kwargs)
 
-    if options["logo"] and logo:
+    if options["logo"]:
         print(LOGO_WITH_VERSION, "\n")
-    
-    if not options["debug"] and debug:
-        options["debug"] = True
 
     options["autograder_dir"] = autograder_dir
 
@@ -50,10 +51,11 @@ def main(autograder_dir, logo=True, debug=False):
 
     print("\n\n")
 
-    df = pd.DataFrame(output["tests"])
-    if "output" in df.columns:
-        df.drop(columns=["output"], inplace=True)
+    if options["print_summary"]:
+        df = pd.DataFrame(output["tests"])
+        if "output" in df.columns:
+            df.drop(columns=["output"], inplace=True)
 
-    print(df)
+        print(df)
 
     os.chdir(curr_dir)

@@ -1,5 +1,5 @@
 """
-Default configurations for Gradescope autograding
+Default configurations for autograding
 """
 
 DEFAULT_OPTIONS = {
@@ -26,4 +26,5 @@ DEFAULT_OPTIONS = {
     "plugins": [],
     "plugin_config": {},
     "logo": True,
+    "print_summary": True,
 }
