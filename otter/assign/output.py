@@ -10,6 +10,7 @@ import nbformat
 
 from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
+from .plugins import replace_plugins_with_calls
 from .solutions import strip_solutions_and_output
 from .tests import write_test
 
@@ -40,6 +41,9 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     os.makedirs(tests_dir, exist_ok=True)
 
     transformed_nb, test_files = transform_notebook(nb, assignment, args)
+
+    # replace plugins
+    transformed_nb = replace_plugins_with_calls(transformed_nb)
 
     if assignment.requirements:
         if isinstance(assignment.requirements, list):

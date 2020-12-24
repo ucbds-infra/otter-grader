@@ -21,6 +21,7 @@ from IPython.display import display, HTML, Javascript
 from .logs import LogEntry, EventType, Log
 from ..execute import check
 from ..export import export_notebook
+from ..plugins import PluginCollection
 # from .utils import wait_for_save
 
 _API_KEY = None
@@ -231,6 +232,11 @@ class Notebook:
 
         return result
 
+    def run_plugin(self, plugin_name, *args, **kwargs):
+        """
+        """
+        pc = PluginCollection([plugin_name], "", {}, {})
+        pc.run("from_notebook", *args, **kwargs)
 
     # @staticmethod
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True):
@@ -274,7 +280,6 @@ class Notebook:
             raise e
         else:
             self._log_event(EventType.TO_PDF)
-
 
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], display_link=True):
         """
