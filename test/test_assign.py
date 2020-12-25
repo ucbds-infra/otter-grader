@@ -146,6 +146,9 @@ class TestAssign(TestCase):
         )
 
     def tearDown(self):
+        """
+        Removes assign output
+        """
         # cleanup
         if os.path.exists(TEST_FILES_PATH + "output"):
             shutil.rmtree(TEST_FILES_PATH + "output")
