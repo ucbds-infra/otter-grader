@@ -8,7 +8,7 @@ import nbformat
 from .constants import MD_RESPONSE_CELL_SOURCE
 from .utils import get_source, lock
 
-def gen_init_cell():
+def gen_init_cell(nb_name):
     """
     Generates a cell to initialize Otter in the notebook. The code cell has the following contents:
 
@@ -17,11 +17,14 @@ def gen_init_cell():
         # Initialize Otter
         import otter
         grader = otter.Notebook()
+
+    Args:
+        nb_name (``str``): the name of the notebook being graded
     
     Returns:
         ``nbformat.NotebookNode``: the init cell
     """
-    cell = nbformat.v4.new_code_cell("# Initialize Otter\nimport otter\ngrader = otter.Notebook()")
+    cell = nbformat.v4.new_code_cell(f'# Initialize Otter\nimport otter\ngrader = otter.Notebook("{nb_name}")')
     lock(cell)
     return cell
 
@@ -38,7 +41,7 @@ def gen_markdown_response_cell():
     """
     return nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)
 
-def gen_export_cells(instruction_text, assignment, pdf=True, filtering=True):
+def gen_export_cells(instruction_text, pdf=True, filtering=True):
     """
     Generates export cells that instruct the student the run a code cell calling 
     ``otter.Notebook.export`` to generate and download their submission. The Markdown cell contains:
@@ -65,7 +68,6 @@ def gen_export_cells(instruction_text, assignment, pdf=True, filtering=True):
     
     Args:
         instruction_text (``str``): extra instructions for students when exporting
-        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         pdf (``bool``, optional): whether a PDF is needed
         filtering (``bool``, optional): whether PDF filtering is needed
     
@@ -83,11 +85,11 @@ def gen_export_cells(instruction_text, assignment, pdf=True, filtering=True):
     export = nbformat.v4.new_code_cell()
     source_lines = ["# Save your notebook first, then run this cell to export your submission."]
     if filtering and pdf:
-        source_lines.append(f"grader.export(\"{assignment.master.name}\")")
+        source_lines.append(f"grader.export()")
     elif not filtering:
-        source_lines.append(f"grader.export(\"{assignment.master.name}\", filtering=False)")
+        source_lines.append(f"grader.export(filtering=False)")
     else:
-        source_lines.append(f"grader.export(\"{assignment.master.name}\", pdf=False)")
+        source_lines.append(f"grader.export(pdf=False)")
     export.source = "\n".join(source_lines)
 
     lock(instructions)

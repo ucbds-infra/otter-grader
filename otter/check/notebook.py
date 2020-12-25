@@ -63,14 +63,14 @@ class Notebook:
         test_dir (``str``, optional): path to tests directory
     """
 
-    def __init__(self, test_dir="./tests"):
+    def __init__(self, nb_path=None, test_dir="./tests"):
         try:
             global _API_KEY, _SHELVE
             # assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
 
             self._path = test_dir
             self._service_enabled = False
-            self._notebook = None
+            self._notebook = nb_path
 
 
             # assume using otter service if there is a .otter file
@@ -198,6 +198,20 @@ class Notebook:
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
+    def _resolve_nb_path(self, nb_path):
+        if nb_path is None and self._notebook is not None:
+            nb_path = self._notebook
+
+        elif nb_path is None and glob("*.ipynb"):
+            notebooks = glob("*.ipynb")
+            assert len(notebooks) == 1, "nb_path not specified and > 1 notebook in working directory"
+            nb_path = notebooks[0]
+
+        elif nb_path is None:
+            raise ValueError("nb_path is None and no otter-service config is available")
+
+        return nb_path
+
     def check(self, question, global_env=None):
         """
         Runs tests for a specific question against a global environment. If no global environment
@@ -232,10 +246,11 @@ class Notebook:
 
         return result
 
-    def run_plugin(self, plugin_name, *args, **kwargs):
+    def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         """
-        pc = PluginCollection([plugin_name], "", {}, {})
+        nb_path = self._resolve_nb_path(nb_path)
+        pc = PluginCollection([plugin_name], nb_path, {}, {})
         pc.run("from_notebook", *args, **kwargs)
 
     # @staticmethod
@@ -252,16 +267,7 @@ class Notebook:
         """
         # self._save_notebook()
         try:
-            if nb_path is None and self._notebook is not None:
-                nb_path = self._notebook
-
-            elif nb_path is None and glob("*.ipynb"):
-                notebooks = glob("*.ipynb")
-                assert len(notebooks) == 1, "nb_path not specified and > 1 notebook in working directory"
-                nb_path = notebooks[0]
-
-            elif nb_path is None:
-                raise ValueError("nb_path is None and no otter-service config is available")
+            nb_path = self._resolve_nb_path(nb_path)
 
             # convert(nb_path, filtering=filtering, filter_type=filter_type)
             export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
@@ -300,16 +306,7 @@ class Notebook:
         # self._save_notebook()
 
         try:
-            if nb_path is None and self._notebook is not None:
-                nb_path = self._notebook
-
-            elif nb_path is None and glob("*.ipynb"):
-                notebooks = glob("*.ipynb")
-                assert len(notebooks) == 1, "nb_path not specified and > 1 notebook in working directory"
-                nb_path = notebooks[0]
-
-            elif nb_path is None:
-                raise ValueError("nb_path is None and no otter-service config is available")
+            nb_path = self._resolve_nb_path(nb_path)
 
             try:
                 with open(nb_path) as f:

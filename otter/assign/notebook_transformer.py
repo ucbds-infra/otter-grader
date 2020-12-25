@@ -35,7 +35,7 @@ def transform_notebook(nb, assignment, args):
     transformed_cells, test_files = get_transformed_cells(nb['cells'], assignment)
 
     if assignment.init_cell and not args.no_init_cell and assignment.is_python:
-        transformed_cells = [gen_init_cell()] + transformed_cells
+        transformed_cells = [gen_init_cell(assignment.master.name)] + transformed_cells
 
     if assignment.check_all_cell and not args.no_check_all and assignment.is_python:
         transformed_cells += gen_check_all_cell()
@@ -47,7 +47,6 @@ def transform_notebook(nb, assignment, args):
 
         transformed_cells += gen_export_cells(
             export_cell.get('instructions', ''), 
-            assignment,
             pdf = export_cell.get('pdf', True),
             filtering = export_cell.get('filtering', True)
         )
