@@ -11,6 +11,7 @@ from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
 from ..export import export_notebook
 from ..export.exporters import WkhtmltopdfNotFoundError
+from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
 def main(args):
@@ -63,6 +64,12 @@ def main(args):
                 generate_args = {'seed': None}
             assert not generate_args or generate_args.get('seed', None) is not None or \
                 not assignment.is_python, "Seeding cell found but no seed provided"
+
+        plugins = assignment.plugins
+        plugin_config = assignment.plugin_config
+        if plugins:
+            pc = PluginCollection(plugins, "", {}, plugin_config)
+            pc.run("during_assign", assignment)
         
         # generate PDF of solutions
         if assignment.solutions_pdf and not assignment.is_rmd and not args.no_pdfs:
