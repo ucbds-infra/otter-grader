@@ -56,7 +56,12 @@ def replace_plugins(lines):
         args = ", ".join(config.get("args", []))
         kwargs = ", ".join([f"{k}={v}" for k, v in config.get("kwargs", {}).items()])
 
-        call = f'grader.run_plugin("{pg}", {args}, {kwargs})'
+        call = f'grader.run_plugin("{pg}"'
+        if args:
+            call += f', {args}'
+        if kwargs:
+            call += f', {kwargs}'
+        call += ')'
 
         del lines[s:e+1]
         lines.insert(s, call)
