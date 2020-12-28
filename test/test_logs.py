@@ -32,7 +32,7 @@ class TestLogs(TestCase):
         self.maxDiff = None
 
     def test_Notebook_check(self):
-        grader = Notebook(self.test_directory)
+        grader = Notebook(test_dir=self.test_directory)
 
         def square(x):
             return x**2
@@ -54,7 +54,7 @@ class TestLogs(TestCase):
 
 
     def test_grade_check(self):
-        grader = Notebook(self.test_directory)
+        grader = Notebook(test_dir=self.test_directory)
 
         def square(x):
             return x**2
@@ -76,7 +76,7 @@ class TestLogs(TestCase):
 
 
     def test_question_entry(self):
-        grader = Notebook(self.test_directory)
+        grader = Notebook(test_dir=self.test_directory)
 
         def square(x):
             return x**2

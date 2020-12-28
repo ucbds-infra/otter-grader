@@ -56,6 +56,8 @@ class Assignment:
         "export_cell": True,
         "seed": None,
         "lang": None,
+        "plugins": [],
+        "plugin_config": {},
     }
 
     def __init__(self):

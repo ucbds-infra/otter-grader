@@ -15,8 +15,10 @@ class AbstractOtterPlugin(ABC):
     """
     Abstract base class for Otter plugins to inherit from. Includes the following methods:
 
+    - ``during_assign``: run during Otter Assign after output directories are written
     - ``during_generate``: run during Otter Generate while all files are in-memory and before the
       the `tmp` directory is created
+    - ``from_notebook``: run as by students as they work through the notebook; see ``Notebook.run_plugin``
     - ``before_grading``: run before the submission is executed
     - ``after_execution``: run after the submission is executed
     - ``after_grading``: run after all tests are run and scores are assigned
@@ -68,6 +70,22 @@ class AbstractOtterPlugin(ABC):
         self.submission_metadata = submission_metadata
         self.plugin_config = plugin_config
 
+    def during_assign(self, assignment):
+        """
+        Plugin event run during the execution of Otter Assign after output directories are wrriten.
+        Assignment configurations are passed in via the ``assignment`` argument.
+
+        Args:
+            assignment (``otter.assign.assignment.Assignment``): the ``Assignment`` instance with 
+                configurations for the assignment; used similar to an ``AttrDict`` where keys are
+                accessed with the dot syntax (e.g. ``assignment.master`` is the path to the master
+                notebook)
+
+        Raises:
+            ``PluginEventNotSupportedException``: if the event is not supported by this plugin
+        """
+        raise PluginEventNotSupportedException()
+
     def during_generate(self, otter_config, assignment):
         """
         Plugin event run during the execution of Otter Generate that can modify the configurations
@@ -79,6 +97,20 @@ class AbstractOtterPlugin(ABC):
             assignment (``otter.assign.assignment.Assignment``): the ``Assignment`` instance with 
                 configurations for the assignment if Otter Assign was used to generate this zip file;
                 will be set to ``None`` if Otter Assign is not being used
+
+        Raises:
+            ``PluginEventNotSupportedException``: if the event is not supported by this plugin
+        """
+        raise PluginEventNotSupportedException()
+
+    def from_notebook(self, *args, **kwargs):
+        """
+        Plugin event run by students as they work through a notebook via the ``Notebook`` API (see
+        ``Notebook.run_plugin``). Accepts arbitrary arguments and has no return.
+
+        Args:
+            *args: arguments for the plugin event
+            **kwargs: keyword arguments for the plugin event
 
         Raises:
             ``PluginEventNotSupportedException``: if the event is not supported by this plugin
