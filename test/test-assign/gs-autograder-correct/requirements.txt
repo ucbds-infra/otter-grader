@@ -15,4 +15,4 @@ rpy2
 jupytext
 numpy==1.16.0
 tornado==5.1.1
-otter-grader==2.0.0.b3
+otter-grader==2.0.0.b4
