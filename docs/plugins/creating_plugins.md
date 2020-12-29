@@ -49,6 +49,10 @@ The `from_notebook` method will be called when a student makes a call to `otter.
 
 The `before_grading` method will be called before grading occurs, just after the plugins are instantiated, and will be passed the parsed dictionary of configurations from `otter_config.json`, **including the default configurations stored in `otter.generate.constants.DEFAULT_OPTIONS`**. Any changes made to the options will be used during grading.
 
+### `before_execution`
+
+The `before_execution` method will be called before execution occurs and will be passed the student's submission. If the submission is a notebook, the object passed will be a ``dict`` from the parsed JSON. If the submission is a scripy, the objet passed will be a string containing the file text. This method should return a properly-formatted ``dict`` or string that will be executed in place of the student's original submission.
+
 ### `after_execution`
 
 The `after_execution` method will be called after the student's submission is executed but before the results object is created. It will be passed the global environment resulting from the execution of the student's code. Any changes made to the global environment will be reflected in the tests that are run _after execution_ (meaning any that do not have a call to `otter.Notebook.check` to run them).

@@ -87,6 +87,18 @@ class PluginCollection:
                 rets.append(None)
         return rets
 
+    def before_execution(self, submission):
+        """
+        """
+        event = "before_execution"
+        for plugin in self._plugins:
+            try:
+                if hasattr(plugin, event):
+                    submission = getattr(plugin, event)(submission)
+            except PluginEventNotSupportedException:
+                pass
+        return submission
+
     def generate_report(self):
         """
         """

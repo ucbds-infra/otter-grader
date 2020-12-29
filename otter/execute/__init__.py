@@ -87,6 +87,9 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         with open(notebook_path) as f:
             nb = f.read()
 
+    if plugin_collection is not None:
+        nb = plugin_collection.before_execution(nb)
+
     # remove any ignored cells from the notebook
     if not script:
         nb = filter_ignored_cells(nb)
