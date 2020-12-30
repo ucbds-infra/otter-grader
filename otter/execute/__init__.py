@@ -5,6 +5,7 @@ Execution and grading internals for Otter-Grader
 import json
 import itertools
 import inspect
+import nbformat
 
 from IPython import get_ipython
 
@@ -15,6 +16,8 @@ from .execute_script import execute_script
 
 from ..test_files import OKTestFile, GradingResults
 from ..utils import id_generator
+
+NBFORMAT_VERSION = 4
 
 def check(test_file_path, global_env=None):
     """
@@ -79,13 +82,16 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
     if not script:
         try:
             with open(notebook_path) as f:
-                nb = json.load(f)
+                nb = nbformat.read(f, as_version=NBFORMAT_VERSION)
         except UnicodeDecodeError:
             with open(notebook_path, encoding='utf-8') as f:
-                nb = json.load(f)
+                nb = nbformat.read(f, as_version=NBFORMAT_VERSION)
     else:
         with open(notebook_path) as f:
             nb = f.read()
+
+    if plugin_collection is not None:
+        nb = plugin_collection.before_execution(nb)
 
     # remove any ignored cells from the notebook
     if not script:

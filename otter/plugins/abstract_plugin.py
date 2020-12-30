@@ -19,7 +19,8 @@ class AbstractOtterPlugin(ABC):
     - ``during_generate``: run during Otter Generate while all files are in-memory and before the
       the `tmp` directory is created
     - ``from_notebook``: run as by students as they work through the notebook; see ``Notebook.run_plugin``
-    - ``before_grading``: run before the submission is executed
+    - ``before_grading``: run before the submission is executed for altering configurations
+    - ``before_execution``: run before the submission is executed for altering the submission
     - ``after_execution``: run after the submission is executed
     - ``after_grading``: run after all tests are run and scores are assigned
     - ``generate_report``: run after results are written
@@ -124,6 +125,25 @@ class AbstractOtterPlugin(ABC):
 
         Args:
             options (``dict``): the dictionary of Otter configurations for grading
+
+        Raises:
+            ``PluginEventNotSupportedException``: if the event is not supported by this plugin
+        """
+        raise PluginEventNotSupportedException()
+
+    def before_execution(self, submission):
+        """
+        Plugin event run before the execution of the submission which can modify the submission itself.
+        This method should return a properly-formatted ``NotebookNode`` or string that will be executed in 
+        place of the student's original submission.
+
+        Args:
+            submission (``nbformat.NotebookNode`` or ``str``): the submission for grading; if it is 
+            a notebook, this will be the JSON-parsed ``dict`` of its contents; if it is a script, 
+            this will be a string containing the code
+
+        Returns:
+            ``nbformat.NotebookNode`` or ``str``: the altered submission to be executed
 
         Raises:
             ``PluginEventNotSupportedException``: if the event is not supported by this plugin
