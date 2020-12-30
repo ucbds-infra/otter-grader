@@ -134,16 +134,16 @@ class AbstractOtterPlugin(ABC):
     def before_execution(self, submission):
         """
         Plugin event run before the execution of the submission which can modify the submission itself.
-        This method should return a properly-formatted ``dict`` or string that will be executed in 
+        This method should return a properly-formatted ``NotebookNode`` or string that will be executed in 
         place of the student's original submission.
 
         Args:
-            submission (``dict`` or ``str``): the submission for grading; if it is a notebook, this 
-                will be the JSON-parsed ``dict`` of its contents; if it is a script, this will be a 
-                string containing the code
+            submission (``nbformat.NotebookNode`` or ``str``): the submission for grading; if it is 
+            a notebook, this will be the JSON-parsed ``dict`` of its contents; if it is a script, 
+            this will be a string containing the code
 
         Returns:
-            ``dict`` or ``str``: the altered submission to be executed
+            ``nbformat.NotebookNode`` or ``str``: the altered submission to be executed
 
         Raises:
             ``PluginEventNotSupportedException``: if the event is not supported by this plugin

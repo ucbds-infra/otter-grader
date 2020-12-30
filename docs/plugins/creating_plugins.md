@@ -51,7 +51,7 @@ The `before_grading` method will be called before grading occurs, just after the
 
 ### `before_execution`
 
-The `before_execution` method will be called before execution occurs and will be passed the student's submission. If the submission is a notebook, the object passed will be a ``dict`` from the parsed JSON. If the submission is a scripy, the objet passed will be a string containing the file text. This method should return a properly-formatted ``dict`` or string that will be executed in place of the student's original submission.
+The `before_execution` method will be called before execution occurs and will be passed the student's submission. If the submission is a notebook, the object passed will be a ``nbformat.NotebookNode`` from the parsed JSON. If the submission is a script, the objet passed will be a string containing the file text. This method should return a properly-formatted ``NotebookNode`` or string that will be executed in place of the student's original submission.
 
 ### `after_execution`
 
