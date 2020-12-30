@@ -135,7 +135,8 @@ class TestRunAutograder(TestCase):
                     "visibility": "visible",
                     "output": "Test case passed!"
                 }
-            ]
+            ],
+            "output": "Students are allowed 1 every 1 days. You have 0 submissions in that period."
         }
 
     def test_run_autograder(self):
@@ -177,6 +178,7 @@ class TestRunAutograder(TestCase):
         os.chdir(self.cwd)
         self.deletePaths([
             TEST_FILES_PATH + "autograder/results/results.json",
+            TEST_FILES_PATH + "autograder/results/results.pkl",
             TEST_FILES_PATH + "autograder/__init__.py",
             TEST_FILES_PATH + "autograder/submission/test",
             TEST_FILES_PATH + "autograder/submission/tests",
