@@ -66,10 +66,15 @@ def main(args):
                 not assignment.is_python, "Seeding cell found but no seed provided"
 
         plugins = assignment.plugins
-        plugin_config = assignment.plugin_config
         if plugins:
-            pc = PluginCollection(plugins, "", {}, plugin_config)
+            pc = PluginCollection(plugins, "", {})
             pc.run("during_assign", assignment)
+            if assignment.generate is True:
+                assignment.generate = {"plugins": []}
+            if assignment.generate is not False:
+                if not assignment.generate.get("plugins"):
+                    assignment.generate["plugins"] = []
+                assignment.generate["plugins"].extend(plugins)
         
         # generate PDF of solutions
         if assignment.solutions_pdf and not assignment.is_rmd and not args.no_pdfs:

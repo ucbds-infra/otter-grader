@@ -28,39 +28,64 @@ class PluginCollection:
         }
 
     Args:
-        plugin_names (``list`` of ``str``): the importable names of plugin classes (e.g. 
+        plugin_names (``list[Union[str,dict[str:Any]]]``): the importable names of plugin classes (e.g. 
             ``some_package.SomePlugin``)
         submission_path (``str``): the absolute path to the submission being graded
-        submission_metadata (``dict``): submission metadata
-        plugin_config (``dict``): dictionary of configurations for all plugins
+        submission_metadata (``dict[str:Any]``): submission metadata
     """
 
-    def __init__(self, plugin_names, submission_path, submission_metadata, plugin_config):
-        self._plugin_names = plugin_names
+    @staticmethod
+    def _parse_plugin_config(plugin_config):
+        if not isinstance(plugin_config, list):
+            raise ValueError(f"Invalid plugin config: {plugin_config}")
+        
+        result = []
+        for plg in plugin_config:
+            if isinstance(plg, str):
+                result.append({
+                    "plugin": plg,
+                    "config": {},
+                })
+            elif isinstance(plg, dict):
+                if not len(plg.keys()) == 1:
+                    raise ValueError(f"Invalid plugin specification: {plg}")
+                result.append({
+                    "plugin": plg.keys()[0],
+                    "config": plg[plg.keys()[0]],
+                })
+
+        return result
+
+    def __init__(self, plugins, submission_path, submission_metadata):
+        self._plugin_config = self._parse_plugin_config(plugins)
         self._plugins = None
 
-        self._load_plugins(submission_path, submission_metadata, plugin_config)
+        self._load_plugins(submission_path, submission_metadata)
 
-    def _load_plugins(self, submission_path, submission_metadata, plugin_config):
+    @property
+    def _plugin_names(self):
+        return [p["plugin"] for p in self._plugin_config]
+
+    def _load_plugins(self, submission_path, submission_metadata):
         """
-        Loads each plugin in ``self._plugin_names`` by importing it with ``importlib`` and creating
+        Loads each plugin in ``self._plugin_config`` by importing it with ``importlib`` and creating
         and instance with the ``submission_metadata`` and the configurations from ``plugin_config``
         for that plugin. Sets ``self._plugins`` to be the list of imported and instantiated plugins.
 
         Args:
             submission_path (``str``): the absolute path to the submission being graded
             submission_metadata (``dict``): submission metadata
-            plugin_config (``dict``): dictionary of configurations for all plugins
         """
         plugins = []
-        for plg in self._plugin_names:
+        for plg_cfg in self._plugin_config:
+            plg, cfg = plg_cfg["plugin"], plg_cfg["config"]
             module, class_ = ".".join(plg.split(".")[:-1]), plg.split(".")[-1]
             module = importlib.import_module(module)
             class_ = getattr(module, class_)
 
             # get the config key for the plugin
-            plugin_cfg = plugin_config.get(class_.PLUGIN_CONFIG_KEY, {})
-            plugin = class_(submission_path, submission_metadata, plugin_cfg)
+            # plugin_cfg = plugin_config.get(class_.PLUGIN_CONFIG_KEY, {})
+            plugin = class_(submission_path, submission_metadata, cfg)
             plugins.append(plugin)
 
         self._plugins = plugins

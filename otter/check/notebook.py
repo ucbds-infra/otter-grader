@@ -250,7 +250,7 @@ class Notebook:
         """
         """
         nb_path = self._resolve_nb_path(nb_path)
-        pc = PluginCollection([plugin_name], nb_path, {}, {})
+        pc = PluginCollection([plugin_name], nb_path, {})
         pc.run("from_notebook", *args, **kwargs)
 
     # @staticmethod

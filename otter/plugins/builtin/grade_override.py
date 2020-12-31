@@ -7,6 +7,7 @@ import tempfile
 import gspread
 import pandas as pd
 
+from .. import PluginCollection
 from ..abstract_plugin import AbstractOtterPlugin
 
 
@@ -16,8 +17,9 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     provided Google Service Account credentials to pull in the spreadsheet as a dataframe and edits
     test case scores by matching on the Gradescope assignment ID, student email, and test case name.
 
-    Implements the ``during_generate`` and ``after_grading`` events. For plugin configurations, use
-    key ``google_sheets_grade_override``. 
+    Implements the ``during_generate`` and ``after_grading`` events. **Make sure to list this plugin
+    as ``otter.plugins.builtin.GoogleSheetsGradeOverride``, otherwise the ``during_generate`` event
+    of this plugin will not work.**
     
     The google sheet should have the following format:
 
@@ -32,7 +34,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     the autograder.
     """
 
-    PLUGIN_CONFIG_KEY = "google_sheets_grade_override"
+    IMPORTABLE_NAME = "otter.plugins.builtin.GoogleSheetsGradeOverride"
 
     def _load_df(self):
         oauth_json = self.plugin_config["service_account_credentials"]
@@ -75,10 +77,11 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         ``credentials_json_path`` and extracts the data from that file into the plugin's config as key
         ``service_account_credentials``.
         """
-        creds_path = otter_config["plugin_config"][self.PLUGIN_CONFIG_KEY]["credentials_json_path"]
+        cfg_idx = [self.IMPORTABLE_NAME in c.keys() for c in otter_config["plugins"] if isinstance(c, dict)].index(True)
+        creds_path = otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["credentials_json_path"]
         with open(creds_path) as f:
             creds = json.load(f)
-        otter_config["plugin_config"][self.PLUGIN_CONFIG_KEY]["service_account_credentials"] = creds
+        otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["service_account_credentials"] = creds
 
     def before_grading(self, options):
         """

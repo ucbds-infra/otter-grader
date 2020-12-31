@@ -30,23 +30,23 @@ class AbstractOtterPlugin(ABC):
     ``otter.plugins.PluginEventNotSupportedException``. (This is the default behavior of this ABC, so
     inheriting from this class will do this for you for any methods you don't overwrite.)
 
-    If this plugin requires metadata, it should be included in the ``plugin_config`` key of the 
-    ``otter_config.json`` file as a subdictionary with key ``PLUGIN_CONFIG_KEY``. **You must set this
-    class variable otherwise no metadata will be passed to the plugin.** For example, if 
-    ``MyOtterPlugin.PLUGIN_CONFIG_KEY`` is ``my_otter_plugin``, the ``otter_config.json`` should look
-    something like:
+    If this plugin requires metadata, it should be included in the plugin configuration of the 
+    ``otter_config.json`` file as a subdictionary with key a key corresponding to the importable name
+    of the plugin. If no configurations are required, the plugin name should be listed as a string.
+    For example, the config below provides configurations for ``MyOtterPlugin`` but not 
+    ``MyOtherOtterPlugin``.
 
     .. code-block:: json
 
         {
             "plugins": [
-                "my_otter_plugin_package.MyOtterPlugin"
+                {
+                    "my_otter_plugin_package.MyOtterPlugin": {
+                        "some_metadata_key": "some_value"
+                    }
+                },
+                "my_otter_plugin_package.MyOtherOtterPlugin"
             ]
-            "plugin_config": {
-                "my_otter_plugin": {
-                    "some_metadata_key": "some_value"
-                }
-            }
         }
 
     Args:
@@ -54,17 +54,17 @@ class AbstractOtterPlugin(ABC):
         submission_metadata (``dict``): submission metadata; if on Gradescope, see
             https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/
         plugin_config (``dict``): configurations from the ``otter_config.json`` for this plugin, pulled
-            from ``otter_config["plugin_config"][PLUGIN_CONFIG_KEY]``
+            from ``otter_config["plugins"][][PLUGIN_NAME]`` if ``otter_config["plugins"][]`` is a 
+            ``dict``
 
     Attributes:
         submission_path (``str``): the absolute path to the submission being graded
         submission_metadata (``dict``): submission metadata; if on Gradescope, see
             https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/
         plugin_config (``dict``): configurations from the ``otter_config.json`` for this plugin, pulled
-            from ``otter_config["plugin_config"][PLUGIN_CONFIG_KEY]``
+            from ``otter_config["plugins"][][PLUGIN_NAME]`` if ``otter_config["plugins"][]`` is a 
+            ``dict``
     """
-
-    PLUGIN_CONFIG_KEY = None
 
     def __init__(self, submission_path, submission_metadata, plugin_config):
         self.submission_path = submission_path
