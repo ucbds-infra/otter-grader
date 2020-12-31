@@ -55,6 +55,7 @@ variables: {}                  # a mapping of variable names -> types for serial
 ignore_modules: []             # a list of module names whose functions to ignore during serialization
 files: []                      # a list of file paths to include in the distribution directories
 autograder_files: []           # a list of file paths to include only in the autograder zip file
+plugins: []                    # a list of properly-formatted plugin configurations, passed automatically to Otter Generate
 ```
 
 All paths specified in the configuration should be **relative to the directory containing the master notebook**. If, for example, I was running Otter Assign on the `lab00.ipynb` notebook in the structure below:
