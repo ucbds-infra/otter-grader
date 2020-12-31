@@ -47,11 +47,12 @@ class PluginCollection:
                     "config": {},
                 })
             elif isinstance(plg, dict):
-                if not len(plg.keys()) == 1:
+                keys = list(plg.keys())
+                if not len(keys) == 1:
                     raise ValueError(f"Invalid plugin specification: {plg}")
                 result.append({
-                    "plugin": plg.keys()[0],
-                    "config": plg[plg.keys()[0]],
+                    "plugin": keys[0],
+                    "config": plg[keys[0]],
                 })
 
         return result
