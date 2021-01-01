@@ -10,7 +10,7 @@ codecov
 jinja2
 docker
 requests
-nbconvert<6.0.0
+nbconvert
 nbformat
 dill
 pdfkit
