@@ -14,7 +14,7 @@ from contextlib import redirect_stdout, redirect_stderr
 from nbconvert.exporters import export
 from PyPDF2 import PdfFileMerger
 
-from .base_exporter import BaseExporter, TEMPLATE_DIR
+from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
 from .utils import notebook_pdf_generator
 
 class PDFViaHTMLExporter(BaseExporter):
@@ -44,12 +44,13 @@ class PDFViaHTMLExporter(BaseExporter):
 
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
-        nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
-        nbconvert.TemplateExporter.template_name = options["template"]
+        if NBCONVERT_6:
+            nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+            nbconvert.TemplateExporter.template_name = options["template"]
 
         exporter = nbconvert.HTMLExporter()
-        # exporter.extra_template_basedirs = [TEMPLATE_DIR]
-        # exporter.template_file = options["template"]
+        if not NBCONVERT_6:
+            exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         if options["save_html"]:
             html, _ = export(exporter, nb)
