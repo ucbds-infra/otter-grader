@@ -106,7 +106,7 @@ def main(args, assignment=None):
         otter_env_name = OTTER_ENV_NAME,
     )
 
-    plugins = PluginCollection(otter_config_json.get("plugins", []), None, {}, otter_config_json.get("plugin_config", {}))
+    plugins = PluginCollection(otter_config_json.get("plugins", []), None, {})
     plugins.run("during_generate", otter_config_json, assignment)
 
     # create tmp directory to zip inside

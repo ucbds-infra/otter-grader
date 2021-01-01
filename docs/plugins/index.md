@@ -22,19 +22,19 @@ Plugins can be configured in your `otter_config.json` file by listing the plugin
 }
 ```
 
-To supply configurations for the plugins, put them as a subkey inside the `plugin_config` key of `otter_config.json`, using `{plugin}.PLUGIN_CONFIG_KEY` as the key. For example, if `mypackage.MyOtterPlugin.PLUGIN_CONFIG_KEY` is `"my_otter_plugin"`, the configurations for this plugin would look like
+To supply configurations for the plugins, add the plugin to `plugins` as a dictionary mapping a single key, the plugin importable name, to a dictionary of configurations. For example, if we needed `mypackage.MyOtterPlugin` with  configurations but `mypackage.MyOtherOtterPlugin` required none, the configurations for these plugins would look like
 
 ```json
 {
     "plugins": [
-        "mypackage.MyOtterPlugin"
-    ],
-    "plugin_config": {
-        "my_otter_plugin": {
-            "key1": "value1",
-            "key2": "value2"
-        }
-    }
+        {
+            "mypackage.MyOtterPlugin": {
+                "key1": "value1",
+                "key2": "value2"
+            }
+        },
+        "mypackage.MyOtherOtterPlugin"
+    ]
 }
 ```
 

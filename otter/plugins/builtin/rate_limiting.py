@@ -15,8 +15,6 @@ class RateLimiting(AbstractOtterPlugin):
     
     """
 
-    PLUGIN_CONFIG_KEY = "rate_limiting"
-
     def _window_to_str(self):
         """
         """
