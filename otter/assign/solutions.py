@@ -67,15 +67,15 @@ def replace_solutions(lines):
     for line in lines:
 
         # ...
-        if any(line.endswith(s) for s in skip_suffixes):
+        if any(line.rstrip().endswith(s) for s in skip_suffixes):
             continue
 
         # ...
-        if solution and not line.endswith('# END SOLUTION'):
+        if solution and not line.rstrip().endswith('# END SOLUTION'):
             continue
 
         # ...
-        if line.endswith('# END SOLUTION'):
+        if line.rstrip().endswith('# END SOLUTION'):
             assert solution, f"END SOLUTION without BEGIN SOLUTION in {lines}"
             solution = False
             continue
