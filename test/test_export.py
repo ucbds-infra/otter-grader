@@ -79,33 +79,6 @@ class TestExport(TestCase):
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(cleanup.returncode, 0,"Error in cleanup: " + str(cleanup.stderr))
 
-    def test_no_open(self):
-        """
-        Tests a filtered export without an opening comment
-        """
-        test_file = "no-open-tag-test"
-        grade_command = ["export", "--filtering", "-e", "latex",
-            TEST_FILES_PATH + test_file + ".ipynb"
-        ]
-
-        should_contain = [
-            "There was an error generating your LaTeX\nShowing concise error message\n" + "=" * 60,
-            "(There were 3 error messages)",
-            "This is BibTeX"
-        ]
-
-        args = parser.parse_args(grade_command)
-        args.func = export
-
-        actual_output = StringIO()
-        with contextlib.redirect_stdout(actual_output):
-            args.func(args)
-
-        for s in should_contain:
-            self.assertIn(s, actual_output.getvalue(), 
-                f"Empty Tex did not contain substring: {s}\n\n"
-                f"Output:\n\n{actual_output.getvalue()}")
-
     def test_no_close(self):
         """
         Tests a filtered export without a closing comment
