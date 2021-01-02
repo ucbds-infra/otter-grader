@@ -7,7 +7,7 @@ import warnings
 import pkg_resources
 import nbconvert
 
-from .base_exporter import BaseExporter
+from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
 
 class PDFViaLatexExporter(BaseExporter):
     """
@@ -25,7 +25,7 @@ class PDFViaLatexExporter(BaseExporter):
     default_options = BaseExporter.default_options.copy()
     default_options.update({
         "save_tex": False,
-        "template": "templates/via_latex.tpl",
+        "template": "via_latex",
     })
 
     @classmethod
@@ -37,12 +37,18 @@ class PDFViaLatexExporter(BaseExporter):
 
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
+        if NBCONVERT_6:
+            nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+            nbconvert.TemplateExporter.template_name = options["template"]
+
         if options["save_tex"]:
             latex_exporter = nbconvert.LatexExporter()
-            latex_exporter.template_file = pkg_resources.resource_filename(__name__, options["template"])
+            if not NBCONVERT_6:
+                latex_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         pdf_exporter = nbconvert.PDFExporter()
-        pdf_exporter.template_file = pkg_resources.resource_filename(__name__, options["template"])
+        if not NBCONVERT_6:
+            pdf_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         try:
             pdf_output = pdf_exporter.from_notebook_node(nb)

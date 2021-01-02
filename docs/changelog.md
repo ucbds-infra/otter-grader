@@ -11,6 +11,7 @@
 * Added `autograder_files` configuration for Otter Assign
 * Added passdown of assignment configurations to Otter Generate from Otter Assign
 * Fixed whitespace bug in Assign solution parsing
+* Resolved conflicts with `nbconvert>=6.0.0`, removed version pin
 
 **v1.1.6:**
 

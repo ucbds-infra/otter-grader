@@ -3,12 +3,16 @@ ABC for Otter Export exporters
 """
 
 import nbformat
+import nbconvert
+import pkg_resources
 
 from abc import ABC, abstractmethod
 
 from .utils import has_begin, has_end, sub_end_for_new_page
 
 NBFORMAT_VERSION = 4
+NBCONVERT_6 = int(nbconvert.__version__.split(".")[0]) >= 6    # for determining template inheritance
+TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 
 class BaseExporter(ABC):
     """
