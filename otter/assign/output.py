@@ -97,7 +97,7 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
         from .tests import remove_hidden_tests_from_dir
 
     # copy autograder dir
-    shutil.copytree(autograder_dir, student_dir)
+    shutil.copytree(autograder_dir, student_dir, copy_function=shutil.copy)
 
     # remove requirements from student dir if present
     requirements = str(student_dir / 'requirements.txt')
