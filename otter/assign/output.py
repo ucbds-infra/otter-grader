@@ -13,6 +13,7 @@ from .notebook_transformer import transform_notebook
 from .plugins import replace_plugins_with_calls
 from .solutions import strip_solutions_and_output
 from .tests import write_test
+from .utils import patch_copytree
 
 def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     """
@@ -97,7 +98,8 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
         from .tests import remove_hidden_tests_from_dir
 
     # copy autograder dir
-    shutil.copytree(autograder_dir, student_dir, copy_function=shutil.copy)
+    with patch_copytree():
+        shutil.copytree(autograder_dir, student_dir, copy_function=shutil.copy)
 
     # remove requirements from student dir if present
     requirements = str(student_dir / 'requirements.txt')
