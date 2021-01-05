@@ -12,6 +12,7 @@
 * Added passdown of assignment configurations to Otter Generate from Otter Assign
 * Fixed whitespace bug in Assign solution parsing
 * Resolved conflicts with `nbconvert>=6.0.0`, removed version pin
+* Added `otter.utils.patch_copytree` as a patch for `shutil.copytee` on WSL
 
 **v1.1.6:**
 
