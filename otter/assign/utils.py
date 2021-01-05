@@ -9,6 +9,7 @@ import pprint
 import pathlib
 
 from glob import glob
+from contextlib import contextmanager
 
 from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
@@ -303,3 +304,21 @@ def run_generate_autograder(result, assignment, args):
     generate_autograder(args, assignment=assignment)
 
     os.chdir(curr_dir)
+
+@contextmanager
+def patch_copytree():
+    import errno, shutil
+    # have to monkey patch to work with WSL as workaround for https://bugs.python.org/issue38633
+    orig_copyxattr = shutil._copyxattr
+    
+    def patched_copyxattr(src, dst, *, follow_symlinks=True):
+        try:
+            orig_copyxattr(src, dst, follow_symlinks=follow_symlinks)
+        except OSError as ex:
+            if ex.errno != errno.EACCES: raise
+    
+    shutil._copyxattr = patched_copyxattr
+
+    yield
+
+    shutil._copyxattr = orig_copyxattr
