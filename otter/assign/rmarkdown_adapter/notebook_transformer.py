@@ -18,7 +18,7 @@ from ..solutions import has_seed
 from ..tests import any_public_tests
 from ..utils import is_ignore_cell, is_markdown_cell, EmptyCellException
 
-def transform_notebook(rmd_string, assignment, args):
+def transform_notebook(rmd_string, assignment):
     """
     Converts a master notebook to an Otter-formatted solutions notebook, parsing test cells into
     dictionaries ready to be written as OK test files.
@@ -26,7 +26,6 @@ def transform_notebook(rmd_string, assignment, args):
     Args:
         rmd_string (``str``): the Rmd document as a string
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
 
     Returns:
         ``tuple(nbformat.NotebookNode, dict)``: the transformed notebook and a dictionary mapping 
@@ -37,13 +36,13 @@ def transform_notebook(rmd_string, assignment, args):
     transformed_cells, test_files = get_transformed_cells(cells, assignment)
     collapse_empty_cells(transformed_cells)
 
-    # if assignment.init_cell and not args.no_init_cell and assignment.is_python:
+    # if assignment.init_cell and not no_init_cell and assignment.is_python:
     #     transformed_cells = [gen_init_cell()] + transformed_cells
 
-    # if assignment.check_all_cell and not args.no_check_all and assignment.is_python:
+    # if assignment.check_all_cell and not no_check_all and assignment.is_python:
     #     transformed_cells += gen_check_all_cell()
     
-    # if assignment.export_cell and not args.no_export_cell and assignment.is_python:
+    # if assignment.export_cell and not no_export_cell and assignment.is_python:
     #     export_cell = assignment.export_cell
     #     if export_cell is True:
     #         export_cell = {}

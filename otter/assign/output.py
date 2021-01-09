@@ -117,7 +117,7 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
     # remove hidden tests from student directory
     remove_hidden_tests_from_dir(student_dir / 'tests', assignment)
 
-def write_output_directories(master_nb_path, result_dir, assignment:
+def write_output_directories(master_nb_path, result_dir, assignment):
     """
     Converts a master notebook to an autograder and student directory based on configurations in 
     ``assignment``.

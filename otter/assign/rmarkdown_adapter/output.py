@@ -14,7 +14,7 @@ from .solutions import strip_solutions_and_output
 from ..r_adapter.tests import remove_hidden_tests_from_dir
 from ..tests import write_test
 
-def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
+def write_autograder_dir(rmd_path, output_rmd_path, assignment):
     """
     Converts a master notebook to a solutions notebook and writes this notebook to the output directory,
     copying support files and writing tests as needed.
@@ -23,7 +23,6 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
         rmd_path (``pathlib.Path``): path to master Rmd file
         output_rmd_path (``pathlib.Path``): path to output Rmd file
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
     """
     with open(rmd_path) as f:
         rmd_string = f.read()
@@ -41,7 +40,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
     tests_dir = output_dir / 'tests'
     os.makedirs(tests_dir, exist_ok=True)
 
-    requirements = assignment.requirements or args.requirements
+    requirements = assignment.requirements
     if requirements is None and os.path.isfile("requirements.R"):
         requirements = "requirements.R"
     if requirements:
@@ -51,7 +50,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
     if assignment.requirements:
         shutil.copy(requirements, str(output_dir / 'requirements.R'))
 
-    transformed_rmd_string, test_files = transform_notebook(rmd_string, assignment, args)
+    transformed_rmd_string, test_files = transform_notebook(rmd_string, assignment)
 
     # write notebook
     # with open(output_nb_path) as f:
@@ -66,7 +65,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
         write_test(tests_dir / (test_name + test_ext), test_file)
 
     # copy files
-    for file in assignment.files or args.files:
+    for file in assignment.files:
 
         # if a directory, copy the entire dir
         if os.path.isdir(file):
@@ -81,7 +80,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment, args):
             os.makedirs(output_dir / rel_path, exist_ok=True)
             shutil.copy(file, str(output_dir / rel_path))
 
-def write_student_dir(rmd_name, autograder_dir, student_dir, assignment, args):
+def write_student_dir(rmd_name, autograder_dir, student_dir, assignment):
     """
     Copies the autograder (solutions) directory and removes extraneous files, strips solutions from
     the notebook, and removes hidden tests from the tests directory.
@@ -91,7 +90,6 @@ def write_student_dir(rmd_name, autograder_dir, student_dir, assignment, args):
         autograder_dir (``pathlib.Path``): the path to the autograder directory
         student_dir (``pathlib.Path``): the path to the student directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
     """
     # copy autograder dir
     shutil.copytree(autograder_dir, student_dir)
@@ -115,16 +113,15 @@ def write_student_dir(rmd_name, autograder_dir, student_dir, assignment, args):
     # remove hidden tests from student directory
     remove_hidden_tests_from_dir(student_dir / 'tests', assignment)
 
-def write_output_directories(master_rmd_path, result_dir, assignment, args):
+def write_output_directories(master_rmd_path, result_dir, assignment):
     """
     Converts a master notebook to an autograder and student directory based on configurations in 
-    ``assignment`` and ``args``.
+    ``assignment``.
 
     Args:
         master_rmd_path (``nbformat.NotebookNode``): the master Rmd path
         result_dir (``pathlib.Path``): path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
     """
     # create directories
     autograder_dir = result_dir / 'autograder'
@@ -135,7 +132,7 @@ def write_output_directories(master_rmd_path, result_dir, assignment, args):
 
     # write autograder directory
     output_rmd_path = autograder_dir / master_rmd_path.name
-    write_autograder_dir(master_rmd_path, output_rmd_path, assignment, args)
+    write_autograder_dir(master_rmd_path, output_rmd_path, assignment)
 
     # write student dir
-    write_student_dir(master_rmd_path.name, autograder_dir, student_dir, assignment, args)
+    write_student_dir(master_rmd_path.name, autograder_dir, student_dir, assignment)

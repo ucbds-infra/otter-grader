@@ -122,7 +122,7 @@ def main(master, result, no_pdfs, no_run_tests, debug, **kwargs):
         if assignment.generate:
             # TODO: move this to another function
             print("Generating autograder zipfile...")
-            run_generate_autograder(result, assignment, args)
+            run_generate_autograder(result, assignment)
 
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:
