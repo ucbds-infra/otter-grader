@@ -23,14 +23,15 @@ from subprocess import Popen, PIPE
 from glob import glob
 from textwrap import dedent
 
-from otter.argparser import get_parser
+# from otter.argparser import get_parser
 from otter.export import export_notebook
 from otter.export import main as export
 from otter.export.exporters.base_exporter import BaseExporter
+from otter.runner import run_otter
 
 from . import TestCase
 
-parser = get_parser()
+# parser = get_parser()
 
 TEST_FILES_PATH = "test/test-export/"
 
@@ -44,9 +45,10 @@ class TestExport(TestCase):
         grade_command = ["export", "--filtering", "-s", "-e", "latex",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
-        args = parser.parse_args(grade_command)
-        args.func = export
-        args.func(args)
+        # args = parser.parse_args(grade_command)
+        # args.func = export
+        # args.func(args)
+        run_otter(grade_command)
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
@@ -66,9 +68,10 @@ class TestExport(TestCase):
             "--pagebreaks", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
-        args = parser.parse_args(grade_command)
-        args.func = export
-        args.func(args)
+        # args = parser.parse_args(grade_command)
+        # args.func = export
+        # args.func(args)
+        run_otter(grade_command)
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
@@ -88,9 +91,10 @@ class TestExport(TestCase):
             "--pagebreaks", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
-        args = parser.parse_args(grade_command)
-        args.func = export
-        args.func(args)
+        # args = parser.parse_args(grade_command)
+        # args.func = export
+        # args.func(args)
+        run_otter(grade_command)
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
