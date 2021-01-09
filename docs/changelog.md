@@ -17,6 +17,7 @@
 * Refactored CLI to allow creation of programmatic API
 * Changed `otter generate autograder` to `otter generate`
 * Removed `otter generate token` as all interaction with `otter.generate.token.APIClient` can be handled elsewhere
+* Added intercell seeding for R Jupyter Notebooks
 
 **v1.1.6:**
 
