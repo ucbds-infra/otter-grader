@@ -14,7 +14,7 @@ from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
-def main(master, result, no_pdfs, no_run_tests, debug, **kwargs):
+def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwargs):
     """
     Runs Otter Assign
     
@@ -122,7 +122,7 @@ def main(master, result, no_pdfs, no_run_tests, debug, **kwargs):
         if assignment.generate:
             # TODO: move this to another function
             print("Generating autograder zipfile...")
-            run_generate_autograder(result, assignment)
+            run_generate_autograder(result, assignment, username, password)
 
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:

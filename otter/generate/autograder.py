@@ -23,7 +23,8 @@ TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-gradescope-env"
 
-def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, files, assignment=None, **kwargs):
+def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, username, 
+        password, files, assignment=None, **kwargs):
     """
     Runs ``otter generate autograder``
     """
@@ -38,6 +39,17 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
             otter_config = json.load(f)
     else:
         otter_config = {}
+    
+    if "course_id" in otter_config and "assignment_id" in otter_config:
+        client = APIClient()
+        if username is not None and password is not None:
+            client.log_in(username, password)
+            token = client.token
+        else:
+            token = client.get_token()
+        otter_config["token"] = token
+    elif "course_id" in otter_config or "assignment_id" in otter_config:
+        raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")
 
     options = DEFAULT_OPTIONS.copy()
     options.update(otter_config)
