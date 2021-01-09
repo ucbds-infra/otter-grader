@@ -13,8 +13,7 @@ nbformat
 dill
 rpy2
 jupytext
-numpy==1.16.0
-tornado==5.1.1
+numpy
 otter-grader==2.0.0.b6
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
