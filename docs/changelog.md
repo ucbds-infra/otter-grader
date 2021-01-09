@@ -13,6 +13,7 @@
 * Fixed whitespace bug in Assign solution parsing
 * Resolved conflicts with `nbconvert>=6.0.0`, removed version pin
 * Added `otter.assign.utils.patch_copytree` as a patch for `shutil.copytee` on WSL
+* Refactored Otter Generate to use `zipfile` to generate zips
 
 **v1.1.6:**
 

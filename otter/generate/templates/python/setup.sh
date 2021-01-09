@@ -20,16 +20,16 @@ apt-get update
 apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libcurl4-openssl-dev libgit2-dev
 
 # install conda
-wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
-chmod +x /autograder/source/miniconda_install.sh
-/autograder/source/miniconda_install.sh -b
+wget -nv -O {{ autograder_dir }}/source/miniconda_install.sh "{{ miniconda_install_url }}"
+chmod +x {{ autograder_dir }}/source/miniconda_install.sh
+{{ autograder_dir }}/source/miniconda_install.sh -b
 echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
 
 export PATH=/root/miniconda3/bin:$PATH
 export TAR="/bin/tar"
 
 # install dependencies with conda
-conda env create -f /autograder/source/environment.yml
+conda env create -f {{ autograder_dir }}/source/environment.yml
 
 # set conda shell
 conda init --all
