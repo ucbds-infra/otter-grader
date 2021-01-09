@@ -84,6 +84,9 @@ class Assignment:
         Args:
             config (``dict``): new configurations
         """
+        for k in config.keys():
+            if k not in self.allowed_configs:
+                raise ValueError(f"Unexpected assignment config: '{k}'")
         self.config.update(config)
 
     @property
@@ -97,6 +100,10 @@ class Assignment:
     @property
     def is_rmd(self):
         return self.master.suffix.lower() == ".rmd"
+    
+    @property
+    def allowed_configs(self):
+        return type(self).defaults.keys()
 
 def read_assignment_metadata(cell):
     """
