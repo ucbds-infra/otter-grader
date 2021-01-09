@@ -14,14 +14,14 @@ from unittest import mock
 from subprocess import PIPE
 from glob import glob
 
-from otter.argparser import get_parser
+# from otter.argparser import get_parser
 from otter.grade import main as grade
 from otter.grade.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from otter.runner import run_otter
 
 from . import TestCase
 
-parser = get_parser()
+# parser = get_parser()
 
 TEST_FILES_PATH = "test/test-grade/"
 
@@ -200,9 +200,10 @@ class TestGrade(TestCase):
             "--containers", "5",
             "--image", "otter-test",
         ]
-        args = parser.parse_args(grade_command)
-        args.func = grade
-        args.func(args)
+        # args = parser.parse_args(grade_command)
+        # args.func = grade
+        # args.func(args)
+        run_otter(grade_command)
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv")

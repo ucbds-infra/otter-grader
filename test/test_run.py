@@ -13,13 +13,13 @@ from glob import glob
 from unittest import mock
 from shutil import copyfile
 
-from otter.argparser import get_parser
+# from otter.argparser import get_parser
 from otter.generate.autograder import main as autograder
 from otter.run.run_autograder import main as run_autograder
 
 from . import TestCase
 
-parser = get_parser()
+# parser = get_parser()
 
 TEST_FILES_PATH = "test/test-run/"
 
