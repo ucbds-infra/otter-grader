@@ -74,7 +74,6 @@ class TestLogs(TestCase):
             # checking repr since the results __eq__ method is not defined
             self.assertEqual(logged_grade, actual_grade, f"Logged results for {question} are not correct")
 
-
     def test_question_entry(self):
         grader = Notebook(test_dir=self.test_directory)
 
@@ -131,9 +130,6 @@ class TestLogs(TestCase):
         env_with_factorial = entry.unshelve(dict(factorial = factorial ))
         self.assertTrue("factorial" in env_with_factorial["func"].__globals__)
         self.assertTrue(factorial is env_with_factorial["func"].__globals__["factorial"])
-
-
-    
     
     def test_Log_getItem(self):
         entry1 = LogEntry(

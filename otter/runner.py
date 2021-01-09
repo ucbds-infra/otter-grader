@@ -41,7 +41,12 @@ def run_otter(unparsed_args=None):
             )
 
         args.func = eval(args.func_str)
-        args.func(args)
+
+        if args.func_str.startswith("service"):
+            args.func(args)
+        else:
+            kwargs = vars(args)
+            args.func(**kwargs)
 
     elif len(sys.argv) > 1 and sys.argv[1] == "generate":
         print(dedent("""\

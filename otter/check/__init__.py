@@ -43,42 +43,33 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 		error=error
 	).flush_to_file(_OTTER_LOG_FILENAME)
 
-def main(args):
+def main(file, tests_path, question, seed, **kwargs):
 	"""
 	Runs Otter Check
 
 	Args:
-		args (``argparse.Namespace``): parsed command line arguments
 	"""
 
 	try:
-		if args.question:
-			test_path = os.path.join(args.tests_path, args.question + ".py")
-			assert os.path.isfile(test_path), "Test {} does not exist".format(args.question)
+		if question:
+			test_path = os.path.join(tests_path, question + ".py")
+			assert os.path.isfile(test_path), "Test {} does not exist".format(question)
 			qs = [test_path]
 		else:
-			qs = glob(os.path.join(args.tests_path, "*.py"))
+			qs = glob(os.path.join(tests_path, "*.py"))
 
-		assert os.path.isfile(args.file), "{} is not a file".format(args.file)
-		assert args.file[-6:] == ".ipynb" or args.file[-3:] == ".py", "{} is not a Jupyter Notebook or Python file".format(args.file)
+		assert os.path.isfile(file), "{} is not a file".format(file)
+		assert file[-6:] == ".ipynb" or file[-3:] == ".py", "{} is not a Jupyter Notebook or Python file".format(file)
 
-		script = args.file[-3:] == ".py"
+		script = file[-3:] == ".py"
 
 		with block_print():
 			results = grade_notebook(
-				args.file,
+				file,
 				tests_glob=qs,
 				script=script,
-				seed=args.seed
+				seed=seed
 			)
-
-		# passed_tests = [
-		# 	results.get_result(test_name).name for test_name in results.tests if not results.get_result(test_name).incorrect
-		# 	# test for test in results if test not in ["possible", "total"] and "hint" not in results[test]
-		# ]
-		# failed_tests = [
-		# 	results.get_result(test_name).test_case_result.message for test_name in results.tests if results.get_result(test_name).incorrect
-		# ]
 
 		if results.total / results.possible == 1:
 			output = "All tests passed!"

@@ -14,6 +14,9 @@
 * Resolved conflicts with `nbconvert>=6.0.0`, removed version pin
 * Added `otter.assign.utils.patch_copytree` as a patch for `shutil.copytee` on WSL
 * Refactored Otter Generate to use `zipfile` to generate zips
+* Refactored CLI to allow creation of programmatic API
+* Changed `otter generate autograder` to `otter generate`
+* Removed `otter generate token` as all interaction with `otter.generate.token.APIClient` can be handled elsewhere
 * Added intercell seeding for R Jupyter Notebooks
 
 **v1.1.6:**

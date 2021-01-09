@@ -15,7 +15,7 @@ from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
 from ..argparser import get_parser
 from ..execute import grade_notebook
-from ..generate.autograder import main as generate_autograder
+from ..generate import main as generate_autograder
 from ..generate.token import APIClient
 from ..utils import get_relpath, get_source
 
@@ -211,15 +211,14 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
 
 # TODO: update for new assign format
-def run_generate_autograder(result, assignment, args):
+def run_generate_autograder(result, assignment):
     """
     Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
-    configurations in ``assignment.generate`` and ``args``.
+    configurations in ``assignment.generate``.
 
     Args:
         result (``pathlib.Path``): the path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
     """
     generate_args = assignment.generate
     if generate_args is True:
@@ -227,7 +226,7 @@ def run_generate_autograder(result, assignment, args):
 
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
-    generate_cmd = ["generate", "autograder"]
+    generate_cmd = ["generate"]
 
     # if generate_args.get('points', None) is not None:
     #     generate_cmd += ["--points", str(generate_args.get('points', None))]
@@ -273,13 +272,13 @@ def run_generate_autograder(result, assignment, args):
     # requirements = assignment.requirements or args.requirements
     # requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))
     if assignment.requirements:
-        requirements = 'requirements.txt' # get_relpath(result / 'autograder', pathlib.Path(assignment.requirements))
+        requirements = 'requirements.txt'
         generate_cmd += ["-r", str(requirements)]
-        if assignment.overwrite_requirements or args.overwrite_requirements:
+        if assignment.overwrite_requirements:
             generate_cmd += ["--overwrite-requirements"]
     
-    if assignment.files or args.files:
-        generate_cmd += assignment.files or args.files
+    if assignment.files:
+        generate_cmd += assignment.files
 
     if assignment.autograder_files:
         ag_files = []
@@ -291,7 +290,6 @@ def run_generate_autograder(result, assignment, args):
         generate_cmd += ag_files
 
     if assignment.variables:
-        # generate_cmd += ["--serialized-variables", str(assignment.variables)]
         generate_args['serialized_variables'] = str(assignment.variables)
 
     if generate_args:
@@ -301,7 +299,7 @@ def run_generate_autograder(result, assignment, args):
     # TODO: change this to import and direct call
     parser = get_parser()
     args = parser.parse_args(generate_cmd)
-    generate_autograder(args, assignment=assignment)
+    generate_autograder(**vars(args), assignment=assignment)
 
     os.chdir(curr_dir)
 

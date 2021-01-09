@@ -32,7 +32,7 @@ def export_notebook(nb_path, dest=None, debug=False, exporter_type=None, **kwarg
     Exporter = get_exporter(exporter_type=exporter_type)
     Exporter.convert_notebook(nb_path, pdf_name, debug=debug, **kwargs)
 
-def main(args):
+def main(source, dest, exporter, filtering, pagebreaks, save, debug, **kwargs):
     """
     Runs Otter Export
 
@@ -40,12 +40,12 @@ def main(args):
         args (``argparse.Namespace``): parsed command line arguments
     """
     export_notebook(
-        args.source,
-        dest = args.dest,
-        exporter_type = args.exporter,
-        filtering = args.filtering,
-        pagebreaks = args.pagebreaks,
-        save_tex = args.save,
-        save_html = args.save,
-        debug = args.debug
+        source,
+        dest = dest,
+        exporter_type = exporter,
+        filtering = filtering,
+        pagebreaks = pagebreaks,
+        save_tex = save,
+        save_html = save,
+        debug = debug
     )

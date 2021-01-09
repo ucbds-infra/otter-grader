@@ -14,12 +14,13 @@ from io import StringIO
 from unittest import mock
 
 from otter import Notebook
-from otter.argparser import get_parser
+# from otter.argparser import get_parser
 from otter.check import main as check
+from otter.runner import run_otter
 
 from . import TestCase
 
-parser = get_parser()
+# parser = get_parser()
 
 TEST_FILES_PATH = "test/test-check/"
 
@@ -36,8 +37,8 @@ class TestCheck(TestCase):
                 "-q", os.path.split(file)[1][:-3],
                 "-t", os.path.split(file)[0]
             ]
-            args = parser.parse_args(check_command)
-            args.func = check
+            # args = parser.parse_args(check_command)
+            # args.func = check
 
             # capture stdout
             output = StringIO()
@@ -45,7 +46,8 @@ class TestCheck(TestCase):
 
                 # mock block_print otherwise they interfere with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    args.func(args)
+                    # args.func(args)
+                    run_otter(check_command)
                     if os.path.split(file)[1] != "q2.py":
                         self.assertEqual(
                             output.getvalue().strip().split("\n")[-1].strip(), 
@@ -58,8 +60,8 @@ class TestCheck(TestCase):
             TEST_FILES_PATH + "file0.py", 
             "-t", TEST_FILES_PATH + "tests"
         ]
-        args = parser.parse_args(check_command)
-        args.func = check
+        # args = parser.parse_args(check_command)
+        # args.func = check
 
         # capture stdout
         output = StringIO()
@@ -67,7 +69,8 @@ class TestCheck(TestCase):
 
             # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                args.func(args)
+                # args.func(args)
+                run_otter(check_command)
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\
@@ -106,8 +109,8 @@ class TestCheck(TestCase):
                 "-q", os.path.split(file)[1][:-3],
                 "-t", os.path.split(file)[0]
             ]
-            args = parser.parse_args(check_command)
-            args.func = check
+            # args = parser.parse_args(check_command)
+            # args.func = check
 
             # capture stdout
             output = StringIO()
@@ -115,7 +118,8 @@ class TestCheck(TestCase):
 
                 # mock block_print otherwise they interfere with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    args.func(args)
+                    # args.func(args)
+                    run_otter(check_command)
                     if os.path.split(file)[1] != "q2.py":
                         self.assertEqual(
                             output.getvalue().strip().split("\n")[-1].strip(), 
@@ -128,8 +132,8 @@ class TestCheck(TestCase):
             TEST_FILES_PATH + "test-nb.ipynb", 
             "-t", TEST_FILES_PATH + "tests"
         ]
-        args = parser.parse_args(check_command)
-        args.func = check
+        # args = parser.parse_args(check_command)
+        # args.func = check
 
         # capture stdout
         output = StringIO()
@@ -137,7 +141,8 @@ class TestCheck(TestCase):
 
             # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                args.func(args)
+                # args.func(args)
+                run_otter(check_command)
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\

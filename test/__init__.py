@@ -34,6 +34,10 @@ class TestCase(unittest.TestCase):
         if delete:
             os.remove(zf_path)
 
+    def create_docker_image(self):
+        create_image_cmd = ["make", "docker-test"]
+        subprocess.run(create_image_cmd, check=True)
+
     def assertFilesEqual(self, p1, p2):
         try:
             with open(p1) as f1:
