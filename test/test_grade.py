@@ -63,7 +63,7 @@ class TestGrade(TestCase):
 
     def generate_autograder_zip(self, pdfs=False):
         cmd = [
-            "generate", "autograder", "-t", TEST_FILES_PATH + "tests", "-r", 
+            "generate", "-t", TEST_FILES_PATH + "tests", "-r", 
             TEST_FILES_PATH + "requirements.txt", "-o", TEST_FILES_PATH
         ]
         if pdfs:
