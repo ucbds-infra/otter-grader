@@ -30,11 +30,11 @@ def get_parser():
     assign_parser = subparsers.add_parser("assign", description="Create distribution versions of otter-assign-formatted notebook")
     assign_parser.add_argument("master", help="Notebook with solutions and tests.")
     assign_parser.add_argument("result", help="Directory containing the result.")
-    assign_parser.add_argument("-l", "--lang", default=None, choices=["python", "r"], nargs="?", help="Assignment programming language; defaults to Python")
-    assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
+    # assign_parser.add_argument("-l", "--lang", default=None, choices=["python", "r"], nargs="?", help="Assignment programming language; defaults to Python")
+    # assign_parser.add_argument("--no-export-cell", help="Don't inject an export cell into the notebook", default=False, action="store_true")
     assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
-    assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")
-    assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
+    # assign_parser.add_argument("--no-init-cell", help="Don't automatically generate an Otter init cell", default=False, action="store_true")
+    # assign_parser.add_argument("--no-check-all", help="Don't automatically add a check_all cell", default=False, action="store_true")
     assign_parser.add_argument("--no-pdfs", help="Don't generate PDFs; overrides assignment config", default=False, action="store_true")
     # assign_parser.add_argument("--no-filter", help="Don't filter the PDF.", default=False, action="store_true")
     # assign_parser.add_argument("--instructions", help="Additional submission instructions for students")
@@ -43,8 +43,8 @@ def get_parser():
 
     # generate options -- COMMENTED OUT BECAUSE YOU SHOULD USE THE ASSIGNMENT METADATA FOR THIS
     # assign_parser.add_argument("--generate", default=False, action="store_true", help="Generate Gradescope autograder zipfile")
-    assign_parser.add_argument("-r", "--requirements", nargs='?', default=None, help="Path to requirements.txt file; ignored if no generate key in assignment metadata")
-    assign_parser.add_argument("--overwrite-requirements", default=False, action="store_true", help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
+    # assign_parser.add_argument("-r", "--requirements", nargs='?', default=None, help="Path to requirements.txt file; ignored if no generate key in assignment metadata")
+    # assign_parser.add_argument("--overwrite-requirements", default=False, action="store_true", help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
     # assign_parser.add_argument("--threshold", type=float, default=None, help="Pass/fail score threshold; use with --generate only")
     # assign_parser.add_argument("--points", type=float, default=None, help="Points possible, overrides sum of test points; use with --generate only")
     # assign_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell; use with --generate only")
@@ -52,7 +52,7 @@ def get_parser():
     # assign_parser.add_argument("--show-hidden", action="store_true", default=False, help="Show autograder results for hidden tests after publishing grades")
     # assign_parser.add_argument("--grade-from-log", default=False, action="store_true", help="Whether to grade assignments based on the logged environments")
 
-    assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
+    # assign_parser.add_argument("files", nargs='*', help="Other support files needed for distribution (e.g. .py files, data files)")
 
     assign_parser.set_defaults(func_str="assign.main")
 

@@ -211,15 +211,14 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
 
 # TODO: update for new assign format
-def run_generate_autograder(result, assignment, args):
+def run_generate_autograder(result, assignment):
     """
     Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
-    configurations in ``assignment.generate`` and ``args``.
+    configurations in ``assignment.generate``.
 
     Args:
         result (``pathlib.Path``): the path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
     """
     generate_args = assignment.generate
     if generate_args is True:
@@ -275,11 +274,11 @@ def run_generate_autograder(result, assignment, args):
     if assignment.requirements:
         requirements = 'requirements.txt' # get_relpath(result / 'autograder', pathlib.Path(assignment.requirements))
         generate_cmd += ["-r", str(requirements)]
-        if assignment.overwrite_requirements or args.overwrite_requirements:
+        if assignment.overwrite_requirements:
             generate_cmd += ["--overwrite-requirements"]
     
-    if assignment.files or args.files:
-        generate_cmd += assignment.files or args.files
+    if assignment.files:
+        generate_cmd += assignment.files
 
     if assignment.autograder_files:
         ag_files = []
