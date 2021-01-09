@@ -80,7 +80,6 @@ class TestGrade(TestCase):
         # assert that it didn't fail, it will fail if it is not installed
         self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
 
-
     def test_metadata_parsers(self):
         """
         Check that metadata parsers work correctly
@@ -207,7 +206,6 @@ class TestGrade(TestCase):
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv")
-        # self.assertTrue("identifier" not in df_test.columns, "did not drop identifier column when no metadata passed")
 
         # sort by filename
         df_test = df_test.sort_values("identifier").reset_index(drop=True)
