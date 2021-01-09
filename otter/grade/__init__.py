@@ -10,15 +10,16 @@ from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .containers import launch_grade
 from .utils import merge_csv, prune_images
 
-def main(args):
+def main(path, output_dir, autograder, gradescope, canvas, json, yaml, containers, scripts, no_kill, 
+        debug, zips, image, pdfs, prune, force, verbose):
     """Runs Otter Grade
 
     Args:
         args (``argparse.Namespace``): parsed command line arguments
     """
     # prune images
-    if args.prune:
-        if not args.force:
+    if prune:
+        if not force:
             sure = input("Are you sure you want to prune Otter's grading images? This action cannot be undone [y/N] ")
             sure = bool(re.match(sure, r"ye?s?", flags=re.IGNORECASE))
         else:
@@ -31,70 +32,51 @@ def main(args):
 
     # Asserts that exactly one metadata flag is provided
     assert sum([meta != False for meta in [
-        args.gradescope,
-        args.canvas,
-        args.json,
-        args.yaml
+        gradescope,
+        canvas,
+        json,
+        yaml
     ]]) <= 1, "You can specify at most one metadata flag (-g, -j, -y, -c)"
 
-    # # Asserts that either --pdf, --tag-filter, or --html-filter but not both provided
-    # assert sum([args.pdf, args.tag_filter, args.html_filter]) <= 1, "Cannot provide more than 1 PDF flag"
-
     # verbose flag
-    verbose = args.verbose
+    verbose = verbose
 
     # Hand off metadata to parser
-    if args.gradescope:
-        meta_parser = GradescopeParser(args.path)
+    if gradescope:
+        meta_parser = GradescopeParser(path)
         if verbose:
             print("Found Gradescope metadata...")
-    elif args.canvas:
-        meta_parser = CanvasParser(args.path)
+    elif canvas:
+        meta_parser = CanvasParser(path)
         if verbose:
             print("Found Canvas metadata...")
-    elif args.json:
-        meta_parser = JSONParser(os.path.join(args.json))
+    elif json:
+        meta_parser = JSONParser(os.path.join(json))
         if verbose:
             print("Found JSON metadata...")
-    elif args.yaml:
-        meta_parser = YAMLParser(os.path.join(args.yaml))
+    elif yaml:
+        meta_parser = YAMLParser(os.path.join(yaml))
         if verbose:
             print("Found YAML metadata...")
     else:
         meta_parser = None
 
-    # check that reqs file is valid
-    # requirements = args.requirements
-    # if requirements is None and os.path.isfile("requirements.txt"):
-    #     requirements = "requirements.txt"
-    #
-    # if requirements:
-    #         assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
-
-    # if not os.path.isfile(args.requirements):
-
-    #     # if user-specified requirements not found, fail with AssertionError
-    #     assert args.requirements == "requirements.txt", f"requirements file {args.requirements} does not exist"
-
-    #     # else just set to None and reqs are ignored
-    #     args.requirements = None
-
     if verbose:
         print("Launching docker containers...")
 
     #Docker
-    grade_dfs = launch_grade(args.autograder,
-        notebooks_dir=args.path,
+    grade_dfs = launch_grade(autograder,
+        notebooks_dir=path,
         verbose=verbose,
-        num_containers=args.containers,
-        scripts=args.scripts,
-        no_kill=args.no_kill,
-        output_path=args.output_dir,
-        debug=args.debug,
-        zips=args.zips,
-        image=args.image,
+        num_containers=containers,
+        scripts=scripts,
+        no_kill=no_kill,
+        output_path=output_dir,
+        debug=debug,
+        zips=zips,
+        image=image,
         meta_parser=meta_parser,
-        pdfs=args.pdfs
+        pdfs=pdfs
     )
 
     if verbose:
@@ -117,4 +99,4 @@ def main(args):
         output_df = output_df[cols[-1:] + cols[:-1]]
 
     # write to CSV file
-    output_df.to_csv(os.path.join(args.output_dir, "final_grades.csv"), index=False)
+    output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
