@@ -1,4 +1,4 @@
-name: otter-gradescope-env
+name: {{ otter_env_name }}
 channels:
     - defaults
     - conda-forge
