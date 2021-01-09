@@ -20,7 +20,6 @@ from otter import Notebook
 from otter.check.logs import LogEntry, EventType, Log
 from otter.check.notebook import _OTTER_LOG_FILENAME
 from otter.check import notebook
-# from otter import TestsDisplay
 
 from . import TestCase
 
