@@ -211,7 +211,7 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
 
 # TODO: update for new assign format
-def run_generate_autograder(result, assignment):
+def run_generate_autograder(result, assignment, gs_username, gs_password):
     """
     Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
     configurations in ``assignment.generate``.
@@ -228,36 +228,12 @@ def run_generate_autograder(result, assignment):
     os.chdir(str(result / 'autograder'))
     generate_cmd = ["generate"]
 
-    # if generate_args.get('points', None) is not None:
-    #     generate_cmd += ["--points", str(generate_args.get('points', None))]
-    
-    # if generate_args.get('threshold', None) is not None:
-    #     generate_cmd += ["--threshold", str(generate_args.get('threshold', None))]
-    
-    # if generate_args.get('show_stdout', False):
-    #     generate_cmd += ["--show-stdout"]
-    
-    # if generate_args.get('show_hidden', False):
-    #     generate_cmd += ["--show-hidden"]
-    
-    # if generate_args.get('grade_from_log', False):
-    #     generate_cmd += ["--grade-from-log"]
-    
-    # if generate_args.get('seed', None) is not None:
-    #     generate_cmd += ["--seed", str(generate_args.get('seed', None))]
-
-    # if generate_args.get('public_multiplier', None) is not None:
-    #     generate_cmd += ["--public-multiplier", str(generate_args.get('public_multiplier', None))]
-
     if generate_args.get('pdfs', {}):
         pdf_args = generate_args.pop('pdfs', {})
         token = APIClient.get_token()
         generate_args['token'] = token
         generate_args['course_id'] = str(pdf_args['course_id'])
         generate_args['assignment_id'] = str(pdf_args['assignment_id'])
-        # generate_cmd += ["--token", token]
-        # generate_cmd += ["--course-id", str(pdf_args["course_id"])]
-        # generate_cmd += ["--assignment-id", str(pdf_args["assignment_id"])]
 
         if not pdf_args.get("filtering", True):
             generate_args['filtering'] = False
@@ -269,13 +245,14 @@ def run_generate_autograder(result, assignment):
         generate_cmd += ["-l", "r"]
         generate_args['lang'] = 'r'
 
-    # requirements = assignment.requirements or args.requirements
-    # requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))
     if assignment.requirements:
         requirements = 'requirements.txt'
         generate_cmd += ["-r", str(requirements)]
         if assignment.overwrite_requirements:
             generate_cmd += ["--overwrite-requirements"]
+    
+    if gs_username is not None and gs_password is not None:
+        generate_cmd += ["--username", gs_username, "--password", gs_password]
     
     if assignment.files:
         generate_cmd += assignment.files

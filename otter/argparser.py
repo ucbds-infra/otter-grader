@@ -32,6 +32,8 @@ def get_parser():
     assign_parser.add_argument("result", help="Directory containing the result.")
     assign_parser.add_argument("--no-run-tests", help="Don't run tests.", default=False, action="store_true")
     assign_parser.add_argument("--no-pdfs", help="Don't generate PDFs; overrides assignment config", default=False, action="store_true")
+    assign_parser.add_argument("--username", default=None, help="Gradescope username for generating a token")
+    assign_parser.add_argument("--password", default=None, help="Gradescope password for generating a token")
     assign_parser.add_argument("--debug", default=False, action="store_true", help="Do not ignore errors in running tests for debugging")
 
     assign_parser.set_defaults(func_str="assign.main")
@@ -69,6 +71,8 @@ def get_parser():
     generate_parser.add_argument("--overwrite-requirements", default=False, action="store_true", help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
     generate_parser.add_argument("-l", "--lang", default="python", choices=["python", "r"], type=str, help="Assignment programming language; defaults to Python")
     generate_parser.add_argument("--autograder-dir", nargs="?", default="/autograder", help="Root autograding directory inside grading container")
+    generate_parser.add_argument("--username", default=None, help="Gradescope username for generating a token")
+    generate_parser.add_argument("--password", default=None, help="Gradescope password for generating a token")
     generate_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
     generate_parser.set_defaults(func_str="generate.main")
