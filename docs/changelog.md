@@ -19,6 +19,7 @@
 * Removed `otter generate token` as all interaction with `otter.generate.token.APIClient` can be handled elsewhere
 * Added intercell seeding for R Jupyter Notebooks
 * Added `ValueError` on unexpected config in `otter.assign.assignment.Assignment`
+* Added `--username`, `--password` flags to Otter Assign and Otter Generate
 
 **v1.1.6:**
 
