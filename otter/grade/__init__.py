@@ -11,7 +11,7 @@ from .containers import launch_grade
 from .utils import merge_csv, prune_images
 
 def main(path, output_dir, autograder, gradescope, canvas, json, yaml, containers, scripts, no_kill, 
-        debug, zips, image, pdfs, prune, force, verbose):
+        debug, zips, image, pdfs, prune, force, verbose, **kwargs):
     """Runs Otter Grade
 
     Args:

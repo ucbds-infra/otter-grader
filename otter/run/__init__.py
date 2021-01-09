@@ -10,7 +10,7 @@ import tempfile
 
 from .run_autograder import main as run_autograder
 
-def main(submission, autograder, output_dir, no_logo, debug):
+def main(submission, autograder, output_dir, no_logo, debug, **kwargs):
     """
     """
 
