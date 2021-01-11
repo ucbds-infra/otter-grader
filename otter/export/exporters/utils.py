@@ -73,6 +73,17 @@ def sub_end_for_new_page(line):
     return re.sub(END_QUESTION_REGEX, NEW_PAGE_CELL_SOURCE, line)
 
 def notebook_pdf_generator(nb):
+    """
+    A generator that takes in a notebook ``nb`` with HTML comments for filtering and splits this
+    notebook up into each filtered block, yielding a complete notebook for each chunk. Used for 
+    implementing pagebreaks in PDFs via HTML.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to be exported
+
+    Yields:
+        ``nbformat.NotebookNode``: a complete notebook containing a single filtered block
+    """
     dummy_nb = copy.copy(nb)
     dummy_nb.cells = []
 

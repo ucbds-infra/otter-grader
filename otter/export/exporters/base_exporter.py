@@ -46,7 +46,7 @@ class BaseExporter(ABC):
             nb_path (``str``): path to notebook
             dest (``str``): path to write PDF
             debug (``bool``, optional): whether to run export in debug mode
-            kwargs: additional arguments use during conversion by subclasses
+            **kwargs: additional arguments use during conversion by subclasses
         """
         ...
 
