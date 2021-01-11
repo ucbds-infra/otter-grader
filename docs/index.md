@@ -30,11 +30,11 @@ Otter Grader is a light-weight, modular open-source autograder developed by the 
 Otter is organized into seven components based on the different stages of the assignment pipeline, each with a command-line interface:
 
 * [Otter Assign](otter_assign/index.md) is an assignment development and distribution tool that allows instructors to create assignments with prompts, solutions, and tests in a simple notebook format that it then converts into santized versions for distribution to students and autograders.
-* [Otter Generate](otter_generate/index.md) creates the necessary setup files so that instructors can autograde assignments.
+* [Otter Generate](workflow/otter_generate/index.md) creates the necessary setup files so that instructors can autograde assignments.
 * [Otter Check](otter_check/index.md) allows students to run publically distributed tests written by instructors against their solutions as they work through assignments to verify their thought processes and design implementations.
 * [Otter Export](pdfs.md) generates PDFs with optional filtering of Jupyter Notebooks for manually grading portions of assignments.
-* [Otter Run](otter_run.md) grades students' assignments locally on the instructor's machine without containerization and supports grading on a JupyterHub account.
-* [Otter Grade](otter_grade.md) grades students' assignments locally on the instructor's machine in parallel Docker containers, returning grade breakdowns as a CSV file.
+* [Otter Run](workflow/executing_submissions/otter_run.md) grades students' assignments locally on the instructor's machine without containerization and supports grading on a JupyterHub account.
+* [Otter Grade](workflow/executing_submissions/otter_grade.md) grades students' assignments locally on the instructor's machine in parallel Docker containers, returning grade breakdowns as a CSV file.
 * [Otter Service](otter_service.md) is a deployable grading server that students can submit their work to which grades these submissions and can optionally upload PDFs of these submission to Gradescope for manual grading.
 
 ## Installation
