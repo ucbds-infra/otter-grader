@@ -21,8 +21,8 @@ NBFORMAT_VERSION = 4
 
 def check(test_file_path, global_env=None):
     """
-    Checks ``global_env`` against given ``test_file`` in OK-format. If global_env is ``None``, the 
-    global environment of the calling function is used. The following two calls are equivalent:
+    Checks a global environment against given ``test_file`` in OK-format. If global_env is ``None``, the 
+    global environment of the calling frame is used; i.e., the following two calls are equivalent:
 
     .. code-block:: python
         check('tests/q1.py')
@@ -34,7 +34,7 @@ def check(test_file_path, global_env=None):
             of a python script or notebook
 
     Returns:
-        ``otter.test_files.ok_test.OKTestFile``: result of running the tests in the 
+        ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
             given global environment
 
     """
@@ -54,17 +54,14 @@ def check(test_file_path, global_env=None):
 def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
     cwd=None, test_dir=None, seed=None, log=None, variables=None, plugin_collection=None):
     """
-    Grade a notebook file & return grade information
-
-    This function grades a single Jupyter notebook using the provided tests. If grading a Python file,
-    set ``script`` to true. 
+    Grade an assignment file and return grade information
 
     Args:
-        notebook_path (``str``): path to a single notebook
-        tests_glob (``list`` of ``str``, optional): names of test files
+        notebook_path (``str``): path to a single notebook or Python script
+        tests_glob (``list`` of ``str``, optional): paths to test files to run
         name (``str``, optional): initial environment name
         ignore_errors (``bool``, optional): whether errors in execution should be ignored
-        script (``bool``, optional): whether the notebook_path is a Python script
+        script (``bool``, optional): whether the ``notebook_path`` is a Python script
         cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
             grading environment
         test_dir (``str``, optional): path to directory of tests in grading environment
@@ -72,6 +69,8 @@ def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True
         log (``otter.check.logs.Log``, optional): log from which to grade questions
         variables (``dict``, optional): map of variable names -> type string to check type of deserialized
             object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
+        plugin_collection (``otter.plugins.PluginCollection``, optional): a set of plugins to run on
+            this assignment during execution and grading
 
     Returns:
         ``otter.test_files.GradingResults``: the results of grading

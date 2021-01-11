@@ -30,7 +30,7 @@ def execute_script(script, secret='secret', initial_env=None, ignore_errors=Fals
         seed (``int``, optional): random seed for intercell seeding
     
     Results:
-        dict: global environment resulting from executing all code of the input script
+        ``dict``: global environment resulting from executing all code of the input script
     """
     with hide_outputs():
         if initial_env:
