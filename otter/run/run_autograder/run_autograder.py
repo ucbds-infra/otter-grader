@@ -6,7 +6,7 @@ import os
 import json
 import shutil
 import pickle
-import subprocess
+# import subprocess
 import warnings
 
 from glob import glob
@@ -31,8 +31,10 @@ def prepare_files():
                 shutil.copy(fp, "./submission")
 
     # create __init__.py files
-    subprocess.run(["touch", "./__init__.py"])
-    subprocess.run(["touch", "./submission/__init__.py"])
+    open("__init__.py", "a").close()
+    open("submission/__init__.py", "a").close()
+    # subprocess.run(["touch", "./__init__.py"])
+    # subprocess.run(["touch", "./submission/__init__.py"])
 
     os.makedirs("./submission/tests", exist_ok=True)
     tests_glob = glob("./source/tests/*.py")
@@ -83,7 +85,24 @@ def run_autograder(options):
 
     os.chdir("./submission")
 
-    nb_path = glob("*.ipynb")[0]
+    nbs = glob("*ipynb")
+
+    if len(nbs) > 1:
+        raise RuntimeError("More than one ipynb file found in submission")
+
+    if len(nbs) == 1:
+        nb_path = nbs[0]
+        script = False
+    else:
+        pys = glob("*.py")
+        pys = list(filter(lambda f: f != "__init__.py", pys))
+        if len(pys) > 1:
+            raise RuntimeError("More than one Python file found in submission")
+        elif len(pys) == 1:
+            nb_path = pys[0]
+            script = True
+        else:
+            raise RuntimeError("No gradable files found in submission")
 
     replace_notebook_instances(nb_path)
 
@@ -131,19 +150,22 @@ def run_autograder(options):
         seed=options["seed"],
         log=log if options["grade_from_log"] else None,
         variables=options["serialized_variables"],
-        plugin_collection=plugin_collection
+        plugin_collection=plugin_collection,
+        script=script,
     )
 
+    if options["print_summary"]:
+        print("\n" + "-" * 30 + " GRADING SUMMARY " + "-" * 30)
+
     # verify the scores against the log
-    print("\n\n")
     if log is not None:
         try:
             found_discrepancy = scores.verify_against_log(log)
-            if not found_discrepancy:
+            if not found_discrepancy and options["print_summary"]:
                 print("No discrepancies found while verifying scores against the log.")
         except BaseException as e:
             print(f"Error encountered while trying to verify scores with log:\n{e}")
-    else:
+    elif options["print_summary"]:
         print("No log found with which to verify student scores")
 
     if generate_pdf:
