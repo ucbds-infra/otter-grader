@@ -61,21 +61,6 @@ def get_spec(source, begin):
 # Cell Type Checkers
 #---------------------------------------------------------------------------------------------------
 
-# def is_seed_cell(cell):
-#     """
-#     Returns whether ``cell`` is seed cell
-    
-#     Args:
-#         cell (``nbformat.NotebookNode``): notebook cell
-    
-#     Returns:
-#         ``bool``: whether the cell is a seed cell
-#     """
-#     if cell['cell_type'] != 'code':
-#         return False
-#     source = get_source(cell)
-#     return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
-
 def is_markdown_cell(cell):
     """
     Returns whether ``cell`` is Markdown cell
@@ -219,6 +204,8 @@ def run_generate_autograder(result, assignment, gs_username, gs_password):
     Args:
         result (``pathlib.Path``): the path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        gs_username (``str``): Gradescope username for token generation
+        gs_password (``str``): Gradescope password for token generation
     """
     generate_args = assignment.generate
     if generate_args is True:
@@ -282,8 +269,11 @@ def run_generate_autograder(result, assignment, gs_username, gs_password):
 
 @contextmanager
 def patch_copytree():
+    """
+    A context manager patch for ``shutil.copytree` on WSL. Shamelessly stolen from https://bugs.python.org/issue38633
+    (see for more information)
+    """
     import errno, shutil
-    # have to monkey patch to work with WSL as workaround for https://bugs.python.org/issue38633
     orig_copyxattr = shutil._copyxattr
     
     def patched_copyxattr(src, dst, *, follow_symlinks=True):

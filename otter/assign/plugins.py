@@ -69,7 +69,8 @@ def replace_plugins(lines):
     return lines
 
 def replace_plugins_with_calls(nb):
-    """Write a notebook with plugins replaced with calls
+    """
+    Write a notebook with plugins replaced with calls
     
     Args:
         nb (``nbformat.NotebookNode``): the notebook
