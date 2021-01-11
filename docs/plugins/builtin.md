@@ -6,13 +6,16 @@ Otter comes with a few built-in plugins to optionally extend its own functionali
 
 This plugin allows you to override test case scores during grading by specifying the new score in a Google Sheet that is pulled in. To use this plugin, you must set up a Google Cloud project and obtain credentials for the Google Sheets API. This plugin relies on `gspread` to interact with the Google Sheets API and [its documentation](https://gspread.readthedocs.io/en/latest/) contains instructions on how to obtain credentials. Once you have created credentials, download them as a JSON file.
 
-This plugin requires one configuration: the path to the credentials JSON file. This should be entered with the key `credentials_json_path`; for example, in Otter Assign:
+This plugin requires two configurations: the path to the credentials JSON file and the URL of the Google Sheet. The former should be entered with the key `credentials_json_path` and the latter `sheet_url`; for example, in Otter Assign:
 
 ```yaml
 plugins:
     - otter.plugins.builtin.GoogleSheetsGradeOverride:
         credentials_json_path: /path/to/google/credentials.json
+        sheet_url: https://docs.google.com/some/google/sheet
 ```
+
+The first tab in the sheet is assumed to be the override information.
 
 During Otter Generate, the plugin will read in this JSON file and store the relevant data in the `otter_config.json` for use during grading. The Google Sheet should have the following format:
 

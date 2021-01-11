@@ -22,14 +22,17 @@ class PluginCollection:
         {
             "plugins": [
                 "some_otter_plugin_package.SomeOtterPlugin",
-                "some_other_otter_plugin_package.SomeOtherOtterPlugin"
-            ],
-            "plugin_config: {}
+                {
+                    "some_other_otter_plugin_package.SomeOtherOtterPlugin": {
+                        "some_key": "some_value"
+                    }
+                }
+            ]
         }
 
     Args:
         plugin_names (``list[Union[str,dict[str:Any]]]``): the importable names of plugin classes (e.g. 
-            ``some_package.SomePlugin``)
+            ``some_package.SomePlugin``) and their configurations
         submission_path (``str``): the absolute path to the submission being graded
         submission_metadata (``dict[str:Any]``): submission metadata
     """
@@ -65,12 +68,15 @@ class PluginCollection:
 
     @property
     def _plugin_names(self):
+        """
+        The importable names of all of the plugins tracked
+        """
         return [p["plugin"] for p in self._plugin_config]
 
     def _load_plugins(self, submission_path, submission_metadata):
         """
         Loads each plugin in ``self._plugin_config`` by importing it with ``importlib`` and creating
-        and instance with the ``submission_metadata`` and the configurations from ``plugin_config``
+        and instance with the ``submission_metadata`` and the configurations from ``self._plugin_config``
         for that plugin. Sets ``self._plugins`` to be the list of imported and instantiated plugins.
 
         Args:
@@ -98,7 +104,10 @@ class PluginCollection:
 
         Args:
             event (``str``): name of the method of the plugin to run
-            args, kwargs (any): arguments for the method
+            *args, **kwargs (any): arguments for the method
+        
+        Returns:
+            ``list[Any]``: the values returned by each plugin for the called event
         """
         # TODO: logging to stdout
         rets = []
@@ -115,6 +124,11 @@ class PluginCollection:
 
     def before_execution(self, submission):
         """
+        Runs the ``before_execution`` event for each plugin, composing the results of each (i.e. the
+        transformed notebook returned by one plugin is passed to the next plugin).
+
+        Args:
+            submission (``Union[str,nbformat.NotebookNode]``): the submission to be executed
         """
         event = "before_execution"
         for plugin in self._plugins:
@@ -127,6 +141,11 @@ class PluginCollection:
 
     def generate_report(self):
         """
+        Runs the ``generate_report`` event of each plugin, formatting and concatenating them into a
+        single string and returning it.
+
+        Returns:
+            ``str``: the plugin report
         """
         reports = self.run("generate_report")
 
