@@ -12,6 +12,22 @@ from .run_autograder import main as run_autograder
 
 def main(submission, autograder, output_dir, no_logo, debug, **kwargs):
     """
+    Grades a single submission using the autograder configuration ``autograder`` without containrization
+
+    Creates a temporary directory in the user's system and replicates grading container structure. Calls
+    the autograder and loads the pickled results object. **Note:** This does not run any setup or 
+    installation files, so the user's environment will need to have everything pre-installed.
+
+    Args:
+        submission (``str``): path to a submission to grade
+        autograder (``str``): path to an Otter configuration zip file
+        output_dir (``str``): directory at which to copy the results JSON file
+        no_logo (``bool``): whether to suppress the Otter logo from being printed to stdout
+        debug (``bool``); whether to run in debug mode (without ignoring errors)
+        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+
+    Returns:
+        ``otter.test_files.GradingResults``: the grading results object
     """
 
     dp = tempfile.mkdtemp()

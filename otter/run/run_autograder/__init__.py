@@ -11,10 +11,11 @@ from ...version import LOGO_WITH_VERSION
 
 def main(autograder_dir, **kwargs):
     """
-    Runs autograder on Gradescope based on predefined configurations.
+    Runs autograder based on predefined configurations
 
     Args:
-        config (``dict``): configurations for autograder
+        autograder_dir (``str``): the absolute path of the directory in which autograding is occurring
+            (e.g. on Gradescope, this is ``/autograder``)
         **kwargs: keyword arguments for updating configurations in the default configurations 
             ``otter.run.run_autograder.constants.DEFAULT_OPTIONS``; these values override anything
             present in ``otter_config.json``
