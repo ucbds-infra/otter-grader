@@ -192,5 +192,5 @@ class TestRun(TestCase):
             TEST_FILES_PATH + "autograder/submission/test",
             TEST_FILES_PATH + "autograder/submission/tests",
             TEST_FILES_PATH + "autograder/submission/__init__.py",
-            TEST_FILES_PATH + "autograder/submission/__init__.py",
+            TEST_FILES_PATH + "autograder/submission/.OTTER_LOG",
         ])

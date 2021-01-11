@@ -1,6 +1,5 @@
 {
     "autograder_dir": "test/test-run/autograder",
-    "debug": true,
     "plugins": [
         {
             "otter.plugins.builtin.RateLimiting": {
