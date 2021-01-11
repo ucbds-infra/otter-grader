@@ -81,7 +81,7 @@ otter generate -t hidden-tests -l r data.csv
 
 There are several configurable behaviors that Otter supports during grading. Each has default values, but these can be configured by creating an Otter config JSON file and passing the path to this file to the `-c` flag (`./otter_config.json` is automatically added if found and `-c` is unspecified).
 
-The support keys and their default values are provided in `otter.run.run_autograder.constants.DEFAULT_OPTIONS`:
+The supported keys and their default values are provided in `otter.run.run_autograder.constants.DEFAULT_OPTIONS`:
 
 ```eval_rst
 .. ipython:: python
