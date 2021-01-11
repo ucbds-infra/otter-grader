@@ -12,10 +12,35 @@ from .utils import merge_csv, prune_images
 
 def main(path, output_dir, autograder, gradescope, canvas, json, yaml, containers, scripts, no_kill, 
         debug, zips, image, pdfs, prune, force, verbose, **kwargs):
-    """Runs Otter Grade
+    """
+    Runs Otter Grade
+
+    Grades a directory of submissions in parallel Docker containers. Results are outputted as a CSV file
+    called ``final_grades.csv``. If ``prune`` is ``True``, Otter's dangling grading images are pruned 
+    and the program exits.
 
     Args:
-        args (``argparse.Namespace``): parsed command line arguments
+        path (``str``): path to directory of submissions
+        output_dir (``str``): directory in which to write ``final_grades.csv``
+        autograder (``str``): path to Otter autograder configuration zip file
+        gradescope (``bool``): whether submissions are a Gradescope export
+        canvas (``bool``): whether submissions are a Canvas export
+        json (``str``): path to a JSON metadata file
+        yaml (``str``): path to a YAML metadata file
+        containers (``int``): number of containers to run in parallel
+        scripts (``bool``): whether Python scripts are being graded
+        no_kill (``bool``): whether to keep containers after grading is finished
+        debug (``bool``): whether to print the stdout of each container
+        zips (``bool``): whether the submissions are Otter-exported zip files
+        image (``bool``): base image from which to build grading image
+        pdfs (``bool``): whether to copy notebook PDFs out of the containers
+        prune (``bool``): whether to prune dangling grading images
+        force (``bool``): whether to force pruning (without confirmation)
+        verbose (``bool``): whether to log status messages to stdout
+        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+
+    Raises:
+        ``AssertionError``: if invalid arguments are provided
     """
     # prune images
     if prune:
