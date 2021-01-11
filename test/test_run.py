@@ -7,6 +7,8 @@ import unittest
 import subprocess
 import json
 import shutil
+import nbformat
+import nbconvert
 
 from subprocess import PIPE
 from glob import glob
@@ -21,9 +23,10 @@ from . import TestCase
 
 # parser = get_parser()
 
+NBFORMAT_VERSION = 4
 TEST_FILES_PATH = "test/test-run/"
 
-class TestRunAutograder(TestCase):
+class TestRun(TestCase):
     def setUp(self):
         super().setUp()
 
@@ -136,7 +139,7 @@ class TestRunAutograder(TestCase):
             "output": "Students are allowed 1 every 1 days. You have 0 submissions in that period."
         }
 
-    def test_run_autograder(self):
+    def test_notebook(self):
 
         run_autograder(self.config['autograder_dir'])
 
@@ -144,6 +147,37 @@ class TestRunAutograder(TestCase):
             actual_results = json.load(f)
 
         self.assertEqual(actual_results, self.expected_results, f"Actual results did not matched expected:\n{actual_results}")
+
+    def test_script(self):
+
+        nb_path = TEST_FILES_PATH + "autograder/submission/fails2and6H.ipynb"
+        nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
+        os.remove(nb_path)
+
+        try:
+            py, _ = nbconvert.export(nbconvert.PythonExporter, nb)
+            with open(TEST_FILES_PATH + "autograder/submission/fails2and6H.py", "w+") as f:
+                f.write(py)
+
+            run_autograder(self.config['autograder_dir'])
+
+            with open(TEST_FILES_PATH + "autograder/results/results.json") as f:
+                actual_results = json.load(f)
+
+            self.assertEqual(actual_results, self.expected_results, f"Actual results did not matched expected:\n{actual_results}")
+
+            self.deletePaths(TEST_FILES_PATH + "autograder/submission/fails2and6H.py")
+
+            with open(nb_path, "w+") as f:
+                nbformat.write(nb, f)
+        
+        except:
+            os.chdir(self.cwd)
+            self.deletePaths([TEST_FILES_PATH + "autograder/submission/fails2and6H.py"])
+            with open(nb_path, "w+") as f:
+                nbformat.write(nb, f)
+            
+            raise
 
     def tearDown(self):
         os.chdir(self.cwd)
@@ -153,5 +187,6 @@ class TestRunAutograder(TestCase):
             TEST_FILES_PATH + "autograder/__init__.py",
             TEST_FILES_PATH + "autograder/submission/test",
             TEST_FILES_PATH + "autograder/submission/tests",
+            TEST_FILES_PATH + "autograder/submission/__init__.py",
             TEST_FILES_PATH + "autograder/submission/__init__.py",
         ])

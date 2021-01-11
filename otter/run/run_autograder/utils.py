@@ -15,7 +15,15 @@ def replace_notebook_instances(nb_path):
     Args:
         nb_path (``str``): path to the notebook
     """
-    nb = nbformat.read(nb_path, as_version=nbformat.NO_CONVERT)
+    try:
+        nb = nbformat.read(nb_path, as_version=nbformat.NO_CONVERT)
+        script = False
+    except nbformat.reader.NotJSONError:
+        nb = nbformat.v4.new_notebook()
+        with open(nb_path) as f:
+            source = f.read()
+        nb['cells'].append(nbformat.v4.new_code_cell(source))
+        script = True
 
     instance_regex = r"otter.Notebook\([\"'].+[\"']\)"
     for cell in nb['cells']:
@@ -25,4 +33,9 @@ def replace_notebook_instances(nb_path):
             source[i] = line
         cell['source'] = "\n".join(source)
 
-    nbformat.write(nb, nb_path)
+    if not script:
+        nbformat.write(nb, nb_path)
+    else:
+        source = get_source(nb['cells'][0])
+        with open(nb_path, "w") as f:
+            f.write("\n".join(source))

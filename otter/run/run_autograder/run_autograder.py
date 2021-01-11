@@ -95,6 +95,7 @@ def run_autograder(options):
         script = False
     else:
         pys = glob("*.py")
+        pys = list(filter(lambda f: f != "__init__.py", pys))
         if len(pys) > 1:
             raise RuntimeError("More than one Python file found in submission")
         elif len(pys) == 1:
