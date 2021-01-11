@@ -39,6 +39,7 @@ class PDFViaLatexExporter(BaseExporter):
 
         if NBCONVERT_6:
             nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+            orig_template_name = nbconvert.TemplateExporter.template_name
             nbconvert.TemplateExporter.template_name = options["template"]
 
         if options["save_tex"]:
@@ -61,7 +62,7 @@ class PDFViaLatexExporter(BaseExporter):
                     output_file.write(latex_output[0])
 
             if NBCONVERT_6:
-                del nbconvert.TemplateExporter.template_name
+                nbconvert.TemplateExporter.template_name = orig_template_name
 
         except nbconvert.pdf.LatexFailed as error:
             print("There was an error generating your LaTeX")
@@ -78,4 +79,4 @@ class PDFViaLatexExporter(BaseExporter):
             print("=" * 60)
 
             if NBCONVERT_6:
-                del nbconvert.TemplateExporter.template_name
+                nbconvert.TemplateExporter.template_name = orig_template_name

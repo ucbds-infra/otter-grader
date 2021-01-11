@@ -46,6 +46,7 @@ class PDFViaHTMLExporter(BaseExporter):
 
         if NBCONVERT_6:
             nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+            orig_template_name = nbconvert.TemplateExporter.template_name
             nbconvert.TemplateExporter.template_name = options["template"]
 
         exporter = nbconvert.HTMLExporter()
@@ -79,4 +80,4 @@ class PDFViaHTMLExporter(BaseExporter):
         merger.write(dest)
 
         if NBCONVERT_6:
-            del nbconvert.TemplateExporter.template_name
+            nbconvert.TemplateExporter.template_name = orig_template_name
