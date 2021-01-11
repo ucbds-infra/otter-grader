@@ -80,7 +80,8 @@ class OKTestFile(TestFile):
     """
 
     def run(self, global_environment):
-        """Runs tests on a given ``global_environment``
+        """
+        Runs tests on a given ``global_environment``
         
         Arguments:
             ``global_environment`` (``dict``): result of executing a Python notebook/script
