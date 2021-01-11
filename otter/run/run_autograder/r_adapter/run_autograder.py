@@ -71,7 +71,7 @@ def run_autograder(options):
     output = r(f"""ottr::run_gradescope("{fp}")""")[0]
     output = json.loads(output)
     
-    if options["show_stdout_on_release"]:
+    if options["show_stdout"]:
         output["stdout_visibility"] = "after_published"
 
     os.chdir(abs_ag_path)
