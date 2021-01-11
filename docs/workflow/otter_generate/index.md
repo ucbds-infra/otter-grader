@@ -41,20 +41,20 @@ Also assume that we have `cd`ed into `hw00-dev`.
 
 ## Usage
 
-The general usage of `otter generate autograder` is to create a zip file at some output directory (`-o` flag, default `./`) which you will then use to create the grading image. Otter Generate has a few optional flags, described in the [Otter CLI Reference](../../cli_reference.md).
+The general usage of `otter generate` is to create a zip file at some output directory (`-o` flag, default `./`) which you will then use to create the grading image. Otter Generate has a few optional flags, described in the [Otter CLI Reference](../../cli_reference.md).
 
 If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts). To autograde an R assignment, pass the `-l r` flag to indicate that the language of the assignment is R.
 
 The simplest usage in our example would be
 
 ```
-otter generate autograder
+otter generate
 ```
 
 This would create a zip file `autograder.zip` with the tests in `./tests` and no extra requirements or files. If we needed `data.csv` in the notebook, our call would instead become
 
 ```
-otter generate autograder data.csv
+otter generate data.csv
 ```
 
 Note that if we needed the requirements in `requirements.txt`, our call wouldn't change, since Otter automatically found `./requirements.txt`.
@@ -62,19 +62,19 @@ Note that if we needed the requirements in `requirements.txt`, our call wouldn't
 Now let's say that we maintained to different directories of tests: `tests` with public versions of tests and `hidden-tests` with hidden versions. Because I want to grade with the hidden tests, my call then becomes
 
 ```
-otter generate autograder -t hidden-tests data.csv
+otter generate -t hidden-tests data.csv
 ```
 
 Now let's say that I need some functions defined in `utils.py`; then I would add this to the last part of my Otter Generate call:
 
 ```
-otter generate autograder -t hidden-tests data.csv utils.py
+otter generate -t hidden-tests data.csv utils.py
 ```
 
 If this was instead an R assignment, I would run
 
 ```
-otter generate autograder -t hidden-tests -l r data.csv
+otter generate -t hidden-tests -l r data.csv
 ```
 
 ### Grading with Environments
@@ -90,7 +90,7 @@ This will tell Otter to shelve the global environment each time a student calls 
 
 ### Autosubmission of Notebook PDFs
 
-Otter Generate allows instructors to automatically generate PDFs of students' notebooks and upload these as submissions to a separate Gradescope assignment. This requires a Gradescope token, which can be obtained with `otter generate token`. This command will ask you to log in to Gradescope with your credentials and will provide you with a token, which can be passed to the `--token` flag of `otter generate autograder` to initialize the generation of PDFs.
+Otter Generate allows instructors to automatically generate PDFs of students' notebooks and upload these as submissions to a separate Gradescope assignment. This requires a Gradescope token, which can be obtained with `otter generate token`. This command will ask you to log in to Gradescope with your credentials and will provide you with a token, which can be passed to the `--token` flag of `otter generate` to initialize the generation of PDFs.
 
 ```
 $ otter generate token
@@ -115,7 +115,7 @@ The configuration generator supports providing a pass/fail threshold. A threshol
 The threshold is specified with the `--threshold` flag:
 
 ```
-otter generate autograder data.csv --threshold 0.75
+otter generate data.csv --threshold 0.75
 ```
 
 For example, if a student passes a 2- and 1- point test but fails a 4-point test (a 43%) on a 25% threshold, they will get all 7 points. If they only pass the 1-point test (a 14%), they will get 0 points.
@@ -129,7 +129,7 @@ For example, if a student passes a 2- and 1- point test but fails a 4-point test
 As an example, the command below scales the number of points to 3:
 
 ```
-otter generate autograder data.csv --points 3
+otter generate data.csv --points 3
 ```
 
 <!-- ### Public Test Multiplier
@@ -137,7 +137,7 @@ otter generate autograder data.csv --points 3
 You can optionally specify a percentage of the points to award students for passing all of the public tests. This percentage defaults to 0 but this can be changed using the `--public-multiplier` flag:
 
 ```
-otter generate autograder --public-multiplier 0.5
+otter generate --public-multiplier 0.5
 ``` -->
 
 ### Intercell Seeding
@@ -145,23 +145,23 @@ otter generate autograder --public-multiplier 0.5
 The autograder supports intercell seeding with the use of the `--seed` flag. _This behavior is not supported for R assignments._ Passing it an integer will cause the autograder to seed NumPy and Python's `random` library between *every* pair of code cells. This is useful for writing deterministic hidden tests. More information about Otter seeding can be found [here](../../seeding.md). As an example, you can set an intercell seed of 42 with
 
 ```
-otter generate autograder data.csv --seed 42
+otter generate data.csv --seed 42
 ```
 
 ### Showing Autograder Results
 
 The generator allows intructors to specify whether or not the stdout of the grading process (anything printed to the console by the grader or the notebook) is shown to students. **The stdout includes a summary of the student's test results, including the points earned and possible of public _and_ hidden tests, as well as the visibility of tests as indicated by `test["hidden"]`.** 
 
-This behavior is turned off by default and can be turned on by passing the `--show-stdout` flag to `otter generate autograder`.
+This behavior is turned off by default and can be turned on by passing the `--show-stdout` flag to `otter generate`.
 
 ```
-otter generate autograder data.csv --show-stdout
+otter generate data.csv --show-stdout
 ```
 
 If `--show-stdout` is passed, the stdout will be made available to students _only after grades are published on Gradescope_. The same can be done for hidden test outputs using the `--show-hidden` flag:
 
 ```
-otter generate autograder --show-hidden
+otter generate --show-hidden
 ```
 
 The [Grading on Gradescope](../executing_submissions/gradescope.md) section details more about how output on Gradescope is formatted. Note that this behavior has no effect on any platform besides Gradescope.
