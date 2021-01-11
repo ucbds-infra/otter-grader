@@ -24,7 +24,6 @@ DEFAULT_OPTIONS = {
     "test_visibility": 'hidden',
     "separate_tests": True,
     "plugins": [],
-    "plugin_config": {},
     "logo": True,
     "print_summary": True,
 }
