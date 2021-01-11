@@ -14,11 +14,14 @@ from enum import Enum, auto
 from glob import glob
 
 class QuestionNotInLogException(Exception):
-    """Exception that indicates that a specific question was not found in any entry in the log"""
+    """
+    Exception that indicates that a specific question was not found in any entry in the log
+    """
 
 
 class EventType(Enum):
-    """Enum of event types for log entries
+    """
+    Enum of event types for log entries
     
     Attributes:
         AUTH: an auth event

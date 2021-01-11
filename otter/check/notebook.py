@@ -60,6 +60,7 @@ class Notebook:
     Notebook class for in-notebook autograding
 
     Args:
+        nb_path(``str``, optional): path to the notebook being run
         test_dir (``str``, optional): path to tests directory
     """
 
@@ -71,7 +72,6 @@ class Notebook:
             self._path = test_dir
             self._service_enabled = False
             self._notebook = nb_path
-
 
             # assume using otter service if there is a .otter file
             otter_configs = glob("*.otter")
@@ -88,13 +88,6 @@ class Notebook:
                 self._ignore_modules = self._config.get("ignore_modules", [])
                 self._vars_to_store = self._config.get("variables", None)
 
-
-
-                # if "notebook" not in self._config:
-                #     assert len(glob("*.ipynb")) == 1, "Notebook not specified in otter config file"
-                #     self._notebook = glob("*.ipynb")[0]
-
-                # else:
                 self._notebook = self._config["notebook"]
 
                 if self._service_enabled:
@@ -166,7 +159,6 @@ class Notebook:
         else:
             self._log_event(EventType.AUTH)
 
-
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
         Logs an event
@@ -199,6 +191,20 @@ class Notebook:
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
     def _resolve_nb_path(self, nb_path):
+        """
+        Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``, ``self._notebook``
+        is checked, then the working directory is searched for `.ipynb` files. If none are found, or 
+        more than one is found, a ``ValueError`` is raised.
+
+        Args:
+            nb_path (``Optional[str]``): path to the notebook
+        
+        Returns:
+            ``str``: resolved notebook path
+        
+        Raises:
+            ``ValueError``: if no notebooks or too many notebooks are found.
+        """
         if nb_path is None and self._notebook is not None:
             nb_path = self._notebook
 
@@ -248,6 +254,16 @@ class Notebook:
 
     def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
         """
+        Runs the plugin ``plugin_name`` with the specified arguments. Use ``nb_path`` if the path
+        to the notebook is not configured.
+
+        Args:
+            plugin_name (``str``): importable name of an Otter plugin that implements the 
+                ``from_notebook`` hook
+            *args: arguments to be passed to the plugin
+            nb_path (``str``, optional): path to the notebook
+            **kwargs: keyword arguments to be passed to the plugin
+
         """
         nb_path = self._resolve_nb_path(nb_path)
         pc = PluginCollection([plugin_name], nb_path, {})
@@ -256,14 +272,14 @@ class Notebook:
     # @staticmethod
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True):
         """
-        Exports a notebook to a PDF. ``filter_type`` can be ``"html"`` or ``"tags"`` if filtering by
-        HTML comments or cell tags, respectively.
+        Exports a notebook to a PDF using Otter Export
 
         Args:
-            nb_path (``str``): Path to iPython notebook we want to export
-            filtering (``bool``, optional): Set true if only exporting a subset of nb cells to PDF
-            pagebreaks (``bool``, optional): If true, pagebreaks are included between questions
-            display_link (``bool``, optional): Whether or not to display a download link
+            nb_path (``str``, optional): path to the notebook we want to export; will attempt to infer
+                if not provided
+            filtering (``bool``, optional): set true if only exporting a subset of notebook cells to PDF
+            pagebreaks (``bool``, optional): if true, pagebreaks are included between questions
+            display_link (``bool``, optional): whether or not to display a download link
         """
         # self._save_notebook()
         try:
@@ -289,17 +305,20 @@ class Notebook:
 
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], display_link=True):
         """
-        Exports a submission to a zipfile. Creates a submission zipfile from a notebook at ``nb_path``,
+        Exports a submission to a zip file. Creates a submission zipfile from a notebook at ``nb_path``,
         optionally including a PDF export of the notebook and any files in ``files``.
 
         Args:
-            nb_path (``str``): path to notebook we want to export
-            export_path (``str``, optional): path at which to write zipfile
+            nb_path (``str``, optional): path to the notebook we want to export; will attempt to infer
+                if not provided
+            export_path (``str``, optional): path at which to write zipfile; defaults to notebook's
+                name + ``.zip``
             pdf (``bool``, optional): whether a PDF should be included
             filtering (``bool``, optional): whether the PDF should be filtered; ignored if ``pdf`` is
                 ``False``
             pagebreaks (``bool``, optional): whether pagebreaks should be included between questions
-            files (``list`` of ``str``, optional): paths to other files to include in the zipfile
+                in the PDF
+            files (``list`` of ``str``, optional): paths to other files to include in the zip file
             display_link (``bool``, optional): whether or not to display a download link
         """
         self._log_event(EventType.BEGIN_EXPORT)
