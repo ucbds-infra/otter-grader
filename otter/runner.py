@@ -26,6 +26,13 @@ except ImportError:
 PARSER = get_parser()
 
 def run_otter(unparsed_args=None):
+    """
+    Runs Otter's CLI by parsing the arguments in ``unparsed_args`` if provided or ``sys.argv`` if not
+
+    Args:
+        unparsed_args (``list[str]``, optional): unparsed arguments for running Otter; if not provided,
+            ``sys.argv`` is used
+    """
     args = PARSER.parse_args(unparsed_args)
 
     if args.version:

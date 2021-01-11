@@ -11,7 +11,8 @@ INVOKED_FROM_PYTHON = "__main__.py" in sys.argv[0]
 PROG = ("otter", "python3 -m otter")[INVOKED_FROM_PYTHON]
 
 def get_parser():
-    """Creates and returns the argument parser for Otter
+    """
+    Creates and returns the argument parser for Otter
 
     Returns:
         ``argparse.ArgumentParser``: the argument parser for Otter command-line tools

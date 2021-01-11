@@ -21,6 +21,12 @@ LOGO_WITH_VERSION = f"""\
 """
 
 def print_version_info(logo=False):
+    """
+    Prints the Otter logo and version information to stdout
+
+    Args:
+        logo (``bool``, optional): whether to print the logo
+    """
     if logo:
         print(LOGO_WITH_VERSION)
     print(dedent(f"""\
