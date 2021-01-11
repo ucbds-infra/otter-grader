@@ -77,3 +77,6 @@ class PDFViaHTMLExporter(BaseExporter):
             merger.append(output, import_bookmarks=False)
 
         merger.write(dest)
+
+        if NBCONVERT_6:
+            del nbconvert.TemplateExporter.template_name

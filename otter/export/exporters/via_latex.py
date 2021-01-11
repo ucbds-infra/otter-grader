@@ -60,6 +60,9 @@ class PDFViaLatexExporter(BaseExporter):
                 with open(os.path.splitext(dest)[0] + ".tex", "w+") as output_file:
                     output_file.write(latex_output[0])
 
+            if NBCONVERT_6:
+                del nbconvert.TemplateExporter.template_name
+
         except nbconvert.pdf.LatexFailed as error:
             print("There was an error generating your LaTeX")
             output = error.output
@@ -73,3 +76,6 @@ class PDFViaLatexExporter(BaseExporter):
             print("=" * 60)
             print(output)
             print("=" * 60)
+
+            if NBCONVERT_6:
+                del nbconvert.TemplateExporter.template_name
