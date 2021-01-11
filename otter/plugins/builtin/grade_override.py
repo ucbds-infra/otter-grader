@@ -23,9 +23,11 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     
     The google sheet should have the following format:
 
-    | Assignment ID | Email            | Test Case | Points | PDF          |
-    |---------------|------------------|-----------|--------|--------------|
-    | 123456        | student@univ.edu | q1a - 1   | 1      | false        |
+    =============== ================== =========== ======== ==============
+     Assignment ID   Email              Test Case   Points   PDF          
+    =============== ================== =========== ======== ==============
+     123456          student@univ.edu   q1a - 1     1        false        
+    =============== ================== =========== ======== ==============
 
     ``Assignment ID`` should be the ID of the assignment on Gradescope, ``Email`` should be the email
     address corresponding to the student's Gradescope account, ``Test Case`` should be the name of

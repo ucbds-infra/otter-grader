@@ -9,3 +9,13 @@ iframe {
     height: 600px;
     border: none;
 }
+
+th, td {
+    padding: 5px;
+}
+
+table {
+    display: table !important;
+    width: 100%;
+    margin-bottom: 15px;
+}

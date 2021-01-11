@@ -28,7 +28,7 @@ class RateLimiting(AbstractOtterPlugin):
         window = dt.timedelta(
             self.plugin_config.get("days", 0),
             self.plugin_config.get("seconds", 0),
-            self.plugin_config.get("microsends", 0),
+            self.plugin_config.get("microseconds", 0),
             self.plugin_config.get("milliseconds", 0),
             self.plugin_config.get("minutes", 0),
             self.plugin_config.get("hours", 0),
@@ -50,7 +50,7 @@ class RateLimiting(AbstractOtterPlugin):
 
         else:
             return True, \
-                f"Students are allowed {self.plugin_config['allowed_submissions']} every {self._window_to_str()}. " + \
+                f"Students are allowed {self.plugin_config['allowed_submissions']} submissions every {self._window_to_str()}. " + \
                 f"You have {prev_subms} submissions in that period."
 
     def after_grading(self, results):
