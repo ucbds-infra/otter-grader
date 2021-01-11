@@ -156,6 +156,10 @@ class TestRun(TestCase):
 
         try:
             py, _ = nbconvert.export(nbconvert.PythonExporter, nb)
+            
+            # remove magic commands
+            py = "\n".join(l for l in py.split("\n") if not l.startswith("get_ipython"))
+            
             with open(TEST_FILES_PATH + "autograder/submission/fails2and6H.py", "w+") as f:
                 f.write(py)
 
@@ -166,7 +170,7 @@ class TestRun(TestCase):
 
             self.assertEqual(actual_results, self.expected_results, f"Actual results did not matched expected:\n{actual_results}")
 
-            self.deletePaths(TEST_FILES_PATH + "autograder/submission/fails2and6H.py")
+            self.deletePaths([TEST_FILES_PATH + "autograder/submission/fails2and6H.py"])
 
             with open(nb_path, "w+") as f:
                 nbformat.write(nb, f)
