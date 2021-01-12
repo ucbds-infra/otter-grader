@@ -9,6 +9,7 @@ import docker
 import pandas as pd
 
 from contextlib import contextmanager
+from hashlib import md5
 
 OTTER_DOCKER_IMAGE_TAG = "otter-grade"
 

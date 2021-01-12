@@ -17,7 +17,6 @@ import pickle
 
 from subprocess import PIPE
 from concurrent.futures import ThreadPoolExecutor, wait
-from hashlib import md5
 
 from .metadata import GradescopeParser
 from .utils import simple_tar, get_container_file, generate_hash, OTTER_DOCKER_IMAGE_TAG
