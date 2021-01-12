@@ -58,6 +58,8 @@ extensions = [
     # 'sphinx.ext.autosummary',
     # 'sphinxcontrib.apidoc',
     'sphinxarg.ext',
+    'IPython.sphinxext.ipython_console_highlighting',
+    'IPython.sphinxext.ipython_directive'
 ]
 
 napoleon_google_docstring = True

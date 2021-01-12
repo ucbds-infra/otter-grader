@@ -27,6 +27,7 @@ def is_markdown_solution_cell(cell):
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
     """
+    Substitutes the first matching group  with ` NULL # YOUR CODE HERE`
     """
     prefix = match.group(1)
     return prefix + ' NULL # YOUR CODE HERE'
@@ -34,6 +35,7 @@ def solution_assignment_sub(match):
 solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
 def solution_line_sub(match):
     """
+    Substitutes the first matching group  with `# YOUR CODE HERE`
     """
     prefix = match.group(1)
     return prefix + '# YOUR CODE HERE'
@@ -111,11 +113,11 @@ def replace_solutions(lines):
     return stripped
 
 def strip_solutions_and_output(rmd_string):
-    """Write a notebook with solutions stripped
+    """
+    Writes a Rmd file with solutions stripped
     
     Args:
-        original_nb_path (path-like): path to original notebook
-        stripped_nb_path (path-like): path to new stripped notebook
+        rmd_string (``str``): the Rmd document as a string
     """
     md_solutions = []
     cells = rmd_to_cells(rmd_string)

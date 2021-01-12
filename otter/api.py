@@ -64,7 +64,7 @@ def grade_submission(ag_path, submission_path, quiet=False, debug=False):
         cm = nullcontext()
         
     with cm:
-        results = run_grader(args)
+        results = run_grader(**vars(args))
 
     if quiet:
         f.close()

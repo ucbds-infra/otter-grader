@@ -143,7 +143,8 @@ def gen_close_export_cell():
     return cell
 
 def add_close_export_to_cell(cell):
-    """Adds an HTML comment to close question export for PDF filtering to the top of ``cell``. ``cell``
+    """
+    Adds an HTML comment to close question export for PDF filtering to the top of ``cell``. ``cell``
     should be a Markdown cell. This adds ``<!-- END QUESTION-->`` as the first line of the cell.
     
     Args:

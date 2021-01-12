@@ -91,18 +91,30 @@ class Assignment:
 
     @property
     def is_r(self):
+        """
+        Whether the language of the assignment is R
+        """
         return self.lang == "r"
     
     @property
     def is_python(self):
+        """
+        Whether the language of the assignment is Python
+        """
         return self.lang == "python"
 
     @property
     def is_rmd(self):
+        """
+        Whether the input file is an RMarkdown document
+        """
         return self.master.suffix.lower() == ".rmd"
     
     @property
     def allowed_configs(self):
+        """
+        The list of allowed configuration keys
+        """
         return type(self).defaults.keys()
 
 def read_assignment_metadata(cell):

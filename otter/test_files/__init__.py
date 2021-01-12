@@ -22,7 +22,7 @@ GradingTestCaseResult = namedtuple(
 
 class GradingResults:
     """
-    Stores and wrangles test result objects.
+    Stores and wrangles test result objects
     
     Initialize with a list of ``otter.test_files.abstract_test.TestFile`` subclass objects and 
     this class will store the results as named tuples so that they can be accessed/manipulated easily. 
@@ -36,6 +36,8 @@ class GradingResults:
         test_files (``list`` of ``TestFile``): the test files passed to the constructor
         results (``dict``): maps test names to ``GradingTestCaseResult`` named tuples containing the 
             test result information
+        output (``str``): a string to include in the output field for Gradescope
+        all_hidden (``bool``): whether all results should be hidden from the student on Gradescope
         total (numeric): the total points earned by the submission
         possible (numeric): the total points possible based on the tests
         tests (``list`` of ``str``): list of test names according to the keys of ``results``
@@ -75,6 +77,9 @@ class GradingResults:
 
     @property
     def test_cases(self):
+        """
+        The names of all test cases tracked in these grading results
+        """
         return list(self.results.keys())
     
     def get_result(self, test_name):
@@ -125,12 +130,13 @@ class GradingResults:
 
     def clear_results(self):
         """
-        Empties the dictionary of results.
+        Empties the dictionary of results
         """
         self.results = {}
 
     def hide_everything(self):
         """
+        Indicates that all results should be hidden from students on Gradescope
         """
         self.all_hidden = True
 
@@ -142,7 +148,7 @@ class GradingResults:
         ignored when verifying scores.
 
         Args:
-            log (``otter.logs.Log``): the log to verify against
+            log (``otter.check.logs.Log``): the log to verify against
             ignore_hidden  (``bool``, optional): whether to ignore hidden tests during verification
 
         Returns:
@@ -200,7 +206,7 @@ class GradingResults:
 
         return output
 
-    def to_gradescope_dict(self, config={}):
+    def to_gradescope_dict(self, config):
         """
         Converts these results into a dictionary formatted for Gradescope's autograder. Requires a 
         dictionary of configurations for the Gradescope assignment generated using Otter Generate.

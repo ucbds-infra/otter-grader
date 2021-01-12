@@ -16,9 +16,18 @@ from ..utils import get_relpath, block_print
 
 def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwargs):
     """
-    Runs Otter Assign
+    Runs Otter Assign on a master notebook
     
     Args:
+        master (``str``): path to master notebook
+        result (``str``): path to result directory
+        no_pdfs (``bool``): whether to ignore any configurations indicating PDF generation for this run
+        no_run_tests (``bool``): prevents Otter tests from being automatically run on the solutions 
+            notebook
+        username (``str``): a username for Gradescope for generating a token
+        password (``str``): a password for Gradescope for generating a token
+        debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
+        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
     """
     master, result = pathlib.Path(os.path.abspath(master)), pathlib.Path(os.path.abspath(result))
     print("Generating views...")

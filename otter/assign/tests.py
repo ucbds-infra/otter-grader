@@ -35,7 +35,7 @@ def any_public_tests(test_cases):
     Returns whether any of the ``Test`` named tuples in ``test_cases`` are public tests.
 
     Args:
-        test_cases (``list`` of ``Test``): list of test cases
+        test_cases (``list`` of ``Test`` or ``OttrTest``): list of test cases
     
     Returns:
         ``bool``: whether any of the tests are public

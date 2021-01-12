@@ -13,16 +13,6 @@ from ..execute import grade_notebook, check
 from ..utils import block_print
 
 
-# RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ tests|length }} tests passed
-# {% if passed_tests %}
-# Tests passed:
-#     {% for passed_test in passed_tests %}{{ passed_test }} {% endfor %}
-# {% endif %}
-# {% if failed_tests %}
-# Tests failed: 
-# {% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
-# """)
-
 def _log_event(event_type, results=[], question=None, success=True, error=None):
 	"""
 	Logs an event
@@ -48,6 +38,11 @@ def main(file, tests_path, question, seed, **kwargs):
 	Runs Otter Check
 
 	Args:
+		file (``str``): path to the file to check
+		tests_path (``str``): path to tests directory
+		question (``str``): test name to run; ``None`` if all tests should be run
+		seed (``int``): a seed to set before execution
+		**kwargs: ignored kwargs (a remnant of how the argument parser is built)
 	"""
 
 	try:

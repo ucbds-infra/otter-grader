@@ -26,13 +26,34 @@ OTTER_ENV_NAME = "otter-gradescope-env"
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, username, 
         password, files, assignment=None, **kwargs):
     """
-    Runs ``otter generate autograder``
+    Runs Otter Generate
+
+    Args:
+        tests_path (``str``): path to directory of test files for this assignment
+        output_path (``str``): directory in which to write output zip file
+        config (``str``): path to an Otter configuration JSON file
+        lang (``str``): the language of the assignment; one of ``["python", "r"]``
+        requirements (``str``): path to a Python or R requirements file for this assignment
+        overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
+            adding to them
+        username (``str``): a username for Gradescope for generating a token
+        password (``str``): a password for Gradescope for generating a token
+        files (``list[str]``): list of file paths to add to the zip file
+        assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
+            if used with Otter Assign
+        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+
+    Raises:
+        ``FileNotFoundError``: if the specified Otter configuration JSON file could not be found
+        ``ValueError``: if the configurations specify a Gradescope course ID or assignment ID but not
+            both
     """
     # read in otter_config.json
     if config is None and os.path.isfile("otter_config.json"):
         config = "otter_config.json"
 
-    assert config is None or os.path.isfile(config), f"Could not find otter configuration file {config}"
+    if config is not None and not os.path.isfile(config):
+        raise FileNotFoundError(f"Could not find otter configuration file {config}")
 
     if config:
         with open(config) as f:

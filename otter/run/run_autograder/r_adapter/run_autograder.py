@@ -17,6 +17,13 @@ from ..utils import get_source
 NBFORMAT_VERSION = 4
 
 def insert_seeds(nb_path, seed):
+    """
+    Adds calls to ``set.seed`` in a Jupyter notebook
+
+    Args:
+        nb_path (``str``): path to notebook to seed
+        seed (``int``): the seed to set
+    """
     nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
     for i, cell in enumerate(nb['cells']):
         if cell['cell_type'] == 'code':
@@ -27,6 +34,14 @@ def insert_seeds(nb_path, seed):
 
 def run_autograder(options):
     """
+    Runs autograder for R assignments based on predefined configurations
+
+    Args:
+        options (``dict``): configurations for autograder; should contain all keys present in
+            ``otter.run.run_adapter.constants.DEFAULT_OPTIONS``
+        
+    Returns:
+        ``dict``: the results of grading as a JSON object
     """
     # options = DEFAULT_OPTIONS.copy()
     # options.update(config)

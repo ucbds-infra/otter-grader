@@ -5,6 +5,7 @@
    :maxdepth: 1
    :hidden:
 
+   builtin
    creating_plugins
 ```
 

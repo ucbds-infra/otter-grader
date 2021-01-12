@@ -77,10 +77,10 @@ For more information about the configurations for Otter Assign and its output fo
 
 ### Otter Generate
 
-Start by `cd`ing into `tutorial/generate`. We have provided premade tests and a requirements file. Running Otter Generate is very simple if there are few needed configurations: just run `otter generate autograder` and it will automatically find the tests in `./tests` and the requirements in `./requirements.txt`.
+Start by `cd`ing into `tutorial/generate`. We have provided premade tests and a requirements file. Running Otter Generate is very simple if there are few needed configurations: just run `otter generate` and it will automatically find the tests in `./tests` and the requirements in `./requirements.txt`.
 
 ```console
-otter generate autograder
+otter generate
 ```
 
 Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](workflow/otter_generate/index.md).

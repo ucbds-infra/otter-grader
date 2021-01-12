@@ -20,6 +20,14 @@ from ...generate.token import APIClient
 from ...plugins import PluginCollection
 
 def prepare_files():
+    """
+    Copies and creates files needed for running the autograder
+
+    Copies all files in ``source/files`` into ``submission`` so that they are accessible by the 
+    submission being executed. Copies all test files in ``source/tests`` into ``submission/tests``.
+    Creates ``__init__.py`` files in the autograding directory and ``submission`` to allow relative
+    imports.
+    """
     # put files into submission directory
     if os.path.exists("./source/files"):
         for file in os.listdir("./source/files"):
@@ -42,6 +50,18 @@ def prepare_files():
         shutil.copy(file, "./submission/tests")
 
 def write_and_submit_pdf(client, nb_path, filtering, pagebreaks, course_id, assignment_id, submit=True):
+    """
+    Converts a notebook to a PDF and uploads it to a Gradescope assignment for manual grading
+
+    Args:
+        client (``otter.generate.token.APIClient``): the Gradescope client
+        nb_path (``str``): path to the notebook
+        filtering (``bool``): whether to filter the notebook
+        pagebreaks (``bool``): whether to insert pagebreaks in the PDF
+        course_id (``str``): Gradescope course ID
+        assignment_id (``str``): Gradescope assignment ID
+        submit (``bool``, optional): whether to upload the PDF instead of just converting
+    """
     try:
         export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
@@ -67,10 +87,14 @@ def write_and_submit_pdf(client, nb_path, filtering, pagebreaks, course_id, assi
 
 def run_autograder(options):
     """
-    Runs autograder on Gradescope based on predefined configurations.
+    Runs autograder based on predefined configurations
 
     Args:
-        config (``dict``): configurations for autograder
+        options (``dict``): configurations for autograder; should contain all keys present in
+            ``otter.run.run_adapter.constants.DEFAULT_OPTIONS``
+        
+    Returns:
+        ``dict``: the results of grading as a JSON object
     """
     # options = DEFAULT_OPTIONS.copy()
     # options.update(config)

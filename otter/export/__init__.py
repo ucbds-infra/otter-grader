@@ -19,7 +19,8 @@ def export_notebook(nb_path, dest=None, debug=False, exporter_type=None, **kwarg
         nb_path (``str``): path to notebook
         dest (``str``, optional): path to write PDF
         debug (``bool``, optional): whether to run export in debug mode
-        exporter_type (``str``, optional): the type of exporter to use; one of {'html', 'latex'}
+        exporter_type (``str``, optional): the type of exporter to use; one of ``['html', 'latex']``
+        **kwargs: additional configurations passed to exporter
     """
     # notebook = load_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 
@@ -37,7 +38,15 @@ def main(source, dest, exporter, filtering, pagebreaks, save, debug, **kwargs):
     Runs Otter Export
 
     Args:
-        args (``argparse.Namespace``): parsed command line arguments
+        source (``str``): path to source notebook
+        dest (``Optional[str]``): path at which to write PDF
+        exporter (``Optional[str]``): exporter name
+        filtering (``bool``): whether to filter cells using HTML comments
+        pagebreaks (``bool``): whether to pagebreak between filtered regions; ignored if ``filtering``
+            is ``False``
+        save (``bool``): whether to save any intermediate files (e.g. ``.tex``, ``.html``)
+        debug (``bool``): whether to run in debug mode (print full error messages)
+        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
     """
     export_notebook(
         source,

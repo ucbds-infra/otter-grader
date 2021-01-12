@@ -16,7 +16,7 @@ from ..tests import write_test
 
 def write_autograder_dir(rmd_path, output_rmd_path, assignment):
     """
-    Converts a master notebook to a solutions notebook and writes this notebook to the output directory,
+    Converts a master Rmd file to a solutions Rmd file and writes this file to the output directory,
     copying support files and writing tests as needed.
 
     Args:
@@ -28,12 +28,6 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
         rmd_string = f.read()
 
     if assignment.lang is None:
-        # try:
-        #     lang = nb["metadata"]["kernelspec"]["language"].lower()
-        #     assignment.lang = lang
-        # except IndexError:
-        #     warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
-        #     assignment.lang = "python"
         assignment.lang = "r"
 
     output_dir = output_rmd_path.parent
@@ -53,9 +47,6 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
     transformed_rmd_string, test_files = transform_notebook(rmd_string, assignment)
 
     # write notebook
-    # with open(output_nb_path) as f:
-    # nbformat.write(transformed_nb, )
-    # nbformat.write(transformed_nb, str(output_nb_path))
     with open(output_rmd_path, "w+") as f:
         f.write(transformed_rmd_string)
 
@@ -83,7 +74,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
 def write_student_dir(rmd_name, autograder_dir, student_dir, assignment):
     """
     Copies the autograder (solutions) directory and removes extraneous files, strips solutions from
-    the notebook, and removes hidden tests from the tests directory.
+    the Rmd file, and removes hidden tests from the tests directory.
 
     Args:
         rmd_name (``str``): the master Rmd file name
@@ -115,11 +106,11 @@ def write_student_dir(rmd_name, autograder_dir, student_dir, assignment):
 
 def write_output_directories(master_rmd_path, result_dir, assignment):
     """
-    Converts a master notebook to an autograder and student directory based on configurations in 
+    Converts a master Rmd file to an autograder and student directory based on configurations in 
     ``assignment``.
 
     Args:
-        master_rmd_path (``nbformat.NotebookNode``): the master Rmd path
+        master_rmd_path (``pathlib.Path``): the master Rmd path
         result_dir (``pathlib.Path``): path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     """

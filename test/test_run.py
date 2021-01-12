@@ -136,7 +136,7 @@ class TestRun(TestCase):
                     "output": "Test case passed!"
                 }
             ],
-            "output": "Students are allowed 1 every 1 days. You have 0 submissions in that period."
+            "output": "Students are allowed 1 submissions every 1 days. You have 0 submissions in that period."
         }
 
     def test_notebook(self):
