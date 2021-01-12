@@ -22,6 +22,7 @@
 * Added `--username`, `--password` flags to Otter Assign and Otter Generate
 * Added support for Python files
 * Removed `FutureWarning` for deprecated global `hidden` key of OK tests
+* Add missing file specifier in environment template
 
 **v1.1.6:**
 
