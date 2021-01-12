@@ -1,5 +1,7 @@
 # Changelog
 
+* Add missing file specifier in environment template
+
 **v1.1.4:**
 
 * Fixed `KeyError` when kernelspec unparsable from notebook in Otter Assign

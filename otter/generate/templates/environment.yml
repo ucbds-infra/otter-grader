@@ -9,4 +9,4 @@ dependencies:
     - r-essentials 
     - r-devtools
     - pip:
-        - -r requirements.txt
+        - -r file:requirements.txt
