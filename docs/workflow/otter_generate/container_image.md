@@ -54,13 +54,13 @@ This file specifies the conda environment that Otter creates in `setup.sh`.
 
 ## `requirements.txt`
 
-This file contains the Python dependencies required to execute submissions. It is also the file that your requirements are appended to when you provided your own requirements file   for a Python assignment (unless `--overwrite-requirements` is passed). The template requirements are:
+This file contains the Python dependencies required to execute submissions. It is also the file that your requirements are appended to when you provided your own requirements file   for a Python assignment (unless `--overwrite-requirements` is passed). The template requirements for Python are:
 
 ```eval_rst
-.. literalinclude:: ../../../otter/generate/templates/r/requirements.txt
+.. literalinclude:: ../../../otter/generate/templates/python/requirements.txt
 ```
 
-Note that this installs the exact version of Otter that you are working from. This is important to ensure that the configurations you set locally are correctly processed and processable by the version on the Gradescope container. If you choose to overwrite the requirements, _make sure to do the same._
+If you are using R, there will be no additional requirements sent to this template, and `rpy2` will be added. Note that this installs the exact version of Otter that you are working from. This is important to ensure that the configurations you set locally are correctly processed and processable by the version on the Gradescope container. If you choose to overwrite the requirements, _make sure to do the same._ 
 
 ## `requirements.R`
 
