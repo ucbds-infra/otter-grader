@@ -22,6 +22,9 @@ sys.path.insert(0, os.path.abspath('..'))
 import recommonmark
 from recommonmark.transform import AutoStructify
 
+from glob import glob
+import nbconvert
+
 
 # -- Project information -----------------------------------------------------
 
@@ -52,9 +55,11 @@ extensions = [
     'sphinx.ext.coverage', 
     'sphinx.ext.napoleon',
     'sphinx_markdown_tables',
-    'sphinx.ext.autosummary',
-    'sphinxcontrib.apidoc',
+    # 'sphinx.ext.autosummary',
+    # 'sphinxcontrib.apidoc',
     'sphinxarg.ext',
+    'IPython.sphinxext.ipython_console_highlighting',
+    'IPython.sphinxext.ipython_directive'
 ]
 
 napoleon_google_docstring = True
@@ -63,6 +68,8 @@ napoleon_numpy_docstring = False
 apidoc_module_dir = '../otter'
 apidoc_output_dir = '.'
 apidoc_excluded_paths = []
+
+autosummary_generate = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -204,3 +211,13 @@ def setup(app):
         # 'enable_auto_doc_ref': True,
     }, True)
     app.add_transform(AutoStructify)
+
+    # run nbconvert on all of the notebooks in _static/notebooks
+    exporter = nbconvert.HTMLExporter()
+    print("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15)
+    for file in glob("docs/_static/notebooks/*.ipynb"):
+        html, _ = exporter.from_filename(file)
+        with open(os.path.splitext(file)[0] + ".html", "w+") as f:
+            f.write(html)
+        print(f"Converted {file} to HTML")
+    print("=" * len("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15))

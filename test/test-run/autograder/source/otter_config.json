@@ -1,0 +1,11 @@
+{
+    "autograder_dir": "test/test-run/autograder",
+    "plugins": [
+        {
+            "otter.plugins.builtin.RateLimiting": {
+                "days": 1,
+                "allowed_submissions": 1
+            }
+        }
+    ]
+}

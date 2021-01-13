@@ -42,6 +42,7 @@ jobs:
             conda install r-base r-essentials
             conda install r-devtools -c conda-forge
             pip install -r requirements.txt
+            pip install -r test_requirements.txt
             Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
 
       - run:

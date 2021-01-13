@@ -3,8 +3,11 @@ Gradescope autograder configuration generator for Otter Generate
 """
 
 import os
+import json
 import shutil
-import subprocess
+# import subprocess
+import zipfile
+import tempfile
 import pathlib
 import pkg_resources
 
@@ -13,92 +16,101 @@ from subprocess import PIPE
 from jinja2 import Template
 
 from .token import APIClient
+from ..plugins import PluginCollection
+from ..run.run_autograder.constants import DEFAULT_OPTIONS
 
-TEMPLATES_DIR = pkg_resources.resource_filename(__name__, "templates")
+TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-gradescope-env"
-TEMPLATE_FILE_PATHS = {
-    "setup.sh": os.path.join(TEMPLATES_DIR, "setup.sh"),
-    "requirements.txt": os.path.join(TEMPLATES_DIR, "requirements.txt"),
-    "requirements.r": os.path.join(TEMPLATES_DIR, "requirements.r"),
-    "run_autograder": os.path.join(TEMPLATES_DIR, "run_autograder"),
-    "run_otter.py": os.path.join(TEMPLATES_DIR, "run_otter.py"),
-    "environment.yml":  os.path.join(TEMPLATES_DIR, "environment.yml"),
-}
 
-def main(args):
+def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, username, 
+        password, files, assignment=None, **kwargs):
     """
-    Runs ``otter generate autograder``
+    Runs Otter Generate
+
+    Args:
+        tests_path (``str``): path to directory of test files for this assignment
+        output_path (``str``): directory in which to write output zip file
+        config (``str``): path to an Otter configuration JSON file
+        lang (``str``): the language of the assignment; one of ``["python", "r"]``
+        requirements (``str``): path to a Python or R requirements file for this assignment
+        overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
+            adding to them
+        username (``str``): a username for Gradescope for generating a token
+        password (``str``): a password for Gradescope for generating a token
+        files (``list[str]``): list of file paths to add to the zip file
+        assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
+            if used with Otter Assign
+        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+
+    Raises:
+        ``FileNotFoundError``: if the specified Otter configuration JSON file could not be found
+        ``ValueError``: if the configurations specify a Gradescope course ID or assignment ID but not
+            both
     """
-    assert args.threshold is None or 0 <= args.threshold <= 1, "{} is not a valid threshold".format(
-        args.threshold
-    )
+    # read in otter_config.json
+    if config is None and os.path.isfile("otter_config.json"):
+        config = "otter_config.json"
 
-    if args.course_id or args.assignment_id:
-        assert args.course_id and args.assignment_id, "Either course ID or assignment ID unspecified for PDF submissions"
-        if not args.token:
-            args.token = APIClient.get_token()
+    if config is not None and not os.path.isfile(config):
+        raise FileNotFoundError(f"Could not find otter configuration file {config}")
 
-    # check that args.public_multiplier is valid
-    assert 0 <= args.public_multiplier <= 1, f"Public test multiplier {args.public_multiplier} is not between 0 and 1"
+    if config:
+        with open(config) as f:
+            otter_config = json.load(f)
+    else:
+        otter_config = {}
+    
+    if "course_id" in otter_config and "assignment_id" in otter_config:
+        client = APIClient()
+        if username is not None and password is not None:
+            client.log_in(username, password)
+            token = client.token
+        else:
+            token = client.get_token()
+        otter_config["token"] = token
+    elif "course_id" in otter_config or "assignment_id" in otter_config:
+        raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")
 
-    # check for valid language
-    args.lang = args.lang.lower()
-    assert args.lang.lower() in ["python", "r"], f"{args.lang} is not a supported language"
+    options = DEFAULT_OPTIONS.copy()
+    options.update(otter_config)
+
+    # update language
+    options["lang"] = lang.lower()
+
+    template_dir = os.path.join(TEMPLATE_DIR, options["lang"])
 
     templates = {}
-    for fn, fp in TEMPLATE_FILE_PATHS.items():
-        with open(fp) as f:
-            templates[fn] = Template(f.read())
+    for fn in os.listdir(template_dir):
+        fp = os.path.join(template_dir, fn)
+        if os.path.isfile(fp): # prevents issue w/ finding __pycache__ in template dirs
+            with open(fp) as f:
+                templates[fn] = Template(f.read())
 
-    # format run_autograder
-    run_otter_py = templates["run_otter.py"].render(
-        threshold = str(args.threshold),
-        points = str(args.points),
-        show_stdout = str(args.show_stdout),
-        show_hidden = str(args.show_hidden),
-        seed = str(args.seed),
-        token = str(args.token),
-        course_id = str(args.course_id),
-        assignment_id = str(args.assignment_id),
-        filtering = str(not args.unfiltered_pdfs),
-        pagebreaks = str(not args.no_pagebreaks),
-        grade_from_log = str(args.grade_from_log),
-        serialized_variables = str(args.serialized_variables),
-        public_multiplier = str(args.public_multiplier),
-        lang = str(args.lang.lower()),
-        autograder_dir = str(args.autograder_dir),
-    )
+    template_context = {
+        "autograder_dir": options['autograder_dir'],
+        "otter_env_name": OTTER_ENV_NAME,
+        "miniconda_install_url": MINICONDA_INSTALL_URL,
+        "ottr_branch": "stable",
+    }
 
-    run_autograder = templates["run_autograder"].render(
-        autograder_dir = str(args.autograder_dir),
-    )
-
-    # format setup.sh
-    setup_sh = templates["setup.sh"].render(
-        autograder_dir = str(args.autograder_dir),
-        miniconda_install_url = MINICONDA_INSTALL_URL,
-        ottr_branch = "stable",
-        otter_env_name = OTTER_ENV_NAME,
-    )
-
-    environment_yml = templates["environment.yml"].render(
-        otter_env_name = OTTER_ENV_NAME,
-    )
+    plugins = PluginCollection(otter_config.get("plugins", []), None, {})
+    plugins.run("during_generate", otter_config, assignment)
 
     # create tmp directory to zip inside
-    os.mkdir("./tmp")
+    with tempfile.TemporaryDirectory() as td:
 
-    try:
+        # try:
         # copy tests into tmp
-        os.mkdir(os.path.join("tmp", "tests"))
-        pattern = ("*.py", "*.[Rr]")[args.lang.lower() == "r"]
-        for file in glob(os.path.join(args.tests_path, pattern)):
-            shutil.copy(file, os.path.join("tmp", "tests"))
+        test_dir = os.path.join(td, "tests")
+        os.mkdir(test_dir)
+        pattern = ("*.py", "*.[Rr]")[options["lang"] == "r"]
+        for file in glob(os.path.join(tests_path, pattern)):
+            shutil.copy(file, test_dir)
 
         # open requirements if it exists
-        requirements = args.requirements
-        reqs_filename = f"requirements.{'R' if args.lang.lower() == 'r' else 'txt'}"
+        requirements = requirements
+        reqs_filename = f"requirements.{'R' if options['lang'] == 'r' else 'txt'}"
         if requirements is None and os.path.isfile(reqs_filename):
             requirements = reqs_filename
         
@@ -108,98 +120,38 @@ def main(args):
         else:
             f = open(os.devnull)
 
-        # render the templates
-        python_requirements = templates["requirements.txt"].render(
-            other_requirements = f.read() if args.lang.lower() == "python" else "",
-            overwrite_requirements = args.lang.lower() == "python" and args.overwrite_requirements
-        )
+        template_context["other_requirements"] = f.read()
+        template_context["overwrite_requirements"] = overwrite_requirements
 
-        # reset the stream
-        f.seek(0)
-
-        r_requirements = templates["requirements.r"].render(
-            other_requirements = f.read() if args.lang.lower() == "r" else "",
-            overwrite_requirements = args.lang.lower() == "python" and args.overwrite_requirements
-
-        )
+        rendered = {}
+        for fn, tmpl in templates.items():
+            rendered[fn] = tmpl.render(**template_context)
 
         # close the stream
         f.close()
+
+        if os.path.isabs(output_path):
+            zip_path = os.path.join(output_path, "autograder.zip")
+        else:
+            zip_path = os.path.join(os.getcwd(), output_path, "autograder.zip")
         
-        # copy requirements into tmp
-        with open(os.path.join(os.getcwd(), "tmp", "requirements.txt"), "w+") as f:
-            f.write(python_requirements)
-
-        with open(os.path.join(os.getcwd(), "tmp", "requirements.r"), "w+") as f:
-            f.write(r_requirements)
-
-        if r_requirements:
-            with open(os.path.join(os.getcwd(), "tmp", "requirements.r"), "w+") as f:
-                f.write(r_requirements)
-
-        # write setup.sh and run_autograder to tmp
-        with open(os.path.join(os.getcwd(), "tmp", "setup.sh"), "w+") as f:
-            f.write(setup_sh)
-
-        with open(os.path.join(os.getcwd(), "tmp", "run_autograder"), "w+") as f:
-            f.write(run_autograder)
-
-        with open(os.path.join(os.getcwd(), "tmp", "run_otter.py"), "w+") as f:
-            f.write(run_otter_py)
-
-        with open(os.path.join(os.getcwd(), "tmp", "environment.yml"), "w+") as f:
-            f.write(environment_yml)
-
-        # copy files into tmp
-        if len(args.files) > 0:
-            os.mkdir(os.path.join("tmp", "files"))
-
-            for file in args.files:
-                # if a directory, copy the entire dir
-                if os.path.isdir(file):
-                    shutil.copytree(file, str(os.path.join("tmp", "files", os.path.basename(file))))
-                else:
-                    # check that file is in subdir
-                    file = os.path.abspath(file)
-                    assert os.getcwd() in file, \
-                        f"{file} is not in a subdirectory of the working directory"
-                    wd_path = pathlib.Path(os.getcwd())
-                    file_path = pathlib.Path(file)
-                    rel_path = file_path.parent.relative_to(wd_path)
-                    output_path = os.path.join("tmp", "files", rel_path)
-                    os.makedirs(output_path, exist_ok=True)
-                    shutil.copy(file, output_path)
-
-        os.chdir("./tmp")
-
-        zip_path = os.path.join("..", args.output_path, "autograder.zip")
         if os.path.exists(zip_path):
             os.remove(zip_path)
 
-        zip_cmd = ["zip", "-r", zip_path, "run_autograder", "run_otter.py", "requirements.r",
-                "setup.sh", "requirements.txt", "environment.yml", "tests"]
-        
-        if r_requirements:
-            zip_cmd += ["requirements.r"]
+        with zipfile.ZipFile(zip_path, mode="w") as zf:
+            for fn, contents in rendered.items():
+                zf.writestr(fn, contents)
 
-        if args.files:
-            zip_cmd += ["files"]
+            test_dir = "tests"
+            pattern = ("*.py", "*.[Rr]")[options["lang"] == "r"]
+            for file in glob(os.path.join(tests_path, pattern)):
+                zf.write(file, arcname=os.path.join(test_dir, os.path.basename(file)))
+            
+            zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))
 
-        zipped = subprocess.run(zip_cmd, stdout=PIPE, stderr=PIPE)
-
-        if zipped.stderr.decode("utf-8"):
-            raise Exception(zipped.stderr.decode("utf-8"))
-
-        # move back to tmp parent directory
-        os.chdir("..")
-    
-    except:
-        # delete tmp directory
-        shutil.rmtree("tmp")
-
-        # raise the exception
-        raise
-    
-    else:
-        # delete tmp directory
-        shutil.rmtree("tmp")
+            # copy files into tmp
+            if len(files) > 0:
+                for file in files:
+                    full_fp = os.path.abspath(file)
+                    assert os.getcwd() in full_fp, f"{file} is not in a subdirectory of the working directory"
+                    zf.write(file, arcname=os.path.join("files", file))

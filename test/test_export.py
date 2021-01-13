@@ -23,14 +23,15 @@ from subprocess import Popen, PIPE
 from glob import glob
 from textwrap import dedent
 
-from otter.argparser import get_parser
+# from otter.argparser import get_parser
 from otter.export import export_notebook
 from otter.export import main as export
 from otter.export.exporters.base_exporter import BaseExporter
+from otter.runner import run_otter
 
 from . import TestCase
 
-parser = get_parser()
+# parser = get_parser()
 
 TEST_FILES_PATH = "test/test-export/"
 
@@ -44,9 +45,10 @@ class TestExport(TestCase):
         grade_command = ["export", "--filtering", "-s", "-e", "latex",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
-        args = parser.parse_args(grade_command)
-        args.func = export
-        args.func(args)
+        # args = parser.parse_args(grade_command)
+        # args.func = export
+        # args.func(args)
+        run_otter(grade_command)
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
@@ -66,9 +68,10 @@ class TestExport(TestCase):
             "--pagebreaks", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
-        args = parser.parse_args(grade_command)
-        args.func = export
-        args.func(args)
+        # args = parser.parse_args(grade_command)
+        # args.func = export
+        # args.func(args)
+        run_otter(grade_command)
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
@@ -79,33 +82,6 @@ class TestExport(TestCase):
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(cleanup.returncode, 0,"Error in cleanup: " + str(cleanup.stderr))
 
-    def test_no_open(self):
-        """
-        Tests a filtered export without an opening comment
-        """
-        test_file = "no-open-tag-test"
-        grade_command = ["export", "--filtering", "-e", "latex",
-            TEST_FILES_PATH + test_file + ".ipynb"
-        ]
-
-        should_contain = [
-            "There was an error generating your LaTeX\nShowing concise error message\n" + "=" * 60,
-            "(There were 3 error messages)",
-            "This is BibTeX"
-        ]
-
-        args = parser.parse_args(grade_command)
-        args.func = export
-
-        actual_output = StringIO()
-        with contextlib.redirect_stdout(actual_output):
-            args.func(args)
-
-        for s in should_contain:
-            self.assertIn(s, actual_output.getvalue(), 
-                f"Empty Tex did not contain substring: {s}\n\n"
-                f"Output:\n\n{actual_output.getvalue()}")
-
     def test_no_close(self):
         """
         Tests a filtered export without a closing comment
@@ -115,9 +91,10 @@ class TestExport(TestCase):
             "--pagebreaks", "-s",
             TEST_FILES_PATH + test_file + ".ipynb"
         ]
-        args = parser.parse_args(grade_command)
-        args.func = export
-        args.func(args)
+        # args = parser.parse_args(grade_command)
+        # args.func = export
+        # args.func(args)
+        run_otter(grade_command)
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))

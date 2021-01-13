@@ -12,13 +12,12 @@ from subprocess import PIPE
 from glob import glob
 from unittest.mock import patch
 
-from otter.argparser import get_parser
+# from otter.argparser import get_parser
 from otter.assign import main as assign
 from otter.generate.token import APIClient
+from otter.runner import run_otter
 
 from . import TestCase
-
-parser = get_parser()
 
 TEST_FILES_PATH = "test/test-assign/"
 
@@ -42,11 +41,12 @@ class TestAssign(TestCase):
         """
         # run otter assign
         run_assign_args = [
-            "assign", "--no-run-tests", TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", "data.csv"
+            "assign", "--no-run-tests", TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output",
         ]
-        args = parser.parse_args(run_assign_args)
-        args.func = assign
-        args.func(args)
+        # args = parser.parse_args(run_assign_args)
+        # args.func = assign
+        # args.func(args)
+        run_otter(run_assign_args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
 
@@ -55,12 +55,13 @@ class TestAssign(TestCase):
         Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
         """
         run_assign_args = [
-            "assign", "--no-init-cell", "--no-check-all", TEST_FILES_PATH + "generate-otter.ipynb", 
-            TEST_FILES_PATH + "output", "data.csv"
+            "assign",  TEST_FILES_PATH + "generate-otter.ipynb", 
+            TEST_FILES_PATH + "output",
         ]
-        args = parser.parse_args(run_assign_args)
-        args.func = assign
-        args.func(args)
+        # args = parser.parse_args(run_assign_args)
+        # args.func = assign
+        # args.func(args)
+        run_otter(run_assign_args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "otter-correct")     
 
@@ -69,11 +70,12 @@ class TestAssign(TestCase):
         Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
         """
         run_assign_args = [
-            "assign", "--no-run-tests", TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output", "data.csv"
+            "assign", "--no-run-tests", TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output",
         ]
-        args = parser.parse_args(run_assign_args)
-        args.func = assign
-        args.func(args)
+        # args = parser.parse_args(run_assign_args)
+        # args.func = assign
+        # args.func(args)
+        run_otter(run_assign_args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
         
@@ -93,12 +95,13 @@ class TestAssign(TestCase):
         mocked_client.return_value = 'token'
         
         run_gradescope_args = [
-            "assign", "--no-run-tests", "--no-check-all", TEST_FILES_PATH + "generate-gradescope.ipynb", 
-            TEST_FILES_PATH + "output", "data.csv"
+            "assign", "--no-run-tests", TEST_FILES_PATH + "generate-gradescope.ipynb", 
+            TEST_FILES_PATH + "output",
         ]
-        args = parser.parse_args(run_gradescope_args)
-        args.func = assign
-        args.func(args)
+        # args = parser.parse_args(run_gradescope_args)
+        # args.func = assign
+        # args.func(args)
+        run_otter(run_gradescope_args)
         
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
 
@@ -113,11 +116,12 @@ class TestAssign(TestCase):
         """
         run_assign_args = [
             "assign", TEST_FILES_PATH + "r-example.ipynb", 
-            TEST_FILES_PATH + "output", "data.csv"
+            TEST_FILES_PATH + "output",
         ]
-        args = parser.parse_args(run_assign_args)
-        args.func = assign
-        args.func(args)
+        # args = parser.parse_args(run_assign_args)
+        # args.func = assign
+        # args.func(args)
+        run_otter(run_assign_args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", ignore_ext=[".pdf",".zip"])
         
@@ -132,11 +136,12 @@ class TestAssign(TestCase):
         """
         run_assign_args = [
             "assign", TEST_FILES_PATH + "rmd-example.Rmd", 
-            TEST_FILES_PATH + "output", "data.csv"
+            TEST_FILES_PATH + "output",
         ]
-        args = parser.parse_args(run_assign_args)
-        args.func = assign
-        args.func(args)
+        # args = parser.parse_args(run_assign_args)
+        # args.func = assign
+        # args.func(args)
+        run_otter(run_assign_args)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", ignore_ext=[".zip"])
         
@@ -146,7 +151,9 @@ class TestAssign(TestCase):
         )
 
     def tearDown(self):
+        """
+        Removes assign output
+        """
         # cleanup
         if os.path.exists(TEST_FILES_PATH + "output"):
             shutil.rmtree(TEST_FILES_PATH + "output")
-        

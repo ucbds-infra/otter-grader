@@ -27,7 +27,7 @@ Note that the `otter.logs.Log` class does not support editing the log file, only
 
 ## Logging Environments
 
-Whenever a student runs a check cell, Otter can store their current global environment as a part of the log. The purpose of this is twofold: 1) to allow the grading of assignments to occur based on variables whose creation requires access to resources not possessed by the grading environment, and 2) to allow instructors to debug students' assignments by inspecting their global environment at the time of the check. **This behavior must be preconfigured with an [Otter configuration file](dot_otter_files.md) that has its `save_environment` key set to `true`.**
+Whenever a student runs a check cell, Otter can store their current global environment as a part of the log. The purpose of this is twofold: 1) to allow the grading of assignments to occur based on variables whose creation requires access to resources not possessed by the grading environment, and 2) to allow instructors to debug students' assignments by inspecting their global environment at the time of the check. **This behavior must be preconfigured with an [Otter configuration file](otter_check/dot_otter_files.md) that has its `save_environment` key set to `true`.**
 
 Shelving is accomplished by using the dill library to pickle (almost) everything in the global environment, with the notable exception of modules (so libraries will need to be reimported in the instructor's environment). The environment (a dictionary) is pickled and the resulting file is then stored as a byte string in one of the fields of the log entry.
 
@@ -58,7 +58,7 @@ entry = LogEntry()
 entry.shelve(globals(), variables=variables)
 ```
 
-If you are grading from the log and are utilizing `variables`, you **must** include this dictionary as a JSON string in your configuration, otherwise the autograder will deserialize anything that the student submits. This configuration is set in two places: in the [Otter configuration file](dot_otter_files.md) that you distribute with your notebook and in the autograder. Both of these are handled for you if you use [Otter Assign](otter_assign/index.md) to generate your distribution files.
+If you are grading from the log and are utilizing `variables`, you **must** include this dictionary as a JSON string in your configuration, otherwise the autograder will deserialize anything that the student submits. This configuration is set in two places: in the [Otter configuration file](otter_check/dot_otter_files.md) that you distribute with your notebook and in the autograder. Both of these are handled for you if you use [Otter Assign](otter_assign/index.md) to generate your distribution files.
 
 To retrieve a shelved environment from an entry, use the `LogEntry.unshelve` method. During the process of unshelving, all functions have their `__globals__` updated to include everything in the unshelved environment and, optionally, anything in the environment passed to `global_env`.
 
@@ -95,7 +95,7 @@ entry.get_results()
 
 As noted earlier, the environments stored in logs can be used to grade students' assignments. If the grading environment does not have the dependencies necessary to run all code, the environment saved in the log entries will be used to run tests against. For example, if the execution hub has access to a large SQL server that cannot be accessed by a Gradescope grading container, these questions can still be graded using the log of checks run by the students and the environments pickled therein.
 
-To configure these pregraded questions, include an [Otter configuration file](dot_otter_files.md) in the assignment directory that defines the notebook name and that the saving of environments should be turned on:
+To configure these pregraded questions, include an [Otter configuration file](otter_check/dot_otter_files.md) in the assignment directory that defines the notebook name and that the saving of environments should be turned on:
 
 ```json
 {

@@ -8,11 +8,9 @@ scipy
 seaborn
 sklearn
 jinja2
-nbconvert<6.0.0
+nbconvert
 nbformat
 dill
-rpy2
 jupytext
-numpy==1.16.0
-tornado==5.1.1
-otter-grader==1.1.6
+numpy
+otter-grader==2.0.0.b6

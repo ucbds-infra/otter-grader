@@ -16,6 +16,9 @@ class APIClient:
 
     Args:
         token (``str``, optional): a pre-retrieved token for the client
+
+    Attributes:
+        token (``str``): the user's Gradescope token
     """
     def __init__(self, token=None):
         self.session = requests.Session()
@@ -24,6 +27,12 @@ class APIClient:
 
     @classmethod
     def get_token(cls):
+        """
+        Prompts a user for their Gradescope username and password and retrieves a token for that user
+
+        Returns:
+            ``str``: the user's token
+        """
         client = cls()
         email = input("Please provide the email address on your Gradescope account: ")
         password = getpass.getpass('Password: ')
@@ -86,19 +95,3 @@ class APIClient:
         request_headers = {'access-token': self.token}
         r = self.post(url, data=form_data, headers=request_headers, files=files)
         return r
-
-def main(args):
-    """
-    Runs ``otter generate token``
-    """
-    client = APIClient()
-    email = input("Please provide the email address on your Gradescope account: ")
-    password = getpass.getpass('Password: ')
-    client.log_in(email, password)
-    print("Your token is:\n", client.token)
-    # Use the APIClient to upload submissions after logging in, e.g:
-    # client.upload_pdf_submission(1234, 5678, 'student@example.edu', 'submission.pdf')
-    # client.upload_programming_submission(1234, 5678, 'student@example.edu', ['README.md', 'src/calculator.py'])
-    # You can get course and assignment IDs from the URL, e.g.
-    # https://www.gradescope.com/courses/1234/assignments/5678
-    # course_id = 1234, assignment_id = 5678

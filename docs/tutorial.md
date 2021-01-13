@@ -77,17 +77,17 @@ For more information about the configurations for Otter Assign and its output fo
 
 ### Otter Generate
 
-Start by `cd`ing into `tutorial/generate`. We have provided premade tests and a requirements file. Running Otter Generate is very simple if there are few needed configurations: just run `otter generate autograder` and it will automatically find the tests in `./tests` and the requirements in `./requirements.txt`.
+Start by `cd`ing into `tutorial/generate`. We have provided premade tests and a requirements file. Running Otter Generate is very simple if there are few needed configurations: just run `otter generate` and it will automatically find the tests in `./tests` and the requirements in `./requirements.txt`.
 
 ```console
-otter generate autograder
+otter generate
 ```
 
-Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](otter_generate/index.md).
+Otter Generate has quite a few options and configurations. For more information, see [Grading on Gradescope](workflow/otter_generate/index.md).
 
 ### Otter Grade
 
-Start by `cd`ing into `tutorial/grade`. The first thing to note is that we have provided a [metadata file](otter_grade.html#metadata) that maps student identifiers to filenames in `meta.json`. Note that metadata files are optional when using Otter, but we have provided one here to demonstrate their use. This metadata file lists _only_ the files in the `ipynbs` subdirectory, so we won't use it when grading `zips`.
+Start by `cd`ing into `tutorial/grade`. The first thing to note is that we have provided a [metadata file](workflow/executing_submissions/otter_grade.html#metadata) that maps student identifiers to filenames in `meta.json`. Note that metadata files are optional when using Otter, but we have provided one here to demonstrate their use. This metadata file lists _only_ the files in the `ipynbs` subdirectory, so we won't use it when grading `zips`.
 
 ```json
 [
@@ -120,12 +120,12 @@ Start by `cd`ing into `tutorial/grade`. The first thing to note is that we have 
 
 The filename and identifier of each notebook indicate which tests should be failing; for example, `demo-fails2.ipynb` fails all cases for `q2` and `demo-fails2Hidden.ipynb` fails the hidden test cases for `q2`.
 
-Let's now construct a call to Otter that will grade these notebooks. We know that we have JSON-formatted metadata, so we'll be use the `-j` metadata flag. Our notebooks are in the `ipynbs` subdirectory, so we'll need to use the `-p` flag. The notebooks also contain a couple of written questions, and the [filtering](pdfs.md) is implemented using HTML comments, so we'll specify the `--html-filter` flag.
+Let's now construct a call to Otter that will grade these notebooks. We know that we have JSON-formatted metadata, so we'll be use the `-j` metadata flag. Our notebooks are in the `ipynbs` subdirectory, so we'll need to use the `-p` flag. The notebooks also contain a couple of written questions, and the [filtering](pdfs.md) is implemented using HTML comments, so we'll specify the `--pdfs html` flag.
 
 Let's run Otter on the notebooks:
 
 ```console
-otter grade -p ipynbs -j meta.json --html-filter -v
+otter grade -p ipynbs -j meta.json --pdfs html -v
 ```
 
 (I've added the `-v` flag so that we get verbose output.) After this finishes running, there should be a new file and a new folder in the working directory: `final_grades.csv` and `submission_pdfs`. The former should contain the grades for each file, and should look something like this:
@@ -218,7 +218,7 @@ Now that you've set up the directory, let's get down to grading. Go to the termi
 
 Now we need to tell Otter how we've structured our metadata. If you're using a Gradescope or Canvas export, just pass the `-g` or `-c` flag, respectively, with no arguments. If you're using a custom metadata file, as in our example, pass the `-j` or `-y` flag with the path to the metadata file as its argument; in our case, we will pass `-y submissions/meta.yml`.
 
-At this point, we need to make a decision: do we want PDFs? If there are questions that need to be manually graded, it might be nice to generate a PDF of each submission so that it can be easily read; if you want to generate PDFs, pass one of the `--pdf`, `--tag-filter`, or `--html-filter` flags (cf. [PDFs](pdfs.md)). For our example, let's say that we *do* want PDFs.
+At this point, we need to make a decision: do we want PDFs? If there are questions that need to be manually graded, it might be nice to generate a PDF of each submission so that it can be easily read; if you want to generate PDFs, pass one of the `--pdfs unfiltered`, `--pdfs tags`, or `--pdfs html` flags (cf. [PDFs](pdfs.md)). For our example, let's say that we *do* want PDFs.
 
 Now that we've made all of these decisions, let's put our command together. Our command is:
 
@@ -249,7 +249,7 @@ Otter created the `final_grades.csv` file with the grades for each student, brok
 
 **Congrats, you're done!** You can use the grades in the CSV file and the PDFs to complete grading however you want.
 
-You can find more information about `otter grade` [here](otter_grade.md).
+You can find more information about `otter grade` [here](workflow/executing_submissions/otter_grade.md).
 
 ### Gradescope
 
@@ -290,4 +290,4 @@ After this command finishes running, you should have a file called `autograder.z
 
 To use this zipfile, create a Programming Assignment on Gradescope and upload this zipfile on the Configure Autograder page of the assignment. Gradescope will then build a Docker image on which it will grade each student's submission.
 
-You can find more information about Gradescope usage [here](otter_generate/index.md).
+You can find more information about Gradescope usage [here](workflow/otter_generate/index.md).

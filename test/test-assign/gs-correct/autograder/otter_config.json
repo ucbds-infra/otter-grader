@@ -1,0 +1,8 @@
+{
+  "seed": 42,
+  "show_stdout": true,
+  "show_hidden": true,
+  "token": "token",
+  "course_id": "123",
+  "assignment_id": "567"
+}

@@ -10,7 +10,7 @@ FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "Dockerfile",
     "otter/generate/templates/requirements.txt",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
-    "test/test_generate/test-run-autograder/autograder-correct/source/requirements.txt",
+    "test/test-run/autograder/source/requirements.txt",
     "test/test-assign/gs-autograder-correct/requirements.txt",
     "test/test-assign/rmd-autograder-correct/requirements.txt",
 ]
@@ -110,11 +110,12 @@ if __name__ == "__main__":
     with open("otter/version.py") as f:
         contents = f.read()
 
-    contents = re.sub(
-        r"__version__\s*=\s*['\"]\d+\.\d+\.\d+(?:\.\w+)?['\"]",
-        f"__version__ = \"{new_version_number}\"",
-        contents
-    )
+    if args.new_version is not None:
+        contents = re.sub(
+            r"__version__\s*=\s*['\"]\d+\.\d+\.\d+(?:\.\w+)?['\"]",
+            f"__version__ = \"{new_version_number}\"",
+            contents
+        )
 
     with open("otter/version.py", "w") as f:
         f.write(contents)

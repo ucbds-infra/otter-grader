@@ -24,13 +24,13 @@ def get_exporter(exporter_type=None):
 
     Args:
         exporter_type (``str``, optional): a string identifying the type of exporter to use; can be one
-            of {"html", "latex"}
+            of ``["html", "latex"]``
 
     Returns:
         ``otter.export.exporters.base_exporter.BaseExporter``: the exporter class
 
     Raises:
-        ``Exception``: if PDF via HTML is indicated but wkhtmltopdf is not installed.
+        ``WkhtmltopdfNotFoundError``: if PDF via HTML is indicated but wkhtmltopdf is not installed.
     """
     if exporter_type is not None:
         exporter_type = exporter_type.lower()

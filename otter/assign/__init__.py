@@ -11,50 +11,60 @@ from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
 from ..export import export_notebook
 from ..export.exporters import WkhtmltopdfNotFoundError
+from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
-def main(args):
+def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwargs):
     """
-    Runs Otter Assign
+    Runs Otter Assign on a master notebook
     
     Args:
-        ``argparse.Namespace``: parsed command line arguments
+        master (``str``): path to master notebook
+        result (``str``): path to result directory
+        no_pdfs (``bool``): whether to ignore any configurations indicating PDF generation for this run
+        no_run_tests (``bool``): prevents Otter tests from being automatically run on the solutions 
+            notebook
+        username (``str``): a username for Gradescope for generating a token
+        password (``str``): a password for Gradescope for generating a token
+        debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
+        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
     """
-    master, result = pathlib.Path(args.master), pathlib.Path(args.result)
+    master, result = pathlib.Path(os.path.abspath(master)), pathlib.Path(os.path.abspath(result))
     print("Generating views...")
 
     assignment = Assignment()
 
-    # check language
-    if args.lang is not None:
-        args.lang = args.lang.lower()
-        assert args.lang in ["r", "python"], f"Language {args.lang} is not valid"
-        assignment.lang = args.lang
+    # # check language
+    # if lang is not None:
+    #     lang = lang.lower()
+    #     assert lang in ["r", "python"], f"Language {lang} is not valid"
+    #     assignment.lang = lang
     
     # TODO: update this condition
     if True:
         result = get_relpath(master.parent, result)
         orig_dir = os.getcwd()
         os.chdir(master.parent)
-        master = pathlib.Path(master.name)
+        # master = pathlib.Path(master.name)
     
     assignment.master, assignment.result = master, result
+    # assignment.files = files
 
     if assignment.is_rmd:
         from .rmarkdown_adapter.output import write_output_directories
     else:
         from .output import write_output_directories
 
-    # update requirements
-    requirements = args.requirements
-    if requirements is None and os.path.isfile("requirements.txt"):
-        requirements = "requirements.txt"
-    if requirements:
-        assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
-    assignment.requirements = requirements
+    # # update requirements
+    # requirements = requirements
+    # if requirements is None and os.path.isfile("requirements.txt"):
+    #     requirements = "requirements.txt"
+    # if requirements:
+    #     assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
+    # assignment.requirements = requirements
     
     try:
-        write_output_directories(master, result, assignment, args)
+        write_output_directories(master, result, assignment)
 
         # check that we have a seed if needed
         if assignment.seed_required:
@@ -63,9 +73,20 @@ def main(args):
                 generate_args = {'seed': None}
             assert not generate_args or generate_args.get('seed', None) is not None or \
                 not assignment.is_python, "Seeding cell found but no seed provided"
+
+        plugins = assignment.plugins
+        if plugins:
+            pc = PluginCollection(plugins, "", {})
+            pc.run("during_assign", assignment)
+            if assignment.generate is True:
+                assignment.generate = {"plugins": []}
+            if assignment.generate is not False:
+                if not assignment.generate.get("plugins"):
+                    assignment.generate["plugins"] = []
+                assignment.generate["plugins"].extend(plugins)
         
         # generate PDF of solutions
-        if assignment.solutions_pdf and not assignment.is_rmd and not args.no_pdfs:
+        if assignment.solutions_pdf and not assignment.is_rmd and not no_pdfs:
             print("Generating solutions PDF...")
             filtering = assignment.solutions_pdf == 'filtered'
 
@@ -86,7 +107,7 @@ def main(args):
                 )
 
         # generate a tempalte PDF for Gradescope
-        if not assignment.is_rmd and assignment.template_pdf and not args.no_pdfs:
+        if not assignment.is_rmd and assignment.template_pdf and not no_pdfs:
             print("Generating template PDF...")
             export_notebook(
                 str(result / 'autograder' / master.name),
@@ -110,17 +131,17 @@ def main(args):
         if assignment.generate:
             # TODO: move this to another function
             print("Generating autograder zipfile...")
-            run_generate_autograder(result, assignment, args)
+            run_generate_autograder(result, assignment, username, password)
 
         # run tests on autograder notebook
-        if assignment.run_tests and not args.no_run_tests and assignment.is_python:
+        if assignment.run_tests and not no_run_tests and assignment.is_python:
             print("Running tests...")
             # with block_print():
             if isinstance(assignment.generate, bool):
                 seed = None
             else:
                 seed = assignment.generate.get('seed', None)
-            run_tests(result / 'autograder' / master.name, debug=args.debug, seed=seed)
+            run_tests(result / 'autograder' / master.name, debug=debug, seed=seed)
             print("All tests passed!")
     
     # for tests

@@ -14,12 +14,13 @@ from io import StringIO
 from unittest import mock
 
 from otter import Notebook
-from otter.argparser import get_parser
+# from otter.argparser import get_parser
 from otter.check import main as check
+from otter.runner import run_otter
 
 from . import TestCase
 
-parser = get_parser()
+# parser = get_parser()
 
 TEST_FILES_PATH = "test/test-check/"
 
@@ -36,8 +37,8 @@ class TestCheck(TestCase):
                 "-q", os.path.split(file)[1][:-3],
                 "-t", os.path.split(file)[0]
             ]
-            args = parser.parse_args(check_command)
-            args.func = check
+            # args = parser.parse_args(check_command)
+            # args.func = check
 
             # capture stdout
             output = StringIO()
@@ -45,7 +46,8 @@ class TestCheck(TestCase):
 
                 # mock block_print otherwise they interfere with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    args.func(args)
+                    # args.func(args)
+                    run_otter(check_command)
                     if os.path.split(file)[1] != "q2.py":
                         self.assertEqual(
                             output.getvalue().strip().split("\n")[-1].strip(), 
@@ -54,12 +56,12 @@ class TestCheck(TestCase):
                         )
 
         # run checker command
-        check_command = check_command = ["check",
+        check_command = ["check",
             TEST_FILES_PATH + "file0.py", 
             "-t", TEST_FILES_PATH + "tests"
         ]
-        args = parser.parse_args(check_command)
-        args.func = check
+        # args = parser.parse_args(check_command)
+        # args.func = check
 
         # capture stdout
         output = StringIO()
@@ -67,33 +69,31 @@ class TestCheck(TestCase):
 
             # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                args.func(args)
+                # args.func(args)
+                run_otter(check_command)
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\
                         [0.         0.02002002 0.04004004 0.06006006 0.08008008]
-                        4 of 5 tests passed
+                        q1 passed!
+                        q2 results:
 
-                        Tests passed:
-                            q1 q3 q4 q5 
-
-
-                        Tests failed: 
-                           test/test-check/tests/q2.py
-
-                        Test result:
                         Trying:
                             1 == 1
                         Expecting:
                             False
                         **********************************************************************
-                        Line 2, in test/test-check/tests/q2.py 1
+                        Line 2, in q2 0
                         Failed example:
                             1 == 1
                         Expected:
                             False
                         Got:
-                            True"""), 
+                            True
+
+                        q3 passed!
+                        q4 passed!
+                        q5 passed!"""), 
                     "Did not pass correct tests"
                 )
 
@@ -109,8 +109,8 @@ class TestCheck(TestCase):
                 "-q", os.path.split(file)[1][:-3],
                 "-t", os.path.split(file)[0]
             ]
-            args = parser.parse_args(check_command)
-            args.func = check
+            # args = parser.parse_args(check_command)
+            # args.func = check
 
             # capture stdout
             output = StringIO()
@@ -118,7 +118,8 @@ class TestCheck(TestCase):
 
                 # mock block_print otherwise they interfere with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    args.func(args)
+                    # args.func(args)
+                    run_otter(check_command)
                     if os.path.split(file)[1] != "q2.py":
                         self.assertEqual(
                             output.getvalue().strip().split("\n")[-1].strip(), 
@@ -127,12 +128,12 @@ class TestCheck(TestCase):
                         )
 
         # run checker command
-        check_command = check_command = ["check",
-            TEST_FILES_PATH + "file0.py", 
+        check_command = ["check",
+            TEST_FILES_PATH + "test-nb.ipynb", 
             "-t", TEST_FILES_PATH + "tests"
         ]
-        args = parser.parse_args(check_command)
-        args.func = check
+        # args = parser.parse_args(check_command)
+        # args.func = check
 
         # capture stdout
         output = StringIO()
@@ -140,33 +141,31 @@ class TestCheck(TestCase):
 
             # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                args.func(args)
+                # args.func(args)
+                run_otter(check_command)
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\
                         [0.         0.02002002 0.04004004 0.06006006 0.08008008]
-                        4 of 5 tests passed
+                        q1 passed!
+                        q2 results:
 
-                        Tests passed:
-                            q1 q3 q4 q5 
-
-
-                        Tests failed: 
-                           test/test-check/tests/q2.py
-
-                        Test result:
                         Trying:
                             1 == 1
                         Expecting:
                             False
                         **********************************************************************
-                        Line 2, in test/test-check/tests/q2.py 1
+                        Line 2, in q2 0
                         Failed example:
                             1 == 1
                         Expected:
                             False
                         Got:
-                            True"""), 
+                            True
+
+                        q3 passed!
+                        q4 passed!
+                        q5 passed!"""), 
                     "Did not pass correct tests"
                 )
     

@@ -34,6 +34,10 @@ class TestCase(unittest.TestCase):
         if delete:
             os.remove(zf_path)
 
+    def create_docker_image(self):
+        create_image_cmd = ["make", "docker-test"]
+        subprocess.run(create_image_cmd, check=True)
+
     def assertFilesEqual(self, p1, p2):
         try:
             with open(p1) as f1:
@@ -63,4 +67,10 @@ class TestCase(unittest.TestCase):
             for f1, f2 in zip(dir1_contents, dir2_contents):
                 f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
                 self.assertDirsEqual(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs)
-    
+
+    def deletePaths(self, paths):
+        for p in paths:
+            if os.path.isdir(p):
+                shutil.rmtree(p)
+            elif os.path.isfile(p):
+                os.remove(p)
