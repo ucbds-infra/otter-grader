@@ -83,7 +83,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
     templates = {}
     for fn in os.listdir(template_dir):
         fp = os.path.join(template_dir, fn)
-        if os.path.isfile(fp):
+        if os.path.isfile(fp): # prevents issue w/ finding __pycache__ in template dirs
             with open(fp) as f:
                 templates[fn] = Template(f.read())
 
