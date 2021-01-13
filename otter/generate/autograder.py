@@ -83,8 +83,9 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
     templates = {}
     for fn in os.listdir(template_dir):
         fp = os.path.join(template_dir, fn)
-        with open(fp) as f:
-            templates[fn] = Template(f.read())
+        if os.path.isfile(fp):
+            with open(fp) as f:
+                templates[fn] = Template(f.read())
 
     template_context = {
         "autograder_dir": options['autograder_dir'],
