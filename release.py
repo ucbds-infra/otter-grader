@@ -8,7 +8,8 @@ import subprocess
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "Dockerfile",
-    "otter/generate/templates/requirements.txt",
+    "otter/generate/templates/python/requirements.txt",
+    "otter/generate/templates/r/requirements.txt",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
     "test/test-run/autograder/source/requirements.txt",
     "test/test-assign/gs-autograder-correct/requirements.txt",
