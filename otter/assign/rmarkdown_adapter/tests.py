@@ -11,7 +11,7 @@ def is_test_cell(cell):
     Returns whether the current cell is a test cell
     
     Args:
-        cell (``nbformat.NotebookNode``): a notebook cell
+        cell (``otter.assign.rmarkdown_adapter.utils.Cell``): an Rmd file cell
 
     Returns:
         ``bool``: whether the cell is a test cell
@@ -34,7 +34,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
-        ``nbformat.NotebookNode``: code cell calling ``otter.Notebook.check`` on this test
+        ``otter.assign.rmarkdown_adapter.utils.Cell``: code cell calling ``ottr::check`` on this test
     """
     source = f'```{{r}}\n. = ottr::check("tests/{question["name"]}.R")\n```'
     cell = Cell("code", source)

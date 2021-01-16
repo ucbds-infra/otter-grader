@@ -2,98 +2,113 @@
 Otter Grade command-line utility. Provides local grading of submissions in parallel Docker containers.
 """
 
+import re
 import os
 import pandas as pd
 
 from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
-from .containers import launch_parallel_containers
-from .utils import merge_csv
+from .containers import launch_grade
+from .utils import merge_csv, prune_images
 
-def main(args):
-    """Runs Otter Grade
+def main(path, output_dir, autograder, gradescope, canvas, json, yaml, containers, scripts, no_kill, 
+        debug, zips, image, pdfs, prune, force, verbose, **kwargs):
+    """
+    Runs Otter Grade
+
+    Grades a directory of submissions in parallel Docker containers. Results are outputted as a CSV file
+    called ``final_grades.csv``. If ``prune`` is ``True``, Otter's dangling grading images are pruned 
+    and the program exits.
 
     Args:
-        args (``argparse.Namespace``): parsed command line arguments
+        path (``str``): path to directory of submissions
+        output_dir (``str``): directory in which to write ``final_grades.csv``
+        autograder (``str``): path to Otter autograder configuration zip file
+        gradescope (``bool``): whether submissions are a Gradescope export
+        canvas (``bool``): whether submissions are a Canvas export
+        json (``str``): path to a JSON metadata file
+        yaml (``str``): path to a YAML metadata file
+        containers (``int``): number of containers to run in parallel
+        scripts (``bool``): whether Python scripts are being graded
+        no_kill (``bool``): whether to keep containers after grading is finished
+        debug (``bool``): whether to print the stdout of each container
+        zips (``bool``): whether the submissions are Otter-exported zip files
+        image (``bool``): base image from which to build grading image
+        pdfs (``bool``): whether to copy notebook PDFs out of the containers
+        prune (``bool``): whether to prune dangling grading images
+        force (``bool``): whether to force pruning (without confirmation)
+        verbose (``bool``): whether to log status messages to stdout
+        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+
+    Raises:
+        ``AssertionError``: if invalid arguments are provided
     """
+    # prune images
+    if prune:
+        if not force:
+            sure = input("Are you sure you want to prune Otter's grading images? This action cannot be undone [y/N] ")
+            sure = bool(re.match(sure, r"ye?s?", flags=re.IGNORECASE))
+        else:
+            sure = True
+        
+        if sure:
+            prune_images()
+        
+        return
+
     # Asserts that exactly one metadata flag is provided
     assert sum([meta != False for meta in [
-        args.gradescope, 
-        args.canvas, 
-        args.json, 
-        args.yaml
+        gradescope,
+        canvas,
+        json,
+        yaml
     ]]) <= 1, "You can specify at most one metadata flag (-g, -j, -y, -c)"
 
-    # # Asserts that either --pdf, --tag-filter, or --html-filter but not both provided
-    # assert sum([args.pdf, args.tag_filter, args.html_filter]) <= 1, "Cannot provide more than 1 PDF flag"
-
     # verbose flag
-    verbose = args.verbose
+    verbose = verbose
 
     # Hand off metadata to parser
-    if args.gradescope:
-        meta_parser = GradescopeParser(args.path)
+    if gradescope:
+        meta_parser = GradescopeParser(path)
         if verbose:
             print("Found Gradescope metadata...")
-    elif args.canvas:
-        meta_parser = CanvasParser(args.path)
+    elif canvas:
+        meta_parser = CanvasParser(path)
         if verbose:
             print("Found Canvas metadata...")
-    elif args.json:
-        meta_parser = JSONParser(os.path.join(args.json))
+    elif json:
+        meta_parser = JSONParser(os.path.join(json))
         if verbose:
             print("Found JSON metadata...")
-    elif args.yaml:
-        meta_parser = YAMLParser(os.path.join(args.yaml))
+    elif yaml:
+        meta_parser = YAMLParser(os.path.join(yaml))
         if verbose:
             print("Found YAML metadata...")
     else:
         meta_parser = None
 
-    # check that reqs file is valid
-    requirements = args.requirements
-    if requirements is None and os.path.isfile("requirements.txt"):
-        requirements = "requirements.txt"
-    
-    if requirements:
-            assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
-
-    # if not os.path.isfile(args.requirements):
-        
-    #     # if user-specified requirements not found, fail with AssertionError
-    #     assert args.requirements == "requirements.txt", f"requirements file {args.requirements} does not exist"
-
-    #     # else just set to None and reqs are ignored
-    #     args.requirements = None
-
     if verbose:
         print("Launching docker containers...")
 
-    # Docker
-    grades_dfs = launch_parallel_containers(args.tests_path, 
-        args.path, 
-        verbose=verbose, 
-        pdfs=args.pdfs,
-        # unfiltered_pdfs=args.pdf, 
-        # tag_filter=args.tag_filter,
-        # html_filter=args.html_filter,
-        # reqs=args.requirements,
-        reqs=requirements,
-        num_containers=args.containers,
-        image=args.image,
-        scripts=args.scripts,
-        no_kill=args.no_kill,
-        output_path=args.output_path,
-        debug=args.debug,
-        seed=args.seed,
-        zips=args.zips,
-        meta_parser=meta_parser
+    #Docker
+    grade_dfs = launch_grade(autograder,
+        notebooks_dir=path,
+        verbose=verbose,
+        num_containers=containers,
+        scripts=scripts,
+        no_kill=no_kill,
+        output_path=output_dir,
+        debug=debug,
+        zips=zips,
+        image=image,
+        meta_parser=meta_parser,
+        pdfs=pdfs
     )
 
     if verbose:
         print("Combining grades and saving...")
 
     # Merge Dataframes
-    output_df = merge_csv(grades_dfs)
+    output_df = merge_csv(grade_dfs)
 
     def map_files_to_ids(row):
         """Returns the identifier for the filename in the specified row"""
@@ -109,4 +124,4 @@ def main(args):
         output_df = output_df[cols[-1:] + cols[:-1]]
 
     # write to CSV file
-    output_df.to_csv(os.path.join(args.output_path, "final_grades.csv"), index=False)
+    output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)

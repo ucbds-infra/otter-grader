@@ -7,7 +7,7 @@ import warnings
 import pkg_resources
 import nbconvert
 
-from .base_exporter import BaseExporter
+from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
 
 class PDFViaLatexExporter(BaseExporter):
     """
@@ -25,7 +25,7 @@ class PDFViaLatexExporter(BaseExporter):
     default_options = BaseExporter.default_options.copy()
     default_options.update({
         "save_tex": False,
-        "template": "templates/via_latex.tpl",
+        "template": "via_latex",
     })
 
     @classmethod
@@ -37,12 +37,19 @@ class PDFViaLatexExporter(BaseExporter):
 
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
+        if NBCONVERT_6:
+            nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+            orig_template_name = nbconvert.TemplateExporter.template_name
+            nbconvert.TemplateExporter.template_name = options["template"]
+
         if options["save_tex"]:
             latex_exporter = nbconvert.LatexExporter()
-            latex_exporter.template_file = pkg_resources.resource_filename(__name__, options["template"])
+            if not NBCONVERT_6:
+                latex_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         pdf_exporter = nbconvert.PDFExporter()
-        pdf_exporter.template_file = pkg_resources.resource_filename(__name__, options["template"])
+        if not NBCONVERT_6:
+            pdf_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         try:
             pdf_output = pdf_exporter.from_notebook_node(nb)
@@ -53,6 +60,9 @@ class PDFViaLatexExporter(BaseExporter):
                 latex_output = latex_exporter.from_notebook_node(nb)
                 with open(os.path.splitext(dest)[0] + ".tex", "w+") as output_file:
                     output_file.write(latex_output[0])
+
+            if NBCONVERT_6:
+                nbconvert.TemplateExporter.template_name = orig_template_name
 
         except nbconvert.pdf.LatexFailed as error:
             print("There was an error generating your LaTeX")
@@ -67,3 +77,6 @@ class PDFViaLatexExporter(BaseExporter):
             print("=" * 60)
             print(output)
             print("=" * 60)
+
+            if NBCONVERT_6:
+                nbconvert.TemplateExporter.template_name = orig_template_name

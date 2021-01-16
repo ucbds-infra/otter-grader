@@ -47,6 +47,7 @@ class Assignment:
         "requirements": None,
         "overwrite_requirements": False,
         "files": [],
+        "autograder_files": [],
         "variables": {},
         "run_tests": True,
         "ignore_modules": [],
@@ -55,6 +56,8 @@ class Assignment:
         "export_cell": True,
         "seed": None,
         "lang": None,
+        "plugins": [],
+        "plugin_config": {},
     }
 
     def __init__(self):
@@ -81,19 +84,38 @@ class Assignment:
         Args:
             config (``dict``): new configurations
         """
+        for k in config.keys():
+            if k not in self.allowed_configs:
+                raise ValueError(f"Unexpected assignment config: '{k}'")
         self.config.update(config)
 
     @property
     def is_r(self):
+        """
+        Whether the language of the assignment is R
+        """
         return self.lang == "r"
     
     @property
     def is_python(self):
+        """
+        Whether the language of the assignment is Python
+        """
         return self.lang == "python"
 
     @property
     def is_rmd(self):
+        """
+        Whether the input file is an RMarkdown document
+        """
         return self.master.suffix.lower() == ".rmd"
+    
+    @property
+    def allowed_configs(self):
+        """
+        The list of allowed configuration keys
+        """
+        return type(self).defaults.keys()
 
 def read_assignment_metadata(cell):
     """

@@ -17,7 +17,7 @@ Test = namedtuple('Test', ['name', 'hidden', 'body'])
 
 def read_test(cell, question, assignment, rmd=False):
     """
-    Returns the contents of a test as an ``(input, output, hidden)`` named tuple
+    Returns the contents of a test as a ``(name, hidden, body)`` named tuple
     
     Args:
         cell (``nbformat.NotebookNode``): a test cell
@@ -27,7 +27,7 @@ def read_test(cell, question, assignment, rmd=False):
             lines of ``cell``'s source are trimmed, since they should be backtick delimeters
 
     Returns:
-        ``Test`` or ``OttrTest``: test named tuple
+        ``Test``: test named tuple
     """
     if rmd:
         source = get_source(cell)[1:-1]
@@ -59,7 +59,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
-        ``nbformat.NotebookNode``: code cell calling ``otter.Notebook.check`` on this test
+        ``nbformat.NotebookNode``: code cell calling ``ottr::check`` on this test
     """
     cell = nbformat.v4.new_code_cell()
     cell.source = ['. = ottr::check("tests/{}.R")'.format(question['name'])]
@@ -80,6 +80,17 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     return cell
 
 def gen_suite(name, tests, points):
+    """
+    Generates an R-formatted test file for ottr
+
+    Args:
+        name (``str``): the test name
+        tests (``list`` of ``Test``): the test case named tuples that define this test file
+        points (``float`` or ``int`` or ``list`` of ``float`` or ``int``): th points per question
+
+    Returns:
+        ``str``: the rendered R test file
+    """
     metadata = {'name': name, 'cases': []}
     cases = metadata['cases']
     for test, p in zip(tests, points):

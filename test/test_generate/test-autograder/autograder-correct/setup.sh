@@ -17,7 +17,7 @@ apt-get install -y /tmp/wkhtmltopdf.deb
 
 apt-get clean
 apt-get update
-apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libcurl4-openssl-dev
+apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libcurl4-openssl-dev libgit2-dev
 
 # install conda
 wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
@@ -28,24 +28,8 @@ echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
 export PATH=/root/miniconda3/bin:$PATH
 export TAR="/bin/tar"
 
-# # install R dependencies
-# conda install --yes r-base r-essentials 
-# conda install --yes r-devtools -c conda-forge
-
-# # install requirements
-# pip3 install -r /autograder/source/requirements.txt
-# pip install -r /autograder/source/requirements.txt
-# Rscript /autograder/source/requirements.r
-
 # install dependencies with conda
 conda env create -f /autograder/source/environment.yml
-conda run -n otter-gradescope-env Rscript /autograder/source/requirements.r
 
 # set conda shell
 conda init --all
-
-# install ottr; not sure why it needs to happen twice but whatever
-git clone --single-branch -b stable https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
-cd /autograder/source/ottr 
-conda run -n otter-gradescope-env Rscript -e "devtools::install\\(\\)"
-conda run -n otter-gradescope-env Rscript -e "devtools::install\\(\\)"

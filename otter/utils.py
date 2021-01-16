@@ -14,7 +14,7 @@ from IPython import get_ipython
 @contextmanager
 def block_print():
     """
-    Context manager that disables printing to stdout.
+    Context manager that disables printing to stdout
     """
     with open(os.devnull, "w") as f, redirect_stdout(f):
         yield
@@ -64,7 +64,8 @@ def hide_outputs():
         ipy.display_formatter.formatters = old_formatters
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
-    """Used to generate a dynamic variable name for grading functions
+    """
+    Used to generate a dynamic variable name for grading functions
 
     This function generates a random name using the given length and character set.
     
@@ -78,7 +79,8 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 def get_variable_type(obj):
-    """Returns the fully-qualified type string of an object ``obj``
+    """
+    Returns the fully-qualified type string of an object ``obj``
 
     Args:
         obj (object): the object in question

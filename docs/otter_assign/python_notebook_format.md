@@ -54,6 +54,8 @@ save_environment: false        # whether to save students' environments in the l
 variables: {}                  # a mapping of variable names -> types for serialization
 ignore_modules: []             # a list of module names whose functions to ignore during serialization
 files: []                      # a list of file paths to include in the distribution directories
+autograder_files: []           # a list of file paths to include only in the autograder zip file
+plugins: []                    # a list of properly-formatted plugin configurations, passed automatically to Otter Generate
 ```
 
 All paths specified in the configuration should be **relative to the directory containing the master notebook**. If, for example, I was running Otter Assign on the `lab00.ipynb` notebook in the structure below:
@@ -134,7 +136,9 @@ generate:
 
 Here is an example question in an Otter Assign-formatted notebook:
 
-![](images/assign_sample_question.png)
+<!-- ![](images/assign_sample_question.png) -->
+
+<iframe src="../_static/notebooks/assign-code-question.html"></iframe>
 
 For code questions, a question is a description *Markdown* cell, followed by a solution *code* cell and zero or more test *code* cells. The description cell must contain a code block (enclosed in triple backticks <code>\`\`\`</code>) that begins with `BEGIN QUESTION` on its own line, followed by YAML that defines metadata associated with the question.
 
@@ -153,6 +157,19 @@ name: q1
 manual: false
 ```
 ````
+
+### Question Points
+
+The `points` key of the question metadata defines how many points each autograded question is worth. Note that the value specified here will be divided evenly among each test case you define for the question. Test cases are defined by the test cells you create (one test cell is one test case). So if you have three test cells and the question is worth 1 point (the default), each test case is worth 1/3 point and students will earn partial credit on the question by according to the proportion of test cases they pass.
+
+Note that you can also define a point value for each individual test case by setting `points` to a dictionary with a single key, `each`:
+
+```yaml
+points:
+  each: 1
+```
+
+This tells Otter Assign that each test case is worth 1 point.
 
 ### Solution Removal
 
@@ -267,3 +284,22 @@ An example of a manually-graded written question (with no prompt):
 An example of a manuall-graded written question with a custom prompt:
 
 ![](images/assign_sample_written_manual_with_prompt.png)
+
+## Ignoring Cells
+
+For any cells that you don't want to be included in _either_ of the output notebooks that are present in the master notebook, include a line at the top of the cell with the `## Ignore ##` comment (case insensitive) just like with test cells. Note that this also works for Markdown cells with the same syntax.
+
+```python
+## Ignore ##
+print("This cell won't appear in the output.")
+```
+
+## Student-Facing Plugins
+
+Otter supports student-facing plugin events via the `otter.Notebook.run_plugin` method. To include a student-facing plugin call in the resulting versions of your master notebook, add a multiline plugin config string to a code cell of your choosing. The plugin config should be YAML-formatted as a mutliline comment-delimited string, similar to the solution and prompt blocks above. The comments `# BEGIN PLUGIN` and `# END PLUGIN` should be used on the lines with the triple-quotes to delimit the YAML's boundaries. There is one required configuration: the plugin name, which should be a fully-qualified importable string that evaluates to a plugin that inherits from `otter.plugins.AbstractOtterPlugin`. 
+
+There are two optional configurations: `args` and `kwargs`. `args` should be a list of additional arguments to pass to the plugin. These will be left unquoted as-is, so you can pass variables in the notebook to the plugin just by listing them. `kwargs` should be a dictionary that mappins keyword argument names to values; thse will also be added to the call in `key=value` format.
+
+Here is an example of plugin replacement in Otter Assign:
+
+<iframe src="../_static/notebooks/assign-plugin.html"></iframe>

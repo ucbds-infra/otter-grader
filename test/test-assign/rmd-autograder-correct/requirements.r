@@ -1,6 +1,7 @@
 
 install.packages(c(
+    "gert",
     "usethis",
     "testthat",
     "startup"
-), repos="http://cran.us.r-project.org")
+), dependencies=TRUE, repos="http://cran.us.r-project.org")

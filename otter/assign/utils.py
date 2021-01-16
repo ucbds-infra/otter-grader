@@ -9,12 +9,13 @@ import pprint
 import pathlib
 
 from glob import glob
+from contextlib import contextmanager
 
-from .constants import SEED_REGEX, BLOCK_QUOTE
+from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
 from ..argparser import get_parser
 from ..execute import grade_notebook
-from ..generate.autograder import main as generate_autograder
+from ..generate import main as generate_autograder
 from ..generate.token import APIClient
 from ..utils import get_relpath, get_source
 
@@ -60,21 +61,6 @@ def get_spec(source, begin):
 # Cell Type Checkers
 #---------------------------------------------------------------------------------------------------
 
-# def is_seed_cell(cell):
-#     """
-#     Returns whether ``cell`` is seed cell
-    
-#     Args:
-#         cell (``nbformat.NotebookNode``): notebook cell
-    
-#     Returns:
-#         ``bool``: whether the cell is a seed cell
-#     """
-#     if cell['cell_type'] != 'code':
-#         return False
-#     source = get_source(cell)
-#     return source and re.match(SEED_REGEX, source[0], flags=re.IGNORECASE)
-
 def is_markdown_cell(cell):
     """
     Returns whether ``cell`` is Markdown cell
@@ -86,6 +72,19 @@ def is_markdown_cell(cell):
         ``bool``: whether the cell is a Markdown cell
     """
     return cell.cell_type == 'markdown'
+
+def is_ignore_cell(cell):
+    """
+    Returns whether the current cell should be ignored
+    
+    Args:
+        cell (``nbformat.NotebookNode``): a notebook cell
+
+    Returns:
+        ``bool``: whether the cell is a ignored
+    """
+    source = get_source(cell)
+    return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
 
 
 #---------------------------------------------------------------------------------------------------
@@ -196,15 +195,17 @@ def write_otter_config_file(master, result, assignment):
     with open(result / 'student' / config_name, "w+") as f:
         json.dump(config, f, indent=4)
 
-def run_generate_autograder(result, assignment, args):
+# TODO: update for new assign format
+def run_generate_autograder(result, assignment, gs_username, gs_password):
     """
     Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
-    configurations in ``assignment.generate`` and ``args``.
+    configurations in ``assignment.generate``.
 
     Args:
         result (``pathlib.Path``): the path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
+        gs_username (``str``): Gradescope username for token generation
+        gs_password (``str``): Gradescope password for token generation
     """
     generate_args = assignment.generate
     if generate_args is True:
@@ -212,59 +213,77 @@ def run_generate_autograder(result, assignment, args):
 
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
-    generate_cmd = ["generate", "autograder"]
-
-    if generate_args.get('points', None) is not None:
-        generate_cmd += ["--points", str(generate_args.get('points', None))]
-    
-    if generate_args.get('threshold', None) is not None:
-        generate_cmd += ["--threshold", str(generate_args.get('threshold', None))]
-    
-    if generate_args.get('show_stdout', False):
-        generate_cmd += ["--show-stdout"]
-    
-    if generate_args.get('show_hidden', False):
-        generate_cmd += ["--show-hidden"]
-    
-    if generate_args.get('grade_from_log', False):
-        generate_cmd += ["--grade-from-log"]
-    
-    if generate_args.get('seed', None) is not None:
-        generate_cmd += ["--seed", str(generate_args.get('seed', None))]
-
-    if generate_args.get('public_multiplier', None) is not None:
-        generate_cmd += ["--public-multiplier", str(generate_args.get('public_multiplier', None))]
+    generate_cmd = ["generate"]
 
     if generate_args.get('pdfs', {}):
-        pdf_args = generate_args.get('pdfs', {})
+        pdf_args = generate_args.pop('pdfs', {})
         token = APIClient.get_token()
-        generate_cmd += ["--token", token]
-        generate_cmd += ["--course-id", str(pdf_args["course_id"])]
-        generate_cmd += ["--assignment-id", str(pdf_args["assignment_id"])]
+        generate_args['token'] = token
+        generate_args['course_id'] = str(pdf_args['course_id'])
+        generate_args['assignment_id'] = str(pdf_args['assignment_id'])
 
         if not pdf_args.get("filtering", True):
-            generate_cmd += ["--unfiltered-pdfs"]
+            generate_args['filtering'] = False
+
+        if not pdf_args.get('pagebreaks', True):
+            generate_args['pagebreaks'] = False
     
     if assignment.is_r:
         generate_cmd += ["-l", "r"]
+        generate_args['lang'] = 'r'
 
-    # requirements = assignment.requirements or args.requirements
-    # requirements = get_relpath(result / 'autograder', pathlib.Path(requirements))
     if assignment.requirements:
-        requirements = get_relpath(result / 'autograder', pathlib.Path(assignment.requirements))
+        requirements = 'requirements.txt'
         generate_cmd += ["-r", str(requirements)]
-        if assignment.overwrite_requirements or args.overwrite_requirements:
+        if assignment.overwrite_requirements:
             generate_cmd += ["--overwrite-requirements"]
     
-    if assignment.files or args.files:
-        generate_cmd += assignment.files or args.files
+    if gs_username is not None and gs_password is not None:
+        generate_cmd += ["--username", gs_username, "--password", gs_password]
+    
+    if assignment.files:
+        generate_cmd += assignment.files
+
+    if assignment.autograder_files:
+        ag_files = []
+        res = (result / "autograder").resolve()
+        for agf in assignment.autograder_files:
+            fp = pathlib.Path(agf).resolve()
+            rp = get_relpath(res, fp)
+            ag_files.append(str(rp))
+        generate_cmd += ag_files
 
     if assignment.variables:
-        generate_cmd += ["--serialized-variables", str(assignment.variables)]
+        generate_args['serialized_variables'] = str(assignment.variables)
+
+    if generate_args:
+        with open("otter_config.json", "w+") as f:
+            json.dump(generate_args, f, indent=2)
     
     # TODO: change this to import and direct call
     parser = get_parser()
     args = parser.parse_args(generate_cmd)
-    generate_autograder(args)
+    generate_autograder(**vars(args), assignment=assignment)
 
     os.chdir(curr_dir)
+
+@contextmanager
+def patch_copytree():
+    """
+    A context manager patch for ``shutil.copytree` on WSL. Shamelessly stolen from https://bugs.python.org/issue38633
+    (see for more information)
+    """
+    import errno, shutil
+    orig_copyxattr = shutil._copyxattr
+    
+    def patched_copyxattr(src, dst, *, follow_symlinks=True):
+        try:
+            orig_copyxattr(src, dst, follow_symlinks=follow_symlinks)
+        except OSError as ex:
+            if ex.errno != errno.EACCES: raise
+    
+    shutil._copyxattr = patched_copyxattr
+
+    yield
+
+    shutil._copyxattr = orig_copyxattr

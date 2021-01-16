@@ -32,7 +32,7 @@ class TestLogs(TestCase):
         self.maxDiff = None
 
     def test_Notebook_check(self):
-        grader = Notebook(self.test_directory)
+        grader = Notebook(test_dir=self.test_directory)
 
         def square(x):
             return x**2
@@ -54,7 +54,7 @@ class TestLogs(TestCase):
 
 
     def test_grade_check(self):
-        grader = Notebook(self.test_directory)
+        grader = Notebook(test_dir=self.test_directory)
 
         def square(x):
             return x**2
@@ -74,9 +74,8 @@ class TestLogs(TestCase):
             # checking repr since the results __eq__ method is not defined
             self.assertEqual(logged_grade, actual_grade, f"Logged results for {question} are not correct")
 
-
     def test_question_entry(self):
-        grader = Notebook(self.test_directory)
+        grader = Notebook(test_dir=self.test_directory)
 
         def square(x):
             return x**2
@@ -131,9 +130,6 @@ class TestLogs(TestCase):
         env_with_factorial = entry.unshelve(dict(factorial = factorial ))
         self.assertTrue("factorial" in env_with_factorial["func"].__globals__)
         self.assertTrue(factorial is env_with_factorial["func"].__globals__["factorial"])
-
-
-    
     
     def test_Log_getItem(self):
         entry1 = LogEntry(

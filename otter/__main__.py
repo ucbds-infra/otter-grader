@@ -2,7 +2,7 @@
 otter module
 """
 
-from .run import run_otter
+from .runner import run_otter
 
 if __name__ == "__main__":
     run_otter()

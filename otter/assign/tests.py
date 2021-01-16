@@ -35,7 +35,7 @@ def any_public_tests(test_cases):
     Returns whether any of the ``Test`` named tuples in ``test_cases`` are public tests.
 
     Args:
-        test_cases (``list`` of ``Test``): list of test cases
+        test_cases (``list`` of ``Test`` or ``OttrTest``): list of test cases
     
     Returns:
         ``bool``: whether any of the tests are public
@@ -86,6 +86,8 @@ def gen_test_cell(question, tests, tests_dict, assignment):
 
     suites = [gen_suite(tests)]
     points = question.get('points', 1)
+    if isinstance(points, dict):
+        points = points.get('each', 1) * len(suites[0]['cases'])
     
     test = {
         'name': question['name'],

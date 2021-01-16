@@ -13,16 +13,6 @@ from ..execute import grade_notebook, check
 from ..utils import block_print
 
 
-RESULT_TEMPLATE = Template("""{% if grade == 1.0 %}All tests passed!{% else %}{{ passed_tests|length }} of {{ tests|length }} tests passed
-{% if passed_tests %}
-Tests passed:
-    {% for passed_test in passed_tests %}{{ passed_test }} {% endfor %}
-{% endif %}
-{% if failed_tests %}
-Tests failed: 
-{% for failed_test in failed_tests %}{{ failed_test }}{% endfor %}{% endif %}{% endif %}
-""")
-
 def _log_event(event_type, results=[], question=None, success=True, error=None):
 	"""
 	Logs an event
@@ -43,49 +33,43 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 		error=error
 	).flush_to_file(_OTTER_LOG_FILENAME)
 
-def main(args):
+def main(file, tests_path, question, seed, **kwargs):
 	"""
 	Runs Otter Check
 
 	Args:
-		args (``argparse.Namespace``): parsed command line arguments
+		file (``str``): path to the file to check
+		tests_path (``str``): path to tests directory
+		question (``str``): test name to run; ``None`` if all tests should be run
+		seed (``int``): a seed to set before execution
+		**kwargs: ignored kwargs (a remnant of how the argument parser is built)
 	"""
 
 	try:
-		if args.question:
-			test_path = os.path.join(args.tests_path, args.question + ".py")
-			assert os.path.isfile(test_path), "Test {} does not exist".format(args.question)
+		if question:
+			test_path = os.path.join(tests_path, question + ".py")
+			assert os.path.isfile(test_path), "Test {} does not exist".format(question)
 			qs = [test_path]
 		else:
-			qs = glob(os.path.join(args.tests_path, "*.py"))
+			qs = glob(os.path.join(tests_path, "*.py"))
 
-		assert os.path.isfile(args.file), "{} is not a file".format(args.file)
-		assert args.file[-6:] == ".ipynb" or args.file[-3:] == ".py", "{} is not a Jupyter Notebook or Python file".format(args.file)
+		assert os.path.isfile(file), "{} is not a file".format(file)
+		assert file[-6:] == ".ipynb" or file[-3:] == ".py", "{} is not a Jupyter Notebook or Python file".format(file)
 
-		script = args.file[-3:] == ".py"
+		script = file[-3:] == ".py"
 
 		with block_print():
 			results = grade_notebook(
-				args.file,
+				file,
 				tests_glob=qs,
 				script=script,
-				seed=args.seed
+				seed=seed
 			)
 
-		passed_tests = [
-			results.get_result(test_name).name for test_name in results.tests if not results.get_result(test_name).incorrect
-			# test for test in results if test not in ["possible", "total"] and "hint" not in results[test]
-		]
-		failed_tests = [
-			repr(results.get_result(test_name).test) for test_name in results.tests if results.get_result(test_name).incorrect
-		]
-
-		output = RESULT_TEMPLATE.render(
-			grade=results.total / results.possible,
-			passed_tests=passed_tests,
-			failed_tests=failed_tests,
-			tests=results.tests
-		)
+		if results.total / results.possible == 1:
+			output = "All tests passed!"
+		else:
+			output = "\n".join(repr(test_file) for test_file in results.test_files)
 
 		print(output)
 

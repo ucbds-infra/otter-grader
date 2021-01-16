@@ -2,6 +2,7 @@ test = {
 	"name": "q6",
 	"points": 5,
 	"hidden": True,
+	"all_or_nothing": False,
 	"suites": [ 
 		{
 			"cases": [ 

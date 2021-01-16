@@ -20,7 +20,6 @@ from otter import Notebook
 from otter.check.logs import LogEntry, EventType, Log
 from otter.check.notebook import _OTTER_LOG_FILENAME
 from otter.check import notebook
-# from otter import TestsDisplay
 
 from . import TestCase
 
@@ -105,7 +104,7 @@ class TestNotebook(TestCase):
         f.close()
 
         # Instance of Notebook class
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
 
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
             q = os.path.split(q_path)[1][:-3]
@@ -153,7 +152,7 @@ class TestNotebook(TestCase):
         f.close()
 
         # Instance of Notebook class
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
 
 
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
@@ -196,7 +195,7 @@ class TestNotebook(TestCase):
 
         # Instance of Notebook class, should throw Exception
         with self.assertRaises(Exception):
-            Notebook(TEST_FILES_PATH + "tests")
+            Notebook(test_dir=TEST_FILES_PATH + "tests")
 
 
     # These tests check to see that auth correctly authorizes a student, based off
@@ -231,7 +230,7 @@ class TestNotebook(TestCase):
 
         # Instance of Notebook class
         with self.assertRaises(Exception):
-            Notebook(TEST_FILES_PATH + "tests")
+            Notebook(test_dir=TEST_FILES_PATH + "tests")
 
 
     @mock.patch('builtins.input')
@@ -265,7 +264,7 @@ class TestNotebook(TestCase):
         f.close()
 
         # Instance of Notebook class
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
 
         self.assertEqual(grader._api_key, "fakekey")
 
@@ -301,7 +300,7 @@ class TestNotebook(TestCase):
         f.close()
 
         # Instance of Notebook class
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
 
         self.assertEqual(grader._api_key, "fakekey")
 
@@ -343,7 +342,7 @@ class TestNotebook(TestCase):
         f.close()
 
         # Instance of Notebook class
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
 
         self.assertEqual(grader._api_key, "fakekey")
 
@@ -358,7 +357,7 @@ class TestNotebook(TestCase):
 
         # Instance of Notebook class
         with self.assertRaises(Exception):
-            grader = Notebook(TEST_FILES_PATH + "tests")
+            grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
             grader.submit()
 
     @mock.patch('otter.check.notebook.requests.post', side_effect=mocked_requests_get)
@@ -386,7 +385,7 @@ class TestNotebook(TestCase):
         f.write(json.dumps(config))
         f.close()
 
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         grader.submit()
 
         #check to see if the right file was used
@@ -394,6 +393,9 @@ class TestNotebook(TestCase):
         self.assertEqual(config['endpoint'] + '/submit', args[0])
 
     def test_submit_3(self):
+        variables = {
+            "arr": "numpy.ndarray"
+        }
         notebook._API_KEY = "fakekey for submit"
         config = {
             "notebook": TEST_FILES_PATH + "hw00.ipynb",
@@ -403,7 +405,7 @@ class TestNotebook(TestCase):
             "ignore_modules": [],
             "variables": variables,
             "endpoint": "http://some.url",
-                    }
+        }
         """
         otter_configs exists, _service_enabled = True, should go into auth if statement
         """
@@ -438,7 +440,7 @@ class TestNotebook(TestCase):
         f.write(json.dumps(config))
         f.close()
 
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         grader.submit()
 
         #check to see if the right file was used
@@ -473,7 +475,7 @@ class TestNotebook(TestCase):
         notebook._API_KEY = 'fakekey'
 
         # i1 = Notebook(TEST_FILES_PATH + "tests") #bypass setup
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
 
         def square(x):
             return x ** 2
@@ -498,7 +500,7 @@ class TestNotebook(TestCase):
         """
         Checks that the ``Notebook`` class works correctly, with no global env input
         """
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
 
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
             q = os.path.split(q_path)[1][:-3]
@@ -513,7 +515,7 @@ class TestNotebook(TestCase):
         Checks that the otter.Notebook class check method correctly raises Exceptions
         when things go wrong
         """
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         global_env = 0
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
             q = os.path.split(q_path)[1][:-3]
@@ -524,21 +526,22 @@ class TestNotebook(TestCase):
         """
         Checks that the representation of results as strings is correct
         """
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
 
         output = str(grader.check_all())
+        output2 = grader.check_all()
 
         # checks each question substring
         output_lst = [
-            'q1:\n\n    All tests passed!\n',
-            'q2:\n\n    \n    0 of 1 tests passed\n',
-            'q3:\n\n    All tests passed!\n',
-            'q4:\n\n    All tests passed!\n',
-            'q5:\n\n    All tests passed!\n'
+            'q1 passed!\n',
+            'q2 results:\n\nTrying:\n    1 == 1',
+            'q3 passed!\n',
+            'q4 passed!\n',
+            'q5 passed!\n'
         ]
 
         for result in output_lst:
-            self.assertTrue(output.count(result) == 1)
+            self.assertTrue(output.count(result) == 1, f"Expected output to contain '{result}':\n{output}")
 
     def test_to_pdf_with_nb_path(self):
         """
@@ -551,7 +554,7 @@ class TestNotebook(TestCase):
         nb['cells'] = [nbformat.v4.new_markdown_cell(text)]
         with open(TEST_FILES_PATH + 'test-nb.ipynb', "w") as f:
             nbformat.write(nb, f)
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         grader.to_pdf(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
 
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
@@ -585,7 +588,7 @@ class TestNotebook(TestCase):
         nb['cells'] = [nbformat.v4.new_markdown_cell(text)]
         with open(TEST_FILES_PATH + 'test-nb.ipynb', "w") as f:
             nbformat.write(nb, f)
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         grader.to_pdf(nb_path = None, filtering=False)
         self.assertTrue(os.path.exists(TEST_FILES_PATH + "test-nb.pdf"))
         # cleanup
@@ -609,7 +612,7 @@ class TestNotebook(TestCase):
             nbformat.write(nb1, f)
         with open('test-nb2.ipynb', "w") as f:
             nbformat.write(nb2, f)
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         self.assertRaises(AssertionError,
                           lambda: grader.to_pdf(nb_path=None, filtering=False))
         os.remove('test-nb1.ipynb')
@@ -629,7 +632,7 @@ class TestNotebook(TestCase):
         os.mkdir(correct_directory)
         with open(correct_directory + 'test-nb.ipynb', "w") as f:
             nbformat.write(nb, f)
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         grader.export(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
 
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
@@ -665,7 +668,7 @@ class TestNotebook(TestCase):
             nbformat.write(nb1, f)
         with open('test-nb2.ipynb', "w") as f:
             nbformat.write(nb2, f)
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         self.assertRaises(AssertionError,
                           lambda: grader.export(nb_path=None, filtering=False))
         os.remove('test-nb1.ipynb')
@@ -713,7 +716,7 @@ class TestNotebook(TestCase):
         nb['cells'] = [nbformat.v4.new_markdown_cell(text)]
         with open(TEST_FILES_PATH + 'test-nb.ipynb', "w") as f:
             nbformat.write(nb, f)
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         self.assertRaises(ValueError,
                           lambda: grader.export(
                               nb_path=None, filtering=False))
@@ -728,9 +731,8 @@ class TestNotebook(TestCase):
         AssertionError for the case when the directory contains
         multiple .otter files.
         """
-        grader = Notebook(TEST_FILES_PATH + "tests")
-        self.assertRaises(ValueError,
-                          lambda: grader.export(nb_path=None, filtering=False))
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        self.assertRaises(ValueError, lambda: grader.export(nb_path=None, filtering=False))
 
     @patch.object(LogEntry, "shelve")
     def test_nb_log(self, mock_log):
@@ -739,7 +741,7 @@ class TestNotebook(TestCase):
         """
 
         mock_log.return_value = LogEntry(EventType.CHECK)
-        grader = Notebook(TEST_FILES_PATH + "tests")
+        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
         output = grader.check_all()
 
         self.assertTrue(os.path.isfile(_OTTER_LOG_FILENAME))

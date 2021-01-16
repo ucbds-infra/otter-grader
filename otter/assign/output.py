@@ -10,10 +10,12 @@ import nbformat
 
 from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
+from .plugins import replace_plugins_with_calls
 from .solutions import strip_solutions_and_output
 from .tests import write_test
+from .utils import patch_copytree
 
-def write_autograder_dir(nb_path, output_nb_path, assignment, args):
+def write_autograder_dir(nb_path, output_nb_path, assignment):
     """
     Converts a master notebook to a solutions notebook and writes this notebook to the output directory,
     copying support files and writing tests as needed.
@@ -22,7 +24,6 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
         nb_path (``pathlib.Path``): path to master notebook
         output_nb_path (``pathlib.Path``): path to output file
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
     """
     with open(nb_path) as f:
         nb = nbformat.read(f, as_version=NB_VERSION)
@@ -39,10 +40,18 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
     tests_dir = output_dir / 'tests'
     os.makedirs(tests_dir, exist_ok=True)
 
-    if assignment.requirements:
-        shutil.copy(assignment.requirements, str(output_dir / 'requirements.txt'))
+    transformed_nb, test_files = transform_notebook(nb, assignment)
 
-    transformed_nb, test_files = transform_notebook(nb, assignment, args)
+    # replace plugins
+    transformed_nb = replace_plugins_with_calls(transformed_nb)
+
+    if assignment.requirements:
+        if isinstance(assignment.requirements, list):
+            with open(str(output_dir / 'requirements.txt'), "w+") as f:
+                f.write("\n".join(assignment.requirements))
+            assignment.requirements = str(output_dir / 'requirements.txt')
+        else:
+            shutil.copy(assignment.requirements, str(output_dir / 'requirements.txt'))
 
     # write notebook
     # with open(output_nb_path) as f:
@@ -55,7 +64,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
         write_test(tests_dir / (test_name + test_ext), test_file)
 
     # copy files
-    for file in assignment.files or args.files:
+    for file in assignment.files:
 
         # if a directory, copy the entire dir
         if os.path.isdir(file):
@@ -65,12 +74,12 @@ def write_autograder_dir(nb_path, output_nb_path, assignment, args):
             # check that file is in subdir
             assert os.path.abspath(nb_path.parent) in os.path.abspath(file), \
                 f"{file} is not in a subdirectory of the master notebook directory"
-            file_path = pathlib.Path(file)
+            file_path = pathlib.Path(file).resolve()
             rel_path = file_path.parent.relative_to(nb_path.parent)
             os.makedirs(output_dir / rel_path, exist_ok=True)
             shutil.copy(file, str(output_dir / rel_path))
 
-def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
+def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
     """
     Copies the autograder (solutions) directory and removes extraneous files, strips solutions from
     the notebook, and removes hidden tests from the tests directory.
@@ -80,7 +89,6 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
         autograder_dir (``pathlib.Path``): the path to the autograder directory
         student_dir (``pathlib.Path``): the path to the student directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
     """
     if assignment.is_r:
         from .r_adapter.tests import remove_hidden_tests_from_dir
@@ -88,7 +96,8 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
         from .tests import remove_hidden_tests_from_dir
 
     # copy autograder dir
-    shutil.copytree(autograder_dir, student_dir)
+    with patch_copytree():
+        shutil.copytree(autograder_dir, student_dir, copy_function=shutil.copy)
 
     # remove requirements from student dir if present
     requirements = str(student_dir / 'requirements.txt')
@@ -108,16 +117,15 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment, args):
     # remove hidden tests from student directory
     remove_hidden_tests_from_dir(student_dir / 'tests', assignment)
 
-def write_output_directories(master_nb_path, result_dir, assignment, args):
+def write_output_directories(master_nb_path, result_dir, assignment):
     """
     Converts a master notebook to an autograder and student directory based on configurations in 
-    ``assignment`` and ``args``.
+    ``assignment``.
 
     Args:
         master_nb_path (``nbformat.NotebookNode``): the master notebook path
         result_dir (``pathlib.Path``): path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        args (``argparse.Namespace``): parsed command line arguments
     """
     # create directories
     autograder_dir = result_dir / 'autograder'
@@ -128,7 +136,7 @@ def write_output_directories(master_nb_path, result_dir, assignment, args):
 
     # write autograder directory
     output_nb_path = autograder_dir / master_nb_path.name
-    write_autograder_dir(master_nb_path, output_nb_path, assignment, args)
+    write_autograder_dir(master_nb_path, output_nb_path, assignment)
 
     # write student dir
-    write_student_dir(master_nb_path.name, autograder_dir, student_dir, assignment, args)
+    write_student_dir(master_nb_path.name, autograder_dir, student_dir, assignment)

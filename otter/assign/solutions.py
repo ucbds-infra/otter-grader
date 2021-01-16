@@ -32,6 +32,7 @@ def has_seed(cell):
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
     """
+    Substitutes the first matching group  with ` ...`
     """
     prefix = match.group(1)
     return prefix + ' ...'
@@ -39,6 +40,7 @@ def solution_assignment_sub(match):
 solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
 def solution_line_sub(match):
     """
+    Substitutes the first matching group  with `...`
     """
     prefix = match.group(1)
     return prefix + '...'
@@ -67,15 +69,15 @@ def replace_solutions(lines):
     for line in lines:
 
         # ...
-        if any(line.endswith(s) for s in skip_suffixes):
+        if any(line.rstrip().endswith(s) for s in skip_suffixes):
             continue
 
         # ...
-        if solution and not line.endswith('# END SOLUTION'):
+        if solution and not line.rstrip().endswith('# END SOLUTION'):
             continue
 
         # ...
-        if line.endswith('# END SOLUTION'):
+        if line.rstrip().endswith('# END SOLUTION'):
             assert solution, f"END SOLUTION without BEGIN SOLUTION in {lines}"
             solution = False
             continue
@@ -101,11 +103,11 @@ def replace_solutions(lines):
     return stripped
 
 def strip_solutions_and_output(nb):
-    """Write a notebook with solutions stripped
+    """
+    Write a notebook with solutions stripped and outputs cleared
     
     Args:
-        original_nb_path (path-like): path to original notebook
-        stripped_nb_path (path-like): path to new stripped notebook
+        nb (``nbformat.NotebookNode``): the notebook to have solutions stripped
     """
     md_solutions = []
     for i, cell in enumerate(nb['cells']):

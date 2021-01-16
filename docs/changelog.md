@@ -1,5 +1,41 @@
 # Changelog
 
+**v2.0.1:**
+
+* Added the `each` key to `points` in question metadata for Otter Assign
+
+**v2.0.0:**
+
+* Changed granularity of results to be test case-by-test case rather than by file
+* Added ability to list requirements directly in assignment metadata w/out requirements.txt file
+* Unified assignment grading workflow and converted local grading to container-per-submission
+* Exposed grading internals for non-containerized grading via `otter run` and `otter.api`
+* Added plugins for altering grades and execution, incl. built-in plugins
+* Added ignorable cells to Otter Assign
+* Added `autograder_files` configuration for Otter Assign
+* Added passdown of assignment configurations to Otter Generate from Otter Assign
+* Fixed whitespace bug in Assign solution parsing
+* Resolved conflicts with `nbconvert>=6.0.0`, removed version pin
+* Added `otter.assign.utils.patch_copytree` as a patch for `shutil.copytee` on WSL
+* Refactored Otter Generate to use `zipfile` to generate zips
+* Refactored CLI to allow creation of programmatic API
+* Changed `otter generate autograder` to `otter generate`
+* Removed `otter generate token` as all interaction with `otter.generate.token.APIClient` can be handled elsewhere
+* Added intercell seeding for R Jupyter Notebooks
+* Added `ValueError` on unexpected config in `otter.assign.assignment.Assignment`
+* Added `--username`, `--password` flags to Otter Assign and Otter Generate
+* Added support for Python files
+* Removed `FutureWarning` for deprecated global `hidden` key of OK tests
+* Add missing file specifier in environment template
+
+**v1.1.6:**
+
+* Fixed `ZeroDivisionError` when an assignment has 0 points total
+
+**v1.1.5:**
+
+* Fixed error in parsing requirements when using Otter Grade
+
 **v1.1.4:**
 
 * Fixed `KeyError` when kernelspec unparsable from notebook in Otter Assign

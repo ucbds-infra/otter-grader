@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from otter.run import run_otter
+from otter.runner import run_otter
 
 if __name__ == "__main__":
     run_otter()
