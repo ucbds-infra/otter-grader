@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.0.1:**
+
+* Added the `each` key to `points` in question metadata for Otter Assign
+
 **v2.0.0:**
 
 * Changed granularity of results to be test case-by-test case rather than by file

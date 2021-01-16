@@ -86,6 +86,8 @@ def gen_test_cell(question, tests, tests_dict, assignment):
 
     suites = [gen_suite(tests)]
     points = question.get('points', 1)
+    if isinstance(points, dict):
+        points = points.get('each', 1) * len(suites[0]['cases'])
     
     test = {
         'name': question['name'],
