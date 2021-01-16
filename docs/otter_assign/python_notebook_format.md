@@ -158,6 +158,19 @@ manual: false
 ```
 ````
 
+### Question Points
+
+The `points` key of the question metadata defines how many points each autograded question is worth. Note that the value specified here will be divided evenly among each test case you define for the question. Test cases are defined by the test cells you create (one test cell is one test case). So if you have three test cells and the question is worth 1 point (the default), each test case is worth 1/3 point and students will earn partial credit on the question by according to the proportion of test cases they pass.
+
+Note that you can also define a point value for each individual test case by setting `points` to a dictionary with a single key, `each`:
+
+```yaml
+points:
+  each: 1
+```
+
+This tells Otter Assign that each test case is worth 1 point.
+
 ### Solution Removal
 
 Solution cells contain code formatted in such a way that the assign parser replaces lines or portions of lines with prespecified prompts. Otter uses the same solution replacement rules as jassign. From the [jAssign docs](https://github.com/okpy/jassign/blob/master/docs/notebook-format.md):
