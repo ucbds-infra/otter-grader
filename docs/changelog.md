@@ -3,6 +3,7 @@
 **v2.0.4:**
 
 * Added ignoreable lines in Otter Assign
+* Added error handling for log deserialization per [#190](https://github.com/ucbds-infra/otter-grader/issues/190)
 
 **v2.0.3:**
 
