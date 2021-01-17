@@ -4,6 +4,7 @@ Classes for working with test files
 
 import math
 import pprint
+import pickle
 
 from collections import namedtuple
 
@@ -43,6 +44,7 @@ class GradingResults:
         tests (``list`` of ``str``): list of test names according to the keys of ``results``
     """
     def __init__(self, test_files):
+        self._plugin_data = {}
         self.test_files = test_files
         self.results = {}
         self.output = None
@@ -139,6 +141,36 @@ class GradingResults:
         Indicates that all results should be hidden from students on Gradescope
         """
         self.all_hidden = True
+    
+    def set_plugin_data(self, plugin_name, data):
+        """
+        Stores plugin data for plugin ``plugin_name`` in the results. ``data`` must be picklable.
+
+        Args:
+            plugin_name (``str``): the importable name of a plugin
+            data (any): the data to store; must be serializable with ``pickle``
+        """
+        try:
+            pickle.dumps(data)
+        except:
+            raise ValueError(f"Data was not pickleable: {data}")
+        self._plugin_data[plugin_name] = data
+    
+    def get_plugin_data(self, plugin_name, default=None):
+        """
+        Retrieves data for plugin ``plugin_name`` in the results
+
+        This method uses ``dict.get`` to retrive the data, so a ``KeyError`` is never raised if
+        ``plugin_name`` is not found; rather, it returns ``None``.
+
+        Args:
+            plugin_name (``str``): the importable name of a plugin
+            default (any, optional): a default value to return if ``plugin_name`` is not found
+
+        Returns:
+            any: the data stored for ``plugin_name`` if found
+        """
+        return self._plugin_data.get(plugin_name, default)
 
     def verify_against_log(self, log, ignore_hidden=True):
         """

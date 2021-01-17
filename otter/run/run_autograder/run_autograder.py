@@ -157,9 +157,13 @@ def run_autograder(options):
         client = None
 
     if os.path.isfile(_OTTER_LOG_FILENAME):
-        log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-        if options["grade_from_log"]:
-            print("\n\n")     # for logging in otter.execute.execute_log
+        try:
+            log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+        except Exception as e:
+            if options["grade_from_log"]:
+                raise e
+            else:
+                print(f"Could not deserialize the log due to an error:\n{e}")
     else:
         assert not options["grade_from_log"], "missing log"
         log = None
