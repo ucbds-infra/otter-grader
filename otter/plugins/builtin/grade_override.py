@@ -2,6 +2,7 @@
 Plugin for using Google Sheets to override scores for test cases
 """
 
+import os
 import json
 import tempfile
 import gspread
@@ -86,7 +87,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         for _, row in df.iterrows():
             results.update_result(row["Test Case"], score=row["Points"])
 
-    def during_generate(self, otter_config):
+    def during_generate(self, otter_config, assignment):
         """
         Takes a path to Google Service Account credentials stored in this plugin's config as key
         ``credentials_json_path`` and extracts the data from that file into the plugin's config as key
@@ -94,12 +95,21 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
 
         Args:
             otter_config (``dict``): the parsed Otter configuration JSON file
+            assignment (``otter.assign.assignment.Assignment``): the assignment configurations if 
+                Otter Assign is used
         """
+        if assignment is not None:
+            curr_dir = os.getcwd()
+            os.chdir(assignment.master.parent)
+        
         cfg_idx = [self.IMPORTABLE_NAME in c.keys() for c in otter_config["plugins"] if isinstance(c, dict)].index(True)
         creds_path = otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["credentials_json_path"]
         with open(creds_path) as f:
             creds = json.load(f)
         otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["service_account_credentials"] = creds
+        
+        if assignment is not None:
+            os.chdir(curr_dir)
 
     def before_grading(self, options):
         """
