@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.0.4:**
+
+* Added ignoreable lines in Otter Assign
+
 **v2.0.3:**
 
 * Fixed positional arg count in ``otter.plugins.builtin.GoogleSheetsGradeOverride``
