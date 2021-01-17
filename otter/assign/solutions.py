@@ -102,6 +102,59 @@ def replace_solutions(lines):
     
     return stripped
 
+def remove_ignored_lines(lines):
+    """
+    Removes ignored lines in ``lines``
+    
+    Args:
+        lines (``list`` of ``str``): cell source as a list of strings
+
+    Returns:
+        ``list`` of ``str``: stripped version of lines without ignored lines
+    """
+    ignore_suffix = "# IGNORE"
+    stripped = []
+    in_block = False
+    for line in lines:
+
+        # ...
+        if line.rstrip().endswith(ignore_suffix):
+            continue
+
+        # ...
+        if in_block and not line.rstrip().endswith('# END IGNORE'):
+            continue
+
+        # ...
+        if line.rstrip().endswith('# END IGNORE'):
+            assert in_block, f"END IGNORE without BEGIN IGNORE in {lines}"
+            in_block = False
+            continue
+
+        # ...
+        if re.match(r"\s*#\s*BEGIN\s*IGNORE\s*", line, flags=re.IGNORECASE):
+            assert not in_block, f"Nested BEGIN IGNORE in {lines}"
+            in_block = True
+            continue
+
+        stripped.append(line)
+    
+    assert not in_block, f"BEGIN IGNORE without END IGNORE in {lines}"
+    
+    return stripped
+
+def strip_ignored_lines(nb):
+    """
+    Write a notebook with ignored lines stripped
+    
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to have ignored lines stripped
+    """
+    for i, cell in enumerate(nb['cells']):
+        cell['source'] = '\n'.join(remove_ignored_lines(get_source(cell)))
+
+    return nb
+
 def strip_solutions_and_output(nb):
     """
     Write a notebook with solutions stripped and outputs cleared

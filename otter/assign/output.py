@@ -11,7 +11,7 @@ import nbformat
 from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
 from .plugins import replace_plugins_with_calls
-from .solutions import strip_solutions_and_output
+from .solutions import strip_ignored_lines, strip_solutions_and_output
 from .tests import write_test
 from .utils import patch_copytree
 
@@ -52,6 +52,9 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
             assignment.requirements = str(output_dir / 'requirements.txt')
         else:
             shutil.copy(assignment.requirements, str(output_dir / 'requirements.txt'))
+    
+    # strip out ignored lines
+    transformed_nb = strip_ignored_lines(transformed_nb)
 
     # write notebook
     # with open(output_nb_path) as f:

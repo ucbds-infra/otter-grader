@@ -1,5 +1,11 @@
 # Changelog
 
+**v2.0.4:**
+
+* Added ignoreable lines in Otter Assign
+* Added error handling for log deserialization per [#190](https://github.com/ucbds-infra/otter-grader/issues/190)
+* Added plugin data storage per [#191](https://github.com/ucbds-infra/otter-grader/issues/191)
+
 **v2.0.3:**
 
 * Fixed positional arg count in ``otter.plugins.builtin.GoogleSheetsGradeOverride``
