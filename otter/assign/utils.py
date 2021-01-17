@@ -233,7 +233,10 @@ def run_generate_autograder(result, assignment, gs_username, gs_password):
         generate_args['lang'] = 'r'
 
     if assignment.requirements:
-        requirements = 'requirements.txt'
+        if assignment.is_r:
+            requirements = 'requirements.R'
+        else:
+            requirements = 'requirements.txt'
         generate_cmd += ["-r", str(requirements)]
         if assignment.overwrite_requirements:
             generate_cmd += ["--overwrite-requirements"]
