@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.0.2:**
+
+* Fixed [#185](https://github.com/ucbds-infra/otter-grader/issues/185)
+
 **v2.0.1:**
 
 * Added the `each` key to `points` in question metadata for Otter Assign
