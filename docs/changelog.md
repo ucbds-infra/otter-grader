@@ -1,5 +1,10 @@
 # Changelog
 
+**v2.0.3:**
+
+* Fixed positional arg count in ``otter.plugins.builtin.GoogleSheetsGradeOverride``
+* Fixed working directory in ``otter.plugins.builtin.GoogleSheetsGradeOverride`` during Otter Assign
+
 **v2.0.2:**
 
 * Fixed [#185](https://github.com/ucbds-infra/otter-grader/issues/185)

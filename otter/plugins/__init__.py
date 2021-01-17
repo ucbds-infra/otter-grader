@@ -117,7 +117,7 @@ class PluginCollection:
                     ret = getattr(plugin, event)(*args, **kwargs)
                     rets.append(ret)
                 else:
-                    ret.append(None)
+                    rets.append(None)
             except PluginEventNotSupportedException:
                 rets.append(None)
         return rets
