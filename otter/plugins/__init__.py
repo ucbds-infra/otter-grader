@@ -148,12 +148,16 @@ class PluginCollection:
             ``str``: the plugin report
         """
         reports = self.run("generate_report")
+        if not any(isinstance(r, str) for r in reports):
+            return ""
 
         header = "=" * 35 + " PLUGIN REPORT " + "=" * 35
         footer = "=" * len(header)
 
         report = header
         for r, plg in zip(reports, self._plugin_names):
+            if not isinstance(r, str):
+                continue
             title = f" {plg} Report "
             dashes = len(header) - len(title)
             if dashes > 4:
