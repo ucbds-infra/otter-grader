@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.0.5:**
+
+* Fixed `NoneType` issue in `PluginCollection.generate_report`
+
 **v2.0.4:**
 
 * Added ignoreable lines in Otter Assign
