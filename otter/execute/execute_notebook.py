@@ -3,7 +3,7 @@ Execution of an IPython notebook
 """
 
 import os
-import re
+# import re
 import ast
 import copy
 
