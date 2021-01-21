@@ -3,7 +3,7 @@ Execution of an IPython notebook
 """
 
 import os
-import re
+# import re
 import ast
 import copy
 
@@ -80,6 +80,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
     # add dummy Notebook class so that we can collect results w/out altering how the CheckCallWrapper
     # needs to function
     from ..check.notebook import Notebook
+    Notebook._tests_dir_override = test_dir if test_dir is not None else './tests'
     notebook_class_name = f"Notebook_{secret}"
     global_env[notebook_class_name] = Notebook
 
@@ -121,19 +122,19 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
                     # Filter out ipython magic commands
                     # Filter out interact widget
                     if not line.startswith('%'):
-                        if "interact(" not in line and not re.search(r"otter\.Notebook\(.*?\)", line):
+                        if "interact(" not in line: # and not re.search(r"otter\.Notebook\(.*?\)", line):
                             code_lines.append(line)
                             if source_is_str_bool:
                                 code_lines.append('\n')
-                        elif re.search(r"otter\.Notebook\(.*?\)", line):
-                            # TODO: move this check into CheckCallWrapper
-                            # if gradescope:
-                            #     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
-                            # el
-                            line = re.sub(r"otter\.Notebook\(.*?\)", f"otter.Notebook(\"{test_dir}\")", line)
-                            code_lines.append(line)
-                            if source_is_str_bool:
-                                code_lines.append('\n')
+                        # elif re.search(r"otter\.Notebook\(.*?\)", line):
+                        #     # TODO: move this check into CheckCallWrapper
+                        #     # if gradescope:
+                        #     #     line = re.sub(r"otter\.Notebook\(.*?\)", "otter.Notebook(\"/autograder/submission/tests\")", line)
+                        #     # el
+                        #     line = re.sub(r"otter\.Notebook\(.*?\)", f"otter.Notebook(\"{test_dir}\")", line)
+                        #     code_lines.append(line)
+                        #     if source_is_str_bool:
+                        #         code_lines.append('\n')
                 if seed is not None:
                     cell_source = "np.random.seed({})\nrandom.seed({})\n".format(seed, seed) + isp.transform_cell(''.join(code_lines))
                 else:

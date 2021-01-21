@@ -64,12 +64,18 @@ class Notebook:
         test_dir (``str``, optional): path to tests directory
     """
 
+    # overrides test_dir arg in __init__, used for changing tests dir during grading
+    _tests_dir_override = None
+
     def __init__(self, nb_path=None, test_dir="./tests"):
         try:
             global _API_KEY, _SHELVE
             # assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
 
-            self._path = test_dir
+            if type(self)._tests_dir_override is not None:
+                self._path = type(self)._tests_dir_override
+            else:
+                self._path = test_dir
             self._service_enabled = False
             self._notebook = nb_path
 
