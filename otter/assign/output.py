@@ -46,12 +46,13 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     transformed_nb = replace_plugins_with_calls(transformed_nb)
 
     if assignment.requirements:
+        output_fn = ("requirements.txt", "requirements.R")[assignment.is_r]
         if isinstance(assignment.requirements, list):
-            with open(str(output_dir / 'requirements.txt'), "w+") as f:
+            with open(str(output_dir / output_fn), "w+") as f:
                 f.write("\n".join(assignment.requirements))
-            assignment.requirements = str(output_dir / 'requirements.txt')
+            assignment.requirements = str(output_dir / output_fn)
         else:
-            shutil.copy(assignment.requirements, str(output_dir / 'requirements.txt'))
+            shutil.copy(assignment.requirements, str(output_dir / output_fn))
     
     # strip out ignored lines
     transformed_nb = strip_ignored_lines(transformed_nb)
@@ -103,7 +104,8 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
         shutil.copytree(autograder_dir, student_dir, copy_function=shutil.copy)
 
     # remove requirements from student dir if present
-    requirements = str(student_dir / 'requirements.txt')
+    output_fn = ("requirements.txt", "requirements.R")[assignment.is_r]
+    requirements = str(student_dir / output_fn)
     if os.path.isfile(requirements):
         os.remove(requirements)
 
