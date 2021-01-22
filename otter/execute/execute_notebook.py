@@ -181,5 +181,8 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
     except:
         if not ignore_errors:
             raise
+    
+    # reset tests dir
+    Notebook._tests_dir_override = None
 
     return global_env
