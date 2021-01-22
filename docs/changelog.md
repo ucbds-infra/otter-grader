@@ -1,5 +1,10 @@
 # Changelog
 
+**v2.0.6:**
+
+* Fixed requirements not found error for R notebooks in Otter Assign
+* Removed use of `re` in overriding `Notebook` test directory override in `otter.execute.execute_notebook` by adding `otter.Notebook._test_dir_override`
+
 **v2.0.5:**
 
 * Fixed `NoneType` issue in `PluginCollection.generate_report`
