@@ -8,5 +8,6 @@ dependencies:
     - r-base 
     - r-essentials 
     - r-devtools
+    - libgit2
     - pip:
         - -r file:requirements.txt
