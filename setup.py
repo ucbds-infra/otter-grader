@@ -29,7 +29,10 @@ setuptools.setup(
 		"pyyaml", "nbformat", "ipython", "nbconvert", "tqdm", "setuptools", "pandas", "tornado",
 		"docker", "jinja2", "dill", "pdfkit", "PyPDF2", "gspread"
 	],
-	scripts=["bin/otter"],
+	# scripts=["bin/otter"],
+	entry_points = {
+		"console_scripts": ["otter=otter.runner:run_otter"]
+	},
 	package_data={
 		"otter.service": ["templates/*.html"],
 		"otter.export.exporters": ["templates/*", "templates/*/*"],
