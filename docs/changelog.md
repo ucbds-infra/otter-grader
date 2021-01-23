@@ -1,5 +1,10 @@
 # Changelog
 
+**v2.0.7:**
+
+* Changed `scripts` to `entry_points` in setup.py for Windows compatibility and removed `bin/otter`
+* Added `otter.check.utils.save_notebook` for autosaving notebooks on export calls
+
 **v2.0.6:**
 
 * Fixed requirements not found error for R notebooks in Otter Assign
