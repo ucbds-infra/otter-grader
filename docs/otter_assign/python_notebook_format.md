@@ -169,7 +169,15 @@ points:
   each: 1
 ```
 
-This tells Otter Assign that each test case is worth 1 point.
+or by setting `points` to a list of point values. The length of this list must equal the number of test cases, public and hidden, that correspond to this test case.
+
+```yaml
+points:
+  - 0
+  - 1
+  - 0.5
+  # etc.
+```
 
 ### Solution Removal
 
