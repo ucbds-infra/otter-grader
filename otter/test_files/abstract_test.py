@@ -37,7 +37,7 @@ class TestFile(ABC):
         name (``str``): the name of test file
         path (``str``): the path to the test file
         test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        value (``int``, optional): the point value of this test, defaults to 1
+        value (``float`` or ``list[float]``, optional): the point value of each test case, defaults to 1
         all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
             cases
 
@@ -45,7 +45,7 @@ class TestFile(ABC):
         name (``str``): the name of test file
         path (``str``): the path to the test file
         test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        value (``int``): the point value of this test, defaults to 1
+        values (``list[float]``): the point value of each test case, defaults to ``1/len(test_cases)``
         all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
             cases
         passed_all (``bool``): whether all of the test cases were passed
@@ -106,7 +106,11 @@ class TestFile(ABC):
         # self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
         # self.hidden_tests = [t for t, h in zip(tests, hiddens) if h]
         self.test_cases = test_cases
-        self.value = value
+        if not isinstance(value, list):
+            value = [value / len(self.test_cases) for _ in range(len(self.test_cases))]
+        if len(values ) != len(self.test_cases):
+            raise ValueError(f"Length of 'values'{(len(values))} != length of 'test_caes' ({len(test_cases)})")
+        self.values = value
         # self.hidden = hidden
         self.passed_all = None
         # self.failed_test = None

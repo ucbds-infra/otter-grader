@@ -52,8 +52,9 @@ class GradingResults:
         
         total_score, points_possible = 0, 0
         for test_file in test_files:
-            pts_per_case = test_file.value / len(test_file.test_case_results)
-            for test_case_result in test_file.test_case_results:
+            # pts_per_case = test_file.value / len(test_file.test_case_results)
+            case_pts = test_file.vaules
+            for pts_per_case, test_case_result in zip(case_pts, test_file.test_case_results):
                 name = test_case_result.test_case.name
                 tr = GradingTestCaseResult(
                     name = test_case_result.test_case.name,
