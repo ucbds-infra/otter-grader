@@ -182,4 +182,6 @@ def remove_hidden_tests_from_dir(test_dir, assignment):
             for i, case in list(enumerate(suite['cases']))[::-1]:
                 if case['hidden']:
                     suite['cases'].pop(i)
+                    if isinstance(test['points'], list):
+                        test['points'].pop(i)
         write_test(f, test)
