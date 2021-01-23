@@ -108,7 +108,7 @@ class TestFile(ABC):
         self.test_cases = test_cases
         if not isinstance(value, list):
             value = [value / len(self.test_cases) for _ in range(len(self.test_cases))]
-        if len(values ) != len(self.test_cases):
+        if len(value) != len(self.test_cases):
             raise ValueError(f"Length of 'values'{(len(values))} != length of 'test_caes' ({len(test_cases)})")
         self.values = value
         # self.hidden = hidden
