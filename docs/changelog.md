@@ -4,6 +4,7 @@
 
 * Changed `scripts` to `entry_points` in setup.py for Windows compatibility and removed `bin/otter`
 * Added `otter.check.utils.save_notebook` for autosaving notebooks on export calls
+* Updated OK format to allow `points` key to be a list of length equal to the number of test cases
 
 **v2.0.6:**
 
