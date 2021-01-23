@@ -88,6 +88,12 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     points = question.get('points', 1)
     if isinstance(points, dict):
         points = points.get('each', 1) * len(suites[0]['cases'])
+    elif isinstance(points, list):
+        if len(points) != len(tests):
+            raise ValueError(
+                f"Error in question {question['name']}: length of 'points' is {len(points)} but there "
+                f"are {len(tests)} tests"
+            )
     
     test = {
         'name': question['name'],
@@ -176,4 +182,6 @@ def remove_hidden_tests_from_dir(test_dir, assignment):
             for i, case in list(enumerate(suite['cases']))[::-1]:
                 if case['hidden']:
                     suite['cases'].pop(i)
+                    if isinstance(test['points'], list):
+                        test['points'].pop(i)
         write_test(f, test)
