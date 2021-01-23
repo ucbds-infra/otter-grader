@@ -19,6 +19,7 @@ from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 
 from .logs import LogEntry, EventType, Log
+from .utils import save_notebook
 from ..execute import check
 from ..export import export_notebook
 from ..plugins import PluginCollection
@@ -291,6 +292,13 @@ class Notebook:
         try:
             nb_path = self._resolve_nb_path(nb_path)
 
+            saved = save_notebook(nb_path)
+            if not saved:
+                warnings.warn(
+                    "Could not force-save notebook; the results of this call will be based on the last "
+                    "saved version of this notebook."
+                )
+
             # convert(nb_path, filtering=filtering, filter_type=filter_type)
             export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 
@@ -332,6 +340,13 @@ class Notebook:
 
         try:
             nb_path = self._resolve_nb_path(nb_path)
+
+            saved = save_notebook(nb_path)
+            if not saved:
+                warnings.warn(
+                    "Could not force-save notebook; the results of this call will be based on the last "
+                    "saved version of this notebook."
+                )
 
             try:
                 with open(nb_path) as f:
