@@ -164,6 +164,7 @@ def run_autograder(options):
                 raise e
             else:
                 print(f"Could not deserialize the log due to an error:\n{e}")
+                log = None
     else:
         assert not options["grade_from_log"], "missing log"
         log = None

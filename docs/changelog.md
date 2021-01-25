@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.1.1:**
+
+* Fixed `UnboundLocalError` with log in `otter.run.run_autograder.run_autograder`
+
 **v2.1.0:**
 
 * Added `nb_conda_kernels` to template environment.yml
