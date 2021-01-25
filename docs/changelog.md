@@ -5,6 +5,7 @@
 * Added `nb_conda_kernels` to template environment.yml
 * Fixed duplicate token calls when using Otter Assign to call Otter Generate
 * Updated grading image to Miniconda 4.9.2
+* Changed Otter conda environment name to `otter-env`
 
 **v2.0.8:**
 

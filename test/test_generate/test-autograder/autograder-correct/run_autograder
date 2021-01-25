@@ -2,5 +2,5 @@
 
 export PATH="/root/miniconda3/bin:$PATH"
 source /root/miniconda3/etc/profile.d/conda.sh
-conda activate otter-gradescope-env
+conda activate otter-env
 python /autograder/source/run_otter.py
