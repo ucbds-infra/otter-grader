@@ -3,6 +3,7 @@
 **v2.0.9:**
 
 * Added `nb_conda_kernels` to template environment.yml
+* Fixed duplicate token calls when using Otter Assign to call Otter Generate
 
 **v2.0.8:**
 
