@@ -10,6 +10,7 @@ import re
 import zipfile
 import pickle
 import time
+import warnings
 import datetime as dt
 
 from getpass import getpass

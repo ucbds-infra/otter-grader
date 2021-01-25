@@ -6,6 +6,7 @@
 * Fixed duplicate token calls when using Otter Assign to call Otter Generate
 * Updated grading image to Miniconda 4.9.2 with Python 3.8
 * Changed Otter conda environment name to `otter-env`
+* Added `warnings` import to `otter.check.notebook`
 
 **v2.0.8:**
 
