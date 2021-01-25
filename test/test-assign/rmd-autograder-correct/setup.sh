@@ -25,7 +25,7 @@ apt-get update
 apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev
 
 # install conda
-wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
+wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.9.2-Linux-x86_64.sh"
 chmod +x /autograder/source/miniconda_install.sh
 /autograder/source/miniconda_install.sh -b
 echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
