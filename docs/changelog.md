@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.0.9:**
+
+* Added `nb_conda_kernels` to template environment.yml
+
 **v2.0.8:**
 
 * Passed plugin collection while running tests in Otter Assign
