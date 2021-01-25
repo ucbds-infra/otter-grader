@@ -84,6 +84,8 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
                 if not assignment.generate.get("plugins"):
                     assignment.generate["plugins"] = []
                 assignment.generate["plugins"].extend(plugins)
+        else:
+            pc = None
         
         # generate PDF of solutions
         if assignment.solutions_pdf and not assignment.is_rmd and not no_pdfs:
@@ -141,7 +143,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
                 seed = None
             else:
                 seed = assignment.generate.get('seed', None)
-            run_tests(result / 'autograder' / master.name, debug=debug, seed=seed)
+            run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=pc)
             print("All tests passed!")
     
     # for tests
