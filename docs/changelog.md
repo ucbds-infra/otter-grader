@@ -1,5 +1,10 @@
 # Changelog
 
+**v2.0.8:**
+
+* Passed plugin collection while running tests in Otter Assign
+* Fixed adding directories in `files` with Otter Generate
+
 **v2.0.7:**
 
 * Changed `scripts` to `entry_points` in setup.py for Windows compatibility and removed `bin/otter`

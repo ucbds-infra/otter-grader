@@ -16,6 +16,7 @@ from subprocess import PIPE
 from jinja2 import Template
 
 from .token import APIClient
+from .utils import zip_folder
 from ..plugins import PluginCollection
 from ..run.run_autograder.constants import DEFAULT_OPTIONS
 
@@ -154,4 +155,9 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
                 for file in files:
                     full_fp = os.path.abspath(file)
                     assert os.getcwd() in full_fp, f"{file} is not in a subdirectory of the working directory"
-                    zf.write(file, arcname=os.path.join("files", file))
+                    if os.path.isfile(full_fp):
+                        zf.write(file, arcname=os.path.join("files", file))
+                    elif os.path.isdir(full_fp):
+                        zip_folder(zf, full_fp, prefix="files")
+                    else:
+                        raise ValueError(f"Could not find file or directory '{full_fp}'")

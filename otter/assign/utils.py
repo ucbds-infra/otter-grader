@@ -141,7 +141,7 @@ def str_to_doctest(code_lines, lines):
     else:
         return str_to_doctest(code_lines, lines + [">>> " + line])
 
-def run_tests(nb_path, debug=False, seed=None):
+def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
     Runs tests in the autograder version of the notebook
     
@@ -149,13 +149,15 @@ def run_tests(nb_path, debug=False, seed=None):
         nb_path (``pathlib.Path``): path to iPython notebooks
         debug (``bool``, optional): ``True`` if errors should not be ignored
         seed (``int``, optional): random seed for notebook execution
+        plugin_collection(``otter.plugins.PluginCollection``, optional): plugins to run with tests
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
     # print(os.getcwd())
     results = grade_notebook(
         nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
-    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed
+    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
+        plugin_collection=plugin_collection
     )
     assert results.total == results.possible, "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
     os.chdir(curr_dir)
