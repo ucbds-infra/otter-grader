@@ -1,5 +1,17 @@
 # Changelog
 
+**v2.1.1:**
+
+* Fixed `UnboundLocalError` with log in `otter.run.run_autograder.run_autograder`
+
+**v2.1.0:**
+
+* Added `nb_conda_kernels` to template environment.yml
+* Fixed duplicate token calls when using Otter Assign to call Otter Generate
+* Updated grading image to Miniconda 4.9.2 with Python 3.8
+* Changed Otter conda environment name to `otter-env`
+* Added `warnings` import to `otter.check.notebook`
+
 **v2.0.8:**
 
 * Passed plugin collection while running tests in Otter Assign

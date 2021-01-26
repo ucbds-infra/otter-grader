@@ -219,8 +219,8 @@ def run_generate_autograder(result, assignment, gs_username, gs_password):
 
     if generate_args.get('pdfs', {}):
         pdf_args = generate_args.pop('pdfs', {})
-        token = APIClient.get_token()
-        generate_args['token'] = token
+        # token = APIClient.get_token()
+        # generate_args['token'] = token
         generate_args['course_id'] = str(pdf_args['course_id'])
         generate_args['assignment_id'] = str(pdf_args['assignment_id'])
 

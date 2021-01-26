@@ -59,4 +59,4 @@ RUN mkdir /autograder
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-RUN pip install otter-grader==2.0.8
+RUN pip install otter-grader==2.1.1

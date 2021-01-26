@@ -5,6 +5,7 @@ channels:
 dependencies:
     - python=3.7
     - pip
+    - nb_conda_kernels
     - r-base 
     - r-essentials 
     - r-devtools

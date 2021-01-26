@@ -25,7 +25,7 @@ apt-get update
 apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev
 
 # install conda
-wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.3-Linux-x86_64.sh"
+wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9.2-Linux-x86_64.sh"
 chmod +x /autograder/source/miniconda_install.sh
 /autograder/source/miniconda_install.sh -b
 echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
@@ -44,7 +44,7 @@ export TAR="/bin/tar"
 
 # install dependencies with conda
 conda env create -f /autograder/source/environment.yml
-conda run -n otter-gradescope-env Rscript /autograder/source/requirements.r
+conda run -n otter-env Rscript /autograder/source/requirements.r
 
 # set conda shell
 conda init --all
@@ -52,5 +52,5 @@ conda init --all
 # install ottr; not sure why it needs to happen twice but whatever
 git clone --single-branch -b stable https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
 cd /autograder/source/ottr 
-conda run -n otter-gradescope-env Rscript -e "devtools::install\\(\\)"
-conda run -n otter-gradescope-env Rscript -e "devtools::install\\(\\)"
+conda run -n otter-env Rscript -e "devtools::install\\(\\)"
+conda run -n otter-env Rscript -e "devtools::install\\(\\)"
