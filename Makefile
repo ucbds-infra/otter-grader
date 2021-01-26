@@ -44,7 +44,7 @@ docker-grade-test:
 	# cp otter/grade/Dockerfile otter/grade/old-Dockerfile
 	# printf "\nADD . /tmp/otter-grader\nRUN pip install /tmp/otter-grader" >> otter/grade/Dockerfile
 	cp otter/generate/templates/python/setup.sh otter/generate/templates/python/old-setup.sh
-	printf "\nconda run -n otter-gradescope-env pip install /home/otter-grader" >> otter/generate/templates/python/setup.sh
+	printf "\nconda run -n otter-env pip install /home/otter-grader" >> otter/generate/templates/python/setup.sh
 
 cleanup-docker-grade-test:
 	# rm otter/grade/Dockerfile
