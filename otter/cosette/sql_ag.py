@@ -104,6 +104,7 @@ def pre_process_tree(query):
     query = re.sub("""(?!\()([^\s]+?\s+?(?:not\s)?like\s+?["'][^\s]+?["'])\s+?(?!\))""", r' (\1) ', query, flags = re.IGNORECASE)
     query = re.sub("""(?!\()([^\s]+?\s+?(?:not\s)?like\s*?["'][^\s]+?["'])\s*?(?!\))""", r' (\1) ', query, flags = re.IGNORECASE)
     query = re.sub("""(?!\()([^\s]+?\s+?(?:not\s)?like\s*?["']%[\w\d\s]+?%["'])\s*?(?!\))""", r' (\1) ', query, flags = re.IGNORECASE)
+    query = re.sub("""(?!\()([^\s]+?\s+?(?:not\s)?like\s*?["']%?[\w\d\s]+?%?["'])\s*?(?!\))""", r' (\1) ', query, flags = re.IGNORECASE)
     query = query.replace(";", "")
     return query
 

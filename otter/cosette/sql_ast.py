@@ -322,6 +322,9 @@ class SelectStatement(TableOp):
                         self.ordering_dir.append(term[2])
                     else:
                         self.ordering_dir.append("asc")
+        if self.order_cols and type(self.order_cols[0]) == UnaryColumnOp:
+            self.order_cols = []
+            self.ordering_dir = []
 
         if 'limit' in entire_s_exp:
             limit_index = entire_s_exp.index('limit')
@@ -438,6 +441,8 @@ class ColOp():
         if s_exp == "*" or s_exp == "[*]":
             return AllColumn()
         assert s_exp[0] == "expr"
+        while type(s_exp[1][0]) == list:
+            s_exp = s_exp[1][0]
         if s_exp[1][0] == "column_name":
             return Column(s_exp[1])
         elif s_exp[1][0] == "literal_value":
@@ -447,7 +452,9 @@ class ColOp():
         elif '.' in s_exp:
             return Column(s_exp, table = True)
         elif len(s_exp) == 4:
-            return BinaryColumnOp(s_exp)       
+            return BinaryColumnOp(s_exp) 
+        else:
+            print("Unknown column type")
 
 class Column(ColOp):
     def __init__(self, s_exp, table = False, direct = False, name = None):
@@ -554,12 +561,13 @@ class PredicateOp():
             return LikePredicate(s_exp)
         else:
             return Predicate(s_exp)
-        
 
 class JoinPredicate(PredicateOp):
     def __init__(self, s_exp):
         assert s_exp[0] == 'join_constraint'
         pred_stmt = s_exp[2]
+        while type(pred_stmt[1][0]) == list:
+            pred_stmt = pred_stmt[1][0]
         self.op = pred_stmt[2]
         if self.op == '==':
             self.op = '='
