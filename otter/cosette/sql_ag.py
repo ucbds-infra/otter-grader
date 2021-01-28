@@ -221,7 +221,7 @@ def output_to_rkt(query, question, output_file, sql_filename = "query.sql"):
 
         return cosette_valid, limit_valid, order_col_valid, order_dir_valid, like_valid
     except:
-        print("ERRORED OUT")
+        print("ERROR OUT")
         print("My query is:\n", query)
         print(traceback.print_exc() )
         return None, None, None, None, None
@@ -260,12 +260,12 @@ def traverse_like(where_tree, like_dict, flipped):
                 like_dict[col_ref]['notlike'] = not_likes
     return like_dict
 
-if __name__ == "__main__":
-    query = """SELECT 
-        cmte_id,
-        transaction_amt,
-        name
-        FROM indiv_sample_nyc
-    WHERE  (name LIKE '%TRUMP%') AND  (name LIKE '%DONALD%') """
-    output = output_to_rkt(query, "q1_a", "/Cosette/cosette-py/temp_112341.rkt")
-    print(output)
+# if __name__ == "__main__":
+#     query = """SELECT 
+#         cmte_id,
+#         transaction_amt,
+#         name
+#         FROM indiv_sample_nyc
+#     WHERE  (name LIKE '%TRUMP%') AND  (name LIKE '%DONALD%') """
+#     output = output_to_rkt(query, "q1_a", "/Cosette/cosette-py/temp_112341.rkt")
+#     print(output)
