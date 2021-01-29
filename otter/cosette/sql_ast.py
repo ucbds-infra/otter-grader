@@ -298,6 +298,7 @@ class SelectStatement(TableOp):
                 self.group_col = [ColOp.col_op_dispatcher(col) for col in s_exp[groupby_index + 2:having_index]]
             else:
                 self.group_col = [ColOp.col_op_dispatcher(col) for col in s_exp[groupby_index + 2:]]
+            print("Here are my group cols", self.group_col)
         else:
             self.group_col = None
         
@@ -360,8 +361,21 @@ class SelectStatement(TableOp):
         self.subquery_tree, child_mappings, used_table_names = self.subquery_tree.rename(schema, used_table_names)
         child_new_names = self.subquery_tree.infer_out_schema(schema)
         
-        # print("My child mappings are", child_mappings)
-        self.rename_ops(child_mappings, child_new_names)
+        my_col_name_mappings = {}
+        for col, col_name in zip(self.columns, self.col_names):
+            if col_name and type(col) not in [UnaryColumnOp, BinaryColumnOp, ConstantColumn]:
+                my_col_name_mappings[col_name] = col.name
+
+        chained_mappings = {key: child_mappings[val] for key, val in my_col_name_mappings.items()}
+
+        enhanced_child_mappings = copy.deepcopy(child_mappings)
+
+        for key, val in chained_mappings.items():
+            if key not in child_mappings.keys():
+                enhanced_child_mappings[key] = val 
+
+        print("My child mappings are", enhanced_child_mappings)
+        self.rename_ops(enhanced_child_mappings, child_new_names)
 
         new_table_name = gen_fresh_name(self.alias if (hasattr(self, "alias") and self.alias) else "t", used_table_names)
 
@@ -384,9 +398,10 @@ class SelectStatement(TableOp):
                 mappings[old_name] = new_table_name + "." + new_name
 
             column_list.append(new_name)
+        
           
-        # print(f"My mapping is [Select {new_table_name}]:")
-        # pprint(mappings)
+        print(f"My mapping is [Select {new_table_name}]:")
+        pprint(mappings)
         
         # old names overwrites new names
         mappings_copy = copy.deepcopy(mappings)
@@ -449,6 +464,8 @@ class ColOp():
             return ConstantColumn(s_exp[1])
         elif s_exp[1][0] == "function_name" and len(s_exp) == 3:
             return UnaryColumnOp(s_exp)
+        elif s_exp[1][0] == 'unary_operator':
+            return Column(s_exp[2][1])
         elif '.' in s_exp:
             return Column(s_exp, table = True)
         elif len(s_exp) == 4:
