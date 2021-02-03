@@ -2,7 +2,7 @@
 
 **v2.1.2:**
 
-* Added `Notebook.export` format support for Otter Grade
+* Added `otter.Notebook.export` format support for Otter Grade
 * Fixed tutorial in documentation
 * Added `force_save` argument to `otter.Notebook.export` to make notebook force-save optional
 
