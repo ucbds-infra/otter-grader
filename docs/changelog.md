@@ -1,5 +1,10 @@
 # Changelog
 
+**v2.1.2:**
+
+* Added `Notebook.export` format support for Otter Grade
+* Fixed tutorial in documentation
+
 **v2.1.1:**
 
 * Fixed `UnboundLocalError` with log in `otter.run.run_autograder.run_autograder`
