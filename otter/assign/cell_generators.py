@@ -41,7 +41,7 @@ def gen_markdown_response_cell():
     """
     return nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)
 
-def gen_export_cells(instruction_text, pdf=True, filtering=True):
+def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=False):
     """
     Generates export cells that instruct the student the run a code cell calling 
     ``otter.Notebook.export`` to generate and download their submission. The Markdown cell contains:
@@ -70,6 +70,8 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True):
         instruction_text (``str``): extra instructions for students when exporting
         pdf (``bool``, optional): whether a PDF is needed
         filtering (``bool``, optional): whether PDF filtering is needed
+        force_save (``bool``, optional): whether or not to set the ``force_save`` argument of 
+            ``otter.Notebook.export`` to ``True``
     
     Returns:
         ``list`` of ``nbformat.NotebookNode``: generated export cells
@@ -84,12 +86,20 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True):
 
     export = nbformat.v4.new_code_cell()
     source_lines = ["# Save your notebook first, then run this cell to export your submission."]
-    if filtering and pdf:
-        source_lines.append(f"grader.export()")
-    elif not filtering:
-        source_lines.append(f"grader.export(filtering=False)")
-    else:
-        source_lines.append(f"grader.export(pdf=False)")
+    args = []
+    if not filtering:
+        args += ["filtering=False"]
+    elif not pdf:
+        args += ["pdf=False"]
+    if force_save:
+        args += ["force_save=True"]
+    # if filtering and pdf:
+    #     source_lines.append(f"grader.export()")
+    # elif not filtering:
+    #     source_lines.append(f"grader.export(filtering=False)")
+    # else:
+    #     source_lines.append(f"grader.export(pdf=False)")
+    source_lines.append(f"grader.export({', '.join(args)}")
     export.source = "\n".join(source_lines)
 
     lock(instructions)
