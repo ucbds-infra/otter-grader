@@ -99,7 +99,7 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
     #     source_lines.append(f"grader.export(filtering=False)")
     # else:
     #     source_lines.append(f"grader.export(pdf=False)")
-    source_lines.append(f"grader.export({', '.join(args)}")
+    source_lines.append(f"grader.export({', '.join(args)})")
     export.source = "\n".join(source_lines)
 
     lock(instructions)
