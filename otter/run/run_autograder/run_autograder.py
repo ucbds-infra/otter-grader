@@ -8,6 +8,7 @@ import shutil
 import pickle
 # import subprocess
 import warnings
+import zipfile
 
 from glob import glob
 
@@ -108,6 +109,14 @@ def run_autograder(options):
     prepare_files()
 
     os.chdir("./submission")
+
+    if options["zips"]:
+        zips = glob("*.zip")
+        if len(zips) > 1:
+            raise RuntimeError("More than one zip file found in submission and 'zips' config is true")
+
+        with zipfile.ZipFile(zips[0])  as zf:
+            zf.extractall()
 
     nbs = glob("*ipynb")
 

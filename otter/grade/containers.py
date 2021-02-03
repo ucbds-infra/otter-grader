@@ -84,7 +84,12 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
     futures = []
     img = build_image(zip_path, image, generate_hash(zip_path))
 
-    notebooks = glob.glob(os.path.join(notebooks_dir, "*.ipynb"))
+    if zips:
+        pattern = "*.zip"
+    else:
+        pattern = "*.ipynb"
+
+    notebooks = glob.glob(os.path.join(notebooks_dir, pattern))
     for nb_path in notebooks:
         futures += [pool.submit(grade_assignments,
             notebook_dir=nb_path,

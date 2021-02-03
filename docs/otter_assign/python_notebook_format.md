@@ -31,6 +31,7 @@ export_cell:                   # include an export cell at the end of the notebo
   pdf: true                    # include a PDF in the export zip file
   filtering: true              # whether the PDF in the export should be filtered
   instructions: ''             # additional instructions for submission included above export cell
+  force_save: false            # whether to force-save a student's notebook before exporting
 template_pdf: false            # whether to generate a manual question template PDF for Gradescope
 generate:                      # configurations for running Otter Generate; defaults to false
   points: null                 # number of points to scale assignment to on Gradescope
@@ -40,10 +41,12 @@ generate:                      # configurations for running Otter Generate; defa
   grade_from_log: false        # whether to grade students' submissions from serialized environments in the log
   seed: null                   # a seed for intercell seeding during grading
   public_multiplier: null      # a percentage of test points to award for passing public tests
+  pdf: false                   # whether to generate a PDF of the notebook; for non-Gradescope grading
   pdfs:                        # configurations for generating PDFs for manually-graded questions. defaults to false
     course_id: ''              # Gradescope course ID for uploading PDFs for manually-graded questions
     assignment_id: ''          # Gradescope assignment ID for uploading PDFs for manually-graded questions
     filtering: true            # whether the PDFs should be filtered
+  zips: false                  # whether the files being grade are zip files from `otter.Notebook.export`
 service:                       # confgiurations for Otter Service
   notebook: ''                 # path to the notebook to submit if different from the master notebook name
   endpoint: ''                 # the endpoint for your Otter Service deployment; required
