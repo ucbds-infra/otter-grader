@@ -17,3 +17,4 @@ docs/_build
 gs-testing-stuff
 .mypy.cache
 .OTTER_LOG
+docs/tutorial/dist
