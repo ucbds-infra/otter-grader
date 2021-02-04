@@ -1,5 +1,11 @@
 # Changelog
 
+**v2.1.2:**
+
+* Added `otter.Notebook.export` format support for Otter Grade
+* Fixed tutorial in documentation
+* Added `force_save` argument to `otter.Notebook.export` to make notebook force-save optional
+
 **v2.1.1:**
 
 * Fixed `UnboundLocalError` with log in `otter.run.run_autograder.run_autograder`

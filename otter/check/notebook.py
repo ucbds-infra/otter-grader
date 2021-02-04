@@ -284,7 +284,7 @@ class Notebook:
         pc.run("from_notebook", *args, **kwargs)
 
     # @staticmethod
-    def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True):
+    def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
         """
         Exports a notebook to a PDF using Otter Export
 
@@ -294,17 +294,20 @@ class Notebook:
             filtering (``bool``, optional): set true if only exporting a subset of notebook cells to PDF
             pagebreaks (``bool``, optional): if true, pagebreaks are included between questions
             display_link (``bool``, optional): whether or not to display a download link
+            force_save (``bool``, optional): whether or not to display JavaScript that force-saves the
+                notebook (only works in Jupyter Notebook classic, not JupyterLab)
         """
         # self._save_notebook()
         try:
             nb_path = self._resolve_nb_path(nb_path)
 
-            saved = save_notebook(nb_path)
-            if not saved:
-                warnings.warn(
-                    "Could not force-save notebook; the results of this call will be based on the last "
-                    "saved version of this notebook."
-                )
+            if force_save:
+                saved = save_notebook(nb_path)
+                if not saved:
+                    warnings.warn(
+                        "Could not force-save notebook; the results of this call will be based on the last "
+                        "saved version of this notebook."
+                    )
 
             # convert(nb_path, filtering=filtering, filter_type=filter_type)
             export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
@@ -348,7 +351,7 @@ class Notebook:
         self._addl_files.extend(addl_files)
 
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
-            display_link=True):
+            display_link=True, force_save=False):
         """
         Exports a submission to a zip file. Creates a submission zipfile from a notebook at ``nb_path``,
         optionally including a PDF export of the notebook and any files in ``files``.
@@ -365,6 +368,8 @@ class Notebook:
                 in the PDF
             files (``list`` of ``str``, optional): paths to other files to include in the zip file
             display_link (``bool``, optional): whether or not to display a download link
+            force_save (``bool``, optional): whether or not to display JavaScript that force-saves the
+                notebook (only works in Jupyter Notebook classic, not JupyterLab)
         """
         self._log_event(EventType.BEGIN_EXPORT)
         # self._save_notebook()
@@ -372,12 +377,13 @@ class Notebook:
         try:
             nb_path = self._resolve_nb_path(nb_path)
 
-            saved = save_notebook(nb_path)
-            if not saved:
-                warnings.warn(
-                    "Could not force-save notebook; the results of this call will be based on the last "
-                    "saved version of this notebook."
-                )
+            if force_save:
+                saved = save_notebook(nb_path)
+                if not saved:
+                    warnings.warn(
+                        "Could not force-save notebook; the results of this call will be based on the last "
+                        "saved version of this notebook."
+                    )
 
             try:
                 with open(nb_path) as f:
