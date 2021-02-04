@@ -150,7 +150,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
                 with open(otter_cfg) as f:
                     cfg = json.load(f)
 
-                test_pc = PluginCollection(cfg, output_nb_path, {})
+                test_pc = PluginCollection(cfg.get("plugins", []), output_nb_path, {})
 
             else:
                 test_pc = None
