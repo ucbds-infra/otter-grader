@@ -145,15 +145,11 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
             else:
                 seed = assignment.generate.get('seed', None)
             
-            otter_cfg = str(result / 'autograder' / 'otter_config.json')
-            if os.path.exists(otter_cfg):
-                with open(otter_cfg) as f:
-                    cfg = json.load(f)
-
-                test_pc = PluginCollection(cfg.get("plugins", []), output_nb_path, {})
+            if assignment._otter_config is not None:
+                test_pc = PluginCollection(assignment._otter_config.get("plugins", []), output_nb_path, {})
 
             else:
-                test_pc = None
+                test_pc = pc
 
             run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
             print("All tests passed!")

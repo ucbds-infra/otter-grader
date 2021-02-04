@@ -165,3 +165,6 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
                         zip_folder(zf, full_fp, prefix="files")
                     else:
                         raise ValueError(f"Could not find file or directory '{full_fp}'")
+    
+    if assignment is not None:
+        assignment._otter_config = otter_config
