@@ -64,7 +64,10 @@ class PluginCollection:
         self._plugin_config = self._parse_plugin_config(plugins)
         self._plugins = None
 
-        self._load_plugins(submission_path, submission_metadata)
+        self._subm_path = submission_path
+        self._subm_meta = submission_metadata
+
+        self._plugins = self._load_plugins(self._plugin_config, submission_path, submission_metadata)
 
     @property
     def _plugin_names(self):
@@ -73,7 +76,8 @@ class PluginCollection:
         """
         return [p["plugin"] for p in self._plugin_config]
 
-    def _load_plugins(self, submission_path, submission_metadata):
+    @staticmethod
+    def _load_plugins(plugin_config, submission_path, submission_metadata):
         """
         Loads each plugin in ``self._plugin_config`` by importing it with ``importlib`` and creating
         and instance with the ``submission_metadata`` and the configurations from ``self._plugin_config``
@@ -82,9 +86,12 @@ class PluginCollection:
         Args:
             submission_path (``str``): the absolute path to the submission being graded
             submission_metadata (``dict``): submission metadata
+
+        Returns:
+            ``list[AbstractOtterPlugin]``: the list of instantiated plugins
         """
         plugins = []
-        for plg_cfg in self._plugin_config:
+        for plg_cfg in plugin_config:
             plg, cfg = plg_cfg["plugin"], plg_cfg["config"]
             module, class_ = ".".join(plg.split(".")[:-1]), plg.split(".")[-1]
             module = importlib.import_module(module)
@@ -95,7 +102,25 @@ class PluginCollection:
             plugin = class_(submission_path, submission_metadata, cfg)
             plugins.append(plugin)
 
-        self._plugins = plugins
+        return plugins
+    
+    def add_new_plugins(self, raw_plugin_config):
+        """
+        Add any new plugins specified in ``raw_plugin_config`` to this plugin collection. Any plugins
+        listed that have already been isntatiated here are *not* added.
+
+        Args:
+            raw_plugin_config (``list[Union[str,dict[str:Any]]]``): the importable names of plugin classes (e.g. 
+            ``some_package.SomePlugin``) and their configurations
+        """
+        plg_cfg = self._parse_plugin_config(raw_plugin_config)
+        for i, plg in list(enumerate(plg_cfg))[::-1]:
+            name = plg["plugin"]
+            if any(c["plugin"] == plg["plugin"] for c in self._plugin_config):
+                plg_cfg.pop(i)
+        
+        self._plugin_config.extend(plg_cfg)
+        self._plugins.extend(self._load_plugins(plg_cfg, self._subm_path, self._subm_meta))
 
     def run(self, event, *args, **kwargs):
         """
