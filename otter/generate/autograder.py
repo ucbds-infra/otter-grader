@@ -25,7 +25,7 @@ MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9
 OTTER_ENV_NAME = "otter-env"
 
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, username, 
-        password, files, assignment=None, **kwargs):
+        password, files, assignment=None, plugin_collection=None, **kwargs):
     """
     Runs Otter Generate
 
@@ -95,8 +95,12 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         "ottr_branch": "stable",
     }
 
-    plugins = PluginCollection(otter_config.get("plugins", []), None, {})
-    plugins.run("during_generate", otter_config, assignment)
+    if plugin_collection is None:
+        plugin_collection = PluginCollection(otter_config.get("plugins", []), None, {})
+    else:
+        plugin_collection.add_new_plugins(otter_config.get("plugins", []))
+    
+    plugin_collection.run("during_generate", otter_config, assignment)
 
     # create tmp directory to zip inside
     with tempfile.TemporaryDirectory() as td:
@@ -161,3 +165,6 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
                         zip_folder(zf, full_fp, prefix="files")
                     else:
                         raise ValueError(f"Could not find file or directory '{full_fp}'")
+    
+    if assignment is not None:
+        assignment._otter_config = otter_config

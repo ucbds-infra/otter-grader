@@ -106,10 +106,11 @@ class RateLimiting(AbstractOtterPlugin):
         Args:
             results (``otter.test_files.GradingResults.hide_everything``): the results of grading
         """
-        allowed, output = self._submission_allowed()
-        results.set_output(output)
-        if not allowed:
-            results.hide_everything()
+        if self.submission_metadata:
+            allowed, output = self._submission_allowed()
+            results.set_output(output)
+            if not allowed:
+                results.hide_everything()
 
     def generate_report(self):
         """
@@ -119,4 +120,5 @@ class RateLimiting(AbstractOtterPlugin):
         Returns:
             ``str``: the message
         """
-        return self._submission_allowed()[1]
+        if self.submission_metadata:
+            return self._submission_allowed()[1]

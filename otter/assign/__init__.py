@@ -3,6 +3,7 @@ Otter Assign command-line utility
 """
 
 import os
+import json
 import pathlib
 import warnings
 
@@ -64,7 +65,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
     # assignment.requirements = requirements
     
     try:
-        write_output_directories(master, result, assignment)
+        output_nb_path = write_output_directories(master, result, assignment)
 
         # check that we have a seed if needed
         if assignment.seed_required:
@@ -133,7 +134,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
         if assignment.generate:
             # TODO: move this to another function
             print("Generating autograder zipfile...")
-            run_generate_autograder(result, assignment, username, password)
+            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
 
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:
@@ -143,7 +144,14 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
                 seed = None
             else:
                 seed = assignment.generate.get('seed', None)
-            run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=pc)
+            
+            if assignment._otter_config is not None:
+                test_pc = PluginCollection(assignment._otter_config.get("plugins", []), output_nb_path, {})
+
+            else:
+                test_pc = pc
+
+            run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
             print("All tests passed!")
     
     # for tests

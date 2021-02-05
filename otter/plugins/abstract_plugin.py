@@ -18,7 +18,8 @@ class AbstractOtterPlugin(ABC):
     - ``during_assign``: run during Otter Assign after output directories are written
     - ``during_generate``: run during Otter Generate while all files are in-memory and before the
       the `tmp` directory is created
-    - ``from_notebook``: run as by students as they work through the notebook; see ``Notebook.run_plugin``
+    - ``from_notebook``: run as students as they work through the notebook; see ``Notebook.run_plugin``
+    - ``notebook_export``: run by ``Notebook.export`` for adding files to the export zip file
     - ``before_grading``: run before the submission is executed for altering configurations
     - ``before_execution``: run before the submission is executed for altering the submission
     - ``after_execution``: run after the submission is executed
@@ -112,6 +113,23 @@ class AbstractOtterPlugin(ABC):
         Args:
             *args: arguments for the plugin event
             **kwargs: keyword arguments for the plugin event
+
+        Raises:
+            ``PluginEventNotSupportedException``: if the event is not supported by this plugin
+        """
+        raise PluginEventNotSupportedException()
+    
+    def notebook_export(self, *args, **kwargs):
+        """
+        Plugin event run when a student calls ``Notebook.export``. Accepts arbitrary arguments and 
+        should return a list of file paths to include in the exported zip file.
+
+        Args:
+            *args: arguments for the plugin event
+            **kwargs: keyword arguments for the plugin event
+
+        Returns:
+            ``list[str]``: the list of file paths to include in the export
 
         Raises:
             ``PluginEventNotSupportedException``: if the event is not supported by this plugin

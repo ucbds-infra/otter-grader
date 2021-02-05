@@ -58,6 +58,7 @@ class Assignment:
         "lang": None,
         "plugins": [],
         "plugin_config": {},
+        "_otter_config": None,
     }
 
     def __init__(self):

@@ -79,13 +79,14 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         Args:
             results (``otter.test_files.GradingResults``): the results of grading
         """
-        df = self.df.copy()
-        df = df[
-            df["Email"].isin([user["email"] for user in self.submission_metadata["users"]]) & \
-            (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
-        ]
-        for _, row in df.iterrows():
-            results.update_result(row["Test Case"], score=row["Points"])
+        if self.submission_metadata:
+            df = self.df.copy()
+            df = df[
+                df["Email"].isin([user["email"] for user in self.submission_metadata["users"]]) & \
+                (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
+            ]
+            for _, row in df.iterrows():
+                results.update_result(row["Test Case"], score=row["Points"])
 
     def during_generate(self, otter_config, assignment):
         """
@@ -120,13 +121,14 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         Args:
             options (``dict``): the grading configurations
         """
-        df = self.df.copy()
-        df = df[
-            df["Email"].isin([user["email"] for user in self.submission_metadata["users"]]) & \
-            (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
-        ]
+        if self.submission_metadata:
+            df = self.df.copy()
+            df = df[
+                df["Email"].isin([user["email"] for user in self.submission_metadata["users"]]) & \
+                (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
+            ]
 
-        for _, row in df.iterrows():
-            generate_pdf = row["PDF"].strip().lower()
-            if generate_pdf in ["n", "false", "f", "0"]:
-                options["token"] = None
+            for _, row in df.iterrows():
+                generate_pdf = row["PDF"].strip().lower()
+                if generate_pdf in ["n", "false", "f", "0"]:
+                    options["token"] = None

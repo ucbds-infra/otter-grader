@@ -131,6 +131,9 @@ def write_output_directories(master_nb_path, result_dir, assignment):
         master_nb_path (``nbformat.NotebookNode``): the master notebook path
         result_dir (``pathlib.Path``): path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+
+    Returns:
+        ``pathlib.Path``: the absolute path to the written autograder notebook
     """
     # create directories
     autograder_dir = result_dir / 'autograder'
@@ -145,3 +148,5 @@ def write_output_directories(master_nb_path, result_dir, assignment):
 
     # write student dir
     write_student_dir(master_nb_path.name, autograder_dir, student_dir, assignment)
+
+    return os.path.abspath(output_nb_path)
