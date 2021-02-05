@@ -10,6 +10,7 @@ from .utils import get_source
 
 BEGIN = "# BEGIN PLUGIN"
 END = "# END PLUGIN"
+BEGIN_EXPORT = "# BEGIN PLUGIN EXPORT"
 
 # TODO: comments, docstrings
 def replace_plugins(lines):
@@ -24,6 +25,7 @@ def replace_plugins(lines):
     """
     starts, ends = [], []
     stripped = [[]]
+    exports = []
     plugin = False
     for i, line in enumerate(lines):
         if line.rstrip().endswith(END):
@@ -35,12 +37,19 @@ def replace_plugins(lines):
         elif line.rstrip().endswith(BEGIN):
             assert not plugin, f"Nested plugins found in {lines}"
             starts.append(i)
+            exports.append(False)
+            plugin = True
+        
+        elif line.rstrip().endswith(BEGIN_EXPORT):
+            assert not plugin, f"Nested plugins found in {lines}"
+            starts.append(i)
+            exports.append(True)
             plugin = True
 
         elif plugin:
             stripped[len(starts) - 1].append(line)
 
-    assert len(stripped) == len(starts) + 1 == len(ends) + 1, f"Error processing plugins in {lines}"
+    assert len(stripped) == len(starts) + 1 == len(ends) + 1 == len(exports) + 1, f"Error processing plugins in {lines}"
     assert all(s < e for s, e in zip(starts, ends))
 
     starts.reverse()
@@ -52,11 +61,14 @@ def replace_plugins(lines):
 
     for i, (s, e) in enumerate(zip(starts, ends)):
         config = yaml.full_load("\n".join(stripped[i]))
+        export = exports[i]
         pg = config["plugin"]
         args = ", ".join(config.get("args", []))
         kwargs = ", ".join([f"{k}={v}" for k, v in config.get("kwargs", {}).items()])
 
-        call = f'grader.run_plugin("{pg}"'
+        call = ("run_plugin", "add_plugin_files")[export]
+
+        call = f'grader.{call}("{pg}"'
         if args:
             call += f', {args}'
         if kwargs:

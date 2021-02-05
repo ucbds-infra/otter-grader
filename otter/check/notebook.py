@@ -80,6 +80,8 @@ class Notebook:
                 self._path = test_dir
             self._service_enabled = False
             self._notebook = nb_path
+            self._addl_files = []
+            self._plugin_collections = {}
 
             # assume using otter service if there is a .otter file
             otter_configs = glob("*.otter")
@@ -274,7 +276,11 @@ class Notebook:
 
         """
         nb_path = self._resolve_nb_path(nb_path)
-        pc = PluginCollection([plugin_name], nb_path, {})
+        if plugin_name in self._plugin_collections:
+            pc = self._plugin_collections[plugin_name]
+        else:
+            pc = PluginCollection([plugin_name], nb_path, {})
+            self._plugin_collections[plugin_name] = pc
         pc.run("from_notebook", *args, **kwargs)
 
     # @staticmethod
@@ -320,6 +326,29 @@ class Notebook:
             raise e
         else:
             self._log_event(EventType.TO_PDF)
+
+    def add_plugin_files(self, plugin_name, *args, nb_path=None, **kwargs):
+        """
+        Runs the ``notebook_export`` event of the plugin ``plugin_name`` and tracks the file paths
+        it returns to be included when calling ``Notebook.export``.
+
+        Args:
+            plugin_name (``str``): importable name of an Otter plugin that implements the 
+                ``from_notebook`` hook
+            *args: arguments to be passed to the plugin
+            nb_path (``str``, optional): path to the notebook
+            **kwargs: keyword arguments to be passed to the plugin        
+        """
+        nb_path = self._resolve_nb_path(nb_path)
+        if plugin_name in self._plugin_collections:
+            pc = self._plugin_collections[plugin_name]
+        else:
+            pc = PluginCollection([plugin_name], nb_path, {})
+            self._plugin_collections[plugin_name] = pc
+        addl_files = pc.run("notebook_export", *args, **kwargs)[0]
+        if addl_files is None:
+            return
+        self._addl_files.extend(addl_files)
 
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
             display_link=True, force_save=False):
@@ -388,6 +417,9 @@ class Notebook:
                 zf.write(glob("*.otter")[0])
 
             for file in files:
+                zf.write(file)
+            
+            for file in self._addl_files:
                 zf.write(file)
 
             zf.close()
