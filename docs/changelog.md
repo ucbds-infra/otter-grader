@@ -1,5 +1,11 @@
 # Changelog
 
+**v2.1.3:**
+
+* Added the `notebook_export` plugin event
+* Fixed plugin bug resulting from running tests in Otter Assign
+* Added creation of plugin collection resulting from Otter Generate for running tests in Otter Assign
+
 **v2.1.2:**
 
 * Added `otter.Notebook.export` format support for Otter Grade
