@@ -128,3 +128,7 @@ def get_source(cell):
     elif isinstance(source, list):
         return [line.strip('\n') for line in source]
     raise ValueError(f'unknown source type: {type(source)}')
+
+@contextmanager
+def nullcontext():
+    yield
