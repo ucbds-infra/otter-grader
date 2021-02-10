@@ -133,15 +133,15 @@ For example, if a student passes a 2- and 1- point test but fails a 4-point test
 
 ### Overriding Points Possible
 
-By default, the number of points possible on Gradescope is the sum of the point values of each test. This value can be overrided, however, to some other value using the `points` key, which accepts an integer. Then the number of points awarded will be the provided points value scaled by the percentage of points awarded by the autograder.
+By default, the number of points possible on Gradescope is the sum of the point values of each test. This value can be overrided, however, to some other value using the `points_possible` key, which accepts an integer. Then the number of points awarded will be the provided points value scaled by the percentage of points awarded by the autograder.
 
-For example, if a student passes a 2- and 1- point test but fails a 4-point test, they will receive (2 + 1) / (2 + 1 + 4) * 2 = 0.8571 points out of a possible 2 when `--points` is set to 2.
+For example, if a student passes a 2- and 1- point test but fails a 4-point test, they will receive (2 + 1) / (2 + 1 + 4) * 2 = 0.8571 points out of a possible 2 when `points_possible` is set to 2.
 
 As an example, the command below scales the number of points to 3:
 
 ```json
 {
-  "points": 3
+  "points_possible": 3
 }
 ```
 

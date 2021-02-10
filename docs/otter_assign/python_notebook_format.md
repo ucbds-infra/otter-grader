@@ -34,7 +34,7 @@ export_cell:                   # include an export cell at the end of the notebo
   force_save: false            # whether to force-save a student's notebook before exporting
 template_pdf: false            # whether to generate a manual question template PDF for Gradescope
 generate:                      # configurations for running Otter Generate; defaults to false
-  points: null                 # number of points to scale assignment to on Gradescope
+  points_possible: null        # number of points to scale assignment to on Gradescope
   threshold: null              # a pass/fail threshold for the assignment on Gradescope
   show_stdout: false           # whether to show grading stdout to students once grades are published
   show_hidden: false           # whether to show hidden test results to students once grades are published
