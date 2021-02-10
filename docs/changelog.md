@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.1.4:**
+
+* Added `otter.utils.nullcontext` to be compatible with Python<3.7
+
 **v2.1.3:**
 
 * Added the `notebook_export` plugin event
