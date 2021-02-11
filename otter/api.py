@@ -8,7 +8,12 @@ import sys
 import shutil
 import tempfile
 
-from contextlib import redirect_stdout, nullcontext
+from contextlib import redirect_stdout
+
+try:
+    from contextlib import nullcontext
+except ImportError:
+    from .utils import nullcontext # nullcontext is new in Python 3.7
 
 from .argparser import get_parser
 from .export import export_notebook
