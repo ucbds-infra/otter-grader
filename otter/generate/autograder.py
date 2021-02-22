@@ -134,8 +134,12 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         for fn, tmpl in templates.items():
             rendered[fn] = tmpl.render(**template_context)
 
+        # close the stream
+        f.close()
 
+        
         # open environment if it exists
+        # unlike requirements.txt, we will always overwrite, not append by default
         environment = environment
         env_filename = "environment.yml"
         if environment is None and os.path.isfile(env_filename):
@@ -156,8 +160,6 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         
         template_context["other_environment"] = f.read()
   
-
-
         # close the stream
         f.close()
 
