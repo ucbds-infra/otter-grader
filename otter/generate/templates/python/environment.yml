@@ -1,3 +1,4 @@
+{% if not other_environment %}
 name: {{ otter_env_name }}
 channels:
     - defaults
@@ -8,3 +9,4 @@ dependencies:
     - nb_conda_kernels
     - pip:
         - -r file:requirements.txt
+{% endif %}
