@@ -1,5 +1,4 @@
-{% if not other_environment %}
-name: {{ otter_env_name }}
+{% if not other_environment %}name: {{ otter_env_name }}
 channels:
     - defaults
     - conda-forge
@@ -8,5 +7,4 @@ dependencies:
     - pip
     - nb_conda_kernels
     - pip:
-        - -r file:requirements.txt
-{% endif %}
+        - -r file:requirements.txt{% else %}{{ other_environment }}{% endif %}

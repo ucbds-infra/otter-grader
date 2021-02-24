@@ -10,7 +10,8 @@ import zipfile
 import tempfile
 import pathlib
 import pkg_resources
-import yaml
+import ruamel_yaml
+import io
 
 from glob import glob
 from subprocess import PIPE
@@ -130,13 +131,8 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         template_context["other_requirements"] = f.read()
         template_context["overwrite_requirements"] = overwrite_requirements
 
-        rendered = {}
-        for fn, tmpl in templates.items():
-            rendered[fn] = tmpl.render(**template_context)
-
-        # close the stream
+        # close the {% if not other_requirements %}stream
         f.close()
-
         
         # open environment if it exists
         # unlike requirements.txt, we will always overwrite, not append by default
@@ -147,21 +143,28 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         
         if environment:
             assert os.path.isfile(environment), f"Environment file {environment} not found"
-
+            yaml = ruamel_yaml.YAML()
+            yaml.indent(sequence=4, offset=2)
+            
             with open(environment) as f:
-                data = yaml.safe_load(f)
-            data['name'] = template_context["otter_env_name"]
-            with open(environment, 'w') as f:
-                yaml.safe_dump(data, f)
+                data = yaml.load(f)
+                f.close()
+            if "name" not in data:
+                data['name'] = template_context["otter_env_name"]
+            buf = io.BytesIO()
+            yaml.dump(data, buf)
+            template_context["other_environment"] = buf.read()
 
-            f = open(environment)
         else:
-            f = open(os.devnull)
         
-        template_context["other_environment"] = f.read()
+            template_context["other_environment"] = None
   
-        # close the stream
-        f.close()
+        rendered = {}
+        for fn, tmpl in templates.items():
+            rendered[fn] = tmpl.render(**template_context)
+
+
+
 
         if os.path.isabs(output_path):
             zip_path = os.path.join(output_path, "autograder.zip")

@@ -42,3 +42,25 @@ class TestAutograder(TestCase):
 
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
             self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-correct")
+
+
+    def test_custom_env(self):
+        """
+        Check that a custom environment.yml is correctly read and modified
+        """
+        # create the zipfile
+        generate_command = [
+            "generate",
+            "-t", TEST_FILES_PATH + "tests",
+            "-o", TEST_FILES_PATH,
+            "-r", TEST_FILES_PATH + "requirements.txt",
+            "-e", TEST_FILES_PATH + "environment.yml",
+            TEST_FILES_PATH + "data/test-df.csv"
+        ]
+        # args = parser.parse_args(generate_command)
+        # args.func = autograder
+        # args.func(args)
+        run_otter(generate_command)
+
+        with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
+            self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-custom-env")
