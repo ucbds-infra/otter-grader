@@ -10,8 +10,7 @@ import zipfile
 import tempfile
 import pathlib
 import pkg_resources
-import ruamel_yaml
-import io
+import yaml
 
 from glob import glob
 from subprocess import PIPE
@@ -143,17 +142,12 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         
         if environment:
             assert os.path.isfile(environment), f"Environment file {environment} not found"
-            yaml = ruamel_yaml.YAML()
-            yaml.indent(sequence=4, offset=2)
-            
             with open(environment) as f:
-                data = yaml.load(f)
+                data = yaml.safe_load(f)
                 f.close()
             if "name" not in data:
                 data['name'] = template_context["otter_env_name"]
-            buf = io.BytesIO()
-            yaml.dump(data, buf)
-            template_context["other_environment"] = buf.read()
+            template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
 
         else:
         
