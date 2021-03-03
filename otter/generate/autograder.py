@@ -148,9 +148,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
             if "name" not in data:
                 data['name'] = template_context["otter_env_name"]
             template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
-
         else:
-        
             template_context["other_environment"] = None
   
         rendered = {}

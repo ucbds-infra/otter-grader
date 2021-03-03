@@ -43,7 +43,7 @@ Also assume that we have `cd`ed into `hw00-dev`.
 
 The general usage of `otter generate` is to create a zip file at some output directory (`-o` flag, default `./`) which you will then use to create the grading image. Otter Generate has a few optional flags, described in the [Otter CLI Reference](../../cli_reference.md).
 
-If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts). To autograde an R assignment, pass the `-l r` flag to indicate that the language of the assignment is R.
+If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. If you do not specify `-e`, Otter will use the default `environment.yml`. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts). To autograde an R assignment, pass the `-l r` flag to indicate that the language of the assignment is R.
 
 The simplest usage in our example would be
 
