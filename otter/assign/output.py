@@ -53,6 +53,15 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
             assignment.requirements = str(output_dir / output_fn)
         else:
             shutil.copy(assignment.requirements, str(output_dir / output_fn))
+
+    if assignment.environment:
+        output_fn = "environment.yml"
+        if isinstance(assignment.environment, list):
+            with open(str(output_dir / output_fn), "w+") as f:
+                f.write("\n".join(assignment.environment))
+            assignment.environment = str(output_dir / output_fn)
+        else:
+            shutil.copy(assignment.environment, str(output_dir / output_fn))
     
     # strip out ignored lines
     transformed_nb = strip_ignored_lines(transformed_nb)
@@ -108,6 +117,12 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
     requirements = str(student_dir / output_fn)
     if os.path.isfile(requirements):
         os.remove(requirements)
+
+    # remove environment from student dir if present
+    output_fn = "environment.yml"
+    environment = str(student_dir / output_fn)
+    if os.path.isfile(environment):
+        os.remove(environment)
 
     # strip solutions from student version
     student_nb_path = student_dir / nb_name
