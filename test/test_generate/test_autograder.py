@@ -41,7 +41,6 @@ class TestAutograder(TestCase):
         # args.func(args)
 
         if 'environment.yml' in os.listdir(os.getcwd()):
-            # shutil.move("environment.yml", TEST_FILES_PATH + "/autograder-correct/environment.yml")
             os.rename('environment.yml', 'environment_temp_rename.yml')
 
 
@@ -50,8 +49,6 @@ class TestAutograder(TestCase):
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
             self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-correct")
 
-        # if 'environment.yml' in os.listdir(TEST_FILES_PATH + "/autograder-correct"):
-            # shutil.move(TEST_FILES_PATH + "/autograder-correct/environment.yml", "environment.yml")
         if 'environment_temp_rename.yml' in os.listdir(os.getcwd()):
             os.rename('environment_temp_rename.yml', 'environment.yml')
 
@@ -79,7 +76,5 @@ class TestAutograder(TestCase):
 
 
     def tearDown(self):
-        # if 'environment.yml' in os.listdir(TEST_FILES_PATH + "/autograder-correct"):
-            # shutil.move(TEST_FILES_PATH + "/autograder-correct/environment.yml", "environment.yml")
         if 'environment_temp_rename.yml' in os.listdir(os.getcwd()):
             os.rename('environment_temp_rename.yml', 'environment.yml')
