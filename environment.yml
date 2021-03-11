@@ -9,7 +9,7 @@ dependencies:
     - r-devtools
     - pip
     - pip:
-        - -r requirements.txt
+        - -r file:requirements.txt
         # - datascience
         # - jupyter_client
         # - ipykernel

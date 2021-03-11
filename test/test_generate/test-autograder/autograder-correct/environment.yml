@@ -9,4 +9,4 @@ dependencies:
 - pip
 - pip:
   - -r file:requirements.txt
-name: otter-grader
+name: otter-env
