@@ -247,7 +247,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
 
     if assignment.environment:
         environment = 'environment.yml'
-        generate_cmd += ["-r", str(environment)]
+        generate_cmd += ["-e", str(environment)]
     
     if gs_username is not None and gs_password is not None:
         generate_cmd += ["--username", gs_username, "--password", gs_password]

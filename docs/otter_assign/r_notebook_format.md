@@ -20,7 +20,7 @@ This cell is removed from both output notebooks. Any unspecified keys will keep 
 ```yaml
 requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
 overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
-environment: environment.yml   # path to an environment file for Gradescope; overwrite by default
+environment: environment.yml   # path to custom conda environment file
 template_pdf: false            # whether to generate a manual question template PDF for Gradescope
 generate:                      # configurations for running Otter Generate; defaults to false
   points: null                 # number of points to scale assignment to on Gradescope

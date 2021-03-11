@@ -8,5 +8,5 @@ dependencies:
 - r-devtools
 - pip
 - pip:
-  - -r requirements.txt
+  - -r file:requirements.txt
 name: otter-grader

@@ -20,7 +20,7 @@ This block is removed from both output files. Any unspecified keys will keep the
 ```yaml
 requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
 overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
-environment: environment.yml   # path to an environment file for Gradescope; overwrite by default
+environment: environment.yml   # path to custom conda environment file
 generate:                      # configurations for running Otter Generate; defaults to false
   points: null                 # number of points to scale assignment to on Gradescope
   threshold: null              # a pass/fail threshold for the assignment on Gradescope

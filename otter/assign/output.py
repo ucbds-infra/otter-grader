@@ -56,12 +56,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
 
     if assignment.environment:
         output_fn = "environment.yml"
-        if isinstance(assignment.environment, list):
-            with open(str(output_dir / output_fn), "w+") as f:
-                f.write("\n".join(assignment.environment))
-            assignment.environment = str(output_dir / output_fn)
-        else:
-            shutil.copy(assignment.environment, str(output_dir / output_fn))
+        shutil.copy(assignment.environment, str(output_dir / output_fn))
     
     # strip out ignored lines
     transformed_nb = strip_ignored_lines(transformed_nb)

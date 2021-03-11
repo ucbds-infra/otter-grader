@@ -38,7 +38,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         requirements (``str``): path to a Python or R requirements file for this assignment
         overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
             adding to them
-        environment (``str``): path to a Python or R envrionment file for this assignment (overwrites)
+        environment (``str``): path to a conda environment file for this assignment
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         files (``list[str]``): list of file paths to add to the zip file
@@ -144,10 +144,9 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
             assert os.path.isfile(environment), f"Environment file {environment} not found"
             with open(environment) as f:
                 data = yaml.safe_load(f)
-                f.close()
-            if "name" not in data:
                 data['name'] = template_context["otter_env_name"]
-            template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
+                template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
+                f.close()
         else:
             template_context["other_environment"] = None
   
