@@ -25,6 +25,7 @@ This cell is removed from both output notebooks. These configurations, listed in
 run_tests: true                # whether to run tests on the resulting autograder directory
 requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
 overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
+environment: environment.yml   # path to custom conda environment file
 init_cell: true                # include an Otter initialization cell at the top of the notebook
 check_all_cell: true           # include a check-all cell at the end of the notebook
 export_cell:                   # include an export cell at the end of the notebook; set to false for no cell
