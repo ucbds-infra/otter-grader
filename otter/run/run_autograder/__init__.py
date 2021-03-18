@@ -53,6 +53,7 @@ def main(autograder_dir, **kwargs):
     print("\n\n")
 
     if options["print_summary"]:
+        pd.set_option("display.max_rows", None) # print all rows
         df = pd.DataFrame(output["tests"])
         if "output" in df.columns:
             df.drop(columns=["output"], inplace=True)
