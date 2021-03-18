@@ -10,6 +10,7 @@ import zipfile
 import tempfile
 import pathlib
 import pkg_resources
+import yaml
 
 from glob import glob
 from subprocess import PIPE
@@ -24,8 +25,8 @@ TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9.2-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
 
-def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, username, 
-        password, files, assignment=None, plugin_collection=None, **kwargs):
+def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
+         username, password, files, assignment=None, plugin_collection=None, **kwargs):
     """
     Runs Otter Generate
 
@@ -37,6 +38,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         requirements (``str``): path to a Python or R requirements file for this assignment
         overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
             adding to them
+        environment (``str``): path to a conda environment file for this assignment
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         files (``list[str]``): list of file paths to add to the zip file
@@ -128,12 +130,32 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         template_context["other_requirements"] = f.read()
         template_context["overwrite_requirements"] = overwrite_requirements
 
+        # close the {% if not other_requirements %}stream
+        f.close()
+        
+        # open environment if it exists
+        # unlike requirements.txt, we will always overwrite, not append by default
+        environment = environment
+        env_filename = "environment.yml"
+        if environment is None and os.path.isfile(env_filename):
+            environment = env_filename
+        
+        if environment:
+            assert os.path.isfile(environment), f"Environment file {environment} not found"
+            with open(environment) as f:
+                data = yaml.safe_load(f)
+                data['name'] = template_context["otter_env_name"]
+                template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
+                f.close()
+        else:
+            template_context["other_environment"] = None
+  
         rendered = {}
         for fn, tmpl in templates.items():
             rendered[fn] = tmpl.render(**template_context)
 
-        # close the stream
-        f.close()
+
+
 
         if os.path.isabs(output_path):
             zip_path = os.path.join(output_path, "autograder.zip")

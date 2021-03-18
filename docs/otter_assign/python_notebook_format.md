@@ -25,6 +25,7 @@ This cell is removed from both output notebooks. These configurations, listed in
 run_tests: true                # whether to run tests on the resulting autograder directory
 requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
 overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
+environment: environment.yml   # path to custom conda environment file
 init_cell: true                # include an Otter initialization cell at the top of the notebook
 check_all_cell: true           # include a check-all cell at the end of the notebook
 export_cell:                   # include an export cell at the end of the notebook; set to false for no cell
@@ -34,7 +35,7 @@ export_cell:                   # include an export cell at the end of the notebo
   force_save: false            # whether to force-save a student's notebook before exporting
 template_pdf: false            # whether to generate a manual question template PDF for Gradescope
 generate:                      # configurations for running Otter Generate; defaults to false
-  points: null                 # number of points to scale assignment to on Gradescope
+  points_possible: null        # number of points to scale assignment to on Gradescope
   threshold: null              # a pass/fail threshold for the assignment on Gradescope
   show_stdout: false           # whether to show grading stdout to students once grades are published
   show_hidden: false           # whether to show hidden test results to students once grades are published

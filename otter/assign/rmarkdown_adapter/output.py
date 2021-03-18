@@ -44,6 +44,17 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
     if assignment.requirements:
         shutil.copy(requirements, str(output_dir / 'requirements.R'))
 
+
+    environment = assignment.environment
+    if environment is None and os.path.isfile("environment.yml"):
+        environment = "environment.yml"
+    if environment:
+        assert os.path.isfile(environment), f"Environment file {environment} not found"
+        assignment.environment = environment
+
+    if assignment.environment:
+        shutil.copy(environment, str(output_dir / 'environment.yml'))
+
     transformed_rmd_string, test_files = transform_notebook(rmd_string, assignment)
 
     # write notebook
@@ -89,6 +100,11 @@ def write_student_dir(rmd_name, autograder_dir, student_dir, assignment):
     requirements = str(student_dir / 'requirements.R')
     if os.path.isfile(requirements):
         os.remove(requirements)
+
+    # remove environment from student dir if present
+    environment = str(student_dir / 'environment.yml')
+    if os.path.isfile(environment):
+        os.remove(environment)
 
     # strip solutions from student version
     student_rmd_path = student_dir / rmd_name

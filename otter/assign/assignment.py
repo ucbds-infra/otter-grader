@@ -46,6 +46,7 @@ class Assignment:
         "save_environment": False,
         "requirements": None,
         "overwrite_requirements": False,
+        "environment": None,
         "files": [],
         "autograder_files": [],
         "variables": {},

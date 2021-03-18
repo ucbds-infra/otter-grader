@@ -43,7 +43,7 @@ Also assume that we have `cd`ed into `hw00-dev`.
 
 The general usage of `otter generate` is to create a zip file at some output directory (`-o` flag, default `./`) which you will then use to create the grading image. Otter Generate has a few optional flags, described in the [Otter CLI Reference](../../cli_reference.md).
 
-If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts). To autograde an R assignment, pass the `-l r` flag to indicate that the language of the assignment is R.
+If you do not specify `-t` or `-o`, then the defaults will be used. If you do not specify `-r`, Otter looks in the working directory for `requirements.txt` and automatically adds it if found; if it is not found, then it is assumed there are no additional requirements. If you do not specify `-e`, Otter will use the default `environment.yml`. There is also an optional positional argument that goes at the end of the command, `files`, that is a list of any files that are required for the notebook to execute (e.g. data files, Python scripts). To autograde an R assignment, pass the `-l r` flag to indicate that the language of the assignment is R.
 
 The simplest usage in our example would be
 
@@ -133,15 +133,15 @@ For example, if a student passes a 2- and 1- point test but fails a 4-point test
 
 ### Overriding Points Possible
 
-By default, the number of points possible on Gradescope is the sum of the point values of each test. This value can be overrided, however, to some other value using the `points` key, which accepts an integer. Then the number of points awarded will be the provided points value scaled by the percentage of points awarded by the autograder.
+By default, the number of points possible on Gradescope is the sum of the point values of each test. This value can be overrided, however, to some other value using the `points_possible` key, which accepts an integer. Then the number of points awarded will be the provided points value scaled by the percentage of points awarded by the autograder.
 
-For example, if a student passes a 2- and 1- point test but fails a 4-point test, they will receive (2 + 1) / (2 + 1 + 4) * 2 = 0.8571 points out of a possible 2 when `--points` is set to 2.
+For example, if a student passes a 2- and 1- point test but fails a 4-point test, they will receive (2 + 1) / (2 + 1 + 4) * 2 = 0.8571 points out of a possible 2 when `points_possible` is set to 2.
 
 As an example, the command below scales the number of points to 3:
 
 ```json
 {
-  "points": 3
+  "points_possible": 3
 }
 ```
 
