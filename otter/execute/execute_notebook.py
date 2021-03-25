@@ -6,6 +6,7 @@ import os
 # import re
 import ast
 import copy
+import astunparse
 
 from unittest import mock
 from contextlib import redirect_stdout, redirect_stderr
@@ -172,7 +173,8 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
     ast.fix_missing_locations(tree)
 
     try:
-        cleaned_source = compile(tree, filename="nb-ast", mode="exec")
+        # cleaned_source = compile(tree, filename="nb-ast", mode="exec")
+        cleaned_source = astunparse.unparse(tree)
         with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
             # patch otter.Notebook.export so that we don't create PDFs in notebooks
             m = mock.mock_open()

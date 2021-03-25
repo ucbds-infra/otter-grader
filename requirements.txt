@@ -15,6 +15,7 @@ nbformat
 dill
 pdfkit
 PyPDF2
+astunparse
 
 # plugins
 gspread
