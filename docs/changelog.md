@@ -2,6 +2,8 @@
 
 **Unreleased:**
 
+* Fixed `try`/`except` statements in tests per [#228](https://github.com/ucbds-infra/otter-grader/issues/228)
+
 **v2.1.5:**
 
 * Added custom `environment.yml` files in autograder per [#103](https://github.com/ucbds-infra/otter-grader/issues/103)
