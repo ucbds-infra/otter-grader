@@ -1,10 +1,6 @@
-datascience
 jupyter_client
 ipykernel
-matplotlib
 pandas
-ipywidgets
-scipy
 tqdm
 codecov
 jinja2
@@ -15,26 +11,9 @@ nbformat
 dill
 pdfkit
 PyPDF2
-
-# plugins
 gspread
-
-# ottr requirements
 rpy2
 jupytext
-
-# otter service requirements
-psycopg2
-queries
 pyyaml
-docker
-PyJWT
-tornado
-stdio-proxy
-
-# documentation requirements
-recommonmark
-sphinx_markdown_tables
-sphinx-book-theme==0.0.39
-sphinxcontrib-apidoc
-sphinx-argparse
+ipython
+setuptools

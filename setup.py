@@ -9,6 +9,9 @@ with open("otter/version.py") as f:
 	exec(f.read(), env)
 version = env["__version__"]
 
+with open("requirements.txt") as f:
+	install_requires = f.readlines()
+
 setuptools.setup(
 	name = "otter-grader",
 	version = version,
@@ -25,10 +28,7 @@ setuptools.setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
 	],
-	install_requires=[
-		"pyyaml", "nbformat", "ipython", "nbconvert", "tqdm", "setuptools", "pandas", "tornado",
-		"docker", "jinja2", "dill", "pdfkit", "PyPDF2", "gspread"
-	],
+	install_requires=install_requires,
 	# scripts=["bin/otter"],
 	entry_points = {
 		"console_scripts": ["otter=otter.runner:run_otter"]

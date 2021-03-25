@@ -1,0 +1,7 @@
+psycopg2
+queries
+pyyaml
+docker
+PyJWT
+tornado
+stdio-proxy
