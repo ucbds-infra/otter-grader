@@ -134,7 +134,8 @@ def str_to_doctest(code_lines, lines):
     line = code_lines.pop(0)
     if line.startswith(" ") or line.startswith("\t"):
         return str_to_doctest(code_lines, lines + ["... " + line])
-    elif line.startswith("except:") or line.startswith("elif ") or line.startswith("else:") or line.startswith("finally:"):
+    elif bool(re.match(r"^except[\s\w]*:", line)) or line.startswith("elif ") or \
+            line.startswith("else:") or line.startswith("finally:"):
         return str_to_doctest(code_lines, lines + ["... " + line])
     elif len(lines) > 0 and lines[-1].strip().endswith("\\"):
         return str_to_doctest(code_lines, lines + ["... " + line])
