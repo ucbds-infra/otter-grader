@@ -131,4 +131,22 @@ def get_source(cell):
 
 @contextmanager
 def nullcontext():
+    """
+    Yields an empty context. Added because ``contextlib.nullcontext`` was added in Python 3.7, so
+    earlier versions of Python require this patch.
+    """
     yield
+
+@contextmanager
+def load_default_file(provided_fn, expected_fn):
+    """
+    """
+    if provided_fn is None and os.path.isfile(expected_fn):
+        provided_fn = expected_fn
+    
+    if provided_fn is not None:
+        assert os.path.isfile(provided_fn), f"Could not find specified file: {provided_fn}"
+        with open(provided_fn) as f:
+            yield f.read()
+    else:
+        yield None
