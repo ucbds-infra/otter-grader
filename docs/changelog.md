@@ -3,6 +3,7 @@
 **Unreleased:**
 
 * Fixed `try`/`except` statements in tests per [#228](https://github.com/ucbds-infra/otter-grader/issues/228)
+* Added error handling in `GoogleSheetsGradeOverride` plugin for when the Google API hits a rate-limit error
 
 **v2.1.5:**
 
