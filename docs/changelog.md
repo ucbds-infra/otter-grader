@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Added `NotebookMetadataTestFile` for reading tests from Jupyter Notebook metadata
+
 **v2.1.6:**
 
 * Fixed `try`/`except` statements in tests per [#228](https://github.com/ucbds-infra/otter-grader/issues/228)
