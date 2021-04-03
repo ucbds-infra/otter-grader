@@ -9,6 +9,7 @@ import pickle
 from collections import namedtuple
 
 # from .abstract_test import TestCollection
+from .metadata_test import NotebookMetadataTestFile
 from .ok_test import OKTestFile
 
 from ..check.logs import QuestionNotInLogException

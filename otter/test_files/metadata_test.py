@@ -74,7 +74,7 @@ class NotebookMetadataTestFile(OKTestFile):
         with open(path) as f:
             nb = json.load(f)
         
-        test_spec = nb["metadata"][NOTEBOOK_METADATA_KEY]["test"]
+        test_spec = nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"]
         if test_name not in test_spec:
             raise ValueError(f"Test {test_name} not found")
         
@@ -83,7 +83,7 @@ class NotebookMetadataTestFile(OKTestFile):
         # We only support a subset of these tests, so let's validate!
 
         # Make sure there is a name
-        assert 'name' in test_spec
+        # assert 'name' in test_spec
 
         # Do not support multiple suites in the same file
         assert len(test_spec['suites']) == 1
@@ -102,7 +102,7 @@ class NotebookMetadataTestFile(OKTestFile):
 
         for i, test_case in enumerate(test_spec['suites'][0]['cases']):
             test_cases.append(TestCase(
-                name = test_case.get('name', f"{test_spec['name']} - {i + 1}"),
+                name = test_case.get('name', f"{test_spec['name']}_{i + 1}"),
                 body = dedent(test_case['code']), 
                 hidden = test_case.get('hidden', True)
             ))
@@ -115,4 +115,4 @@ class NotebookMetadataTestFile(OKTestFile):
         # grab whether the tests are all-or-nothing
         all_or_nothing = test_spec.get('all_or_nothing', True)
 
-        return cls(test_spec['name'], path, test_cases, test_spec.get('points', 1), all_or_nothing)
+        return cls(test_name, path, test_cases, test_spec.get('points', 1), all_or_nothing)
