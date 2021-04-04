@@ -47,20 +47,27 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         Returns:
             ``pandas.core.frame.DataFrame``: the sheet as a dataframe
         """
-        oauth_json = self.plugin_config["service_account_credentials"]
-        with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as ntf:
-            json.dump(oauth_json, ntf)
-            ntf.seek(0)
+        try:
+            oauth_json = self.plugin_config["service_account_credentials"]
+            with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as ntf:
+                json.dump(oauth_json, ntf)
+                ntf.seek(0)
 
-            gc = gspread.service_account(filename=ntf.name)
-        
-        sheet_url = self.plugin_config["sheet_url"]
-        sheet = gc.open_by_url(sheet_url)
-        worksheet = sheet.get_worksheet(0)
-        data = worksheet.get_all_values()
-        colnames = data.pop(0)
+                gc = gspread.service_account(filename=ntf.name)
 
-        self._df = pd.DataFrame(data, columns=colnames)
+            sheet_url = self.plugin_config["sheet_url"]
+            sheet = gc.open_by_url(sheet_url)
+            worksheet = sheet.get_worksheet(0)
+            data = worksheet.get_all_values()
+            colnames = data.pop(0)
+
+            self._df = pd.DataFrame(data, columns=colnames)
+        except Exception as e:
+            if self.plugin_config.get("catch_api_error", True):
+                print(f"Error encountered while loading grade override sheet:\n{e}")
+                self._df = pd.DataFrame(columns=["Assignment ID", "Email", "Test Case", "Points", "PDF"])
+            else:
+                raise e
 
     @property
     def df(self):
