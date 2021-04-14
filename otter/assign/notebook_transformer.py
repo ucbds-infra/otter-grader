@@ -80,7 +80,8 @@ def get_transformed_cells(cells, assignment):
     transformed_cells, test_files = [], {}
     question_metadata, test_cases, processed_solution, md_has_prompt = {}, [], False, False
     need_close_export, no_solution = False, False
-
+    DEFAULT_SUCCESS_MESSAGE = "Test case passed!" # move
+    DEFAULT_FAILURE_MESSAGE = "Test case failed." # move
     for cell in cells:
 
         if has_seed(cell):
@@ -112,12 +113,13 @@ def get_transformed_cells(cells, assignment):
             elif is_test_cell(cell):
                 no_solution = True
                 test = read_test(cell, question_metadata, assignment)
-                if (test.points == None):
-                    test.points = 1
-                if (test.success_message == None):
-                    test.success_message = DEFAULT_SUCCESS_MESSAGE
-                if (test.failure_message == None):
-                    test.failure_message = DEFAULT_FAILURE_MESSAGE
+                if (hasattr(test, 'points')):
+                    if (test.points == None):
+                        test._replace(points = 1)
+                    if (test.success_message == None):
+                        test._replace(success_message = DEFAULT_SUCCESS_MESSAGE)
+                    if (test.failure_message == None):
+                        test._replace(failure_message = DEFAULT_FAILURE_MESSAGE)
                 test_cases.append(test)
 
             # elif is_seed_cell(cell):
@@ -132,15 +134,14 @@ def get_transformed_cells(cells, assignment):
         # if this is a test cell, parse and add to test_cases
         elif question_metadata and processed_solution and is_test_cell(cell):
             test = read_test(cell, question_metadata, assignment)
-            DEFAULT_SUCCESS_MESSAGE = "Test case passed!" # move
-            DEFAULT_FAILURE_MESSAGE = "Test case failed." # move
-    
-            if (test.points == None):
-                test.points = 1
-            if (test.success_message == None):
-                test.success_message = DEFAULT_SUCCESS_MESSAGE
-            if (test.failure_message == None):
-                test.failure_message = DEFAULT_FAILURE_MESSAGE
+
+            if (hasattr(test, 'points')):
+                if (test.points == None):
+                    test._replace(points = 1)
+                if (test.success_message == None):
+                    test._replace(success_message = DEFAULT_SUCCESS_MESSAGE)
+                if (test.failure_message == None):
+                    test._replace(failure_message = DEFAULT_FAILURE_MESSAGE)
             test_cases.append(test)
 
         # # if this is a solution cell, append. if manual question and no prompt, also append prompt cell

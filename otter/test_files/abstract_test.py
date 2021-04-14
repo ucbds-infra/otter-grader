@@ -16,7 +16,8 @@ from pygments.formatters import HtmlFormatter
 # class for storing the test cases themselves
 #   - body is the string that gets run for the test
 #   - hidden is the visibility of the test case
-TestCase = namedtuple("TestCase", ["name", "body", "hidden", "success_message", "failure_message"])
+fields = ["name", "body", "hidden", "success_message", "failure_message"]
+TestCase = namedtuple("TestCase", fields, defaults=(None,) * len(fields))
 
 
 # class for storing the results of a single test _case_ (within a test file)

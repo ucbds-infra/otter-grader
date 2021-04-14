@@ -10,7 +10,7 @@ import nbformat
 from collections import namedtuple
 
 from .constants import TEST_REGEX, TEST_META_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
-from .utils import get_source, lock, str_to_doctest, get_spec
+from .utils import get_source, lock, str_to_doctest
 
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
 OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
@@ -82,14 +82,7 @@ def read_test(cell, question, assignment):
 
     BEGIN = "# BEGIN TEST"
     END = "# END TEST"
-    source = get_source(cell)
-    begin_test_line = get_spec(source, "test")
-    i, lines = begin_test_line + 1, []
-    while source[i].strip() != BLOCK_QUOTE:
-        lines.append(source[i])
-        i = i + 1
-        
-    lines = yaml.full_load('\n'.join(lines))
+    lines = get_source(cell)
 
     has_metadata = False
     points = None
