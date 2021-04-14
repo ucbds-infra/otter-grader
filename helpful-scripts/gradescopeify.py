@@ -22,7 +22,8 @@ for drct in directories:
     print(f"Zipping {drct}")
     assert os.path.isdir(drct), f"{drct} is not a direcrory"
     support_files = [f for f in os.listdir(drct) if os.path.isfile(os.path.join(drct, f)) and \
-        f[-6:] != ".ipynb" and f != "requirements.txt" and f[0] != "." and f != "autograder.zip"]
+        f[-6:] != ".ipynb" and f != "requirements.txt" and f[0] != "." and f != "autograder.zip"
+        and f != "environment.yml"]
     
     # change directories
     original_dir = os.getcwd()
@@ -34,6 +35,10 @@ for drct in directories:
     if os.path.exists(os.path.join(drct, "requirements.txt")) and \
     os.path.isfile(os.path.join(drct, "requirements.txt")):
         gen_cmd += ["-r", os.path.join(drct, "requirements.txt")]
+    
+    if os.path.exists(os.path.join(drct, "environment.yml")) and \
+    os.path.isfile(os.path.join(drct, "environment.yml")):
+        gen_cmd += ["-r", os.path.join(drct, "environment.yml")]
 
     gen_cmd += support_files
 

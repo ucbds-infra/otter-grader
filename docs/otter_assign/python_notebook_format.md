@@ -25,7 +25,7 @@ This cell is removed from both output notebooks. These configurations, listed in
 run_tests: true                # whether to run tests on the resulting autograder directory
 requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
 overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
-environment: environment.yml   # path to an environment file for Gradescope; overwrite by default
+environment: environment.yml   # path to custom conda environment file
 init_cell: true                # include an Otter initialization cell at the top of the notebook
 check_all_cell: true           # include a check-all cell at the end of the notebook
 export_cell:                   # include an export cell at the end of the notebook; set to false for no cell
@@ -100,12 +100,12 @@ You can also set the autograder up to automatically upload PDFs to student submi
 generate:
   pdfs:
     token: YOUR_GS_TOKEN   # required
-    class_id: 1234         # required
+    course_id: 1234         # required
     assignment_id: 5678    # required
     filtering: true        # true is the default
 ```
 
-If you have an Otter Service deployment to which you would like students to submit, the necessary configurations for this submission can be specified in the `service` key of the assignment metadata. This has the required keys `endpoint` (the URL of the VM), `assignment_id` (the ID of the assignment in the Otter Service database), and `class_id` (the class ID in the database). You can optionally also set an auth provider with the `auth` key (which defaults to `google`).
+If you have an Otter Service deployment to which you would like students to submit, the necessary configurations for this submission can be specified in the `service` key of the assignment metadata. This has the required keys `endpoint` (the URL of the VM), `assignment_id` (the ID of the assignment in the Otter Service database), and `course_id` (the class ID in the database). You can optionally also set an auth provider with the `auth` key (which defaults to `google`).
 
 ```yaml
 service:

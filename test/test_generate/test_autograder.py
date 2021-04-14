@@ -3,6 +3,7 @@
 ####################################
 
 import os
+import shutil
 import unittest
 import subprocess
 import json
@@ -38,10 +39,18 @@ class TestAutograder(TestCase):
         # args = parser.parse_args(generate_command)
         # args.func = autograder
         # args.func(args)
+
+        if 'environment.yml' in os.listdir(os.getcwd()):
+            os.rename('environment.yml', 'environment_temp_rename.yml')
+
+
         run_otter(generate_command)
 
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
             self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-correct")
+
+        if 'environment_temp_rename.yml' in os.listdir(os.getcwd()):
+            os.rename('environment_temp_rename.yml', 'environment.yml')
 
 
     def test_custom_env(self):
@@ -64,3 +73,8 @@ class TestAutograder(TestCase):
 
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
             self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-custom-env")
+
+
+    def tearDown(self):
+        if 'environment_temp_rename.yml' in os.listdir(os.getcwd()):
+            os.rename('environment_temp_rename.yml', 'environment.yml')

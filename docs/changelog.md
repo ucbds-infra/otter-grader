@@ -1,5 +1,15 @@
 # Changelog
 
+**v2.1.6:**
+
+* Fixed `try`/`except` statements in tests per [#228](https://github.com/ucbds-infra/otter-grader/issues/228)
+* Added error handling in `GoogleSheetsGradeOverride` plugin for when the Google API hits a rate-limit error
+
+**v2.1.5:**
+
+* Added custom `environment.yml` files in autograder per [#103](https://github.com/ucbds-infra/otter-grader/issues/103)
+* Set `display.max_rows` to `None` for pandas to print all rows in summary per [#224](https://github.com/ucbds-infra/otter-grader/issues/224)
+
 **v2.1.4:**
 
 * Added `otter.utils.nullcontext` to be compatible with Python<3.7

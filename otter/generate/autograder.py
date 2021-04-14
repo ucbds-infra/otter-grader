@@ -20,6 +20,7 @@ from .token import APIClient
 from .utils import zip_folder
 from ..plugins import PluginCollection
 from ..run.run_autograder.constants import DEFAULT_OPTIONS
+from ..utils import load_default_file
 
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9.2-Linux-x86_64.sh"
@@ -38,7 +39,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         requirements (``str``): path to a Python or R requirements file for this assignment
         overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
             adding to them
-        environment (``str``): path to a Python or R envrionment file for this assignment (overwrites)
+        environment (``str``): path to a conda environment file for this assignment
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         files (``list[str]``): list of file paths to add to the zip file
@@ -116,47 +117,23 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
             shutil.copy(file, test_dir)
 
         # open requirements if it exists
-        requirements = requirements
-        reqs_filename = f"requirements.{'R' if options['lang'] == 'r' else 'txt'}"
-        if requirements is None and os.path.isfile(reqs_filename):
-            requirements = reqs_filename
-        
-        if requirements:
-            assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
-            f = open(requirements)
-        else:
-            f = open(os.devnull)
+        with load_default_file(requirements, f"requirements.{'R' if options['lang'] == 'r' else 'txt'}") as reqs:
+            template_context["other_requirements"] = reqs if reqs is not None else ""
 
-        template_context["other_requirements"] = f.read()
         template_context["overwrite_requirements"] = overwrite_requirements
 
-        # close the {% if not other_requirements %}stream
-        f.close()
-        
         # open environment if it exists
         # unlike requirements.txt, we will always overwrite, not append by default
-        environment = environment
-        env_filename = "environment.yml"
-        if environment is None and os.path.isfile(env_filename):
-            environment = env_filename
-        
-        if environment:
-            assert os.path.isfile(environment), f"Environment file {environment} not found"
-            with open(environment) as f:
-                data = yaml.safe_load(f)
-                f.close()
-            if "name" not in data:
+        with load_default_file(environment, "environment.yml") as env_contents:
+            template_context["other_environment"] = env_contents
+            if env_contents is not None:
+                data = yaml.safe_load(env_contents)
                 data['name'] = template_context["otter_env_name"]
-            template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
-        else:
-            template_context["other_environment"] = None
+                template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
   
         rendered = {}
         for fn, tmpl in templates.items():
             rendered[fn] = tmpl.render(**template_context)
-
-
-
 
         if os.path.isabs(output_path):
             zip_path = os.path.join(output_path, "autograder.zip")

@@ -1,12 +1,10 @@
+name: otter-env
 channels:
-- conda-forge
-- defaults
+    - defaults
+    - conda-forge
 dependencies:
-- python>=3.6
-- r-base
-- r-essentials
-- r-devtools
-- pip
-- pip:
-  - -r requirements.txt
-name: otter-grader
+    - python=3.7
+    - pip
+    - nb_conda_kernels
+    - pip:
+        - -r file:requirements.txt
