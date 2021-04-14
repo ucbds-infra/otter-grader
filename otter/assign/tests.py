@@ -9,11 +9,26 @@ import nbformat
 
 from collections import namedtuple
 
-from .constants import TEST_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
-from .utils import get_source, lock, str_to_doctest
+from .constants import TEST_REGEX, TEST_META_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
+from .utils import get_source, lock, str_to_doctest, get_spec
 
-Test = namedtuple('Test', ['input', 'output', 'hidden'])
+Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
 OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
+
+# def is_test_meta_cell(cell):
+#     """
+#     Returns whether the current cell is a test cell with metadata
+    
+#     Args:
+#         cell (``nbformat.NotebookNode``): a notebook cell
+
+#     Returns:
+#         ``bool``: whether the cell is a test cell
+#     """
+#     if cell.cell_type != 'code':
+#         return False
+#     source = get_source(cell)
+#     return source and re.match(TEST_META_REGEX, source[0], flags=re.IGNORECASE)
 
 def is_test_cell(cell):
     """
@@ -28,7 +43,7 @@ def is_test_cell(cell):
     if cell.cell_type != 'code':
         return False
     source = get_source(cell)
-    return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
+    return source and (re.match(TEST_REGEX, source[0], flags=re.IGNORECASE) or re.match(TEST_META_REGEX, source[0], flags=re.IGNORECASE))
 
 def any_public_tests(test_cases):
     """
@@ -44,7 +59,7 @@ def any_public_tests(test_cases):
 
 def read_test(cell, question, assignment):
     """
-    Returns the contents of a test as an ``(input, output, hidden)`` named tuple
+    Returns the contents of a test as an ``(input, output, hidden, points, success_message, failure_message)`` named tuple
     
     Args:
         cell (``nbformat.NotebookNode``): a test cell
@@ -63,7 +78,46 @@ def read_test(cell, question, assignment):
             output += results[0]
         elif results:
             output += results
-    return Test('\n'.join(get_source(cell)[1:]), output, hidden)
+
+
+    BEGIN = "# BEGIN TEST"
+    END = "# END TEST"
+    source = get_source(cell)
+    begin_test_line = get_spec(source, "test")
+    i, lines = begin_test_line + 1, []
+    while source[i].strip() != BLOCK_QUOTE:
+        lines.append(source[i])
+        i = i + 1
+        
+    lines = yaml.full_load('\n'.join(lines))
+
+    has_metadata = False
+    points = None
+    success_message = None
+    failure_message = None
+
+    for i, line in enumerate(lines):
+        if line.rstrip().endswith(END):
+            break
+        elif line.rstrip().endswith(BEGIN):
+            has_metadata = True
+        elif not has_metadata:
+            break
+        elif line.rstrip().startswith("points"):
+            value = line.rstrip().split(":")
+            points = value[-1]
+        elif line.rstrip().startswith("success_message"):
+            value = line.rstrip().split(":")
+            success_message = value[-1]
+        elif line.rstrip().startswith("failure_message"):
+            value = line.rstrip().split(":")
+            failure_message = value[-1]
+        elif ":" not in line.rstrip():
+            raise ValueError(
+                "Error in test metadata"
+            )
+
+    return Test('\n'.join(get_source(cell)[1:]), output, hidden, points, success_message, failure_message)
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """

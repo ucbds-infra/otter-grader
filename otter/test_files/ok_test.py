@@ -97,7 +97,7 @@ class OKTestFile(TestFile):
                 passed_all = False
             else:
                 n_passed += 1
-                result = 'Test case passed!'
+                result = test_case.success_message
 
             test_case_results.append(TestCaseResult(
                 test_case = test_case,

@@ -16,7 +16,7 @@ from pygments.formatters import HtmlFormatter
 # class for storing the test cases themselves
 #   - body is the string that gets run for the test
 #   - hidden is the visibility of the test case
-TestCase = namedtuple("TestCase", ["name", "body", "hidden"])
+TestCase = namedtuple("TestCase", ["name", "body", "hidden", "success_message", "failure_message"])
 
 
 # class for storing the results of a single test _case_ (within a test file)
@@ -68,7 +68,13 @@ class TestFile(ABC):
         {% if not test_case_result.passed %}
             <pre>{{ test_case_result.message }}</pre>
         {% else %}
-            <pre>Test case passed!</pre>
+            <pre>
+                {% if not test_case_result.success_message %}
+                    Test case passed!
+                {% else %} 
+                    {{ test_case_result.success_message }}
+                {% endif %}
+            </pre>
         {% endif %}
         </p>
     {% endfor %}
