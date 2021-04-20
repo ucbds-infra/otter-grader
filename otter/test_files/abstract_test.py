@@ -109,17 +109,17 @@ class TestFile(ABC):
             )
 
     # @abstractmethod
-    def __init__(self, name, path, test_cases, value=-1, all_or_nothing=True):
+    def __init__(self, name, path, test_cases, value=1, all_or_nothing=True, no_question_metadata_points=True):
         self.name = name
         self.path = path
         # self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
         # self.hidden_tests = [t for t, h in zip(tests, hiddens) if h]
 
         # if value is default, then it is okay for us to override points with the test metadata
-        no_question_metadata_points = False
-        if value == -1:
-            value = 1
-            no_question_metadata_points = True
+        # no_question_metadata_points = False
+        # if value == -1:
+        #     value = 1
+        #     no_question_metadata_points = True
 
 
         self.test_cases = test_cases
