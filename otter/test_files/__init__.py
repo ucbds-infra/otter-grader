@@ -56,11 +56,14 @@ class GradingResults:
             case_pts = test_file.values
             for pts_per_case, test_case_result in zip(case_pts, test_file.test_case_results):
                 name = test_case_result.test_case.name
+                score = pts_per_case * test_case_result.passed
+                if test_case_result.points:
+                    score = test_case_result.points * test_case_result.passed
                 tr = GradingTestCaseResult(
                     name = test_case_result.test_case.name,
                     # the score is the number of points earned for the file divided by the number of tests in the file
                     # times 0 if the test case failed and 1 if it passed
-                    score = pts_per_case * test_case_result.passed,
+                    score = score,
                     possible = pts_per_case,
                     # test_file = test_file,
                     hidden = test_case_result.test_case.hidden,
@@ -68,9 +71,12 @@ class GradingResults:
                     test_case_result = test_case_result
                 )
                 self.results[name] = tr
-
-                total_score += pts_per_case * test_case_result.passed
-                points_possible += pts_per_case
+                if test_case_result.points:
+                    total_score += test_case_result.points * test_case_result.passed
+                    points_possible += test_case_result.points
+                else:
+                    total_score += pts_per_case * test_case_result.passed
+                    points_possible += pts_per_case
         
         self.total = total_score
         self.possible = points_possible

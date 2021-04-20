@@ -16,15 +16,16 @@ from pygments.formatters import HtmlFormatter
 # class for storing the test cases themselves
 #   - body is the string that gets run for the test
 #   - hidden is the visibility of the test case
-fields = ["name", "body", "hidden", "success_message", "failure_message"]
-TestCase = namedtuple("TestCase", fields, defaults=(None,) * len(fields))
+TestCase_fields = ["name", "body", "hidden", "success_message", "failure_message", "points"]
+TestCase = namedtuple("TestCase", TestCase_fields, defaults=(None,) * len(TestCase_fields))
 
 
 # class for storing the results of a single test _case_ (within a test file)
 #   - message should be a string to print out to the student (ignored if passed is True)
 #   - passed is whether the test case passed
 #   - hidden is the visibility of the test case
-TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed"])
+TestCaseResult_fields = ["test_case", "message", "passed", "points"]
+TestCaseResult = namedtuple("TestCaseResult", TestCaseResult_fields, defaults=(None,) * len(TestCaseResult_fields))
 
 
 # TODO: fix reprs

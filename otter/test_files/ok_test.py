@@ -95,14 +95,20 @@ class OKTestFile(TestFile):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
             if not passed:
                 passed_all = False
+                result = test_case.failure_message
             else:
                 n_passed += 1
                 result = test_case.success_message
 
+            points = None
+            if test_case.points:
+                points = test_case.points
+                
             test_case_results.append(TestCaseResult(
                 test_case = test_case,
                 message = result,
-                passed = passed
+                passed = passed,
+                points = points
             ))
 
         self.passed_all = passed_all
