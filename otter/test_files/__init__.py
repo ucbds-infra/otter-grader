@@ -54,12 +54,13 @@ class GradingResults:
         for test_file in test_files:
             # pts_per_case = test_file.value / len(test_file.test_case_results)
             case_pts = test_file.values
-            for pts_per_case, test_case_result in zip(case_pts, test_file.test_case_results):
+            for i, (pts_per_case, test_case_result) in enumerate(zip(case_pts, test_file.test_case_results)):
                 name = test_case_result.test_case.name
 
                 # points specified in test metadata overrides the given case_pts if available
                 score = pts_per_case * test_case_result.passed
-                if test_case_result.points:
+                if test_case_result.points and test_file.no_question_metadata_points:
+                    # test_file.values[i] = test_case_result.points
                     score = test_case_result.points * test_case_result.passed
 
                 tr = GradingTestCaseResult(
@@ -75,7 +76,7 @@ class GradingResults:
                 )
                 self.results[name] = tr
 
-                if test_case_result.points:
+                if test_case_result.points and test_file.no_question_metadata_points:
                     total_score += test_case_result.points * test_case_result.passed
                     points_possible += test_case_result.points
                 else:

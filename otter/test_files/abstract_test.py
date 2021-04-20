@@ -109,19 +109,32 @@ class TestFile(ABC):
             )
 
     # @abstractmethod
-    def __init__(self, name, path, test_cases, value=1, all_or_nothing=True):
+    def __init__(self, name, path, test_cases, value=-1, all_or_nothing=True):
         self.name = name
         self.path = path
         # self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
         # self.hidden_tests = [t for t, h in zip(tests, hiddens) if h]
+
+        # if value is default, then it is okay for us to override points with the test metadata
+        no_question_metadata_points = False
+        if value == -1:
+            value = 1
+            no_question_metadata_points = True
+
+
         self.test_cases = test_cases
         if not isinstance(value, list):
             value = [value / len(self.test_cases) for _ in range(len(self.test_cases))]
         if len(value) != len(self.test_cases):
             raise ValueError(f"Length of 'value'{(len(value))} != length of 'test_caes' ({len(test_cases)})")
-        for i, tc in enumerate(test_cases):
-            if tc.points:
-                value[i] = tc.points
+
+        # if our test case has a point value (not none)
+        if no_question_metadata_points:
+            for i, tc in enumerate(test_cases):
+                if tc.points:
+                    value[i] = tc.points
+
+        self.no_question_metadata_points = no_question_metadata_points
         self.values = value
         # self.hidden = hidden
         self.passed_all = None

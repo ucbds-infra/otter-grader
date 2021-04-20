@@ -126,7 +126,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     cell.source = ['grader.check("{}")'.format(question['name'])]
 
     suites = [gen_suite(tests)]
-    points = question.get('points', 1)
+    points = question.get('points', -1)
     if isinstance(points, dict):
         points = points.get('each', 1) * len(suites[0]['cases'])
     elif isinstance(points, list):

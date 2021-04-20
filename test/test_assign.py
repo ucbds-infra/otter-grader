@@ -29,7 +29,7 @@ class TestAssign(TestCase):
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(unzip.stderr), 0, unzip.stderr.decode("utf-8"))
 
-        # shutil.move(TEST_FILES_PATH + "autograder", correct_dir_path)
+        # shutil.move(TEST_FILES_PATH + "autograder", correct_dir_path+ '/autograder')
         self.assertDirsEqual(TEST_FILES_PATH + "autograder", correct_dir_path, ignore_ext=[])
 
         # cleanup
@@ -48,9 +48,9 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_assign_args)
-        # shutil.move(TEST_FILES_PATH + "output/autograder", TEST_FILES_PATH + "example-correct/newautograder")
-        # shutil.move(TEST_FILES_PATH + "output/autograder", TEST_FILES_PATH + "example-correct/autograder")
-        # shutil.move(TEST_FILES_PATH + "output/student", TEST_FILES_PATH + "example-correct/student")
+        # shutil.move(TEST_FILES_PATH + "output/autograder", TEST_FILES_PATH + "example-correct/")
+        # shutil.move(TEST_FILES_PATH + "output/student", TEST_FILES_PATH + "example-correct/")
+        # shutil.move(TEST_FILES_PATH + "output/student", TEST_FILES_PATH + "example-correct/newstudent")
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
         
     def test_otter_example(self):
@@ -65,7 +65,8 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_assign_args)
-
+        # shutil.move(TEST_FILES_PATH + "output/autograder", TEST_FILES_PATH + "otter-correct/")
+        # shutil.move(TEST_FILES_PATH + "output/student", TEST_FILES_PATH + "otter-correct/")
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "otter-correct")     
 
     def test_pdf_example(self):
@@ -79,7 +80,8 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_assign_args)
-
+        # shutil.move(TEST_FILES_PATH + "output/autograder", TEST_FILES_PATH + "pdf-correct/")
+        # shutil.move(TEST_FILES_PATH + "output/student", TEST_FILES_PATH + "pdf-correct/")
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
         
         # # check gradescope zip file

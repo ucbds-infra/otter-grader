@@ -1,5 +1,5 @@
 test = {   'name': 'q8',
-    'points': 1,
+    'points': -1,
     'suites': [   {   'cases': [   {   'code': '>>> len(z) == 10\nTrue',
                                        'failure_message': 'Make sure the length is 10.',
                                        'hidden': False,
