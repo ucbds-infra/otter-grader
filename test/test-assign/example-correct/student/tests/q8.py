@@ -1,1 +1,12 @@
-test = {'name': 'q8', 'points': 1, 'suites': [{'cases': [{'code': '>>> len(z) == 10\nTrue', 'hidden': False, 'locked': False}], 'scored': True, 'setup': '', 'teardown': '', 'type': 'doctest'}]}
+test = {   'name': 'q8',
+    'points': 1,
+    'suites': [   {   'cases': [   {   'code': '>>> len(z) == 10\nTrue',
+                                       'failure_message': 'Make sure the length is 10.',
+                                       'hidden': False,
+                                       'locked': False,
+                                       'points': 10.0,
+                                       'success_message': 'The length is correct!'}],
+                      'scored': True,
+                      'setup': '',
+                      'teardown': '',
+                      'type': 'doctest'}]}

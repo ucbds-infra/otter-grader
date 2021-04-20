@@ -84,16 +84,16 @@ def read_test(cell, question, assignment):
             break
         elif line.rstrip().startswith("points"):
             value = line.rstrip().split(":")
-            points = value[-1]
+            points = value[-1].strip()
         elif line.rstrip().startswith("hidden"):
             value = line.rstrip().split(":")
-            hidden = "true" in value[-1].lower() or "true" == value[-1].lower()
+            hidden = "true" in value[-1].strip().lower() or "true" == value[-1].strip().lower()
         elif line.rstrip().startswith("success_message"):
             value = line.rstrip().split(":")
-            success_message = value[-1]
+            success_message = value[-1].strip()
         elif line.rstrip().startswith("failure_message"):
             value = line.rstrip().split(":")
-            failure_message = value[-1]
+            failure_message = value[-1].strip()
         elif len(line.rstrip()) <= 1:
             continue
         elif ":" not in line.rstrip():
@@ -183,11 +183,13 @@ def gen_case(test):
             code_lines[i] += ';'
     code_lines = code_lines[new_start_index+1:]
     code_lines.append(test.output)
-
+    points = None
+    if test.points != None:
+        points = float(test.points)
     return {
         'code': '\n'.join(code_lines),
         'hidden': test.hidden,
-        'points': float(test.points), 
+        'points': points, 
         'success_message': test.success_message, 
         'failure_message': test.failure_message, 
         'locked': False
