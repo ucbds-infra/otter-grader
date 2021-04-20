@@ -47,6 +47,7 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_assign_args)
+        # shutil.move(TEST_FILES_PATH + "output/autograder", TEST_FILES_PATH + "example-correct/newautograder")
         # shutil.move(TEST_FILES_PATH + "output/autograder", TEST_FILES_PATH + "example-correct/autograder")
         # shutil.move(TEST_FILES_PATH + "output/student", TEST_FILES_PATH + "example-correct/student")
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
@@ -103,7 +104,7 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_gradescope_args)
-
+        
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
 
         # check gradescope zip file
