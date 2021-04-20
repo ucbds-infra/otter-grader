@@ -93,20 +93,20 @@ class OKTestFile(TestFile):
         n_passed, passed_all, test_case_results = 0, True, []
 
         DEFAULT_SUCCESS_MESSAGE = "Test case passed!" # move
-        DEFAULT_FAILURE_MESSAGE = "Test case failed." # move
+        # DEFAULT_FAILURE_MESSAGE = "Test case failed." # move
 
         for i, test_case in enumerate(self.test_cases):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
             if not passed:
                 passed_all = False
-                result = test_case.failure_message
-                if result == None:
-                    result = DEFAULT_FAILURE_MESSAGE
+                # result = DEFAULT_FAILURE_MESSAGE
+                if test_case.failure_message:
+                    result += "\n" + test_case.failure_message
             else:
                 n_passed += 1
-                result = test_case.success_message
-                if result == None:
-                    result = DEFAULT_SUCCESS_MESSAGE
+                result = DEFAULT_SUCCESS_MESSAGE
+                if test_case.success_message:
+                    result = test_case.success_message
 
             # make points as a separate field
             points = None
