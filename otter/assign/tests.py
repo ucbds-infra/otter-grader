@@ -175,10 +175,6 @@ def gen_case(test):
     code_lines = str_to_doctest(test.input.split('\n'), [])
 
     END = "# END TEST"
-    # for i in range(len(code_lines) - 1):
-    #     if code_lines[i].rstrip().endswith(END):
-    #         code_lines = code_lines[i+1:]
-    #         break
     new_start_index = -1
     for i in range(len(code_lines) - 1):
         if code_lines[i].rstrip().endswith(END):
