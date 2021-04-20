@@ -93,10 +93,10 @@ def read_test(cell, question, assignment):
             hidden = "true" in value[-1].strip().lower() or "true" == value[-1].strip().lower()
         elif line.rstrip().startswith("success_message"):
             value = line.rstrip().split(":")
-            success_message = value[-1].strip()
+            success_message = ":".join(value[1:]).strip()
         elif line.rstrip().startswith("failure_message"):
             value = line.rstrip().split(":")
-            failure_message = value[-1].strip()
+            failure_message = ":".join(value[1:]).strip()
         elif len(line.rstrip()) <= 1:
             continue
         elif ":" not in line.rstrip():
