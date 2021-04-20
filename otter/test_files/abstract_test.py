@@ -76,7 +76,13 @@ class TestFile(ABC):
         </p>
     {% endfor %}
     """)
-
+    html_result_success_template = Template("""
+    {% for test_case_result in test_case_results %}
+        <p><em>{{ test_case_result.test_case.name }}: </em>
+        {% if test_case_result.passed %}<pre>{{ test_case_result.message }}</pre>{% endif %}
+        </p>
+    {% endfor %}
+    """)
     plain_result_fail_template = Template(dedent("""\
     {{ name }} results:
     {% for test_case_result in test_case_results %}{% if not test_case_result.passed %}
@@ -84,7 +90,7 @@ class TestFile(ABC):
 
     def _repr_html_(self):
         if self.passed_all:
-            return type(self).html_result_pass_template.render(name=self.name)
+            return type(self).html_result_pass_template.render(name=self.name) + type(self).html_result_success_template.render(name = self.name, test_case_results=self.test_case_results)
         else:
             return type(self).html_result_fail_template.render(
                 name=self.name,
@@ -94,7 +100,7 @@ class TestFile(ABC):
 
     def __repr__(self):
         if self.passed_all:
-            return type(self).plain_result_pass_template.render(name=self.name)
+            return type(self).plain_result_pass_template.render(name=self.name) + type(self).html_result_success_template.render(name = self.name, test_case_results=self.test_case_results)
         else:
             return type(self).plain_result_fail_template.render(
                 name=self.name,
@@ -113,6 +119,9 @@ class TestFile(ABC):
             value = [value / len(self.test_cases) for _ in range(len(self.test_cases))]
         if len(value) != len(self.test_cases):
             raise ValueError(f"Length of 'value'{(len(value))} != length of 'test_caes' ({len(test_cases)})")
+        for i, tc in enumerate(test_cases):
+            if tc.points:
+                value[i] = tc.points
         self.values = value
         # self.hidden = hidden
         self.passed_all = None
