@@ -103,7 +103,7 @@ class OKTestFile(TestFile):
             points = None
             if test_case.points:
                 points = test_case.points
-                
+
             test_case_results.append(TestCaseResult(
                 test_case = test_case,
                 message = result,
@@ -163,7 +163,10 @@ class OKTestFile(TestFile):
             test_cases.append(TestCase(
                 name = test_case.get('name', f"{test_spec['name']} - {i + 1}"),
                 body = dedent(test_case['code']), 
-                hidden = test_case.get('hidden', True)
+                hidden = test_case.get('hidden', True),
+                points = test_case.get('points'),
+                success_message = test_case.get('success_message'),
+                failure_message = test_case.get('failure_message')
             ))
             # tests.append(dedent(test_case['code']))
             # hiddens.append(test_case.get('hidden', True))

@@ -187,6 +187,9 @@ def gen_case(test):
     return {
         'code': '\n'.join(code_lines),
         'hidden': test.hidden,
+        'points': float(test.points), 
+        'success_message': test.success_message, 
+        'failure_message': test.failure_message, 
         'locked': False
     }
 

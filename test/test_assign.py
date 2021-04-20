@@ -47,7 +47,7 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_assign_args)
-        # shutil.move(TEST_FILES_PATH + "output/student/example.ipynb", TEST_FILES_PATH + "example-correct/example.ipynb")
+        # shutil.move(TEST_FILES_PATH + "output/autograder/tests/q1.py", TEST_FILES_PATH + "example-correct/q1MOVED.py")
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
         
     def test_otter_example(self):
