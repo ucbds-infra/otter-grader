@@ -71,11 +71,7 @@ class TestFile(ABC):
             <pre>{{ test_case_result.message }}</pre>
         {% else %}
             <pre>
-                {% if not test_case_result.success_message %}
-                    Test case passed!
-                {% else %} 
-                    {{ test_case_result.success_message }}
-                {% endif %}
+                {{ test_case_result.message }}
             </pre>
         {% endif %}
         </p>
