@@ -65,7 +65,7 @@ def read_test(cell, question, assignment):
         elif results:
             output += results
 
-
+    # do we want to allow # BEGIN HIDDEN TEST
     BEGIN = "# BEGIN TEST"
     END = "# END TEST"
     lines = get_source(cell)
@@ -75,6 +75,9 @@ def read_test(cell, question, assignment):
     success_message = None
     failure_message = None
 
+    # parse through the test cell block
+    # default values to be None, will set in ok_test.py and __init__.py if needed
+    # alternatively, can set now or try in notebook_transformer.py
     for i, line in enumerate(lines):
         if line.rstrip().endswith(END):
             break
@@ -175,12 +178,14 @@ def gen_case(test):
     code_lines = str_to_doctest(test.input.split('\n'), [])
 
     END = "# END TEST"
+    # Need to define a new index as we might night just have one line to define test metadata
     new_start_index = -1
     for i in range(len(code_lines) - 1):
         if code_lines[i].rstrip().endswith(END):
             new_start_index = i
         if code_lines[i+1].startswith('>>>') and len(code_lines[i].strip()) > 3 and not code_lines[i].strip().endswith("\\"):
             code_lines[i] += ';'
+
     code_lines = code_lines[new_start_index+1:]
     code_lines.append(test.output)
     points = None

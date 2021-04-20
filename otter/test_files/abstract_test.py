@@ -62,6 +62,7 @@ class TestFile(ABC):
 
     plain_result_pass_template = Template("{{ name }} passed!")
 
+    
     html_result_fail_template = Template("""
     <p><strong style='color: red;'>{{ name }}</strong></p>
     <p><strong>Test result:</strong></p>

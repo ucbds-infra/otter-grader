@@ -91,15 +91,24 @@ class OKTestFile(TestFile):
                 the percentage score on this test, and a pointer to the current ``otter.ok_parser.OKTest`` object
         """
         n_passed, passed_all, test_case_results = 0, True, []
+
+        DEFAULT_SUCCESS_MESSAGE = "Test case passed!" # move
+        DEFAULT_FAILURE_MESSAGE = "Test case failed." # move
+
         for i, test_case in enumerate(self.test_cases):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
             if not passed:
                 passed_all = False
                 result = test_case.failure_message
+                if result == None:
+                    result = DEFAULT_FAILURE_MESSAGE
             else:
                 n_passed += 1
                 result = test_case.success_message
+                if result == None:
+                    result = DEFAULT_SUCCESS_MESSAGE
 
+            # make points as a separate field
             points = None
             if test_case.points:
                 points = test_case.points
@@ -159,6 +168,7 @@ class OKTestFile(TestFile):
         test_cases = []
         # hiddens = []
 
+        # support points, success/failure message
         for i, test_case in enumerate(test_spec['suites'][0]['cases']):
             test_cases.append(TestCase(
                 name = test_case.get('name', f"{test_spec['name']} - {i + 1}"),
