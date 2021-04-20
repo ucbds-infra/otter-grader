@@ -15,20 +15,6 @@ from .utils import get_source, lock, str_to_doctest
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
 OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
 
-# def is_test_meta_cell(cell):
-#     """
-#     Returns whether the current cell is a test cell with metadata
-    
-#     Args:
-#         cell (``nbformat.NotebookNode``): a notebook cell
-
-#     Returns:
-#         ``bool``: whether the cell is a test cell
-#     """
-#     if cell.cell_type != 'code':
-#         return False
-#     source = get_source(cell)
-#     return source and re.match(TEST_META_REGEX, source[0], flags=re.IGNORECASE)
 
 def is_test_cell(cell):
     """
@@ -43,7 +29,7 @@ def is_test_cell(cell):
     if cell.cell_type != 'code':
         return False
     source = get_source(cell)
-    return source and (re.match(TEST_REGEX, source[0], flags=re.IGNORECASE) or re.match(TEST_META_REGEX, source[0], flags=re.IGNORECASE))
+    return source and (re.match(TEST_REGEX, source[0], flags=re.IGNORECASE) or re.match(TEST_META_REGEX, "".join(source), flags=re.IGNORECASE))
 
 def any_public_tests(test_cases):
     """
@@ -99,12 +85,17 @@ def read_test(cell, question, assignment):
         elif line.rstrip().startswith("points"):
             value = line.rstrip().split(":")
             points = value[-1]
+        elif line.rstrip().startswith("hidden"):
+            value = line.rstrip().split(":")
+            hidden = "true" in value[-1].lower() or "true" == value[-1].lower()
         elif line.rstrip().startswith("success_message"):
             value = line.rstrip().split(":")
             success_message = value[-1]
         elif line.rstrip().startswith("failure_message"):
             value = line.rstrip().split(":")
             failure_message = value[-1]
+        elif len(line.rstrip()) <= 1:
+            continue
         elif ":" not in line.rstrip():
             raise ValueError(
                 "Error in test metadata"
@@ -183,10 +174,18 @@ def gen_case(test):
     """
     code_lines = str_to_doctest(test.input.split('\n'), [])
 
+    END = "# END TEST"
+    # for i in range(len(code_lines) - 1):
+    #     if code_lines[i].rstrip().endswith(END):
+    #         code_lines = code_lines[i+1:]
+    #         break
+    new_start_index = -1
     for i in range(len(code_lines) - 1):
+        if code_lines[i].rstrip().endswith(END):
+            new_start_index = i
         if code_lines[i+1].startswith('>>>') and len(code_lines[i].strip()) > 3 and not code_lines[i].strip().endswith("\\"):
             code_lines[i] += ';'
-
+    code_lines = code_lines[new_start_index+1:]
     code_lines.append(test.output)
 
     return {
