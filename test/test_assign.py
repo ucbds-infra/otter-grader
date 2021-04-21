@@ -29,7 +29,7 @@ class TestAssign(TestCase):
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(unzip.stderr), 0, unzip.stderr.decode("utf-8"))
 
-        # shutil.move(TEST_FILES_PATH + "autograder", correct_dir_path+ '/autograder')
+        # shutil.move(TEST_FILES_PATH + "autograder", correct_dir_path)
         self.assertDirsEqual(TEST_FILES_PATH + "autograder", correct_dir_path, ignore_ext=[])
 
         # cleanup
