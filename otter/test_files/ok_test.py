@@ -187,7 +187,7 @@ class OKTestFile(TestFile):
         # grab whether the tests are all-or-nothing
         all_or_nothing = test_spec.get('all_or_nothing', True)
         
-        no_question_metadata_points= True
-        if test_spec.get('points'):
-            no_question_metadata_points = False
-        return cls(test_spec['name'], path, test_cases, test_spec.get('points', 1), all_or_nothing, no_question_metadata_points)
+        # no_question_metadata_points= True
+        # if test_spec.get('points'):
+        #     no_question_metadata_points = False
+        return cls(test_spec['name'], path, test_cases, test_spec.get('points', 1), all_or_nothing)

@@ -109,7 +109,7 @@ class TestFile(ABC):
             )
 
     # @abstractmethod
-    def __init__(self, name, path, test_cases, value=1, all_or_nothing=True, no_question_metadata_points=True):
+    def __init__(self, name, path, test_cases, value=1, all_or_nothing=True):
         self.name = name
         self.path = path
         # self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
@@ -121,21 +121,23 @@ class TestFile(ABC):
         #     value = 1
         #     no_question_metadata_points = True
 
+        self.resolve_point_values(value, test_cases)
+
 
         self.test_cases = test_cases
-        if not isinstance(value, list):
-            value = [value / len(self.test_cases) for _ in range(len(self.test_cases))]
-        if len(value) != len(self.test_cases):
-            raise ValueError(f"Length of 'value'{(len(value))} != length of 'test_caes' ({len(test_cases)})")
+        # if not isinstance(value, list):
+        #     value = [value / len(self.test_cases) for _ in range(len(self.test_cases))]
+        # if len(value) != len(self.test_cases):
+        #     raise ValueError(f"Length of 'value'{(len(value))} != length of 'test_caes' ({len(test_cases)})")
 
         # if our test case has a point value (not none)
-        if no_question_metadata_points:
-            for i, tc in enumerate(test_cases):
-                if tc.points:
-                    value[i] = tc.points
+        # if no_question_metadata_points:
+        #     for i, tc in enumerate(test_cases):
+        #         if tc.points:
+        #             value[i] = tc.points
 
-        self.no_question_metadata_points = no_question_metadata_points
-        self.values = value
+        # self.no_question_metadata_points = no_question_metadata_points
+        self.values = [c.points for c in self.test_cases]
         # self.hidden = hidden
         self.passed_all = None
         # self.failed_test = None
@@ -144,6 +146,18 @@ class TestFile(ABC):
         self.all_or_nothing = all_or_nothing
         self.test_case_results = []
         self.grade = None
+
+    @staticmethod
+    def resolve_point_values(value, cases, ctx=""):
+        case_pts = [c.points for c in cases]
+        total_specified = sum(p for p in case_pts if p is not None)
+        if total_specified > value:
+            raise ValueError(f"Individual test case point values exceed total question value{': ' if ctx else ''}{ctx}")
+        pts_left = value - total_specified
+        pts_per_unspecified_case = pts_left / len([p for p in case_pts if p is None])
+        for i, case in enumerate(cases):
+            if case.points is None:
+                cases[i] = case._replace(points=pts_per_unspecified_case)
 
     @classmethod
     @abstractmethod

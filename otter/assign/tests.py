@@ -9,8 +9,10 @@ import nbformat
 
 from collections import namedtuple
 
-from .constants import TEST_REGEX, TEST_META_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
+from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGEX, OTTR_TEST_NAME_REGEX, \
+    OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
+from ..test_files.abstract_test import TestFile
 
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
 OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
@@ -29,7 +31,7 @@ def is_test_cell(cell):
     if cell.cell_type != 'code':
         return False
     source = get_source(cell)
-    return source and (re.match(TEST_REGEX, source[0], flags=re.IGNORECASE) or re.match(TEST_META_REGEX, "".join(source), flags=re.IGNORECASE))
+    return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
 
 def any_public_tests(test_cases):
     """
@@ -45,7 +47,8 @@ def any_public_tests(test_cases):
 
 def read_test(cell, question, assignment):
     """
-    Returns the contents of a test as an ``(input, output, hidden, points, success_message, failure_message)`` named tuple
+    Returns the contents of a test as an ``(input, output, hidden, points, success_message, 
+    failure_message)`` named tuple
     
     Args:
         cell (``nbformat.NotebookNode``): a test cell
@@ -65,46 +68,24 @@ def read_test(cell, question, assignment):
         elif results:
             output += results
 
-    # do we want to allow # BEGIN HIDDEN TEST
-    BEGIN = "# BEGIN TEST"
-    END = "# END TEST"
     lines = get_source(cell)
 
-    has_metadata = False
-    points = None
-    success_message = None
-    failure_message = None
+    if re.match(BEGIN_TEST_CONFIG_REGEX, lines[0], flags=re.IGNORECASE):
+        for i, line in enumerate(lines):
+            if re.match(END_TEST_CONFIG_REGEX, line, flags=re.IGNORECASE):
+                break
+        config = yaml.full_load("\n".join(lines[:i+1]))
+        assert isinstance(config, dict), f"Invalid test config in cell {cell}"
+    else:
+        config = {}
+        i = 0
+    
+    hidden = config.get("hidden", hidden)
+    points = config.get("points", None)
+    success_message = config.get("success_message", None)
+    failure_message = config.get("failure_message", None)
 
-    # parse through the test cell block
-    # default values to be None, will set in ok_test.py and __init__.py if needed
-    # alternatively, can set now or try in notebook_transformer.py
-    for i, line in enumerate(lines):
-        if line.rstrip().endswith(END):
-            break
-        elif line.rstrip().endswith(BEGIN):
-            has_metadata = True
-        elif not has_metadata:
-            break
-        elif line.rstrip().startswith("points"):
-            value = line.rstrip().split(":")
-            points = value[-1].strip()
-        elif line.rstrip().startswith("hidden"):
-            value = line.rstrip().split(":")
-            hidden = "true" in value[-1].strip().lower() or "true" == value[-1].strip().lower()
-        elif line.rstrip().startswith("success_message"):
-            value = line.rstrip().split(":")
-            success_message = ":".join(value[1:]).strip()
-        elif line.rstrip().startswith("failure_message"):
-            value = line.rstrip().split(":")
-            failure_message = ":".join(value[1:]).strip()
-        elif len(line.rstrip()) <= 1:
-            continue
-        elif ":" not in line.rstrip():
-            raise ValueError(
-                "Error in test metadata"
-            )
-
-    return Test('\n'.join(get_source(cell)[1:]), output, hidden, points, success_message, failure_message)
+    return Test('\n'.join(get_source(cell)[i+1:]), output, hidden, points, success_message, failure_message)
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """
@@ -124,7 +105,8 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     cell = nbformat.v4.new_code_cell()
 
     cell.source = ['grader.check("{}")'.format(question['name'])]
-
+    
+    TestFile.resolve_point_values(question.get("points", 1), tests, ctx=question['name'])
     suites = [gen_suite(tests)]
     points = question.get('points', 1)
     if isinstance(points, dict):
@@ -176,28 +158,14 @@ def gen_case(test):
         ``dict``: the OK test case
     """
     code_lines = str_to_doctest(test.input.split('\n'), [])
-
-    END = "# END TEST"
-    # Need to define a new index as we might night just have one line to define test metadata
-    new_start_index = -1
-    for i in range(len(code_lines) - 1):
-        if code_lines[i].rstrip().endswith(END):
-            new_start_index = i
-        if code_lines[i+1].startswith('>>>') and len(code_lines[i].strip()) > 3 and not code_lines[i].strip().endswith("\\"):
-            code_lines[i] += ';'
-
-    code_lines = code_lines[new_start_index+1:]
     code_lines.append(test.output)
-    points = None
-    if test.points != None:
-        points = float(test.points)
     return {
         'code': '\n'.join(code_lines),
         'hidden': test.hidden,
-        'points': points, 
+        'points': test.points, 
         'success_message': test.success_message, 
         'failure_message': test.failure_message, 
-        'locked': False
+        'locked': False,
     }
 
 def write_test(path, test):

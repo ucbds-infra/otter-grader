@@ -59,9 +59,9 @@ class GradingResults:
 
                 # points specified in test metadata overrides the given case_pts if available
                 score = pts_per_case * test_case_result.passed
-                if test_case_result.points and test_file.no_question_metadata_points:
-                    # test_file.values[i] = test_case_result.points
-                    score = test_case_result.points * test_case_result.passed
+                # if test_case_result.points and test_file.no_question_metadata_points:
+                #     # test_file.values[i] = test_case_result.points
+                #     score = test_case_result.points * test_case_result.passed
 
                 tr = GradingTestCaseResult(
                     name = test_case_result.test_case.name,
