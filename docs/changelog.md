@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.1.7:**
+
+* Swapped `IPython.core.inputsplitter.IPythonInputSplitter` for `IPython.core.inputtransformer2.TransformerManager` in `otter.execute.execute_notebook`
+
 **v2.1.6:**
 
 * Fixed `try`/`except` statements in tests per [#228](https://github.com/ucbds-infra/otter-grader/issues/228)
