@@ -260,7 +260,7 @@ class GradingResults:
         output["tests"].append({
             "name": "Public Tests",
             "visibility": "visible",
-            "output": "\n\n".join(tf.summary() for _, tf in self.results.items())
+            "output": "\n\n".join(tf.summary(public_only=True) for _, tf in self.results.items())
         })
 
         for test_name in self.test_files:
