@@ -78,6 +78,14 @@ class TestFile(ABC):
 
     @staticmethod
     def resolve_test_file_points(total_points, test_cases):
+        if isinstance(total_points, list):
+            if len(total_points) != len(test_cases):
+                raise ValueError("Points specified in test has different length than number of test cases")
+            test_cases = [tc._replace(points=pt) for tc, pt in zip(test_cases, total_points)]
+            total_points = None
+        elif total_points is not None and not isinstance(total_points, (int, float)):
+            raise TypeError(f"Test spec points has invalid type: {total_points}")
+
         point_values = []
         for i, test_case in enumerate(test_cases):
             if test_case.points is not None:

@@ -163,13 +163,6 @@ class OKTestFile(TestFile):
 
         # resolve point values for each test case
         spec_pts = test_spec.get('points', None)
-        if isinstance(spec_pts, list):
-            if len(spec_pts) != len(test_cases):
-                raise ValueError("Points specified in test has different length than number of test cases")
-            test_cases = [tc._replace(points=pt) for tc, pt in zip(test_cases, spec_pts)]
-            spec_pts = None
-        elif spec_pts is not None and not isinstance(spec_pts, (int, float)):
-            raise TypeError(f"Test spec points has invalid type: {spec_pts}")
         test_cases = cls.resolve_test_file_points(spec_pts, test_cases)
 
         # convert path into PurePosixPath for test name

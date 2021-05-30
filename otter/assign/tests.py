@@ -105,19 +105,20 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     cell = nbformat.v4.new_code_cell()
 
     cell.source = ['grader.check("{}")'.format(question['name'])]
-    
-    TestFile.resolve_point_values(question.get("points", 1), tests, ctx=question['name'])
-    suites = [gen_suite(tests)]
-    points = question.get('points', 1)
+
+    points = question.get('points', None)
     if isinstance(points, dict):
-        points = points.get('each', 1) * len(suites[0]['cases'])
+        points = points.get('each', 1) * len(tests)
     elif isinstance(points, list):
         if len(points) != len(tests):
             raise ValueError(
                 f"Error in question {question['name']}: length of 'points' is {len(points)} but there "
                 f"are {len(tests)} tests"
             )
-    
+
+    tests = TestFile.resolve_test_file_points(points, tests)
+    suites = [gen_suite(tests)]
+
     test = {
         'name': question['name'],
         'points': points,
