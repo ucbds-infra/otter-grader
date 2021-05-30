@@ -51,33 +51,15 @@ class TestFile(ABC):
             ``test_cases``
     """
 
-    html_result_pass_template = Template("""
-    <p><strong>{{ name }}</strong> passed!</p>
-    """)
-
-    html_result_fail_template = Template("""
-    <p><strong style='color: red;'>{{ name }}</strong></p>
-    <p><strong>Test result:</strong></p>
-    {% for test_case_result in test_case_results %}
-        <p><em>{{ test_case_result.test_case.name }}</em>
-        {% if not test_case_result.passed %}
-            <pre>{{ test_case_result.message }}</pre>
-        {% else %}
-            <pre>Test case passed!</pre>
-        {% endif %}
-        </p>
-    {% endfor %}
-    """)
-
     def _repr_html_(self):
         if self.passed_all:
-            return type(self).html_result_pass_template.render(name=self.name)
+            return f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed!</p>"
         else:
-            return type(self).html_result_fail_template.render(
-                name=self.name,
-                # test_code=highlight(self.failed_test, PythonConsoleLexer(), HtmlFormatter(noclasses=True)),
-                test_case_results=self.test_case_results
-            )
+            ret = f"<p><strong style='color: red;'><pre style='display: inline;'>{self.name}</pre> results:</strong></p>"
+            for tcr in self.test_case_results:
+                ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> result:</strong></p>"
+                ret += f"<pre>{indent(tcr.message, '  ')}</pre>"
+            return ret
 
     def __repr__(self):
         return self.summary()
@@ -109,7 +91,7 @@ class TestFile(ABC):
                 per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
         else:
             # assume all other tests are worth 0 points
-            if pre_specified == 0 and total_points != 0:
+            if pre_specified == 0:
                 per_remaining = 1 / len(point_values)
             else:
                 per_remaining = 0.0

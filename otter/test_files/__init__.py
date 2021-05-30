@@ -256,17 +256,24 @@ class GradingResults:
         # hidden visibility determined by show_hidden_tests_on_release
         hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
 
-        for test_name in self.test_cases:
-            result = self.get_result(test_name)
-            hidden, incorrect = result.hidden, result.incorrect
-            score, possible = result.score, result.possible
+        # start w/ summary of public tests
+        output["tests"].append({
+            "name": "Public Tests",
+            "visibility": "visible",
+            "output": "\n\n".join(tf.summary() for _, tf in self.results.items())
+        })
+
+        for test_name in self.test_files:
+            test_file = self.get_result(test_name)
+            # hidden, incorrect = result.hidden, result.incorrect
+            score, possible = test_file.score, test_file.possible
 
             output["tests"].append({
-                "name": result.name,
+                "name": test_file.name,
                 "score": score,
                 "max_score": possible,
-                "visibility": hidden_test_visibility if hidden else 'visible',
-                "output": result.test_case_result.message
+                "visibility": hidden_test_visibility, #  if hidden else 'visible',
+                "output": test_file.summary(),
             })
 
         if options["show_stdout"]:
