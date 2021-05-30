@@ -1,5 +1,17 @@
 # Changelog
 
+**v2.2.0:**
+
+* Changed grouping of results to be per-question rather than per-test case
+
+**v2.1.8:**
+
+* Fixed bug in total score calculation when the grade override plugin is used
+
+**v2.1.7:**
+
+* Swapped `IPython.core.inputsplitter.IPythonInputSplitter` for `IPython.core.inputtransformer2.TransformerManager` in `otter.execute.execute_notebook`
+
 **v2.1.6:**
 
 * Fixed `try`/`except` statements in tests per [#228](https://github.com/ucbds-infra/otter-grader/issues/228)
