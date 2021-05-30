@@ -69,7 +69,7 @@ def main(file, tests_path, question, seed, **kwargs):
 		if results.total / results.possible == 1:
 			output = "All tests passed!"
 		else:
-			output = "\n".join(repr(test_file) for test_file in results.test_files)
+			output = "\n".join(repr(test_file) for _, test_file in results.results.items())
 
 		print(output)
 
