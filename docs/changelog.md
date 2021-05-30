@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.1.8:**
+
+* Fixed bug in total score calculation when the grade override plugin is used
+
 **v2.1.7:**
 
 * Swapped `IPython.core.inputsplitter.IPythonInputSplitter` for `IPython.core.inputtransformer2.TransformerManager` in `otter.execute.execute_notebook`
