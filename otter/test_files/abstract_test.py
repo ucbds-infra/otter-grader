@@ -58,7 +58,7 @@ class TestFile(ABC):
             ret = f"<p><strong style='color: red;'><pre style='display: inline;'>{self.name}</pre> results:</strong></p>"
             for tcr in self.test_case_results:
                 ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> result:</strong></p>"
-                ret += f"<pre>{indent(tcr.message, '  ')}</pre>"
+                ret += f"<pre>{indent(tcr.message, '    ')}</pre>"
             return ret
 
     def __repr__(self):
@@ -153,7 +153,7 @@ class TestFile(ABC):
             if not tcr.passed:
                 tcr_summaries.append(tcr.message.strip())
 
-        return f"{self.name} results:\n" + indent("\n".join(tcr_summaries), "  ")
+        return f"{self.name} results:\n" + indent("\n".join(tcr_summaries), "    ")
 
     @classmethod
     @abstractmethod
