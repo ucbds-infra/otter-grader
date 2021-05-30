@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Changed grouping of results to be per-question rather than per-test case
+
 **v2.1.8:**
 
 * Fixed bug in total score calculation when the grade override plugin is used
