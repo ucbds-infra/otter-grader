@@ -69,11 +69,11 @@ class GradingResults:
                 )
                 self.results[name] = tr
 
-                total_score += pts_per_case * test_case_result.passed
-                points_possible += pts_per_case
+        #         total_score += pts_per_case * test_case_result.passed
+        #         points_possible += pts_per_case
         
-        self.total = total_score
-        self.possible = points_possible
+        # self.total = total_score
+        # self.possible = points_possible
     
     def __repr__(self):
         return pprint.pformat(self.to_dict(), indent=2)
@@ -84,6 +84,20 @@ class GradingResults:
         The names of all test cases tracked in these grading results
         """
         return list(self.results.keys())
+
+    @property
+    def total(self):
+        """
+        The total points earned
+        """
+        return sum(tr.score for tr in self.results.values())
+
+    @property
+    def possible(self):
+        """
+        The total points possible
+        """
+        return sum(tr.possible for tr in self.results.values())
     
     def get_result(self, test_name):
         """
