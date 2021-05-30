@@ -5,7 +5,7 @@ their results
 
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from textwrap import dedent
+from textwrap import dedent, indent
 from typing import Tuple, List, Dict, Any
 from jinja2 import Template
 from pygments import highlight
@@ -55,8 +55,6 @@ class TestFile(ABC):
     <p><strong>{{ name }}</strong> passed!</p>
     """)
 
-    plain_result_pass_template = Template("{{ name }} passed!")
-
     html_result_fail_template = Template("""
     <p><strong style='color: red;'>{{ name }}</strong></p>
     <p><strong>Test result:</strong></p>
@@ -71,11 +69,6 @@ class TestFile(ABC):
     {% endfor %}
     """)
 
-    plain_result_fail_template = Template(dedent("""\
-    {{ name }} results:
-    {% for test_case_result in test_case_results %}{% if not test_case_result.passed %}
-    {{ test_case_result.message }}{% endif %}{% endfor %}"""))
-
     def _repr_html_(self):
         if self.passed_all:
             return type(self).html_result_pass_template.render(name=self.name)
@@ -87,14 +80,7 @@ class TestFile(ABC):
             )
 
     def __repr__(self):
-        if self.passed_all:
-            return type(self).plain_result_pass_template.render(name=self.name)
-        else:
-            return type(self).plain_result_fail_template.render(
-                name=self.name,
-                # test_code=self.failed_test,
-                test_case_results=self.test_case_results
-            )
+        return self.summary()
 
     # @abstractmethod
     def __init__(self, name, path, test_cases, all_or_nothing=True):
@@ -103,6 +89,7 @@ class TestFile(ABC):
         self.test_cases = test_cases
         self.all_or_nothing = all_or_nothing
         self.test_case_results = []
+        self._score = None
 
     @staticmethod
     def resolve_test_file_points(total_points, test_cases):
@@ -143,6 +130,45 @@ class TestFile(ABC):
         else:
             return sum(tcr.test_case.points for tcr in self.test_case_results if tcr.passed) / \
                 sum(tc.points for tc in self.test_cases)
+
+    @property
+    def score(self):
+        if self._score is not None:
+            return self._score
+        return sum(tcr.test_case.points for tcr in self.test_case_results if tcr.passed)
+
+    @property
+    def possible(self):
+        return sum(tc.points for tc in self.test_cases)
+
+    def update_score(self, new_score):
+        self._score = new_score
+
+    def to_dict(self):
+        return {
+            "score": self.score,
+            "possible": self.possible,
+            "name": self.name,
+            "path": self.path,
+            "test_cases": [tc._asdict() for tc in self.test_cases],
+            "all_or_nothing": self.all_or_nothing,
+            "test_case_results": [tcr._asdict() for tcr in self.test_case_results],
+        }
+
+    def summary(self, public_only=False):
+        if self.passed_all:
+            return f"{self.name} results: All test cases passed!"
+
+        tcrs = self.test_case_results
+        if public_only:
+            tcrs = [tcr for tcr in tcrs if not tcr.test_case.hidden]
+        
+        tcr_summaries = []
+        for tcr in tcrs:
+            if not tcr.passed:
+                tcr_summaries.append(tcr.message.strip())
+
+        return f"{self.name} results:\n" + indent("\n".join(tcr_summaries), "  ")
 
     @classmethod
     @abstractmethod

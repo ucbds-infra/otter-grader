@@ -45,33 +45,33 @@ class GradingResults:
     """
     def __init__(self, test_files):
         self._plugin_data = {}
-        self.test_files = test_files
-        self.results = {}
+        self.results = {tf.name: tf for tf in test_files}
+        # self.results = {}
         self.output = None
         self.all_hidden = False
         
-        total_score, points_possible = 0, 0
-        for test_file in test_files:
-            for test_case_result in test_file.test_case_results:
-                case_pts = test_case_result.test_case.points
-                name = test_case_result.test_case.name
-                self.results[name] = GradingTestCaseResult(
-                    name = test_case_result.test_case.name,
-                    score = case_pts * test_case_result.passed,
-                    possible = case_pts,
-                    hidden = test_case_result.test_case.hidden,
-                    incorrect = not test_case_result.passed,
-                    test_case_result = test_case_result,
-                    test_file = test_file,
-                )
+        # total_score, points_possible = 0, 0
+        # for test_file in test_files:
+        #     for test_case_result in test_file.test_case_results:
+        #         case_pts = test_case_result.test_case.points
+        #         name = test_case_result.test_case.name
+        #         self.results[name] = GradingTestCaseResult(
+        #             name = test_case_result.test_case.name,
+        #             score = case_pts * test_case_result.passed,
+        #             possible = case_pts,
+        #             hidden = test_case_result.test_case.hidden,
+        #             incorrect = not test_case_result.passed,
+        #             test_case_result = test_case_result,
+        #             test_file = test_file,
+        #         )
 
     def __repr__(self):
         return pprint.pformat(self.to_dict(), indent=2)
 
     @property
-    def test_cases(self):
+    def test_files(self):
         """
-        The names of all test cases tracked in these grading results
+        The names of all test files tracked in these grading results
         """
         return list(self.results.keys())
 
@@ -91,13 +91,13 @@ class GradingResults:
     
     def get_result(self, test_name):
         """
-        Returns the ``GradingTestCaseResult`` named tuple corresponding to the test with name ``test_name``
+        Returns the ``TestFile`` corresponding to the test with name ``test_name``
 
         Args:
             test_name (``str``): the name of the desired test
         
         Returns:
-            ``GradingTestCaseResult``: the results of that test
+            ``TestFile``: the graded test file object
         """
         return self.results[test_name]
 
@@ -114,16 +114,16 @@ class GradingResults:
         result = self.results[test_name]
         return result.score
 
-    def update_result(self, test_name, **kwargs):
+    def update_score(self, test_name, new_score):
         """
         Updates the values in the ``GradingTestCaseResult`` object stored in ``self.results[test_name]`` 
         with the key-value pairs in ``kwargs``.
 
         Args:
             test_name (``str``): the name of the test
-            kwargs: key-value pairs for updating the ``GradingTestCaseResult`` object
+            new_score (``int`` or ``float``): the new score
         """
-        self.results[test_name] = self.results[test_name]._replace(**kwargs)
+        self.results[test_name].update_score(new_score)
 
     def set_output(self, output):
         """
@@ -193,21 +193,16 @@ class GradingResults:
         """
         found_discrepancy = False
         # for test_name in  self.test_cases:
-        for test_file in self.test_files:
-            test_name = test_file.name
-            # if ignore_hidden and self.get_results(test_name).hidden:
-            #     continue
-            
-            # score = self.get_score(test_name)
+        for test_name, test_file in self.results.items():
             if ignore_hidden:
                 tcrs = [test_case_result.passed for test_case_result in test_file.test_case_results if not test_case_result.hidden]
-                score = sum(tcrs) / len(tcrs) * test_file.value
+                score = sum(tcr.test_case.points for tcr in tcrs)
             else:
-                score = test_file.grade * test_file.value
+                score = test_file.score
             try:
                 result = log.get_results(test_name)
                 # TODO fix
-                logged_score = result.grade * result.value
+                logged_score = result.score
                 if not math.isclose(score, logged_score):
                     print("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
                         test_name, score, logged_score
@@ -236,12 +231,7 @@ class GradingResults:
         Returns:
             ``dict``: the results in dictionary form
         """
-        output = {}
-        for test_name in self.test_cases:
-            result = self.get_result(test_name)
-            output[test_name] = dict(result._asdict())
-
-        return output
+        return {tn: tf.to_dict() for tn, tf in self.results.items()}
 
     def to_gradescope_dict(self, config):
         """
@@ -261,18 +251,15 @@ class GradingResults:
 
         if self.output is not None:
             output["output"] = self.output
+            # TODO: use output to display public test case results?
 
         # hidden visibility determined by show_hidden_tests_on_release
         hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
-        # no_separate_visibility = options["test_visibility"]
-        # assert no_separate_visibility in ["hidden", "visible", "after_published"]
 
         for test_name in self.test_cases:
             result = self.get_result(test_name)
             hidden, incorrect = result.hidden, result.incorrect
             score, possible = result.score, result.possible
-            # public_score, hidden_score = score * options["public_multiplier"], score * (1 - options["public_multiplier"])
-            # public_possible, hidden_possible = possible * options["public_multiplier"], possible * (1 - options["public_multiplier"])
 
             output["tests"].append({
                 "name": result.name,
