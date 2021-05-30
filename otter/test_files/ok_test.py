@@ -90,30 +90,30 @@ class OKTestFile(TestFile):
             ``tuple`` of (``bool``, ``float`` ``otter.ok_parser.OKTest``): whether the test passed,
                 the percentage score on this test, and a pointer to the current ``otter.ok_parser.OKTest`` object
         """
-        n_passed, passed_all, test_case_results = 0, True, []
+        n_passed = 0 #, passed_all, test_case_results = 0, True, []
         for i, test_case in enumerate(self.test_cases):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
-            if not passed:
-                passed_all = False
-            else:
+            # if not passed:
+            #     passed_all = False
+            if passed:
                 n_passed += 1
                 result = 'Test case passed!'
 
-            test_case_results.append(TestCaseResult(
+            self.test_case_results.append(TestCaseResult(
                 test_case = test_case,
                 message = result,
-                passed = passed
+                passed = passed,
             ))
 
-        self.passed_all = passed_all
-        self.test_case_results = test_case_results
+        # self.passed_all = passed_all
+        # self.test_case_results = test_case_results
 
-        if self.all_or_nothing and not self.passed_all:
-            self.grade = 0
-        elif not self.all_or_nothing and not self.passed_all:
-            self.grade = n_passed / len(self.test_case_results)
-        else:
-            self.grade = 1
+        # if self.all_or_nothing and not self.passed_all:
+        #     self.grade = 0
+        # elif not self.all_or_nothing and not self.passed_all:
+        #     self.grade = n_passed / len(self.test_case_results)
+        # else:
+        #     self.grade = 1
 
     @classmethod
     def from_file(cls, path):
@@ -151,16 +151,16 @@ class OKTestFile(TestFile):
         assert not bool(test_suite.get('teardown'))
 
         test_cases = []
-        # hiddens = []
-
         for i, test_case in enumerate(test_spec['suites'][0]['cases']):
             test_cases.append(TestCase(
                 name = test_case.get('name', f"{test_spec['name']} - {i + 1}"),
                 body = dedent(test_case['code']), 
-                hidden = test_case.get('hidden', True)
+                hidden = test_case.get('hidden', True),
+                points = test_case.get('points', None),
             ))
-            # tests.append(dedent(test_case['code']))
-            # hiddens.append(test_case.get('hidden', True))
+
+        # resolve point values for each test case
+        test_cases = cls.resolve_test_file_points(test_spec.get('points', None), test_cases)
 
         # convert path into PurePosixPath for test name
         path = str(pathlib.Path(path).as_posix())
@@ -168,4 +168,4 @@ class OKTestFile(TestFile):
         # grab whether the tests are all-or-nothing
         all_or_nothing = test_spec.get('all_or_nothing', True)
 
-        return cls(test_spec['name'], path, test_cases, test_spec.get('points', 1), all_or_nothing)
+        return cls(test_spec['name'], path, test_cases, all_or_nothing)

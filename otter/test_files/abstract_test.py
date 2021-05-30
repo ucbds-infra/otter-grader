@@ -16,7 +16,8 @@ from pygments.formatters import HtmlFormatter
 # class for storing the test cases themselves
 #   - body is the string that gets run for the test
 #   - hidden is the visibility of the test case
-TestCase = namedtuple("TestCase", ["name", "body", "hidden"])
+#   - points is the number of points this test case is worth
+TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points"])
 
 
 # class for storing the results of a single test _case_ (within a test file)
@@ -37,7 +38,6 @@ class TestFile(ABC):
         name (``str``): the name of test file
         path (``str``): the path to the test file
         test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        value (``float`` or ``list[float]``, optional): the point value of each test case, defaults to 1
         all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
             cases
 
@@ -45,13 +45,10 @@ class TestFile(ABC):
         name (``str``): the name of test file
         path (``str``): the path to the test file
         test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        values (``list[float]``): the point value of each test case, defaults to ``1/len(test_cases)``
         all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
             cases
-        passed_all (``bool``): whether all of the test cases were passed
         test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
             ``test_cases``
-        grade (``float``): the percentage of ``points`` earned for this test file as a decimal
     """
 
     html_result_pass_template = Template("""
@@ -100,25 +97,52 @@ class TestFile(ABC):
             )
 
     # @abstractmethod
-    def __init__(self, name, path, test_cases, value=1, all_or_nothing=True):
+    def __init__(self, name, path, test_cases, all_or_nothing=True):
         self.name = name
         self.path = path
-        # self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
-        # self.hidden_tests = [t for t, h in zip(tests, hiddens) if h]
         self.test_cases = test_cases
-        if not isinstance(value, list):
-            value = [value / len(self.test_cases) for _ in range(len(self.test_cases))]
-        if len(value) != len(self.test_cases):
-            raise ValueError(f"Length of 'value'{(len(value))} != length of 'test_caes' ({len(test_cases)})")
-        self.values = value
-        # self.hidden = hidden
-        self.passed_all = None
-        # self.failed_test = None
-        # self.failed_test_hidden = None
-        # self.result = None
         self.all_or_nothing = all_or_nothing
         self.test_case_results = []
-        self.grade = None
+
+    @staticmethod
+    def resolve_test_file_points(total_points, test_cases):
+        point_values = []
+        for i, test_case in enumerate(test_cases):
+            if test_case.points is not None:
+                assert type(test_case.points) in (int, float), f"Invalid point type: {type(test_case.points)}"
+                point_values.append(test_case.points)
+            else:
+                point_values.append(None)
+
+        pre_specified = sum(p for p in point_values if p is not None)
+        if total_points is not None:
+            if pre_specified > total_points:
+                raise ValueError(f"More points specified in test cases that allowed for test")
+            else:
+                per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
+        else:
+            # assume all other tests are worth 0 points
+            if pre_specified == 0 and total_points != 0:
+                per_remaining = 1 / len(point_values)
+            else:
+                per_remaining = 0.0
+
+        point_values = [p if p is not None else per_remaining for p in point_values]
+        return [tc._replace(points=p) for tc, p in zip(test_cases, point_values)]
+
+    @property
+    def passed_all(self):
+        return all(tcr.passed for tcr in self.test_case_results)
+
+    @property
+    def grade(self):
+        if self.all_or_nothing and not self.passed_all:
+            return 0
+        elif self.all_or_nothing and self.passed_all:
+            return 1
+        else:
+            return sum(tcr.test_case.points for tcr in self.test_case_results if tcr.passed) / \
+                sum(tc.points for tc in self.test_cases)
 
     @classmethod
     @abstractmethod

@@ -17,7 +17,7 @@ from ..run.run_autograder.constants import DEFAULT_OPTIONS
 
 GradingTestCaseResult = namedtuple(
     "GradingTestCaseResult", 
-    ["name", "score", "possible", "hidden", "incorrect", "test_case_result"]
+    ["name", "score", "possible", "hidden", "incorrect", "test_case_result", "test_file"]
 )
 
 
@@ -52,29 +52,19 @@ class GradingResults:
         
         total_score, points_possible = 0, 0
         for test_file in test_files:
-            # pts_per_case = test_file.value / len(test_file.test_case_results)
-            case_pts = test_file.values
-            for pts_per_case, test_case_result in zip(case_pts, test_file.test_case_results):
+            for test_case_result in test_file.test_case_results:
+                case_pts = test_case_result.test_case.points
                 name = test_case_result.test_case.name
-                tr = GradingTestCaseResult(
+                self.results[name] = GradingTestCaseResult(
                     name = test_case_result.test_case.name,
-                    # the score is the number of points earned for the file divided by the number of tests in the file
-                    # times 0 if the test case failed and 1 if it passed
-                    score = pts_per_case * test_case_result.passed,
-                    possible = pts_per_case,
-                    # test_file = test_file,
+                    score = case_pts * test_case_result.passed,
+                    possible = case_pts,
                     hidden = test_case_result.test_case.hidden,
                     incorrect = not test_case_result.passed,
-                    test_case_result = test_case_result
+                    test_case_result = test_case_result,
+                    test_file = test_file,
                 )
-                self.results[name] = tr
 
-        #         total_score += pts_per_case * test_case_result.passed
-        #         points_possible += pts_per_case
-        
-        # self.total = total_score
-        # self.possible = points_possible
-    
     def __repr__(self):
         return pprint.pformat(self.to_dict(), indent=2)
 
