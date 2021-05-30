@@ -93,7 +93,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
                 (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
             ]
             for _, row in df.iterrows():
-                results.update_result(row["Test Case"], score=row["Points"])
+                results.update_result(row["Test Case"], score=float(row["Points"]))
 
     def during_generate(self, otter_config, assignment):
         """
