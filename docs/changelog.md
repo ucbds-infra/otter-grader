@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v2.2.0:**
 
 * Changed grouping of results to be per-question rather than per-test case
 
