@@ -25,14 +25,14 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     The google sheet should have the following format:
 
     =============== ================== =========== ======== ==============
-     Assignment ID   Email              Test Case   Points   PDF          
+     Assignment ID   Email              Question    Points   PDF          
     =============== ================== =========== ======== ==============
      123456          student@univ.edu   q1a - 1     1        false        
     =============== ================== =========== ======== ==============
 
     ``Assignment ID`` should be the ID of the assignment on Gradescope, ``Email`` should be the email
-    address corresponding to the student's Gradescope account, ``Test Case`` should be the name of
-    the test case, and ``Points`` should be the number of points that the student should be assigned.
+    address corresponding to the student's Gradescope account, ``Question`` should be the name of
+    the question, and ``Points`` should be the number of points that the student should be assigned.
     ``PDF`` should be ``false`` if the student's PDF should *not* be regenerated during this run of
     the autograder.
     """
@@ -65,7 +65,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         except Exception as e:
             if self.plugin_config.get("catch_api_error", True):
                 print(f"Error encountered while loading grade override sheet:\n{e}")
-                self._df = pd.DataFrame(columns=["Assignment ID", "Email", "Test Case", "Points", "PDF"])
+                self._df = pd.DataFrame(columns=["Assignment ID", "Email", "Question", "Points", "PDF"])
             else:
                 raise e
 
@@ -93,7 +93,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
                 (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
             ]
             for _, row in df.iterrows():
-                results.update_result(row["Test Case"], score=row["Points"])
+                results.update_score(row["Question"], float(row["Points"]))
 
     def during_generate(self, otter_config, assignment):
         """

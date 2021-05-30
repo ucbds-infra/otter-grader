@@ -38,102 +38,51 @@ class TestRun(TestCase):
         self.expected_results = {
             "tests": [
                 {
-                    "name": "q1 - 1",
-                    "score": 0.0,
-                    "max_score": 0.0,
+                    "name": "Public Tests",
                     "visibility": "visible",
-                    "output": "Test case passed!"
+                    "output": "q1 results: All test cases passed!\n\nq2 results: All test cases passed!\n\nq3 results: All test cases passed!\n\nq4 results: All test cases passed!\n\nq6 results: All test cases passed!\n\nq7 results: All test cases passed!"
                 },
                 {
-                    "name": "q1 - 2",
-                    "score": 0.0,
-                    "max_score": 0.0,
-                    "visibility": "visible",
-                    "output": "Test case passed!"
-                },
-                {
-                    "name": "q1 - 3",
+                    "name": "q1",
                     "score": 0.0,
                     "max_score": 0.0,
                     "visibility": "hidden",
-                    "output": "Test case passed!"
+                    "output": "q1 results: All test cases passed!"
                 },
                 {
-                    "name": "q1 - 4",
-                    "score": 0.0,
-                    "max_score": 0.0,
+                    "name": "q2",
+                    "score": 0,
+                    "max_score": 2.0,
                     "visibility": "hidden",
-                    "output": "Test case passed!"
+                    "output": "q2 results:\n    Trying:\n        negate(True)\n    Expecting:\n        False\n    **********************************************************************\n    Line 2, in q2 0\n    Failed example:\n        negate(True)\n    Expected:\n        False\n    Got:\n        True\n    Trying:\n        negate(False)\n    Expecting:\n        True\n    **********************************************************************\n    Line 2, in q2 1\n    Failed example:\n        negate(False)\n    Expected:\n        True\n    Got:\n        False\n    Trying:\n        negate(\"\")\n    Expecting:\n        True\n    **********************************************************************\n    Line 2, in q2 2\n    Failed example:\n        negate(\"\")\n    Expected:\n        True\n    Got:\n        ''\n    Trying:\n        negate(1)\n    Expecting:\n        False\n    **********************************************************************\n    Line 2, in q2 3\n    Failed example:\n        negate(1)\n    Expected:\n        False\n    Got:\n        1"
                 },
                 {
-                    "name": "q2 - 1",
-                    "score": 0.0,
-                    "max_score": 0.5,
-                    "visibility": "visible",
-                    "output": "Trying:\n    negate(True)\nExpecting:\n    False\n**********************************************************************\nLine 2, in q2 0\nFailed example:\n    negate(True)\nExpected:\n    False\nGot:\n    True\n"
-                },
-                {
-                    "name": "q2 - 2",
-                    "score": 0.0,
-                    "max_score": 0.5,
-                    "visibility": "visible",
-                    "output": "Trying:\n    negate(False)\nExpecting:\n    True\n**********************************************************************\nLine 2, in q2 1\nFailed example:\n    negate(False)\nExpected:\n    True\nGot:\n    False\n"
-                },
-                {
-                    "name": "q2 - 3",
-                    "score": 0.0,
-                    "max_score": 0.5,
+                    "name": "q3",
+                    "score": 2.0,
+                    "max_score": 2.0,
                     "visibility": "hidden",
-                    "output": "Trying:\n    negate(\"\")\nExpecting:\n    True\n**********************************************************************\nLine 2, in q2 2\nFailed example:\n    negate(\"\")\nExpected:\n    True\nGot:\n    ''\n"
+                    "output": "q3 results: All test cases passed!"
                 },
                 {
-                    "name": "q2 - 4",
-                    "score": 0.0,
-                    "max_score": 0.5,
-                    "visibility": "hidden",
-                    "output": "Trying:\n    negate(1)\nExpecting:\n    False\n**********************************************************************\nLine 2, in q2 3\nFailed example:\n    negate(1)\nExpected:\n    False\nGot:\n    1\n"
-                },
-                {
-                    "name": "q3 - 1",
-                    "score": 1.0,
-                    "max_score": 1.0,
-                    "visibility": "visible",
-                    "output": "Test case passed!"
-                },
-                {
-                    "name": "q3 - 2",
+                    "name": "q4",
                     "score": 1.0,
                     "max_score": 1.0,
                     "visibility": "hidden",
-                    "output": "Test case passed!"
+                    "output": "q4 results: All test cases passed!"
                 },
                 {
-                    "name": "q4 - 1",
-                    "score": 1.0,
-                    "max_score": 1.0,
-                    "visibility": "hidden",
-                    "output": "Test case passed!"
-                },
-                {
-                    "name": "q6 - 1",
+                    "name": "q6",
                     "score": 2.5,
-                    "max_score": 2.5,
-                    "visibility": "visible",
-                    "output": "Test case passed!"
-                },
-                {
-                    "name": "q6 - 2",
-                    "score": 0.0,
-                    "max_score": 2.5,
+                    "max_score": 5.0,
                     "visibility": "hidden",
-                    "output": "Trying:\n    fib = fiberator()\nExpecting nothing\nok\nTrying:\n    for _ in range(10):\n        print(next(fib))\nExpecting:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\n**********************************************************************\nLine 3, in q6 1\nFailed example:\n    for _ in range(10):\n        print(next(fib))\nExpected:\n    0\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n    34\nGot:\n    0\n    1\n    1\n    1\n    2\n    3\n    5\n    8\n    13\n    21\n"
+                    "output": "q6 results:\n    Trying:\n        fib = fiberator()\n    Expecting nothing\n    ok\n    Trying:\n        for _ in range(10):\n            print(next(fib))\n    Expecting:\n        0\n        1\n        1\n        2\n        3\n        5\n        8\n        13\n        21\n        34\n    **********************************************************************\n    Line 3, in q6 1\n    Failed example:\n        for _ in range(10):\n            print(next(fib))\n    Expected:\n        0\n        1\n        1\n        2\n        3\n        5\n        8\n        13\n        21\n        34\n    Got:\n        0\n        1\n        1\n        1\n        2\n        3\n        5\n        8\n        13\n        21"
                 },
                 {
-                    "name": "q7 - 1",
+                    "name": "q7",
                     "score": 1.0,
                     "max_score": 1.0,
-                    "visibility": "visible",
-                    "output": "Test case passed!"
+                    "visibility": "hidden",
+                    "output": "q7 results: All test cases passed!"
                 }
             ],
             "output": "Students are allowed 1 submissions every 1 days. You have 0 submissions in that period."

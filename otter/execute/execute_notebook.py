@@ -10,7 +10,7 @@ import copy
 from unittest import mock
 from contextlib import redirect_stdout, redirect_stderr
 from IPython.display import display
-from IPython.core.inputsplitter import IPythonInputSplitter
+from IPython.core.inputtransformer2 import TransformerManager
 
 from .check_wrapper import CheckCallWrapper
 
@@ -109,7 +109,7 @@ def execute_notebook(nb, secret='secret', initial_env=None, ignore_errors=False,
         if cell['cell_type'] == 'code':
             # transform the input to executable Python
             # FIXME: use appropriate IPython functions here
-            isp = IPythonInputSplitter(line_input_checker=False)
+            isp = TransformerManager()#(line_input_checker=False)
             try:
                 code_lines = []
                 cell_source_lines = cell['source']
