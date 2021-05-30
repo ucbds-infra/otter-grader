@@ -57,6 +57,8 @@ def main(autograder_dir, **kwargs):
         df = pd.DataFrame(output["tests"])
         if "output" in df.columns:
             df.drop(columns=["output"], inplace=True)
+        if "visibility" in df.columns:
+            df.drop(columns=["visibility"], inplace=True)
 
         print(df)
 
