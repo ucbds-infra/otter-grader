@@ -103,6 +103,9 @@ class TestFile(ABC):
     def passed_all(self):
         return all(tcr.passed for tcr in self.test_case_results)
 
+    def passed_all_public(self):
+        return all(tcr.passed for tcr in self.test_case_results if not tcr.test_case.hidden)
+
     @property
     def grade(self):
         if self.all_or_nothing and not self.passed_all:
@@ -138,7 +141,7 @@ class TestFile(ABC):
         }
 
     def summary(self, public_only=False):
-        if self.passed_all:
+        if (not public_only and self.passed_all) or (public_only and self.passed_all_public):
             return f"{self.name} results: All test cases passed!"
 
         tcrs = self.test_case_results
