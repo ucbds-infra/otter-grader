@@ -5,7 +5,7 @@ their results
 
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from textwrap import dedent
+from textwrap import dedent, indent
 from typing import Tuple, List, Dict, Any
 from jinja2 import Template
 from pygments import highlight
@@ -16,7 +16,8 @@ from pygments.formatters import HtmlFormatter
 # class for storing the test cases themselves
 #   - body is the string that gets run for the test
 #   - hidden is the visibility of the test case
-TestCase = namedtuple("TestCase", ["name", "body", "hidden"])
+#   - points is the number of points this test case is worth
+TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points", "success_message", "failure_message"])
 
 
 # class for storing the results of a single test _case_ (within a test file)
@@ -26,7 +27,6 @@ TestCase = namedtuple("TestCase", ["name", "body", "hidden"])
 TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed"])
 
 
-# TODO: fix reprs
 class TestFile(ABC):
     """
     A (abstract) single test file for Otter. This ABC defines how test results are represented and sets
@@ -37,7 +37,6 @@ class TestFile(ABC):
         name (``str``): the name of test file
         path (``str``): the path to the test file
         test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        value (``float`` or ``list[float]``, optional): the point value of each test case, defaults to 1
         all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
             cases
 
@@ -45,80 +44,142 @@ class TestFile(ABC):
         name (``str``): the name of test file
         path (``str``): the path to the test file
         test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        values (``list[float]``): the point value of each test case, defaults to ``1/len(test_cases)``
         all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
             cases
-        passed_all (``bool``): whether all of the test cases were passed
         test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
             ``test_cases``
-        grade (``float``): the percentage of ``points`` earned for this test file as a decimal
     """
-
-    html_result_pass_template = Template("""
-    <p><strong>{{ name }}</strong> passed!</p>
-    """)
-
-    plain_result_pass_template = Template("{{ name }} passed!")
-
-    html_result_fail_template = Template("""
-    <p><strong style='color: red;'>{{ name }}</strong></p>
-    <p><strong>Test result:</strong></p>
-    {% for test_case_result in test_case_results %}
-        <p><em>{{ test_case_result.test_case.name }}</em>
-        {% if not test_case_result.passed %}
-            <pre>{{ test_case_result.message }}</pre>
-        {% else %}
-            <pre>Test case passed!</pre>
-        {% endif %}
-        </p>
-    {% endfor %}
-    """)
-
-    plain_result_fail_template = Template(dedent("""\
-    {{ name }} results:
-    {% for test_case_result in test_case_results %}{% if not test_case_result.passed %}
-    {{ test_case_result.message }}{% endif %}{% endfor %}"""))
 
     def _repr_html_(self):
         if self.passed_all:
-            return type(self).html_result_pass_template.render(name=self.name)
+            return f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed!</p>"
         else:
-            return type(self).html_result_fail_template.render(
-                name=self.name,
-                # test_code=highlight(self.failed_test, PythonConsoleLexer(), HtmlFormatter(noclasses=True)),
-                test_case_results=self.test_case_results
-            )
+            ret = f"<p><strong style='color: red;'><pre style='display: inline;'>{self.name}</pre> results:</strong></p>"
+            for tcr in self.test_case_results:
+                ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> result:</strong></p>"
+                ret += f"<pre>{indent(tcr.message, '    ')}</pre>"
+                if tcr.passed and tcr.test_case.success_message is not None:
+                    ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.success_message}</p>"
+                if not tcr.passed and tcr.test_case.failure_message is not None:
+                    ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.failure_message}</p>"
+            return ret
 
     def __repr__(self):
-        if self.passed_all:
-            return type(self).plain_result_pass_template.render(name=self.name)
-        else:
-            return type(self).plain_result_fail_template.render(
-                name=self.name,
-                # test_code=self.failed_test,
-                test_case_results=self.test_case_results
-            )
+        return self.summary()
 
     # @abstractmethod
-    def __init__(self, name, path, test_cases, value=1, all_or_nothing=True):
+    def __init__(self, name, path, test_cases, all_or_nothing=True):
         self.name = name
         self.path = path
-        # self.public_tests = [t for t, h in zip(tests, hiddens) if not h]
-        # self.hidden_tests = [t for t, h in zip(tests, hiddens) if h]
         self.test_cases = test_cases
-        if not isinstance(value, list):
-            value = [value / len(self.test_cases) for _ in range(len(self.test_cases))]
-        if len(value) != len(self.test_cases):
-            raise ValueError(f"Length of 'value'{(len(value))} != length of 'test_caes' ({len(test_cases)})")
-        self.values = value
-        # self.hidden = hidden
-        self.passed_all = None
-        # self.failed_test = None
-        # self.failed_test_hidden = None
-        # self.result = None
         self.all_or_nothing = all_or_nothing
         self.test_case_results = []
-        self.grade = None
+        self._score = None
+
+    @staticmethod
+    def resolve_test_file_points(total_points, test_cases):
+        if isinstance(total_points, list):
+            if len(total_points) != len(test_cases):
+                raise ValueError("Points specified in test has different length than number of test cases")
+            test_cases = [tc._replace(points=pt) for tc, pt in zip(test_cases, total_points)]
+            total_points = None
+        elif total_points is not None and not isinstance(total_points, (int, float)):
+            raise TypeError(f"Test spec points has invalid type: {total_points}")
+
+        point_values = []
+        for i, test_case in enumerate(test_cases):
+            if test_case.points is not None:
+                assert type(test_case.points) in (int, float), f"Invalid point type: {type(test_case.points)}"
+                point_values.append(test_case.points)
+            else:
+                point_values.append(None)
+
+        pre_specified = sum(p for p in point_values if p is not None)
+        if total_points is not None:
+            if pre_specified > total_points:
+                raise ValueError(f"More points specified in test cases that allowed for test")
+            else:
+                try:
+                    per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
+                except ZeroDivisionError:
+                    per_remaining = 0.0
+        else:
+            if pre_specified == 0 and all(p in (0, None) for p in point_values):
+                # if only zeros specified, assume test worth 1 pt and divide amongst nonzero cases
+                try:
+                    per_remaining = 1 / sum(p is None for p in point_values)
+                except ZeroDivisionError:
+                    per_remaining = 0.0
+            elif pre_specified == 0:
+                per_remaining = 1 / len(point_values)
+            else:
+                # assume all other tests are worth 0 points
+                per_remaining = 0.0
+
+        point_values = [p if p is not None else per_remaining for p in point_values]
+        return [tc._replace(points=p) for tc, p in zip(test_cases, point_values)]
+
+    @property
+    def passed_all(self):
+        return all(tcr.passed for tcr in self.test_case_results)
+
+    def passed_all_public(self):
+        return all(tcr.passed for tcr in self.test_case_results if not tcr.test_case.hidden)
+
+    @property
+    def grade(self):
+        if self.all_or_nothing and not self.passed_all:
+            return 0
+        elif self.all_or_nothing and self.passed_all:
+            return 1
+        else:
+            return sum(tcr.test_case.points for tcr in self.test_case_results if tcr.passed) / \
+                sum(tc.points for tc in self.test_cases)
+
+    @property
+    def score(self):
+        if self._score is not None:
+            return self._score
+        return sum(tcr.test_case.points for tcr in self.test_case_results if tcr.passed)
+
+    @property
+    def possible(self):
+        return sum(tc.points for tc in self.test_cases)
+
+    def update_score(self, new_score):
+        self._score = new_score
+
+    def to_dict(self):
+        return {
+            "score": self.score,
+            "possible": self.possible,
+            "name": self.name,
+            "path": self.path,
+            "test_cases": [tc._asdict() for tc in self.test_cases],
+            "all_or_nothing": self.all_or_nothing,
+            "test_case_results": [tcr._asdict() for tcr in self.test_case_results],
+        }
+
+    def summary(self, public_only=False):
+        if (not public_only and self.passed_all) or (public_only and self.passed_all_public):
+            return f"{self.name} results: All test cases passed!"
+
+        tcrs = self.test_case_results
+        if public_only:
+            tcrs = [tcr for tcr in tcrs if not tcr.test_case.hidden]
+        
+        tcr_summaries = []
+        for tcr in tcrs:
+            smry = f"{tcr.test_case.name} result:\n"
+            smry += f"{indent(tcr.message.strip(), '    ')}"
+            if tcr.passed and tcr.test_case.success_message is not None:
+                smry += f"{tcr.test_case.name} message: {tcr.test_case.success_message}\n"
+            if not tcr.passed and tcr.test_case.failure_message is not None:
+                smry += f"{tcr.test_case.name} message: {tcr.test_case.failure_message}\n"
+
+            tcr_summaries.append(smry.strip())
+
+        return f"{self.name} results:\n" + indent("\n".join(tcr_summaries), "    ")
 
     @classmethod
     @abstractmethod

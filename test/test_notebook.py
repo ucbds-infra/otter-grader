@@ -533,11 +533,11 @@ class TestNotebook(TestCase):
 
         # checks each question substring
         output_lst = [
-            'q1 passed!\n',
-            'q2 results:\n\nTrying:\n    1 == 1',
-            'q3 passed!\n',
-            'q4 passed!\n',
-            'q5 passed!\n'
+            'q1 results: All test cases passed!\n',
+            'q2 results:\n    q2 - 1 result:\n        Trying:',
+            'q3 results: All test cases passed!\n',
+            'q4 results: All test cases passed!\n',
+            'q5 results: All test cases passed!\n'
         ]
 
         for result in output_lst:

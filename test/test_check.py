@@ -69,31 +69,31 @@ class TestCheck(TestCase):
 
             # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                # args.func(args)
                 run_otter(check_command)
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\
                         [0.         0.02002002 0.04004004 0.06006006 0.08008008]
-                        q1 passed!
+                        q1 results: All test cases passed!
                         q2 results:
-
-                        Trying:
-                            1 == 1
-                        Expecting:
-                            False
-                        **********************************************************************
-                        Line 2, in q2 0
-                        Failed example:
-                            1 == 1
-                        Expected:
-                            False
-                        Got:
-                            True
-
-                        q3 passed!
-                        q4 passed!
-                        q5 passed!"""), 
+                            q2 - 1 result:
+                                Trying:
+                                    1 == 1
+                                Expecting:
+                                    False
+                                **********************************************************************
+                                Line 2, in q2 0
+                                Failed example:
+                                    1 == 1
+                                Expected:
+                                    False
+                                Got:
+                                    True
+                            q2 - 2 result:
+                                Test case passed!
+                        q3 results: All test cases passed!
+                        q4 results: All test cases passed!
+                        q5 results: All test cases passed!"""), 
                     "Did not pass correct tests"
                 )
 
@@ -139,33 +139,35 @@ class TestCheck(TestCase):
         output = StringIO()
         with contextlib.redirect_stdout(output):
 
-            # mock block_print otherwise they interfere with capture of stdout
+        # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                # args.func(args)
+                # print(output.getvalue())
+
                 run_otter(check_command)
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\
                         [0.         0.02002002 0.04004004 0.06006006 0.08008008]
-                        q1 passed!
+                        q1 results: All test cases passed!
                         q2 results:
-
-                        Trying:
-                            1 == 1
-                        Expecting:
-                            False
-                        **********************************************************************
-                        Line 2, in q2 0
-                        Failed example:
-                            1 == 1
-                        Expected:
-                            False
-                        Got:
-                            True
-
-                        q3 passed!
-                        q4 passed!
-                        q5 passed!"""), 
+                            q2 - 1 result:
+                                Trying:
+                                    1 == 1
+                                Expecting:
+                                    False
+                                **********************************************************************
+                                Line 2, in q2 0
+                                Failed example:
+                                    1 == 1
+                                Expected:
+                                    False
+                                Got:
+                                    True
+                            q2 - 2 result:
+                                Test case passed!
+                        q3 results: All test cases passed!
+                        q4 results: All test cases passed!
+                        q5 results: All test cases passed!"""), 
                     "Did not pass correct tests"
                 )
     
