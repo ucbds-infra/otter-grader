@@ -9,11 +9,15 @@ import nbformat
 
 from collections import namedtuple
 
-from .constants import TEST_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
+from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGEX, OTTR_TEST_NAME_REGEX, \
+    OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
+from ..test_files.abstract_test import TestFile
 
-Test = namedtuple('Test', ['input', 'output', 'hidden'])
+
+Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
 OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
+
 
 def is_test_cell(cell):
     """
@@ -30,6 +34,7 @@ def is_test_cell(cell):
     source = get_source(cell)
     return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
 
+
 def any_public_tests(test_cases):
     """
     Returns whether any of the ``Test`` named tuples in ``test_cases`` are public tests.
@@ -42,9 +47,11 @@ def any_public_tests(test_cases):
     """
     return any(not test.hidden for test in test_cases)
 
+
 def read_test(cell, question, assignment):
     """
-    Returns the contents of a test as an ``(input, output, hidden)`` named tuple
+    Returns the contents of a test as an ``(input, output, hidden, points, success_message, 
+    failure_message)`` named tuple
     
     Args:
         cell (``nbformat.NotebookNode``): a test cell
@@ -63,7 +70,26 @@ def read_test(cell, question, assignment):
             output += results[0]
         elif results:
             output += results
-    return Test('\n'.join(get_source(cell)[1:]), output, hidden)
+
+    lines = get_source(cell)
+
+    if re.match(BEGIN_TEST_CONFIG_REGEX, lines[0], flags=re.IGNORECASE):
+        for i, line in enumerate(lines):
+            if re.match(END_TEST_CONFIG_REGEX, line, flags=re.IGNORECASE):
+                break
+        config = yaml.full_load("\n".join(lines[1:i]))
+        assert isinstance(config, dict), f"Invalid test config in cell {cell}"
+    else:
+        config = {}
+        i = 0
+    
+    hidden = config.get("hidden", hidden)
+    points = config.get("points", None)
+    success_message = config.get("success_message", None)
+    failure_message = config.get("failure_message", None)
+
+    return Test('\n'.join(get_source(cell)[i+1:]), output, hidden, points, success_message, failure_message)
+
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """
@@ -84,17 +110,20 @@ def gen_test_cell(question, tests, tests_dict, assignment):
 
     cell.source = ['grader.check("{}")'.format(question['name'])]
 
-    suites = [gen_suite(tests)]
-    points = question.get('points', 1)
+    points = question.get('points', None)
     if isinstance(points, dict):
-        points = points.get('each', 1) * len(suites[0]['cases'])
+        points = points.get('each', 1) * len(tests)
     elif isinstance(points, list):
         if len(points) != len(tests):
             raise ValueError(
                 f"Error in question {question['name']}: length of 'points' is {len(points)} but there "
                 f"are {len(tests)} tests"
             )
-    
+
+    # check for errors in resolving points
+    TestFile.resolve_test_file_points(points, tests)
+
+    suites = [gen_suite(tests)]
     test = {
         'name': question['name'],
         'points': points,
@@ -104,6 +133,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     tests_dict[question['name']] = test
     lock(cell)
     return cell
+
 
 def gen_suite(tests):
     """
@@ -124,6 +154,7 @@ def gen_suite(tests):
       'type': 'doctest'
     }
 
+
 def gen_case(test):
     """
     Generates an OK test case for a test named tuple
@@ -135,18 +166,20 @@ def gen_case(test):
         ``dict``: the OK test case
     """
     code_lines = str_to_doctest(test.input.split('\n'), [])
-
-    for i in range(len(code_lines) - 1):
-        if code_lines[i+1].startswith('>>>') and len(code_lines[i].strip()) > 3 and not code_lines[i].strip().endswith("\\"):
-            code_lines[i] += ';'
-
     code_lines.append(test.output)
-
-    return {
+    ret = {
         'code': '\n'.join(code_lines),
         'hidden': test.hidden,
-        'locked': False
+        'locked': False,
     }
+    if test.points is not None:
+        ret['points'] = test.points
+    if test.success_message:
+        ret['success_message'] = test.success_message
+    if test.failure_message:
+        ret['failure_message'] = test.failure_message
+    return ret
+
 
 def write_test(path, test):
     """
@@ -162,6 +195,7 @@ def write_test(path, test):
             pprint.pprint(test, f, indent=4, width=200, depth=None)
         else:
             f.write(test)
+
 
 def remove_hidden_tests_from_dir(test_dir, assignment):
     """

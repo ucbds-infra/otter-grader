@@ -17,7 +17,7 @@ from pygments.formatters import HtmlFormatter
 #   - body is the string that gets run for the test
 #   - hidden is the visibility of the test case
 #   - points is the number of points this test case is worth
-TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points"])
+TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points", "success_message", "failure_message"])
 
 
 # class for storing the results of a single test _case_ (within a test file)
@@ -27,7 +27,6 @@ TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points"])
 TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed"])
 
 
-# TODO: fix reprs
 class TestFile(ABC):
     """
     A (abstract) single test file for Otter. This ABC defines how test results are represented and sets
@@ -59,6 +58,10 @@ class TestFile(ABC):
             for tcr in self.test_case_results:
                 ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> result:</strong></p>"
                 ret += f"<pre>{indent(tcr.message, '    ')}</pre>"
+                if tcr.passed and tcr.test_case.success_message is not None:
+                    ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.success_message}</p>"
+                if not tcr.passed and tcr.test_case.failure_message is not None:
+                    ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.failure_message}</p>"
             return ret
 
     def __repr__(self):
@@ -75,6 +78,14 @@ class TestFile(ABC):
 
     @staticmethod
     def resolve_test_file_points(total_points, test_cases):
+        if isinstance(total_points, list):
+            if len(total_points) != len(test_cases):
+                raise ValueError("Points specified in test has different length than number of test cases")
+            test_cases = [tc._replace(points=pt) for tc, pt in zip(test_cases, total_points)]
+            total_points = None
+        elif total_points is not None and not isinstance(total_points, (int, float)):
+            raise TypeError(f"Test spec points has invalid type: {total_points}")
+
         point_values = []
         for i, test_case in enumerate(test_cases):
             if test_case.points is not None:
@@ -88,12 +99,21 @@ class TestFile(ABC):
             if pre_specified > total_points:
                 raise ValueError(f"More points specified in test cases that allowed for test")
             else:
-                per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
+                try:
+                    per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
+                except ZeroDivisionError:
+                    per_remaining = 0.0
         else:
-            # assume all other tests are worth 0 points
-            if pre_specified == 0:
+            if pre_specified == 0 and all(p in (0, None) for p in point_values):
+                # if only zeros specified, assume test worth 1 pt and divide amongst nonzero cases
+                try:
+                    per_remaining = 1 / sum(p is None for p in point_values)
+                except ZeroDivisionError:
+                    per_remaining = 0.0
+            elif pre_specified == 0:
                 per_remaining = 1 / len(point_values)
             else:
+                # assume all other tests are worth 0 points
                 per_remaining = 0.0
 
         point_values = [p if p is not None else per_remaining for p in point_values]
@@ -150,8 +170,14 @@ class TestFile(ABC):
         
         tcr_summaries = []
         for tcr in tcrs:
-            if not tcr.passed:
-                tcr_summaries.append(tcr.message.strip())
+            smry = f"{tcr.test_case.name} result:\n"
+            smry += f"{indent(tcr.message.strip(), '    ')}"
+            if tcr.passed and tcr.test_case.success_message is not None:
+                smry += f"{tcr.test_case.name} message: {tcr.test_case.success_message}\n"
+            if not tcr.passed and tcr.test_case.failure_message is not None:
+                smry += f"{tcr.test_case.name} message: {tcr.test_case.failure_message}\n"
+
+            tcr_summaries.append(smry.strip())
 
         return f"{self.name} results:\n" + indent("\n".join(tcr_summaries), "    ")
 

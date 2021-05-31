@@ -53,7 +53,7 @@ class TestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(dir1), f"{dir1} does not exist")
         self.assertTrue(os.path.exists(dir2), f"{dir2} does not exist")
         self.assertTrue(os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type")
-
+        
         if os.path.isfile(dir1):
             if os.path.splitext(dir1)[1] not in ignore_ext:
                 self.assertFilesEqual(dir1, dir2)
