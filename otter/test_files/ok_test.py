@@ -84,21 +84,17 @@ class OKTestFile(TestFile):
     def run(self, global_environment):
         """
         Runs tests on a given ``global_environment``
-        
+
         Arguments:
             ``global_environment`` (``dict``): result of executing a Python notebook/script
-        
+
         Returns:
             ``tuple`` of (``bool``, ``float`` ``otter.ok_parser.OKTest``): whether the test passed,
                 the percentage score on this test, and a pointer to the current ``otter.ok_parser.OKTest`` object
         """
-        n_passed = 0 #, passed_all, test_case_results = 0, True, []
         for i, test_case in enumerate(self.test_cases):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
-            # if not passed:
-            #     passed_all = False
             if passed:
-                n_passed += 1
                 result = 'Test case passed!'
 
             self.test_case_results.append(TestCaseResult(
