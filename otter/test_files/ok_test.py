@@ -108,7 +108,7 @@ class OKTestFile(TestFile):
             ))
 
     @classmethod
-    def from_spec(cls, test_spec):
+    def from_spec(cls, test_spec, path=""):
         # Make sure there is a name
         assert 'name' in test_spec
 
@@ -165,4 +165,4 @@ class OKTestFile(TestFile):
 
         test_spec = test_globals['test']
 
-        return cls.from_spec(test_spec)        
+        return cls.from_spec(test_spec, path=path)        

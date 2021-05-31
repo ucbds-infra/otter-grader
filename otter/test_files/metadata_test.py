@@ -80,4 +80,4 @@ class NotebookMetadataOKTestFile(OKTestFile):
         
         test_spec = test_spec[test_name]
 
-        return cls.from_spec(test_spec)
+        return cls.from_spec(test_spec, path=path)
