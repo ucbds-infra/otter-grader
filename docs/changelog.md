@@ -1,5 +1,10 @@
 # Changelog
 
+**Unreleased:**
+
+* Added metadata for each test case to Otter Assign format
+* Added success and failure messages for test cases
+
 **v2.2.0:**
 
 * Changed grouping of results to be per-question rather than per-test case
