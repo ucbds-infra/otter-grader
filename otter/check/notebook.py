@@ -242,7 +242,7 @@ class Notebook:
             ``otter.test_files.abstract_test.TestCollectionResults``: the grade for the question
         """
         try:
-            if os.path.isdir(self._path) and os.path.ifile(os.path.join(self._path, question + ".py")):
+            if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
                 test_path = os.path.join(self._path, question + ".py")
                 test_name = None
 
