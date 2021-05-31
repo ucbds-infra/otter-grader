@@ -120,9 +120,10 @@ def gen_test_cell(question, tests, tests_dict, assignment):
                 f"are {len(tests)} tests"
             )
 
-    tests = TestFile.resolve_test_file_points(points, tests)
-    suites = [gen_suite(tests)]
+    # check for errors in resolving points
+    TestFile.resolve_test_file_points(points, tests)
 
+    suites = [gen_suite(tests)]
     test = {
         'name': question['name'],
         'points': points,
@@ -166,14 +167,18 @@ def gen_case(test):
     """
     code_lines = str_to_doctest(test.input.split('\n'), [])
     code_lines.append(test.output)
-    return {
+    ret = {
         'code': '\n'.join(code_lines),
         'hidden': test.hidden,
-        'points': test.points, 
-        'success_message': test.success_message, 
-        'failure_message': test.failure_message, 
         'locked': False,
     }
+    if test.points is not None:
+        ret['points'] = test.points
+    if test.success_message:
+        ret['success_message'] = test.success_message
+    if test.failure_message:
+        ret['failure_message'] = test.failure_message
+    return ret
 
 
 def write_test(path, test):
