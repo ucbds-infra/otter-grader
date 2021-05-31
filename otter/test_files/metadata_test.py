@@ -20,7 +20,7 @@ from ..utils import hide_outputs
 NOTEBOOK_METADATA_KEY = "otter"
 
 
-class NotebookMetadataTestFile(OKTestFile):
+class NotebookMetadataOKTestFile(OKTestFile):
     """
     A single notebook metadata test file for Otter.
 
@@ -80,39 +80,4 @@ class NotebookMetadataTestFile(OKTestFile):
         
         test_spec = test_spec[test_name]
 
-        # We only support a subset of these tests, so let's validate!
-
-        # Make sure there is a name
-        # assert 'name' in test_spec
-
-        # Do not support multiple suites in the same file
-        assert len(test_spec['suites']) == 1
-
-        test_suite = test_spec['suites'][0]
-
-        # Only support doctest. I am unsure if other tests are implemented
-        assert test_suite.get('type', 'doctest') == 'doctest'
-
-        # Not setup and teardown supported
-        assert not bool(test_suite.get('setup'))
-        assert not bool(test_suite.get('teardown'))
-
-        test_cases = []
-        # hiddens = []
-
-        for i, test_case in enumerate(test_spec['suites'][0]['cases']):
-            test_cases.append(TestCase(
-                name = test_case.get('name', f"{test_spec['name']}_{i + 1}"),
-                body = dedent(test_case['code']), 
-                hidden = test_case.get('hidden', True)
-            ))
-            # tests.append(dedent(test_case['code']))
-            # hiddens.append(test_case.get('hidden', True))
-
-        # convert path into PurePosixPath for test name
-        path = str(pathlib.Path(path).as_posix())
-
-        # grab whether the tests are all-or-nothing
-        all_or_nothing = test_spec.get('all_or_nothing', True)
-
-        return cls(test_name, path, test_cases, test_spec.get('points', 1), all_or_nothing)
+        return cls.from_spec(test_spec)

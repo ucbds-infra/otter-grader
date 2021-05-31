@@ -14,7 +14,7 @@ from .execute_notebook import execute_notebook, filter_ignored_cells
 from .execute_script import execute_script
 # from .results import GradingResults
 
-from ..test_files import GradingResults, NotebookMetadataTestFile, OKTestFile
+from ..test_files import GradingResults, NotebookMetadataOKTestFile, OKTestFile
 from ..utils import id_generator
 
 NBFORMAT_VERSION = 4
@@ -42,7 +42,7 @@ def check(nb_or_test_path, test_name=None, global_env=None):
     if test_name is None:
         test = OKTestFile.from_file(nb_or_test_path)
     else:
-        test = NotebookMetadataTestFile.from_file(nb_or_test_path, test_name)
+        test = NotebookMetadataOKTestFile.from_file(nb_or_test_path, test_name)
 
     if global_env is None:
         # Get the global env of our callers - one level below us in the stack

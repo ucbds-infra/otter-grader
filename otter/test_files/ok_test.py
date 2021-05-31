@@ -108,25 +108,7 @@ class OKTestFile(TestFile):
             ))
 
     @classmethod
-    def from_file(cls, path):
-        """
-        Parse an ok test file & return an ``OKTest``
-
-        Args:
-            path (``str``): path to ok test file
-
-        Returns:
-            ``otter.ok_parser.OKTest``: new ``OKTest`` object created from the given file
-        """
-        # ok test files are python files, with a global 'test' defined
-        test_globals = {}
-        with open(path) as f:
-            exec(f.read(), test_globals)
-
-        test_spec = test_globals['test']
-
-        # We only support a subset of these tests, so let's validate!
-
+    def from_spec(cls, test_spec):
         # Make sure there is a name
         assert 'name' in test_spec
 
@@ -164,3 +146,23 @@ class OKTestFile(TestFile):
         all_or_nothing = test_spec.get('all_or_nothing', True)
 
         return cls(test_spec['name'], path, test_cases, all_or_nothing)
+
+    @classmethod
+    def from_file(cls, path):
+        """
+        Parse an ok test file & return an ``OKTest``
+
+        Args:
+            path (``str``): path to ok test file
+
+        Returns:
+            ``otter.ok_parser.OKTest``: new ``OKTest`` object created from the given file
+        """
+        # ok test files are python files, with a global 'test' defined
+        test_globals = {}
+        with open(path) as f:
+            exec(f.read(), test_globals)
+
+        test_spec = test_globals['test']
+
+        return cls.from_spec(test_spec)        
