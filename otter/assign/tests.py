@@ -14,6 +14,7 @@ from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGE
 from .utils import get_source, lock, str_to_doctest
 from ..test_files.abstract_test import TestFile
 
+
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
 OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
 
@@ -33,6 +34,7 @@ def is_test_cell(cell):
     source = get_source(cell)
     return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
 
+
 def any_public_tests(test_cases):
     """
     Returns whether any of the ``Test`` named tuples in ``test_cases`` are public tests.
@@ -44,6 +46,7 @@ def any_public_tests(test_cases):
         ``bool``: whether any of the tests are public
     """
     return any(not test.hidden for test in test_cases)
+
 
 def read_test(cell, question, assignment):
     """
@@ -74,7 +77,7 @@ def read_test(cell, question, assignment):
         for i, line in enumerate(lines):
             if re.match(END_TEST_CONFIG_REGEX, line, flags=re.IGNORECASE):
                 break
-        config = yaml.full_load("\n".join(lines[:i+1]))
+        config = yaml.full_load("\n".join(lines[1:i]))
         assert isinstance(config, dict), f"Invalid test config in cell {cell}"
     else:
         config = {}
@@ -86,6 +89,7 @@ def read_test(cell, question, assignment):
     failure_message = config.get("failure_message", None)
 
     return Test('\n'.join(get_source(cell)[i+1:]), output, hidden, points, success_message, failure_message)
+
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """
@@ -129,6 +133,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     lock(cell)
     return cell
 
+
 def gen_suite(tests):
     """
     Generates an OK test suite for a list of tests as named tuples
@@ -147,6 +152,7 @@ def gen_suite(tests):
       'teardown': '',
       'type': 'doctest'
     }
+
 
 def gen_case(test):
     """
@@ -169,6 +175,7 @@ def gen_case(test):
         'locked': False,
     }
 
+
 def write_test(path, test):
     """
     Writes an OK test file
@@ -183,6 +190,7 @@ def write_test(path, test):
             pprint.pprint(test, f, indent=4, width=200, depth=None)
         else:
             f.write(test)
+
 
 def remove_hidden_tests_from_dir(test_dir, assignment):
     """

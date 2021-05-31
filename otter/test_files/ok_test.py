@@ -14,6 +14,7 @@ from textwrap import dedent
 from .abstract_test import TestFile, TestCase, TestCaseResult
 from ..utils import hide_outputs
 
+
 def run_doctest(name, doctest_string, global_environment):
     """
     Run a single test with given ``global_environment``. Returns ``(True, '')`` if the doctest passes. 
@@ -53,6 +54,7 @@ def run_doctest(name, doctest_string, global_environment):
         return (True, '')
     else:
         return False, runresults.getvalue()
+
 
 class OKTestFile(TestFile):
     """
@@ -104,16 +106,6 @@ class OKTestFile(TestFile):
                 message = result,
                 passed = passed,
             ))
-
-        # self.passed_all = passed_all
-        # self.test_case_results = test_case_results
-
-        # if self.all_or_nothing and not self.passed_all:
-        #     self.grade = 0
-        # elif not self.all_or_nothing and not self.passed_all:
-        #     self.grade = n_passed / len(self.test_case_results)
-        # else:
-        #     self.grade = 1
 
     @classmethod
     def from_file(cls, path):

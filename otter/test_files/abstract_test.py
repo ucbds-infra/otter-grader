@@ -24,7 +24,7 @@ TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points", "success_
 #   - message should be a string to print out to the student (ignored if passed is True)
 #   - passed is whether the test case passed
 #   - hidden is the visibility of the test case
-TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed", "points"])
+TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed"])
 
 
 class TestFile(ABC):
@@ -57,11 +57,11 @@ class TestFile(ABC):
             ret = f"<p><strong style='color: red;'><pre style='display: inline;'>{self.name}</pre> results:</strong></p>"
             for tcr in self.test_case_results:
                 ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> result:</strong></p>"
+                ret += f"<pre>{indent(tcr.message, '    ')}</pre>"
                 if tcr.passed and tcr.test_case.success_message is not None:
                     ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.success_message}</p>"
                 if not tcr.passed and tcr.test_case.failure_message is not None:
                     ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.failure_message}</p>"
-                ret += f"<pre>{indent(tcr.message, '    ')}</pre>"
             return ret
 
     def __repr__(self):
@@ -99,12 +99,21 @@ class TestFile(ABC):
             if pre_specified > total_points:
                 raise ValueError(f"More points specified in test cases that allowed for test")
             else:
-                per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
+                try:
+                    per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
+                except ZeroDivisionError:
+                    per_remaining = 0.0
         else:
-            # assume all other tests are worth 0 points
-            if pre_specified == 0:
+            if pre_specified == 0 and all(p in (0, None) for p in point_values):
+                # if only zeros specified, assume test worth 1 pt and divide amongst nonzero cases
+                try:
+                    per_remaining = 1 / sum(p is None for p in point_values)
+                except ZeroDivisionError:
+                    per_remaining = 0.0
+            elif pre_specified == 0:
                 per_remaining = 1 / len(point_values)
             else:
+                # assume all other tests are worth 0 points
                 per_remaining = 0.0
 
         point_values = [p if p is not None else per_remaining for p in point_values]
@@ -162,27 +171,15 @@ class TestFile(ABC):
         tcr_summaries = []
         for tcr in tcrs:
             smry = f"{tcr.test_case.name} result:\n"
+            smry += f"{indent(tcr.message.strip(), '    ')}"
             if tcr.passed and tcr.test_case.success_message is not None:
                 smry += f"{tcr.test_case.name} message: {tcr.test_case.success_message}\n"
             if not tcr.passed and tcr.test_case.failure_message is not None:
                 smry += f"{tcr.test_case.name} message: {tcr.test_case.failure_message}\n"
-            smry += f"{indent(tcr.message.strip(), '    ')}"
 
             tcr_summaries.append(smry.strip())
 
         return f"{self.name} results:\n" + indent("\n".join(tcr_summaries), "    ")
-
-    # @staticmethod
-    # def resolve_point_values(value, cases, ctx=""):
-    #     case_pts = [c.points for c in cases]
-    #     total_specified = sum(p for p in case_pts if p is not None)
-    #     if total_specified > value:
-    #         raise ValueError(f"Individual test case point values exceed total question value{': ' if ctx else ''}{ctx}")
-    #     pts_left = value - total_specified
-    #     pts_per_unspecified_case = pts_left / len([p for p in case_pts if p is None])
-    #     for i, case in enumerate(cases):
-    #         if case.points is None:
-    #             cases[i] = case._replace(points=pts_per_unspecified_case)
 
     @classmethod
     @abstractmethod
