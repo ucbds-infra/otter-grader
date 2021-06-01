@@ -3,6 +3,7 @@
 **Unreleased:**
 
 * Added `NotebookMetadataTestFile` for reading tests from Jupyter Notebook metadata
+* Added optional storage of tests in notebook metadata for Otter Assign
 * Added metadata for each test case to Otter Assign format
 * Added success and failure messages for test cases
 
