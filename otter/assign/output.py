@@ -7,6 +7,7 @@ import shutil
 import pathlib
 import warnings
 import nbformat
+import tempfile
 
 from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
@@ -37,8 +38,9 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
             assignment.lang = "python"
 
     output_dir = output_nb_path.parent
-    tests_dir = output_dir / 'tests'
-    os.makedirs(tests_dir, exist_ok=True)
+    if assignment.test_files:
+        tests_dir = output_dir / 'tests'
+        os.makedirs(tests_dir, exist_ok=True)
 
     transformed_nb, test_files = transform_notebook(nb, assignment)
 
@@ -66,6 +68,13 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     for test_name, test_file in test_files.items():
         test_path = tests_dir / (test_name + test_ext) if assignment.test_files else test_name
         write_test(transformed_nb, test_path, test_file, use_file=assignment.test_files)
+
+    # write a temp dir for otter generate tests
+    if assignment.generate:
+        assignment._temp_test_dir = pathlib.Path(tempfile.mkdtemp())
+        for test_name, test_file in test_files.items():
+            test_path = assignment._temp_test_dir / (test_name + test_ext)
+            write_test(transformed_nb, test_path, test_file, use_file=True)
 
     # write notebook
     nbformat.write(transformed_nb, str(output_nb_path))
@@ -125,11 +134,12 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
 
     nb = strip_solutions_and_output(nb)
 
+    # remove hidden tests from student directory
+    remove_hidden_tests_from_dir(nb, student_dir / 'tests', assignment, use_files=assignment.test_files)
+
     with open(student_nb_path, "w") as f:
         nbformat.write(nb, f)
 
-    # remove hidden tests from student directory
-    remove_hidden_tests_from_dir(student_dir / 'tests', assignment)
 
 def write_output_directories(master_nb_path, result_dir, assignment):
     """

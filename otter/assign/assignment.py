@@ -60,7 +60,8 @@ class Assignment:
         "plugins": [],
         "plugin_config": {},
         "_otter_config": None,
-        "test_files": True,
+        "test_files": False,
+        "_temp_test_dir": None, # path to a temp dir for tests for otter generate
     }
 
     def __init__(self):
