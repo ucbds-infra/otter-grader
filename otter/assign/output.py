@@ -61,15 +61,14 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     # strip out ignored lines
     transformed_nb = strip_ignored_lines(transformed_nb)
 
-    # write notebook
-    # with open(output_nb_path) as f:
-    # nbformat.write(transformed_nb, )
-    nbformat.write(transformed_nb, str(output_nb_path))
-
     # write tests
     test_ext = (".R", ".py")[assignment.is_python]
     for test_name, test_file in test_files.items():
-        write_test(tests_dir / (test_name + test_ext), test_file)
+        test_path = tests_dir / (test_name + test_ext) if assignment.test_files else test_name
+        write_test(transformed_nb, test_path, test_file, use_file=assignment.test_files)
+
+    # write notebook
+    nbformat.write(transformed_nb, str(output_nb_path))
 
     # copy files
     for file in assignment.files:

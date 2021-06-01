@@ -60,6 +60,7 @@ class Assignment:
         "plugins": [],
         "plugin_config": {},
         "_otter_config": None,
+        "test_files": True,
     }
 
     def __init__(self):

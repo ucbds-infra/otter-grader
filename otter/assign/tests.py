@@ -13,6 +13,7 @@ from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGE
     OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
 from ..test_files.abstract_test import TestFile
+from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
@@ -181,20 +182,30 @@ def gen_case(test):
     return ret
 
 
-def write_test(path, test):
+def write_test(nb, path, test, use_file=False):
     """
     Writes an OK test file
     
     Args:
-        path (``str``): path of file to be written
+        nb (``dict``): the notebook being written
+        path (``str``): path of file to be written or the name of the test
         test (``dict``): OK test to be written
+        use_file (``bool``): whether to write to a file instead of putting the test in the notebook
+            metadata
     """
-    with open(path, 'w') as f:
-        if isinstance(test, dict):
-            f.write('test = ')
-            pprint.pprint(test, f, indent=4, width=200, depth=None)
-        else:
-            f.write(test)
+    if use_file:
+        with open(path, 'w') as f:
+            if isinstance(test, dict):
+                f.write('test = ')
+                pprint.pprint(test, f, indent=4, width=200, depth=None)
+            else:
+                f.write(test)
+    else:
+        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+            nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
+        if "tests" not in nb["metadata"][NOTEBOOK_METADATA_KEY]:
+            nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"] = {}
+        nb["metadata"][NOTEBOOK_METADATA_KEY]["test"][path] = test
 
 
 def remove_hidden_tests_from_dir(test_dir, assignment):
