@@ -1,5 +1,5 @@
 """
-Plugin for using Google Sheets to override scores for test cases
+Plugin for using the Gmail API to notify students about the results of public test cases
 """
 
 import os
@@ -10,7 +10,6 @@ import pandas as pd
 import base64
 import google.oauth2.credentials
 
-# from __future__ import print_function
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from googleapiclient.discovery import build
@@ -26,6 +25,21 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 class GmailNotifications(AbstractOtterPlugin):
     """
+    Otter plugin for sending students an email notification with the results of their public test
+    cases. Uses the Gmail API along with user-specified credentials a Google OAuth2 Client to send
+    the emails once grading is finished.
+
+    This plugin requires the following configurations:
+
+    - ``client_id``: the Google OAuth2 Client ID
+    - ``client_secret``: the Google OAuth2 Client secret
+    - ``refresh_tokem``: the Google OAuth2 Client refresh token; more information below
+    - ``email``: the email address to send from
+
+    It also supports the following optional configurations:
+
+    - ``catch_api_error``: if this configuration is true, errors thrown by Google API calls are ignored;
+      if false, the errors are raised and the grading process stops; defaults to ``True``
     """
 
     IMPORTABLE_NAME = "otter.plugins.builtin.GmailNotifications"
@@ -63,16 +77,10 @@ class GmailNotifications(AbstractOtterPlugin):
 
     def _authenticate(self):
         """
+        Create a Google API service using the client ID, secret, and refresh token in the plugin
+        configurations.
         """
         try:
-            # oauth_json = self.plugin_config["service_account_credentials"]
-            # with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as ntf:
-            #     json.dump(oauth_json, ntf)
-            #     ntf.seek(0)
-
-
-                # creds = Credentials.from_service_account_file(ntf.name, scopes=SCOPES)
-                # creds = flow.run_local_server(port=0)
             credentials = google.oauth2.credentials.Credentials(
                 'token',
                 refresh_token=self.plugin_config["refresh_token"],
@@ -81,8 +89,6 @@ class GmailNotifications(AbstractOtterPlugin):
                 client_secret=self.plugin_config["client_secret"],
             )
             self._service = build('gmail', 'v1', credentials=credentials, cache_discovery=False)
-
-            # self._service = build('gmail', 'v1', credentials=creds)
 
         except Exception as e:
             if self.plugin_config.get("catch_api_error", True):
@@ -93,7 +99,7 @@ class GmailNotifications(AbstractOtterPlugin):
     @property
     def service(self):
         """
-        The grade override information dataframe
+        The Google API service
         """
         if not hasattr(self, "_service") or self._service is None:
             self._authenticate()
@@ -101,8 +107,8 @@ class GmailNotifications(AbstractOtterPlugin):
 
     def after_grading(self, results):
         """
-        Modifies the results of grading by pulling in the Google Sheet as a dataframe and updating 
-        the scores for the test cases found.
+        Summarizes the results of grading and formats an email to send to the student using the
+        submission metadata. If not submission metadata is supplied, no action is taken.
 
         Args:
             results (``otter.test_files.GradingResults``): the results of grading
@@ -148,27 +154,3 @@ class GmailNotifications(AbstractOtterPlugin):
                         print(f'An error occurred while emailing results:\n{e}')
                     else:
                         raise e
-
-    # def during_generate(self, otter_config, assignment):
-    #     """
-    #     Takes a path to Google Service Account credentials stored in this plugin's config as key
-    #     ``credentials_json_path`` and extracts the data from that file into the plugin's config as key
-    #     ``service_account_credentials``.
-
-    #     Args:
-    #         otter_config (``dict``): the parsed Otter configuration JSON file
-    #         assignment (``otter.assign.assignment.Assignment``): the assignment configurations if 
-    #             Otter Assign is used
-    #     """
-    #     if assignment is not None:
-    #         curr_dir = os.getcwd()
-    #         os.chdir(assignment.master.parent)
-        
-    #     cfg_idx = [self.IMPORTABLE_NAME in c.keys() for c in otter_config["plugins"] if isinstance(c, dict)].index(True)
-    #     creds_path = otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["credentials_json_path"]
-    #     with open(creds_path) as f:
-    #         creds = json.load(f)
-    #     otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["service_account_credentials"] = creds
-        
-    #     if assignment is not None:
-    #         os.chdir(curr_dir)
