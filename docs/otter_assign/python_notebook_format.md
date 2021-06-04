@@ -48,12 +48,6 @@ generate:                      # configurations for running Otter Generate; defa
     assignment_id: ''          # Gradescope assignment ID for uploading PDFs for manually-graded questions
     filtering: true            # whether the PDFs should be filtered
   zips: false                  # whether the files being grade are zip files from `otter.Notebook.export`
-service:                       # confgiurations for Otter Service
-  notebook: ''                 # path to the notebook to submit if different from the master notebook name
-  endpoint: ''                 # the endpoint for your Otter Service deployment; required
-  auth: google                 # auth type for your Otter Service deployment
-  assignment_id: ''            # the assignment ID from the Otter Service database
-  class_id: ''                 # the class ID from the Otter Service database
 save_environment: false        # whether to save students' environments in the log for grading
 variables: {}                  # a mapping of variable names -> types for serialization
 ignore_modules: []             # a list of module names whose functions to ignore during serialization
@@ -105,6 +99,7 @@ generate:
     filtering: true        # true is the default
 ```
 
+<!-- 
 If you have an Otter Service deployment to which you would like students to submit, the necessary configurations for this submission can be specified in the `service` key of the assignment metadata. This has the required keys `endpoint` (the URL of the VM), `assignment_id` (the ID of the assignment in the Otter Service database), and `course_id` (the class ID in the database). You can optionally also set an auth provider with the `auth` key (which defaults to `google`).
 
 ```yaml
@@ -114,6 +109,8 @@ service:
   class_id: some_class         # required
   auth: google                 # the default
 ```
+
+-->
 
 If you are grading from the log or would like to store students' environments in the log, use the `save_environment` key. If this key is set to `true`, Otter will serialize the stuednt's environment whenever a check is run, as described in [Logging](../logging.md). To restrict the serialization of variables to specific names and types, use the `variables` key, which maps variable names to fully-qualified type strings. The `ignore_modules` key is used to ignore functions from specific modules. To turn on grading from the log on Gradescope, set `generate[grade_from_log]` to `true`. The configuration below turns on the serialization of environments, storing only variables of the name `df` that are pandas dataframes.
 
@@ -250,7 +247,33 @@ def circumference(r):
 
 ### Test Cells
 
-The test cells are any code cells following the solution cell that begin with the comment `## Test ##` or `## Hidden Test ##` (case insensitive). A `Test` is distributed to students so that they can validate their work. A `Hidden Test` is not distributed to students, but is used for scoring their work.
+There are two ways to format test cells. The test cells are any code cells following the solution cell that begin with the comment `## Test ##` or `## Hidden Test ##` (case insensitive). A `Test` is distributed to students so that they can validate their work. A `Hidden Test` is not distributed to students, but is used for scoring their work.
+
+Test cells also support test case-level metadata. If your test requires metadata beyond whether the test is hidden or not, specify the test by including a mutliline string at the top of the cell that includes YAML-formatted test metadata. For example,
+
+```python
+""" # BEGIN TEST CONFIG
+points: 1
+success_message: Good job!
+""" # END TEST CONFIG
+do_something()
+```
+
+The test metadata supports the following keys with the defaults specified below:
+
+```yaml
+hidden: false          # whether the test is hidden
+points: null           # the point value of the test
+success_message: null  # a messsge to show to the student when the test case passes
+failure_message: null  # a messsge to show to the student when the test case fails
+```
+
+Because points can be specified at the question level and at the test case level, point values get resolved as follows:
+
+* If one or more test cases specify a point value and no point value is specified for the question, each test case with unspecified point values is assumed to be worth 0 points.
+* If one or more test cases specify a point value and a point value _is_ specified for the question, each test case with unspecified point values is assumed to be equally weighted and together are worth the question point value less the sum of specified point values. For example, in a 6-point question with 4 test cases where two test cases are each specified to be worth 2 points, each of the other test cases is worth \\(\frac{6-(2 + 2)}{2} = 1\\) point.)
+* If no test cases specify a point value and a point value _is_ specified for the question, each test case is assumed to be equally weighted and is assigned a point value of \\(\frac{p}{n}\\) where \\(p\\) is the number of points for the question and \\(n\\) is the number of test cases.
+* If no test cases specify a point value and no point value is specified for the question, the question is assumed to be worth 1 point and each test case is equally weighted.
 
 **Note:** Currently, the conversion to OK format does not handle multi-line tests if any line but the last one generates output. So, if you want to print
 twice, make two separate test cells instead of a single cell with:
