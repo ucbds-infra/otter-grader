@@ -27,7 +27,8 @@ setuptools.setup(
 	],
 	install_requires=[
 		"pyyaml", "nbformat", "ipython", "nbconvert", "tqdm", "setuptools", "pandas", "tornado",
-		"docker", "jinja2", "dill", "pdfkit", "PyPDF2", "gspread"
+		"docker", "jinja2", "dill", "pdfkit", "PyPDF2", "gspread", "google-auth-oauthlib",
+		"google-api-python-client",
 	],
 	# scripts=["bin/otter"],
 	entry_points = {
