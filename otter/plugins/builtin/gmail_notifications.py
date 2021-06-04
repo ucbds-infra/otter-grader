@@ -8,12 +8,12 @@ import tempfile
 import gspread
 import pandas as pd
 import base64
+import google.oauth2.credentials
 
 # from __future__ import print_function
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
 from jinja2 import Template
 from textwrap import dedent
 
@@ -63,16 +63,24 @@ class GmailNotifications(AbstractOtterPlugin):
         """
         """
         try:
-            oauth_json = self.plugin_config["service_account_credentials"]
-            with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as ntf:
-                json.dump(oauth_json, ntf)
-                ntf.seek(0)
+            # oauth_json = self.plugin_config["service_account_credentials"]
+            # with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as ntf:
+            #     json.dump(oauth_json, ntf)
+            #     ntf.seek(0)
 
 
-                flow = InstalledAppFlow.from_client_secrets_file(ntf.name, SCOPES)
-                creds = flow.run_local_server(port=0)
+                # creds = Credentials.from_service_account_file(ntf.name, scopes=SCOPES)
+                # creds = flow.run_local_server(port=0)
+            credentials = google.oauth2.credentials.Credentials(
+                'token',
+                refresh_token=self.plugin_config["refresh_token"],
+                token_uri='https://accounts.google.com/o/oauth2/token',
+                client_id=self.plugin_config["client_id"],
+                client_secret=self.plugin_config["client_secret"],
+            )
+            self._service = build('gmail', 'v1', credentials=credentials, cache_discovery=False)
 
-            self._service = build('gmail', 'v1', credentials=creds)
+            # self._service = build('gmail', 'v1', credentials=creds)
 
         except Exception as e:
             if self.plugin_config.get("catch_api_error", True):
@@ -121,10 +129,10 @@ class GmailNotifications(AbstractOtterPlugin):
                 message["subject"] = f'Autograder Results for {{ self.submission_metadata["assignment"]["title"] }}'
                 message["to"] = user["email"]
                 message["from"] = self.plugin_config["email"]
-                msg = {'raw': base64.urlsafe_b64encode(message.as_string())}
+                msg = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
 
                 try:
-                    message = self.service.users().messages().send(userId='me', body=message).execute()
+                    message = self.service.users().messages().send(userId='me', body=msg).execute()
                 except Exception as e:
                     if self.plugin_config.get("catch_api_error", True):
                         print(f'An error occurred while emailing results:\n{e}')
