@@ -233,6 +233,11 @@ class GradingResults:
         """
         return {tn: tf.to_dict() for tn, tf in self.results.items()}
 
+    def summary(self, public_only=False):
+        """
+        """
+        return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
+
     def to_gradescope_dict(self, config):
         """
         Converts these results into a dictionary formatted for Gradescope's autograder. Requires a 
@@ -260,7 +265,7 @@ class GradingResults:
         output["tests"].append({
             "name": "Public Tests",
             "visibility": "visible",
-            "output": "\n\n".join(tf.summary(public_only=True) for _, tf in self.results.items())
+            "output": self.summary(public_only=True),
         })
 
         for test_name in self.test_files:
