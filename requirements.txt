@@ -20,6 +20,7 @@ PyPDF2
 gspread
 google-auth-oauthlib
 google-api-python-client
+six
 
 # ottr requirements
 rpy2

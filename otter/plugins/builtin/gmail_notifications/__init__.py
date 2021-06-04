@@ -17,8 +17,8 @@ from googleapiclient.discovery import build
 from jinja2 import Template
 from textwrap import dedent
 
-from .. import PluginCollection
-from ..abstract_plugin import AbstractOtterPlugin
+from ... import PluginCollection
+from ...abstract_plugin import AbstractOtterPlugin
 
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
