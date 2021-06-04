@@ -396,9 +396,9 @@ class Notebook:
                     assert len(f.read().strip()) > 0, \
                         f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
 
-            timestamp = dt.datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+            timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
             if export_path is None:
-                zip_path = ".".join(nb_path.split(".")[:-1]) + timestamp + ".zip"
+                zip_path = ".".join(nb_path.split(".")[:-1]) + "_" + timestamp + ".zip"
             else:
                 zip_path = export_path
 
