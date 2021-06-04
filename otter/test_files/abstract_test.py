@@ -123,6 +123,7 @@ class TestFile(ABC):
     def passed_all(self):
         return all(tcr.passed for tcr in self.test_case_results)
 
+    @property
     def passed_all_public(self):
         return all(tcr.passed for tcr in self.test_case_results if not tcr.test_case.hidden)
 
@@ -173,9 +174,9 @@ class TestFile(ABC):
             smry = f"{tcr.test_case.name} result:\n"
             smry += f"{indent(tcr.message.strip(), '    ')}"
             if tcr.passed and tcr.test_case.success_message is not None:
-                smry += f"{tcr.test_case.name} message: {tcr.test_case.success_message}\n"
+                smry += f"\n{tcr.test_case.name} message: {tcr.test_case.success_message}\n"
             if not tcr.passed and tcr.test_case.failure_message is not None:
-                smry += f"{tcr.test_case.name} message: {tcr.test_case.failure_message}\n"
+                smry += f"\n{tcr.test_case.name} message: {tcr.test_case.failure_message}\n"
 
             tcr_summaries.append(smry.strip())
 
