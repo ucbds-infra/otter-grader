@@ -107,14 +107,6 @@ class GmailNotifications(AbstractOtterPlugin):
         """
         if self.submission_metadata:
             for user in self.submission_metadata["users"]:
-                email_contents = self.email_template_html.render({
-                    "student_name": user["name"],
-                    "assignment_title": self.submission_metadata["assignment"]["title"],
-                    "submission_timestamp": self.submission_metadata["created_at"],
-                    "score_report": results.summary(public_only=True),
-                })
-                html_email = MIMEText(email_contents, _subtype="html")
-
                 email_contents = self.email_template_plain.render({
                     "student_name": user["name"],
                     "assignment_title": self.submission_metadata["assignment"]["title"],
@@ -123,10 +115,18 @@ class GmailNotifications(AbstractOtterPlugin):
                 })
                 plain_email = MIMEText(email_contents, _subtype="plain")
 
-                message = MIMEMultipart()
+                email_contents = self.email_template_html.render({
+                    "student_name": user["name"],
+                    "assignment_title": self.submission_metadata["assignment"]["title"],
+                    "submission_timestamp": self.submission_metadata["created_at"],
+                    "score_report": results.summary(public_only=True),
+                })
+                html_email = MIMEText(email_contents, _subtype="html")
+
+                message = MIMEMultipart('alternative')
                 message.attach(plain_email)
                 message.attach(html_email)
-                message["subject"] = f'Autograder Results for {{ self.submission_metadata["assignment"]["title"] }}'
+                message["subject"] = f'Autograder Results for { self.submission_metadata["assignment"]["title"] }'
                 message["to"] = user["email"]
                 message["from"] = self.plugin_config["email"]
                 msg = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
