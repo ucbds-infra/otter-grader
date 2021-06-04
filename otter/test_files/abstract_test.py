@@ -172,15 +172,15 @@ class TestFile(ABC):
         tcr_summaries = []
         for tcr in tcrs:
             smry = f"{tcr.test_case.name} result:\n"
-            smry += f"{indent(tcr.message.strip(), '    ')}"
+            smry += f"{indent(tcr.message.strip(), '    ')}\n\n"
             if tcr.passed and tcr.test_case.success_message is not None:
-                smry += f"\n{tcr.test_case.name} message: {tcr.test_case.success_message}\n"
+                smry += f"{tcr.test_case.name} message: {tcr.test_case.success_message}\n\n"
             if not tcr.passed and tcr.test_case.failure_message is not None:
-                smry += f"\n{tcr.test_case.name} message: {tcr.test_case.failure_message}\n"
+                smry += f"{tcr.test_case.name} message: {tcr.test_case.failure_message}\n\n"
 
             tcr_summaries.append(smry.strip())
 
-        return f"{self.name} results:\n" + indent("\n".join(tcr_summaries), "    ")
+        return f"{self.name} results:\n" + indent("\n\n".join(tcr_summaries), "    ")
 
     @classmethod
     @abstractmethod
