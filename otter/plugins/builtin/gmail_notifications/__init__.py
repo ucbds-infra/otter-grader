@@ -33,8 +33,9 @@ class GmailNotifications(AbstractOtterPlugin):
     email_template_html = Template(dedent("""\
         <p>Hello {{ student_name }},</p>
 
-        <p>Your submission for assignment <strong>{{ assignment_title }}</strong> submitted at 
-        {{ submission_timestamp }} received the following scores on public tests:</p>
+        <p>Your submission {% if zip_name %}<code>{{ zip_name }}</code>{% endif %} for assignment 
+        <strong>{{ assignment_title }}</strong> submitted at {{ submission_timestamp }} received the 
+        following scores on public tests:</p>
 
         <pre>{{ score_report }}</pre>
 
@@ -48,7 +49,8 @@ class GmailNotifications(AbstractOtterPlugin):
     email_template_plain = Template(dedent("""\
         Hello {{ student_name }},
 
-        Your submission for assignment {{ assignment_title }} submitted at {{ submission_timestamp }} received the following scores on public tests:
+        Your submission {% if zip_name %}{{ zip_name }}{% endif %} for assignment {{ assignment_title }} 
+        submitted at {{ submission_timestamp }} received the following scores on public tests:
 
         {{ score_report }}
 
@@ -105,6 +107,12 @@ class GmailNotifications(AbstractOtterPlugin):
         Args:
             results (``otter.test_files.GradingResults``): the results of grading
         """
+        from ....check.notebook import _ZIP_NAME_FILENAME
+        if os.path.exists(_ZIP_NAME_FILENAME):
+            with open(_ZIP_NAME_FILENAME) as f:
+                zip_name = f.read().strip()
+        else:
+            zip_name = None
         if self.submission_metadata:
             for user in self.submission_metadata["users"]:
                 email_contents = self.email_template_plain.render({
@@ -112,6 +120,7 @@ class GmailNotifications(AbstractOtterPlugin):
                     "assignment_title": self.submission_metadata["assignment"]["title"],
                     "submission_timestamp": self.submission_metadata["created_at"],
                     "score_report": results.summary(public_only=True),
+                    "zip_name": zip_name,
                 })
                 plain_email = MIMEText(email_contents, _subtype="plain")
 
@@ -120,6 +129,7 @@ class GmailNotifications(AbstractOtterPlugin):
                     "assignment_title": self.submission_metadata["assignment"]["title"],
                     "submission_timestamp": self.submission_metadata["created_at"],
                     "score_report": results.summary(public_only=True),
+                    "zip_name": zip_name,
                 })
                 html_email = MIMEText(email_contents, _subtype="html")
 
