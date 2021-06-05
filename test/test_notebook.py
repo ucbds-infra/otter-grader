@@ -534,7 +534,7 @@ class TestNotebook(TestCase):
         # checks each question substring
         output_lst = [
             'q1 results: All test cases passed!\n',
-            'q2 results:\n    Trying:\n        1 == 1',
+            'q2 results:\n    q2 - 1 result:\n        Trying:',
             'q3 results: All test cases passed!\n',
             'q4 results: All test cases passed!\n',
             'q5 results: All test cases passed!\n'
@@ -636,7 +636,9 @@ class TestNotebook(TestCase):
         grader.export(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
 
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
-        with self.unzip_to_temp(TEST_FILES_PATH + "test-nb.zip") as unzipped_dir:
+        zips = glob(TEST_FILES_PATH + "test-nb*.zip")
+        assert len(zips) == 1
+        with self.unzip_to_temp(zips[0]) as unzipped_dir:
             # breakpoint()
             os.remove(unzipped_dir + '/test/test-notebook/test-nb.pdf')
             self.assertDirsEqual(
@@ -650,7 +652,7 @@ class TestNotebook(TestCase):
         os.rmdir(correct_directory)
         os.remove(TEST_FILES_PATH + "test-nb.ipynb")
         os.remove(TEST_FILES_PATH + "test-nb.pdf")
-        os.remove(TEST_FILES_PATH + "test-nb.zip")
+        os.remove(zips[0])
 
     def test_export_without_nb_path_case2_fail(self):
         """

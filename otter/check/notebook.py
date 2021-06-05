@@ -27,6 +27,7 @@ from ..plugins import PluginCollection
 # from .utils import wait_for_save
 
 _API_KEY = None
+_ZIP_NAME_FILENAME = "__zip_filename__"
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
@@ -395,8 +396,9 @@ class Notebook:
                     assert len(f.read().strip()) > 0, \
                         f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
 
+            timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
             if export_path is None:
-                zip_path = ".".join(nb_path.split(".")[:-1]) + ".zip"
+                zip_path = ".".join(nb_path.split(".")[:-1]) + "_" + timestamp + ".zip"
             else:
                 zip_path = export_path
 
@@ -411,6 +413,8 @@ class Notebook:
 
             if os.path.isfile(_OTTER_LOG_FILENAME):
                 zf.write(_OTTER_LOG_FILENAME)
+
+            zf.writestr(_ZIP_NAME_FILENAME, os.path.basename(zip_path))
 
             if glob("*.otter"):
                 assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"

@@ -14,6 +14,7 @@ from textwrap import dedent
 from .abstract_test import TestFile, TestCase, TestCaseResult
 from ..utils import hide_outputs
 
+
 def run_doctest(name, doctest_string, global_environment):
     """
     Run a single test with given ``global_environment``. Returns ``(True, '')`` if the doctest passes. 
@@ -53,6 +54,7 @@ def run_doctest(name, doctest_string, global_environment):
         return (True, '')
     else:
         return False, runresults.getvalue()
+
 
 class OKTestFile(TestFile):
     """
@@ -105,16 +107,6 @@ class OKTestFile(TestFile):
                 passed = passed,
             ))
 
-        # self.passed_all = passed_all
-        # self.test_case_results = test_case_results
-
-        # if self.all_or_nothing and not self.passed_all:
-        #     self.grade = 0
-        # elif not self.all_or_nothing and not self.passed_all:
-        #     self.grade = n_passed / len(self.test_case_results)
-        # else:
-        #     self.grade = 1
-
     @classmethod
     def from_file(cls, path):
         """
@@ -157,17 +149,12 @@ class OKTestFile(TestFile):
                 body = dedent(test_case['code']), 
                 hidden = test_case.get('hidden', True),
                 points = test_case.get('points', None),
+                success_message = test_case.get('success_message', None),
+                failure_message = test_case.get('failure_message', None)
             ))
 
         # resolve point values for each test case
         spec_pts = test_spec.get('points', None)
-        if isinstance(spec_pts, list):
-            if len(spec_pts) != len(test_cases):
-                raise ValueError("Points specified in test has different length than number of test cases")
-            test_cases = [tc._replace(points=pt) for tc, pt in zip(test_cases, spec_pts)]
-            spec_pts = None
-        elif spec_pts is not None and not isinstance(spec_pts, (int, float)):
-            raise TypeError(f"Test spec points has invalid type: {spec_pts}")
         test_cases = cls.resolve_test_file_points(spec_pts, test_cases)
 
         # convert path into PurePosixPath for test name

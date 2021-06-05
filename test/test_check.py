@@ -76,18 +76,22 @@ class TestCheck(TestCase):
                         [0.         0.02002002 0.04004004 0.06006006 0.08008008]
                         q1 results: All test cases passed!
                         q2 results:
-                            Trying:
-                                1 == 1
-                            Expecting:
-                                False
-                            **********************************************************************
-                            Line 2, in q2 0
-                            Failed example:
-                                1 == 1
-                            Expected:
-                                False
-                            Got:
-                                True
+                            q2 - 1 result:
+                                Trying:
+                                    1 == 1
+                                Expecting:
+                                    False
+                                **********************************************************************
+                                Line 2, in q2 0
+                                Failed example:
+                                    1 == 1
+                                Expected:
+                                    False
+                                Got:
+                                    True
+
+                            q2 - 2 result:
+                                Test case passed!
                         q3 results: All test cases passed!
                         q4 results: All test cases passed!
                         q5 results: All test cases passed!"""), 
@@ -147,18 +151,22 @@ class TestCheck(TestCase):
                         [0.         0.02002002 0.04004004 0.06006006 0.08008008]
                         q1 results: All test cases passed!
                         q2 results:
-                            Trying:
-                                1 == 1
-                            Expecting:
-                                False
-                            **********************************************************************
-                            Line 2, in q2 0
-                            Failed example:
-                                1 == 1
-                            Expected:
-                                False
-                            Got:
-                                True
+                            q2 - 1 result:
+                                Trying:
+                                    1 == 1
+                                Expecting:
+                                    False
+                                **********************************************************************
+                                Line 2, in q2 0
+                                Failed example:
+                                    1 == 1
+                                Expected:
+                                    False
+                                Got:
+                                    True
+
+                            q2 - 2 result:
+                                Test case passed!
                         q3 results: All test cases passed!
                         q4 results: All test cases passed!
                         q5 results: All test cases passed!"""), 

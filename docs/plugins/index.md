@@ -5,7 +5,7 @@
    :maxdepth: 1
    :hidden:
 
-   builtin
+   builtin/index
    creating_plugins
 ```
 

@@ -47,9 +47,9 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_assign_args)
-
+       
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
-
+        
     def test_otter_example(self):
         """
         Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
@@ -62,7 +62,7 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_assign_args)
-
+        
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "otter-correct")     
 
     def test_pdf_example(self):
@@ -76,7 +76,7 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_assign_args)
-
+      
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
         
         # # check gradescope zip file
@@ -102,7 +102,7 @@ class TestAssign(TestCase):
         # args.func = assign
         # args.func(args)
         run_otter(run_gradescope_args)
-        
+      
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
 
         # check gradescope zip file
