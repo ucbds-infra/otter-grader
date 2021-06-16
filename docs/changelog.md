@@ -2,6 +2,10 @@
 
 **Unreleased:**
 
+* Added `show_all_public` configuration for grading
+
+**v2.2.1:**
+
 * Added metadata for each test case to Otter Assign format
 * Added success and failure messages for test cases
 * Added Gmail notifications plugin
