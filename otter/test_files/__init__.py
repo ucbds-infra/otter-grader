@@ -247,7 +247,7 @@ class GradingResults:
         hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
 
         # if show_all_public is true and all tests are public tests, display all tests in results
-        if options["show_all_public"] and all(tf.all_public for tf in self.test_files.values()):
+        if options["show_all_public"] and all(tf.all_public for tf in self.results.values()):
             hidden_test_visibility = "visible"
 
         # start w/ summary of public tests
