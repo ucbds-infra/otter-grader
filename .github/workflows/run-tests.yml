@@ -44,6 +44,8 @@ jobs:
 
     - name: Install Python and R packages
       run: |
+        sudo apt-get -y build-dep libcurl4-gnutls-dev
+        sudo apt-get -y install libcurl4-gnutls-dev
         $CONDA/bin/conda install r-base r-essentials
         $CONDA/bin/conda install r-devtools -c conda-forge
         $CONDA/bin/pip install -r requirements.txt
@@ -78,3 +80,4 @@ jobs:
     - name: Send to Codecov
       run: |
         $CONDA/bin/codecov
+
