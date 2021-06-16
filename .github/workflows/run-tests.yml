@@ -49,7 +49,7 @@ jobs:
         sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get -y build-dep libcurl4-gnutls-dev
-        $CONDA/bin/conda install r-base r-essentials
+        $CONDA/bin/conda install r-base r-essentials gxx_linux-64
         $CONDA/bin/conda install r-devtools -c conda-forge
         $CONDA/bin/pip install -r requirements.txt
         $CONDA/bin/pip install -r test_requirements.txt
