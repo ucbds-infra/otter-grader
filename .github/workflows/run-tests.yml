@@ -44,6 +44,9 @@ jobs:
 
     - name: Install Python and R packages
       run: |
+        # first three lines from https://askubuntu.com/a/857433
+        sudo cp /etc/apt/sources.list /etc/apt/sources.list~
+        sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get -y build-dep libcurl4-gnutls-dev
         sudo apt-get -y install libcurl4-gnutls-dev
