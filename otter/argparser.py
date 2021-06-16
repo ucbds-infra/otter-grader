@@ -19,7 +19,7 @@ def get_parser():
     """
 
     parser = argparse.ArgumentParser(prog=PROG, description=dedent("""\
-    Command-line utility for Otter-Grader, a Python-based autograder for Jupyter Notebooks, RMarkdown 
+    Command-line utility for Otter-Grader, a Python-based autograder for Jupyter Notebooks, RMarkdown
     files, and Python and R scripts that runs locally on the instructors machine. For more information,
     see https://otter-grader.readthedocs.io/
     """))
@@ -75,6 +75,7 @@ def get_parser():
     generate_parser.add_argument("--autograder-dir", nargs="?", default="/autograder", help="Root autograding directory inside grading container")
     generate_parser.add_argument("--username", default=None, help="Gradescope username for generating a token")
     generate_parser.add_argument("--password", default=None, help="Gradescope password for generating a token")
+    generate_parser.add_argument("--token", default=None, help="Gradescope token to bypass username and password")
     generate_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
     generate_parser.set_defaults(func_str="generate.main")

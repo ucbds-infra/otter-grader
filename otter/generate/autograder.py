@@ -27,7 +27,7 @@ MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9
 OTTER_ENV_NAME = "otter-env"
 
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
-         username, password, files, assignment=None, plugin_collection=None, **kwargs):
+         username, password, token, files, assignment=None, plugin_collection=None, **kwargs):
     """
     Runs Otter Generate
 
@@ -42,6 +42,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         environment (``str``): path to a conda environment file for this assignment
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
+        token(``str``): a token to bypass Gradescope username and password
         files (``list[str]``): list of file paths to add to the zip file
         assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
             if used with Otter Assign
@@ -64,14 +65,15 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
             otter_config = json.load(f)
     else:
         otter_config = {}
-    
+
     if "course_id" in otter_config and "assignment_id" in otter_config:
         client = APIClient()
-        if username is not None and password is not None:
-            client.log_in(username, password)
-            token = client.token
-        else:
-            token = client.get_token()
+        if token is None:
+            if username is not None and password is not None:
+                client.log_in(username, password)
+                token = client.token
+            else:
+                token = client.get_token()
         otter_config["token"] = token
     elif "course_id" in otter_config or "assignment_id" in otter_config:
         raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")
@@ -102,7 +104,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         plugin_collection = PluginCollection(otter_config.get("plugins", []), None, {})
     else:
         plugin_collection.add_new_plugins(otter_config.get("plugins", []))
-    
+
     plugin_collection.run("during_generate", otter_config, assignment)
 
     # create tmp directory to zip inside
@@ -130,7 +132,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
                 data = yaml.safe_load(env_contents)
                 data['name'] = template_context["otter_env_name"]
                 template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
-  
+
         rendered = {}
         for fn, tmpl in templates.items():
             rendered[fn] = tmpl.render(**template_context)
@@ -139,7 +141,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
             zip_path = os.path.join(output_path, "autograder.zip")
         else:
             zip_path = os.path.join(os.getcwd(), output_path, "autograder.zip")
-        
+
         if os.path.exists(zip_path):
             os.remove(zip_path)
 
@@ -151,7 +153,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
             pattern = ("*.py", "*.[Rr]")[options["lang"] == "r"]
             for file in glob(os.path.join(tests_path, pattern)):
                 zf.write(file, arcname=os.path.join(test_dir, os.path.basename(file)))
-            
+
             zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))
 
             # copy files into tmp
@@ -165,6 +167,6 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
                         zip_folder(zf, full_fp, prefix="files")
                     else:
                         raise ValueError(f"Could not find file or directory '{full_fp}'")
-    
+
     if assignment is not None:
         assignment._otter_config = otter_config

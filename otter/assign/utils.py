@@ -31,14 +31,14 @@ class EmptyCellException(Exception):
 
 def get_spec(source, begin):
     """
-    Returns the line number of the spec begin line or ``None``. Converts ``begin`` to an uppercase 
+    Returns the line number of the spec begin line or ``None``. Converts ``begin`` to an uppercase
     string and looks for a line matching ``f"BEGIN {begin.upper()}"``. Used for finding question and
     assignment metadata, which match ``BEGIN QUESTION`` and ``BEGIN ASSIGNMENT``, resp.
-    
+
     Args:
         source (``list`` of ``str``): cell source as a list of lines of text
         begin (``str``): the spec to look for
-    
+
     Returns:
         ``int``: line number of BEGIN ASSIGNMENT, if present
         ``None``: if BEGIN ASSIGNMENT not present in the cell
@@ -49,11 +49,11 @@ def get_spec(source, begin):
     assert len(block_quotes) % 2 == 0, f"wrong number of block quote delimieters in {source}"
 
     begins = [
-        block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) 
+        block_quotes[i] + 1 for i in range(0, len(block_quotes), 2)
         if source[block_quotes[i]+1].strip(' ') == f"BEGIN {begin.upper()}"
     ]
     assert len(begins) <= 1, f'multiple BEGIN {begin.upper()} blocks defined in {source}'
-    
+
     return begins[0] if begins else None
 
 
@@ -64,10 +64,10 @@ def get_spec(source, begin):
 def is_markdown_cell(cell):
     """
     Returns whether ``cell`` is Markdown cell
-    
+
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
-    
+
     Returns:
         ``bool``: whether the cell is a Markdown cell
     """
@@ -76,7 +76,7 @@ def is_markdown_cell(cell):
 def is_ignore_cell(cell):
     """
     Returns whether the current cell should be ignored
-    
+
     Args:
         cell (``nbformat.NotebookNode``): a notebook cell
 
@@ -94,7 +94,7 @@ def is_ignore_cell(cell):
 def remove_output(nb):
     """
     Removes all outputs from a notebook in-place
-    
+
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
@@ -125,7 +125,7 @@ def str_to_doctest(code_lines, lines):
     Args:
         code_lines (``list``): list of lines of python code
         lines (``list``): set of characters used to create function name
-    
+
     Returns:
         ``list`` of ``str``: doctest formatted list of lines
     """
@@ -145,7 +145,7 @@ def str_to_doctest(code_lines, lines):
 def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
     Runs tests in the autograder version of the notebook
-    
+
     Args:
         nb_path (``pathlib.Path``): path to iPython notebooks
         debug (``bool``, optional): ``True`` if errors should not be ignored
@@ -156,7 +156,7 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     os.chdir(nb_path.parent)
     # print(os.getcwd())
     results = grade_notebook(
-        nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
+        nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(),
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
         plugin_collection=plugin_collection
     )
@@ -199,9 +199,9 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
 
 # TODO: update for new assign format
-def run_generate_autograder(result, assignment, gs_username, gs_password, plugin_collection=None):
+def run_generate_autograder(result, assignment, gs_username, gs_password, token, plugin_collection=None):
     """
-    Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
+    Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on
     configurations in ``assignment.generate``.
 
     Args:
@@ -209,6 +209,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         gs_username (``str``): Gradescope username for token generation
         gs_password (``str``): Gradescope password for token generation
+        token (``str``): token to bypass Gradescope username and password
         plugin_collection (``otter.plugins.PluginCollection``, optional): a plugin collection to pass
             to Otter Generate
     """
@@ -232,7 +233,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
 
         if not pdf_args.get('pagebreaks', True):
             generate_args['pagebreaks'] = False
-    
+
     if assignment.is_r:
         generate_cmd += ["-l", "r"]
         generate_args['lang'] = 'r'
@@ -249,10 +250,13 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if assignment.environment:
         environment = 'environment.yml'
         generate_cmd += ["-e", str(environment)]
-    
+
     if gs_username is not None and gs_password is not None:
         generate_cmd += ["--username", gs_username, "--password", gs_password]
-    
+
+    if token is not None:
+        generate_cmd += ['--token', token]
+
     if assignment.files:
         generate_cmd += assignment.files
 
@@ -271,7 +275,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args:
         with open("otter_config.json", "w+") as f:
             json.dump(generate_args, f, indent=2)
-    
+
     # TODO: change this to import and direct call
     parser = get_parser()
     args = parser.parse_args(generate_cmd)
@@ -287,13 +291,13 @@ def patch_copytree():
     """
     import errno, shutil
     orig_copyxattr = shutil._copyxattr
-    
+
     def patched_copyxattr(src, dst, *, follow_symlinks=True):
         try:
             orig_copyxattr(src, dst, follow_symlinks=follow_symlinks)
         except OSError as ex:
             if ex.errno != errno.EACCES: raise
-    
+
     shutil._copyxattr = patched_copyxattr
 
     yield

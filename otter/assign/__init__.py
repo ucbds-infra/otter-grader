@@ -15,18 +15,19 @@ from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
-def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwargs):
+def main(master, result, no_pdfs, no_run_tests, username, password, token, debug, **kwargs):
     """
     Runs Otter Assign on a master notebook
-    
+
     Args:
         master (``str``): path to master notebook
         result (``str``): path to result directory
         no_pdfs (``bool``): whether to ignore any configurations indicating PDF generation for this run
-        no_run_tests (``bool``): prevents Otter tests from being automatically run on the solutions 
+        no_run_tests (``bool``): prevents Otter tests from being automatically run on the solutions
             notebook
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
+        token (``str``): a token to bypass Gradescope username and password
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
         **kwargs: ignored kwargs (a remnant of how the argument parser is built)
     """
@@ -40,14 +41,14 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
     #     lang = lang.lower()
     #     assert lang in ["r", "python"], f"Language {lang} is not valid"
     #     assignment.lang = lang
-    
+
     # TODO: update this condition
     if True:
         result = get_relpath(master.parent, result)
         orig_dir = os.getcwd()
         os.chdir(master.parent)
         # master = pathlib.Path(master.name)
-    
+
     assignment.master, assignment.result = master, result
     # assignment.files = files
 
@@ -63,7 +64,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
     # if requirements:
     #     assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
     # assignment.requirements = requirements
-    
+
     try:
         output_nb_path = write_output_directories(master, result, assignment)
 
@@ -87,7 +88,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
                 assignment.generate["plugins"].extend(plugins)
         else:
             pc = None
-        
+
         # generate PDF of solutions
         if assignment.solutions_pdf and not assignment.is_rmd and not no_pdfs:
             print("Generating solutions PDF...")
@@ -114,9 +115,9 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
             print("Generating template PDF...")
             export_notebook(
                 str(result / 'autograder' / master.name),
-                dest=str(result / 'autograder' / (master.stem + '-template.pdf')), 
-                filtering=True, 
-                pagebreaks=True, 
+                dest=str(result / 'autograder' / (master.stem + '-template.pdf')),
+                filtering=True,
+                pagebreaks=True,
                 exporter_type="latex",
             )
 
@@ -134,7 +135,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
         if assignment.generate:
             # TODO: move this to another function
             print("Generating autograder zipfile...")
-            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
+            run_generate_autograder(result, assignment, username, password, token, plugin_collection=pc)
 
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:
@@ -144,7 +145,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
                 seed = None
             else:
                 seed = assignment.generate.get('seed', None)
-            
+
             if assignment._otter_config is not None:
                 test_pc = PluginCollection(assignment._otter_config.get("plugins", []), output_nb_path, {})
 
@@ -153,7 +154,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
 
             run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
             print("All tests passed!")
-    
+
     # for tests
     except:
         # TODO: change this condition
