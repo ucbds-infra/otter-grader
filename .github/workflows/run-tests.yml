@@ -44,6 +44,7 @@ jobs:
 
     - name: Install Python and R packages
       run: |
+        sudo apt-get update
         sudo apt-get -y build-dep libcurl4-gnutls-dev
         sudo apt-get -y install libcurl4-gnutls-dev
         $CONDA/bin/conda install r-base r-essentials
