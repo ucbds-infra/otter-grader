@@ -49,6 +49,7 @@ jobs:
       run: |
         $CONDA/bin/pip install -r requirements.txt
         $CONDA/bin/pip install -r test_requirements.txt
+        sudo apt install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
         Rscript -e "install.packages('devtools')"
         Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
 
