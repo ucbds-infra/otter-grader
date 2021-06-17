@@ -128,6 +128,10 @@ class TestFile(ABC):
         return all(tcr.passed for tcr in self.test_case_results if not tcr.test_case.hidden)
 
     @property
+    def all_public(self):
+        return all(not tc.hidden for tc in self.test_cases)
+
+    @property
     def grade(self):
         if self.all_or_nothing and not self.passed_all:
             return 0

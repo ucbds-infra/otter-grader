@@ -1,6 +1,10 @@
 # Changelog
 
-**Unreleased:**
+**v2.2.2:**
+
+* Added `show_all_public` configuration for grading
+
+**v2.2.1:**
 
 * Added metadata for each test case to Otter Assign format
 * Added success and failure messages for test cases
