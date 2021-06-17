@@ -23,6 +23,9 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v1
         
     - name: Docker versions
       run: |
@@ -44,17 +47,11 @@ jobs:
 
     - name: Install Python and R packages
       run: |
-        # first three lines from https://askubuntu.com/a/857433
-        sudo cp /etc/apt/sources.list /etc/apt/sources.list~
-        sudo sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
-        sudo apt-get update
-        sudo apt-get -y build-dep libcurl4-gnutls-dev
-        sudo apt-get -y install libcurl4-gnutls-dev
-        $CONDA/bin/conda install r-base r-essentials
-        $CONDA/bin/conda install r-devtools -c conda-forge
         $CONDA/bin/pip install -r requirements.txt
         $CONDA/bin/pip install -r test_requirements.txt
-        $CONDA/bin/Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
+        sudo apt install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
+        Rscript -e "install.packages('devtools')"
+        Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
 
     - name: Install nbconvert dependencies
       run: |
