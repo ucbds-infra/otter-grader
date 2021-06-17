@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v2.2.2:**
 
 * Added `show_all_public` configuration for grading
 
