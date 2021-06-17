@@ -36,7 +36,11 @@ jobs:
       run: |
         sudo apt update
         sudo apt install postgresql postgresql-contrib libpq-dev
-        sudo pg_ctlcluster 12 main start
+        cat /var/lib/postgresql/12/main /var/log/postgresql/postgresql-12-main.log || :
+        sudo service postgresql start
+    - name: Create Postgres user
+      run: |
+        sudo -u postgres psql -c "create user root createdb password 'root';"
 
     - name: Setup Conda
       run: |
@@ -70,10 +74,6 @@ jobs:
         docker version
         docker-compose version
         $CONDA/bin/conda info -a
-
-    - name: Create Postgres user
-      run: |
-        sudo -u postgres psql -c "create user root createdb password 'root';"
 
     - name: Run tests
       run: |
