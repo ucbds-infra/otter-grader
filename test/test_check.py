@@ -89,6 +89,7 @@ class TestCheck(TestCase):
                                     False
                                 Got:
                                     True
+
                             q2 - 2 result:
                                 Test case passed!
                         q3 results: All test cases passed!
@@ -163,6 +164,7 @@ class TestCheck(TestCase):
                                     False
                                 Got:
                                     True
+
                             q2 - 2 result:
                                 Test case passed!
                         q3 results: All test cases passed!

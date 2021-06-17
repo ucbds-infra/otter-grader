@@ -1,0 +1,86 @@
+# Workflow for running the test suite
+
+name: Run tests
+
+on:
+  push:
+    branches: [ master, stable ]
+  pull_request:
+    branches: [ master, stable ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    env:
+      TAR: /bin/tar
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v1
+        
+    - name: Docker versions
+      run: |
+        docker version
+        docker-compose version
+    
+    - name: Install Postgres
+      run: |
+        sudo apt update
+        sudo apt install postgresql postgresql-contrib libpq-dev
+        sudo cat /var/lib/postgresql/12/main /var/log/postgresql/postgresql-12-main.log || :
+        sudo service postgresql start
+
+    - name: Create Postgres user
+      run: |
+        sudo -u postgres psql -c "create user root createdb password 'root';"
+
+    - name: Setup Conda
+      run: |
+        $CONDA/bin/conda config --set always_yes yes --set changeps1 no
+
+    - name: Pull Docker images
+      run: |
+        docker pull gradescope/auto-builds:latest
+
+    - name: Install Python and R packages
+      run: |
+        $CONDA/bin/pip install -r requirements.txt
+        $CONDA/bin/pip install -r test_requirements.txt
+        sudo apt install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
+        Rscript -e "install.packages('devtools')"
+        Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
+
+    - name: Install nbconvert dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y pandoc
+        sudo apt install -y texlive-xetex texlive-fonts-recommended
+        sudo apt install fonts-lmodern
+
+    - name: Build testing Docker image
+      run: |
+        make docker-test
+
+    - name: Docker, Conda version info
+      run: |
+        docker version
+        docker-compose version
+        $CONDA/bin/conda info -a
+
+    - name: Run tests
+      run: |
+        $CONDA/bin/coverage run -m test
+
+    - name: Send to Codecov
+      run: |
+        $CONDA/bin/codecov
+

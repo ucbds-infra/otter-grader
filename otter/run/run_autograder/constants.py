@@ -7,6 +7,7 @@ DEFAULT_OPTIONS = {
     "points_possible": None,
     "show_stdout": False,
     "show_hidden": False,
+    "show_all_public": False,
     "seed": None,
     "grade_from_log": False,
     "serialized_variables": {},
