@@ -2,6 +2,7 @@ import os
 import zipfile
 import tempfile
 import shutil
+import subprocess
 import unittest
 
 from contextlib import contextmanager
