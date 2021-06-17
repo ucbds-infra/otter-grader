@@ -36,6 +36,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install postgresql postgresql-contrib libpq-dev
+        sudo pg_ctlcluster 12 main start
 
     - name: Setup Conda
       run: |
