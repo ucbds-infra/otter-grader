@@ -235,9 +235,9 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
             generate_args['pagebreaks'] = False
 
     # use temp tests dir
-    if assignment._temp_test_dir is None:
+    if assignment.is_python and not assignment.test_files and assignment._temp_test_dir is None:
         raise RuntimeError("Failed to create temp tests directory for Otter Generate")
-    else:
+    elif assignment.is_python and assignment.test_files:
         generate_cmd += ["-t", str(assignment._temp_test_dir)]
     
     if assignment.is_r:
@@ -285,7 +285,8 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     generate_autograder(**vars(args), assignment=assignment, plugin_collection=plugin_collection)
 
     # clean up temp tests dir
-    shutil.rmtree(str(assignment._temp_test_dir))
+    if assignment._temp_test_dir is not None:
+        shutil.rmtree(str(assignment._temp_test_dir))
 
     os.chdir(curr_dir)
 

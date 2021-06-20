@@ -37,15 +37,15 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
             warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
             assignment.lang = "python"
 
-    output_dir = output_nb_path.parent
-    if assignment.test_files:
-        tests_dir = output_dir / 'tests'
-        os.makedirs(tests_dir, exist_ok=True)
-
     transformed_nb, test_files = transform_notebook(nb, assignment)
 
     # replace plugins
     transformed_nb = replace_plugins_with_calls(transformed_nb)
+
+    output_dir = output_nb_path.parent
+    tests_dir = output_dir / 'tests'
+    if assignment.test_files:
+        os.makedirs(tests_dir, exist_ok=True)
 
     if assignment.requirements:
         output_fn = ("requirements.txt", "requirements.R")[assignment.is_r]

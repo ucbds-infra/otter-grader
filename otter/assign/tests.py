@@ -194,7 +194,7 @@ def write_test(nb, path, test, use_file=False):
             metadata
     """
     if use_file:
-        with open(path, 'w') as f:
+        with open(path, 'w+') as f:
             if isinstance(test, dict):
                 f.write('test = ')
                 pprint.pprint(test, f, indent=4, width=200, depth=None)
@@ -232,7 +232,7 @@ def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=False):
                         suite['cases'].pop(i)
                         if isinstance(test['points'], list):
                             test['points'].pop(i)
-            write_test(f, test)
+            write_test({}, f, test, use_file=True)
     else:
         tests = nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"]
         for tn, test in tests.items():

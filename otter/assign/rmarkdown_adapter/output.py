@@ -64,7 +64,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
     # write tests
     test_ext =".R"
     for test_name, test_file in test_files.items():
-        write_test(tests_dir / (test_name + test_ext), test_file)
+        write_test({}, tests_dir / (test_name + test_ext), test_file, use_file=True)
 
     # copy files
     for file in assignment.files:
@@ -118,7 +118,7 @@ def write_student_dir(rmd_name, autograder_dir, student_dir, assignment):
         f.write(rmd_string)
 
     # remove hidden tests from student directory
-    remove_hidden_tests_from_dir(student_dir / 'tests', assignment)
+    remove_hidden_tests_from_dir({}, student_dir / 'tests', assignment)
 
 def write_output_directories(master_rmd_path, result_dir, assignment):
     """
