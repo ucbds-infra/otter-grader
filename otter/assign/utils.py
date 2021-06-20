@@ -237,7 +237,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     # use temp tests dir
     if assignment.is_python and not assignment.test_files and assignment._temp_test_dir is None:
         raise RuntimeError("Failed to create temp tests directory for Otter Generate")
-    elif assignment.is_python and assignment.test_files:
+    elif assignment.is_python and not assignment.test_files:
         generate_cmd += ["-t", str(assignment._temp_test_dir)]
     
     if assignment.is_r:
