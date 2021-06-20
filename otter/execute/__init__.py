@@ -14,31 +14,35 @@ from .execute_notebook import execute_notebook, filter_ignored_cells
 from .execute_script import execute_script
 # from .results import GradingResults
 
-from ..test_files import OKTestFile, GradingResults
+from ..test_files import GradingResults, NotebookMetadataOKTestFile, OKTestFile
 from ..utils import id_generator
 
 NBFORMAT_VERSION = 4
 
-def check(test_file_path, global_env=None):
+def check(nb_or_test_path, test_name=None, global_env=None):
     """
-    Checks a global environment against given ``test_file`` in OK-format. If global_env is ``None``, the 
-    global environment of the calling frame is used; i.e., the following two calls are equivalent:
+    Checks a global environment against given test file. If global_env is ``None``, the global 
+    environment of the calling frame is used; i.e., the following two calls are equivalent:
 
     .. code-block:: python
+
         check('tests/q1.py')
         check('tests/q1.py', globals())
     
     Args:
-        test_file_path (``str``): path to test file
+        nb_or_test_path (``str``): path to test file or notebook
+        test_name (``str``, optional): the name of the test if a notebook metadata test
         global_env (``dict``, optional): a global environment resulting from the execution 
             of a python script or notebook
 
     Returns:
         ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
-            given global environment
-
+        given global environment
     """
-    test = OKTestFile.from_file(test_file_path)
+    if test_name is None:
+        test = OKTestFile.from_file(nb_or_test_path)
+    else:
+        test = NotebookMetadataOKTestFile.from_file(nb_or_test_path, test_name)
 
     if global_env is None:
         # Get the global env of our callers - one level below us in the stack

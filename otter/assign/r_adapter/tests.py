@@ -107,7 +107,7 @@ def gen_suite(name, tests, points):
         tests = tests
     )
 
-def remove_hidden_tests_from_dir(test_dir, assignment):
+def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=True):
     """
     Rewrites test files in a directory to remove hidden tests
     
@@ -163,4 +163,4 @@ def remove_hidden_tests_from_dir(test_dir, assignment):
             yaml.dump(metadata).split("\n") + ["\""]
         test = "\n".join(lines)
 
-        write_test(f, test)
+        write_test({}, f, test, use_file=True)
