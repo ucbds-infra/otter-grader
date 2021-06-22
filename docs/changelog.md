@@ -6,6 +6,7 @@
 * Added success and failure messages for test cases
 * Added Gmail notifications plugin
 * Added timestamps to `otter.Notebook.export` filenames
+* Added token argument to Otter Generate and Otter Assign
 
 **v2.2.0:**
 
