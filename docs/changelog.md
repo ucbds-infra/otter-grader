@@ -4,6 +4,7 @@
 
 * Added `NotebookMetadataTestFile` for reading tests from Jupyter Notebook metadata
 * Added optional storage of tests in notebook metadata for Otter Assign
+* Added token argument to Otter Generate and Otter Assign
 
 **v2.2.2:**
 
@@ -15,7 +16,6 @@
 * Added success and failure messages for test cases
 * Added Gmail notifications plugin
 * Added timestamps to `otter.Notebook.export` filenames
-* Added token argument to Otter Generate and Otter Assign
 
 **v2.2.0:**
 
