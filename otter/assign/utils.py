@@ -199,7 +199,7 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
 
 # TODO: update for new assign format
-def run_generate_autograder(result, assignment, gs_username, gs_password, token, plugin_collection=None):
+def run_generate_autograder(result, assignment, gs_username, gs_password, plugin_collection=None):
     """
     Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on
     configurations in ``assignment.generate``.
@@ -209,7 +209,6 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, token,
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         gs_username (``str``): Gradescope username for token generation
         gs_password (``str``): Gradescope password for token generation
-        token (``str``): token to bypass Gradescope username and password
         plugin_collection (``otter.plugins.PluginCollection``, optional): a plugin collection to pass
             to Otter Generate
     """
@@ -224,7 +223,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, token,
     if generate_args.get('pdfs', {}):
         pdf_args = generate_args.pop('pdfs', {})
         # token = APIClient.get_token()
-        # generate_args['token'] = token
+        generate_args['token'] = token
         generate_args['course_id'] = str(pdf_args['course_id'])
         generate_args['assignment_id'] = str(pdf_args['assignment_id'])
 
@@ -253,9 +252,6 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, token,
 
     if gs_username is not None and gs_password is not None:
         generate_cmd += ["--username", gs_username, "--password", gs_password]
-
-    if token is not None:
-        generate_cmd += ['--token', token]
 
     if assignment.files:
         generate_cmd += assignment.files

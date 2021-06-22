@@ -15,7 +15,7 @@ from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
-def main(master, result, no_pdfs, no_run_tests, username, password, token, debug, **kwargs):
+def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwargs):
     """
     Runs Otter Assign on a master notebook
 
@@ -27,7 +27,6 @@ def main(master, result, no_pdfs, no_run_tests, username, password, token, debug
             notebook
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
-        token (``str``): a token to bypass Gradescope username and password
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
         **kwargs: ignored kwargs (a remnant of how the argument parser is built)
     """
@@ -135,7 +134,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, token, debug
         if assignment.generate:
             # TODO: move this to another function
             print("Generating autograder zipfile...")
-            run_generate_autograder(result, assignment, username, password, token, plugin_collection=pc)
+            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
 
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:

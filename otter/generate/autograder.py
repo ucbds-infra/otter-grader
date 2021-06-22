@@ -27,7 +27,7 @@ MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9
 OTTER_ENV_NAME = "otter-env"
 
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
-         username, password, token, files, assignment=None, plugin_collection=None, **kwargs):
+         username, password, files, assignment=None, plugin_collection=None, **kwargs):
     """
     Runs Otter Generate
 
@@ -42,7 +42,6 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         environment (``str``): path to a conda environment file for this assignment
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
-        token(``str``): a token to bypass Gradescope username and password
         files (``list[str]``): list of file paths to add to the zip file
         assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
             if used with Otter Assign
@@ -68,12 +67,13 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
 
     if "course_id" in otter_config and "assignment_id" in otter_config:
         client = APIClient()
-        if token is None:
-            if username is not None and password is not None:
-                client.log_in(username, password)
-                token = client.token
-            else:
-                token = client.get_token()
+        if "token" in otter_config:
+            token = otter_config["token"]
+        elif username is not None and password is not None:
+            client.log_in(username, password)
+            token = client.token
+        else:
+            token = client.get_token()
         otter_config["token"] = token
     elif "course_id" in otter_config or "assignment_id" in otter_config:
         raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")
