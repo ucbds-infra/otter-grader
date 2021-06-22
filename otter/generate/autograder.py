@@ -27,7 +27,7 @@ MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9
 OTTER_ENV_NAME = "otter-env"
 
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
-         username, password, files, assignment=None, plugin_collection=None, **kwargs):
+         username, password, token, files, assignment=None, plugin_collection=None, **kwargs):
     """
     Runs Otter Generate
 
@@ -42,6 +42,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         environment (``str``): path to a conda environment file for this assignment
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
+        token (``str``): a pre-specified token for Gradescope, overrides username and password
         files (``list[str]``): list of file paths to add to the zip file
         assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
             if used with Otter Assign
@@ -65,15 +66,18 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
     else:
         otter_config = {}
     
-    if "course_id" in otter_config and "assignment_id" in otter_config:
-        client = APIClient()
-        if username is not None and password is not None:
-            client.log_in(username, password)
-            token = client.token
-        else:
-            token = client.get_token()
+    if "token" not in otter_config and token is not None:
         otter_config["token"] = token
-    elif "course_id" in otter_config or "assignment_id" in otter_config:
+    elif "token" not in otter_config and "course_id" in otter_config and "assignment_id" in otter_config:
+        client = APIClient()
+        if token is None or "token" not in otter_config.keys():
+            if username is not None and password is not None:
+                client.log_in(username, password)
+                token = client.token
+            else:
+                token = client.get_token()
+        otter_config["token"] = token
+    elif ("course_id" in otter_config) ^ ("assignment_id" in otter_config):
         raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")
 
     options = DEFAULT_OPTIONS.copy()

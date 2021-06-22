@@ -43,11 +43,41 @@ class TestAutograder(TestCase):
         if 'environment.yml' in os.listdir(os.getcwd()):
             os.rename('environment.yml', 'environment_temp_rename.yml')
 
-
         run_otter(generate_command)
 
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
             self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-correct")
+
+        if 'environment_temp_rename.yml' in os.listdir(os.getcwd()):
+            os.rename('environment_temp_rename.yml', 'environment.yml')
+
+
+    def test_token_autograder(self):
+        """
+        Check that the correct zipfile is created by gs_generator.py with user specified token
+        """
+        # create the zipfile
+        generate_command = [
+            "generate",
+            "-t", TEST_FILES_PATH + "tests",
+            "-o", TEST_FILES_PATH,
+            "-r", TEST_FILES_PATH + "requirements.txt",
+            "-c", TEST_FILES_PATH + "otter_config.json",
+            TEST_FILES_PATH + "data/test-df.csv"
+        ]
+        # args = parser.parse_args(generate_command)
+        # args.func = autograder
+        # args.func(args)
+
+        if 'environment.yml' in os.listdir(os.getcwd()):
+            os.rename('environment.yml', 'environment_temp_rename.yml')
+
+        with mock.patch("otter.generate.autograder.APIClient") as mocked_client:
+            run_otter(generate_command)
+            mocked_client.assert_not_called()
+
+        with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
+            self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-token-correct")
 
         if 'environment_temp_rename.yml' in os.listdir(os.getcwd()):
             os.rename('environment_temp_rename.yml', 'environment.yml')

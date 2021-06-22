@@ -46,6 +46,7 @@ generate:                      # configurations for running Otter Generate; defa
   pdfs:                        # configurations for generating PDFs for manually-graded questions. defaults to false
     course_id: ''              # Gradescope course ID for uploading PDFs for manually-graded questions
     assignment_id: ''          # Gradescope assignment ID for uploading PDFs for manually-graded questions
+    token: ''                  # Pre-specified toekn to bypass course ID and assignment ID for uploading PDFs
     filtering: true            # whether the PDFs should be filtered
   zips: false                  # whether the files being grade are zip files from `otter.Notebook.export`
 save_environment: false        # whether to save students' environments in the log for grading
