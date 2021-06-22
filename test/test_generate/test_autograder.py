@@ -52,6 +52,34 @@ class TestAutograder(TestCase):
         if 'environment_temp_rename.yml' in os.listdir(os.getcwd()):
             os.rename('environment_temp_rename.yml', 'environment.yml')
 
+    def test_autograder_with_token(self):
+
+        """
+        Checks otter assign with token specified instead of username and password.
+        """
+
+        # create the zipfile
+        generate_command = [
+            "generate",
+            "-t", TEST_FILES_PATH + "tests",
+            "-o", TEST_FILES_PATH,
+            "-r", TEST_FILES_PATH + "requirements.txt",
+            "-c", TEST_FILES_PATH + "otter_config.json",
+            TEST_FILES_PATH + "data/test-df.csv"
+        ]
+
+        if 'environment.yml' in os.listdir(os.getcwd()):
+            os.rename('environment.yml', 'environment_temp_rename.yml')
+
+        with mock.patch("otter.generate.autograder.APIClient") as mocked_client:
+            run_otter(generate_command)
+            mocked_client.assert_not_called()
+    
+        with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
+            self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-token-correct")
+
+        if 'environment_temp_rename.yml' in os.listdir(os.getcwd()):
+            os.rename('environment_temp_rename.yml', 'environment.yml')
 
     def test_custom_env(self):
         """

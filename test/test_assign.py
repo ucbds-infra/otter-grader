@@ -11,6 +11,7 @@ import subprocess
 from subprocess import PIPE
 from glob import glob
 from unittest.mock import patch
+from unittest import mock
 
 # from otter.argparser import get_parser
 from otter.assign import main as assign
@@ -101,9 +102,13 @@ class TestAssign(TestCase):
         # args = parser.parse_args(run_gradescope_args)
         # args.func = assign
         # args.func(args)
+        
         run_otter(run_gradescope_args)
-      
+        
+        # with mock.patch("test.test-assign.output.autograder.generate-gradescope.ipynb") as m:
+        self.assertDirsEqual.__self__.maxDiff = None
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
+            # m.assert_not_called()
 
         # check gradescope zip file
         self.check_gradescope_zipfile(
