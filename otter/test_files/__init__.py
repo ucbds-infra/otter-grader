@@ -9,6 +9,7 @@ import pickle
 from collections import namedtuple
 
 # from .abstract_test import TestCollection
+from .metadata_test import NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
 
 from ..check.logs import QuestionNotInLogException
@@ -49,21 +50,6 @@ class GradingResults:
         # self.results = {}
         self.output = None
         self.all_hidden = False
-        
-        # total_score, points_possible = 0, 0
-        # for test_file in test_files:
-        #     for test_case_result in test_file.test_case_results:
-        #         case_pts = test_case_result.test_case.points
-        #         name = test_case_result.test_case.name
-        #         self.results[name] = GradingTestCaseResult(
-        #             name = test_case_result.test_case.name,
-        #             score = case_pts * test_case_result.passed,
-        #             possible = case_pts,
-        #             hidden = test_case_result.test_case.hidden,
-        #             incorrect = not test_case_result.passed,
-        #             test_case_result = test_case_result,
-        #             test_file = test_file,
-        #         )
 
     def __repr__(self):
         return pprint.pformat(self.to_dict(), indent=2)
@@ -258,8 +244,12 @@ class GradingResults:
             output["output"] = self.output
             # TODO: use output to display public test case results?
 
-        # hidden visibility determined by show_hidden_tests_on_release
+        # hidden visibility determined by show_hidden
         hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
+
+        # if show_all_public is true and all tests are public tests, display all tests in results
+        if options["show_all_public"] and all(tf.all_public for tf in self.results.values()):
+            hidden_test_visibility = "visible"
 
         # start w/ summary of public tests
         output["tests"].append({
@@ -270,14 +260,13 @@ class GradingResults:
 
         for test_name in self.test_files:
             test_file = self.get_result(test_name)
-            # hidden, incorrect = result.hidden, result.incorrect
             score, possible = test_file.score, test_file.possible
 
             output["tests"].append({
                 "name": test_file.name,
                 "score": score,
                 "max_score": possible,
-                "visibility": hidden_test_visibility, #  if hidden else 'visible',
+                "visibility": hidden_test_visibility,
                 "output": test_file.summary(),
             })
 
@@ -285,7 +274,6 @@ class GradingResults:
             output["stdout_visibility"] = "after_published"
 
         if options["points_possible"] is not None:
-            # output["score"] = self.total / self.possible * options["points_possible"]
             try:
                 output["score"] = self.total / self.possible * options["points_possible"]
             except ZeroDivisionError:

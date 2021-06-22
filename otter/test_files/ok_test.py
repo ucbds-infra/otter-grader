@@ -84,21 +84,17 @@ class OKTestFile(TestFile):
     def run(self, global_environment):
         """
         Runs tests on a given ``global_environment``
-        
+
         Arguments:
             ``global_environment`` (``dict``): result of executing a Python notebook/script
-        
+
         Returns:
             ``tuple`` of (``bool``, ``float`` ``otter.ok_parser.OKTest``): whether the test passed,
                 the percentage score on this test, and a pointer to the current ``otter.ok_parser.OKTest`` object
         """
-        n_passed = 0 #, passed_all, test_case_results = 0, True, []
         for i, test_case in enumerate(self.test_cases):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
-            # if not passed:
-            #     passed_all = False
             if passed:
-                n_passed += 1
                 result = 'Test case passed!'
 
             self.test_case_results.append(TestCaseResult(
@@ -108,25 +104,7 @@ class OKTestFile(TestFile):
             ))
 
     @classmethod
-    def from_file(cls, path):
-        """
-        Parse an ok test file & return an ``OKTest``
-
-        Args:
-            path (``str``): path to ok test file
-
-        Returns:
-            ``otter.ok_parser.OKTest``: new ``OKTest`` object created from the given file
-        """
-        # ok test files are python files, with a global 'test' defined
-        test_globals = {}
-        with open(path) as f:
-            exec(f.read(), test_globals)
-
-        test_spec = test_globals['test']
-
-        # We only support a subset of these tests, so let's validate!
-
+    def from_spec(cls, test_spec, path=""):
         # Make sure there is a name
         assert 'name' in test_spec
 
@@ -164,3 +142,23 @@ class OKTestFile(TestFile):
         all_or_nothing = test_spec.get('all_or_nothing', True)
 
         return cls(test_spec['name'], path, test_cases, all_or_nothing)
+
+    @classmethod
+    def from_file(cls, path):
+        """
+        Parse an ok test file & return an ``OKTest``
+
+        Args:
+            path (``str``): path to ok test file
+
+        Returns:
+            ``otter.ok_parser.OKTest``: new ``OKTest`` object created from the given file
+        """
+        # ok test files are python files, with a global 'test' defined
+        test_globals = {}
+        with open(path) as f:
+            exec(f.read(), test_globals)
+
+        test_spec = test_globals['test']
+
+        return cls.from_spec(test_spec, path=path)        

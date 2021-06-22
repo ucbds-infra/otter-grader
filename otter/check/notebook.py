@@ -24,13 +24,14 @@ from .utils import save_notebook
 from ..execute import check
 from ..export import export_notebook
 from ..plugins import PluginCollection
-# from .utils import wait_for_save
+
 
 _API_KEY = None
 _ZIP_NAME_FILENAME = "__zip_filename__"
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
+
 
 class TestsDisplay:
     """
@@ -55,7 +56,6 @@ class TestsDisplay:
         for name, result in zip(self.test_names, self.results):
             ret += f"{result._repr_html_()}\n\n"
         return ret
-
 
 
 class Notebook:
@@ -204,7 +204,7 @@ class Notebook:
     def _resolve_nb_path(self, nb_path):
         """
         Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``, ``self._notebook``
-        is checked, then the working directory is searched for `.ipynb` files. If none are found, or 
+        is checked, then the working directory is searched for ``.ipynb`` files. If none are found, or 
         more than one is found, a ``ValueError`` is raised.
 
         Args:
@@ -243,7 +243,13 @@ class Notebook:
             ``otter.test_files.abstract_test.TestCollectionResults``: the grade for the question
         """
         try:
-            test_path = os.path.join(self._path, question + ".py")
+            if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
+                test_path = os.path.join(self._path, question + ".py")
+                test_name = None
+
+            else:
+                test_path = self._resolve_nb_path(None)
+                test_name = question
 
             # ensure that desired test exists
             assert os.path.isfile(test_path), "Test {} does not exist".format(question)
@@ -253,7 +259,7 @@ class Notebook:
                 global_env = inspect.currentframe().f_back.f_globals
 
             # run the check
-            result = check(test_path, global_env)
+            result = check(test_path, test_name, global_env)
 
         except Exception as e:
             self._log_event(EventType.CHECK, question=question, success=False, error=e, shelve_env=global_env)
