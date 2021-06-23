@@ -104,11 +104,9 @@ class TestAssign(TestCase):
         # args.func(args)
         
         run_otter(run_gradescope_args)
-        
-        # with mock.patch("test.test-assign.output.autograder.generate-gradescope.ipynb") as m:
+
         self.assertDirsEqual.__self__.maxDiff = None
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
-            # m.assert_not_called()
 
         # check gradescope zip file
         self.check_gradescope_zipfile(
