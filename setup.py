@@ -38,7 +38,6 @@ setuptools.setup(
 		],
 	},
 	package_data={
-		"otter.service": ["templates/*.html"],
 		"otter.export.exporters": ["templates/*", "templates/*/*"],
 		"otter.generate": ["templates/*", "templates/*/*"],
 		"otter.grade": ["Dockerfile"],
