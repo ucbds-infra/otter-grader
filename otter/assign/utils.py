@@ -181,6 +181,7 @@ def write_otter_config_file(master, result, assignment):
         config.update({
             "endpoint": service["endpoint"],
             "auth": service.get("auth", "google"),
+            "token": service["token"],      #
             "assignment_id": service["assignment_id"],
             "class_id": service["class_id"]
         })
@@ -223,7 +224,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args.get('pdfs', {}):
         pdf_args = generate_args.pop('pdfs', {})
         # token = APIClient.get_token()
-        generate_args['token'] = token
+        generate_args['token'] = str(pdf_args['token'])
         generate_args['course_id'] = str(pdf_args['course_id'])
         generate_args['assignment_id'] = str(pdf_args['assignment_id'])
 
