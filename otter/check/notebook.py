@@ -26,7 +26,6 @@ from ..export import export_notebook
 from ..plugins import PluginCollection
 
 
-_API_KEY = None
 _ZIP_NAME_FILENAME = "__zip_filename__"
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -72,7 +71,7 @@ class Notebook:
 
     def __init__(self, nb_path=None, test_dir="./tests"):
         try:
-            global _API_KEY, _SHELVE
+            global _SHELVE
             # assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
 
             if type(self)._tests_dir_override is not None:
