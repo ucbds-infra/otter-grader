@@ -26,15 +26,6 @@ six
 rpy2
 jupytext
 
-# otter service requirements
-psycopg2
-queries
-pyyaml
-docker
-PyJWT
-tornado
-stdio-proxy
-
 # documentation requirements
 recommonmark
 sphinx_markdown_tables
