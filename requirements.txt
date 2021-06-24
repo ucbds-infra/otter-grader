@@ -25,12 +25,3 @@ six
 # ottr requirements
 rpy2
 jupytext
-
-# otter service requirements
-psycopg2
-queries
-pyyaml
-docker
-PyJWT
-tornado
-stdio-proxy

@@ -42,7 +42,6 @@ class Assignment:
         "solutions_pdf": False,
         "template_pdf": False,
         "seed_required": False,
-        "service": {},
         "save_environment": False,
         "requirements": None,
         "overwrite_requirements": False,
