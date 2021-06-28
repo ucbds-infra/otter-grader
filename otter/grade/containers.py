@@ -37,12 +37,19 @@ def build_image(zip_path, base_image, tag):
         ``str``: the tag of the newly-build Docker image
     """
     image = OTTER_DOCKER_IMAGE_TAG + ":" + tag
-    dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
-    build_out = subprocess.Popen(
-        ["docker", "build","--build-arg", "ZIPPATH=" + zip_path, "--build-arg", "BASE_IMAGE=" + base_image,
-         ".", "-f", dockerfile, "-t", image],
-    )
-    build_out.wait()
+    dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")    
+    if os.environ.get("OTTER_DOCKER_CLIENT_VERSION") is not None:
+        client = docker.from_env(version=os.environ.get("OTTER_DOCKER_CLIENT_VERSION"))
+    else:
+        client = docker.from_env()
+    try:
+        client.images.get(image)
+    except docker.errors.ImageNotFound as e:
+        build_out = subprocess.Popen(
+            ["docker", "build","--build-arg", "ZIPPATH=" + zip_path, "--build-arg", "BASE_IMAGE=" + base_image,
+            ".", "-f", dockerfile, "-t", image],
+        )
+        build_out.wait()
     return image
 
 def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
