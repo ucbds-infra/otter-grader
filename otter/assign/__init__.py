@@ -121,7 +121,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
             )
 
         # generate the .otter file if needed
-        if not assignment.is_rmd and assignment.service or assignment.save_environment:
+        if not assignment.is_rmd and assignment.save_environment:
             if assignment.is_r:
                 warnings.warn(
                     "Otter Service and serialized environments are unsupported with R, "

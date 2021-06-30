@@ -177,16 +177,7 @@ def write_otter_config_file(master, result, assignment):
     """
     config = {}
 
-    service = assignment.service
-    if service:
-        config.update({
-            "endpoint": service["endpoint"],
-            "auth": service.get("auth", "google"),
-            "assignment_id": service["assignment_id"],
-            "class_id": service["class_id"]
-        })
-
-    config["notebook"] = service.get('notebook', master.name)
+    config["notebook"] = master.name
     config["save_environment"] = assignment.save_environment
     config["ignore_modules"] = assignment.ignore_modules
 

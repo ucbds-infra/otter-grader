@@ -9,6 +9,10 @@ with open("otter/version.py") as f:
 	exec(f.read(), env)
 version = env["__version__"]
 
+# get requirements
+with open("requirements.txt") as f:
+	install_requires = f.readlines()
+
 setuptools.setup(
 	name = "otter-grader",
 	version = version,
@@ -25,11 +29,7 @@ setuptools.setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
 	],
-	install_requires=[
-		"pyyaml", "nbformat", "ipython", "nbconvert", "tqdm", "setuptools", "pandas", "tornado",
-		"docker", "jinja2", "dill", "pdfkit", "PyPDF2", "gspread", "google-auth-oauthlib",
-		"google-api-python-client", "six",
-	],
+	install_requires=install_requires,
 	# scripts=["bin/otter"],
 	entry_points = {
 		"console_scripts": [
@@ -38,7 +38,6 @@ setuptools.setup(
 		],
 	},
 	package_data={
-		"otter.service": ["templates/*.html"],
 		"otter.export.exporters": ["templates/*", "templates/*/*"],
 		"otter.generate": ["templates/*", "templates/*/*"],
 		"otter.grade": ["Dockerfile"],

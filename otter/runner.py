@@ -17,12 +17,6 @@ from . import generate
 from . import grade
 from . import run
 
-MISSING_PACKAGES = False
-try:
-    from . import service
-except ImportError:
-    MISSING_PACKAGES = True
-
 PARSER = get_parser()
 
 def run_otter(unparsed_args=None):
@@ -40,33 +34,9 @@ def run_otter(unparsed_args=None):
         return
 
     if hasattr(args, 'func_str'):
-        if args.func_str.startswith("service") and MISSING_PACKAGES:
-            raise ImportError(
-                "Missing some packages required for otter service. "
-                "Please install all requirements at "
-                "https://raw.githubusercontent.com/ucbds-infra/otter-grader/master/requirements.txt"
-            )
-
         args.func = eval(args.func_str)
-
-        if args.func_str.startswith("service"):
-            args.func(args)
-        else:
-            kwargs = vars(args)
-            args.func(**kwargs)
-
-    elif len(sys.argv) > 1 and sys.argv[1] == "generate":
-        print(dedent("""\
-        You must specify a command for Otter Generate:
-            autograder
-            token"""))
-
-    elif len(sys.argv) > 1 and sys.argv[1] == "service":
-        print(dedent("""\
-        You must specify a command for Otter Service:
-            build
-            create
-            start"""))
+        kwargs = vars(args)
+        args.func(**kwargs)
 
     else:
         print(dedent("""\
@@ -75,5 +45,4 @@ def run_otter(unparsed_args=None):
             check
             export
             generate
-            grade
-            service"""))
+            grade"""))
