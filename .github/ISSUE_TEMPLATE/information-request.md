@@ -3,7 +3,6 @@ name: Information request
 about: Ask for more information about Otter
 title: ''
 labels: question
-assignees: chrispyles
 
 ---
 
