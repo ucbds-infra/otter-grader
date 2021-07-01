@@ -21,9 +21,10 @@ from IPython.display import display, HTML, Javascript
 
 from .logs import LogEntry, EventType, Log
 from .utils import save_notebook
-from ..execute import check
+from ..execute import check, grade_notebook
 from ..export import export_notebook
 from ..plugins import PluginCollection
+from multiprocessing import Process, Queue, queues
 
 
 _ZIP_NAME_FILENAME = "__zip_filename__"
@@ -365,7 +366,7 @@ class Notebook:
             
             for file in self._addl_files:
                 zf.write(file)
-
+            
             zf.close()
 
             if display_link:
@@ -376,6 +377,27 @@ class Notebook:
                 """.format(zip_path)
 
                 display(HTML(out_html))
+
+            queue = Queue()
+
+            def grade_to_queue(queue, *args, **kwargs):
+                ret = grade_notebook(*args, **kwargs)
+                queue.add(ret)
+
+            process = Process(target=grade_to_queue, args=(queue, nb_path, glob(os.path.join("tests", "*.py"))), kwargs=dict(
+                cwd=os.getcwd(),
+                test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
+                plugin_collection=self.plugin_collection
+            ))
+
+            process.join()
+
+            if queue.is_empty():
+                raise Exception()
+
+            grading_results = queue.get()
+            display(grading_results)
+            assert queue.is_empty()
 
         except Exception as e:
             self._log_event(EventType.END_EXPORT, success=False, error=e)
