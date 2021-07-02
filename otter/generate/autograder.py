@@ -70,12 +70,11 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         otter_config["token"] = token
     elif "token" not in otter_config and "course_id" in otter_config and "assignment_id" in otter_config:
         client = APIClient()
-        if token is None or "token" not in otter_config.keys():
-            if username is not None and password is not None:
-                client.log_in(username, password)
-                token = client.token
-            else:
-                token = client.get_token()
+        if username is not None and password is not None:
+            client.log_in(username, password)
+            token = client.token
+        else:
+            token = client.get_token()
         otter_config["token"] = token
     elif ("course_id" in otter_config) ^ ("assignment_id" in otter_config):
         raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")

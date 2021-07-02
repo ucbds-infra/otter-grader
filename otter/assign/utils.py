@@ -226,7 +226,9 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         # generate_args['token'] = token
         generate_args['course_id'] = str(pdf_args['course_id'])
         generate_args['assignment_id'] = str(pdf_args['assignment_id'])
-        generate_args["token"] = str(pdf_args["token"])
+        
+        if not pdf_args.get("token:", ''):
+            generate_args['token'] = str(pdf_args['token'])
 
         if not pdf_args.get("filtering", True):
             generate_args['filtering'] = False
