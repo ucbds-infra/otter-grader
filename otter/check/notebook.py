@@ -383,9 +383,9 @@ class Notebook:
 
             queue = Queue()
 
-            def grade_to_queue(queue, *args, **kwargs):
-                ret = grade_notebook(*args, **kwargs)
-                queue.add(ret)
+            # def grade_to_queue(queue, *args, **kwargs):
+            #     ret = grade_notebook(*args, **kwargs)
+            #     queue.add(ret)
 
             process = Process(target=grade_to_queue, args=(queue, nb_path, glob(os.path.join("tests", "*.py"))), 
                             kwargs=dict(
@@ -394,12 +394,10 @@ class Notebook:
                                 plugin_collection=plugin_collection)
                 )
 
+            process.start()
+            grading_results = queue.get()
             process.join()
 
-            if queue.empty():
-                raise Exception()
-
-            grading_results = queue.get()
             display(grading_results)
             assert queue.empty()
 
@@ -449,3 +447,11 @@ class Notebook:
             self._log_event(EventType.END_CHECK_ALL)
 
         return TestsDisplay(results)
+
+
+def grade_to_queue(queue, *args, **kwargs):
+    """
+    TO DO
+    """
+    ret = grade_notebook(*args, **kwargs)
+    queue.put(ret)
