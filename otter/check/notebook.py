@@ -24,7 +24,7 @@ from .utils import save_notebook
 from ..execute import check, grade_notebook
 from ..export import export_notebook
 from ..plugins import PluginCollection
-from multiprocessing import Process, Queue, queues
+from multiprocessing import Process, Queue
 
 
 _ZIP_NAME_FILENAME = "__zip_filename__"
@@ -293,7 +293,7 @@ class Notebook:
         self._addl_files.extend(addl_files)
 
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
-            display_link=True, force_save=False):
+            display_link=True, force_save=False, debug=False, seed=None, plugin_collection=None):
         """
         Exports a submission to a zip file. Creates a submission zipfile from a notebook at ``nb_path``,
         optionally including a PDF export of the notebook and any files in ``files``.
@@ -312,6 +312,9 @@ class Notebook:
             display_link (``bool``, optional): whether or not to display a download link
             force_save (``bool``, optional): whether or not to display JavaScript that force-saves the
                 notebook (only works in Jupyter Notebook classic, not JupyterLab)
+            debug (``bool``, optional): whether or not to ignore errors when grading the notebook
+            seed (``int``, optional): random seed for grading the notebook
+            plugin_collection (``otter.plugins.PluginCollection``, optional): plugins to run with call to grade_notebook
         """
         self._log_event(EventType.BEGIN_EXPORT)
         # self._save_notebook()
@@ -384,20 +387,21 @@ class Notebook:
                 ret = grade_notebook(*args, **kwargs)
                 queue.add(ret)
 
-            process = Process(target=grade_to_queue, args=(queue, nb_path, glob(os.path.join("tests", "*.py"))), kwargs=dict(
-                cwd=os.getcwd(),
-                test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
-                plugin_collection=self.plugin_collection
-            ))
+            process = Process(target=grade_to_queue, args=(queue, nb_path, glob(os.path.join("tests", "*.py"))), 
+                            kwargs=dict(
+                                cwd=os.getcwd(),
+                                test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
+                                plugin_collection=plugin_collection)
+                )
 
             process.join()
 
-            if queue.is_empty():
+            if queue.empty():
                 raise Exception()
 
             grading_results = queue.get()
             display(grading_results)
-            assert queue.is_empty()
+            assert queue.empty()
 
         except Exception as e:
             self._log_event(EventType.END_EXPORT, success=False, error=e)
