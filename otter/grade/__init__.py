@@ -100,7 +100,6 @@ def main(path, output_dir, autograder, gradescope, canvas, json, yaml, container
         debug=debug,
         zips=zips,
         image=image,
-        meta_parser=meta_parser,
         pdfs=pdfs
     )
 
