@@ -5,6 +5,7 @@
 * Added `NotebookMetadataTestFile` for reading tests from Jupyter Notebook metadata
 * Added optional storage of tests in notebook metadata for Otter Assign
 * Removed deprecated tool Otter Service
+* Added printout of total score to autograder output
 
 **v2.2.2:**
 
