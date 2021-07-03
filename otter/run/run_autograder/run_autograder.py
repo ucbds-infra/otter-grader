@@ -219,7 +219,7 @@ def run_autograder(options):
 
     if plugin_collection:
         report = plugin_collection.generate_report()
-        print(report)
+        print("\n\n" + report)
 
     os.chdir(abs_ag_path)
 

@@ -152,11 +152,13 @@ def load_default_file(provided_fn, expected_fn):
     else:
         yield None
 
-def print_full_width(char, mid_text="", whitespace=" ", **kwargs):
+def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs):
     """
     Prints a character at the full terminal width. If ``mid_text`` is supplied, this text is printed
     in the middle of the terminal, surrounded by ``whitespace``. Additional kwargs passed to 
     ``print``.
+
+    If ``ret_str`` is true, the string is returned; if not, it is printed directly to the console.
     """
     cols, rows = shutil.get_terminal_size()
 
@@ -172,5 +174,8 @@ def print_full_width(char, mid_text="", whitespace=" ", **kwargs):
 
     else:
         out = char * cols
+
+    if ret_str:
+        return out
 
     print(out, **kwargs)
