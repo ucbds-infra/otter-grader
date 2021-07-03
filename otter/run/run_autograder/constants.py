@@ -27,5 +27,6 @@ DEFAULT_OPTIONS = {
     "plugins": [],
     "logo": True,
     "print_summary": True,
+    "print_score": True,
     "zips": False,
 }

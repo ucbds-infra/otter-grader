@@ -7,6 +7,7 @@ import sys
 import pathlib
 import random
 import string
+import shutil
 
 from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
@@ -150,3 +151,26 @@ def load_default_file(provided_fn, expected_fn):
             yield f.read()
     else:
         yield None
+
+def print_full_width(char, mid_text="", whitespace=" ", **kwargs):
+    """
+    Prints a character at the full terminal width. If ``mid_text`` is supplied, this text is printed
+    in the middle of the terminal, surrounded by ``whitespace``. Additional kwargs passed to 
+    ``print``.
+    """
+    cols, rows = shutil.get_terminal_size()
+
+    if mid_text:
+        left = cols - len(mid_text) - 2 * len(whitespace)
+        if left <= 0:
+            left = 2
+        l, r = left // 2, left // 2
+        if left % 2 == 1:
+            r += 1
+        
+        out = char * l + whitespace + mid_text + whitespace + char * r
+
+    else:
+        out = char * cols
+
+    print(out, **kwargs)
