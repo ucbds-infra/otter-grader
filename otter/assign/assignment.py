@@ -59,7 +59,7 @@ class Assignment:
         "plugins": [],
         "plugin_config": {},
         "_otter_config": None,
-        "test_files": False,
+        "test_files": True,
         "_temp_test_dir": None, # path to a temp dir for tests for otter generate
     }
 
