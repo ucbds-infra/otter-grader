@@ -125,48 +125,4 @@ def get_parser():
     run_parser.set_defaults(func_str="run.main")
 
 
-    ###### PARSER FOR otter service #####
-    service_parser = subparsers.add_parser("service", description="Create and manage an otter-service")
-    service_subparsers = service_parser.add_subparsers()
-
-
-    ##### PARSER FOR otter service build #####
-    service_build_parser = service_subparsers.add_parser("build", description="Build images for an otter-service instance")
-    service_build_parser.add_argument("repo_path", default=".", help="Path to assignments repo root")
-    service_build_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
-    service_build_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
-    service_build_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
-    service_build_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
-    service_build_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Based image for grading containers")
-    service_build_parser.add_argument("-q", "--quiet", default=False, action="store_true", help="Build images without writing Docker messages to stdout")
-
-    service_build_parser.set_defaults(func_str="service.build.main")
-
-
-    ##### PARSER FOR otter service create #####
-    service_create_parser = service_subparsers.add_parser("create", description="Create database for otter-service")
-    service_create_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
-    service_create_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
-    service_create_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
-    service_create_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
-
-    service_create_parser.set_defaults(func_str="service.create.main")
-
-
-    ##### PARSER FOR otter service start #####
-    service_start_parser = service_subparsers.add_parser("start", description="Start an otter-service instance")
-    service_start_parser.add_argument("-c", "--config", help="Path to config file")
-    service_start_parser.add_argument("-e", "--endpoint", help="Address of this VM including port")
-    service_start_parser.add_argument("--port", type=int, default=80, help="Port for server to listen on")
-    service_start_parser.add_argument("-k", "--google-key", help="Google OAuth key; use environment variable if not specified")
-    service_start_parser.add_argument("-s", "--google-secret", help="Google OAuth secret; use environment variable if not specified")
-    service_start_parser.add_argument("--db-host", default="localhost", help="Postgres database host")
-    service_start_parser.add_argument("--db-port", default=5432, type=int, help="Postgres database port")
-    service_start_parser.add_argument("-u", "--db-user", default="root", help="Postgres database user")
-    service_start_parser.add_argument("-p", "--db-pass", default="root", help="Postgres database password")
-    service_start_parser.add_argument("-l", "--rate-limit", default=120, type=int, help="Rate limit for submissions in seconds")
-
-    service_start_parser.set_defaults(func_str="service.start.main")
-
-
     return parser

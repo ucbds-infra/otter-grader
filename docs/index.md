@@ -35,7 +35,6 @@ Otter is organized into seven components based on the different stages of the as
 * [Otter Export](pdfs.md) generates PDFs with optional filtering of Jupyter Notebooks for manually grading portions of assignments.
 * [Otter Run](workflow/executing_submissions/otter_run.md) grades students' assignments locally on the instructor's machine without containerization and supports grading on a JupyterHub account.
 * [Otter Grade](workflow/executing_submissions/otter_grade.md) grades students' assignments locally on the instructor's machine in parallel Docker containers, returning grade breakdowns as a CSV file.
-* [Otter Service](otter_service.md) is a deployable grading server that students can submit their work to which grades these submissions and can optionally upload PDFs of these submission to Gradescope for manual grading.
 
 ## Installation
 

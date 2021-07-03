@@ -7,6 +7,7 @@ import os
 import json
 import pprint
 import pathlib
+import shutil
 
 from glob import glob
 from contextlib import contextmanager
@@ -176,16 +177,7 @@ def write_otter_config_file(master, result, assignment):
     """
     config = {}
 
-    service = assignment.service
-    if service:
-        config.update({
-            "endpoint": service["endpoint"],
-            "auth": service.get("auth", "google"),
-            "assignment_id": service["assignment_id"],
-            "class_id": service["class_id"]
-        })
-
-    config["notebook"] = service.get('notebook', master.name)
+    config["notebook"] = master.name
     config["save_environment"] = assignment.save_environment
     config["ignore_modules"] = assignment.ignore_modules
 
@@ -232,6 +224,12 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
 
         if not pdf_args.get('pagebreaks', True):
             generate_args['pagebreaks'] = False
+
+    # use temp tests dir
+    if assignment.is_python and not assignment.test_files and assignment._temp_test_dir is None:
+        raise RuntimeError("Failed to create temp tests directory for Otter Generate")
+    elif assignment.is_python and not assignment.test_files:
+        generate_cmd += ["-t", str(assignment._temp_test_dir)]
     
     if assignment.is_r:
         generate_cmd += ["-l", "r"]
@@ -276,6 +274,10 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     parser = get_parser()
     args = parser.parse_args(generate_cmd)
     generate_autograder(**vars(args), assignment=assignment, plugin_collection=plugin_collection)
+
+    # clean up temp tests dir
+    if assignment._temp_test_dir is not None:
+        shutil.rmtree(str(assignment._temp_test_dir))
 
     os.chdir(curr_dir)
 

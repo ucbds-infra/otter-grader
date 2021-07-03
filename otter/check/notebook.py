@@ -24,13 +24,13 @@ from .utils import save_notebook
 from ..execute import check
 from ..export import export_notebook
 from ..plugins import PluginCollection
-# from .utils import wait_for_save
 
-_API_KEY = None
+
 _ZIP_NAME_FILENAME = "__zip_filename__"
 _OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
+
 
 class TestsDisplay:
     """
@@ -57,7 +57,6 @@ class TestsDisplay:
         return ret
 
 
-
 class Notebook:
     """
     Notebook class for in-notebook autograding
@@ -72,14 +71,13 @@ class Notebook:
 
     def __init__(self, nb_path=None, test_dir="./tests"):
         try:
-            global _API_KEY, _SHELVE
+            global _SHELVE
             # assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
 
             if type(self)._tests_dir_override is not None:
                 self._path = type(self)._tests_dir_override
             else:
                 self._path = test_dir
-            self._service_enabled = False
             self._notebook = nb_path
             self._addl_files = []
             self._plugin_collections = {}
@@ -95,80 +93,16 @@ class Notebook:
                     self._config = json.load(f)
 
                 _SHELVE = self._config.get("save_environment", False)
-                self._service_enabled = "endpoint" in self._config
                 self._ignore_modules = self._config.get("ignore_modules", [])
                 self._vars_to_store = self._config.get("variables", None)
 
                 self._notebook = self._config["notebook"]
-
-                if self._service_enabled:
-                    # check that config file has required info
-                    assert all([key in self._config for key in ["endpoint", "assignment_id", "class_id"]]), "Otter config file missing required information"
-
-                    if "auth" not in self._config:
-                        self._config["auth"] = "google"
-
-                    self._google_auth_url = urljoin(self._config["endpoint"], "auth/google")
-                    self._default_auth_url = urljoin(self._config["endpoint"], "auth")
-                    self._submit_url = urljoin(self._config["endpoint"], "submit")
-
-                    self._auth()
 
         except Exception as e:
             self._log_event(EventType.INIT, success=False, error=e)
             raise e
         else:
             self._log_event(EventType.INIT)
-
-    # TODO: cut out personal auth?
-    def _auth(self):
-        """
-        Asks student to authenticate with an Otter Service instance if Otter Service is configured
-        for this notebook
-
-        Raises:
-            ``AssertionError``: if Otter Service is not enabled or an invalid auth provider is indicated
-        """
-        try:
-            global _API_KEY
-            assert self._service_enabled, 'notebook not configured for otter service'
-            assert self._config["auth"] in ["google", "default"], "invalid auth provider"
-
-            if _API_KEY is not None:
-                self._api_key = _API_KEY
-                return
-
-            # have users authenticate with OAuth
-            if self._config["auth"] == "google":
-
-                    # send them to google login page
-                    display(HTML(f"""
-                    <p>Please <a href="{self._google_auth_url}" target="_blank">log in</a> to Otter Service
-                    and enter your API key below.</p>
-                    """))
-
-                    self._api_key = input()
-            # else have them auth with default auth
-            else:
-                print("Please enter a username and password.")
-                username = input("Username: ")
-                password = getpass("Password: ")
-
-                # in-notebook auth
-                response = requests.get(url=self._default_auth_url, params={"username":username, "password":password})
-                self._api_key = response.content.decode("utf-8")
-                # print("Your API Key is {}\n".format())
-                # print("Paste this in and hit enter")
-                # self._api_key = input()
-
-            # store API key so we don't re-auth every time
-            _API_KEY = self._api_key
-
-        except Exception as e:
-            self._log_event(EventType.AUTH, success=False, error=e)
-            raise e
-        else:
-            self._log_event(EventType.AUTH)
 
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
@@ -204,7 +138,7 @@ class Notebook:
     def _resolve_nb_path(self, nb_path):
         """
         Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``, ``self._notebook``
-        is checked, then the working directory is searched for `.ipynb` files. If none are found, or 
+        is checked, then the working directory is searched for ``.ipynb`` files. If none are found, or 
         more than one is found, a ``ValueError`` is raised.
 
         Args:
@@ -243,7 +177,13 @@ class Notebook:
             ``otter.test_files.abstract_test.TestCollectionResults``: the grade for the question
         """
         try:
-            test_path = os.path.join(self._path, question + ".py")
+            if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
+                test_path = os.path.join(self._path, question + ".py")
+                test_name = None
+
+            else:
+                test_path = self._resolve_nb_path(None)
+                test_name = question
 
             # ensure that desired test exists
             assert os.path.isfile(test_path), "Test {} does not exist".format(question)
@@ -253,7 +193,7 @@ class Notebook:
                 global_env = inspect.currentframe().f_back.f_globals
 
             # run the check
-            result = check(test_path, global_env)
+            result = check(test_path, test_name, global_env)
 
         except Exception as e:
             self._log_event(EventType.CHECK, question=question, success=False, error=e, shelve_env=global_env)
@@ -483,41 +423,3 @@ class Notebook:
             self._log_event(EventType.END_CHECK_ALL)
 
         return TestsDisplay(results)
-
-    def submit(self):
-        """
-        Submits this notebook to an Otter Service instance if Otter Service is configured
-
-        Raises:
-            ``AssertionError``: if this notebook is not configured for Otter Service
-        """
-        assert self._service_enabled, 'notebook not configured for otter service'
-
-        try:
-            if not hasattr(self, '_api_key'):
-                self._auth()
-
-
-            notebook_path = os.path.join(os.getcwd(), self._notebook)
-
-            assert os.path.exists(notebook_path) and os.path.isfile(notebook_path), \
-            "Could not find notebook: {}".format(self._notebook)
-
-            with open(notebook_path) as f:
-                notebook_data = json.load(f)
-
-            notebook_data["metadata"]["assignment_id"] = self._config["assignment_id"]
-            notebook_data["metadata"]["class_id"] = self._config["class_id"]
-
-            print("Submitting notebook to server...")
-
-            response = requests.post(self._submit_url, json.dumps({
-                "api_key": self._api_key,
-                "nb": notebook_data,
-            }))
-
-        except Exception as e:
-            self._log_event(EventType.SUBMIT, success=False, error=e)
-            raise e
-        else:
-            self._log_event(EventType.SUBMIT)

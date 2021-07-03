@@ -42,7 +42,6 @@ class Assignment:
         "solutions_pdf": False,
         "template_pdf": False,
         "seed_required": False,
-        "service": {},
         "save_environment": False,
         "requirements": None,
         "overwrite_requirements": False,
@@ -60,6 +59,8 @@ class Assignment:
         "plugins": [],
         "plugin_config": {},
         "_otter_config": None,
+        "test_files": True,
+        "_temp_test_dir": None, # path to a temp dir for tests for otter generate
     }
 
     def __init__(self):
