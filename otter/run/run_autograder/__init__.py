@@ -58,6 +58,8 @@ def main(autograder_dir, **kwargs):
 
     if options["print_score"]:
         total, possible = df["score"].sum(), df["max_score"].sum()
+        if "score" in output:
+            total, possible = output["score"], options["points_possible"] or possible
         perc = total / possible * 100
         print(f"Total Score: {total:.3f} / {possible:.3f} ({perc:.3f}%)\n")
 
