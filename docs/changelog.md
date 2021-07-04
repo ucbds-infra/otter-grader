@@ -1,6 +1,10 @@
 # Changelog
 
-**Unreleased:**
+**v2.2.4:**
+
+* Fixed total score printout for the use of the `points_possible` configuration
+
+**v2.2.3:**
 
 * Added `NotebookMetadataTestFile` for reading tests from Jupyter Notebook metadata
 * Added optional storage of tests in notebook metadata for Otter Assign (default-off until v3)
