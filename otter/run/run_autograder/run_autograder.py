@@ -195,19 +195,21 @@ def run_autograder(options):
 
     if options["print_summary"]:
         # print("\n" + "-" * 30 + " GRADING SUMMARY " + "-" * 30)
-        print()
+        print("\n\n\n\n", end="")
         print_full_width("-", mid_text="GRADING SUMMARY")
 
     # verify the scores against the log
-    if log is not None:
-        try:
-            found_discrepancy = scores.verify_against_log(log)
-            if not found_discrepancy and options["print_summary"]:
-                print("No discrepancies found while verifying scores against the log.")
-        except BaseException as e:
-            print(f"Error encountered while trying to verify scores with log:\n{e}")
-    elif options["print_summary"]:
-        print("No log found with which to verify student scores.")
+    if options["print_summary"]:
+        print()
+        if log is not None:
+            try:
+                found_discrepancy = scores.verify_against_log(log)
+                if not found_discrepancy and options["print_summary"]:
+                    print("No discrepancies found while verifying scores against the log.")
+            except BaseException as e:
+                print(f"Error encountered while trying to verify scores with log:\n{e}")
+        else:
+            print("No log found with which to verify student scores.")
 
     if generate_pdf:
         write_and_submit_pdf(
@@ -219,7 +221,8 @@ def run_autograder(options):
 
     if plugin_collection:
         report = plugin_collection.generate_report()
-        print("\n\n" + report)
+        if report.strip():
+            print("\n\n" + report)
 
     os.chdir(abs_ag_path)
 
