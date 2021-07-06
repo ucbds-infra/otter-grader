@@ -5,6 +5,8 @@
 import unittest
 import sys
 import os
+import zipfile
+import datetime as dt
 import shutil
 import subprocess
 import json
@@ -163,6 +165,36 @@ class TestNotebook(TestCase):
         for result in output_lst:
             self.assertTrue(output.count(result) == 1, f"Expected output to contain '{result}':\n{output}")
 
+    def test_grading_separate_process(self):
+        """
+        Checks export contents when ran and displayed in separate process, tests export contents for equality of PDF and zip
+        """
+        nb_path = TEST_FILES_PATH + "hw00_test_process_export.ipynb"
+        nb = Notebook(nb_path = nb_path, test_dir=TEST_FILES_PATH + "tests")
+        
+        correct_directory = TEST_FILES_PATH + 'export-correct/'
+        os.mkdir(correct_directory)
+        shutil.copy(nb_path, correct_directory + 'hw00_test_process_export.ipynb')
+
+        nb.export(filtering=False)
+
+        self.assertTrue(os.path.isfile(TEST_FILES_PATH + "hw00_test_process_export.pdf"))
+        zips = glob(TEST_FILES_PATH + "hw00_test_process_export*.zip")
+        assert len(zips) == 1
+        with self.unzip_to_temp(zips[0]) as unzipped_dir:
+            os.remove(unzipped_dir + '/test/test-notebook/hw00_test_process_export.pdf')
+            self.assertDirsEqual(
+                unzipped_dir + '/test/test-notebook/',
+                TEST_FILES_PATH + "export-correct",
+                ignore_ext=[".pdf"]
+            )
+
+        # cleanup
+        os.remove(correct_directory + "hw00_test_process_export.ipynb")
+        os.rmdir(correct_directory)
+        os.remove(TEST_FILES_PATH + "hw00_test_process_export.pdf")
+        os.remove(zips[0])
+    
     def test_to_pdf_with_nb_path(self):
         """
         Checks for existence of notebook PDF

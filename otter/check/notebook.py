@@ -296,7 +296,8 @@ class Notebook:
             display_link=True, force_save=False, debug=False, seed=None, plugin_collection=None):
         """
         Exports a submission to a zip file. Creates a submission zipfile from a notebook at ``nb_path``,
-        optionally including a PDF export of the notebook and any files in ``files``.
+        optionally including a PDF export of the notebook and any files in ``files``. Grades notebook in a separate
+        process and displays the results in the notebook.
 
         Args:
             nb_path (``str``, optional): path to the notebook we want to export; will attempt to infer
@@ -383,10 +384,6 @@ class Notebook:
 
             queue = Queue()
 
-            # def grade_to_queue(queue, *args, **kwargs):
-            #     ret = grade_notebook(*args, **kwargs)
-            #     queue.add(ret)
-
             process = Process(target=grade_to_queue, args=(queue, nb_path, glob(os.path.join("tests", "*.py"))), 
                             kwargs=dict(
                                 cwd=os.getcwd(),
@@ -451,7 +448,7 @@ class Notebook:
 
 def grade_to_queue(queue, *args, **kwargs):
     """
-    TO DO
+    Grades a notebook and adds results to a queue that gets passed into the notebook Process
     """
     ret = grade_notebook(*args, **kwargs)
     queue.put(ret)
