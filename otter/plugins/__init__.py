@@ -5,6 +5,7 @@ Grading plugins for Otter
 import importlib
 
 from .abstract_plugin import AbstractOtterPlugin, PluginEventNotSupportedException
+from ..utils import print_full_width
 
 
 class PluginCollection:
@@ -176,26 +177,28 @@ class PluginCollection:
         if not any(isinstance(r, str) for r in reports):
             return ""
 
-        header = "=" * 35 + " PLUGIN REPORT " + "=" * 35
+        # header = "=" * 35 + " PLUGIN REPORT " + "=" * 35
+        header = print_full_width("=", mid_text="PLUGIN REPORT", ret_str=True)
         footer = "=" * len(header)
 
         report = header
         for r, plg in zip(reports, self._plugin_names):
             if not isinstance(r, str):
                 continue
-            title = f" {plg} Report "
-            dashes = len(header) - len(title)
-            if dashes > 4:
-                if dashes % 2 == 0:
-                    ld, rd = dashes // 2, dashes // 2
-                else:
-                    ld, rd = dashes // 2, dashes // 2 + 1
-            else:
-                ld, rd = 2, 2
+            # title = f" {plg} Report "
+            # dashes = len(header) - len(title)
+            # if dashes > 4:
+            #     if dashes % 2 == 0:
+            #         ld, rd = dashes // 2, dashes // 2
+            #     else:
+            #         ld, rd = dashes // 2, dashes // 2 + 1
+            # else:
+            #     ld, rd = 2, 2
 
-            title = "-" * ld + title + "-" * rd
+            # title = "-" * ld + title + "-" * rd
+            title = print_full_width("-", mid_text=f"{plg} Report", ret_str=True)
 
-            body = title + "\n" + r + "\n"
+            body = "\n" + title + "\n" + r + "\n"
 
             report += "\n" + body
         

@@ -33,7 +33,7 @@ export_cell:                   # include an export cell at the end of the notebo
   filtering: true              # whether the PDF in the export should be filtered
   instructions: ''             # additional instructions for submission included above export cell
   force_save: false            # whether to force-save a student's notebook before exporting
-test_files: false              # whether to write tests in separate files isntead of in the notebook metadata
+test_files: true               # whether to write tests in separate files isntead of in the notebook metadata
 template_pdf: false            # whether to generate a manual question template PDF for Gradescope
 generate:                      # configurations for running Otter Generate; defaults to false
   points_possible: null        # number of points to scale assignment to on Gradescope
