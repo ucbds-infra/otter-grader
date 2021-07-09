@@ -12,9 +12,11 @@ from concurrent.futures import ThreadPoolExecutor, wait
 import docker
 import pandas as pd
 import pkg_resources
-from docker.errors import ImageNotFound
+from docker.errors import BuildError, ImageNotFound
 
 from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
+from docker.utils.json_stream import json_stream
+import itertools
 
 
 def build_image(zip_path, base_image, tag):
@@ -38,10 +40,24 @@ def build_image(zip_path, base_image, tag):
     try:
         client.images.get(image)
     except ImageNotFound:
-        client.images.build(buildargs={
-                                "ZIPPATH": zip_path,
-                                "BASE_IMAGE": base_image
-                            }, tag=image, dockerfile=dockerfile, path=".")
+        print(f"Building new image using {base_image} as base image")
+        generator = client.api.build(buildargs={
+                            "ZIPPATH": zip_path,
+                            "BASE_IMAGE": base_image
+                        }, tag=image, dockerfile=dockerfile, path=".")
+        try:
+            result_stream, internal_stream = itertools.tee(json_stream(generator))
+            for chunk in internal_stream:
+                if 'error' in chunk:
+                    raise BuildError(chunk['error'], result_stream)
+                if 'stream' in chunk:
+                    line = chunk['stream'].strip("\r\n")
+                    if len(line) != 0:
+                        print(line)
+    
+        except BuildError:
+            raise
+    client.close()
     return image
 
 
@@ -158,7 +174,7 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
         if pdfs:
             volumes.update({f"{path_pdf}": {"bind": f"/autograder/submission/{nb_name}.pdf"}})
         container = client.containers.run(image, "/autograder/run_autograder", volumes=volumes,
-                                          detach=True, tty=True)
+                                          detach=True, tty=False)
 
         if verbose:
             print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container.id}...")
