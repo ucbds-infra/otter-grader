@@ -71,6 +71,12 @@ apidoc_excluded_paths = []
 
 autosummary_generate = False
 
+# imports for IPython
+ipython_execlines = [
+    "import json",
+    "from otter.run.run_autograder.constants import DEFAULT_OPTIONS_WITH_DESCRIPTIONS",
+]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

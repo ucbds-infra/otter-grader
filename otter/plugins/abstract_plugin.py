@@ -157,8 +157,8 @@ class AbstractOtterPlugin(ABC):
 
         Args:
             submission (``nbformat.NotebookNode`` or ``str``): the submission for grading; if it is 
-            a notebook, this will be the JSON-parsed ``dict`` of its contents; if it is a script, 
-            this will be a string containing the code
+                a notebook, this will be the JSON-parsed ``dict`` of its contents; if it is a script, 
+                this will be a string containing the code
 
         Returns:
             ``nbformat.NotebookNode`` or ``str``: the altered submission to be executed
