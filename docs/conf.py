@@ -27,6 +27,7 @@ from glob import glob
 import nbconvert
 from importlib import import_module
 import yaml
+from textwrap import indent
 
 
 # -- Project information -----------------------------------------------------
@@ -212,8 +213,8 @@ texinfo_documents = [
 # -- YAML Dictionary Replacement ---------------------------------------------
 
 files_to_replace = [
-    "workflow/otter_generate/index.md",
-    "otter_assign/python_notebook_format.md",
+    # "workflow/otter_generate/index.md",
+    "otter_assign/python_notebook_format.rst",
 ]
 
 def update_yaml_block(file):
@@ -223,11 +224,11 @@ def update_yaml_block(file):
 
     s, e = None, None
     for i, line in enumerate(lines):
-        match = re.match(r"<!-- BEGIN YAML TARGET: ([\w.]+) -->", line)
+        match = re.match(r"\.\. BEGIN YAML TARGET: ([\w.]+)\s*", line)
         if match:
             obj = match.group(1)
             s = i
-        elif line.strip() == "<!-- END YAML TARGET -->":
+        elif line.rstrip() == ".. END YAML TARGET":
             e = i
     assert s is not None and e is not None, f"Unable to replace YAML targets in {file}"
     assert s < e, f"Unable to replace YAML targets in {file}"
@@ -240,7 +241,7 @@ def update_yaml_block(file):
     member_data = getattr(import_module(module_path), member_name)
     code = yaml.safe_dump(member_data, indent=2, sort_keys=False)
 
-    to_replace = "```yaml\n" + code + "\n```"
+    to_replace = "\n.. code-block:: yaml\n\n" + indent(code, "    ") + "\n\n"
     lines[s+1:e] = to_replace.split("\n")
 
     with open(file, "w") as f:

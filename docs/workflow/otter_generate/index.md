@@ -83,6 +83,7 @@ There are several configurable behaviors that Otter supports during grading. Eac
 
 The supported keys and their default values are provided in `otter.run.run_autograder.constants.DEFAULT_OPTIONS`, which is generated from the dictionary printed below for documenting each option.
 
+<!-- TODO -->
 <!-- BEGIN YAML TARGET: otter.run.run_autograder.constants.DEFAULT_OPTIONS_WITH_DESCRIPTIONS -->
 ```yaml
 - key: score_threshold

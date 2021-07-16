@@ -44,13 +44,21 @@ Otter Assign should create a `dist` directory which contains two further subdire
 ```
 tutorial/dist
 ├── autograder
-│   ├── autograder.zip
-│   ├── demo-sol.pdf
-│   ├── demo.ipynb
-│   ├── otter_config.json
-│   └── requirements.txt
+│   ├── autograder.zip
+│   ├── demo-sol.pdf
+│   ├── demo.ipynb
+│   ├── otter_config.json
+│   ├── requirements.txt
+│   └── tests
+│       ├── q1.py
+│       ├── q2.py
+│       └── q3.py
 └── student
-    └── demo.ipynb
+    ├── demo.ipynb
+    └── tests
+        ├── q1.py
+        ├── q2.py
+        └── q3.py
 ```
 
 For more information about the configurations for Otter Assign and its output format, see [Distributing Assignments](otter_assign/index.md).

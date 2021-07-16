@@ -28,7 +28,8 @@ docker-test:
 	docker build . -t otter-test -f test-Dockerfile
 	rm test-Dockerfile
 
-documentation:
+.PHONY: docs
+docs:
 	# sphinx-apidoc -fo docs otter
 	# jupyter nbconvert --to html docs/_static/notebooks/*.ipynb
 	sphinx-build -b html docs docs/_build -aEv
