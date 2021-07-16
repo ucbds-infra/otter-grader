@@ -14,6 +14,7 @@
 #
 import os
 import sys
+import re
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -24,6 +25,8 @@ from recommonmark.transform import AutoStructify
 
 from glob import glob
 import nbconvert
+from importlib import import_module
+import yaml
 
 
 # -- Project information -----------------------------------------------------
@@ -74,6 +77,7 @@ autosummary_generate = False
 # imports for IPython
 ipython_execlines = [
     "import json",
+    "import yaml",
     "from otter.run.run_autograder.constants import DEFAULT_OPTIONS_WITH_DESCRIPTIONS",
 ]
 
@@ -204,6 +208,42 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+
+# -- YAML Dictionary Replacement ---------------------------------------------
+
+files_to_replace = []
+
+def update_yaml_block(file):
+    with open(file) as f:
+        lines = f.readlines()
+
+    s, e = None, None
+    for i, line in enumerate(lines):
+        match = re.match(r"<!-- BEGIN YAML TARGET: ([\w.]+) -->", line)
+        if match:
+            obj = match.group(1)
+            s = i
+        elif line.strip() == "<!-- END YAML TARGET -->":
+            e = i
+    assert s is not None and e is not None, f"Unable to replace YAML targets in {file}"
+    assert s < e, f"Unable to replace YAML targets in {file}"
+
+    if s + 1 == e:
+        lines.insert(e, "")
+        e += 1
+
+    module_path, member_name = obj.rsplit('.', 1)
+    member_data = getattr(import_module(module_path), member_name)
+    code = yaml.safe_dumps(member_data, indent=2)
+
+    to_replace = "```yaml\n" + code + "\n```"
+    lines[s+1:e] = to_replace.split("\n")
+
+    with ope(file, "w") as f:
+        f.write("\n".join(lines))
+
+for file in files_to_replace:
+    update_yaml_block(file)
 
 # -- Extension configuration -------------------------------------------------
 def setup(app):

@@ -87,8 +87,11 @@ The supported keys and their default values are provided in `otter.run.run_autog
 .. ipython:: python
 
   # a dictionary of available grading configurations for documentation
-  print(json.dumps(DEFAULT_OPTIONS_WITH_DESCRIPTIONS, indent=2))
+  print(yaml.safe_dump(DEFAULT_OPTIONS_WITH_DESCRIPTIONS, indent=2))
 ```
+
+<!-- BEGIN YAML TARGET: otter.run.run_autograder.constants.DEFAULT_OPTIONS_WITH_DESCRIPTIONS -->
+<!-- END YAML TARGET -->
 
 ### Grading with Environments
 
