@@ -7,6 +7,7 @@ import hashlib
 
 from IPython import get_ipython
 from IPython.display import display, Javascript
+from ..execute import grade_notebook
 
 def save_notebook(filename, timeout=10):
     """
@@ -37,3 +38,11 @@ def save_notebook(filename, timeout=10):
         return curr != md5
     
     return True
+
+
+def grade_to_queue(queue, *args, **kwargs):
+    """
+    Grades a notebook and adds results to a queue that gets passed into the notebook Process
+    """
+    ret = grade_notebook(*args, **kwargs)
+    queue.put(ret)

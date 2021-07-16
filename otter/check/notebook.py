@@ -20,7 +20,7 @@ from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
 
 from .logs import LogEntry, EventType, Log
-from .utils import save_notebook
+from .utils import save_notebook, grade_to_queue
 from ..execute import check, grade_notebook
 from ..export import export_notebook
 from ..plugins import PluginCollection
@@ -444,11 +444,3 @@ class Notebook:
             self._log_event(EventType.END_CHECK_ALL)
 
         return TestsDisplay(results)
-
-
-def grade_to_queue(queue, *args, **kwargs):
-    """
-    Grades a notebook and adds results to a queue that gets passed into the notebook Process
-    """
-    ret = grade_notebook(*args, **kwargs)
-    queue.put(ret)
