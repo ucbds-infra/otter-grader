@@ -211,11 +211,15 @@ texinfo_documents = [
 
 # -- YAML Dictionary Replacement ---------------------------------------------
 
-files_to_replace = []
+files_to_replace = [
+    "workflow/otter_generate/index.md",
+    "otter_assign/python_notebook_format.md",
+]
 
 def update_yaml_block(file):
     with open(file) as f:
         lines = f.readlines()
+    lines = [l.strip("\n") for l in lines]
 
     s, e = None, None
     for i, line in enumerate(lines):
@@ -234,16 +238,17 @@ def update_yaml_block(file):
 
     module_path, member_name = obj.rsplit('.', 1)
     member_data = getattr(import_module(module_path), member_name)
-    code = yaml.safe_dumps(member_data, indent=2)
+    code = yaml.safe_dump(member_data, indent=2, sort_keys=False)
 
     to_replace = "```yaml\n" + code + "\n```"
     lines[s+1:e] = to_replace.split("\n")
 
-    with ope(file, "w") as f:
+    with open(file, "w") as f:
         f.write("\n".join(lines))
 
 for file in files_to_replace:
     update_yaml_block(file)
+
 
 # -- Extension configuration -------------------------------------------------
 def setup(app):

@@ -21,7 +21,82 @@ export_cell: true
 
 This cell is removed from both output notebooks. These configurations, listed in the YAML snippet below, can be **overwritten** by their command line counterparts (e.g. `init_cell: true` is overwritten by the `--no-init-cell` flag). The options, their defaults, and descriptions are listed below. Any unspecified keys will keep their default values. For more information about many of these arguments, see [Usage and Output](usage.md). Any keys that map to sub-dictionaries (e.g. `export_cell`, `generate`) can have their behaviors turned off by changing their value to `false`. The only one that defaults to true (with the specified sub-key defaults) is `export_cell`.
 
+<!-- BEGIN YAML TARGET: otter.assign.assignment._DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS -->
 ```yaml
+- key: requirements
+  description: the path to a requirements.txt file
+  default: null
+- key: overwrite_requirements
+  description: whether to overwrite Otter's default requirement.txt in Otter Generate
+  default: false
+- key: environment
+  description: the path to a conda environment.yml file
+  default: null
+- key: run_tests
+  description: whether to run the assignment tests against the autograder notebook
+  default: true
+- key: solutions_pdf
+  description: whether to generate a PDF of the solutions notebook
+  default: false
+- key: template_pdf
+  description: whether to generate a filtered Gradescope assignment template PDF
+  default: false
+- key: init_cell
+  description: whether to include an Otter initialization cell in the output notebooks
+  default: true
+- key: check_all_cell
+  description: whether to include an Otter check-all cell in the output notebooks
+  default: true
+- key: export_cell
+  description: whether to include an Otter export cell in the output notebooks
+  default:
+  - key: instructions
+    description: additional submission instructions to include in the export cell
+    default: ''
+  - key: pdf
+    description: whether to include a PDF of the notebook in the generated zip file
+    default: true
+  - key: filtering
+    description: whether the generated PDF should be filtered
+    default: true
+  - key: force_save
+    description: whether to force-save the notebook with JavaScript (only works in
+      classic notebook)
+    default: false
+- key: seed
+  description: a seed for intercell seeding
+  default: null
+- key: generate
+  description: grading configurations to be passed to Otter Generate as an otter_config.json;
+    if false, Otter Generate is disabled
+  default: false
+- key: save_environment
+  description: whether to save the student's environment in the log
+  default: false
+- key: variables
+  description: a mapping of variable names to type strings for serlizing environments
+  default: {}
+- key: ignore_modules
+  description: a list of modules to ignore variables from during environment serialization
+  default: []
+- key: files
+  description: a list of other files to include in the output directories and autograder
+  default: []
+- key: autograder_files
+  description: a list of other files only to include in the autograder
+  default: []
+- key: plugins
+  description: a list of plugin names and configurations
+  default: []
+- key: test_files
+  description: whether to store tests in separate .py files rather than in the notebook
+    metadata
+  default: true
+
+```
+<!-- END YAML TARGET -->
+
+<!-- ```yaml
 run_tests: true                # whether to run tests on the resulting autograder directory
 requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
 overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
@@ -55,7 +130,7 @@ ignore_modules: []             # a list of module names whose functions to ignor
 files: []                      # a list of file paths to include in the distribution directories
 autograder_files: []           # a list of file paths to include only in the autograder zip file
 plugins: []                    # a list of properly-formatted plugin configurations, passed automatically to Otter Generate
-```
+``` -->
 
 All paths specified in the configuration should be **relative to the directory containing the master notebook**. If, for example, I was running Otter Assign on the `lab00.ipynb` notebook in the structure below:
 
