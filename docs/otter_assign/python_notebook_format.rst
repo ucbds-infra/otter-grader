@@ -119,8 +119,6 @@ of these arguments, see `Usage and Output <usage.md>`_. Any keys that map to sub
         metadata
       default: true
 
-
-
 .. END YAML TARGET
 
 All paths specified in the configuration should be **relative to the directory containing the master 

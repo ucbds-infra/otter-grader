@@ -241,13 +241,14 @@ def update_yaml_block(file):
     member_data = getattr(import_module(module_path), member_name)
     code = yaml.safe_dump(member_data, indent=2, sort_keys=False)
 
-    to_replace = "\n.. code-block:: yaml\n\n" + indent(code, "    ") + "\n\n"
+    to_replace = "\n.. code-block:: yaml\n\n" + indent(code.rstrip(), "    ") + "\n"
     lines[s+1:e] = to_replace.split("\n")
 
     with open(file, "w") as f:
         f.write("\n".join(lines))
 
 for file in files_to_replace:
+    print(f"Replacing YAML targets in: {file}")
     update_yaml_block(file)
 
 
@@ -267,7 +268,7 @@ def setup(app):
     # run nbconvert on all of the notebooks in _static/notebooks
     exporter = nbconvert.HTMLExporter()
     print("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15)
-    for file in glob("docs/_static/notebooks/*.ipynb"):
+    for file in glob("_static/notebooks/*.ipynb"):
         html, _ = exporter.from_filename(file)
         with open(os.path.splitext(file)[0] + ".html", "w+") as f:
             f.write(html)
