@@ -31,7 +31,7 @@ from textwrap import indent
 # -- Project information -----------------------------------------------------
 
 project = 'Otter-Grader'
-copyright = '2020, UC Berkeley Data Science Education Program'
+copyright = '2019-2021, UC Berkeley Data Science Education Program'
 author = 'UC Berkeley Data Science Education Program Infrastructure Team'
 
 # The short X.Y version
