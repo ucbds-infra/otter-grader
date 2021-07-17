@@ -124,7 +124,8 @@ notebook.
     ├── data.csv
     └── hw00.ipynb
 
-To generate the distribution versions of ``hw00.ipynb`` (after ``cd``ing into ``hw00``), I would run
+To generate the distribution versions of ``hw00.ipynb`` (after changing into the ``hw00`` 
+directory), I would run
 
 .. code-block::
 

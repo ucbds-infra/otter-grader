@@ -36,12 +36,12 @@ includes Otter Assign, Otter Generate, and Otter Grade.
 Otter Assign
 ------------
 
-Start by ``cd``ing into ``tutorial``. This directory includes the master notebook ``demo.ipynb``. 
-Look over this notebook to get an idea of its structure. It contains five questions, four code and 
-one Markdown (two of which are manually-graded). Also note that the assignment configuration in the 
-first cell tells Otter Assign to generate a solutions PDF and a Gradescope autograder zip file and 
-to include special submission instructions before the export cell. To run Otter Assign on this 
-notebook, run
+Start by moving into the ``tutorial`` directrory. This directory includes the master notebook 
+``demo.ipynb``. Look over this notebook to get an idea of its structure. It contains five questions, 
+four code and one Markdown (two of which are manually-graded). Also note that the assignment 
+configuration in the first cell tells Otter Assign to generate a solutions PDF and a Gradescope 
+autograder zip file and to include special submission instructions before the export cell. To run 
+Otter Assign on this notebook, run
 
 .. code-block:: console
 

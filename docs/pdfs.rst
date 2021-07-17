@@ -28,14 +28,3 @@ multiple filtering groups in a notebook. When using Otter Export, you can also o
 breaks after an ``<!-- END QUESTION -->`` by setting ``pagebreaks=True`` in 
 ``otter.export.export_notebook`` or using the corresponding flags/arguments in whichever utility is 
 calling Otter Export.
-
-
-Otter Export Reference
-----------------------
-
-.. argparse::
-    :module: otter.argparser
-    :func: get_parser
-    :prog: otter
-    :path: export
-    :nodefaultconst:

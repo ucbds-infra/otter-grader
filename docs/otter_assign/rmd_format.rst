@@ -134,7 +134,7 @@ The test cells are any code cells following the solution cell that begin with th
 ``## Test ##`` or ``## Hidden Test ##`` (case insensitive). A ``Test`` is distributed to students 
 so that they can validate their work. A ``Hidden Test`` is not distributed to students, but is used 
 for scoring their work. When writing tests, each test cell should be a single call to 
-``testthat::test_that`` and there should be **no code outside of the ``test_that`` call**. For 
+``testthat::test_that`` and there should be no code outside of the ``test_that`` call. For 
 example, instead of
 
 .. code-block:: r

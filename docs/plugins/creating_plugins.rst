@@ -80,7 +80,7 @@ plugin event must be gathered from the arguments passed to it.
 
 The ``before_grading`` method will be called before grading occurs, just after the plugins are 
 instantiated, and will be passed the parsed dictionary of configurations from ``otter_config.json``, 
-**including the default configurations stored in ``otter.generate.constants.DEFAULT_OPTIONS``**. Any 
+including the default configurations stored in ``otter.generate.constants.DEFAULT_OPTIONS``. Any 
 changes made to the options will be used during grading.
 
 
