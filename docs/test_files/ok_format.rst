@@ -24,13 +24,13 @@ While Otter uses OK format, there are a few caveats to the tests when using them
 * Otter uses the ``"hidden"`` key of each test case only on Gradescope. When displaying results on 
   Gradescope, the ``test["suites"][0]["cases"][<int>]["hidden"]`` should evaluate to a boolean that 
   indicates whether or not the test is hidden. The behavior of showing and hiding tests is described 
-  in `Grading on Gradescope <../workflow/executing_submissions/gradescope.md>`_.
+  in :ref:`Grading on Gradescope <workflow_executing_submissions_gradescope>`.
 
 
 Writing OK Tests
 ----------------
 
-We recommend that you develop assignments using `Otter Assign <../otter_assign/index.md>`_, a tool 
+We recommend that you develop assignments using :ref:`Otter Assign <otter_assign>`, a tool 
 which will generate these test files for you. If you already have assignments or would prefer to 
 write them yourself, you can find an online `OK test generator <https://oktests.chrispyles.io>`_ 
 that will assist you in generating these test files without using Otter Assign.

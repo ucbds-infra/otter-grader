@@ -2,6 +2,8 @@
     :format: html
 
 
+.. _workflow_executing_submissions_gradescope:
+
 Grading on Gradescope
 =====================
 

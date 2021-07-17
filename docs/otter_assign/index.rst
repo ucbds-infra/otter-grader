@@ -1,3 +1,5 @@
+.. _otter_assign:
+
 Creating Assignments
 ====================
 
