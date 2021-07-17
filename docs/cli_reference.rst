@@ -1,3 +1,4 @@
+.. _cli_reference:
 
 CLI Reference
 =============

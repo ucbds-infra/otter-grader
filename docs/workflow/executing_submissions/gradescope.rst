@@ -32,15 +32,12 @@ The tests that are used by the Gradescope autograder are the same as those used 
 Otter, but there is one important field that is relevant to Gradescope that is not pertinent to any 
 other uses.
 
-As noted in the second bullet `here <../../test_files/ok_format.html#caveats>`_, the ``"hidden"`` 
+As noted in the second bullet :ref:`here <test_files_ok_format_caveats>`, the ``"hidden"`` 
 key of each test case indicates the visibility of that specific test case. If a student passes all 
 tests, they are shown a successful check. If they pass all public tests but fail hidden tests, they 
 are shown a successful check but a second output is shown below that for instructors only, showing 
 the output of the failed test. If students fail a public test, students are shown the output of the 
 failed test and there is no second box.
-
-For more information on how tests are displayed to students, see `Grading on Gradescope 
-<../executing_submissions/gradescope.md>`_.
 
 
 Instructor View
@@ -69,19 +66,19 @@ Note that the above submission shows a discrepancy between the autograder score 
 Below the autograder output, each test case is broken down into boxes. Based on the passing of public and hidden tests, there are three possible cases:
 
 
-* If a public test is failed, there is a single box for the test called ``{test name} - Public`` that displays the failed output of the test.:raw-html-m2r:`<br/>`
+* If a public test is failed, there is a single box for the test called ``{test name} - Public`` that displays the failed output of the test.
 
   .. image:: images/gradescope_failed_public_test.png
      :target: images/gradescope_failed_public_test.png
      :alt: 
 
-* If all public tests pass but a hidden test fails, there are two boxes: one called ``{test name} - Public`` that shows ``All tests passed!`` and a second called ``{test name} - Hidden`` that shows the failed output of the test.:raw-html-m2r:`<br/>`
+* If all public tests pass but a hidden test fails, there are two boxes: one called ``{test name} - Public`` that shows ``All tests passed!`` and a second called ``{test name} - Hidden`` that shows the failed output of the test.
 
   .. image:: images/gradescope_failed_hidden_test.png
      :target: images/gradescope_failed_hidden_test.png
      :alt: 
 
-* If all tests pass, there are two boxes, ``{test name} - Public`` and ``{test name} - Hidden``, that both show ``All tests passed!``.:raw-html-m2r:`<br/>`
+* If all tests pass, there are two boxes, ``{test name} - Public`` and ``{test name} - Hidden``, that both show ``All tests passed!``.
 
   .. image:: images/gradescope_instructor_test_breakdown.png
      :target: images/gradescope_instructor_test_breakdown.png
@@ -99,8 +96,8 @@ Student View
 ------------
 
 On submission, students will only be able to see the results of those test cases for which 
-``test["suites"][0]["cases"][<int>]["hidden"]`` evaluates to ``True`` (see `Test Files 
-<../../test_files/index.md>`_ for more info). If ``test["suites"][0]["cases"][<int>]["hidden"]`` is 
+``test["suites"][0]["cases"][<int>]["hidden"]`` evaluates to ``True`` (see :ref:`Test Files 
+<test_files>` for more info). If ``test["suites"][0]["cases"][<int>]["hidden"]`` is 
 ``False`` or not specified, then that test case is hidden.
 
 If ``--show-stdout`` was specified when constructing the autograder zipfile, then the autograder 

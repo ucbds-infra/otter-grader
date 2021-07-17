@@ -10,7 +10,7 @@ Executing Submissions
     otter_run
 
 This section describes how students' submissions can be executed using the configuration file from 
-`the previous part <../otter_generate/index.md>`_. There are three main options for executing 
+:ref:`the previous part <workflow_otter_generate>`. There are three main options for executing 
 students' submissions:
 
 * **local grading**, in which the assignments are downloaded onto the instructor's machine and 

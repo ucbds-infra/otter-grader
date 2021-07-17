@@ -13,6 +13,8 @@ resource we developed on writing autograder tests that can be found `here
 pitfalls of string comparison, and seeding tests.
 
 
+.. _test_files_ok_format_caveats:
+
 Caveats
 -------
 

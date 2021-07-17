@@ -1,3 +1,5 @@
+.. _workflow_otter_generate_container_image:
+
 Grading Container Image
 =======================
 

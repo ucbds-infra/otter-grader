@@ -10,8 +10,8 @@ it is recommended that Otter Grade is used instead, as non-containerized grading
 
 To grade locally, Otter exposes the ``otter run`` command for the command line or the module 
 ``otter.api`` for running Otter programmatically. The use of both is described in this section. 
-Before using Otter Run, you should have generated an `autograder configuration zip file 
-<../otter_generate/index.md>`_.
+Before using Otter Run, you should have generated an :ref:`autograder configuration zip file 
+<workflow_otter_generate>`.
 
 Otter Run works by creating a temporary grading directory using the ``tempfile`` library and 
 replicating the autograder tree structure in that folder. It then runs the autograder there as 
@@ -43,8 +43,8 @@ If my autograder configuration file was at ``../autograder.zip``, I would run
 
 Either of the above will produce the results file at ``./results.json``. 
 
-For more information on the command-line interface for Otter Run, see the `Otter CLI reference 
-<../../cli_reference.md>`_.
+For more information on the command-line interface for Otter Run, see the :ref:`Otter CLI reference 
+<cli_reference>`.
 
 
 Grading Programmatically
@@ -67,8 +67,10 @@ would run
 ``grade_submission`` has an optional argument ``quiet`` which will suppress anything printed to the 
 console by the grading process during execution when set to ``True`` (default ``False``).
 
-For more information about grading programmatically, see the ```otter.api`` reference 
-<../../api_reference.md>`_.
+For more information about grading programmatically, see the |otter.api reference|_.
+
+.. |otter.api reference| replace:: ``otter.api`` reference
+.. _otter.api reference: api_reference
 
 
 Grading Results

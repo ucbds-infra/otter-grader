@@ -1,3 +1,5 @@
+.. _workflow_otter_generate:
+
 Generating Configuration Files
 ==============================
 

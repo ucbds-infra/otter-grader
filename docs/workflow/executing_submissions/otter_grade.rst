@@ -11,8 +11,8 @@ Configuration Files
 
 Otter grades students submissions in individual Docker containers that are based on a Docker image 
 generated through the use of a configuration zip file. Before grading assignments locally, an 
-instructor should create such a zip file by using a tool such as `Otter Assign 
-<../../otter_assign/index.md>`_ or `Otter Generate <../otter_generate/index.md>`_. This file will be 
+instructor should create such a zip file by using a tool such as :ref`Otter Assign 
+<otter_assign>` or :ref:`Otter Generate <workflow_otter_generate>`. This file will be 
 used in the construction of a Docker image tagged ``otter-grader:{zip file hash}``. This Docker 
 image will then have containers spawned from it for each submission that is graded.
 
@@ -120,7 +120,7 @@ Before using the command line utility, you should have
 
 The grading interface, encapsulated in the ``otter grade`` command, runs the local grading process 
 and defines the options that instructors can set when grading. A comprehensive list of flags is 
-provided `below <#otter-grade-reference>`_.
+provided :ref:`below <cli_reference>`.
 
 
 Basic Usage
@@ -203,10 +203,10 @@ and at the end of grading we would have
 Requirements
 ++++++++++++
 
-The Docker image used for grading will be built as described in the `Otter Generatte 
-<../otter_generate/container_image.md>`_ section. If you require any packages not listed there, or 
-among the dependencies of any packages above, you should create a requirements.txt file *containing 
-only those packages* and use it when running your configuration generator. 
+The Docker image used for grading will be built as described in the :ref:`Otter Generatte 
+<workflow_otter_generate_container_image>` section. If you require any packages not listed there, 
+or among the dependencies of any packages above, you should create a requirements.txt file 
+*containing only those packages* and use it when running your configuration generator. 
 
 
 Support Files
@@ -219,5 +219,5 @@ files, you should generate your configuration zip file with those files.
 Intercell Seeding
 +++++++++++++++++
 
-Otter Grade also supports `intercell seeding <../../seeding.md>`_. This behavior should be 
+Otter Grade also supports :ref:`intercell seeding <seeding>`. This behavior should be 
 configured as a part of your configuration zip file.
