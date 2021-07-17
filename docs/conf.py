@@ -26,6 +26,7 @@ import nbconvert
 from importlib import import_module
 import yaml
 from textwrap import indent
+from otter.utils import convert_config_description_dict
 
 
 # -- Project information -----------------------------------------------------
@@ -210,6 +211,25 @@ files_to_replace = [
     "otter_assign/python_notebook_format.rst",
 ]
 
+def extract_descriptions_as_comments(config):
+    coms = []
+    for d in config:
+        coms.append("# " + d["description"])
+        if isinstance(d["default"], list) and len(d["default"]) > 0 and \
+                all(isinstance(e, dict) for e in d["default"]):
+            coms.extend(extract_descriptions_as_comments(d["default"]))
+    return coms
+
+def add_comments_to_yaml(yaml, comments):
+    lines = yaml.split("\n")
+    ret = []
+    pad_to = max(len(l) for l in lines) + 2
+    for l, c in zip(lines, comments):
+        pad = pad_to - len(l)
+        new_line = l + " " * pad + c
+        ret.append(new_line)
+    return "\n".join(ret)
+
 def update_yaml_block(file):
     with open(file) as f:
         lines = f.readlines()
@@ -232,7 +252,11 @@ def update_yaml_block(file):
 
     module_path, member_name = obj.rsplit('.', 1)
     member_data = getattr(import_module(module_path), member_name)
-    code = yaml.safe_dump(member_data, indent=2, sort_keys=False)
+
+    defaults = convert_config_description_dict(member_data)
+    code = yaml.safe_dump(defaults, indent=2, sort_keys=False)
+    comments = extract_descriptions_as_comments(member_data)
+    code = add_comments_to_yaml(code, comments)
 
     to_replace = "\n.. code-block:: yaml\n\n" + indent(code.rstrip(), "    ") + "\n"
     lines[s+1:e] = to_replace.split("\n")

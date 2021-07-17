@@ -119,79 +119,29 @@ printed below for documenting each option.
 
 .. code-block:: yaml
 
-    - key: score_threshold
-      description: a score threshold for pass-fail assignments
-      default: null
-    - key: points_possible
-      description: a custom total score for the assignment; if unspecified the sum of
-        question point values is used.
-      default: null
-    - key: show_stdout
-      description: whether to display the autograding process stdout to students on Gradescope
-      default: false
-    - key: show_hidden
-      description: whether to display the results of hidden tests to students on Gradescope
-      default: false
-    - key: show_all_public
-      description: whether to display all test results if all tests are public tests
-      default: false
-    - key: seed
-      description: a random seed for intercell seeding
-      default: null
-    - key: grade_from_log
-      description: whether to re-assemble the student's environment from the log rather
-        than by re-executing their submission
-      default: false
-    - key: serialized_variables
-      description: a mapping of variable names to type strings for validating a deserialized
-        student environment
-      default: {}
-    - key: pdf
-      description: whether to generate a PDF of the notebook when not using Gradescope
-        auto-upload
-      default: false
-    - key: token
-      description: a Gradescope token for uploading a PDF of the notebook
-      default: null
-    - key: course_id
-      description: a Gradescope course ID for uploading a PDF of the notebook
-      default: None
-    - key: assignment_id
-      description: a Gradescope assignment ID for uploading a PDF of the notebook
-      default: None
-    - key: filtering
-      description: whether the generated PDF should have cells filtered out
-      default: true
-    - key: pagebreaks
-      description: whether the generated PDF should have pagebreaks between filtered sectios
-      default: true
-    - key: debug
-      description: whether to run the autograder in debug mode (without ignoring errors)
-      default: false
-    - key: autograder_dir
-      description: the directory in which autograding is taking place
-      default: /autograder
-    - key: lang
-      description: the language of the assignment; one of {'python', 'r'}
-      default: python
-    - key: miniconda_path
-      description: the path to the miniconda install directory
-      default: /root/miniconda3
-    - key: plugins
-      description: a list of plugin names and configuration details for grading
-      default: []
-    - key: logo
-      description: whether to print the Otter logo to stdout
-      default: true
-    - key: print_summary
-      description: whether to print the grading summary
-      default: true
-    - key: print_score
-      description: whether to print out the submission score in the grading summary
-      default: true
-    - key: zips
-      description: whether zip files are being graded
-      default: false
+    score_threshold: null             # a score threshold for pass-fail assignments
+    points_possible: null             # a custom total score for the assignment; if unspecified the sum of question point values is used.
+    show_stdout: false                # whether to display the autograding process stdout to students on Gradescope
+    show_hidden: false                # whether to display the results of hidden tests to students on Gradescope
+    show_all_public: false            # whether to display all test results if all tests are public tests
+    seed: null                        # a random seed for intercell seeding
+    grade_from_log: false             # whether to re-assemble the student's environment from the log rather than by re-executing their submission
+    serialized_variables: {}          # a mapping of variable names to type strings for validating a deserialized student environment
+    pdf: false                        # whether to generate a PDF of the notebook when not using Gradescope auto-upload
+    token: null                       # a Gradescope token for uploading a PDF of the notebook
+    course_id: None                   # a Gradescope course ID for uploading a PDF of the notebook
+    assignment_id: None               # a Gradescope assignment ID for uploading a PDF of the notebook
+    filtering: true                   # whether the generated PDF should have cells filtered out
+    pagebreaks: true                  # whether the generated PDF should have pagebreaks between filtered sectios
+    debug: false                      # whether to run the autograder in debug mode (without ignoring errors)
+    autograder_dir: /autograder       # the directory in which autograding is taking place
+    lang: python                      # the language of the assignment; one of {'python', 'r'}
+    miniconda_path: /root/miniconda3  # the path to the miniconda install directory
+    plugins: []                       # a list of plugin names and configuration details for grading
+    logo: true                        # whether to print the Otter logo to stdout
+    print_summary: true               # whether to print the grading summary
+    print_score: true                 # whether to print out the submission score in the grading summary
+    zips: false                       # whether zip files are being graded
 
 .. END YAML TARGET
 

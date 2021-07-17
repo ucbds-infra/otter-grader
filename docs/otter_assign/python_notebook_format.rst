@@ -49,75 +49,28 @@ defaults) is ``export_cell``.
 
 .. code-block:: yaml
 
-    - key: requirements
-      description: the path to a requirements.txt file
-      default: null
-    - key: overwrite_requirements
-      description: whether to overwrite Otter's default requirement.txt in Otter Generate
-      default: false
-    - key: environment
-      description: the path to a conda environment.yml file
-      default: null
-    - key: run_tests
-      description: whether to run the assignment tests against the autograder notebook
-      default: true
-    - key: solutions_pdf
-      description: whether to generate a PDF of the solutions notebook
-      default: false
-    - key: template_pdf
-      description: whether to generate a filtered Gradescope assignment template PDF
-      default: false
-    - key: init_cell
-      description: whether to include an Otter initialization cell in the output notebooks
-      default: true
-    - key: check_all_cell
-      description: whether to include an Otter check-all cell in the output notebooks
-      default: true
-    - key: export_cell
-      description: whether to include an Otter export cell in the output notebooks
-      default:
-      - key: instructions
-        description: additional submission instructions to include in the export cell
-        default: ''
-      - key: pdf
-        description: whether to include a PDF of the notebook in the generated zip file
-        default: true
-      - key: filtering
-        description: whether the generated PDF should be filtered
-        default: true
-      - key: force_save
-        description: whether to force-save the notebook with JavaScript (only works in
-          classic notebook)
-        default: false
-    - key: seed
-      description: a seed for intercell seeding
-      default: null
-    - key: generate
-      description: grading configurations to be passed to Otter Generate as an otter_config.json;
-        if false, Otter Generate is disabled
-      default: false
-    - key: save_environment
-      description: whether to save the student's environment in the log
-      default: false
-    - key: variables
-      description: a mapping of variable names to type strings for serlizing environments
-      default: {}
-    - key: ignore_modules
-      description: a list of modules to ignore variables from during environment serialization
-      default: []
-    - key: files
-      description: a list of other files to include in the output directories and autograder
-      default: []
-    - key: autograder_files
-      description: a list of other files only to include in the autograder
-      default: []
-    - key: plugins
-      description: a list of plugin names and configurations
-      default: []
-    - key: test_files
-      description: whether to store tests in separate .py files rather than in the notebook
-        metadata
-      default: true
+    requirements: null             # the path to a requirements.txt file
+    overwrite_requirements: false  # whether to overwrite Otter's default requirement.txt in Otter Generate
+    environment: null              # the path to a conda environment.yml file
+    run_tests: true                # whether to run the assignment tests against the autograder notebook
+    solutions_pdf: false           # whether to generate a PDF of the solutions notebook
+    template_pdf: false            # whether to generate a filtered Gradescope assignment template PDF
+    init_cell: true                # whether to include an Otter initialization cell in the output notebooks
+    check_all_cell: true           # whether to include an Otter check-all cell in the output notebooks
+    export_cell:                   # whether to include an Otter export cell in the output notebooks
+      instructions: ''             # additional submission instructions to include in the export cell
+      pdf: true                    # whether to include a PDF of the notebook in the generated zip file
+      filtering: true              # whether the generated PDF should be filtered
+      force_save: false            # whether to force-save the notebook with JavaScript (only works in classic notebook)
+    seed: null                     # a seed for intercell seeding
+    generate: false                # grading configurations to be passed to Otter Generate as an otter_config.json; if false, Otter Generate is disabled
+    save_environment: false        # whether to save the student's environment in the log
+    variables: {}                  # a mapping of variable names to type strings for serlizing environments
+    ignore_modules: []             # a list of modules to ignore variables from during environment serialization
+    files: []                      # a list of other files to include in the output directories and autograder
+    autograder_files: []           # a list of other files only to include in the autograder
+    plugins: []                    # a list of plugin names and configurations
+    test_files: true               # whether to store tests in separate .py files rather than in the notebook metadata
 
 .. END YAML TARGET
 
