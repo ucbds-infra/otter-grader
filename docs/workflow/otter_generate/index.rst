@@ -306,9 +306,9 @@ Showing Autograder Results
 ++++++++++++++++++++++++++
 
 The generator allows intructors to specify whether or not the stdout of the grading process 
-(anything printed to the console by the grader or the notebook) is shown to students. **The stdout 
+(anything printed to the console by the grader or the notebook) is shown to students. The stdout 
 includes a summary of the student's test results, including the points earned and possible of public 
-*and* hidden tests, as well as the visibility of tests as indicated by ``test["hidden"]``.** 
+*and* hidden tests, as well as the visibility of tests as indicated by ``test["hidden"]``.
 
 This behavior is turned off by default and can be turned on by setting ``show_stdout`` to ``true``.
 
