@@ -55,7 +55,7 @@ Usage
 
 The general usage of ``otter generate`` is to create a zip file at some output directory (``-o`` 
 flag, default ``./``) which you will then use to create the grading image. Otter Generate has a few 
-optional flags, described in the :ref:`Otter CLI Reference <cli_reference>`.
+optional flags, described in the :ref:`cli_reference`.
 
 If you do not specify ``-t`` or ``-o``, then the defaults will be used. If you do not specify 
 ``-r``, Otter looks in the working directory for ``requirements.txt`` and automatically adds it if 
@@ -202,8 +202,8 @@ Grading with Environments
 Otter can grade assignments using saved environments in the log in the Gradescope container. *This 
 behavior is not supported for R assignments.* This works by deserializing the environment stored in 
 each check entry of Otter's log and grading against it. The notebook is parsed and only its import 
-statements are executed. For more inforamtion about saving and using environments, see :ref:`Logging 
-<logging>`.
+statements are executed. For more inforamtion about saving and using environments, see 
+:ref:`logging`.
 
 To configure this behavior, two things are required:
 
@@ -324,7 +324,7 @@ If ``show_stdout`` is passed, the stdout will be made available to students *onl
 published on Gradescope*. The same can be done for hidden test outputs using the ``show_hidden`` 
 key.
 
-The :ref:`Grading on Gradescope <workflow_executing_submissions_gradescope>` section details more 
+The :ref:`workflow_executing_submissions_gradescope` section details more 
 about how output on Gradescope is formatted. Note that this behavior has no effect on any platform 
 besides Gradescope.
 

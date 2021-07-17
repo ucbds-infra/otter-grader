@@ -22,8 +22,8 @@ arguments in an assignment metadata code block.
     ```
 
 This block is removed from both output files. Any unspecified keys will keep their default values. 
-For more information about many of these arguments, see :ref:`Usage and Output 
-<otter_assign_usage>`. The YAML block below lists all configurations **supported with Rmd files** 
+For more information about many of these arguments, see :ref:`otter_assign_usage`. 
+The YAML block below lists all configurations **supported with Rmd files** 
 and their defaults. Any keys that appear in the Python or R Juptyer notebook sections but not below 
 will be ignored when using Otter Assign with Rmd files.
 

@@ -96,8 +96,8 @@ Student View
 ------------
 
 On submission, students will only be able to see the results of those test cases for which 
-``test["suites"][0]["cases"][<int>]["hidden"]`` evaluates to ``True`` (see :ref:`Test Files 
-<test_files>` for more info). If ``test["suites"][0]["cases"][<int>]["hidden"]`` is 
+``test["suites"][0]["cases"][<int>]["hidden"]`` evaluates to ``True`` (see :ref:`test_files` 
+for more info). If ``test["suites"][0]["cases"][<int>]["hidden"]`` is 
 ``False`` or not specified, then that test case is hidden.
 
 If ``--show-stdout`` was specified when constructing the autograder zipfile, then the autograder 

@@ -40,7 +40,7 @@ This cell is removed from both output notebooks. These configurations, listed in
 below, can be **overwritten** by their command line counterparts (e.g. ``init_cell: true`` is 
 overwritten by the ``--no-init-cell`` flag). The options, their defaults, and descriptions are 
 listed below. Any unspecified keys will keep their default values. For more information about many 
-of these arguments, see :ref:`Usage and Output <otter_assign_usage>`. Any keys that map to 
+of these arguments, see :ref:`otter_assign_usage`. Any keys that map to 
 sub-dictionaries (e.g. ``export_cell``, ``generate``) can have their behaviors turned off by 
 changing their value to ``false``. The only one that defaults to true (with the specified sub-key 
 defaults) is ``export_cell``.
@@ -176,7 +176,7 @@ Gradescope assignment by setting the necessary keys in the ``pdfs`` subkey of ``
 
 If you are grading from the log or would like to store students' environments in the log, use the 
 ``save_environment`` key. If this key is set to ``true``, Otter will serialize the stuednt's 
-environment whenever a check is run, as described in :ref:`Logging <logging>`. To restrict the 
+environment whenever a check is run, as described in :ref:`logging`. To restrict the 
 serialization of variables to specific names and types, use the ``variables`` key, which maps 
 variable names to fully-qualified type strings. The ``ignore_modules`` key is used to ignore 
 functions from specific modules. To turn on grading from the log on Gradescope, set 

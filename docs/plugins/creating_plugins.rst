@@ -114,8 +114,8 @@ The ``after_grading`` method will be called after grading has occurred (meaning 
 run and the results object has been created). It will be passed the 
 ``otter.test_files.GradingResults`` object that contains the results of the student's submission 
 against the tests. Any changes made to this object will be reflected in the results returned by the 
-autograder. For more information about this object, see :ref:`Grading Results 
-<workflow_executing_submissions_otter_run>`.
+autograder. For more information about this object, see 
+:ref:`workflow_executing_submissions_otter_run`.
 
 
 ``generate_report``

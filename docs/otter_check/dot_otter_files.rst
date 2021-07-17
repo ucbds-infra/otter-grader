@@ -59,5 +59,4 @@ fully-qualified type string.
     fn = lambda x: x
     get_variable_type(fn)
 
-More information about grading from serialized environments can be found in :ref:`Logging 
-<logging>`.
+More information about grading from serialized environments can be found in :ref:`logging`.

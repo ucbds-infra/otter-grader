@@ -53,4 +53,4 @@ Building Plugins
 
 Plugins can be created as importable classes in packages that inherit from the 
 ``otter.plugins.AbstractOtterPlugin`` class. For more information about creating plugins, see 
-:ref:`Creating Plugins <plugins_creating_plugins>`.
+:ref:`plugins_creating_plugins`.

@@ -22,8 +22,8 @@ arguments in an assignment metadata cell.
     ```
 
 This cell is removed from both output notebooks. Any unspecified keys will keep their default 
-values. For more information about many of these arguments, see :ref:`Usage and Output 
-<otter_assign_usage>`. The YAML block below lists all configurations **supported with R** and their 
+values. For more information about many of these arguments, see :ref:`otter_assign_usage`. The YAML 
+block below lists all configurations **supported with R** and their 
 defaults. Any keys that appear in the Python section but not below will be ignored when using Otter 
 Assign with R.
 

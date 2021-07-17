@@ -43,8 +43,7 @@ If my autograder configuration file was at ``../autograder.zip``, I would run
 
 Either of the above will produce the results file at ``./results.json``. 
 
-For more information on the command-line interface for Otter Run, see the :ref:`Otter CLI reference 
-<cli_reference>`.
+For more information on the command-line interface for Otter Run, see the :ref:`cli_reference`.
 
 
 Grading Programmatically
