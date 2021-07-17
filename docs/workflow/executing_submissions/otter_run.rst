@@ -1,3 +1,5 @@
+.. _workflow_executing_submissions_otter_run:
+
 Non-containerized Grading
 =========================
 

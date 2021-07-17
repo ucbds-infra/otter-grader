@@ -1,3 +1,5 @@
+.. _plugins_creating_plugins:
+
 Creating Plugins
 ================
 
@@ -11,16 +13,17 @@ Plugin Configurations
 
 When instantiated, plugins will receive three arguments: ``submission_path``, the absolute path to 
 the submission being executed, ``submission_metadata``, the information about the submission as read 
-in from ```submission_metadata.json`` 
-<https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/>`_, and 
-``plugin_config``, the parsed configurations from the user-specified list of plugins in the 
-``plugins`` key of ``otter_config.json``. The default implementation of ``__init__``, which should 
-have the signature shown `below <#absctractotterplugin-reference>`_, sets these two values to the 
-instance variables ``self.submission_metadata`` and ``self.plugin_config``, respectively. *Note that 
-some events are executed in contexts in which some or all of these variables are unavailable, and so 
-these events should not rely on the use of these instance variables.* In cases in which these are 
-unavailable, they will be set for the falsey version of their type, e.g. ``{}`` for 
-``self.submission_metadata``.
+in from |submission_metadata.json|_, and ``plugin_config``, the parsed configurations from the 
+user-specified list of plugins in the ``plugins`` key of ``otter_config.json``. The default 
+implementation of ``__init__``, which should have the signature shown :ref:`below 
+<plugins_creating_plugins_abstract_reference>`, sets these two values to the instance variables 
+``self.submission_metadata`` and ``self.plugin_config``, respectively. *Note that some events are 
+executed in contexts in which some or all of these variables are unavailable, and so these events 
+should not rely on the use of these instance variables.* In cases in which these are unavailable, 
+they will be set for the falsey version of their type, e.g. ``{}`` for ``self.submission_metadata``.
+
+.. |submission_metadata.json| replace:: ``submission_metadata.json``
+.. _submission_metadata.json: https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/
 
 
 Plugin Events
@@ -29,8 +32,8 @@ Plugin Events
 Plugins currently support five events. Most events are expected to modify the state of the 
 autograder and should not return anything, unless otherwise noted. Any plugins not supported should 
 raise a ``otter.plugins.PluginEventNotSupportedException``, as the default implementations in
-``AbstractOtterPlugin`` do. Note that all methods should have the signatures described `below
-<#absctractotterplugin-reference>`_.
+``AbstractOtterPlugin`` do. Note that all methods should have the signatures described :ref:`below 
+<plugins_creating_plugins_abstract_reference>`.
 
 
 ``during_assign``
@@ -111,8 +114,8 @@ The ``after_grading`` method will be called after grading has occurred (meaning 
 run and the results object has been created). It will be passed the 
 ``otter.test_files.GradingResults`` object that contains the results of the student's submission 
 against the tests. Any changes made to this object will be reflected in the results returned by the 
-autograder. For more information about this object, see `Grading Results 
-<../workflow/executing_submissions/otter_run.md>`_.
+autograder. For more information about this object, see :ref:`Grading Results 
+<workflow_executing_submissions_otter_run>`.
 
 
 ``generate_report``
@@ -122,6 +125,8 @@ The ``generate_report`` method will be called after results have been written. I
 arguments but should **return a value**. The return value of this method should be a string that 
 will be printed to stdout by Otter as part of the grading report.
 
+
+.. _plugins_creating_plugins_abstract_reference:
 
 ``AbstractOtterPlugin`` Reference
 ---------------------------------
