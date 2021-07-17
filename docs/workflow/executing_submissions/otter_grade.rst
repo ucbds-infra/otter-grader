@@ -1,3 +1,5 @@
+.. _workflow_executing_submissions_otter_grade:
+
 Grading Locally
 ===============
 
@@ -18,6 +20,8 @@ image will then have containers spawned from it for each submission that is grad
 
 Otter's Docker images can be pruned with ``otter grade --prune``.
 
+
+.. _workflow_executing_submissions_otter_grade_metadata:
 
 Metadata
 --------

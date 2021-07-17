@@ -60,8 +60,8 @@ grading the correct values.
 #. Students will not have access to the random seed, so any values they compute in the notebook may 
 be different from the results of their submission when it is run through the autograder.
 
-With respect to (1), Otter Assign implements this behavior through the use of `seeding cells 
-<otter_assign.html#intercell-seeding>`_ that are discarded in the output. This has a natural 
+With respect to (1), Otter Assign implements this behavior through the use of :ref:`seeding cells 
+<otter_assign_python_seeding>` that are discarded in the output. This has a natural 
 consequence of (2), which highlights the important of writing public tests that **do not** rely on 
 the use of seeds unless they are provided in the distribution notebooks themselves (but I guess that 
 renders the use of behind-the-scenes seeding useless, doesn't it?).

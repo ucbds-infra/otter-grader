@@ -2,7 +2,7 @@ Tutorial
 ========
 
 This tutorial can help you to verify that you have installed Otter correctly and introduce you to 
-the general Otter workflow. Once you have `installed <index.md>`_ Otter, download `this zip file 
+the general Otter workflow. Once you have :ref:`installed <home>` Otter, download `this zip file 
 <_static/tutorial.zip>`_ and unzip it into some directory on your machine; you should have the 
 following directory structure:
 
@@ -79,7 +79,7 @@ sanitized student notebook. Both contain a ``tests`` subdirectory that contains 
             └── q3.py
 
 For more information about the configurations for Otter Assign and its output format, see 
-`Distributing Assignments <otter_assign/index.md>`_.
+:reF:`otter_assign`.
 
 
 Otter Generate
@@ -107,12 +107,13 @@ will need some of its output files.
 At this step of grading, the instructor faces a choice: where to grade assignments. The rest of this 
 tutorial details how to grade assignments locally using Docker containers on the instructor's 
 machine. You can also grade on Gradescope or without containerization, as described in the 
-`Executing Submissions <workflow/executing_submissions/index.md>`_ section.
+:ref:`workflow_executing_submissions` section.
 
-In the zip file, we have provided a `metadata file <workflow/executing_submissions/otter_grade.html#metadata>`_ 
-that maps student identifiers to filenames in ``meta.json``. Note that metadata files are optional 
-when using Otter, but we have provided one here to demonstrate their use. This metadata file lists 
-*only* the files in the ``ipynbs`` subdirectory, so we won't use it when grading ``zips``.
+In the zip file, we have provided a :ref:`metadata file 
+<workflow_executing_submissions_otter_grade_metadata>` that maps student identifiers to filenames in 
+``meta.json``. Note that metadata files are optional when using Otter, but we have provided one here 
+to demonstrate their use. This metadata file lists *only* the files in the ``ipynbs`` subdirectory, 
+so we won't use it when grading ``zips``.
 
 .. code-block:: json
 
@@ -151,7 +152,7 @@ Let's now construct a call to Otter that will grade these notebooks. We will use
 ``dist/autograder/autograder.zip`` from running Otter Assign to configure our grading image. We also 
 know that we have JSON-formatted metadata, so we'll be use the ``-j`` metadata flag. Our notebooks 
 are in the ``ipynbs`` subdirectory, so we'll need to use the ``-p`` flag. The notebooks also contain 
-a couple of written questions, and the `filtering <pdfs.md>`_ is implemented using HTML comments, so 
+a couple of written questions, and the :ref:`filtering <pdfs>` is implemented using HTML comments, so 
 we'll specify the ``--pdfs`` flag to indicate that Otter should grab the PDFs out of the Docker 
 containers.
 
@@ -231,4 +232,4 @@ grade those:
 This should have the same CSV output as above but no ``submission_pdfs`` directory since we didn't 
 tell Otter to generate PDFs.
 
-You can learn more about the grading workflow for Otter in `this section <workflow/index.md>`_.
+You can learn more about the grading workflow for Otter in :ref:`this section <workflow>`.

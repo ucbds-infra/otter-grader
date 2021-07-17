@@ -406,6 +406,8 @@ that the lack of a ``Notebook.check`` cell for questions with only hidden tests 
 are run *at the end of execution*, and therefore are not robust to variable name collisions.
 
 
+.. _otter_assign_python_seeding:
+
 Intercell Seeding
 +++++++++++++++++
 

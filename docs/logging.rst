@@ -43,8 +43,8 @@ Whenever a student runs a check cell, Otter can store their current global envir
 the log. The purpose of this is twofold: 1) to allow the grading of assignments to occur based on 
 variables whose creation requires access to resources not possessed by the grading environment, and 
 2) to allow instructors to debug students' assignments by inspecting their global environment at the 
-time of the check. This behavior must be preconfigured with an `Otter configuration file 
-<otter_check/dot_otter_files.md>`_ that has its ``save_environment`` key set to ``true``.
+time of the check. This behavior must be preconfigured with an :ref:`Otter configuration file 
+<otter_check_dot_otter_files>` that has its ``save_environment`` key set to ``true``.
 
 Shelving is accomplished by using the dill library to pickle (almost) everything in the global 
 environment, with the notable exception of modules (so libraries will need to be reimported in the 
@@ -87,9 +87,9 @@ With this, we can tell the log entry to only shelve dataframes named ``df``:
 
 If you are grading from the log and are utilizing ``variables``, you **must** include this 
 dictionary as a JSON string in your configuration, otherwise the autograder will deserialize 
-anything that the student submits. This configuration is set in two places: in the `Otter 
-configuration file <otter_check/dot_otter_files.md>`_ that you distribute with your notebook and in 
-the autograder. Both of these are handled for you if you use `Otter Assign <otter_assign/index.md>`_ 
+anything that the student submits. This configuration is set in two places: in the :ref:`Otter 
+configuration file <otter_check_dot_otter_files>` that you distribute with your notebook and in 
+the autograder. Both of these are handled for you if you use :ref:`Otter Assign <otter_assign>` 
 to generate your distribution files.
 
 To retrieve a shelved environment from an entry, use the ``LogEntry.unshelve`` method. During the 
@@ -106,8 +106,8 @@ unshelved environment and, optionally, anything in the environment passed to ``g
     >>> factorial is env_with_factorial["some_fn"].__globals__["factorial"]
     True
 
-See the reference `below <#otter-logs-reference>`_ for more information about the arguments to 
-``LogEntry.shelve`` and ``LogEntry.unshelve``.
+See the reference :ref:`below <logging_otter_logs_reference>` for more information about the 
+arguments to ``LogEntry.shelve`` and ``LogEntry.unshelve``.
 
 
 Debugging with the Log
@@ -141,8 +141,8 @@ in the log entries will be used to run tests against. For example, if the execut
 to a large SQL server that cannot be accessed by a Gradescope grading container, these questions can 
 still be graded using the log of checks run by the students and the environments pickled therein.
 
-To configure these pregraded questions, include an `Otter configuration file 
-<otter_check/dot_otter_files.md>`_ in the assignment directory that defines the notebook name and 
+To configure these pregraded questions, include an :ref:`Otter configuration file 
+<otter_check_dot_otter_files>` in the assignment directory that defines the notebook name and 
 that the saving of environments should be turned on:
 
 .. code-block:: json
@@ -157,6 +157,8 @@ If you are restricting the variables serialized during checks, also set the ``va
 to grade from the log using the ``--grade-from-log`` flag when running or the ``grade_from_log`` 
 subkey of ``generate`` if using Otter Assign.
 
+
+.. _logging_otter_logs_reference:
 
 Otter Logs Reference
 --------------------

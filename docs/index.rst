@@ -1,3 +1,5 @@
+.. _home:
+
 Otter-Grader Documentation
 ==========================
 
@@ -20,8 +22,6 @@ Otter-Grader Documentation
     resources
     Changelog <https://github.com/ucbds-infra/otter-grader/tree/master/CHANGELOG.md>
 
-**This is the documentation for the development version of Otter Grader. For the last stable release, visit `https://otter-grader.readthedocs.io/en/stable/ <https://otter-grader.readthedocs.io/en/stable/>`_.**
-
 .. TODO: rewrite this
 
 Otter Grader is a light-weight, modular open-source autograder developed by the Data Science 
@@ -29,27 +29,27 @@ Education Program at UC Berkeley. It is designed to grade Python and R assignmen
 any scale by abstracting away the autograding internals in a way that is compatible with any 
 instructor's assignment distribution and collection pipeline. Otter supports local grading through 
 parallel Docker containers, grading using the autograding platforms of 3rd-party learning management 
-systems (LMSs), the deployment of an Otter-managed grading virtual machine, and a client package 
+systems (LMSs), non-containerized grading on an instructor's machine, and a client package 
 that allows students to check and instructors to grade assignments their own machines. Otter is 
-designed to grade Pyhon and R executabeles, Jupyter Notebooks, and RMarkdown documents and is 
+designed to grade Pyhon and R executables, Jupyter Notebooks, and RMarkdown documents and is 
 compatible with a few different LMSs, including Canvas and Gradescope.
 
-Otter is organized into seven components based on the different stages of the assignment pipeline, 
+Otter is organized into six components based on the different stages of the assignment pipeline, 
 each with a command-line interface:
 
-* `Otter Assign <otter_assign/index.md>`_ is an assignment development and distribution tool that 
+* :ref:`Otter Assign <otter_assign>` is an assignment development and distribution tool that 
   allows instructors to create assignments with prompts, solutions, and tests in a simple notebook 
   format that it then converts into santized versions for distribution to students and autograders.
-* `Otter Generate <workflow/otter_generate/index.md>`_ creates the necessary setup files so that 
+* :ref:`Otter Generate <workflow_otter_generate>` creates the necessary setup files so that 
   instructors can autograde assignments.
-* `Otter Check <otter_check/index.md>`_ allows students to run publically distributed tests written 
+* :ref:`Otter Check <otter_check>` allows students to run publically distributed tests written 
   by instructors against their solutions as they work through assignments to verify their thought 
   processes and design implementations.
-* `Otter Export <pdfs.md>`_ generates PDFs with optional filtering of Jupyter Notebooks for manually 
+* :ref:`Otter Export <pdfs>` generates PDFs with optional filtering of Jupyter Notebooks for manually 
   grading portions of assignments.
-* `Otter Run <workflow/executing_submissions/otter_run.md>`_ grades students' assignments locally on 
+* :ref:`Otter Run <workflow_executing_submissions_otter_run>` grades students' assignments locally on 
   the instructor's machine without containerization and supports grading on a JupyterHub account.
-* `Otter Grade <workflow/executing_submissions/otter_grade.md>`_ grades students' assignments 
+* :ref:`Otter Grade <workflow_executing_submissions_otter_grade>` grades students' assignments 
   locally on the instructor's machine in parallel Docker containers, returning grade breakdowns as a 
   CSV file.
 
