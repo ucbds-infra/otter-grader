@@ -20,8 +20,6 @@ import re
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
-import recommonmark
-from recommonmark.transform import AutoStructify
 
 from glob import glob
 import nbconvert
@@ -54,7 +52,6 @@ release = ''
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.githubpages',
-    'recommonmark',
     # 'sphinx.ext.autodoc', 
     'sphinx.ext.coverage', 
     'sphinx.ext.napoleon',
@@ -89,11 +86,7 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = ['.rst', '.md']
-
-# source_parsers = {
-#    '.md': 'recommonmark.parser.CommonMarkParser',
-# }
+source_suffix = ['.rst']
 
 # The master toctree document.
 master_doc = 'index'
@@ -254,17 +247,6 @@ for file in files_to_replace:
 
 # -- Extension configuration -------------------------------------------------
 def setup(app):
-    app.add_config_value('recommonmark_config', {
-        #'url_resolver': lambda url: github_doc_root + url,
-        # 'enable_auto_toc_tree': True,
-        # 'auto_toc_tree_section': 'Contents',
-        'enable_math': False,
-        'enable_inline_math': False,
-        'enable_eval_rst': True,
-        # 'enable_auto_doc_ref': True,
-    }, True)
-    app.add_transform(AutoStructify)
-
     # run nbconvert on all of the notebooks in _static/notebooks
     exporter = nbconvert.HTMLExporter()
     print("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15)
