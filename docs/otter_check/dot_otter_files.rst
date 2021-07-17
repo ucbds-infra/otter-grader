@@ -1,3 +1,5 @@
+.. _otter_check_dot_otter_files:
+
 Otter Configuration Files
 =========================
 

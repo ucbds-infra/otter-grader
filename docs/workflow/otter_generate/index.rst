@@ -10,8 +10,8 @@ Generating Configuration Files
     container_image
 
 This section details how to generate the configuration files needed for preparing Otter autograders. 
-Note that this step can be accomplished automatically if you're using `Otter Assign 
-<../../otter_assign/index.md>`_.
+Note that this step can be accomplished automatically if you're using :ref:`Otter Assign 
+<otter_assign>`.
 
 To use Otter to autograde an assignment, you must first generate a zip file that Otter will use to 
 create a Docker image with which to grade submissions. Otter's command line utility 
@@ -21,10 +21,10 @@ create a Docker image with which to grade submissions. Otter's command line util
 Before Using Otter Generate
 ---------------------------
 
-Before using Otter Generate, you should already have written `tests <../../test_files/index.md>`_ 
-for the assignment and collected extra requirements into a requirements.txt file (see `here 
-<container_image.md>`_). (Note: the default requirements can be overwritten by your requirements by 
-passing the ``--overwrite-requirements`` flag.)
+Before using Otter Generate, you should already have written :ref:`tests <test_files>` 
+for the assignment and collected extra requirements into a requirements.txt file (see :ref:`here 
+<workflow_otter_generate_container_image>`). (Note: the default requirements can be overwritten by 
+your requirements by passing the ``--overwrite-requirements`` flag.)
 
 
 Directory Structure
@@ -55,7 +55,7 @@ Usage
 
 The general usage of ``otter generate`` is to create a zip file at some output directory (``-o`` 
 flag, default ``./``) which you will then use to create the grading image. Otter Generate has a few 
-optional flags, described in the `Otter CLI Reference <../../cli_reference.md>`_.
+optional flags, described in the :ref:`Otter CLI Reference <cli_reference>`.
 
 If you do not specify ``-t`` or ``-o``, then the defaults will be used. If you do not specify 
 ``-r``, Otter looks in the working directory for ``requirements.txt`` and automatically adds it if 
@@ -202,13 +202,13 @@ Grading with Environments
 Otter can grade assignments using saved environments in the log in the Gradescope container. *This 
 behavior is not supported for R assignments.* This works by deserializing the environment stored in 
 each check entry of Otter's log and grading against it. The notebook is parsed and only its import 
-statements are executed. For more inforamtion about saving and using environments, see `Logging 
-<../../logging.md>`_.
+statements are executed. For more inforamtion about saving and using environments, see :ref:`Logging 
+<logging>`.
 
 To configure this behavior, two things are required:
 
 * the use of the ``grade_from_log`` key in your config JSON file
-* providing studens with an `Otter configuration file <../../otter_check/dot_otter_files.md>`_ that 
+* providing studens with an :ref:`Otter configuration file <otter_check_dot_otter_files>` that 
   has ``save_environments`` set to ``true``
 
 This will tell Otter to shelve the global environment each time a student calls ``Notebook.check`` 
@@ -243,7 +243,7 @@ and password. Alternatively, you can provide these via the command-line with the
 
     otter generate --username someemail@domain.com --password thisisnotasecurepassword
 
-Currently, this action supports `HTML comment filtering <../../pdfs.md>`_ with pagebreaks, but these 
+Currently, this action supports :ref:`HTML comment filtering <pdfs>` with pagebreaks, but these 
 can be disabled with the ``filtering`` and ``pagebreaks`` keys of your config.
 
 
@@ -294,7 +294,7 @@ The autograder supports intercell seeding with the use of the ``seed`` key. *Thi
 supported for Rmd and R script assignments, but is supported for R Jupyter notebooks.* Passing it an 
 integer will cause the autograder to seed NumPy and Python's ``random`` library or call ``set.seed`` 
 in R between *every* pair of code cells. This is useful for writing deterministic hidden tests. More 
-information about Otter seeding can be found `here <../../seeding.md>`_. As an example, you can set 
+information about Otter seeding can be found :ref:`here <seeding>`. As an example, you can set 
 an intercell seed of 42 with
 
 .. code-block:: json
@@ -324,9 +324,9 @@ If ``show_stdout`` is passed, the stdout will be made available to students *onl
 published on Gradescope*. The same can be done for hidden test outputs using the ``show_hidden`` 
 key.
 
-The `Grading on Gradescope <../executing_submissions/gradescope.md>`_ section details more about how 
-output on Gradescope is formatted. Note that this behavior has no effect on any platform besides 
-Gradescope.
+The :ref:`Grading on Gradescope <workflow_executing_submissions_gradescope>` section details more 
+about how output on Gradescope is formatted. Note that this behavior has no effect on any platform 
+besides Gradescope.
 
 
 Plugins
@@ -350,12 +350,12 @@ configurations.
         ]
     }
 
-For more information about Plugins, see `here <../../plugins/index.md>`_.
+For more information about Plugins, see :ref:`here <plugins>`.
 
 
 Generating with Otter Assign
 ----------------------------
 
 Otter Assign comes with an option to generate this zip file automatically when the distribution 
-notebooks are created via the ``generate`` key of the assignment metadata. See `Distributing 
-Assignments <../../otter_assign/index.md>`_ for more details.
+notebooks are created via the ``generate`` key of the assignment metadata. See :ref:`otter_assign` 
+for more details.

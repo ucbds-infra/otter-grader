@@ -43,9 +43,8 @@ This script does the following:
 #. Install apt-get dependencies for R
 #. Install Miniconda
 #. Install R, ``r-essentials``, and ``r-devtools`` from conda
-#. Install Python requirements from ```requirements.txt`` <#requirements.txt>`_ (this step 
-   installs Otter itself)
-#. Install R requires from ```requirements.R`` <#requirements.R>`_
+#. Install Python requirements from ``requirements.txt`` (this step installs Otter itself)
+#. Install R requires from ``requirements.R``
 #. Install Otter's R autograding package ottr
 
 Currently this script is not customizable, but you can unzip the provided zip file to edit it 
