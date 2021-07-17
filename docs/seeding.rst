@@ -1,4 +1,4 @@
-.. seeding:
+.. _seeding:
 
 Intercell Seeding
 =================
