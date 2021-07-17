@@ -213,7 +213,7 @@ texinfo_documents = [
 # -- YAML Dictionary Replacement ---------------------------------------------
 
 files_to_replace = [
-    # "workflow/otter_generate/index.md",
+    "workflow/otter_generate/index.rst",
     "otter_assign/python_notebook_format.rst",
 ]
 
