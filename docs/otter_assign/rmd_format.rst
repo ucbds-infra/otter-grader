@@ -22,10 +22,10 @@ arguments in an assignment metadata code block.
     ```
 
 This block is removed from both output files. Any unspecified keys will keep their default values. 
-For more information about many of these arguments, see `Usage and Output <usage.md>`_. The YAML 
-block below lists all configurations **supported with Rmd files** and their defaults. Any keys that 
-appear in the Python or R Juptyer notebook sections but not below will be ignored when using Otter 
-Assign with Rmd files.
+For more information about many of these arguments, see :ref:`Usage and Output 
+<otter_assign_usage>`. The YAML block below lists all configurations **supported with Rmd files** 
+and their defaults. Any keys that appear in the Python or R Juptyer notebook sections but not below 
+will be ignored when using Otter Assign with Rmd files.
 
 .. code-block:: yaml
 
@@ -116,9 +116,9 @@ Solution Removal
 
 Solution cells contain code formatted in such a way that the assign parser replaces lines or 
 portions of lines with prespecified prompts. The format for solution cells in Rmd files is the same 
-as in Python and R Jupyter notebooks, described :ref:`here <assign_python_solution_removal>`. Otter 
-Assign's solution removal for prompts is compatible with normal strings in R, including assigning 
-these to a dummy variable so that there is no undesired output below the cell:
+as in Python and R Jupyter notebooks, described :ref:`here <otter_assign_python_solution_removal>`. 
+Otter Assign's solution removal for prompts is compatible with normal strings in R, including 
+assigning these to a dummy variable so that there is no undesired output below the cell:
 
 .. code-block:: r
 

@@ -1,3 +1,5 @@
+.. _otter_assign_usage:
+
 Usage and Output
 ================
 
@@ -107,7 +109,7 @@ filtering in the export cell, use the ``--no-filter`` flag. To remove the export
 the ``--no-export-cell`` tag. If you have custom instructions for submission that you want to add to 
 the export cell, pass them to the ``--instructions`` flag.
 
-**Note:** Otter Assign currently only supports `HTML comment filtering <../pdfs.md>`_. This means 
+**Note:** Otter Assign currently only supports :ref:`HTML comment filtering <pdfs>`. This means 
 that if you have other cells you want included in the export, you must delimit them using HTML 
 comments, not using cell tags.
 

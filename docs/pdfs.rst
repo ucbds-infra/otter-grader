@@ -1,3 +1,5 @@
+.. _pdfs:
+
 PDF Generation and Filtering
 ============================
 

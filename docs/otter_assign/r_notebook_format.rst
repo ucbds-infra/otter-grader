@@ -22,9 +22,10 @@ arguments in an assignment metadata cell.
     ```
 
 This cell is removed from both output notebooks. Any unspecified keys will keep their default 
-values. For more information about many of these arguments, see `Usage and Output <usage.md>`_. The 
-YAML block below lists all configurations **supported with R** and their defaults. Any keys that 
-appear in the Python section but not below will be ignored when using Otter Assign with R.
+values. For more information about many of these arguments, see :ref:`Usage and Output 
+<otter_assign_usage>`. The YAML block below lists all configurations **supported with R** and their 
+defaults. Any keys that appear in the Python section but not below will be ignored when using Otter 
+Assign with R.
 
 .. code-block:: yaml
 
@@ -85,7 +86,7 @@ Solution Removal
 
 Solution cells contain code formatted in such a way that the assign parser replaces lines or 
 portions of lines with prespecified prompts. The format for solution cells in R notebooks is the 
-same as in Python notebooks, described :ref:`here <assign_python_solution_removal>`. Otter Assign's 
+same as in Python notebooks, described :ref:`here <otter_assign_python_solution_removal>`. Otter Assign's 
 solution removal for prompts is compatible with normal strings in R, including assigning these to a 
 dummy variable so that there is no undesired output below the cell:
 
@@ -132,4 +133,4 @@ Manually Graded Questions
 
 Otter Assign also supports manually-graded questions using a similar specification to the one 
 described above. The behavior for manually graded questions in R is exactly the same as it is in 
-:ref:`Python <assign_python_manual_questions>`.
+:ref:`Python <otter_assign_python_manual_questions>`.
