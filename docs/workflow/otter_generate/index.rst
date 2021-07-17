@@ -32,22 +32,20 @@ For the rest of this page, assume that we have the following directory structure
 
 .. code-block::
 
-    | hw00-dev
-        | - data.csv
-        | - hw00-sol.ipynb
-        | - hw00.ipynb
-        | - requirements.txt
-        | - utils.py
-        | tests
-        | - q1.py
-        | - q2.py
-        ...
-        | hidden-tests
-        | - q1.py
-        | - q2.py
-        ...
+    hw00-dev
+    ├── data.csv
+    ├── hidden-tests
+    │   ├── q1.py
+    │   └── q2.py  # etc.
+    ├── hw00-sol.ipynb
+    ├── hw00.ipynb
+    ├── requirements.txt
+    ├── tests
+    │   ├── q1.py
+    │   └── q2.py  # etc.
+    └── utils.py
 
-Also assume that we have ``cd``ed into ``hw00-dev``.
+Also assume that the working directory is ``hw00-dev``.
 
 
 Usage

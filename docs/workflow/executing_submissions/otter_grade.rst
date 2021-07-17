@@ -132,18 +132,16 @@ requirements.
 
 .. code-block::
 
-    | grading
-        | - autograder.zip
-        | - meta.yml
-        | - nb0.ipynb
-        | - nb1.ipynb
-        | - nb2.ipynb
-        ...
-        | tests
-        | - q1.py
-        | - q2.py
-        | - q3.py
-        ...
+    grading
+    ├── autograder.zip
+    ├── meta.yml
+    ├── nb0.ipynb
+    ├── nb1.ipynb
+    ├── nb2.ipynb  # etc.
+    └── tests
+        ├── q1.py
+        ├── q2.py
+        └── q3.py  # etc.
 
 In the case above, our otter command would be, very simply,
 
@@ -160,19 +158,17 @@ After grader, our directory will look like this:
 
 .. code-block::
 
-    | grading
-        | - autograder.zip
-        | - final_grades.csv
-        | - meta.yml
-        | - nb0.ipynb
-        | - nb1.ipynb
-        | - nb2.ipynb
-        ...
-        | tests
-        | - q1.py
-        | - q2.py
-        | - q3.py
-        ...
+    grading
+    ├── autograder.zip
+    ├── final_grades.csv
+    ├── meta.yml
+    ├── nb0.ipynb
+    ├── nb1.ipynb
+    ├── nb2.ipynb  # etc.
+    └── tests
+        ├── q1.py
+        ├── q2.py
+        └── q3.py  # etc.
 
 and the grades for each submission will be in ``final_grades.csv``.
 
@@ -187,24 +183,21 @@ and at the end of grading we would have
 
 .. code-block::
 
-    | grading
-        | - autograder.zip
-        | - final_grades.csv
-        | - meta.yml
-        | - nb0.ipynb
-        | - nb1.ipynb
-        | - nb2.ipynb
-        ...
-        | submission_pdfs
-        | - nb0.pdf
-        | - nb1.pdf
-        | - nb2.pdf
-        ...
-        | tests
-        | - q1.py
-        | - q2.py
-        | - q3.py
-        ...
+    grading
+    ├── autograder.zip
+    ├── final_grades.csv
+    ├── meta.yml
+    ├── nb0.ipynb
+    ├── nb1.ipynb
+    ├── nb2.ipynb    # etc.
+    ├── submission_pdfs
+    │   ├── nb0.pdf
+    │   ├── nb1.pdf
+    │   └── nb2.pdf  # etc.
+    └── tests
+        ├── q1.py
+        ├── q2.py
+        └── q3.py    # etc.
 
 
 Requirements

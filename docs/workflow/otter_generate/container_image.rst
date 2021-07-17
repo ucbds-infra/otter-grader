@@ -7,18 +7,16 @@ contents:
 
 .. code-block::
 
-    autograder/
-    | - environment.yml
-    | - otter_config.json
-    | - requirements.R
-    | - requirements.txt
-    | - run_autograder
-    | - run_otter.py
-    | - setup.sh
-    | files/
-    | - ...
-    | tests/
-    | - ...
+    autograder
+    ├── environment.yml
+    ├── files/
+    ├── otter_config.json
+    ├── requirements.R
+    ├── requirements.txt
+    ├── run_autograder
+    ├── run_otter.py
+    ├── setup.sh
+    └── tests/
 
 Note that for pure-Python assignments, ``requirements.R`` is not included and all of the 
 R-pertinent portions of ``setup.sh`` are removed. Below are descriptions of each of the items 
