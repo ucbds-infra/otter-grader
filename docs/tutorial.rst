@@ -29,8 +29,8 @@ following directory structure:
             └── demo-passesAll.zip
 
 This section describes the basic execution of Otter's tools using the provided zip file. It is meant 
-to verify your installation and too *loosely* describe how Otter tools are used. This section 
-includes Otter Assign, Otter Generate, and Otter Grade.
+to verify your installation and to *loosely* describe how a few Otter tools are used. This tutorial 
+covers Otter Assign, Otter Generate, and Otter Grade.
 
 
 Otter Assign
@@ -39,7 +39,7 @@ Otter Assign
 Start by moving into the ``tutorial`` directrory. This directory includes the master notebook 
 ``demo.ipynb``. Look over this notebook to get an idea of its structure. It contains five questions, 
 four code and one Markdown (two of which are manually-graded). Also note that the assignment 
-configuration in the first cell tells Otter Assign to generate a solutions PDF and a Gradescope 
+configuration in the first cell tells Otter Assign to generate a solutions PDF and an 
 autograder zip file and to include special submission instructions before the export cell. To run 
 Otter Assign on this notebook, run
 
@@ -87,9 +87,9 @@ Otter Generate
 
 In the ``dist/autograder`` directory created by Otter Assign, there should be a file called 
 ``autograder.zip``. This file is the result of using Otter Generate to generate a zip file with all 
-of your tests and requirements, which is done invisibly by Otter Assign when it is used. 
-Alternatively, you could generate this zip file yourself from the contents of ``dist/autograder`` by 
-running
+of your tests and requirements, which is done invisibly by Otter Assign when it is used (which it is 
+configured to do in the assignment metadata). Alternatively, you could generate this zip file 
+yourself from the contents of ``dist/autograder`` by running
 
 .. code-block:: console
 
@@ -162,7 +162,7 @@ Let's run Otter on the notebooks:
 
     otter grade -p submissions/ipynbs -a dist/autograder/autograder.zip -j meta.json --pdfs -v
 
-(I've added the ``-v`` flag so that we get verbose output.) After this finishes running, there 
+(The ``-v`` flag so that we get verbose output.) After this finishes running, there 
 should be a new file and a new folder in the working directory: ``final_grades.csv`` and 
 ``submission_pdfs``. The former should contain the grades for each file, and should look something 
 like this:

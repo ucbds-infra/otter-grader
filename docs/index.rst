@@ -10,8 +10,8 @@ Otter-Grader Documentation
     tutorial
     test_files/index
     otter_assign/index
-    workflow/index
     otter_check/index
+    workflow/index
     execution
     plugins/index
     pdfs
@@ -21,8 +21,6 @@ Otter-Grader Documentation
     cli_reference
     resources
     Changelog <https://github.com/ucbds-infra/otter-grader/tree/master/CHANGELOG.md>
-
-.. TODO: rewrite this
 
 Otter Grader is a light-weight, modular open-source autograder developed by the Data Science 
 Education Program at UC Berkeley. It is designed to grade Python and R assignments for classes at 
@@ -44,7 +42,7 @@ each with a command-line interface:
   instructors can autograde assignments.
 * :ref:`Otter Check <otter_check>` allows students to run publically distributed tests written 
   by instructors against their solutions as they work through assignments to verify their thought 
-  processes and design implementations.
+  processes and implementations.
 * :ref:`Otter Export <pdfs>` generates PDFs with optional filtering of Jupyter Notebooks for manually 
   grading portions of assignments.
 * :ref:`Otter Run <workflow_executing_submissions_otter_run>` grades students' assignments locally on 
@@ -74,16 +72,14 @@ If you are going to be autograding R, you must also install the R package using
     devtools::install_github("ucbds-infra/ottr@stable")
 
 Installing the Python package will install the ``otter`` binary so that Otter can be called from the 
-command line. **If you are running Otter on Windows,** this binary will not work. Instead, call 
-Otter as a Python module: ``python3 -m otter``. This will have *the same* commands, arguments, and 
-behaviors as all calls to ``otter`` that are shown in the documentation. 
+command line. You can also call Otter as a Python module with ``python3 -m otter``.
 
 
 Docker
 ++++++
 
 Otter uses Docker to create containers in which to run the students' submissions. **Docker and our 
-Docker image are only required if using Otter Grade or Otter Service.** Please make sure that you 
+Docker image are only required if using Otter Grade.** Please make sure that you 
 install Docker and pull our Docker image, which is used to grade the notebooks. To get the Docker 
 image, run
 
