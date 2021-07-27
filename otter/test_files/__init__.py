@@ -224,6 +224,15 @@ class GradingResults:
         """
         return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
 
+    def pretty_display(self, public_only=False):
+        """
+        Prints results more nicely when calling otter assign
+        """
+        for _, tf in self.results.items():
+            print(f"{tf.name} passed all tests -> {tf.passed_all}")
+            print(tf.summary(public_only=public_only))
+            print()
+
     def to_gradescope_dict(self, config):
         """
         Converts these results into a dictionary formatted for Gradescope's autograder. Requires a 
