@@ -229,8 +229,10 @@ class GradingResults:
         Prints results more nicely when calling otter assign
         """
         for _, tf in self.results.items():
+            print("==============================================================================")
             print(f"{tf.name} passed all tests -> {tf.passed_all}")
             print(tf.summary(public_only=public_only))
+            print("==============================================================================")
             print()
 
     def to_gradescope_dict(self, config):
