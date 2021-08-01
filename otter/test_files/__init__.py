@@ -2,15 +2,18 @@
 Classes for working with test files
 """
 
+import os
 import math
+import json
 import pprint
 import pickle
 
 from collections import namedtuple
 
-# from .abstract_test import TestCollection
+from .abstract_test import TestCase, TestCaseResult
 from .metadata_test import NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
+from .ottr_test import OttrTestFile
 
 from ..check.logs import QuestionNotInLogException
 from ..run.run_autograder.constants import DEFAULT_OPTIONS
@@ -53,6 +56,49 @@ class GradingResults:
 
     def __repr__(self):
         return pprint.pformat(self.to_dict(), indent=2)
+
+    @classmethod
+    def from_ottr_json(cls, ottr_output):
+        """
+        Creates a ``GradingResults`` object from the JSON output of Ottr.
+
+        Args:
+            ottr_output (``str``): the JSON output of Ottr as a string
+        
+        Returns:
+            ``GradingResults``: the Ottr grading results
+        """
+        test_file_results = json.loads(ottr_output)["test_file_results"]
+        test_files = []
+        for tfr in test_file_results:
+            test_cases, test_case_results = [], []
+
+            for tcr in tfr["test_case_results"]:
+                tc = tcr["test_case"]
+                test_cases.append(TestCase(
+                    name = tc["name"],
+                    body = tc["code"],
+                    hidden = tc["hidden"],
+                    points = tc["points"],
+                    success_message = tc["success_message"],
+                    failure_message = tc["failure_message"],
+                ))
+                test_case_results.append(TestCaseResult(
+                    test_case = test_cases[-1],
+                    message = tcr["error"],
+                    passed = tcr["passed"],
+                ))
+            
+            test_file = OttrTestFile(
+                name = os.path.splitext(os.path.basename(tfr["filename"]))[0],
+                path = tfr["filename"],
+                test_cases = test_cases,
+            )
+            test_file.test_case_results = test_case_results
+            
+            test_files.append(test_file)
+        
+        return cls(test_files)
 
     @property
     def test_files(self):

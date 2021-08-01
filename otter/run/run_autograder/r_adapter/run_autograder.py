@@ -76,6 +76,9 @@ def run_autograder(options):
         r(f"knitr::purl('{fp}', '{wp}')")
 
     # get the R script
+    if len(glob("*.[Rr]")) > 1:
+        raise RuntimeError("More than one R script found")
+
     fp = glob("*.[Rr]")[0]
 
     os.makedirs("./tests", exist_ok=True)
@@ -83,7 +86,7 @@ def run_autograder(options):
     for file in tests_glob:
         shutil.copy(file, "./tests")
 
-    output = r(f"""ottr::run_gradescope("{fp}")""")[0]
+    output = r(f"""ottr::run_autograder("{fp}")""")[0]
     output = json.loads(output)
     
     if options["show_stdout"]:
