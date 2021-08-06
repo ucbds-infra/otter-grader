@@ -7,4 +7,4 @@ dependencies:
     - pip
     - nb_conda_kernels
     - pip:
-        - -r file:requirements.txt{% else %}{{ other_environment }}{% endif %}
+        - -r requirements.txt{% else %}{{ other_environment }}{% endif %}
