@@ -23,7 +23,7 @@ from ..run.run_autograder.constants import DEFAULT_OPTIONS
 from ..utils import load_default_file
 
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
-MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9.2-Linux-x86_64.sh"
+MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
 
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
