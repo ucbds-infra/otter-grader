@@ -112,7 +112,7 @@ def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=True):
         with open(f) as f2:
             test = f2.read()
         
-        test = re.sub(r"    ottr::TestCase\$new\(\s*hidden = TRUE[\w\W]+?    \),?", "", test)
-        test = re.sub(r",(\s*  \))", r"\1", test)  # removes a trailing comma if present
+        test = re.sub(r"    ottr::TestCase\$new\(\s*hidden = TRUE[\w\W]+?^    \),?", "", test, flags=re.MULTILINE)
+        test = re.sub(r",(\s*  \))", r"\1", test, flags=re.MULTILINE)  # removes a trailing comma if present
 
         write_test({}, f, test, use_file=True)
