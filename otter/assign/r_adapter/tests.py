@@ -13,7 +13,7 @@ from ..constants import TEST_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLAT
 from ..tests import write_test
 from ..utils import get_source, lock
 
-Test = namedtuple('Test', ['name', 'hidden', 'body'])
+Test = namedtuple('Test', ['name', 'hidden', 'body', 'success_message', 'failure_message'])
 
 def read_test(cell, question, assignment, rmd=False):
     """
@@ -35,16 +35,16 @@ def read_test(cell, question, assignment, rmd=False):
         source = get_source(cell)
     hidden = bool(re.search("hidden", source[0], flags=re.IGNORECASE))
     lines = source[1:]
-    assert sum("test_that(" in line for line in lines) == 1, \
-        f"Too many test_that calls in test cell (max 1 allowed):\n{cell}"
     test_name = None
-    for line in lines:
-        match = re.match(OTTR_TEST_NAME_REGEX, line)
-        if match:
-            test_name = match.group(1)
-            break
-    assert test_name is not None, f"Could not parse test name:\n{cell}"
-    return Test(test_name, hidden, '\n'.join(lines))
+    # for line in lines:
+    #     match = re.match(OTTR_TEST_NAME_REGEX, line)
+    #     if match:
+    #         test_name = match.group(1)
+    #         break
+    # assert test_name is not None, f"Could not parse test name:\n{cell}"
+    # TODO: hook up success_message and failure_message
+    # TODO: add parsing for TEST CONFIG blocks
+    return Test(test_name, hidden, '\n'.join(lines), "", "")
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """
@@ -91,29 +91,18 @@ def gen_suite(name, tests, points):
     Returns:
         ``str``: the rendered R test file
     """
-    metadata = {'name': name, 'cases': []}
-    cases = metadata['cases']
-    for test, p in zip(tests, points):
-        cases.append({
-            'name': test.name,
-            'points': p,
-            'hidden': test.hidden
-        })
-    
-    metadata = yaml.dump(metadata)
-
-    return OTTR_TEST_FILE_TEMPLATE.render(
-        metadata = metadata,
-        tests = tests
-    )
+    template_data = {'name': name, 'test_cases': tests}
+    return OTTR_TEST_FILE_TEMPLATE.render(**template_data)
 
 def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=True):
     """
     Rewrites test files in a directory to remove hidden tests
     
     Args:
+        nb (``nbformat.NotebookNode``): the student notebook
         test_dir (``pathlib.Path``): path to test files directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        use_files (``bool``, optional): ignored for R assignments
     """
     for f in test_dir.iterdir():
         if f.suffix != '.R':
@@ -122,45 +111,7 @@ def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=True):
         with open(f) as f2:
             test = f2.read()
         
-        metadata, in_metadata, start_lines, test_names = "", False, {}, []
-        metadata_start, metadata_end = -1, -1
-        lines = test.split("\n")
-        for i, line in enumerate(lines):
-            match = re.match(OTTR_TEST_NAME_REGEX, line)
-            if line.strip() == "test_metadata = \"":
-                in_metadata = True
-                metadata_start = i
-            elif in_metadata and line.strip() == "\"":
-                in_metadata = False
-                metadata_end = i
-            elif in_metadata:
-                metadata += line + "\n"
-            elif match:
-                test_name = match.group(1)
-                test_names.append(test_name)
-                start_lines[test_name] = i
-
-        assert metadata and metadata_start != -1 and metadata_end != -1, \
-            f"Failed to parse test metadata in {f}"
-        metadata = yaml.full_load(metadata)
-        cases = metadata['cases']
-
-        lines_to_remove, cases_to_remove = [], []
-        for i, case in enumerate(cases):
-            if case['hidden']:
-                start_line = start_lines[case['name']]
-                try:
-                    next_test = test_names[test_names.index(case['name']) + 1]
-                    end_line = start_lines[next_test]
-                except IndexError:
-                    end_line = len(lines)
-                lines_to_remove.extend(range(start_line, end_line))
-                cases_to_remove.append(i)
-
-        metadata['cases'] = [c for i, c in enumerate(cases) if i not in set(cases_to_remove)]
-        lines = [l for i, l in enumerate(lines) if i not in set(lines_to_remove)]
-        lines[metadata_start:metadata_end + 1] = ["test_metadata = \""] + \
-            yaml.dump(metadata).split("\n") + ["\""]
-        test = "\n".join(lines)
+        test = re.sub(r"    ottr::TestCase\$new\(\s*hidden = TRUE[\w\W]+?^    \),?", "", test, flags=re.MULTILINE)
+        test = re.sub(r",(\s*  \))", r"\1", test, flags=re.MULTILINE)  # removes a trailing comma if present
 
         write_test({}, f, test, use_file=True)

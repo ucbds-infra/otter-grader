@@ -39,11 +39,14 @@ class TestCase(unittest.TestCase):
         create_image_cmd = ["make", "docker-test"]
         subprocess.run(create_image_cmd, check=True)
 
-    def assertFilesEqual(self, p1, p2):
+    def assertFilesEqual(self, p1, p2, ignore_trailing_whitespace=True):
         try:
             with open(p1) as f1:
                 with open(p2) as f2:
-                    self.assertEqual(f1.read(), f2.read(), f"Contents of {p1} did not equal contents of {p2}")
+                    c1, c2 = f1.read(), f2.read()
+                    if ignore_trailing_whitespace:
+                        c1, c2 = c1.rstrip(), c2.rstrip()
+                    self.assertEqual(c1, c2, f"Contents of {p1} did not equal contents of {p2}")
         
         except UnicodeDecodeError:
             with open(p1, "rb") as f1:

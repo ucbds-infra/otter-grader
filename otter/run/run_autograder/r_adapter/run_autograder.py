@@ -7,12 +7,14 @@ import json
 import shutil
 import nbformat
 import jupytext
+import pickle
 
 from glob import glob
 from rpy2.robjects import r
 
 from ..constants import DEFAULT_OPTIONS
 from ..utils import get_source
+from ....test_files import GradingResults
 
 NBFORMAT_VERSION = 4
 
@@ -54,7 +56,8 @@ def run_autograder(options):
         for file in os.listdir("./source/files"):
             fp = os.path.join("./source/files", file)
             if os.path.isdir(fp):
-                shutil.copytree(fp, os.path.join("./submission", os.path.basename(fp)))
+                if not os.path.exists(os.path.join("./submission", os.path.basename(fp))):
+                    shutil.copytree(fp, os.path.join("./submission", os.path.basename(fp)))
             else:
                 shutil.copy(fp, "./submission")
 
@@ -76,6 +79,9 @@ def run_autograder(options):
         r(f"knitr::purl('{fp}', '{wp}')")
 
     # get the R script
+    if len(glob("*.[Rr]")) > 1:
+        raise RuntimeError("More than one R script found")
+
     fp = glob("*.[Rr]")[0]
 
     os.makedirs("./tests", exist_ok=True)
@@ -83,12 +89,17 @@ def run_autograder(options):
     for file in tests_glob:
         shutil.copy(file, "./tests")
 
-    output = r(f"""ottr::run_gradescope("{fp}")""")[0]
-    output = json.loads(output)
+    output = r(f"""ottr::run_autograder("{fp}")""")[0]
+    scores = GradingResults.from_ottr_json(output)
+
+    output = scores.to_gradescope_dict(options)
     
     if options["show_stdout"]:
         output["stdout_visibility"] = "after_published"
 
     os.chdir(abs_ag_path)
+
+    with open("results/results.pkl", "wb+") as f:
+        pickle.dump(scores, f)
 
     return output

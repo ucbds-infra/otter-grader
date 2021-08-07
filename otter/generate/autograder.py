@@ -25,9 +25,10 @@ from ..utils import load_default_file
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
+OTTR_BRANCH = "1.0.0.b0"  # this should match a release tag on GitHub
 
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
-         username, password, files, assignment=None, plugin_collection=None, **kwargs):
+         no_env, username, password, files, assignment=None, plugin_collection=None, **kwargs):
     """
     Runs Otter Generate
 
@@ -40,6 +41,8 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
             adding to them
         environment (``str``): path to a conda environment file for this assignment
+        no_env (``bool``): whether ``./evironment.yml`` should be automatically checked if 
+            ``environment`` is unspecified
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         files (``list[str]``): list of file paths to add to the zip file
@@ -95,7 +98,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
         "autograder_dir": options['autograder_dir'],
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
-        "ottr_branch": "stable",
+        "ottr_branch": OTTR_BRANCH,
     }
 
     if plugin_collection is None:
@@ -124,7 +127,7 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
 
         # open environment if it exists
         # unlike requirements.txt, we will always overwrite, not append by default
-        with load_default_file(environment, "environment.yml") as env_contents:
+        with load_default_file(environment, "environment.yml", default_disabled=no_env) as env_contents:
             template_context["other_environment"] = env_contents
             if env_contents is not None:
                 data = yaml.safe_load(env_contents)

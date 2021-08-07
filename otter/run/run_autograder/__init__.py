@@ -33,7 +33,7 @@ def main(autograder_dir, **kwargs):
     options.update(kwargs)
 
     if options["logo"]:
-        # ASCII 8207 is an invisible non-whitespace character; this should prevent grqdescope from
+        # ASCII 8207 is an invisible non-whitespace character; this should prevent gradescope from
         # incorrectly left-stripping the whitespace at the beginning of the logo
         print(f"{chr(8207)}\n", LOGO_WITH_VERSION, "\n", sep="")
 
