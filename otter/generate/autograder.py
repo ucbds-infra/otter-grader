@@ -25,7 +25,7 @@ from ..utils import load_default_file
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
-OTTR_BRANCH = "beta"
+OTTR_BRANCH = "1.0.0.b0"  # this should match a release tag on GitHub
 
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
          no_env, username, password, files, assignment=None, plugin_collection=None, **kwargs):
