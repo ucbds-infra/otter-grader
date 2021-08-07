@@ -9,6 +9,6 @@ dependencies:
     - r-devtools
     - pip
     - pip:
-        - -r file:requirements.txt
-        - -r file:requirements-test.txt
-        - -r file:docs/requirements.txt
+        - -r requirements.txt
+        - -r requirements-test.txt
+        - -r docs/requirements.txt

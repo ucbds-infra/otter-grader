@@ -11,4 +11,4 @@ dependencies:
     - r-devtools
     - libgit2
     - pip:
-        - -r file:requirements.txt{% else %}{{ other_environment }}{% endif %}
+        - -r requirements.txt{% else %}{{ other_environment }}{% endif %}
