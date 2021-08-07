@@ -3,7 +3,7 @@ test = list(
   cases = list(
     ottr::TestCase$new(
       hidden = FALSE,
-      name = "q8a",
+      name = NA,
       points = ,
       code = {
         test_that("q8a", {
@@ -13,7 +13,7 @@ test = list(
     ),
     ottr::TestCase$new(
       hidden = TRUE,
-      name = "q8b",
+      name = NA,
       points = ,
       code = {
         test_that("q8b", {
