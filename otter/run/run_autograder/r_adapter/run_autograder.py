@@ -56,7 +56,8 @@ def run_autograder(options):
         for file in os.listdir("./source/files"):
             fp = os.path.join("./source/files", file)
             if os.path.isdir(fp):
-                shutil.copytree(fp, os.path.join("./submission", os.path.basename(fp)))
+                if not os.path.exists(os.path.join("./submission", os.path.basename(fp))):
+                    shutil.copytree(fp, os.path.join("./submission", os.path.basename(fp)))
             else:
                 shutil.copy(fp, "./submission")
 
@@ -91,7 +92,7 @@ def run_autograder(options):
     output = r(f"""ottr::run_autograder("{fp}")""")[0]
     scores = GradingResults.from_ottr_json(output)
 
-    output = scores.to_gradescope_dict()
+    output = scores.to_gradescope_dict(options)
     
     if options["show_stdout"]:
         output["stdout_visibility"] = "after_published"
