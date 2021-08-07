@@ -35,16 +35,15 @@ def read_test(cell, question, assignment, rmd=False):
         source = get_source(cell)
     hidden = bool(re.search("hidden", source[0], flags=re.IGNORECASE))
     lines = source[1:]
-    assert sum("test_that(" in line for line in lines) == 1, \
-        f"Too many test_that calls in test cell (max 1 allowed):\n{cell}"
     test_name = None
-    for line in lines:
-        match = re.match(OTTR_TEST_NAME_REGEX, line)
-        if match:
-            test_name = match.group(1)
-            break
-    assert test_name is not None, f"Could not parse test name:\n{cell}"
+    # for line in lines:
+    #     match = re.match(OTTR_TEST_NAME_REGEX, line)
+    #     if match:
+    #         test_name = match.group(1)
+    #         break
+    # assert test_name is not None, f"Could not parse test name:\n{cell}"
     # TODO: hook up success_message and failure_message
+    # TODO: add parsing for TEST CONFIG blocks
     return Test(test_name, hidden, '\n'.join(lines), "", "")
 
 def gen_test_cell(question, tests, tests_dict, assignment):

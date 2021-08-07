@@ -31,7 +31,7 @@ test = list(
   cases = list({% for tc in test_cases %}
     ottr::TestCase$new(
       hidden = {% if tc.hidden %}TRUE{% else %}FALSE{% endif %},
-      name = "{{ tc.name }}",
+      name = {% if tc.name %}"{{ tc.name }}"{% else %}NA{% endif %},
       points = {{ tc.points }},{% if tc.success_message %}
       success_message = {{ tc.success_message }}{% endif %}{% if tc.failure_message %}
       failure_message = {{ tc.failure_message }}{% endif %}
