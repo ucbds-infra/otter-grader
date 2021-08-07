@@ -7,12 +7,14 @@ import json
 import shutil
 import nbformat
 import jupytext
+import pickle
 
 from glob import glob
 from rpy2.robjects import r
 
 from ..constants import DEFAULT_OPTIONS
 from ..utils import get_source
+from ....test_files import GradingResults
 
 NBFORMAT_VERSION = 4
 
@@ -87,11 +89,16 @@ def run_autograder(options):
         shutil.copy(file, "./tests")
 
     output = r(f"""ottr::run_autograder("{fp}")""")[0]
-    output = json.loads(output)
+    scores = GradingResults.from_ottr_json(output)
+
+    output = scores.to_gradescope_dict()
     
     if options["show_stdout"]:
         output["stdout_visibility"] = "after_published"
 
     os.chdir(abs_ag_path)
+
+    with open("results/results.pkl", "wb+") as f:
+        pickle.dump(scores, f)
 
     return output
