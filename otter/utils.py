@@ -139,11 +139,15 @@ def nullcontext():
     yield
 
 @contextmanager
-def load_default_file(provided_fn, expected_fn):
+def load_default_file(provided_fn, default_fn, default_disabled=False):
     """
+    Reads the contents of a file with an optional default path. If ``proivided_fn`` is not specified
+    and ``expected_fn`` is a existing file path, the contents of ``expected_fn`` are read in place
+    of ``provided_fn``. The use of ``expected_fn`` can be disabled by setting ``default_disabled``
+    to ``True``.
     """
-    if provided_fn is None and os.path.isfile(expected_fn):
-        provided_fn = expected_fn
+    if provided_fn is None and os.path.isfile(default_fn) and not default_disabled:
+        provided_fn = default_fn
     
     if provided_fn is not None:
         assert os.path.isfile(provided_fn), f"Could not find specified file: {provided_fn}"
