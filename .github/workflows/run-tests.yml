@@ -55,8 +55,9 @@ jobs:
       run: |
         sudo apt install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
         $CONDA/bin/conda env update -n base -f environment.yml
-        $CONDA/bin/Rscript -e "install.packages('devtools')"
-        $CONDA/bin/Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
+        $CONDA/bin/Rscript -e "Sys.unsetenv('GITHUB_PAT'); install.packages('devtools')"
+        $CONDA/bin/Rscript -e "Sys.unsetenv('GITHUB_PAT'); devtools::install_github('ucbds-infra/ottr')" || \
+          $CONDA/bin/Rscript -e "Sys.unsetenv('GITHUB_PAT'); devtools::install_github('ucbds-infra/ottr')"
 
     - name: Install nbconvert dependencies
       run: |
