@@ -38,13 +38,10 @@ class GradingResults:
         results (``list`` of ``TestFile``): the list of test file objects summarized in this grade
     
     Attributes:
-        test_files (``list`` of ``TestFile``): the test files passed to the constructor
         results (``dict``): maps test names to ``GradingTestCaseResult`` named tuples containing the 
             test result information
         output (``str``): a string to include in the output field for Gradescope
         all_hidden (``bool``): whether all results should be hidden from the student on Gradescope
-        total (numeric): the total points earned by the submission
-        possible (numeric): the total points possible based on the tests
         tests (``list`` of ``str``): list of test names according to the keys of ``results``
     """
     def __init__(self, test_files):
@@ -103,21 +100,21 @@ class GradingResults:
     @property
     def test_files(self):
         """
-        The names of all test files tracked in these grading results
+        ``list[TestFile]``: the names of all test files tracked in these grading results
         """
         return list(self.results.keys())
 
     @property
     def total(self):
         """
-        The total points earned
+        ``int`` or ``float``: the total points earned
         """
         return sum(tr.score for tr in self.results.values())
 
     @property
     def possible(self):
         """
-        The total points possible
+        ``int`` or ``float``: the total points possible
         """
         return sum(tr.possible for tr in self.results.values())
     

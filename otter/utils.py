@@ -183,3 +183,58 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
         return out
 
     print(out, **kwargs)
+
+def convert_config_description_dict(configs):
+    """
+    Recursively converts a documented list of dictionary configurations into a dictionary with the 
+    default values loaded.
+
+    Expects a list of the form:
+
+    .. code-block:: python
+
+        [
+            {
+                "key": "config_name",
+                "description": "a description of the config for documentation",
+                "default": True,  # the default config value
+            },
+            {
+                "key": "nested_config_name",
+                "description": "a description of the config for documentation",
+                "default": [  # note that a list is used for nested dict configs
+                    {
+                        "key": "subconfig",
+                        "description": "a nested key",
+                        "default": None,
+                    }
+                ],
+            },
+        ]
+
+    The list above gets converted to a dictionary mapping each ``key`` to each ``default``:
+
+    .. code-block:: python
+
+        {
+            "config_name": True,
+            "nested_config_name": {
+                "subconfig": None,
+            },
+        }
+
+    Args:
+        configs (``list[dict[str,object]]``): the configurations with the structure defined above
+
+    Returns:
+        ``dict[str,object]``: a dictionary mapping keys to default values
+    """
+    res = {}
+    for d in configs:
+        if isinstance(d["default"], list) and len(d["default"]) > 0 and \
+                all(isinstance(e, dict) for e in d["default"]):
+            default = convert_config_description_dict(d["default"])
+        else:
+            default = d["default"]
+        res[d["key"]] = default
+    return res
