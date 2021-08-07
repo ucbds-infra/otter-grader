@@ -14,4 +14,4 @@ dill
 rpy2
 jupytext
 numpy
-git+https://github.com/ucbds-infra/otter-grader.git@b0824d65208cfb58673c9c08044850bf3f452955
+otter-grader==2.2.5
