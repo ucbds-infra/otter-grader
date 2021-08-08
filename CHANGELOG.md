@@ -8,6 +8,11 @@ _Changes listed in this section are currently hosted in the `beta` branch on Git
 * Converted CLI to `click` from `argparse`
 * Converted documentation source from Markdown to RST, removing use of `recommonmark`
 
+**v2.2.5:**
+
+* Upgraded to Miniconda 4.10.3 in grading images
+* Fixed [#272](https://github.com/ucbds-infra/otter-grader/issues/272)
+
 **v2.2.4:**
 
 * Fixed total score printout for the use of the `points_possible` configuration
