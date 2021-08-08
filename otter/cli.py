@@ -18,6 +18,7 @@ def cli():
 
 
 from .assign import assign_cli
+from .check import check_cli
 
 # def get_parser():
 #     """
@@ -35,16 +36,6 @@ from .assign import assign_cli
 #     parser.add_argument("--version", default=False, action="store_true", help="Show version information and exit")
 #     subparsers = parser.add_subparsers()
 
-
-
-#     ##### PARSER FOR otter check #####
-#     check_parser = subparsers.add_parser("check", description="Checks Python file against tests")
-#     check_parser.add_argument("file", help="Python file to grade")
-#     check_parser.add_argument("-q", "--question", help="Grade a specific test")
-#     check_parser.add_argument("-t", "--tests-path", default="tests", help="Path to test files")
-#     check_parser.add_argument("--seed", type=int, default=None, help="A random seed to be executed before each cell")
-
-#     check_parser.set_defaults(func_str="check.main")
 
 
 #     ##### PARSER FOR otter export #####
