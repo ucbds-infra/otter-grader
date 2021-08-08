@@ -3,3 +3,4 @@ responses
 scikit-learn
 nbformat<5.1.0
 tqdm
+codecov
