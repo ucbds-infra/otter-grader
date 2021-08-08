@@ -1,6 +1,5 @@
 """IPython notebook PDF Exporter forked from nb2pdf and gsExport"""
 
-import click
 import nbformat
 import nbconvert
 import os
@@ -8,8 +7,6 @@ import pkg_resources
 import warnings
 
 from .exporters import get_exporter
-
-from ..cli import cli
 
 
 def export_notebook(nb_path, dest=None, debug=False, exporter_type=None, **kwargs):
@@ -61,20 +58,3 @@ def main(src, dest, exporter, filtering, pagebreaks, save, debug):
         save_html = save,
         debug = debug
     )
-
-
-@cli.command("export")
-@click.argument("src", type=click.Path(exists=True, dir_okay=False))
-@click.argument("dest", required=False, type=click.Path())
-@click.option("--filtering", is_flag=True, help="Whether the PDF should be filtered")
-@click.option("--pagebreaks", is_flag=True, help="Whether the PDF should have pagebreaks between questions")
-@click.option("-s", "--save", is_flag=True, help="Save intermediate file(s) as well")
-@click.option("-e", "--exporter", default=None, type=click.Choice(["latex", "html"]), help="Type of PDF exporter to use")
-@click.option("--debug", is_flag=True, help="Export in debug mode")
-def export_cli(*args, **kwargs):
-    """
-    Export a Jupyter Notebook SRC as a PDF at DEST with optional filtering.
-
-    If unspecified, DEST is assumed to be the basename of SRC with a .pdf extension.
-    """
-    return main(*args, **kwargs)

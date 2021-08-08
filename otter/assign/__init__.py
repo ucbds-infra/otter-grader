@@ -2,7 +2,6 @@
 Otter Assign command-line utility
 """
 
-import click
 import json
 import os
 import pathlib
@@ -11,14 +10,14 @@ import warnings
 from .assignment import Assignment
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
-from ..cli import cli
 from ..export import export_notebook
 from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
 
-def main(master, result, no_pdfs, no_run_tests, username, password, debug):
+def main(master, result, no_pdfs=False, no_run_tests=False, username=None, password=None, 
+         debug=False):
     """
     Runs Otter Assign on a master notebook
     
@@ -161,19 +160,3 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug):
         # TODO: change this condition
         if True:
             os.chdir(orig_dir)
-
-
-@cli.command("assign")
-@click.argument("master", type=click.Path(exists=True, dir_okay=False))
-@click.argument("result", type=click.Path())
-@click.option("--no-run-tests", is_flag=True, help="Do not run the tests against the autograder notebook")
-@click.option("--no-pdfs", is_flag=True, help="Do not generate PDFs; overrides assignment config")
-@click.option("--username", help="Gradescope username for generating a token")
-@click.option("--password", help="Gradescope password for generating a token")
-@click.option("--debug", is_flag=True, help="Do not ignore errors in running tests for debugging")
-def assign_cli(*args, **kwargs):
-    """
-    Create distribution versions of the Otter Assign formatted notebook MASTER and write the
-    results to the directory RESULT, which will be created if it does not already exist.
-    """
-    return main(*args, **kwargs)

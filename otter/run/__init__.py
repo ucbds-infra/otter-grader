@@ -1,6 +1,5 @@
 """Non-containerized single notebook grading for Otter-Grader"""
 
-import click
 import json
 import os
 import pickle
@@ -9,8 +8,6 @@ import tempfile
 import zipfile
 
 from .run_autograder import main as run_autograder
-
-from ..cli import cli
 
 
 def main(submission, autograder, output_dir, no_logo, debug):
@@ -69,16 +66,3 @@ def main(submission, autograder, output_dir, no_logo, debug):
         shutil.rmtree(dp)
 
     return results
-
-
-@cli.command("run")
-@click.argument("submission", help="Path to submission to be graded")
-@click.option("-a", "--autograder", default="./autograder.zip", type=click.Path(exists=True, dir_okay=False), help="Path to autograder zip file")
-@click.option("-o", "--output-dir", default="./", type=click.Path(exists=True, file_okay=False), help="Directory to which to write output")
-@click.option("--no-logo", is_flag=True, help="Suppress Otter logo in stdout")
-@click.option("--debug", is_flag=True, help="Do not ignore errors when running submission")
-def run_cli(*args, **kwargs):
-    """
-    Run non-containerized Otter on a single submission.
-    """
-    return main(*args, **kwargs)

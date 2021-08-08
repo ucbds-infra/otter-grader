@@ -1,6 +1,5 @@
 """Otter Check command-line utility"""
 
-import click
 import os
 
 from glob import glob
@@ -9,7 +8,6 @@ from jinja2 import Template
 from .logs import LogEntry, EventType
 from .notebook import _OTTER_LOG_FILENAME
 
-from ..cli import cli
 from ..execute import grade_notebook, check
 from ..utils import block_print
 
@@ -35,7 +33,7 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 	).flush_to_file(_OTTER_LOG_FILENAME)
 
 
-def main(file, tests_path, question, seed):
+def main(file, tests_path="./tests", question=None, seed=None):
 	"""
 	Runs Otter Check
 
@@ -46,7 +44,6 @@ def main(file, tests_path, question, seed):
 		seed (``int``): a seed to set before execution
 		**kwargs: ignored kwargs (a remnant of how the argument parser is built)
 	"""
-
 	try:
 		if question:
 			test_path = os.path.join(tests_path, question + ".py")
@@ -81,15 +78,3 @@ def main(file, tests_path, question, seed):
 			
 	else:
 		_log_event(EventType.CHECK, results=results)
-
-
-@cli.command("check")
-@click.argument("file", type=click.Path(exists=True, dir_okay=False))
-@click.option("-q", "--question", help="A specific quetsion to grade")
-@click.option("-t", "--tests-path", type=click.Path(exists=True, file_okay=False), help="Path to the direcotry of test files")
-@click.option("--seed", type=click.INT, help="A random seed to be executed before each cell")
-def check_cli(*args, **kwargs):
-	"""
-	Check the Python script or Jupyter Notebook FILE against tests.
-	"""
-	return main(*args, **kwargs)

@@ -20,9 +20,123 @@ def cli(version):
         return
 
 
-from .assign import assign_cli
-from .check import check_cli
-from .export import export_cli
-from .generate import generate_cli
-from .grade import grade_cli
-from .run import run_cli
+@cli.command("assign")
+@click.argument("master", type=click.Path(exists=True, dir_okay=False))
+@click.argument("result", type=click.Path())
+@click.option("--no-run-tests", is_flag=True, help="Do not run the tests against the autograder notebook")
+@click.option("--no-pdfs", is_flag=True, help="Do not generate PDFs; overrides assignment config")
+@click.option("--username", help="Gradescope username for generating a token")
+@click.option("--password", help="Gradescope password for generating a token")
+@click.option("--debug", is_flag=True, help="Do not ignore errors in running tests for debugging")
+def assign_cli(*args, **kwargs):
+    """
+    Create distribution versions of the Otter Assign formatted notebook MASTER and write the
+    results to the directory RESULT, which will be created if it does not already exist.
+    """
+    return assign(*args, **kwargs)
+
+
+@cli.command("check")
+@click.argument("file", type=click.Path(exists=True, dir_okay=False))
+@click.option("-q", "--question", help="A specific quetsion to grade")
+@click.option("-t", "--tests-path", default="./tests", type=click.Path(exists=True, file_okay=False), help="Path to the direcotry of test files")
+@click.option("--seed", type=click.INT, help="A random seed to be executed before each cell")
+def check_cli(*args, **kwargs):
+	"""
+	Check the Python script or Jupyter Notebook FILE against tests.
+	"""
+	return check(*args, **kwargs)
+
+
+@cli.command("export")
+@click.argument("src", type=click.Path(exists=True, dir_okay=False))
+@click.argument("dest", required=False, type=click.Path())
+@click.option("--filtering", is_flag=True, help="Whether the PDF should be filtered")
+@click.option("--pagebreaks", is_flag=True, help="Whether the PDF should have pagebreaks between questions")
+@click.option("-s", "--save", is_flag=True, help="Save intermediate file(s) as well")
+@click.option("-e", "--exporter", default=None, type=click.Choice(["latex", "html"]), help="Type of PDF exporter to use")
+@click.option("--debug", is_flag=True, help="Export in debug mode")
+def export_cli(*args, **kwargs):
+    """
+    Export a Jupyter Notebook SRC as a PDF at DEST with optional filtering.
+
+    If unspecified, DEST is assumed to be the basename of SRC with a .pdf extension.
+    """
+    return export(*args, **kwargs)
+
+
+@cli.command("generate")
+@click.option("-t", "--tests-path", default="./tests/", type=click.Path(exists=True, file_okay=False), help="Path to test files")
+@click.option("-o", "--output-path", default="./", type=click.Path(exists=True, file_okay=False), help="Path to which to write zipfile")
+@click.option("-c", "--config", type=click.Path(exists=True, file_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
+@click.option("-r", "--requirements", type=click.Path(exists=True, file_okay=False), help="Path to requirements.txt file; ./requirements.txt automatically checked")
+@click.option("--overwrite-requirements", is_flag=True, help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
+@click.option("-e", "--environment", type=click.Path(exists=True, file_okay=False), help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
+@click.option("--no-env", is_flag=True, help="Whether to ignore an automatically found but unspecified environment.yml file")
+@click.option("-l", "--lang", default="python", type=click.Choice(["python", "r"], case_sensitive=False), help="Assignment programming language; defaults to Python")
+@click.option("--autograder-dir", default="/autograder", type=click.Path(), help="Root autograding directory inside grading container")
+@click.option("--username", help="Gradescope username for generating a token")
+@click.option("--password", help="Gradescope password for generating a token")
+@click.argument("files", nargs=-1)
+def generate_cli(*args, **kwargs):
+    """
+    Generate a zip file to configure an Otter autograder, including FILES as support files.
+    """
+    return generate(*args, **kwargs)
+
+
+@cli.command("grade")
+
+# necessary path arguments
+@click.option("-p", "--path", default="./", type=click.Path(exists=True, file_okay=False), help="Path to directory of submissions")
+@click.option("-a", "--autograder", default="./autograder.zip", type=click.Path(exists=True, dir_okay=False), help="Path to autograder zip file")
+@click.option("-o", "--output-dir", default="./", type=click.Path(exists=True, file_okay=False), help="Directory to which to write output")
+
+# metadata parser arguments
+@click.option("-g", "--gradescope", is_flag=True, help="Flag for Gradescope export")
+@click.option("-c", "--canvas", is_flag=True, help="Flag for Canvas export")
+@click.option("-j", "--json", default=False, type=click.Path(exists=True, dir_okay=False), help="Flag for path to JSON metadata")
+@click.option("-y", "--yaml", default=False, type=click.Path(exists=True, dir_okay=False), help="Flag for path to YAML metadata")
+
+# submission format arguments
+@click.option("-s", "--scripts", is_flag=True, help="Flag to incidicate grading Python scripts")
+@click.option("-z", "--zips", is_flag=True, help="Whether submissions are zip files from Notebook.export")
+
+# PDF export options
+@click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
+
+# other settings and optional arguments
+@click.option("-v", "--verbose", is_flag=True, help="Flag for verbose output")
+@click.option("--containers", type=click.INT, help="Specify number of containers to run in parallel")
+@click.option("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
+@click.option("--no-kill", is_flag=True, help="Do not kill containers after grading")
+@click.option("--debug", is_flag=True, help="Print stdout/stderr from grading for debugging")
+
+@click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
+@click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
+def grade_cli(*args, **kwargs):
+    """
+    Grade assignments locally using Docker containers.
+    """
+    return grade(*args, **kwargs)
+
+
+@cli.command("run")
+@click.argument("submission")
+@click.option("-a", "--autograder", default="./autograder.zip", type=click.Path(exists=True, dir_okay=False), help="Path to autograder zip file")
+@click.option("-o", "--output-dir", default="./", type=click.Path(exists=True, file_okay=False), help="Directory to which to write output")
+@click.option("--no-logo", is_flag=True, help="Suppress Otter logo in stdout")
+@click.option("--debug", is_flag=True, help="Do not ignore errors when running submission")
+def run_cli(*args, **kwargs):
+    """
+    Run non-containerized Otter on a single submission.
+    """
+    return run(*args, **kwargs)
+
+
+from .assign import main as assign
+from .check import main as check
+from .export import main as export
+from .generate import main as generate
+from .grade import main as grade
+from .run import main as run

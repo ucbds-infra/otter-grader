@@ -1,6 +1,5 @@
 """Autograder configuration generator for Otter-Grader"""
 
-import click
 import json
 import os
 import pathlib
@@ -17,7 +16,6 @@ from subprocess import PIPE
 from .token import APIClient
 from .utils import zip_folder
 
-from ..cli import cli
 from ..plugins import PluginCollection
 from ..run.run_autograder.constants import DEFAULT_OPTIONS
 from ..utils import load_default_file
@@ -173,23 +171,3 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
     
     if assignment is not None:
         assignment._otter_config = otter_config
-
-
-@cli.command("generate")
-@click.option("-t", "--tests-path", default="./tests/", type=click.Path(exists=True, file_okay=False), help="Path to test files")
-@click.option("-o", "--output-path", default="./", type=click.Path(exists=True, file_okay=False), help="Path to which to write zipfile")
-@click.option("-c", "--config", type=click.Path(exists=True, file_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
-@click.option("-r", "--requirements", type=click.Path(exists=True, file_okay=False), help="Path to requirements.txt file; ./requirements.txt automatically checked")
-@click.option("--overwrite-requirements", is_flag=True, help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
-@click.option("-e", "--environment", type=click.Path(exists=True, file_okay=False), help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
-@click.option("--no-env", is_flag=True, help="Whether to ignore an automatically found but unspecified environment.yml file")
-@click.option("-l", "--lang", default="python", type=click.Choice(["python", "r"], case_sensitive=False), help="Assignment programming language; defaults to Python")
-@click.option("--autograder-dir", default="/autograder", type=click.Path(), help="Root autograding directory inside grading container")
-@click.option("--username", help="Gradescope username for generating a token")
-@click.option("--password", help="Gradescope password for generating a token")
-@click.argument("files", nargs=-1, help="Other support files needed for grading (e.g. .py files, data files)")
-def generate_cli(*args, **kwargs):
-    """
-    Generate a zip file to configure an Otter autograder, including FILES as support files.
-    """
-    return main(*args, **kwargs)
