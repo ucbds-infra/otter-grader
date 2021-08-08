@@ -13,7 +13,7 @@ from .run import main as run
 from .version import print_version_info
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.option("--version", is_flag=True, help="Show the version and exit")
 def cli(version):
     """
