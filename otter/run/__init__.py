@@ -13,7 +13,7 @@ from .run_autograder import main as run_autograder
 from ..cli import cli
 
 
-def main(submission, autograder, output_dir, no_logo, debug, **kwargs):
+def main(submission, autograder, output_dir, no_logo, debug):
     """
     Grades a single submission using the autograder configuration ``autograder`` without containrization
 
