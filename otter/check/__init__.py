@@ -35,7 +35,7 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 	).flush_to_file(_OTTER_LOG_FILENAME)
 
 
-def main(file, tests_path, question, seed, **kwargs):
+def main(file, tests_path, question, seed):
 	"""
 	Runs Otter Check
 

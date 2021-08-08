@@ -2,16 +2,20 @@
 Otter Grade command-line utility. Provides local grading of submissions in parallel Docker containers.
 """
 
-import re
+import click
 import os
 import pandas as pd
+import re
 
-from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .containers import launch_grade
+from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .utils import merge_csv, prune_images
 
+from ..cli import cli
+
+
 def main(path, output_dir, autograder, gradescope, canvas, json, yaml, containers, scripts, no_kill, 
-        debug, zips, image, pdfs, prune, force, verbose, **kwargs):
+        debug, zips, image, pdfs, prune, force, verbose):
     """
     Runs Otter Grade
 
@@ -125,3 +129,36 @@ def main(path, output_dir, autograder, gradescope, canvas, json, yaml, container
 
     # write to CSV file
     output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
+
+
+@cli.command("grade")
+
+# necessary path arguments
+@click.option("-p", "--path", default="./", type=click.Path(exists=True, file_okay=False), help="Path to directory of submissions")
+@click.option("-a", "--autograder", default="./autograder.zip", type=click.Path(exists=True, dir_okay=False), help="Path to autograder zip file")
+@click.option("-o", "--output-dir", default="./", type=click.Path(exists=True, file_okay=False), help="Directory to which to write output")
+
+# metadata parser arguments
+@click.option("-g", "--gradescope", is_flag=True, help="Flag for Gradescope export")
+@click.option("-c", "--canvas", is_flag=True, help="Flag for Canvas export")
+@click.option("-j", "--json", default=False, type=click.Path(exists=True, dir_okay=False), help="Flag for path to JSON metadata")
+@click.option("-y", "--yaml", default=False, type=click.Path(exists=True, dir_okay=False), help="Flag for path to YAML metadata")
+
+# submission format arguments
+@click.option("-s", "--scripts", is_flag=True, help="Flag to incidicate grading Python scripts")
+@click.option("-z", "--zips", is_flag=True, help="Whether submissions are zip files from Notebook.export")
+
+# PDF export options
+@click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
+
+# other settings and optional arguments
+@click.option("-v", "--verbose", is_flag=True, help="Flag for verbose output")
+@click.option("--containers", type=click.INT, help="Specify number of containers to run in parallel")
+@click.option("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
+@click.option("--no-kill", is_flag=True, help="Do not kill containers after grading")
+@click.option("--debug", is_flag=True, help="Print stdout/stderr from grading for debugging")
+
+@click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
+@click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
+def grade_cli(*args, **kwargs):
+    return main(*args, **kwargs)

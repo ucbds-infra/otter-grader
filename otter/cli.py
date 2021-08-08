@@ -20,6 +20,8 @@ def cli():
 from .assign import assign_cli
 from .check import check_cli
 from .export import export_cli
+from .generate import generate_cli
+from .grade import grade_cli
 
 # def get_parser():
 #     """
@@ -37,46 +39,6 @@ from .export import export_cli
 #     parser.add_argument("--version", default=False, action="store_true", help="Show version information and exit")
 #     subparsers = parser.add_subparsers()
 
-
-
-
-
-
-
-
-
-#     ##### PARSER FOR otter grade #####
-#     grade_parser = subparsers.add_parser("grade", description="Grade assignments locally using Docker containers")
-
-#     # necessary path arguments
-#     grade_parser.add_argument("-p", "--path", type=str, default="./", help="Path to directory of submissions")
-#     grade_parser.add_argument("-a", "--autograder", type=str, default="./autograder.zip", help="Path to autograder zip file")
-#     grade_parser.add_argument("-o", "--output-dir", type=str, default="./", help="Directory to which to write output")
-
-#     # metadata parser arguments
-#     grade_parser.add_argument("-g", "--gradescope", action="store_true", default=False, help="Flag for Gradescope export")
-#     grade_parser.add_argument("-c", "--canvas", action="store_true", default=False, help="Flag for Canvas export")
-#     grade_parser.add_argument("-j", "--json", default=False, help="Flag for path to JSON metadata")
-#     grade_parser.add_argument("-y", "--yaml", default=False, help="Flag for path to YAML metadata")
-
-#     # submission format arguments
-#     grade_parser.add_argument("-s", "--scripts", action="store_true", default=False, help="Flag to incidicate grading Python scripts")
-#     grade_parser.add_argument("-z", "--zips", action="store_true", default=False, help="Whether submissions are zip files from Notebook.export")
-
-#     # PDF export options
-#     grade_parser.add_argument("--pdfs", default=False, action="store_true", help="Whether to copy notebook PDFs out of containers")
-
-#     # other settings and optional arguments
-#     grade_parser.add_argument("-v", "--verbose", action="store_true", help="Flag for verbose output")
-#     grade_parser.add_argument("--containers", type=int, help="Specify number of containers to run in parallel")
-#     grade_parser.add_argument("--image", default="ucbdsinfra/otter-grader", help="Custom docker image to run on")
-#     grade_parser.add_argument("--no-kill", action="store_true", default=False, help="Do not kill containers after grading")
-#     grade_parser.add_argument("--debug", action="store_true", default=False, help="Print stdout/stderr from grading for debugging")
-
-#     grade_parser.add_argument("--prune", action="store_true", default=False, help="Prune all of Otter's grading images")
-#     grade_parser.add_argument("-f", "--force", action="store_true", default=False, help="Force action (don't ask for confirmation)")
-
-#     grade_parser.set_defaults(func_str="grade.main")
 
 
 #     ###### PARSER FOR otter run #####

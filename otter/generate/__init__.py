@@ -30,7 +30,7 @@ OTTR_BRANCH = "1.0.0.b0"  # this should match a release tag on GitHub
 
 
 def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
-         no_env, username, password, files, assignment=None, plugin_collection=None, **kwargs):
+         no_env, username, password, files, assignment=None, plugin_collection=None):
     """
     Runs Otter Generate
 
@@ -178,15 +178,15 @@ def main(tests_path, output_path, config, lang, requirements, overwrite_requirem
 @cli.command("generate")
 @click.option("-t", "--tests-path", default="./tests/", type=click.Path(exists=True, file_okay=False), help="Path to test files")
 @click.option("-o", "--output-path", default="./", type=click.Path(exists=True, file_okay=False), help="Path to which to write zipfile")
-@click.option("-c", "--config", default=None, type=click.Path(exists=True, file_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
-@click.option("-r", "--requirements", default=None, type=click.Path(exists=True, file_okay=False), help="Path to requirements.txt file; ./requirements.txt automatically checked")
+@click.option("-c", "--config", type=click.Path(exists=True, file_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
+@click.option("-r", "--requirements", type=click.Path(exists=True, file_okay=False), help="Path to requirements.txt file; ./requirements.txt automatically checked")
 @click.option("--overwrite-requirements", is_flag=True, help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
-@click.option("-e", "--environment", default=None, type=click.Path(exists=True, file_okay=False), help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
+@click.option("-e", "--environment", type=click.Path(exists=True, file_okay=False), help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
 @click.option("--no-env", is_flag=True, help="Whether to ignore an automatically found but unspecified environment.yml file")
 @click.option("-l", "--lang", default="python", type=click.Choice(["python", "r"], case_sensitive=False), help="Assignment programming language; defaults to Python")
 @click.option("--autograder-dir", default="/autograder", type=click.Path(), help="Root autograding directory inside grading container")
-@click.option("--username", default=None, help="Gradescope username for generating a token")
-@click.option("--password", default=None, help="Gradescope password for generating a token")
+@click.option("--username", help="Gradescope username for generating a token")
+@click.option("--password", help="Gradescope password for generating a token")
 @click.argument("files", nargs=-1, help="Other support files needed for grading (e.g. .py files, data files)")
 def generate_cli(*args, **kwargs):
     """
