@@ -181,7 +181,7 @@ def run_autograder(options):
 
     scores = grade_notebook(
         nb_path, 
-        glob("./tests/*.py"), 
+        tests_glob=glob("./tests/*.py"), 
         name="submission", 
         cwd=".", 
         test_dir="./tests",
