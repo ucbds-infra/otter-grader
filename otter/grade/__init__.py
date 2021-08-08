@@ -161,4 +161,7 @@ def main(path, output_dir, autograder, gradescope, canvas, json, yaml, container
 @click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
 @click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
 def grade_cli(*args, **kwargs):
+    """
+    Grade assignments locally using Docker containers.
+    """
     return main(*args, **kwargs)

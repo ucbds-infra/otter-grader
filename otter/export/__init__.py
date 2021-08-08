@@ -73,6 +73,8 @@ def main(src, dest, exporter, filtering, pagebreaks, save, debug):
 @click.option("--debug", is_flag=True, help="Export in debug mode")
 def export_cli(*args, **kwargs):
     """
-    Exports a Jupyter Notebook to PDF with optional filtering
+    Export a Jupyter Notebook SRC as a PDF at DEST with optional filtering.
+
+    If unspecified, DEST is assumed to be the basename of SRC with a .pdf extension.
     """
     return main(*args, **kwargs)

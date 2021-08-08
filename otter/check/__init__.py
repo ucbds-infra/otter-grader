@@ -90,6 +90,6 @@ def main(file, tests_path, question, seed):
 @click.option("--seed", type=click.INT, help="A random seed to be executed before each cell")
 def check_cli(*args, **kwargs):
 	"""
-	Check the Python script FILE against tests.
+	Check the Python script or Jupyter Notebook FILE against tests.
 	"""
 	return main(*args, **kwargs)
