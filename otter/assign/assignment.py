@@ -6,6 +6,124 @@ import yaml
 
 from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
+from ..utils import convert_config_description_dict
+
+_DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
+    {
+        "key": "requirements",
+        "description": "the path to a requirements.txt file",
+        "default": None,
+    },
+    {
+        "key": "overwrite_requirements",
+        "description": "whether to overwrite Otter's default requirement.txt in Otter Generate",
+        "default": False,
+    },
+    {
+        "key": "environment",
+        "description": "the path to a conda environment.yml file",
+        "default": None,
+    },
+    {
+        "key": "run_tests",
+        "description": "whether to run the assignment tests against the autograder notebook",
+        "default": True,
+    },
+    {
+        "key": "solutions_pdf",
+        "description": "whether to generate a PDF of the solutions notebook",
+        "default": False,
+    },
+    {
+        "key": "template_pdf",
+        "description": "whether to generate a filtered Gradescope assignment template PDF",
+        "default": False,
+    },
+    {
+        "key": "init_cell",
+        "description": "whether to include an Otter initialization cell in the output notebooks",
+        "default": True,
+    },
+    {
+        "key": "check_all_cell",
+        "description": "whether to include an Otter check-all cell in the output notebooks",
+        "default": True,
+    },
+    {
+        "key": "export_cell",
+        "description": "whether to include an Otter export cell in the output notebooks",
+        "default": [
+            {
+                "key": "instructions",
+                "description": "additional submission instructions to include in the export cell",
+                "default": "",
+            },
+            {
+                "key": "pdf",
+                "description": "whether to include a PDF of the notebook in the generated zip file",
+                "default": True,
+            },
+            {
+                "key": "filtering",
+                "description": "whether the generated PDF should be filtered",
+                "default": True,
+            },
+            {
+                "key": "force_save",
+                "description": "whether to force-save the notebook with JavaScript (only works in " \
+                    "classic notebook)",
+                "default": False,
+            },
+        ],
+    },
+    {
+        "key": "seed",
+        "description": "a seed for intercell seeding",
+        "default": None,
+    },
+    {
+        "key": "generate",
+        "description": "grading configurations to be passed to Otter Generate as an "\
+            "otter_config.json; if false, Otter Generate is disabled",
+        "default": False,
+    },
+    {
+        "key": "save_environment",
+        "description": "whether to save the student's environment in the log",
+        "default": False,
+    },
+    {
+        "key": "variables",
+        "description": "a mapping of variable names to type strings for serlizing environments",
+        "default": {},
+    },
+    {
+        "key": "ignore_modules",
+        "description": "a list of modules to ignore variables from during environment serialization",
+        "default": [],
+    },
+    {
+        "key": "files",
+        "description": "a list of other files to include in the output directories and autograder",
+        "default": [],
+    },
+    {
+        "key": "autograder_files",
+        "description": "a list of other files only to include in the autograder",
+        "default": [],
+    },
+    {
+        "key": "plugins",
+        "description": "a list of plugin names and configurations",
+        "default": [],
+    },
+    {
+        "key": "test_files",
+        "description": "whether to store tests in separate .py files rather than in the notebook " \
+            "metadata",
+        "default": True,
+    },
+]
 
 class Assignment:
     """
@@ -38,29 +156,11 @@ class Assignment:
     defaults = {
         "master": None,
         "result": None,
-        "generate": {},
-        "solutions_pdf": False,
-        "template_pdf": False,
         "seed_required": False,
-        "save_environment": False,
-        "requirements": None,
-        "overwrite_requirements": False,
-        "environment": None,
-        "files": [],
-        "autograder_files": [],
-        "variables": {},
-        "run_tests": True,
-        "ignore_modules": [],
-        "init_cell": True,
-        "check_all_cell": True,
-        "export_cell": True,
-        "seed": None,
-        "lang": None,
-        "plugins": [],
-        "plugin_config": {},
         "_otter_config": None,
-        "test_files": True,
+        "lang": None,
         "_temp_test_dir": None, # path to a temp dir for tests for otter generate
+        **convert_config_description_dict(_DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS),
     }
 
     def __init__(self):
