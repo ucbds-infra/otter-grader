@@ -65,7 +65,7 @@ class TestGrade(TestCase):
         generate(
             tests_path = TEST_FILES_PATH + "tests", 
             requirements = TEST_FILES_PATH + "requirements.txt", 
-            output_path = TEST_FILES_PATH,
+            output_dir = TEST_FILES_PATH,
             config = TEST_FILES_PATH + "otter_config.json" if pdfs else None,
         )
 

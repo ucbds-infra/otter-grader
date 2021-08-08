@@ -27,7 +27,7 @@ OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "1.0.0.b0"  # this should match a release tag on GitHub
 
 
-def main(*, tests_path="./tests", output_path="./", config=None, lang="python", requirements=None, 
+def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", requirements=None, 
          overwrite_requirements=False, environment=None, no_env=False, username=None, password=None, 
          files=[], assignment=None, plugin_collection=None):
     """
@@ -35,7 +35,7 @@ def main(*, tests_path="./tests", output_path="./", config=None, lang="python", 
 
     Args:
         tests_path (``str``): path to directory of test files for this assignment
-        output_path (``str``): directory in which to write output zip file
+        output_dir (``str``): directory in which to write output zip file
         config (``str``): path to an Otter configuration JSON file
         lang (``str``): the language of the assignment; one of ``["python", "r"]``
         requirements (``str``): path to a Python or R requirements file for this assignment
@@ -139,10 +139,10 @@ def main(*, tests_path="./tests", output_path="./", config=None, lang="python", 
         for fn, tmpl in templates.items():
             rendered[fn] = tmpl.render(**template_context)
 
-        if os.path.isabs(output_path):
-            zip_path = os.path.join(output_path, "autograder.zip")
+        if os.path.isabs(output_dir):
+            zip_path = os.path.join(output_dir, "autograder.zip")
         else:
-            zip_path = os.path.join(os.getcwd(), output_path, "autograder.zip")
+            zip_path = os.path.join(os.getcwd(), output_dir, "autograder.zip")
         
         if os.path.exists(zip_path):
             os.remove(zip_path)
