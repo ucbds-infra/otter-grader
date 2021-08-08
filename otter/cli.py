@@ -42,22 +42,7 @@ from .export import export_cli
 
 
 
-#     ##### PARSER FOR otter generate #####
-#     generate_parser = subparsers.add_parser("generate", description="Generates zipfile to configure Gradescope autograder")
-#     generate_parser.add_argument("-t", "--tests-path", nargs='?', type=str, default="./tests/", help="Path to test files")
-#     generate_parser.add_argument("-o", "--output-path", nargs='?', type=str, default="./", help="Path to which to write zipfile")
-#     generate_parser.add_argument("-c", "--config", nargs='?', default=None, help="Path to otter configuration file; ./otter_config.json automatically checked")
-#     generate_parser.add_argument("-r", "--requirements", nargs='?', default=None, help="Path to requirements.txt file; ./requirements.txt automatically checked")
-#     generate_parser.add_argument("--overwrite-requirements", default=False, action="store_true", help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
-#     generate_parser.add_argument("-e", "--environment", nargs='?', default=None, help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
-#     generate_parser.add_argument("--no-env", default=False, action="store_true", help="Whether to ignore an automatically found but unspecified environment.yml file")
-#     generate_parser.add_argument("-l", "--lang", default="python", choices=["python", "r"], type=str, help="Assignment programming language; defaults to Python")
-#     generate_parser.add_argument("--autograder-dir", nargs="?", default="/autograder", help="Root autograding directory inside grading container")
-#     generate_parser.add_argument("--username", default=None, help="Gradescope username for generating a token")
-#     generate_parser.add_argument("--password", default=None, help="Gradescope password for generating a token")
-#     generate_parser.add_argument("files", nargs='*', help="Other support files needed for grading (e.g. .py files, data files)")
 
-#     generate_parser.set_defaults(func_str="generate.main")
 
 
 #     ##### PARSER FOR otter grade #####

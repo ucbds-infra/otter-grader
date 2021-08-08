@@ -1,6 +1,4 @@
-"""
-Otter Check command-line utility
-"""
+"""Otter Check command-line utility"""
 
 import click
 import os

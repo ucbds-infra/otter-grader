@@ -16,7 +16,7 @@ from unittest import mock
 from shutil import copyfile
 
 # from otter.argparser import get_parser
-from otter.generate.autograder import main as autograder
+from otter.generate import main as autograder
 from otter.run.run_autograder import main as run_autograder
 
 from . import TestCase

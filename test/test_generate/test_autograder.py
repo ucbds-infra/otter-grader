@@ -13,7 +13,7 @@ from glob import glob
 from unittest import mock
 
 # from otter.argparser import get_parser
-from otter.generate.autograder import main as autograder
+from otter.generate import main as autograder
 from otter.runner import run_otter
 
 from .. import TestCase

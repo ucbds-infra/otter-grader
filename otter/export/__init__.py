@@ -69,7 +69,7 @@ def main(src, dest, exporter, filtering, pagebreaks, save, debug, **kwargs):
 @click.option("--filtering", is_flag=True, help="Whether the PDF should be filtered")
 @click.option("--pagebreaks", is_flag=True, help="Whether the PDF should have pagebreaks between questions")
 @click.option("-s", "--save", is_flag=True, help="Save intermediate file(s) as well")
-@click.option("-e", "--exporter", default=None, type=click.Choices(["latex", "html"]), help="Type of PDF exporter to use")
+@click.option("-e", "--exporter", default=None, type=click.Choice(["latex", "html"]), help="Type of PDF exporter to use")
 @click.option("--debug", is_flag=True, help="Export in debug mode")
 def export_cli(*args, **kwargs):
     """
