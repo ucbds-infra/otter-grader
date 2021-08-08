@@ -4,6 +4,12 @@ Argument parser for Otter command-line tools
 
 import click
 
+from .assign import main as assign
+from .check import main as check
+from .export import main as export
+from .generate import main as generate
+from .grade import main as grade
+from .run import main as run
 from .version import print_version_info
 
 
@@ -132,11 +138,3 @@ def run_cli(*args, **kwargs):
     Run non-containerized Otter on a single submission.
     """
     return run(*args, **kwargs)
-
-
-from .assign import main as assign
-from .check import main as check
-from .export import main as export
-from .generate import main as generate
-from .grade import main as grade
-from .run import main as run
