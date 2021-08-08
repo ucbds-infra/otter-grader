@@ -1,5 +1,13 @@
 # Changelog
 
+**Unreleased (beta):**
+
+_Changes listed in this section are currently hosted in the `beta` branch on GitHub but are not in a beta release yet._
+
+* Added support for Ottr v1.0.0.b0
+* Converted CLI to `click` from `argparse`
+* Converted documentation source from Markdown to RST, removing use of `recommonmark`
+
 **v2.2.5:**
 
 * Upgraded to Miniconda 4.10.3 in grading images

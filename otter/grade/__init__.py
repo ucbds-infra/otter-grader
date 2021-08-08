@@ -2,16 +2,19 @@
 Otter Grade command-line utility. Provides local grading of submissions in parallel Docker containers.
 """
 
-import re
 import os
 import pandas as pd
+import re
 
-from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .containers import launch_grade
+from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .utils import merge_csv, prune_images
 
-def main(path, output_dir, autograder, gradescope, canvas, json, yaml, containers, scripts, no_kill, 
-        debug, zips, image, pdfs, prune, force, verbose, **kwargs):
+
+def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescope=False, 
+         canvas=False, json=False, yaml=False, containers=None, scripts=False, no_kill=False, 
+         debug=False, zips=False, image="ucbdsinfra/otter-grader", pdfs=False, prune=False, 
+         force=False, verbose=False):
     """
     Runs Otter Grade
 

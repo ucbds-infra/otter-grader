@@ -14,10 +14,9 @@ from unittest import mock
 from subprocess import PIPE
 from glob import glob
 
-# from otter.argparser import get_parser
+from otter.generate import main as generate
 from otter.grade import main as grade
 from otter.grade.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
-from otter.runner import run_otter
 
 from . import TestCase
 
@@ -61,14 +60,14 @@ class TestGrade(TestCase):
             self.test_points[env['test']['name']] = env['test']['points']
         return super().setUp()
 
-    def generate_autograder_zip(self, pdfs=False):
-        cmd = [
-            "generate", "-t", TEST_FILES_PATH + "tests", "-r", 
-            TEST_FILES_PATH + "requirements.txt", "-o", TEST_FILES_PATH
-        ]
-        if pdfs:
-            cmd += ["-c", TEST_FILES_PATH + "otter_config.json"]
-        run_otter(cmd)
+    @staticmethod
+    def generate_autograder_zip(pdfs=False):
+        generate(
+            tests_path = TEST_FILES_PATH + "tests", 
+            requirements = TEST_FILES_PATH + "requirements.txt", 
+            output_dir = TEST_FILES_PATH,
+            config = TEST_FILES_PATH + "otter_config.json" if pdfs else None,
+        )
 
     def test_docker(self):
         """
@@ -189,21 +188,14 @@ class TestGrade(TestCase):
         self.generate_autograder_zip(pdfs=True)
 
         # grade the 100 notebooks
-        grade_command = ["grade",
-            "-y", TEST_FILES_PATH + "notebooks/meta.yml", 
-            "-p", TEST_FILES_PATH + "notebooks/", 
-            # "-t", TEST_FILES_PATH + "tests/", 
-            # "-r", TEST_FILES_PATH + "requirements.txt",
-            "-o", "test/",
-            # "--pdfs",
-            "-a", TEST_FILES_PATH + "autograder.zip",
-            "--containers", "5",
-            "--image", "otter-test",
-        ]
-        # args = parser.parse_args(grade_command)
-        # args.func = grade
-        # args.func(args)
-        run_otter(grade_command)
+        grade(
+            yaml = TEST_FILES_PATH + "notebooks/meta.yml", 
+            path = TEST_FILES_PATH + "notebooks/", 
+            output_dir = "test/",
+            autograder = TEST_FILES_PATH + "autograder.zip",
+            containers = 5,
+            image = "otter-test",
+        )
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv")
@@ -244,4 +236,4 @@ class TestGrade(TestCase):
             shutil.move("otter/grade/old-Dockerfile", "otter/grade/Dockerfile")
         
         # prune images
-        run_otter(["grade", "--prune", "-f"])
+        grade(prune=True, force=True)

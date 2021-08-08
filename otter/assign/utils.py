@@ -1,6 +1,4 @@
-"""
-Utilities for Otter Assign
-"""
+"""Utilities for Otter Assign"""
 
 import re
 import os
@@ -14,11 +12,11 @@ from contextlib import contextmanager
 
 from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
-from ..argparser import get_parser
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
 from ..generate.token import APIClient
 from ..utils import get_relpath, get_source
+
 
 class EmptyCellException(Exception):
     """
@@ -157,7 +155,7 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     os.chdir(nb_path.parent)
     # print(os.getcwd())
     results = grade_notebook(
-        nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
+        nb_path.name, tests_glob=glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
         plugin_collection=plugin_collection
     )
@@ -208,10 +206,14 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args is True:
         generate_args = {}
 
+        if assignment.is_r:
+            generate_args["lang"] = "r"
+
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
-    generate_cmd = ["generate"]
 
+    # TODO: make it so pdfs is not a key in the generate key, but matches the structure expected by
+    # run_autograder
     if generate_args.get('pdfs', {}):
         pdf_args = generate_args.pop('pdfs', {})
         # token = APIClient.get_token()
@@ -226,43 +228,31 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
             generate_args['pagebreaks'] = False
 
     # use temp tests dir
+    test_dir = "tests"
     if assignment.is_python and not assignment.test_files and assignment._temp_test_dir is None:
         raise RuntimeError("Failed to create temp tests directory for Otter Generate")
     elif assignment.is_python and not assignment.test_files:
-        generate_cmd += ["-t", str(assignment._temp_test_dir)]
-    
-    if assignment.is_r:
-        generate_cmd += ["-l", "r"]
-        generate_args['lang'] = 'r'
+        test_dir = str(assignment._temp_test_dir)
 
+    requirements = None
     if assignment.requirements:
         if assignment.is_r:
             requirements = 'requirements.R'
         else:
             requirements = 'requirements.txt'
-        generate_cmd += ["-r", str(requirements)]
-        if assignment.overwrite_requirements:
-            generate_cmd += ["--overwrite-requirements"]
 
-    if assignment.environment:
-        environment = 'environment.yml'
-        generate_cmd += ["-e", str(environment)]
-    
-    if gs_username is not None and gs_password is not None:
-        generate_cmd += ["--username", gs_username, "--password", gs_password]
-    
+    files = []
     if assignment.files:
-        generate_cmd += assignment.files
+        files += assignment.files
 
     if assignment.autograder_files:
-        ag_files = []
         res = (result / "autograder").resolve()
         for agf in assignment.autograder_files:
             fp = pathlib.Path(agf).resolve()
             rp = get_relpath(res, fp)
-            ag_files.append(str(rp))
-        generate_cmd += ag_files
+            files.append(str(rp))
 
+    # TODO: move this config out of the assignment metadata and into the generate key
     if assignment.variables:
         generate_args['serialized_variables'] = str(assignment.variables)
 
@@ -270,10 +260,22 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         with open("otter_config.json", "w+") as f:
             json.dump(generate_args, f, indent=2)
     
-    # TODO: change this to import and direct call
-    parser = get_parser()
-    args = parser.parse_args(generate_cmd)
-    generate_autograder(**vars(args), assignment=assignment, plugin_collection=plugin_collection)
+    # TODO: change generate_autograder so that only necessary kwargs are needed
+    generate_autograder(
+        tests_path=test_dir,
+        output_dir=".",
+        config="otter_config.json" if generate_args else None,
+        lang="python" if assignment.is_python else "r",
+        requirements=requirements,
+        overwrite_requirements=assignment.overwrite_requirements,
+        environment="environment.yml" if assignment.environment else None,
+        no_env=False,
+        username=gs_username,
+        password=gs_password,
+        files=files,
+        plugin_collection=plugin_collection,
+        assignment=assignment,
+    )
 
     # clean up temp tests dir
     if assignment._temp_test_dir is not None:

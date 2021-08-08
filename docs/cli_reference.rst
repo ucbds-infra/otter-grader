@@ -3,8 +3,6 @@
 CLI Reference
 =============
 
-.. argparse::
-    :module: otter.argparser
-    :func: get_parser
+.. click:: otter.cli:cli
     :prog: otter
-    :nodefaultconst:
+    :nested: full

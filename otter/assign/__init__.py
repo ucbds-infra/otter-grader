@@ -2,8 +2,8 @@
 Otter Assign command-line utility
 """
 
-import os
 import json
+import os
 import pathlib
 import warnings
 
@@ -15,7 +15,9 @@ from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
-def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwargs):
+
+def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
+         debug=False):
     """
     Runs Otter Assign on a master notebook
     
@@ -56,14 +58,6 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
     else:
         from .output import write_output_directories
 
-    # # update requirements
-    # requirements = requirements
-    # if requirements is None and os.path.isfile("requirements.txt"):
-    #     requirements = "requirements.txt"
-    # if requirements:
-    #     assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
-    # assignment.requirements = requirements
-    
     try:
         output_nb_path = write_output_directories(master, result, assignment)
 

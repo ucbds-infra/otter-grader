@@ -53,15 +53,12 @@ release = ''
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.githubpages',
-    # 'sphinx.ext.autodoc', 
     'sphinx.ext.coverage', 
     'sphinx.ext.napoleon',
     'sphinx_markdown_tables',
-    # 'sphinx.ext.autosummary',
-    # 'sphinxcontrib.apidoc',
-    'sphinxarg.ext',
     'IPython.sphinxext.ipython_console_highlighting',
-    'IPython.sphinxext.ipython_directive'
+    'IPython.sphinxext.ipython_directive',
+    'sphinx_click',
 ]
 
 napoleon_google_docstring = True

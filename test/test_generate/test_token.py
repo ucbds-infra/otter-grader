@@ -14,8 +14,7 @@ from glob import glob
 from unittest.mock import patch, mock_open
 from shutil import copyfile
 
-from otter.generate.autograder import main as autograder
-from otter.generate.autograder import main as autograder
+from otter.generate import main as autograder
 from otter.generate.token import APIClient
 from otter.run.run_autograder import main as run_autograder
 
