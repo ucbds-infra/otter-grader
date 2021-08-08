@@ -165,7 +165,7 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
 
 @cli.command("assign")
 @click.argument("master", type=click.Path(exists=True, dir_okay=False))
-@click.argument("result", type=click.Path(exists=False, file_okay=False))
+@click.argument("result", type=click.Path())
 @click.option("--no-run-tests", is_flag=True, help="Do not run the tests against the autograder notebook")
 @click.option("--no-pdfs", is_flag=True, help="Do not generate PDFs; overrides assignment config")
 @click.option("--username", help="Gradescope username for generating a token")

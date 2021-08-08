@@ -19,6 +19,7 @@ def cli():
 
 from .assign import assign_cli
 from .check import check_cli
+from .export import export_cli
 
 # def get_parser():
 #     """
@@ -38,17 +39,7 @@ from .check import check_cli
 
 
 
-#     ##### PARSER FOR otter export #####
-#     export_parser = subparsers.add_parser("export", description="Exports a Jupyter Notebook to PDF with optional filtering")
-#     export_parser.add_argument("source", help="Notebook to export")
-#     export_parser.add_argument("dest", nargs='?', default=None, help="Path to write PDF")
-#     export_parser.add_argument("--filtering", default=False, action="store_true", help="Whether the PDF should be filtered")
-#     export_parser.add_argument("--pagebreaks", default=False, action="store_true", help="Whether the PDF should have pagebreaks between questions")
-#     export_parser.add_argument("-s", "--save", default=False, action="store_true", help="Save intermediate file(s) as well")
-#     export_parser.add_argument("-e", "--exporter", default=None, choices=["latex", "html"], nargs="?", help="Type of PDF exporter to use")
-#     export_parser.add_argument("--debug", default=False, action="store_true", help="Export in debug mode")
 
-#     export_parser.set_defaults(func_str="export.main")
 
 
 #     ##### PARSER FOR otter generate #####
