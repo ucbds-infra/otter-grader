@@ -33,7 +33,7 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 	).flush_to_file(_OTTER_LOG_FILENAME)
 
 
-def main(file, tests_path="./tests", question=None, seed=None):
+def main(file,  *, tests_path="./tests", question=None, seed=None):
 	"""
 	Runs Otter Check
 

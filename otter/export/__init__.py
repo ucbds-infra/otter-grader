@@ -33,7 +33,7 @@ def export_notebook(nb_path, dest=None, debug=False, exporter_type=None, **kwarg
     Exporter.convert_notebook(nb_path, pdf_name, debug=debug, **kwargs)
 
 
-def main(src, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, debug=False):
+def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, debug=False):
     """
     Runs Otter Export
 

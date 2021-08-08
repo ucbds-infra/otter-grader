@@ -55,7 +55,7 @@ def check(nb_or_test_path, test_name=None, global_env=None):
 
     return test
 
-def grade_notebook(notebook_path, tests_glob=None, name=None, ignore_errors=True, script=False, 
+def grade_notebook(notebook_path, *, tests_glob=None, name=None, ignore_errors=True, script=False, 
     cwd=None, test_dir=None, seed=None, log=None, variables=None, plugin_collection=None):
     """
     Grade an assignment file and return grade information

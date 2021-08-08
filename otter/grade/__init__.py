@@ -11,10 +11,10 @@ from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .utils import merge_csv, prune_images
 
 
-def main(path="./", output_dir="./", autograder="./autograder.zip", gradescope=False, canvas=False, 
-         json=False, yaml=False, containers=None, scripts=False, no_kill=False, debug=False, 
-         zips=False, image="ucbdsinfra/otter-grader", pdfs=False, prune=False, force=False, 
-         verbose=False):
+def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescope=False, 
+         canvas=False, json=False, yaml=False, containers=None, scripts=False, no_kill=False, 
+         debug=False, zips=False, image="ucbdsinfra/otter-grader", pdfs=False, prune=False, 
+         force=False, verbose=False):
     """
     Runs Otter Grade
 

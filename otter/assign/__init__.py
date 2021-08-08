@@ -16,7 +16,7 @@ from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
 
-def main(master, result, no_pdfs=False, no_run_tests=False, username=None, password=None, 
+def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
          debug=False):
     """
     Runs Otter Assign on a master notebook
