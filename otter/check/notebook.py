@@ -3,7 +3,6 @@ IPython notebook API for Otter Check
 """
 
 import inspect
-import requests
 import json
 import os
 import re

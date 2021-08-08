@@ -1,12 +1,7 @@
-datascience
 jupyter_client
 ipykernel
 matplotlib
 pandas
-ipywidgets
-scipy
-tqdm
-codecov
 jinja2
 docker
 requests
