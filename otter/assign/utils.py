@@ -273,6 +273,8 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         username=gs_username,
         password=gs_password,
         files=files,
+        plugin_collection=plugin_collection,
+        assignment=assignment,
     )
 
     # clean up temp tests dir
