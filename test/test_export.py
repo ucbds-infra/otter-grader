@@ -3,9 +3,7 @@
 ##################################
 
 # NOTES:
-# - tests do not check for PDF equality but rather have exporter save the TeX file as well
-#   and check that the TeX is correct (assuming that TeX conversion works correctly) and checks
-#   that PDF file exists
+# - tests do not check for PDF equality
 
 import os
 import unittest
@@ -23,32 +21,28 @@ from subprocess import Popen, PIPE
 from glob import glob
 from textwrap import dedent
 
-# from otter.argparser import get_parser
 from otter.export import export_notebook
 from otter.export import main as export
 from otter.export.exporters.base_exporter import BaseExporter
-from otter.runner import run_otter
 
 from . import TestCase
 
-# parser = get_parser()
 
 TEST_FILES_PATH = "test/test-export/"
 
+
 class TestExport(TestCase):
+
+    @staticmethod
+    def run_export(notebook_stem, **kwargs):
+        export(TEST_FILES_PATH + notebook_stem + ".ipynb", **kwargs)
 
     def test_success_HTML(self):
         """
         Tests a successful export with filtering and no pagebreaks
         """
         test_file = "successful-html-test"
-        grade_command = ["export", "--filtering", "-s", "-e", "latex",
-            TEST_FILES_PATH + test_file + ".ipynb"
-        ]
-        # args = parser.parse_args(grade_command)
-        # args.func = export
-        # args.func(args)
-        run_otter(grade_command)
+        self.run_export(test_file, filtering=True, save=True, exporter="latex")
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
@@ -64,14 +58,7 @@ class TestExport(TestCase):
         Tests a successful filter with pagebreaks
         """
         test_file = "success-pagebreak-test"
-        grade_command = ["export", "--filtering", "-e", "latex",
-            "--pagebreaks", "-s",
-            TEST_FILES_PATH + test_file + ".ipynb"
-        ]
-        # args = parser.parse_args(grade_command)
-        # args.func = export
-        # args.func(args)
-        run_otter(grade_command)
+        self.run_export(test_file, filtering=True, exporter="latex", pagebreaks=True, save=True)
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
@@ -87,21 +74,13 @@ class TestExport(TestCase):
         Tests a filtered export without a closing comment
         """
         test_file = "no-close-tag-test"
-        grade_command = ["export", "--filtering", "-e", "latex",
-            "--pagebreaks", "-s",
-            TEST_FILES_PATH + test_file + ".ipynb"
-        ]
-        # args = parser.parse_args(grade_command)
-        # args.func = export
-        # args.func(args)
-        run_otter(grade_command)
+        self.run_export(test_file, filtering=True, exporter="latex", pagebreaks=True, save=True)
 
         # check existence of pdf and tex
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".tex"))
 
         # cleanup
-
         cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(cleanup.returncode, 0,"Error in cleanup:" + str(cleanup.stderr))
