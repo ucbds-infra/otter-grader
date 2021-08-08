@@ -27,8 +27,9 @@ OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "1.0.0.b0"  # this should match a release tag on GitHub
 
 
-def main(tests_path, output_path, config, lang, requirements, overwrite_requirements, environment,
-         no_env, username, password, files, assignment=None, plugin_collection=None):
+def main(tests_path="./tests", output_path="./", config=None, lang="python", requirements=None, 
+         overwrite_requirements=False, environment=None, no_env=False, username=None, password=None, 
+         files=[], assignment=None, plugin_collection=None):
     """
     Runs Otter Generate
 

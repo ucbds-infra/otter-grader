@@ -10,7 +10,7 @@ import zipfile
 from .run_autograder import main as run_autograder
 
 
-def main(submission, autograder, output_dir, no_logo, debug):
+def main(submission, autograder="./autograder.zip", output_dir="./", no_logo=False, debug=False):
     """
     Grades a single submission using the autograder configuration ``autograder`` without containrization
 
