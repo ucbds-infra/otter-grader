@@ -33,7 +33,7 @@ setuptools.setup(
 	# scripts=["bin/otter"],
 	entry_points = {
 		"console_scripts": [
-			"otter=otter.runner:run_otter", 
+			"otter=otter.cli:cli", 
 			"gmail_oauth2=otter.plugins.builtin.gmail_notifications.bin.gmail_oauth2:main",
 		],
 	},
