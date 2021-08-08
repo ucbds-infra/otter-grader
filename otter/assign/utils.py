@@ -155,7 +155,7 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     os.chdir(nb_path.parent)
     # print(os.getcwd())
     results = grade_notebook(
-        nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
+        nb_path.name, tests_glob=glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
         plugin_collection=plugin_collection
     )
@@ -205,6 +205,9 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     generate_args = assignment.generate
     if generate_args is True:
         generate_args = {}
+
+        if assignment.is_r:
+            generate_args["lang"] = "r"
 
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
