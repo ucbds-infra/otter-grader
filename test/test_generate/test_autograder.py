@@ -43,7 +43,7 @@ class TestAutograder(TestCase):
         Checks otter assign with token specified instead of username and password.
         """
         # create the zipfile
-        with mock.patch("otter.generate.autograder.APIClient") as mocked_client:
+        with mock.patch("otter.generate.APIClient") as mocked_client:
             generate(
                 tests_path = TEST_FILES_PATH + "tests",
                 output_dir = TEST_FILES_PATH,
