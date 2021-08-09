@@ -15,7 +15,6 @@ from glob import glob
 from unittest import mock
 from shutil import copyfile
 
-from otter.generate import main as autograder
 from otter.run.run_autograder import main as run_autograder
 
 from . import TestCase
