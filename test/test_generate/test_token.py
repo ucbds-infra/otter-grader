@@ -14,17 +14,18 @@ from glob import glob
 from unittest.mock import patch, mock_open
 from shutil import copyfile
 
-from otter.generate import main as autograder
 from otter.generate.token import APIClient
-from otter.run.run_autograder import main as run_autograder
 
 from .. import TestCase
 
+
 client = APIClient('token1')
+
 
 # mock input
 def get_input(text):
     return input(text)
+
 
 # This method will be used by the mock to replace requests.post
 def mocked_requests_post(*args, **kwargs):
@@ -37,6 +38,7 @@ def mocked_requests_post(*args, **kwargs):
             return self.text
 
     return MockResponse({"token": "value1"}, 200)
+
 
 class TestToken(TestCase):
 
@@ -91,4 +93,3 @@ class TestToken(TestCase):
         mockPost.return_value = mocked_requests_post()
         client.upload_programming_submission('123', '1', 'email', ['python.py', 'nb.ipynb'])
         self.assertEqual(mockPost.return_value.status_code, 200)
-
