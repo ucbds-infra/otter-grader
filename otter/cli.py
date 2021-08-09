@@ -87,6 +87,7 @@ defaults = generate.__kwdefaults__
 # @click.option("--autograder-dir", default=defaults["autograder_dir"], type=click.Path(), help="Root autograding directory inside grading container")
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
+@click.option("--token", help="Gradescope token for uploading PDFs")
 @click.argument("files", nargs=-1)
 def generate_cli(*args, **kwargs):
     """

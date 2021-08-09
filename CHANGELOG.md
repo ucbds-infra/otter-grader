@@ -7,6 +7,7 @@ _Changes listed in this section are currently hosted in the `beta` branch on Git
 * Added support for Ottr v1.0.0.b0
 * Converted CLI to `click` from `argparse`
 * Converted documentation source from Markdown to RST, removing use of `recommonmark`
+* Added token argument to Otter Generate and Otter Assign
 
 **v2.2.5:**
 
@@ -21,6 +22,8 @@ _Changes listed in this section are currently hosted in the `beta` branch on Git
 
 * Added `NotebookMetadataTestFile` for reading tests from Jupyter Notebook metadata
 * Added optional storage of tests in notebook metadata for Otter Assign (default-off until v3)
+
+
 * Removed deprecated tool Otter Service
 * Added printout of total score to autograder output
 
