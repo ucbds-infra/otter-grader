@@ -29,7 +29,7 @@ OTTR_BRANCH = "1.0.0.b0"  # this should match a release tag on GitHub
 
 def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", requirements=None, 
          overwrite_requirements=False, environment=None, no_env=False, username=None, password=None, 
-         files=[], assignment=None, plugin_collection=None):
+         token=None, files=[], assignment=None, plugin_collection=None):
     """
     Runs Otter Generate
 
@@ -46,6 +46,7 @@ def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", r
             ``environment`` is unspecified
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
+        token (``str``): a token for Gradescope
         files (``list[str]``): list of file paths to add to the zip file
         assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
             if used with Otter Assign
@@ -68,8 +69,12 @@ def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", r
             otter_config = json.load(f)
     else:
         otter_config = {}
+
+    # ensure that a token is present if necessary
+    if "token" not in otter_config and token is not None:
+        otter_config["token"] = token
     
-    if "course_id" in otter_config and "assignment_id" in otter_config:
+    elif "token" not in otter_config and "course_id" in otter_config and "assignment_id" in otter_config:
         client = APIClient()
         if username is not None and password is not None:
             client.log_in(username, password)
@@ -77,7 +82,8 @@ def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", r
         else:
             token = client.get_token()
         otter_config["token"] = token
-    elif "course_id" in otter_config or "assignment_id" in otter_config:
+    
+    elif ("course_id" in otter_config) ^ ("assignment_id" in otter_config):
         raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")
 
     options = DEFAULT_OPTIONS.copy()

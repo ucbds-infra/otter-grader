@@ -38,6 +38,25 @@ class TestAutograder(TestCase):
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
             self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-correct")
 
+    def test_autograder_with_token(self):
+        """
+        Checks otter assign with token specified instead of username and password.
+        """
+        # create the zipfile
+        with mock.patch("otter.generate.APIClient") as mocked_client:
+            generate(
+                tests_path = TEST_FILES_PATH + "tests",
+                output_dir = TEST_FILES_PATH,
+                requirements = TEST_FILES_PATH + "requirements.txt",
+                config = TEST_FILES_PATH + "otter_config.json",
+                files = [TEST_FILES_PATH + "data/test-df.csv"],
+                no_env = True,  # don't use the environment.yml in the root of the repo
+            )
+            mocked_client.assert_not_called()
+    
+        with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
+            self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-token-correct")
+
     def test_custom_env(self):
         """
         Check that a custom environment.yml is correctly read and modified

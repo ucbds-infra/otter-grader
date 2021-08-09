@@ -60,13 +60,15 @@ class TestAssign(TestCase):
       
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
     
-    @patch.object(APIClient,"get_token")
+    @patch.object(APIClient, "get_token")
     def test_gradescope_example(self, mocked_client):
         """
         Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs.
         Additionally, includes testing Gradescope integration.
         """
-        mocked_client.return_value = 'token'
+        # set a return value that does not match the token in the notebook, so we'll know if APIClient
+        # is called
+        mocked_client.return_value = 'token'  
 
         assign(TEST_FILES_PATH + "generate-gradescope.ipynb", TEST_FILES_PATH + "output", no_run_tests=True)
       
