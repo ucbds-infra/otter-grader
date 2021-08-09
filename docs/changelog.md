@@ -1,10 +1,20 @@
 # Changelog
 
-**Unreleased:**
+**v2.2.5:**
+
+* Upgraded to Miniconda 4.10.3 in grading images
+* Fixed [#272](https://github.com/ucbds-infra/otter-grader/issues/272)
+
+**v2.2.4:**
+
+* Fixed total score printout for the use of the `points_possible` configuration
+
+**v2.2.3:**
 
 * Added `NotebookMetadataTestFile` for reading tests from Jupyter Notebook metadata
-* Added optional storage of tests in notebook metadata for Otter Assign
+* Added optional storage of tests in notebook metadata for Otter Assign (default-off until v3)
 * Removed deprecated tool Otter Service
+* Added printout of total score to autograder output
 
 **v2.2.2:**
 

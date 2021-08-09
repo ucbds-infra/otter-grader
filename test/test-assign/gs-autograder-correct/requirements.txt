@@ -13,4 +13,4 @@ nbformat
 dill
 jupytext
 numpy
-otter-grader==2.2.2
+otter-grader==2.2.5

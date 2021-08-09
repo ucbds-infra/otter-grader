@@ -43,7 +43,7 @@ jobs:
       run: |
         sudo -u postgres psql -c "create user root createdb password 'root';"
 
-    - name: Setup Conda
+    - name: Set Up Conda
       run: |
         $CONDA/bin/conda config --set always_yes yes --set changeps1 no
 
@@ -53,11 +53,13 @@ jobs:
 
     - name: Install Python and R packages
       run: |
-        $CONDA/bin/pip install -r requirements.txt
-        $CONDA/bin/pip install -r requirements-test.txt
         sudo apt install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
-        Rscript -e "install.packages('devtools')"
-        Rscript -e "devtools::install_github('ucbds-infra/ottr')" || Rscript -e "devtools::install_github('ucbds-infra/ottr')"
+        $CONDA/bin/conda env update -n base -f environment.yml
+        $CONDA/bin/Rscript -e "install.packages('devtools')"
+        tmp_dir=$(mktemp -d)
+        git clone --single-branch -b beta https://github.com/ucbds-infra/ottr.git $tmp_dir
+        cd $tmp_dir
+        $CONDA/bin/Rscript -e "devtools::install()" || $CONDA/bin/Rscript -e "devtools::install()"
 
     - name: Install nbconvert dependencies
       run: |

@@ -33,7 +33,9 @@ def main(autograder_dir, **kwargs):
     options.update(kwargs)
 
     if options["logo"]:
-        print(LOGO_WITH_VERSION, "\n")
+        # ASCII 8207 is an invisible non-whitespace character; this should prevent grqdescope from
+        # incorrectly left-stripping the whitespace at the beginning of the logo
+        print(f"{chr(8207)}\n", LOGO_WITH_VERSION, "\n", sep="")
 
     options["autograder_dir"] = autograder_dir
 
@@ -50,11 +52,19 @@ def main(autograder_dir, **kwargs):
     with open("./results/results.json", "w+") as f:
         json.dump(output, f, indent=4)
 
-    print("\n\n")
+    print("\n\n", end="")
+
+    df = pd.DataFrame(output["tests"])
+
+    if options["print_score"]:
+        total, possible = df["score"].sum(), df["max_score"].sum()
+        if "score" in output:
+            total, possible = output["score"], options["points_possible"] or possible
+        perc = total / possible * 100
+        print(f"Total Score: {total:.3f} / {possible:.3f} ({perc:.3f}%)\n")
 
     if options["print_summary"]:
         pd.set_option("display.max_rows", None) # print all rows
-        df = pd.DataFrame(output["tests"])
         if "output" in df.columns:
             df.drop(columns=["output"], inplace=True)
         if "visibility" in df.columns:

@@ -15,7 +15,7 @@ if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     # update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
     # install conda
-    wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9.2-Linux-x86_64.sh"
+    wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
     chmod +x /autograder/source/miniconda_install.sh
     /autograder/source/miniconda_install.sh -b
     echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
