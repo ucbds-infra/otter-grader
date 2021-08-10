@@ -1,12 +1,11 @@
-"""
-Utilities for Otter Grade
-"""
+"""Utilities for Otter Grade"""
 
-import os
 import docker
+import os
 import pandas as pd
 
 from hashlib import md5
+
 
 OTTER_DOCKER_IMAGE_TAG = "otter-grade"
 
