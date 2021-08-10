@@ -1,6 +1,4 @@
-"""
-Otter Grade command-line utility. Provides local grading of submissions in parallel Docker containers.
-"""
+"""Local grading of submissions in Docker containers for Otter-Grader"""
 
 import os
 import pandas as pd
@@ -103,7 +101,6 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescop
         debug=debug,
         zips=zips,
         image=image,
-        meta_parser=meta_parser,
         pdfs=pdfs
     )
 

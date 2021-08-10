@@ -9,6 +9,12 @@ _Changes listed in this section are currently hosted in the `beta` branch on Git
 * Converted documentation source from Markdown to RST, removing use of `recommonmark`
 * Added token argument to Otter Generate and Otter Assign
 
+**Unreleased:**
+
+* Updated Otter Grade Dockerfile to simplify build process
+* Updated Otter Grade container management workflow
+* Updated `setup.sh` templates to reflect the new Dockerfile changes
+
 **v2.2.5:**
 
 * Upgraded to Miniconda 4.10.3 in grading images

@@ -1,3 +1,5 @@
+OS := $(shell uname -s)
+
 .PHONY: docs
 docs:
 	$(MAKE) -C docs html
@@ -9,20 +11,33 @@ docker-test:
 	rm test-Dockerfile
 
 tutorial:
-	# rm docs/tutorial/tutorial.zip
 	cd docs/tutorial; \
 	zip -r tutorial.zip submissions demo.ipynb meta.json requirements.txt -x "*.DS_Store"; \
 	cp tutorial.zip ../_static; \
 	rm tutorial.zip
 
 docker-grade-test:
-	# cp otter/grade/Dockerfile otter/grade/old-Dockerfile
-	# printf "\nADD . /home/otter-grader\nRUN pip install /home/otter-grader" >> otter/grade/Dockerfile
+ifeq ($(OS), Darwin)
 	cp otter/generate/templates/python/setup.sh otter/generate/templates/python/old-setup.sh
 	printf "\nconda run -n otter-env pip install /home/otter-grader" >> otter/generate/templates/python/setup.sh
+	sed -i '' -e "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/setup.sh
+	sed -i '' -e "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/run_autograder
+else
+	cp otter/generate/templates/python/setup.sh otter/generate/templates/python/old-setup.sh
+	printf "\nconda run -n otter-env pip install /home/otter-grader" >> otter/generate/templates/python/setup.sh
+	sed -i "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/setup.sh
+	sed -i "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/run_autograder
+endif
 
 cleanup-docker-grade-test:
-	# rm otter/grade/Dockerfile
-	# mv otter/grade/old-Dockerfile otter/grade/Dockerfile
+ifeq ($(OS), Darwin)
 	rm otter/generate/templates/python/setup.sh
 	mv otter/generate/templates/python/old-setup.sh otter/generate/templates/python/setup.sh
+	sed -i '' -e "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/setup.sh
+	sed -i '' -e "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/run_autograder
+else
+	rm otter/generate/templates/python/setup.sh
+	mv otter/generate/templates/python/old-setup.sh otter/generate/templates/python/setup.sh
+	sed -i "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/setup.sh
+	sed -i "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/run_autograder
+endif
