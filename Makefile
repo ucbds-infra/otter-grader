@@ -45,9 +45,13 @@ docker-grade-test:
 	# printf "\nADD . /home/otter-grader\nRUN pip install /home/otter-grader" >> otter/grade/Dockerfile
 	cp otter/generate/templates/python/setup.sh otter/generate/templates/python/old-setup.sh
 	printf "\nconda run -n otter-env pip install /home/otter-grader" >> otter/generate/templates/python/setup.sh
+	sed -i "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/setup.sh
+	sed -i "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/run_autograder
 
 cleanup-docker-grade-test:
 	# rm otter/grade/Dockerfile
 	# mv otter/grade/old-Dockerfile otter/grade/Dockerfile
 	rm otter/generate/templates/python/setup.sh
 	mv otter/generate/templates/python/old-setup.sh otter/generate/templates/python/setup.sh
+	sed -i "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/setup.sh
+	sed -i "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/run_autograder

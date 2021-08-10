@@ -64,7 +64,7 @@ class TestCase(unittest.TestCase):
                 [f for f in os.listdir(dir1) if not (os.path.isdir(os.path.join(dir1, f)) and f in ignore_dirs)], 
                 [f for f in os.listdir(dir2) if not (os.path.isdir(os.path.join(dir2, f)) and f in ignore_dirs)], 
             )
-            self.assertEqual(dir1_contents, dir2_contents, f"{dir1} and {dir2} have different contents")
+            self.assertEqual(sorted(dir1_contents), sorted(dir2_contents), f"{dir1} and {dir2} have different contents")
             for f1, f2 in zip(dir1_contents, dir2_contents):
                 f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
                 self.assertDirsEqual(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs)
