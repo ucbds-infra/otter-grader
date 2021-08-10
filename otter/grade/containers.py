@@ -152,26 +152,29 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
     docker_version = os.environ.get("OTTER_DOCKER_CLIENT_VERSION", "auto")
     client = docker.from_env(version=docker_version)
 
-    fd, path = tempfile.mkstemp(suffix=".pkl")
-    path_pdf = None
+    _, temp_subm_path = tempfile.mkstemp()
+    shutil.copyfile(submission_path, temp_subm_path)
+
+    results_file, results_path = tempfile.mkstemp(suffix=".pkl")
+    pdf_path = None
     if pdfs:
-        _, path_pdf = tempfile.mkstemp(suffix=".pdf")
+        _, pdf_path = tempfile.mkstemp(suffix=".pdf")
 
     try:
-        nb_path = os.path.abspath(submission_path)
-        nb_name = os.path.splitext(os.path.split(nb_path)[1])[0]
+        nb_basename = os.path.basename(submission_path)
+        nb_name = os.path.splitext(nb_basename)[0]
 
         volumes = {
-            f"{nb_path}": {'bind': f"/autograder/submission/{os.path.split(nb_path)[1]}"},
-            f"{path}": {'bind': "/autograder/results/results.pkl"}
+            f"{temp_subm_path}": {'bind': f"/autograder/submission/{nb_basename}"},
+            f"{results_path}": {'bind': "/autograder/results/results.pkl"}
         }
         if pdfs:
-            volumes.update({f"{path_pdf}": {"bind": f"/autograder/submission/{nb_name}.pdf"}})
+            volumes.update({f"{pdf_path}": {"bind": f"/autograder/submission/{nb_name}.pdf"}})
         container = client.containers.run(image, "/autograder/run_autograder", volumes=volumes,
                                           detach=True, tty=False)
 
         if verbose:
-            print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container.id}...")
+            print(f"Grading {submission_path} in container {container.id}...")
 
         container.wait()
 
@@ -181,7 +184,7 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         if not no_kill:
             container.remove()
 
-        with open(fd, "rb") as f:
+        with open(results_file, "rb") as f:
             scores = pickle.load(f)
 
         scores = scores.to_dict()
@@ -194,12 +197,13 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             os.makedirs(pdf_folder, exist_ok=True)
 
             local_pdf_path = os.path.join(pdf_folder, f"{nb_name}.pdf")
-            shutil.copy(path_pdf, local_pdf_path)
+            shutil.copy(pdf_path, local_pdf_path)
 
     finally:
         client.close()
-        os.remove(path)
+        os.remove(results_path)
+        os.remove(temp_subm_path)
         if pdfs:
-            os.remove(path_pdf)
+            os.remove(pdf_path)
 
     return df
