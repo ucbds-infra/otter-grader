@@ -1,22 +1,20 @@
-"""
-Docker container management for Otter Grade
-"""
-
-import glob
-import os
-import pickle
-import shutil
-import tempfile
-from concurrent.futures import ThreadPoolExecutor, wait
+"""Docker container management for Otter Grade"""
 
 import docker
+import glob
+import itertools
+import os
 import pandas as pd
+import pickle
 import pkg_resources
+import shutil
+import tempfile
+
+from concurrent.futures import ThreadPoolExecutor, wait
 from docker.errors import BuildError, ImageNotFound
+from docker.utils.json_stream import json_stream
 
 from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
-from docker.utils.json_stream import json_stream
-import itertools
 
 
 def build_image(zip_path, base_image, tag):
@@ -33,30 +31,28 @@ def build_image(zip_path, base_image, tag):
     """
     image = OTTER_DOCKER_IMAGE_TAG + ":" + tag
     dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
-    if os.environ.get("OTTER_DOCKER_CLIENT_VERSION") is not None:
-        client = docker.from_env(version=os.environ.get("OTTER_DOCKER_CLIENT_VERSION"))
-    else:
-        client = docker.from_env()
+    docker_version = os.environ.get("OTTER_DOCKER_CLIENT_VERSION", "auto")
+    client = docker.from_env(version=docker_version)
+
     try:
         client.images.get(image)
+
     except ImageNotFound:
         print(f"Building new image using {base_image} as base image")
         generator = client.api.build(buildargs={
-                            "ZIPPATH": zip_path,
-                            "BASE_IMAGE": base_image
-                        }, tag=image, dockerfile=dockerfile, path=".")
-        try:
-            result_stream, internal_stream = itertools.tee(json_stream(generator))
-            for chunk in internal_stream:
-                if 'error' in chunk:
-                    raise BuildError(chunk['error'], result_stream)
-                if 'stream' in chunk:
-                    line = chunk['stream'].strip("\r\n")
-                    if len(line) != 0:
-                        print(line)
-    
-        except BuildError:
-            raise
+            "ZIPPATH": zip_path,
+            "BASE_IMAGE": base_image
+        }, tag=image, dockerfile=dockerfile, path=".")
+        
+        result_stream, internal_stream = itertools.tee(json_stream(generator))
+        for chunk in internal_stream:
+            if 'error' in chunk:
+                raise BuildError(chunk['error'], result_stream)
+            if 'stream' in chunk:
+                line = chunk['stream'].strip("\r\n")
+                if len(line) != 0:
+                    print(line)
+
     client.close()
     return image
 
@@ -109,7 +105,7 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
         futures += [
             pool.submit(
                 grade_assignments,
-                notebook_dir=nb_path,
+                submission_path=nb_path,
                 verbose=verbose,
                 # TODO:check if path is not default for generate hash
                 image=img,
@@ -130,14 +126,14 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
 
 # TODO: these arguments need to be updated. replace notebooks_dir with the path to the notebook that
 # this container will be grading
-def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=False,
+def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=False,
                       scripts=False, no_kill=False, output_path="./", debug=False, pdfs=False):
     """
     Grades multiple submissions in a directory using a single docker container. If no PDF assignment is
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
 
     Args:
-        notebook_dir (``str``): path to the students submission to be graded
+        submission_path (``str``): path to the submission to be graded
         image (``str``, optional): a Docker image tag to be used for grading environment
         verbose (``bool``, optional): whether status messages should be printed to the command line
         scripts (``bool``, optional): whether student submissions are Python scripts rather than
@@ -153,63 +149,61 @@ def grade_assignments(notebook_dir, image="ucbdsinfra/otter-grader", verbose=Fal
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
     # this is a fix for travis -- allows overriding docker client version
-    if os.environ.get("OTTER_DOCKER_CLIENT_VERSION") is not None:
-        client = docker.from_env(version=os.environ.get("OTTER_DOCKER_CLIENT_VERSION"))
-    else:
-        client = docker.from_env()
+    docker_version = os.environ.get("OTTER_DOCKER_CLIENT_VERSION", "auto")
+    client = docker.from_env(version=docker_version)
 
-    fd, path = tempfile.mkstemp(suffix=".pkl")
-    path_pdf = None
+    _, temp_subm_path = tempfile.mkstemp()
+    shutil.copyfile(submission_path, temp_subm_path)
+
+    results_file, results_path = tempfile.mkstemp(suffix=".pkl")
+    pdf_path = None
     if pdfs:
-        _, path_pdf = tempfile.mkstemp(suffix=".pdf")
-    try:
+        _, pdf_path = tempfile.mkstemp(suffix=".pdf")
 
-        nb_path = os.path.abspath(notebook_dir)
-        nb_name = os.path.splitext(os.path.split(nb_path)[1])[0]
+    try:
+        nb_basename = os.path.basename(submission_path)
+        nb_name = os.path.splitext(nb_basename)[0]
 
         volumes = {
-            f"{nb_path}": {'bind': f"/autograder/submission/{os.path.split(nb_path)[1]}"},
-            f"{path}": {'bind': "/autograder/results/results.pkl"}
+            f"{temp_subm_path}": {'bind': f"/autograder/submission/{nb_basename}"},
+            f"{results_path}": {'bind': "/autograder/results/results.pkl"}
         }
         if pdfs:
-            volumes.update({f"{path_pdf}": {"bind": f"/autograder/submission/{nb_name}.pdf"}})
+            volumes.update({f"{pdf_path}": {"bind": f"/autograder/submission/{nb_name}.pdf"}})
         container = client.containers.run(image, "/autograder/run_autograder", volumes=volumes,
                                           detach=True, tty=False)
 
         if verbose:
-            print(f"Grading {('notebooks', 'scripts')[scripts]} in container {container.id}...")
+            print(f"Grading {submission_path} in container {container.id}...")
+
         container.wait()
+
         if debug:
             print(container.logs(stderr=True, stdout=True).decode("utf-8"))
+
         if not no_kill:
             container.remove()
 
-        with open(fd, "rb") as f:
+        with open(results_file, "rb") as f:
             scores = pickle.load(f)
 
-        # TODO: wrangle results
         scores = scores.to_dict()
         scores = {t: [scores[t]["score"]] if type(scores[t]) == dict else scores[t] for t in scores}
-        scores["file"] = os.path.split(notebook_dir)[1]
+        scores["file"] = os.path.split(submission_path)[1]
         df = pd.DataFrame(scores)
-
-        # TODO: PDFs still need to work, so this code needs to be adapted to get the PDF of the notebook
-        #       at path /autograder/submission/{notebook name}.pdf
-
-        # not fixed yet @Edward
 
         if pdfs:
             pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
             os.makedirs(pdf_folder, exist_ok=True)
 
             local_pdf_path = os.path.join(pdf_folder, f"{nb_name}.pdf")
-            shutil.copy(path_pdf, local_pdf_path)
-        client.close()
-    except:
-        raise
+            shutil.copy(pdf_path, local_pdf_path)
+
     finally:
         client.close()
-        os.remove(path)
+        os.remove(results_path)
+        os.remove(temp_subm_path)
         if pdfs:
-            os.remove(path_pdf)
+            os.remove(pdf_path)
+
     return df

@@ -1,6 +1,4 @@
-"""
-Otter Grade command-line utility. Provides local grading of submissions in parallel Docker containers.
-"""
+"""Local grading of submissions in Docker containers for Otter-Grader"""
 
 import re
 import os

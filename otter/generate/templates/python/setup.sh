@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# apt-get clean
-# apt-get update
-# apt-get install -y python3.7 python3-pip python3.7-dev
 if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     apt-get clean
     apt-get update
