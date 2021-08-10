@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# apt-get clean
-# apt-get update
-# apt-get install -y python3.7 python3-pip python3.7-dev
 if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     apt-get clean
     apt-get update
@@ -28,14 +25,6 @@ if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     export PATH=/root/miniconda3/bin:$PATH
     export TAR="/bin/tar"
 fi
-# # install R dependencies
-# conda install --yes r-base r-essentials 
-# conda install --yes r-devtools -c conda-forge
-
-# # install requirements
-# pip3 install -r /autograder/source/requirements.txt
-# pip install -r /autograder/source/requirements.txt
-# Rscript /autograder/source/requirements.r
 
 # install dependencies with conda
 conda env create -f /autograder/source/environment.yml
