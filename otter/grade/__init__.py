@@ -11,8 +11,7 @@ from .utils import merge_csv, prune_images
 
 def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescope=False, 
          canvas=False, json=False, yaml=False, containers=None, scripts=False, no_kill=False, 
-         debug=False, zips=False, image="ucbdsinfra/otter-grader", pdfs=False, prune=False, 
-         force=False, verbose=False):
+         debug=False, zips=False, image="ucbdsinfra/otter-grader", pdfs=False, verbose=False):
     """
     Runs Otter Grade
 
@@ -35,27 +34,12 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescop
         zips (``bool``): whether the submissions are Otter-exported zip files
         image (``bool``): base image from which to build grading image
         pdfs (``bool``): whether to copy notebook PDFs out of the containers
-        prune (``bool``): whether to prune dangling grading images
-        force (``bool``): whether to force pruning (without confirmation)
         verbose (``bool``): whether to log status messages to stdout
         **kwargs: ignored kwargs (a remnant of how the argument parser is built)
 
     Raises:
         ``AssertionError``: if invalid arguments are provided
     """
-    # prune images
-    if prune:
-        if not force:
-            sure = input("Are you sure you want to prune Otter's grading images? This action cannot be undone [y/N] ")
-            sure = bool(re.match(r"ye?s?", sure, flags=re.IGNORECASE))
-        else:
-            sure = True
-        
-        if sure:
-            prune_images()
-        
-        return
-
     # Asserts that exactly one metadata flag is provided
     assert sum([meta != False for meta in [
         gradescope,
