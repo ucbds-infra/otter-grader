@@ -241,10 +241,17 @@ def convert_config_description_dict(configs):
 
 def assert_path_exists(path_tuples):
     """
-    Ensures that a series of file paths exist. Elements of ``path_tuples`` should be 2-tuples where
-    the first element is a string representing the file path and the second element is ``True`` if
-    the path should be a directory, ``False`` if it should be a file, and ``None`` if it doesn't
-    matter.
+    Ensure that a series of file paths exist and are of a specific type, or raise a ``ValueError``.
+    
+    Elements of ``path_tuples`` should be 2-tuples where the first element is a string representing 
+    the file path and the second element is ``True`` if the path should be a directory, ``False`` if 
+    it should be a file, and ``None`` if it doesn't matter.
+
+    Args:
+        path_tuples (``list[tuple[str, bool]]``): the list of paths as described above
+
+    Raises:
+        ``ValueError``: if the path does not exist or it is not of the correct type
     """
     for path, is_dir in path_tuples:
         if not os.path.exists(path):
