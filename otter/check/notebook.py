@@ -372,7 +372,7 @@ class Notebook:
                 results = grade_zip_file(zip_path, nb_path, self._path)
                 print(
                     "Your submission received the following results when run against " + \
-                    "available test cases:\n" + indent(results.summary(), "    ")
+                    "available test cases:\n\n" + indent(results.summary(), "    ")
                 )
 
             if display_link:
