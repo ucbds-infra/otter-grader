@@ -8,10 +8,13 @@ from .containers import launch_grade
 from .metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 from .utils import merge_csv, prune_images
 
+from ..utils import assert_path_exists
+
 
 def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescope=False, 
          canvas=False, json=False, yaml=False, containers=None, scripts=False, no_kill=False, 
-         debug=False, zips=False, image="ucbdsinfra/otter-grader", pdfs=False, verbose=False):
+         debug=False, zips=False, image="ucbdsinfra/otter-grader", pdfs=False, verbose=False,
+         prune=False, force=False):
     """
     Runs Otter Grade
 
@@ -35,11 +38,16 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescop
         image (``bool``): base image from which to build grading image
         pdfs (``bool``): whether to copy notebook PDFs out of the containers
         verbose (``bool``): whether to log status messages to stdout
-        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+        prune (``bool``): whether to prune the grading images; if true, no grading is performed
+        force (``bool``): whether to force-prune the images (do not ask for confirmation)
 
     Raises:
         ``AssertionError``: if invalid arguments are provided
     """
+    if prune:
+        prune_images(force=force)
+        return
+
     # Asserts that exactly one metadata flag is provided
     assert sum([meta != False for meta in [
         gradescope,
@@ -48,8 +56,18 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescop
         yaml
     ]]) <= 1, "You can specify at most one metadata flag (-g, -j, -y, -c)"
 
-    # verbose flag
-    verbose = verbose
+    # check file paths
+    assert_path_exists([
+        (path, True),
+        (output_dir, True),
+        (autograder, False),
+    ])
+
+    if json:
+        assert_path_exists([(json, False)])
+
+    if yaml:
+        assert_path_exists([(yaml, False)])
 
     # Hand off metadata to parser
     if gradescope:

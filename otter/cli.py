@@ -96,30 +96,19 @@ def generate_cli(*args, **kwargs):
     return generate(*args, **kwargs)
 
 
-def grade_prune_images(ctx, param, value):
-    """
-    Runs ``otter.grade.utils.prune_images``.
-    """
-    if not value or ctx.resilient_parsing:
-        return
-    breakpoint()
-    prune_images(force=ctx.params["force"])
-    ctx.exit()
-
-
 defaults = grade.__kwdefaults__
-@cli.group("grade", invoke_without_command=True)
+@cli.command("grade")
 
 # necessary path arguments
-@click.option("-p", "--path", default=defaults["path"], type=click.Path(exists=True, file_okay=False), help="Path to directory of submissions")
-@click.option("-a", "--autograder", default=defaults["autograder"], type=click.Path(exists=True, dir_okay=False), help="Path to autograder zip file")
-@click.option("-o", "--output-dir", default=defaults["output_dir"], type=click.Path(exists=True, file_okay=False), help="Directory to which to write output")
+@click.option("-p", "--path", default=defaults["path"], help="Path to directory of submissions")
+@click.option("-a", "--autograder", default=defaults["autograder"], help="Path to autograder zip file")
+@click.option("-o", "--output-dir", default=defaults["output_dir"], help="Directory to which to write output")
 
 # metadata parser arguments
 @click.option("-g", "--gradescope", is_flag=True, help="Flag for Gradescope export")
 @click.option("-c", "--canvas", is_flag=True, help="Flag for Canvas export")
-@click.option("-j", "--json", default=defaults["json"], type=click.Path(exists=True, dir_okay=False), help="Flag for path to JSON metadata")
-@click.option("-y", "--yaml", default=defaults["yaml"], type=click.Path(exists=True, dir_okay=False), help="Flag for path to YAML metadata")
+@click.option("-j", "--json", default=defaults["json"], help="Flag for path to JSON metadata")
+@click.option("-y", "--yaml", default=defaults["yaml"], help="Flag for path to YAML metadata")
 
 # submission format arguments
 @click.option("-s", "--scripts", is_flag=True, help="Flag to incidicate grading Python scripts")
@@ -135,8 +124,8 @@ defaults = grade.__kwdefaults__
 @click.option("--no-kill", is_flag=True, help="Do not kill containers after grading")
 @click.option("--debug", is_flag=True, help="Print stdout/stderr from grading for debugging")
 
-@click.option("--prune", is_flag=True, is_eager=True, callback=grade_prune_images, expose_value=False, help="Prune all of Otter's grading images")
-@click.option("-f", "--force", is_flag=True, is_eager=True, help="Force action (don't ask for confirmation)")
+@click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
+@click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
 def grade_cli(*args, **kwargs):
     """
     Grade assignments locally using Docker containers.

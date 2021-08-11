@@ -50,16 +50,13 @@ def prune_images(force=False):
     
     if sure:
         # this is a fix for travis -- allows overriding docker client version
-        if os.environ.get("OTTER_DOCKER_CLIENT_VERSION") is not None:
-            client = docker.from_env(version=os.environ.get("OTTER_DOCKER_CLIENT_VERSION"))
-        else:
-            client = docker.from_env()
+        docker_version = os.environ.get("OTTER_DOCKER_CLIENT_VERSION", "auto")
+        client = docker.from_env(version=docker_version)
         
         images = client.images.list()
 
         for img in images:
-            breakpoint()
-            if any([OTTER_DOCKER_IMAGE_TAG in t for t in img.tags]):
+            if any([t.startswith(OTTER_DOCKER_IMAGE_TAG + ":") for t in img.tags]):
                 client.images.remove(img.tags[0], force=True)
 
 def generate_hash(path):
