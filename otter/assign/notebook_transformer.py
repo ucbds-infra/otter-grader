@@ -49,6 +49,7 @@ def transform_notebook(nb, assignment):
             pdf = export_cell.get('pdf', True),
             filtering = export_cell.get('filtering', True),
             force_save = export_cell.get('force_save', False),
+            run_tests = export_cell.get('run_tests', False)
         )
 
     transformed_nb = copy.deepcopy(nb)
