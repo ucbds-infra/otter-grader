@@ -74,6 +74,12 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
                     "classic notebook)",
                 "default": False,
             },
+            {
+                "key": "run_tests",
+                "description": "whether to run student submissions against local tests during export",
+                "default": False,
+            },
+
         ],
     },
     {
