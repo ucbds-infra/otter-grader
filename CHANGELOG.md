@@ -8,6 +8,7 @@ _Changes listed in this section are currently hosted in the `beta` branch on Git
 * Converted CLI to `click` from `argparse`
 * Converted documentation source from Markdown to RST, removing use of `recommonmark`
 * Added token argument to Otter Generate and Otter Assign
+* Implemented submission zip validation against local test cases in `otter.Notebook`
 
 **Unreleased:**
 
