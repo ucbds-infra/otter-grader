@@ -5,6 +5,7 @@
 * Updated Otter Grade Dockerfile to simplify build process
 * Updated Otter Grade container management workflow
 * Updated `setup.sh` templates to reflect the new Dockerfile changes
+* Changed the display of failed test results in Otter Assign validation
 
 **v2.2.5:**
 
