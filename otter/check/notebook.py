@@ -1,25 +1,25 @@
-"""
-IPython notebook API for Otter Check
-"""
+"""IPython notebook API for Otter Check"""
 
+import datetime as dt
 import inspect
 import json
 import os
-import re
-import zipfile
 import pickle
+import re
 import time
 import warnings
-import datetime as dt
+import zipfile
 
 from getpass import getpass
 from glob import glob
-from urllib.parse import urljoin
 from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
+from textwrap import indent
+from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import save_notebook
+from .utils import grade_zip_file, save_notebook
+
 from ..execute import check
 from ..export import export_notebook
 from ..plugins import PluginCollection
@@ -291,7 +291,7 @@ class Notebook:
         self._addl_files.extend(addl_files)
 
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
-            display_link=True, force_save=False):
+            display_link=True, force_save=False, run_tests=False):
         """
         Exports a submission to a zip file. Creates a submission zipfile from a notebook at ``nb_path``,
         optionally including a PDF export of the notebook and any files in ``files``.
@@ -366,6 +366,14 @@ class Notebook:
                 zf.write(file)
 
             zf.close()
+
+            if run_tests:
+                results = grade_zip_file(zip_path, nb_path, self._path)
+                if results.total != results.possible:
+                    print(
+                        "Your submission received the following results when run against " + \
+                        "available test cases:\n" + indent(results.summary(), "    ")
+                    )
 
             if display_link:
                 # create and display output HTML
