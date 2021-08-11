@@ -47,7 +47,7 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", gradescop
     if prune:
         if not force:
             sure = input("Are you sure you want to prune Otter's grading images? This action cannot be undone [y/N] ")
-            sure = bool(re.match(sure, r"ye?s?", flags=re.IGNORECASE))
+            sure = bool(re.match(r"ye?s?", sure, flags=re.IGNORECASE))
         else:
             sure = True
         
