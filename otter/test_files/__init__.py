@@ -264,6 +264,13 @@ class GradingResults:
 
     def summary(self, public_only=False):
         """
+        Generate a summary of these results and return it as a string.
+
+        Args:
+            public_only (``bool``, optional): whether only public test cases should be included
+
+        Returns:
+            ``str``: the summary of results
         """
         return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
 

@@ -1,14 +1,15 @@
 """Utilities for Otter Assign"""
 
-import re
-import os
 import json
-import pprint
+import os
 import pathlib
+import pprint
+import re
 import shutil
 
-from glob import glob
 from contextlib import contextmanager
+from glob import glob
+from textwrap import indent
 
 from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
@@ -153,13 +154,17 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
-    # print(os.getcwd())
+
     results = grade_notebook(
         nb_path.name, tests_glob=glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
         plugin_collection=plugin_collection
     )
-    assert results.total == results.possible, "Some autograder tests failed:\n\n" + pprint.pformat(results, indent=2)
+
+    if results.total != results.possible:
+        raise RuntimeError(f"Some autograder tests failed in the autograder notebook:\n" + \
+            indent(results.summary(), '    '))
+
     os.chdir(curr_dir)
 
 def write_otter_config_file(master, result, assignment):
