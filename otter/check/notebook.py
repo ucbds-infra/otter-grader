@@ -368,12 +368,12 @@ class Notebook:
             zf.close()
 
             if run_tests:
+                print("Running your submission against local test cases...")
                 results = grade_zip_file(zip_path, nb_path, self._path)
-                if results.total != results.possible:
-                    print(
-                        "Your submission received the following results when run against " + \
-                        "available test cases:\n" + indent(results.summary(), "    ")
-                    )
+                print(
+                    "Your submission received the following results when run against " + \
+                    "available test cases:\n" + indent(results.summary(), "    ")
+                )
 
             if display_link:
                 # create and display output HTML

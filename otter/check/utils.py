@@ -61,9 +61,7 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
 
         # run the command
         results = run(command, stdout=PIPE, stderr=PIPE)
-        
-        if results.stdout:
-            print(results.stdout)
+
         if results.stderr:
             raise RuntimeError(results.stderr)
 
