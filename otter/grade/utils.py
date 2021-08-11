@@ -3,6 +3,7 @@
 import docker
 import os
 import pandas as pd
+import re
 
 from hashlib import md5
 
