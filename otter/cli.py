@@ -9,7 +9,6 @@ from .check import main as check
 from .export import main as export
 from .generate import main as generate
 from .grade import main as grade
-from .grade import prune_images
 from .run import main as run
 from .version import print_version_info
 
