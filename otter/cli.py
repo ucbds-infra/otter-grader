@@ -84,7 +84,6 @@ defaults = generate.__kwdefaults__
 @click.option("-e", "--environment", type=click.Path(exists=True, file_okay=False), help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
 @click.option("--no-env", is_flag=True, help="Whether to ignore an automatically found but unspecified environment.yml file")
 @click.option("-l", "--lang", default=defaults["lang"], type=click.Choice(["python", "r"], case_sensitive=False), help="Assignment programming language; defaults to Python")
-# @click.option("--autograder-dir", default=defaults["autograder_dir"], type=click.Path(), help="Root autograding directory inside grading container")
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--token", help="Gradescope token for uploading PDFs")
@@ -100,15 +99,15 @@ defaults = grade.__kwdefaults__
 @cli.command("grade")
 
 # necessary path arguments
-@click.option("-p", "--path", default=defaults["path"], type=click.Path(exists=True, file_okay=False), help="Path to directory of submissions")
-@click.option("-a", "--autograder", default=defaults["autograder"], type=click.Path(exists=True, dir_okay=False), help="Path to autograder zip file")
-@click.option("-o", "--output-dir", default=defaults["output_dir"], type=click.Path(exists=True, file_okay=False), help="Directory to which to write output")
+@click.option("-p", "--path", default=defaults["path"], help="Path to directory of submissions")
+@click.option("-a", "--autograder", default=defaults["autograder"], help="Path to autograder zip file")
+@click.option("-o", "--output-dir", default=defaults["output_dir"], help="Directory to which to write output")
 
 # metadata parser arguments
 @click.option("-g", "--gradescope", is_flag=True, help="Flag for Gradescope export")
 @click.option("-c", "--canvas", is_flag=True, help="Flag for Canvas export")
-@click.option("-j", "--json", default=defaults["json"], type=click.Path(exists=True, dir_okay=False), help="Flag for path to JSON metadata")
-@click.option("-y", "--yaml", default=defaults["yaml"], type=click.Path(exists=True, dir_okay=False), help="Flag for path to YAML metadata")
+@click.option("-j", "--json", default=defaults["json"], help="Flag for path to JSON metadata")
+@click.option("-y", "--yaml", default=defaults["yaml"], help="Flag for path to YAML metadata")
 
 # submission format arguments
 @click.option("-s", "--scripts", is_flag=True, help="Flag to incidicate grading Python scripts")
