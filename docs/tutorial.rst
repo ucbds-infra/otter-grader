@@ -10,7 +10,6 @@ following directory structure:
 
     tutorial
     ├── demo.ipynb
-    ├── meta.json
     ├── requirements.txt
     └── submissions
         ├── ipynbs
@@ -109,48 +108,8 @@ tutorial details how to grade assignments locally using Docker containers on the
 machine. You can also grade on Gradescope or without containerization, as described in the 
 :ref:`workflow_executing_submissions` section.
 
-In the zip file, we have provided a :ref:`metadata file 
-<workflow_executing_submissions_otter_grade_metadata>` that maps student identifiers to filenames in 
-``meta.json``. Note that metadata files are optional when using Otter, but we have provided one here 
-to demonstrate their use. This metadata file lists *only* the files in the ``ipynbs`` subdirectory, 
-so we won't use it when grading ``zips``.
-
-.. code-block:: json
-
-    [
-        {
-            "identifier": "passesAll",
-            "filename": "demo-passesAll.ipynb"
-        },
-        {
-            "identifier": "fails1",
-            "filename": "demo-fails1.ipynb"
-        },
-        {
-            "identifier": "fails2",
-            "filename": "demo-fails2.ipynb"
-        },
-        {
-            "identifier": "fails2Hidden",
-            "filename": "demo-fails2Hidden.ipynb"
-        },
-        {
-            "identifier": "fails3",
-            "filename": "demo-fails3.ipynb"
-        },
-        {
-            "identifier": "fails3Hidden",
-            "filename": "demo-fails3Hidden.ipynb"
-        }
-    ]
-
-The filename and identifier of each notebook indicate which tests should be failing; for example, 
-``demo-fails2.ipynb`` fails all cases for ``q2`` and ``demo-fails2Hidden.ipynb`` fails the hidden 
-test cases for ``q2``.
-
 Let's now construct a call to Otter that will grade these notebooks. We will use 
-``dist/autograder/autograder.zip`` from running Otter Assign to configure our grading image. We also 
-know that we have JSON-formatted metadata, so we'll be use the ``-j`` metadata flag. Our notebooks 
+``dist/autograder/autograder.zip`` from running Otter Assign to configure our grading image. Our notebooks 
 are in the ``ipynbs`` subdirectory, so we'll need to use the ``-p`` flag. The notebooks also contain 
 a couple of written questions, and the :ref:`filtering <pdfs>` is implemented using HTML comments, so 
 we'll specify the ``--pdfs`` flag to indicate that Otter should grab the PDFs out of the Docker 
@@ -160,7 +119,7 @@ Let's run Otter on the notebooks:
 
 .. code-block:: console
 
-    otter grade -p submissions/ipynbs -a dist/autograder/autograder.zip -j meta.json --pdfs -v
+    otter grade -p submissions/ipynbs -a dist/autograder/autograder.zip --pdfs -v
 
 (The ``-v`` flag so that we get verbose output.) After this finishes running, there 
 should be a new file and a new folder in the working directory: ``final_grades.csv`` and 
@@ -169,44 +128,44 @@ like this:
 
 .. code-block::
 
-    identifier,q1,q2,q3
-    fails3Hidden,1.0,1.0,0.5
-    passesAll,1.0,1.0,1.0
-    fails1,0.6666666666666666,1.0,1.0
-    fails2Hidden,1.0,0.5,1.0
-    fails3,1.0,1.0,0.375
-    fails2,1.0,0.0,1.0
+    filename,q1,q2,q3
+    fails3Hidden.ipynb,1.0,1.0,0.5
+    passesAll.ipynb,1.0,1.0,1.0
+    fails1.ipynb,0.6666666666666666,1.0,1.0
+    fails2Hidden.ipynb,1.0,0.5,1.0
+    fails3.ipynb,1.0,1.0,0.375
+    fails2.ipynb,1.0,0.0,1.0
 
 Let's make that a bit prettier:
 
 .. list-table::
     :header-rows: 1
 
-    * - identifier
+    * - filename
       - q1
       - q2
       - q3
-    * - fails3Hidden
+    * - fails3Hidden.ipynb
       - 1.0
       - 1.0
       - 0.5
-    * - passesAll
+    * - passesAll.ipynb
       - 1.0
       - 1.0
       - 1.0
-    * - fails1
+    * - fails1.ipynb
       - 0.6666666666666666
       - 1.0
       - 1.0
-    * - fails2Hidden
+    * - fails2Hidden.ipynb
       - 1.0
       - 0.5
       - 1.0
-    * - fails3
+    * - fails3.ipynb
       - 1.0
       - 1.0
       - 0.375
-    * - fails2
+    * - fails2.ipynb
       - 1.0
       - 0.0
       - 1.0
