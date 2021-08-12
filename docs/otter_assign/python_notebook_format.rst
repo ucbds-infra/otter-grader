@@ -62,6 +62,7 @@ defaults) is ``export_cell``.
       pdf: true                    # whether to include a PDF of the notebook in the generated zip file
       filtering: true              # whether the generated PDF should be filtered
       force_save: false            # whether to force-save the notebook with JavaScript (only works in classic notebook)
+      run_tests: false             # whether to run student submissions against local tests during export
     seed: null                     # a seed for intercell seeding
     generate: false                # grading configurations to be passed to Otter Generate as an otter_config.json; if false, Otter Generate is disabled
     save_environment: false        # whether to save the student's environment in the log

@@ -103,12 +103,6 @@ defaults = grade.__kwdefaults__
 @click.option("-a", "--autograder", default=defaults["autograder"], help="Path to autograder zip file")
 @click.option("-o", "--output-dir", default=defaults["output_dir"], help="Directory to which to write output")
 
-# metadata parser arguments
-@click.option("-g", "--gradescope", is_flag=True, help="Flag for Gradescope export")
-@click.option("-c", "--canvas", is_flag=True, help="Flag for Canvas export")
-@click.option("-j", "--json", default=defaults["json"], help="Flag for path to JSON metadata")
-@click.option("-y", "--yaml", default=defaults["yaml"], help="Flag for path to YAML metadata")
-
 # submission format arguments
 @click.option("-s", "--scripts", is_flag=True, help="Flag to incidicate grading Python scripts")
 @click.option("-z", "--zips", is_flag=True, help="Whether submissions are zip files from Notebook.export")

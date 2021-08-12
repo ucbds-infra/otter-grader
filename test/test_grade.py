@@ -2,27 +2,25 @@
 ##### Tests for otter grade #####
 #################################
 
-import os
-import unittest
-import subprocess
-import shutil
-import json
-import re
 import pandas as pd
+import os
+import re
+import shutil
+import subprocess
+import unittest
 
-from unittest import mock
-from subprocess import PIPE
 from glob import glob
+from subprocess import PIPE
+from unittest import mock
 
 from otter.generate import main as generate
 from otter.grade import main as grade
-from otter.grade.metadata import GradescopeParser, CanvasParser, JSONParser, YAMLParser
 
 from . import TestCase
 
-# parser = get_parser()
 
 TEST_FILES_PATH = "test/test-grade/"
+
 
 class TestGrade(TestCase):
     
@@ -32,8 +30,6 @@ class TestGrade(TestCase):
         
         create_image_cmd = ["make", "docker-test"]
         subprocess.run(create_image_cmd, check=True)
-        # create_image = subprocess.run(create_image_cmd, check=True)
-        # assert not create_image.stderr, create_image.stderr.decode("utf-8")
 
         create_image_cmd = ["make", "docker-grade-test"]
         subprocess.run(create_image_cmd, check=True)
@@ -80,108 +76,6 @@ class TestGrade(TestCase):
         # assert that it didn't fail, it will fail if it is not installed
         self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
 
-    def test_metadata_parsers(self):
-        """
-        Check that metadata parsers work correctly
-        """
-        correct_metadata = [
-            {
-                "identifier": "12345",
-                "filename": "12345_empty_file.ipynb"
-            }, {
-                "identifier": "23456",
-                "filename": "23456_empty_file.ipynb"
-            }, {
-                "identifier": "34567",
-                "filename": "34567_empty_file.ipynb"
-            }, {
-                "identifier": "45678",
-                "filename": "45678_empty_file.ipynb"
-            }, {
-                "identifier": "56789",
-                "filename": "56789_empty_file.ipynb"
-            }
-        ]
-
-        correct_file_to_id = {
-            "12345_empty_file.ipynb": "12345",
-            "23456_empty_file.ipynb": "23456",
-            "34567_empty_file.ipynb": "34567",
-            "45678_empty_file.ipynb": "45678",
-            "56789_empty_file.ipynb": "56789",
-        }
-
-        correct_id_to_file = {
-            "12345": "12345_empty_file.ipynb",
-            "23456": "23456_empty_file.ipynb",
-            "34567": "34567_empty_file.ipynb",
-            "45678": "45678_empty_file.ipynb",
-            "56789": "56789_empty_file.ipynb",
-        }
-
-        correct_filenames = [
-            "12345_empty_file.ipynb",
-            "23456_empty_file.ipynb",
-            "34567_empty_file.ipynb",
-            "45678_empty_file.ipynb",
-            "56789_empty_file.ipynb",
-        ]
-
-        correct_identifiers = [
-            "12345",
-            "23456",
-            "34567",
-            "45678",
-            "56789",
-        ]
-
-        try:
-            # gradescope parser
-            gs_parser = GradescopeParser(TEST_FILES_PATH + "gradescope-export")
-            self.assertCountEqual(gs_parser.get_metadata(), correct_metadata)
-            self.assertCountEqual(gs_parser.get_filenames(), correct_filenames)
-            self.assertCountEqual(gs_parser.get_identifiers(), correct_identifiers)
-            for file, identifier in zip(correct_file_to_id, correct_id_to_file):
-                self.assertEqual(correct_file_to_id[file], gs_parser.file_to_id(file))
-                self.assertEqual(correct_id_to_file[identifier], gs_parser.id_to_file(identifier))
-
-            # canvas parser
-            canvas_parser = CanvasParser(TEST_FILES_PATH + "canvas-export")
-            self.assertCountEqual(canvas_parser.get_metadata(), correct_metadata)
-            self.assertCountEqual(canvas_parser.get_filenames(), correct_filenames)
-            self.assertCountEqual(canvas_parser.get_identifiers(), correct_identifiers)
-            for file, identifier in zip(correct_file_to_id, correct_id_to_file):
-                self.assertEqual(correct_file_to_id[file], canvas_parser.file_to_id(file))
-                self.assertEqual(correct_id_to_file[identifier], canvas_parser.id_to_file(identifier))
-
-            # JSON parser
-            json_parser = JSONParser(TEST_FILES_PATH + "meta.json")
-            self.assertCountEqual(json_parser.get_metadata(), correct_metadata)
-            self.assertCountEqual(json_parser.get_filenames(), correct_filenames)
-            self.assertCountEqual(json_parser.get_identifiers(), correct_identifiers)
-            for file, identifier in zip(correct_file_to_id, correct_id_to_file):
-                self.assertEqual(correct_file_to_id[file], json_parser.file_to_id(file))
-                self.assertEqual(correct_id_to_file[identifier], json_parser.id_to_file(identifier))
-
-            # YAML parser
-            yaml_parser = YAMLParser(TEST_FILES_PATH + "meta.yml")
-            self.assertCountEqual(yaml_parser.get_metadata(), correct_metadata)
-            self.assertCountEqual(yaml_parser.get_filenames(), correct_filenames)
-            self.assertCountEqual(yaml_parser.get_identifiers(), correct_identifiers)
-            for file, identifier in zip(correct_file_to_id, correct_id_to_file):
-                self.assertEqual(correct_file_to_id[file], yaml_parser.file_to_id(file))
-                self.assertEqual(correct_id_to_file[identifier], yaml_parser.id_to_file(identifier))
-
-            # cleanup
-            gs_rm = subprocess.run(["rm", "-rf"] + glob(TEST_FILES_PATH + "gradescope-export/*.ipynb"), stdout=PIPE, stderr=PIPE)
-            self.assertEqual(len(gs_rm.stderr), 0, gs_rm.stderr.decode("utf-8"))
-
-        except:
-            # cleanup
-            gs_rm = subprocess.run(["rm", "-rf"] + glob(TEST_FILES_PATH + "gradescope-export/*.ipynb"), stdout=PIPE, stderr=PIPE)
-            self.assertEqual(len(gs_rm.stderr), 0, gs_rm.stderr.decode("utf-8"))
-            raise
-
     def test_notebooks_with_pdfs(self):
         """
         Check that the example of 100 notebooks runs correctely locally.
@@ -190,7 +84,6 @@ class TestGrade(TestCase):
 
         # grade the 100 notebooks
         grade(
-            yaml = TEST_FILES_PATH + "notebooks/meta.yml", 
             path = TEST_FILES_PATH + "notebooks/", 
             output_dir = "test/",
             autograder = TEST_FILES_PATH + "autograder.zip",
@@ -202,8 +95,8 @@ class TestGrade(TestCase):
         df_test = pd.read_csv("test/final_grades.csv")
 
         # sort by filename
-        df_test = df_test.sort_values("identifier").reset_index(drop=True)
-        df_test["failures"] = df_test["identifier"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
+        df_test = df_test.sort_values("file").reset_index(drop=True)
+        df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
 
         # add score sum cols for tests
         for test in self.test_points:
@@ -215,12 +108,12 @@ class TestGrade(TestCase):
             for test in self.test_points:
                 if int(re.sub(r"\D", "", test)) in row["failures"]:
                     # q6.py has all_or_nothing set to False, so if the hidden tests fail you should get 2.5 points
-                    if "6H" in row["identifier"] and "q6" == test:
-                        self.assertEqual(row[test], 2.5, "{} supposed to fail {} but passed".format(row["identifier"], test))
+                    if "6H" in row["file"] and "q6" == test:
+                        self.assertEqual(row[test], 2.5, "{} supposed to fail {} but passed".format(row["file"], test))
                     else:
-                        self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["identifier"], test))
+                        self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["file"], test))
                 else:
-                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["identifier"], test))
+                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["file"], test))
 
         # remove the extra output
         cleanup_command = ["rm", "-rf", "test/final_grades.csv", "test/submission_pdfs", "test/final_grades.csv", TEST_FILES_PATH + "autograder.zip"]

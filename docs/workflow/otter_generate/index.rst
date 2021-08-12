@@ -131,8 +131,8 @@ printed below for documenting each option.
     token: null                       # a Gradescope token for uploading a PDF of the notebook
     course_id: None                   # a Gradescope course ID for uploading a PDF of the notebook
     assignment_id: None               # a Gradescope assignment ID for uploading a PDF of the notebook
-    filtering: true                   # whether the generated PDF should have cells filtered out
-    pagebreaks: true                  # whether the generated PDF should have pagebreaks between filtered sectios
+    filtering: false                  # whether the generated PDF should have cells filtered out
+    pagebreaks: false                 # whether the generated PDF should have pagebreaks between filtered sectios
     debug: false                      # whether to run the autograder in debug mode (without ignoring errors)
     autograder_dir: /autograder       # the directory in which autograding is taking place
     lang: python                      # the language of the assignment; one of {'python', 'r'}
