@@ -1,46 +1,30 @@
 #!/usr/bin/env bash
 
-# apt-get clean
-# apt-get update
-# apt-get install -y python3.7 python3-pip python3.7-dev
+if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
+    apt-get clean
+    apt-get update
+    apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-generic-recommended build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev
 
-apt-get clean
-apt-get update
-apt-get install -y pandoc
-apt-get install -y texlive-xetex texlive-fonts-recommended texlive-generic-recommended
+    # install wkhtmltopdf
+    wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
+    apt-get install -y /tmp/wkhtmltopdf.deb
 
-# install wkhtmltopdf
-wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
-apt-get install -y /tmp/wkhtmltopdf.deb
+    # update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
 
-# update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+    # try to set up R
+    apt-get clean
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+    add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/'
 
-# try to set up R
-apt-get clean
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
-add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/'
+    # install conda
+    wget -nv -O {{ autograder_dir }}/source/miniconda_install.sh "{{ miniconda_install_url }}"
+    chmod +x {{ autograder_dir }}/source/miniconda_install.sh
+    {{ autograder_dir }}/source/miniconda_install.sh -b
+    echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
 
-add-apt-repository ppa:cran/libgit2
-apt-get update
-apt-get install -y build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev
-
-# install conda
-wget -nv -O {{ autograder_dir }}/source/miniconda_install.sh "{{ miniconda_install_url }}"
-chmod +x {{ autograder_dir }}/source/miniconda_install.sh
-{{ autograder_dir }}/source/miniconda_install.sh -b
-echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
-
-export PATH=/root/miniconda3/bin:$PATH
-export TAR="/bin/tar"
-
-# # install R dependencies
-# conda install --yes r-base r-essentials 
-# conda install --yes r-devtools -c conda-forge
-
-# # install requirements
-# pip3 install -r {{ autograder_dir }}/source/requirements.txt
-# pip install -r {{ autograder_dir }}/source/requirements.txt
-# Rscript {{ autograder_dir }}/source/requirements.r
+    export PATH=/root/miniconda3/bin:$PATH
+    export TAR="/bin/tar"
+fi
 
 # install dependencies with conda
 conda env create -f {{ autograder_dir }}/source/environment.yml

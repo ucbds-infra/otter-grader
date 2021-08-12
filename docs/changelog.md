@@ -1,5 +1,18 @@
 # Changelog
 
+**v2.2.6:**
+
+* Updated Otter Grade Dockerfile to simplify build process
+* Updated Otter Grade container management workflow
+* Updated `setup.sh` templates to reflect the new Dockerfile changes
+* Changed the display of failed test results in Otter Assign validation
+* Made `rpy2` an optional depenency
+
+**v2.2.5:**
+
+* Upgraded to Miniconda 4.10.3 in grading images
+* Fixed [#272](https://github.com/ucbds-infra/otter-grader/issues/272)
+
 **v2.2.4:**
 
 * Fixed total score printout for the use of the `points_possible` configuration

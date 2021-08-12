@@ -2,3 +2,4 @@ git+https://github.com/tk0miya/testing.postgresql.git@c81ded434d00ec8424de0f9e1f
 responses
 scikit-learn
 nbformat<5.1.0
+rpy2
