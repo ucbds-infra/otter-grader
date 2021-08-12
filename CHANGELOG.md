@@ -10,12 +10,13 @@ _Changes listed in this section are currently hosted in the `beta` branch on Git
 * Added token argument to Otter Generate and Otter Assign
 * Implemented submission zip validation against local test cases in `otter.Notebook`
 
-**Unreleased:**
+**v2.2.6:**
 
 * Updated Otter Grade Dockerfile to simplify build process
 * Updated Otter Grade container management workflow
 * Updated `setup.sh` templates to reflect the new Dockerfile changes
 * Changed the display of failed test results in Otter Assign validation
+* Made `rpy2` an optional depenency
 
 **v2.2.5:**
 
