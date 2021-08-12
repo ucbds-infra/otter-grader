@@ -12,7 +12,7 @@ docker-test:
 
 tutorial:
 	cd docs/tutorial; \
-	zip -r tutorial.zip submissions demo.ipynb meta.json requirements.txt -x "*.DS_Store"; \
+	zip -r tutorial.zip submissions demo.ipynb requirements.txt -x "*.DS_Store"; \
 	cp tutorial.zip ../_static; \
 	rm tutorial.zip
 
