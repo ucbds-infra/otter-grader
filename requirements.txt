@@ -23,5 +23,5 @@ google-api-python-client
 six
 
 # ottr requirements
-rpy2
 jupytext
+# rpy2 is also required but not included here because R is required for its installation
