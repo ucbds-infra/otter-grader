@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v2.2.6:**
 
 * Updated Otter Grade Dockerfile to simplify build process
 * Updated Otter Grade container management workflow
