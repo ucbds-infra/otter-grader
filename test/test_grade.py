@@ -95,8 +95,8 @@ class TestGrade(TestCase):
         df_test = pd.read_csv("test/final_grades.csv")
 
         # sort by filename
-        df_test = df_test.sort_values("identifier").reset_index(drop=True)
-        df_test["failures"] = df_test["identifier"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
+        df_test = df_test.sort_values("file").reset_index(drop=True)
+        df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
 
         # add score sum cols for tests
         for test in self.test_points:
@@ -108,12 +108,12 @@ class TestGrade(TestCase):
             for test in self.test_points:
                 if int(re.sub(r"\D", "", test)) in row["failures"]:
                     # q6.py has all_or_nothing set to False, so if the hidden tests fail you should get 2.5 points
-                    if "6H" in row["identifier"] and "q6" == test:
-                        self.assertEqual(row[test], 2.5, "{} supposed to fail {} but passed".format(row["identifier"], test))
+                    if "6H" in row["file"] and "q6" == test:
+                        self.assertEqual(row[test], 2.5, "{} supposed to fail {} but passed".format(row["file"], test))
                     else:
-                        self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["identifier"], test))
+                        self.assertEqual(row[test], 0, "{} supposed to fail {} but passed".format(row["file"], test))
                 else:
-                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["identifier"], test))
+                    self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["file"], test))
 
         # remove the extra output
         cleanup_command = ["rm", "-rf", "test/final_grades.csv", "test/submission_pdfs", "test/final_grades.csv", TEST_FILES_PATH + "autograder.zip"]

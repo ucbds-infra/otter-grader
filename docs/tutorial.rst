@@ -128,7 +128,7 @@ like this:
 
 .. code-block::
 
-    filename,q1,q2,q3
+    file,q1,q2,q3
     fails3Hidden.ipynb,1.0,1.0,0.5
     passesAll.ipynb,1.0,1.0,1.0
     fails1.ipynb,0.6666666666666666,1.0,1.0
@@ -141,7 +141,7 @@ Let's make that a bit prettier:
 .. list-table::
     :header-rows: 1
 
-    * - filename
+    * - file
       - q1
       - q2
       - q3
