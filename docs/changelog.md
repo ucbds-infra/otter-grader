@@ -6,6 +6,7 @@
 * Updated Otter Grade container management workflow
 * Updated `setup.sh` templates to reflect the new Dockerfile changes
 * Changed the display of failed test results in Otter Assign validation
+* Made `rpy2` an optional depenency
 
 **v2.2.5:**
 
