@@ -28,8 +28,9 @@ OTTR_BRANCH = "1.0.0.b0"  # this should match a release tag on GitHub
 
 
 def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", requirements=None, 
-         overwrite_requirements=False, environment=None, no_env=False, username=None, password=None, 
-         token=None, files=[], assignment=None, plugin_collection=None):
+         no_requirements=False, overwrite_requirements=False, environment=None, no_environment=False, 
+         username=None, password=None, token=None, files=[], assignment=None, 
+         plugin_collection=None):
     """
     Runs Otter Generate
 
@@ -39,10 +40,11 @@ def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", r
         config (``str``): path to an Otter configuration JSON file
         lang (``str``): the language of the assignment; one of ``["python", "r"]``
         requirements (``str``): path to a Python or R requirements file for this assignment
+        no_requirements (``bool``): disables auto-inclusion of requirements file at ./requirements.txt
         overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
             adding to them
         environment (``str``): path to a conda environment file for this assignment
-        no_env (``bool``): whether ``./evironment.yml`` should be automatically checked if 
+        no_environment (``bool``): whether ``./evironment.yml`` should be automatically checked if 
             ``environment`` is unspecified
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
@@ -127,14 +129,18 @@ def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", r
             shutil.copy(file, test_dir)
 
         # open requirements if it exists
-        with load_default_file(requirements, f"requirements.{'R' if options['lang'] == 'r' else 'txt'}") as reqs:
+        with load_default_file(
+            requirements, 
+            f"requirements.{'R' if options['lang'] == 'r' else 'txt'}", 
+            default_disabled=no_requirements
+        ) as reqs:
             template_context["other_requirements"] = reqs if reqs is not None else ""
 
         template_context["overwrite_requirements"] = overwrite_requirements
 
         # open environment if it exists
         # unlike requirements.txt, we will always overwrite, not append by default
-        with load_default_file(environment, "environment.yml", default_disabled=no_env) as env_contents:
+        with load_default_file(environment, "environment.yml", default_disabled=no_environment) as env_contents:
             template_context["other_environment"] = env_contents
             if env_contents is not None:
                 data = yaml.safe_load(env_contents)
