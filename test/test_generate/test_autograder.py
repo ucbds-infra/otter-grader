@@ -32,7 +32,7 @@ class TestAutograder(TestCase):
             output_dir = TEST_FILES_PATH,
             requirements = TEST_FILES_PATH + "requirements.txt",
             files = [TEST_FILES_PATH + "data/test-df.csv"],
-            no_env = True,  # don't use the environment.yml in the root of the repo
+            no_environment = True,  # don't use the environment.yml in the root of the repo
         )
 
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
@@ -50,7 +50,7 @@ class TestAutograder(TestCase):
                 requirements = TEST_FILES_PATH + "requirements.txt",
                 config = TEST_FILES_PATH + "otter_config.json",
                 files = [TEST_FILES_PATH + "data/test-df.csv"],
-                no_env = True,  # don't use the environment.yml in the root of the repo
+                no_environment = True,  # don't use the environment.yml in the root of the repo
             )
             mocked_client.assert_not_called()
     

@@ -63,7 +63,7 @@ class TestGrade(TestCase):
             requirements = TEST_FILES_PATH + "requirements.txt", 
             output_dir = TEST_FILES_PATH,
             config = TEST_FILES_PATH + "otter_config.json" if pdfs else None,
-            no_env = True,
+            no_environment = True,
         )
 
     def test_docker(self):

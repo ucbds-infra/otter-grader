@@ -275,7 +275,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         requirements=requirements,
         overwrite_requirements=assignment.overwrite_requirements,
         environment="environment.yml" if assignment.environment else None,
-        no_env=False,
+        no_environment=False,
         username=gs_username,
         password=gs_password,
         files=files,
