@@ -27,9 +27,9 @@ OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "1.0.0.b0"  # this should match a release tag on GitHub
 
 
-def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", requirements=None, 
-         no_requirements=False, overwrite_requirements=False, environment=None, no_environment=False, 
-         username=None, password=None, token=None, files=[], assignment=None, 
+def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False, lang="python", 
+         requirements=None, no_requirements=False, overwrite_requirements=False, environment=None, 
+         no_environment=False, username=None, password=None, token=None, files=[], assignment=None, 
          plugin_collection=None):
     """
     Runs Otter Generate
@@ -38,6 +38,7 @@ def main(*, tests_path="./tests", output_dir="./", config=None, lang="python", r
         tests_path (``str``): path to directory of test files for this assignment
         output_dir (``str``): directory in which to write output zip file
         config (``str``): path to an Otter configuration JSON file
+        no_config (``bool``): disables auto-inclusion of Otter config file at ./otter_config.json
         lang (``str``): the language of the assignment; one of ``["python", "r"]``
         requirements (``str``): path to a Python or R requirements file for this assignment
         no_requirements (``bool``): disables auto-inclusion of requirements file at ./requirements.txt

@@ -79,6 +79,7 @@ defaults = generate.__kwdefaults__
 @click.option("-t", "--tests-path", default=defaults["tests_path"], type=click.Path(exists=True, file_okay=False), help="Path to test files")
 @click.option("-o", "--output-dir", default=defaults["output_dir"], type=click.Path(exists=True, file_okay=False), help="Path to which to write zipfile")
 @click.option("-c", "--config", type=click.Path(exists=True, file_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
+@click.option("--no-config", is_flag=True, help="Disable auto-inclusion of unspecified Otter config file at ./otter_config.json")
 @click.option("-r", "--requirements", type=click.Path(exists=True, file_okay=False), help="Path to requirements.txt file; ./requirements.txt automatically checked")
 @click.option("--no-requirements", is_flag=True, help="Disable auto-inclusion of unespecified requirements file at ./requirements.txt")
 @click.option("--overwrite-requirements", is_flag=True, help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
