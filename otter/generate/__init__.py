@@ -61,7 +61,7 @@ def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False,
             both
     """
     # read in otter_config.json
-    if config is None and os.path.isfile("otter_config.json"):
+    if config is None and os.path.isfile("otter_config.json") and not no_config:
         config = "otter_config.json"
 
     if config is not None and not os.path.isfile(config):
