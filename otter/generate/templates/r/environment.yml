@@ -6,6 +6,8 @@ dependencies:
     - python=3.7
     - pip
     - nb_conda_kernels
+    - gcc_linux-64
+    - gxx_linux-64
     - r-base 
     - r-essentials 
     - r-devtools

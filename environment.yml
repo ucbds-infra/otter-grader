@@ -4,6 +4,8 @@ channels:
     - defaults
 dependencies:
     - python>=3.6
+    - gcc_linux-64
+    - gxx_linux-64
     - r-base
     - r-essentials
     - r-devtools
