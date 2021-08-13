@@ -10,6 +10,7 @@ _Changes listed in this section are currently hosted in the `beta` branch on Git
 * Added token argument to Otter Generate and Otter Assign
 * Implemented submission zip validation against local test cases in `otter.Notebook`
 * Removed metadata files for Otter Grade
+* Added flags for disabling file auto-inclusion in Otter Generate
 
 **v2.2.6:**
 
