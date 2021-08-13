@@ -1,8 +1,6 @@
 # Changelog
 
-**Unreleased (beta):**
-
-_Changes listed in this section are currently hosted in the `beta` branch on GitHub but are not in a beta release yet._
+**v3.0.0.b0:**
 
 * Added support for Ottr v1.0.0.b0
 * Converted CLI to `click` from `argparse`
