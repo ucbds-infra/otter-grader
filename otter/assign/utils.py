@@ -211,8 +211,8 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args is True:
         generate_args = {}
 
-        if assignment.is_r:
-            generate_args["lang"] = "r"
+    if assignment.is_r:
+        generate_args["lang"] = "r"
 
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
