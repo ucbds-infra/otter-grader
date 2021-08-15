@@ -1,5 +1,9 @@
 # Changelog
 
+**v3.0.0.b1:**
+
+* Fixed installation of `stringi` in Gradescope R build per [#259](https://github.com/ucbds-infra/otter-grader/issues/259)
+
 **v3.0.0.b0:**
 
 * Added support for Ottr v1.0.0.b0
