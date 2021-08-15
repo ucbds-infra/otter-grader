@@ -6,7 +6,5 @@ dependencies:
     - python=3.7
     - pip
     - nb_conda_kernels
-    - gcc_linux-64
-    - gxx_linux-64
     - pip:
         - -r requirements.txt{% else %}{{ other_environment }}{% endif %}
