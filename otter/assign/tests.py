@@ -17,7 +17,6 @@ from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
-OttrTest = namedtuple('OttrTest', ['name', 'hidden', 'body'])
 
 
 def is_test_cell(cell):
@@ -41,7 +40,7 @@ def any_public_tests(test_cases):
     Returns whether any of the ``Test`` named tuples in ``test_cases`` are public tests.
 
     Args:
-        test_cases (``list`` of ``Test`` or ``OttrTest``): list of test cases
+        test_cases (``list`` of ``Test``): list of test cases
     
     Returns:
         ``bool``: whether any of the tests are public
@@ -60,7 +59,7 @@ def read_test(cell, question, assignment):
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
-        ``Test`` or ``OttrTest``: test named tuple
+        ``Test``: test named tuple
     """
     hidden = bool(re.search("hidden", get_source(cell)[0], flags=re.IGNORECASE))
     output = ''
