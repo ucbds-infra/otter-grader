@@ -181,6 +181,9 @@ fields (in any order):
 * ``manual`` (optional) - a boolean (default ``false``); whether to include the response cell in a 
   PDF for manual grading
 * ``points`` (optional) - a number (default ``1``); how many points the question is worth
+* ``check_cell`` (optional) - a boolean (default ``true``); whether to include a cell after the
+  question that calls ``otter.Notebook.check`` for the public tests; ignored if ``manual`` is 
+  ``true``
 
 As an example, the question metadata below indicates an autograded question ``q1`` worth 1 point.
 
