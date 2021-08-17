@@ -1,3 +1,5 @@
+# A workflow for automatically adding all new issues to a project
+name: Add issues to project
 on:
   issues:
     types: [ opened ]
