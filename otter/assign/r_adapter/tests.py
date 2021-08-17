@@ -13,7 +13,7 @@ from ..constants import TEST_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLAT
 from ..tests import write_test
 from ..utils import get_source, lock
 
-Test = namedtuple('Test', ['name', 'hidden', 'body', 'success_message', 'failure_message'])
+Test = namedtuple('Test', ['name', 'hidden', 'points', 'body', 'success_message', 'failure_message'])
 
 def read_test(cell, question, assignment, rmd=False):
     """
@@ -44,7 +44,7 @@ def read_test(cell, question, assignment, rmd=False):
     # assert test_name is not None, f"Could not parse test name:\n{cell}"
     # TODO: hook up success_message and failure_message
     # TODO: add parsing for TEST CONFIG blocks
-    return Test(test_name, hidden, '\n'.join(lines), "", "")
+    return Test(test_name, hidden, None, '\n'.join(lines), "", "")
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """
@@ -65,7 +65,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     cell.source = ['. = ottr::check("tests/{}.R")'.format(question['name'])]
 
     points = question.get('points', len(tests))
-    if isinstance(points, int):
+    if isinstance(points, (int, float)):
         if points % len(tests) == 0:
             points = [points // len(tests) for _ in range(len(tests))]
         else:
@@ -73,6 +73,8 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     assert isinstance(points, list) and len(points) == len(tests), \
         f"Points for question {question['name']} could not be parsed:\n{points}"
 
+    # update point values
+    tests = [tc._replace(points=p) for tc, p in zip(tests, points)]
     test = gen_suite(question['name'], tests, points)
 
     tests_dict[question['name']] = test

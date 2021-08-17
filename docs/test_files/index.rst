@@ -8,4 +8,4 @@ Test Files
     :hidden:
 
     ok_format
-    testthat_format
+    r_format

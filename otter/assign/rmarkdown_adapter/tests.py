@@ -40,7 +40,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     cell = Cell("code", source)
 
     points = question.get('points', len(tests))
-    if isinstance(points, int):
+    if isinstance(points, (int, float)):
         if points % len(tests) == 0:
             points = [points // len(tests) for _ in range(len(tests))]
         else:
@@ -48,6 +48,8 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     assert isinstance(points, list) and len(points) == len(tests), \
         f"Points for question {question['name']} could not be parsed:\n{points}"
 
+    # update point values
+    tests = [tc._replace(points=p) for tc, p in zip(tests, points)]
     test = gen_suite(question['name'], tests, points)
 
     tests_dict[question['name']] = test

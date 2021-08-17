@@ -46,6 +46,8 @@ Autograded Questions
 
 Here is an example question in an Otter Assign for R formatted notebook:
 
+.. TODO: update screenshot
+
 .. image:: images/R_assign_sample_question.png
     :target: images/R_assign_sample_question.png
     :alt: 
@@ -104,29 +106,20 @@ Test Cells
 The test cells are any code cells following the solution cell that begin with the comment 
 ``## Test ##`` or ``## Hidden Test ##`` (case insensitive). A ``Test`` is distributed to students 
 so that they can validate their work. A ``Hidden Test`` is not distributed to students, but is used 
-for scoring their work. When writing tests, each test cell should be a single call to 
-``testthat::test_that`` and there should be no code outside of the ``test_that`` call. For 
-example, instead of
+for scoring their work. When writing tests, each test cell maps to a single test case and should
+raise an error if the test fails. The removal behavior regarding questions with no solution 
+provided holds for R notebooks.
 
 .. code-block:: r
 
     ## Test ##
-    data = data.frame()
-    test_that("q1a", {
-        # some test
-    })
-
-do the following:
+    testthat::expect_true(some_bool)
 
 .. code-block:: r
 
-    ## Test ##
-    test_that("q1a", {
-        data = data.frame()
-        # some test
-    })
+    ## Hidden Test ##
+    testthat::expect_equal(some_value, 1.04)
 
-The removal behavior regarding questions with no solution provided holds for R notebooks.
 
 Manually Graded Questions
 -------------------------
