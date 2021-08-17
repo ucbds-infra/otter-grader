@@ -114,20 +114,7 @@ def get_transformed_cells(cells, assignment):
             elif is_test_cell(cell):
                 no_solution = True
                 test = read_test(cell, question_metadata, assignment)
-
-                # does not seem to work
-                # if (hasattr(test, 'points')):
-                #     if (test.points == None):
-                #         test._replace(points = 1)
-                #     if (test.success_message == None):
-                #         test._replace(success_message = DEFAULT_SUCCESS_MESSAGE)
-                #     if (test.failure_message == None):
-                #         test._replace(failure_message = DEFAULT_FAILURE_MESSAGE)
                 test_cases.append(test)
-
-            # elif is_seed_cell(cell):
-            #     assignment.seed_required = True
-            #     continue
 
             if not no_solution:
                 transformed_cells.append(cell)
@@ -137,22 +124,7 @@ def get_transformed_cells(cells, assignment):
         # if this is a test cell, parse and add to test_cases
         elif question_metadata and processed_solution and is_test_cell(cell):
             test = read_test(cell, question_metadata, assignment)
-            
-            # does not seem to work
-            # if (hasattr(test, 'points')):
-            #     if (test.points == None):
-            #         test._replace(points = 1)
-            #     if (test.success_message == None):
-            #         test._replace(success_message = DEFAULT_SUCCESS_MESSAGE)
-            #     if (test.failure_message == None):
-            #         test._replace(failure_message = DEFAULT_FAILURE_MESSAGE)
             test_cases.append(test)
-
-        # # if this is a solution cell, append. if manual question and no prompt, also append prompt cell
-        # elif question_metadata and processed_solution and is_solution_cell(cell):
-        #     if is_markdown_solution_cell(cell) and not md_has_prompt:
-        #         transformed_cells.append(gen_markdown_response_cell())
-        #     transformed_cells.append(cell)
 
         else:
             # the question is over -- we've seen the question and solution and any tests and now we 
@@ -164,7 +136,9 @@ def get_transformed_cells(cells, assignment):
                     check_cell = gen_test_cell(question_metadata, test_cases, test_files, assignment)
 
                     # only add to notebook if there's a response cell or if there are public tests
-                    if not no_solution or any_public_tests(test_cases):
+                    # don't add cell if the 'check_cell' key of quetion_metadata is false
+                    if (not no_solution or any_public_tests(test_cases)) and \
+                            question_metadata.get('check_cell', True):
                         transformed_cells.append(check_cell)
 
                 # add a cell with <!-- END QUESTION --> if a manually graded question

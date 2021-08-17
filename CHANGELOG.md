@@ -1,5 +1,10 @@
 # Changelog
 
+**v3.0.0.b2:**
+
+* Fixed bug in Otter Assign for R causing point values in test files not to render
+* Added the `check_cell` key to question metadata in Otter Assign
+
 **v3.0.0.b1:**
 
 * Fixed installation of `stringi` in Gradescope R build per [#259](https://github.com/ucbds-infra/otter-grader/issues/259)
