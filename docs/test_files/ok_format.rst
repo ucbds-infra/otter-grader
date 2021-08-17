@@ -1,4 +1,4 @@
-Python: OK Format
+Python Format
 =================
 
 Otter has different test file formats depending on which language you are grading. Python test files 
