@@ -4,7 +4,7 @@ test = list(
     ottr::TestCase$new(
       hidden = FALSE,
       name = NA,
-      points = ,
+      points = 1,
       code = {
         test_that("q1a", {
             expect_true(is.numeric(x))
@@ -14,7 +14,7 @@ test = list(
     ottr::TestCase$new(
       hidden = FALSE,
       name = NA,
-      points = ,
+      points = 1,
       code = {
         test_that("q1b", {
             expect_true(0 < x)
@@ -25,7 +25,7 @@ test = list(
     ottr::TestCase$new(
       hidden = TRUE,
       name = NA,
-      points = ,
+      points = 1,
       code = {
         test_that("q1c", {
             expect_equal(x, 2)
@@ -35,7 +35,7 @@ test = list(
     ottr::TestCase$new(
       hidden = TRUE,
       name = NA,
-      points = ,
+      points = 2,
       code = {
         test_that("q1d", {
             expect_equal(as.character(x), "2")
