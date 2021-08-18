@@ -40,7 +40,7 @@ class TestAssign(TestCase):
         Checks that otter assign filters and outputs correctly
         """
         # run otter assign
-        assign(TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v0=True)
+        assign(TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", no_run_tests=True)
        
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
         
