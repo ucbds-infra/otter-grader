@@ -127,7 +127,7 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "key": "test_files",
         "description": "whether to store tests in separate .py files rather than in the notebook " \
             "metadata",
-        "default": True,
+        "default": False,
     },
 ]
 

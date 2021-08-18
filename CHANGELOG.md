@@ -1,5 +1,12 @@
 # Changelog
 
+**Unreleased (beta):**
+
+* Added Otter Assign format v1
+* Added flag ``--v0`` to `otter assign`` to indicate use of Otter Assign format v0
+* Deprecated Otter Assign format v0 for removal in Otter v4
+* Default-disabled separate test files in Otter Assign v1 format
+
 **v3.0.0.b2:**
 
 * Fixed bug in Otter Assign for R causing point values in test files not to render
