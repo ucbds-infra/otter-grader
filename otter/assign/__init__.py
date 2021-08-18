@@ -17,7 +17,7 @@ from ..utils import get_relpath, block_print
 
 
 def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
-         debug=False, v0=False):
+         debug=False, v1=False):
     """
     Runs Otter Assign on a master notebook
     
@@ -30,12 +30,12 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
-        v0 (``bool``): whether to use Otter Assign Format v0 instead of v1
+        v1 (``bool``): whether to use Otter Assign Format v1 instead of v0
     """
-    if v0:
+    if not v1:
         warnings.warn(
-            "Otter Assign format v0 is deprecated and will be removed in Otter v4.",
-            DeprecationWarning)
+            "Otter Assign format v0 will be deprecated in Otter v4 and removed in a later release.",
+            FutureWarning)
             
         from .v0 import main as v0_main
         return v0_main(master, result, no_pdfs=no_pdfs, no_run_tests=no_run_tests, username=username, 

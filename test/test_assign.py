@@ -40,7 +40,7 @@ class TestAssign(TestCase):
         Checks that otter assign filters and outputs correctly
         """
         # run otter assign
-        assign(TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", no_run_tests=True)
+        assign(TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v1=True)
        
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
         
@@ -48,7 +48,7 @@ class TestAssign(TestCase):
         """
         Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
         """
-        assign(TEST_FILES_PATH + "generate-otter.ipynb", TEST_FILES_PATH + "output", v0=True)
+        assign(TEST_FILES_PATH + "generate-otter.ipynb", TEST_FILES_PATH + "output")
         
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "otter-correct")     
 
@@ -56,7 +56,7 @@ class TestAssign(TestCase):
         """
         Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
         """
-        assign(TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v0=True)
+        assign(TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output", no_run_tests=True)
       
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
     
@@ -70,7 +70,7 @@ class TestAssign(TestCase):
         # is called
         mocked_client.return_value = 'token'  
 
-        assign(TEST_FILES_PATH + "generate-gradescope.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v0=True)
+        assign(TEST_FILES_PATH + "generate-gradescope.ipynb", TEST_FILES_PATH + "output", no_run_tests=True)
       
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
 
@@ -83,7 +83,7 @@ class TestAssign(TestCase):
         """
         Checks that otter assign works for R notebooks correctly
         """
-        assign(TEST_FILES_PATH + "r-example.ipynb", TEST_FILES_PATH + "output", v0=True)
+        assign(TEST_FILES_PATH + "r-example.ipynb", TEST_FILES_PATH + "output")
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", ignore_ext=[".pdf",".zip"])
 
@@ -91,7 +91,7 @@ class TestAssign(TestCase):
         """
         Checks that otter assign works for Rmd files
         """
-        assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output", v0=True)
+        assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output")
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", ignore_ext=[".zip"])
         

@@ -33,7 +33,7 @@ defaults = assign.__kwdefaults__
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--debug", is_flag=True, help="Do not ignore errors in running tests for debugging")
-@click.option("--v0", is_flag=True, help="Use Otter Assign format v0 instead of v1")
+@click.option("--v1", is_flag=True, help="Use Otter Assign format v1 instead of v0")
 def assign_cli(*args, **kwargs):
     """
     Create distribution versions of the Otter Assign formatted notebook MASTER and write the
