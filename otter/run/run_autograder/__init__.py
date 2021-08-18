@@ -49,15 +49,19 @@ def main(autograder_dir, **kwargs):
     
     try:
         output = run_autograder(options)
+
     except OtterRuntimeError as e:
         output = {
             "score": 0,
             "output": f"Otter encountered an error when grading this submission:\n\n{e}",
             "stdout_visibility": "hidden",
         }
+        raise e
 
-    with open("./results/results.json", "w+") as f:
-        json.dump(output, f, indent=4)
+    finally:
+        if "output" in vars():
+            with open("./results/results.json", "w+") as f:
+                json.dump(output, f, indent=4)
 
     print("\n\n", end="")
 
