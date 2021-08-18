@@ -34,7 +34,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
     """
     if v0:
         warnings.warn(
-            "Otter Assign format v0 is deprecated and will be removed in Otter-Grader v4.",
+            "Otter Assign format v0 is deprecated and will be removed in Otter v4.",
             DeprecationWarning)
             
         from .v0 import main as v0_main
