@@ -111,122 +111,126 @@ def run_autograder(options):
 
     os.chdir("./submission")
 
-    if options["zips"]:
-        zips = glob("*.zip")
-        if len(zips) > 1:
-            raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
+    try:
+        if options["zips"]:
+            zips = glob("*.zip")
+            if len(zips) > 1:
+                raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
 
-        with zipfile.ZipFile(zips[0])  as zf:
-            zf.extractall()
+            with zipfile.ZipFile(zips[0])  as zf:
+                zf.extractall()
 
-    nbs = glob("*ipynb")
+        nbs = glob("*ipynb")
 
-    if len(nbs) > 1:
-        raise OtterRuntimeError("More than one ipynb file found in submission")
+        if len(nbs) > 1:
+            raise OtterRuntimeError("More than one ipynb file found in submission")
 
-    if len(nbs) == 1:
-        nb_path = nbs[0]
-        script = False
-    else:
-        pys = glob("*.py")
-        pys = list(filter(lambda f: f != "__init__.py", pys))
-        if len(pys) > 1:
-            raise OtterRuntimeError("More than one Python file found in submission")
-        elif len(pys) == 1:
-            nb_path = pys[0]
-            script = True
+        if len(nbs) == 1:
+            nb_path = nbs[0]
+            script = False
         else:
-            raise OtterRuntimeError("No gradable files found in submission")
-
-    replace_notebook_instances(nb_path)
-
-    # load plugins
-    plugins = options["plugins"]
-
-    if plugins:
-        with open("../submission_metadata.json") as f:
-            submission_metadata = json.load(f)
-        
-        plugin_collection = PluginCollection(
-            plugins, os.path.abspath(nb_path), submission_metadata
-        )
-    
-    else:
-        plugin_collection = None
-
-    if plugin_collection:
-        plugin_collection.run("before_grading", options)
-
-    if options["token"] is not None:
-        client = APIClient(token=options["token"])
-        generate_pdf = True
-        has_token = True
-    else:
-        generate_pdf = options["pdf"]
-        has_token = False
-        client = None
-
-    if os.path.isfile(_OTTER_LOG_FILENAME):
-        try:
-            log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-        except Exception as e:
-            if options["grade_from_log"]:
-                raise e
+            pys = glob("*.py")
+            pys = list(filter(lambda f: f != "__init__.py", pys))
+            if len(pys) > 1:
+                raise OtterRuntimeError("More than one Python file found in submission")
+            elif len(pys) == 1:
+                nb_path = pys[0]
+                script = True
             else:
-                print(f"Could not deserialize the log due to an error:\n{e}")
-                log = None
-    else:
-        assert not options["grade_from_log"], "missing log"
-        log = None
+                raise OtterRuntimeError("No gradable files found in submission")
 
-    scores = grade_notebook(
-        nb_path, 
-        glob("./tests/*.py"), 
-        name="submission", 
-        cwd=".", 
-        test_dir="./tests",
-        ignore_errors=not options["debug"], 
-        seed=options["seed"],
-        log=log if options["grade_from_log"] else None,
-        variables=options["serialized_variables"],
-        plugin_collection=plugin_collection,
-        script=script,
-    )
+        replace_notebook_instances(nb_path)
 
-    if options["print_summary"]:
-        # print("\n" + "-" * 30 + " GRADING SUMMARY " + "-" * 30)
-        print("\n\n\n\n", end="")
-        print_full_width("-", mid_text="GRADING SUMMARY")
+        # load plugins
+        plugins = options["plugins"]
 
-    # verify the scores against the log
-    if options["print_summary"]:
-        print()
-        if log is not None:
-            try:
-                found_discrepancy = scores.verify_against_log(log)
-                if not found_discrepancy and options["print_summary"]:
-                    print("No discrepancies found while verifying scores against the log.")
-            except BaseException as e:
-                print(f"Error encountered while trying to verify scores with log:\n{e}")
+        if plugins:
+            with open("../submission_metadata.json") as f:
+                submission_metadata = json.load(f)
+            
+            plugin_collection = PluginCollection(
+                plugins, os.path.abspath(nb_path), submission_metadata
+            )
+
         else:
-            print("No log found with which to verify student scores.")
+            plugin_collection = None
 
-    if generate_pdf:
-        write_and_submit_pdf(
-            client, nb_path, options['filtering'], options['pagebreaks'], options['course_id'], 
-            options['assignment_id'], submit=has_token
+        if plugin_collection:
+            plugin_collection.run("before_grading", options)
+
+        if options["token"] is not None:
+            client = APIClient(token=options["token"])
+            generate_pdf = True
+            has_token = True
+        else:
+            generate_pdf = options["pdf"]
+            has_token = False
+            client = None
+
+        if os.path.isfile(_OTTER_LOG_FILENAME):
+            try:
+                log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+            except Exception as e:
+                if options["grade_from_log"]:
+                    raise e
+                else:
+                    print(f"Could not deserialize the log due to an error:\n{e}")
+                    log = None
+        else:
+            assert not options["grade_from_log"], "missing log"
+            log = None
+
+        scores = grade_notebook(
+            nb_path, 
+            glob("./tests/*.py"), 
+            name="submission", 
+            cwd=".", 
+            test_dir="./tests",
+            ignore_errors=not options["debug"], 
+            seed=options["seed"],
+            log=log if options["grade_from_log"] else None,
+            variables=options["serialized_variables"],
+            plugin_collection=plugin_collection,
+            script=script,
         )
 
-    output = scores.to_gradescope_dict(options)
+        if options["print_summary"]:
+            # print("\n" + "-" * 30 + " GRADING SUMMARY " + "-" * 30)
+            print("\n\n\n\n", end="")
+            print_full_width("-", mid_text="GRADING SUMMARY")
 
-    if plugin_collection:
-        report = plugin_collection.generate_report()
-        if report.strip():
-            print("\n\n" + report)
+        # verify the scores against the log
+        if options["print_summary"]:
+            print()
+            if log is not None:
+                try:
+                    found_discrepancy = scores.verify_against_log(log)
+                    if not found_discrepancy and options["print_summary"]:
+                        print("No discrepancies found while verifying scores against the log.")
+                except BaseException as e:
+                    print(f"Error encountered while trying to verify scores with log:\n{e}")
+            else:
+                print("No log found with which to verify student scores.")
 
-    os.chdir(abs_ag_path)
+        if generate_pdf:
+            write_and_submit_pdf(
+                client, nb_path, options['filtering'], options['pagebreaks'], options['course_id'], 
+                options['assignment_id'], submit=has_token
+            )
 
-    with open("results/results.pkl", "wb+") as f:
-        pickle.dump(scores, f)
+        output = scores.to_gradescope_dict(options)
 
-    return output
+        if plugin_collection:
+            report = plugin_collection.generate_report()
+            if report.strip():
+                print("\n\n" + report)
+
+        os.chdir(abs_ag_path)
+
+        with open("results/results.pkl", "wb+") as f:
+            pickle.dump(scores, f)
+
+        return output
+
+    finally:
+        os.chdir(abs_ag_path)
