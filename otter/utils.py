@@ -200,6 +200,11 @@ def convert_config_description_dict(configs):
                 "default": True,  # the default config value
             },
             {
+                "key": "required_config_name",
+                "description": "a description of the config for documentation",
+                "required": True,  # indicates that this must be user-specified and has no default
+            },
+            {
                 "key": "nested_config_name",
                 "description": "a description of the config for documentation",
                 "default": [  # note that a list is used for nested dict configs
@@ -223,6 +228,10 @@ def convert_config_description_dict(configs):
             },
         }
 
+    Any configurations with ``default`` unspecified have their default value set to ``None``. Any
+    configurations marked with ``"required": True`` are not included in the output dict (so that
+    they raise a ``KeyError`` if unspecified).
+
     Args:
         configs (``list[dict[str,object]]``): the configurations with the structure defined above
 
@@ -231,12 +240,12 @@ def convert_config_description_dict(configs):
     """
     res = {}
     for d in configs:
-        if isinstance(d["default"], list) and len(d["default"]) > 0 and \
-                all(isinstance(e, dict) for e in d["default"]):
+        default = d.get("default", None)
+        if isinstance(default, list) and len(default) > 0 and \
+                all(isinstance(e, dict) for e in default):
             default = convert_config_description_dict(d["default"])
-        else:
-            default = d["default"]
-        res[d["key"]] = default
+        if not d.get("required", False):
+            res[d["key"]] = default
     return res
 
 def assert_path_exists(path_tuples):

@@ -12,7 +12,7 @@ from .tests import gen_test_cell, is_test_cell
 from .utils import rmd_to_cells, Cell, collapse_empty_cells
 
 from ..assignment import is_assignment_cell, read_assignment_metadata
-from ..questions import is_question_cell, read_question_metadata, gen_question_cell
+from ..questions import is_question_cell, read_question_metadata
 from ..r_adapter.tests import read_test
 from ..solutions import has_seed
 from ..tests import any_public_tests

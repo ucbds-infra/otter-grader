@@ -1,9 +1,9 @@
 """Master notebook transformer for Otter Assign"""
 
-import os
 import copy
-import pathlib
 import nbformat
+import os
+import pathlib
 
 from .assignment import is_assignment_cell, read_assignment_metadata
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
@@ -11,10 +11,11 @@ from .cell_generators import (
     add_export_tag_to_cell, gen_init_cell, gen_markdown_response_cell, gen_export_cells, 
     gen_check_all_cell, gen_close_export_cell
 )
-from .questions import is_question_cell, read_question_metadata, gen_question_cell
+from .questions import create_question_config
 from .solutions import has_seed, SOLUTION_CELL_TAG
 from .tests import any_public_tests
 from .utils import add_tag, AssignNotebookFormatException, EmptyCellException, is_cell_type, is_ignore_cell
+
 
 def transform_notebook(nb, assignment):
     """
@@ -43,6 +44,7 @@ def transform_notebook(nb, assignment):
         if export_cell is True:
             export_cell = {}
 
+        # TODO: convert export_cell to default dict
         transformed_cells += gen_export_cells(
             export_cell.get('instructions', ''), 
             pdf = export_cell.get('pdf', True),
@@ -55,6 +57,7 @@ def transform_notebook(nb, assignment):
     transformed_nb['cells'] = transformed_cells
 
     return transformed_nb, test_files
+
 
 def get_transformed_cells(cells, assignment):
     """
@@ -88,7 +91,7 @@ def get_transformed_cells(cells, assignment):
 
             if block_type is BlockType.QUESTION:
 
-                if question_metadata.get("manual", False):  # TODO: convert question_metadata to defaultdict
+                if question_metadata["manual"]:
                     need_end_export = True
 
                 # generate a check cell
@@ -98,7 +101,7 @@ def get_transformed_cells(cells, assignment):
                     # only add to notebook if there's a response cell or if there are public tests
                     # don't add cell if the 'check_cell' key of quetion_metadata is false
                     if (not no_solution or any_public_tests(test_cases)) and \
-                            question_metadata.get('check_cell', True):
+                            question_metadata["check_cell"]:
                         transformed_cells.append(check_cell)
 
                     question_metadata, test_cases, has_prompt, no_solution = \
@@ -159,11 +162,11 @@ def get_transformed_cells(cells, assignment):
                 prompt_insertion_index = len(transformed_cells)
 
             elif block_type is BlockType.TESTS and not has_prompt:
-                no_solution = True  # TODO: what is this for?
+                no_solution = True
 
             elif block_type is BlockType.QUESTION:
-                question_metadata = get_cell_config(cell)
-                if question_metadata.get("manual", False):
+                question_metadata = create_question_config(get_cell_config(cell))
+                if question_metadata["manual"]:
                     need_begin_export = True
 
             curr_block.append(block_type)
