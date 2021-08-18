@@ -46,7 +46,7 @@ def read_test(cell, question, assignment):
         ``Test``: test named tuple
     """
     source = get_source(cell)
-    if source[0].lstrip.startswith("#"):
+    if source[0].lstrip().startswith("#"):
         hidden = bool(re.match(r"#\s+hidden\s*", source[0], flags=re.IGNORECASE))
     else:
         hidden = False
