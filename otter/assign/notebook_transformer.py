@@ -12,7 +12,7 @@ from .cell_generators import (
     gen_check_all_cell, gen_close_export_cell
 )
 from .questions import is_question_cell, read_question_metadata, gen_question_cell
-from .solutions import has_seed, is_markdown_solution_cell, SOLUTION_CELL_TAG
+from .solutions import has_seed, SOLUTION_CELL_TAG
 from .tests import any_public_tests
 from .utils import add_tag, AssignNotebookFormatException, EmptyCellException, is_cell_type, is_ignore_cell
 
@@ -37,7 +37,7 @@ def transform_notebook(nb, assignment):
 
     if assignment.check_all_cell and assignment.is_python:
         transformed_cells += gen_check_all_cell()
-    
+
     if assignment.export_cell and assignment.is_python:
         export_cell = assignment.export_cell
         if export_cell is True:
@@ -154,7 +154,7 @@ def get_transformed_cells(cells, assignment):
             # if not an invalid begin cell, update state
             if block_type is BlockType.PROMPT:
                 has_prompt = True
-            
+
             elif block_type is BlockType.SOLUTION and not has_prompt:
                 prompt_insertion_index = len(transformed_cells)
 
@@ -178,9 +178,11 @@ def get_transformed_cells(cells, assignment):
                 test_cases.append(test_case)
                 continue
 
-            elif curr_block[-1] == BlockType.SOLUTION and is_cell_type(cell, "markdown"):
-                solution_has_md_cells = True
+            elif curr_block[-1] == BlockType.SOLUTION:
                 cell = add_tag(cell, SOLUTION_CELL_TAG)
+
+                if is_cell_type(cell, "markdown"):
+                    solution_has_md_cells = True
 
         # add export tags if needed
         if need_begin_export:
