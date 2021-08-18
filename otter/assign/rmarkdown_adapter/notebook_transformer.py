@@ -16,7 +16,7 @@ from ..questions import is_question_cell, read_question_metadata
 from ..r_adapter.tests import read_test
 from ..solutions import has_seed
 from ..tests import any_public_tests
-from ..utils import is_ignore_cell, is_markdown_cell, EmptyCellException
+from ..utils import is_ignore_cell, EmptyCellException
 
 def transform_notebook(rmd_string, assignment):
     """

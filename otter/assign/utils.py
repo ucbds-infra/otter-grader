@@ -84,7 +84,7 @@ def is_ignore_cell(cell):
     return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
 
 def is_cell_type(cell, cell_type):
-    return cell["cell_type"] == cell_type
+    return cell.cell_type == cell_type
 
 
 #---------------------------------------------------------------------------------------------------
