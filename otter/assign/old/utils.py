@@ -25,14 +25,6 @@ class EmptyCellException(Exception):
     """
 
 
-class AssignNotebookFormatException(Exception):
-    """
-    """
-    def __init__(self, message, cell_index, *args, **kwargs):
-        message = message + f" (cell number { cell_index + 1 })"
-        super().__init__(message, *args, **kwargs)
-
-
 #---------------------------------------------------------------------------------------------------
 # Getters
 #---------------------------------------------------------------------------------------------------
@@ -69,6 +61,18 @@ def get_spec(source, begin):
 # Cell Type Checkers
 #---------------------------------------------------------------------------------------------------
 
+def is_markdown_cell(cell):
+    """
+    Returns whether ``cell`` is Markdown cell
+    
+    Args:
+        cell (``nbformat.NotebookNode``): notebook cell
+    
+    Returns:
+        ``bool``: whether the cell is a Markdown cell
+    """
+    return cell.cell_type == 'markdown'
+
 def is_ignore_cell(cell):
     """
     Returns whether the current cell should be ignored
@@ -81,9 +85,6 @@ def is_ignore_cell(cell):
     """
     source = get_source(cell)
     return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
-
-def is_cell_type(cell, cell_type):
-    return cell["cell_type"] == cell_type
 
 
 #---------------------------------------------------------------------------------------------------

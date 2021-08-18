@@ -151,7 +151,7 @@ def gen_close_export_cell():
     lock(cell)
     return cell
 
-def add_export_tag_to_cell(cell, end=False):
+def add_close_export_to_cell(cell):
     """
     Adds an HTML comment to close question export for PDF filtering to the top of ``cell``. ``cell``
     should be a Markdown cell. This adds ``<!-- END QUESTION-->`` as the first line of the cell.
@@ -164,8 +164,7 @@ def add_export_tag_to_cell(cell, end=False):
     """
     cell = copy.deepcopy(cell)
     source = get_source(cell)
-    tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
-    source = [tag, ""] + source
+    source = ["<!-- END QUESTION -->\n", "\n"] + source
     cell['source'] = "\n".join(source)
     return cell
 
