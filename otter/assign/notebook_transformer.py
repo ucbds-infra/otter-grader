@@ -106,9 +106,10 @@ def get_transformed_cells(cells, assignment):
                             question_metadata["check_cell"]:
                         transformed_cells.append(check_cell)
 
-                    question_metadata, test_cases, has_prompt, no_solution = \
-                        {}, [], False, False
-                    solution_has_md_cells, prompt_insertion_index = False, None
+                # TODO: reformat this state update
+                question_metadata, test_cases, has_prompt, no_solution = \
+                    {}, [], False, False
+                solution_has_md_cells, prompt_insertion_index = False, None
 
             elif block_type is BlockType.SOLUTION:
                 if not has_prompt and solution_has_md_cells:
@@ -190,12 +191,25 @@ def get_transformed_cells(cells, assignment):
                     solution_has_md_cells = True
 
         # add export tags if needed
+        export_delim_cell = None
         if need_begin_export:
-            cell = add_export_tag_to_cell(cell)
+            if is_cell_type(cell, "markdown"):
+                cell = add_export_tag_to_cell(cell)
+            else:
+                export_delim_cell = nbformat.v4.new_markdown_cell()
+                export_delim_cell = add_export_tag_to_cell(export_delim_cell)
             need_begin_export = False
         if need_end_export:
-            cell = add_export_tag_to_cell(cell, end=True)
+            if is_cell_type(cell, "markdown"):
+                cell = add_export_tag_to_cell(cell, end=True)
+            else:
+                if export_delim_cell is None:
+                    export_delim_cell = nbformat.v4.new_markdown_cell()
+                export_delim_cell = add_export_tag_to_cell(export_delim_cell, end=True)
             need_end_export = False
+
+        if export_delim_cell is not None:
+            transformed_cells.append(export_delim_cell)
 
         if has_seed(cell):
             assignment.seed_required = True

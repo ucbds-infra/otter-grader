@@ -23,8 +23,8 @@ _DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     },
     {
         "key": "points",
-        "description": "how many points this question is worth",
-        "default": 1,
+        "description": "how many points this question is worth; defaults to 1 internally",
+        "default": None,
     },
     {
         "key": "check_cell",
