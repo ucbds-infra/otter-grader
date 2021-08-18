@@ -83,17 +83,17 @@ class TestAssign(TestCase):
         """
         Checks that otter assign works for R notebooks correctly
         """
-        assign(TEST_FILES_PATH + "r-example.ipynb", TEST_FILES_PATH + "output")
+        assign(TEST_FILES_PATH + "r-example.ipynb", TEST_FILES_PATH + "output", v0=True)
 
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", ignore_ext=[".pdf",".zip"], v0=True)
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", ignore_ext=[".pdf",".zip"])
 
     def test_rmd_example(self):
         """
         Checks that otter assign works for Rmd files
         """
-        assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output")
+        assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output", v0=True)
 
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", ignore_ext=[".zip"], v0=True)
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", ignore_ext=[".zip"])
         
         # check gradescope zip file
         self.check_gradescope_zipfile(
