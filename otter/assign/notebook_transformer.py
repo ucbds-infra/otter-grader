@@ -5,12 +5,10 @@ import nbformat
 import os
 import pathlib
 
-# TODO: remove unused imports
-from .assignment import is_assignment_cell, read_assignment_metadata
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
 from .cell_generators import (
     add_export_tag_to_cell, gen_init_cell, gen_markdown_response_cell, gen_export_cells, 
-    gen_check_all_cell, gen_close_export_cell
+    gen_check_all_cell
 )
 from .questions import create_question_config
 from .solutions import has_seed, SOLUTION_CELL_TAG
@@ -80,6 +78,9 @@ def get_transformed_cells(cells, assignment):
     need_begin_export, need_end_export = False, False
 
     for i, cell in enumerate(cells):
+
+        if is_ignore_cell(cell):
+            continue
 
         # check for assignment config
         if is_assignment_config_cell(cell):
@@ -195,6 +196,9 @@ def get_transformed_cells(cells, assignment):
         if need_end_export:
             cell = add_export_tag_to_cell(cell, end=True)
             need_end_export = False
+
+        if has_seed(cell):
+            assignment.seed_required = True
 
         # this is just a normal cell so add it to transformed_cells
         transformed_cells.append(cell)

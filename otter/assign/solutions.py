@@ -10,7 +10,7 @@ SOLUTION_CELL_TAG = "otter_assign_solution_cell"
 
 
 def has_seed(cell):
-    if not cell.cell_type == 'code':
+    if not is_cell_type(cell, "code"):
         return False
     source = get_source(cell)
     return source and any([l.strip().endswith('# SEED') for l in source])
