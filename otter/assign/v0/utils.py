@@ -13,10 +13,10 @@ from textwrap import indent
 
 from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
-from ..execute import grade_notebook
-from ..generate import main as generate_autograder
-from ..generate.token import APIClient
-from ..utils import get_relpath, get_source
+from ...execute import grade_notebook
+from ...generate import main as generate_autograder
+from ...generate.token import APIClient
+from ...utils import get_relpath, get_source
 
 
 class EmptyCellException(Exception):

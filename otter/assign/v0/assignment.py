@@ -6,7 +6,7 @@ import yaml
 
 from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
-from ..utils import convert_config_description_dict
+from ...utils import convert_config_description_dict
 
 _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {

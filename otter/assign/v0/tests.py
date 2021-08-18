@@ -12,8 +12,8 @@ from collections import namedtuple
 from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGEX, OTTR_TEST_NAME_REGEX, \
     OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
-from ..test_files.abstract_test import TestFile
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
+from ...test_files.abstract_test import TestFile
+from ...test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
