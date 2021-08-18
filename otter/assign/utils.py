@@ -1,5 +1,6 @@
 """Utilities for Otter Assign"""
 
+import copy
 import json
 import os
 import pathlib
@@ -111,6 +112,29 @@ def lock(cell):
     m = cell['metadata']
     m["editable"] = False
     m["deletable"] = False
+
+def add_tag(cell, tag):
+    """
+    """
+    cell = copy.deepcopy(cell)
+    if "tags" not in cell["metadata"]:
+        cell["metadata"]["tags"] = []
+    cell["metadata"]["tags"].append(tag)
+    return cell
+
+def has_tag(cell, tag):
+    """
+    """
+    return tag in cell["metadata"].get("tags", [])
+
+def remove_tag(cell, tag):
+    """
+    """
+    cell = copy.deepcopy(cell)
+    if "tags" not in cell["metadata"] or tag not in cell["metadata"]["tags"]:
+        return cell
+    cell["metadata"]["tags"].remove(tag)
+    return cell
 
 
 #---------------------------------------------------------------------------------------------------

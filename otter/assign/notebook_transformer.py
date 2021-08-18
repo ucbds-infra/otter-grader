@@ -1,6 +1,4 @@
-"""
-Master notebook parser and transformer for Otter Assign
-"""
+"""Master notebook transformer for Otter Assign"""
 
 import os
 import copy
@@ -14,9 +12,9 @@ from .cell_generators import (
     gen_check_all_cell, gen_close_export_cell
 )
 from .questions import is_question_cell, read_question_metadata, gen_question_cell
-from .solutions import is_markdown_solution_cell, has_seed
+from .solutions import has_seed, is_markdown_solution_cell, SOLUTION_CELL_TAG
 from .tests import any_public_tests
-from .utils import AssignNotebookFormatException, EmptyCellException, is_cell_type, is_ignore_cell
+from .utils import add_tag, AssignNotebookFormatException, EmptyCellException, is_cell_type, is_ignore_cell
 
 def transform_notebook(nb, assignment):
     """
@@ -182,6 +180,7 @@ def get_transformed_cells(cells, assignment):
 
             elif curr_block[-1] == BlockType.SOLUTION and is_cell_type(cell, "markdown"):
                 solution_has_md_cells = True
+                cell = add_tag(cell, SOLUTION_CELL_TAG)
 
         # add export tags if needed
         if need_begin_export:
