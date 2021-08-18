@@ -33,8 +33,10 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         v0 (``bool``): whether to use Otter Assign Format v0 instead of v1
     """
     if v0:
-        warnings.warn(DeprecationWarning, 
-            "Otter Assign format v0 is deprecated and will be removed in Otter-Grader v4.")
+        warnings.warn(
+            "Otter Assign format v0 is deprecated and will be removed in Otter-Grader v4.",
+            DeprecationWarning)
+            
         from .v0 import main as v0_main
         return v0_main(master, result, no_pdfs=no_pdfs, no_run_tests=no_run_tests, username=username, 
             password=password, debug=debug)
