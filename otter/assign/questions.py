@@ -31,6 +31,11 @@ _DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "description": "whether to include a check cell after this question (for autograded questions only)",
         "default": True,
     },
+    {
+        "key": "export",
+        "description": "whether to force-include this question in the exported PDF",
+        "default": False,
+    },
 ]
 
 DEFAULT_QUESTION_CONFIGURATIONS = convert_config_description_dict(_DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS)

@@ -93,7 +93,7 @@ def get_transformed_cells(cells, assignment):
 
             if block_type is BlockType.QUESTION:
 
-                if question_metadata["manual"]:
+                if question_metadata["manual"] or question_metadata["export"]:
                     need_end_export = True
 
                 # generate a check cell
@@ -169,7 +169,7 @@ def get_transformed_cells(cells, assignment):
 
             elif block_type is BlockType.QUESTION:
                 question_metadata = create_question_config(get_cell_config(cell))
-                if question_metadata["manual"]:
+                if question_metadata["manual"] or question_metadata["export"]:
                     need_begin_export = True
 
             curr_block.append(block_type)

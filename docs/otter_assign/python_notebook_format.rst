@@ -183,8 +183,9 @@ fields (in any order):
 
     name: null        # (required) the path to a requirements.txt file
     manual: false     # whether this is a manually-graded question
-    points: 1         # how many points this question is worth
+    points: null      # how many points this question is worth; defaults to 1 internally
     check_cell: true  # whether to include a check cell after this question (for autograded questions only)
+    export: false     # whether to force-include this question in the exported PDF
 
 .. END YAML TARGET
 
