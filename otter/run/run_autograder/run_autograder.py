@@ -12,7 +12,7 @@ import zipfile
 
 from glob import glob
 
-from .utils import replace_notebook_instances
+from .utils import OtterRuntimeError, replace_notebook_instances
 from ...check.logs import Log, QuestionNotInLogException
 from ...check.notebook import _OTTER_LOG_FILENAME
 from ...execute import grade_notebook
@@ -114,7 +114,7 @@ def run_autograder(options):
     if options["zips"]:
         zips = glob("*.zip")
         if len(zips) > 1:
-            raise RuntimeError("More than one zip file found in submission and 'zips' config is true")
+            raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
 
         with zipfile.ZipFile(zips[0])  as zf:
             zf.extractall()
@@ -122,7 +122,7 @@ def run_autograder(options):
     nbs = glob("*ipynb")
 
     if len(nbs) > 1:
-        raise RuntimeError("More than one ipynb file found in submission")
+        raise OtterRuntimeError("More than one ipynb file found in submission")
 
     if len(nbs) == 1:
         nb_path = nbs[0]
@@ -131,12 +131,12 @@ def run_autograder(options):
         pys = glob("*.py")
         pys = list(filter(lambda f: f != "__init__.py", pys))
         if len(pys) > 1:
-            raise RuntimeError("More than one Python file found in submission")
+            raise OtterRuntimeError("More than one Python file found in submission")
         elif len(pys) == 1:
             nb_path = pys[0]
             script = True
         else:
-            raise RuntimeError("No gradable files found in submission")
+            raise OtterRuntimeError("No gradable files found in submission")
 
     replace_notebook_instances(nb_path)
 

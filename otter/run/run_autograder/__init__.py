@@ -1,13 +1,13 @@
-"""
-Gradescope autograding internals
-"""
+"""Gradescope autograding internals"""
 
 import os
 import json
 import pandas as pd
 
 from .constants import DEFAULT_OPTIONS
+from .utils import OtterRuntimeError
 from ...version import LOGO_WITH_VERSION
+
 
 def main(autograder_dir, **kwargs):
     """
@@ -47,7 +47,14 @@ def main(autograder_dir, **kwargs):
     else:
         from .run_autograder import run_autograder
     
-    output = run_autograder(options)
+    try:
+        output = run_autograder(options)
+    except OtterRuntimeError as e:
+        output = {
+            "score": 0,
+            "output": f"Otter encountered an error when grading this submission:\n\n{e}",
+            "stdout_visibility": "hidden",
+        }
 
     with open("./results/results.json", "w+") as f:
         json.dump(output, f, indent=4)
