@@ -17,7 +17,7 @@ from ..utils import get_relpath, block_print
 
 
 def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
-         debug=False):
+         debug=False, v0=False):
     """
     Runs Otter Assign on a master notebook
     
@@ -30,19 +30,18 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
-        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+        v0 (``bool``): whether to use Otter Assign Format v0 instead of v1
     """
+    if v0:
+        from .v0 import main as v0_main
+        return v0_main(master, result, no_pdfs=no_pdfs, no_run_tests=no_run_tests, username=username, 
+            password=password, debug=debug)
+
     master, result = pathlib.Path(os.path.abspath(master)), pathlib.Path(os.path.abspath(result))
     print("Generating views...")
 
     assignment = Assignment()
 
-    # # check language
-    # if lang is not None:
-    #     lang = lang.lower()
-    #     assert lang in ["r", "python"], f"Language {lang} is not valid"
-    #     assignment.lang = lang
-    
     # TODO: update this condition
     if True:
         result = get_relpath(master.parent, result)
