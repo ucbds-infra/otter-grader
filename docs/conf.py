@@ -212,9 +212,10 @@ def extract_descriptions_as_comments(config):
     coms = []
     for d in config:
         coms.append("# " + d["description"])
-        if isinstance(d["default"], list) and len(d["default"]) > 0 and \
-                all(isinstance(e, dict) for e in d["default"]):
-            coms.extend(extract_descriptions_as_comments(d["default"]))
+        default = d.get("default", None)
+        if isinstance(default, list) and len(default) > 0 and \
+                all(isinstance(e, dict) for e in default):
+            coms.extend(extract_descriptions_as_comments(default))
     return coms
 
 def add_comments_to_yaml(yaml, comments):
@@ -250,7 +251,7 @@ def update_yaml_block(file):
     module_path, member_name = obj.rsplit('.', 1)
     member_data = getattr(import_module(module_path), member_name)
 
-    defaults = convert_config_description_dict(member_data)
+    defaults = convert_config_description_dict(member_data, include_required=True)
     code = yaml.safe_dump(defaults, indent=2, sort_keys=False)
     comments = extract_descriptions_as_comments(member_data)
     code = add_comments_to_yaml(code, comments)

@@ -184,7 +184,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
 
     print(out, **kwargs)
 
-def convert_config_description_dict(configs):
+def convert_config_description_dict(configs, include_required=False):
     """
     Recursively converts a documented list of dictionary configurations into a dictionary with the 
     default values loaded.
@@ -244,7 +244,7 @@ def convert_config_description_dict(configs):
         if isinstance(default, list) and len(default) > 0 and \
                 all(isinstance(e, dict) for e in default):
             default = convert_config_description_dict(d["default"])
-        if not d.get("required", False):
+        if not d.get("required", False) or include_required:
             res[d["key"]] = default
     return res
 

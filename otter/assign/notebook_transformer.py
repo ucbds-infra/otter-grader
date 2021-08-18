@@ -5,6 +5,7 @@ import nbformat
 import os
 import pathlib
 
+# TODO: remove unused imports
 from .assignment import is_assignment_cell, read_assignment_metadata
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
 from .cell_generators import (

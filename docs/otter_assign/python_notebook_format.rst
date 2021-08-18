@@ -177,13 +177,16 @@ that defines metadata associated with the question.
 The rest of the code block within the description cell must be YAML-formatted with the following 
 fields (in any order):
 
-* ``name`` (required) - a string identifier that is a legal file name (without an extension)
-* ``manual`` (optional) - a boolean (default ``false``); whether to include the response cell in a 
-  PDF for manual grading
-* ``points`` (optional) - a number (default ``1``); how many points the question is worth
-* ``check_cell`` (optional) - a boolean (default ``true``); whether to include a cell after the
-  question that calls ``otter.Notebook.check`` for the public tests; ignored if ``manual`` is 
-  ``true``
+.. BEGIN YAML TARGET: otter.assign.questions._DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS
+
+.. code-block:: yaml
+
+    name: null        # (required) the path to a requirements.txt file
+    manual: false     # whether this is a manually-graded question
+    points: 1         # how many points this question is worth
+    check_cell: true  # whether to include a check cell after this question (for autograded questions only)
+
+.. END YAML TARGET
 
 As an example, the question metadata below indicates an autograded question ``q1`` worth 1 point.
 

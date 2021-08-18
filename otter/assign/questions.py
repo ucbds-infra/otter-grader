@@ -13,7 +13,7 @@ from ..utils import convert_config_description_dict
 _DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {
         "key": "name",
-        "description": "the path to a requirements.txt file",
+        "description": "(required) the path to a requirements.txt file",
         "required": True,
     },
     {
@@ -24,7 +24,7 @@ _DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {
         "key": "points",
         "description": "how many points this question is worth",
-        "default": None,
+        "default": 1,
     },
     {
         "key": "check_cell",
