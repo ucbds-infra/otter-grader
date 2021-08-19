@@ -2,6 +2,7 @@
 
 **Unreleased (beta):**
 
+* Added Colab support to `otter.Notebook` by disabling methods that require a notebook path and ensuring that a tests directory is present
 * Added Otter Assign format v1
 * Added flag ``--v0`` to `otter assign`` to indicate use of Otter Assign format v0
 * Deprecated Otter Assign format v0 for removal in Otter v4
@@ -25,6 +26,10 @@
 * Implemented submission zip validation against local test cases in `otter.Notebook`
 * Removed metadata files for Otter Grade
 * Added flags for disabling file auto-inclusion in Otter Generate
+
+**v2.2.7:**
+
+* Added student-visible error reporting in Gradescope results
 
 **v2.2.6:**
 

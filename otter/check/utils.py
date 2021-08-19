@@ -72,3 +72,14 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
 
     finally:
         os.remove(results_path)
+
+
+def running_on_colab():
+    """
+    Determine whether the current environment is running on Google Colab by checking the IPython
+    interpreter.
+
+    Returns:
+        ``bool``: whether the current environment is on Google Colab
+    """
+    return "google.colab" in str(get_ipython())
