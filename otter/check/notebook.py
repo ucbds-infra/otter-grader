@@ -18,7 +18,7 @@ from textwrap import indent
 from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import grade_zip_file, save_notebook
+from .utils import grade_zip_file, running_on_colab, save_notebook
 
 from ..execute import check
 from ..export import export_notebook
@@ -79,9 +79,12 @@ class Notebook:
     # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
 
-    def __init__(self, nb_path=None, tests_dir="./tests", colab=False):
+    def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
         try:
             global _SHELVE
+
+            if colab is None:
+                colab = running_on_colab()
 
             if colab and not os.path.isdir(tests_dir):
                 raise ValueError(f"Tests directory {tests_dir} does not exist")
