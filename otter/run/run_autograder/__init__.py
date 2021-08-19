@@ -53,8 +53,13 @@ def main(autograder_dir, **kwargs):
     except OtterRuntimeError as e:
         output = {
             "score": 0,
-            "output": f"Otter encountered an error when grading this submission:\n\n{e}",
             "stdout_visibility": "hidden",
+            "tests": [
+                {
+                    "name": "Autograder Error",
+                    "output": f"Otter encountered an error when grading this submission:\n\n{e}",
+                },
+            ],
         }
         raise e
 
