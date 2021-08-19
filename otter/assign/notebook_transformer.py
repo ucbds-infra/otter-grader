@@ -26,8 +26,8 @@ def transform_notebook(nb, assignment):
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
-        ``tuple(nbformat.NotebookNode, dict)``: the transformed notebook and a dictionary mapping 
-            test names to their parsed contents
+        ``tuple[nbformat.NotebookNode, dict]``: the transformed notebook and a dictionary mapping 
+        test names to their parsed contents
 
     """
     transformed_cells, test_files = get_transformed_cells(nb['cells'], assignment)
@@ -60,6 +60,20 @@ def transform_notebook(nb, assignment):
 
 def get_transformed_cells(cells, assignment):
     """
+    Takes in a list of cells from the master notebook and returns a list of cells for the solutions
+    notebook. 
+
+    Replaces test cells with a cell calling ``otter.Notebook.check``, inserts Markdown
+    response cells for manual questions with Markdown solutions, and comments out question metadata 
+    in question cells, among other things.
+
+    Args:
+        cells (``list[nbformat.NotebookNode]``): original code cells
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+    
+    Returns:
+        ``tuple[list, dict]``: list of cleaned notebook cells and a dictionary mapping test names to 
+        their parsed contents
     """
     if assignment.is_r:
         from otter.assign.r_adapter.tests import read_test, gen_test_cell

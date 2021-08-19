@@ -1,13 +1,11 @@
-"""
-Output writing for Otter Assign
-"""
+"""Output directory creation for Otter Assign"""
 
-import os
-import shutil
-import pathlib
-import warnings
 import nbformat
+import os
+import pathlib
+import shutil
 import tempfile
+import warnings
 
 from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
@@ -15,6 +13,7 @@ from .plugins import replace_plugins_with_calls
 from .solutions import strip_ignored_lines, strip_solutions_and_output
 from .tests import write_test
 from .utils import patch_copytree
+
 
 def write_autograder_dir(nb_path, output_nb_path, assignment):
     """
@@ -94,6 +93,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
             rel_path = file_path.parent.relative_to(nb_path.parent)
             os.makedirs(output_dir / rel_path, exist_ok=True)
             shutil.copy(file, str(output_dir / rel_path))
+
 
 def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
     """

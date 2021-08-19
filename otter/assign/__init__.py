@@ -1,6 +1,4 @@
-"""
-Otter Assign command-line utility
-"""
+"""Assignment creation tool for Otter-Grader"""
 
 import json
 import os
@@ -19,7 +17,7 @@ from ..utils import get_relpath, block_print
 def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
          debug=False, v1=False):
     """
-    Runs Otter Assign on a master notebook
+    Runs Otter Assign on a master notebook.
     
     Args:
         master (``str``): path to master notebook
@@ -46,15 +44,11 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
     assignment = Assignment()
 
-    # TODO: update this condition
-    if True:
-        result = get_relpath(master.parent, result)
-        orig_dir = os.getcwd()
-        os.chdir(master.parent)
-        # master = pathlib.Path(master.name)
+    result = get_relpath(master.parent, result)
+    orig_dir = os.getcwd()
+    os.chdir(master.parent)
     
     assignment.master, assignment.result = master, result
-    # assignment.files = files
 
     if assignment.is_rmd:
         from .rmarkdown_adapter.output import write_output_directories
@@ -84,6 +78,11 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 assignment.generate["plugins"].extend(plugins)
         else:
             pc = None
+
+        # generate Gradescope autograder zipfile
+        if assignment.generate:
+            print("Generating autograder zipfile...")
+            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
         
         # generate PDF of solutions
         if assignment.solutions_pdf and not assignment.is_rmd and not no_pdfs:
@@ -127,12 +126,6 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             else:
                 write_otter_config_file(master, result, assignment)
 
-        # generate Gradescope autograder zipfile
-        if assignment.generate:
-            # TODO: move this to another function
-            print("Generating autograder zipfile...")
-            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
-
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:
             print("Running tests...")
@@ -150,16 +143,6 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
             run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
             print("All tests passed!")
-    
-    # for tests
-    except:
-        # TODO: change this condition
-        if True:
-            os.chdir(orig_dir)
 
-        raise
-
-    else:
-        # TODO: change this condition
-        if True:
-            os.chdir(orig_dir)
+    finally:
+        os.chdir(orig_dir)

@@ -1,11 +1,10 @@
-"""
-Constants (global variables) for Otter Assign
-"""
+"""Various constants for Otter Assign"""
 
 import re
 
-from textwrap import indent
 from jinja2 import Template
+from textwrap import indent
+
 
 NB_VERSION = 4
 BLOCK_QUOTE = "```"
