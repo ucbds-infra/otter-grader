@@ -298,6 +298,34 @@ class TestNotebook(TestCase):
 
         self.assertTrue(os.path.isfile(_OTTER_LOG_FILENAME))
 
+    def test_colab(self):
+        """
+        Checks that the ``Notebook`` class correctly disables methods on Google Colab.
+        """
+        tests_dir = TEST_FILES_PATH + "tests"
+        with mock.patch("otter.check.notebook.os.path.isdir") as mocked_isdir:
+            mocked_isdir.return_value = False
+            with self.assertRaises(ValueError, msg=f"Tests directory {tests_dir} does not exist"):
+                grader = Notebook(tests_dir=tests_dir, colab=True)
+
+            mocked_isdir.assert_called_once_with(tests_dir)
+
+            mocked_isdir.return_value = True
+            grader = Notebook(tests_dir=tests_dir, colab=True)
+
+            # check for appropriate errors
+            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
+                grader.run_plugin()
+
+            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
+                grader.to_pdf()
+
+            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
+                grader.add_plugin_files()
+
+            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
+                grader.export()
+
     def tearDown(self):
         for i in range(1, 7):
             file = "demofile{}.otter".format(i)
