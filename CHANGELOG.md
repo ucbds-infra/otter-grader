@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased (beta):**
+
+* Added Colab support to `otter.Notebook` by disabling methods that require a notebook path and ensuring that a tests directory is present
+
 **v3.0.0.b2:**
 
 * Fixed bug in Otter Assign for R causing point values in test files not to render
