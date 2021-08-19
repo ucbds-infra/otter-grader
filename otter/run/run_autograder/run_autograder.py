@@ -137,41 +137,32 @@ def run_autograder(options):
                 nb_path = pys[0]
                 script = True
             else:
-                print(f"Could not deserialize the log due to an error:\n{e}")
-                log = None
-    else:
-        assert not options["grade_from_log"], "missing log"
-        log = None
+                raise OtterRuntimeError("No gradable files found in submission")
 
-    scores = grade_notebook(
-        nb_path, 
-        tests_glob=glob("./tests/*.py"), 
-        name="submission", 
-        cwd=".", 
-        test_dir="./tests",
-        ignore_errors=not options["debug"], 
-        seed=options["seed"],
-        log=log if options["grade_from_log"] else None,
-        variables=options["serialized_variables"],
-        plugin_collection=plugin_collection,
-        script=script,
-    )
+        replace_notebook_instances(nb_path)
 
-    if options["print_summary"]:
-        # print("\n" + "-" * 30 + " GRADING SUMMARY " + "-" * 30)
-        print("\n\n\n\n", end="")
-        print_full_width("-", mid_text="GRADING SUMMARY")
+        # load plugins
+        plugins = options["plugins"]
 
-    # verify the scores against the log
-    if options["print_summary"]:
-        print()
-        if log is not None:
-            try:
-                found_discrepancy = scores.verify_against_log(log)
-                if not found_discrepancy and options["print_summary"]:
-                    print("No discrepancies found while verifying scores against the log.")
-            except BaseException as e:
-                print(f"Error encountered while trying to verify scores with log:\n{e}")
+        if plugins:
+            with open("../submission_metadata.json") as f:
+                submission_metadata = json.load(f)
+
+            plugin_collection = PluginCollection(
+                plugins, os.path.abspath(nb_path), submission_metadata
+            )
+
+        else:
+            plugin_collection = None
+
+        if plugin_collection:
+            plugin_collection.run("before_grading", options)
+
+        if options["token"] is not None:
+            client = APIClient(token=options["token"])
+            generate_pdf = True
+            has_token = True
+
         else:
             generate_pdf = options["pdf"]
             has_token = False
