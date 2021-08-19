@@ -58,11 +58,7 @@ def main(submission, autograder, output_dir, no_logo, debug, **kwargs):
         with open(results_pkl_path, "rb") as f:
             results = pickle.load(f)
 
-    except:
-        shutil.rmtree(dp)
-        raise
-    
-    else:
+    finally:
         shutil.rmtree(dp)
 
     return results
