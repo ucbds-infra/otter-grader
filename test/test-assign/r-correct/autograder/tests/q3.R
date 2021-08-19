@@ -6,9 +6,7 @@ test = list(
       name = NA,
       points = 0.6666666666666666,
       code = {
-        test_that("q3a", {
-            expect_equal(nine, 9)
-        })
+        
       }
     ),
     ottr::TestCase$new(
@@ -16,19 +14,15 @@ test = list(
       name = NA,
       points = 0.6666666666666666,
       code = {
-        test_that("q3b", {
-            expect_equal(square(16), 256)
-        })
+        
       }
     ),
     ottr::TestCase$new(
-      hidden = TRUE,
+      hidden = FALSE,
       name = NA,
       points = 0.6666666666666666,
       code = {
-        test_that("q3c", {
-            expect_equal(square(1), 1)
-        })
+        
       }
     )
   )

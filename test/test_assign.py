@@ -83,7 +83,7 @@ class TestAssign(TestCase):
         """
         Checks that otter assign works for R notebooks correctly
         """
-        assign(TEST_FILES_PATH + "r-example.ipynb", TEST_FILES_PATH + "output")
+        assign(TEST_FILES_PATH + "r-example.ipynb", TEST_FILES_PATH + "output", v1=True)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", ignore_ext=[".pdf",".zip"])
 
@@ -91,7 +91,7 @@ class TestAssign(TestCase):
         """
         Checks that otter assign works for Rmd files
         """
-        assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output")
+        assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output", v1=True)
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", ignore_ext=[".zip"])
         
