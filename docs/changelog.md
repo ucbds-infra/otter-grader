@@ -1,5 +1,9 @@
 # Changelog
 
+**v2.2.7:**
+
+* Added student-visible error reporting in Gradescope results
+
 **v2.2.6:**
 
 * Updated Otter Grade Dockerfile to simplify build process

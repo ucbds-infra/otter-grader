@@ -1,11 +1,16 @@
-"""
-Utilities for Otter Run
-"""
+"""Utilities for Otter Run"""
 
 import re
 import nbformat
 
 from ...utils import get_source
+
+
+class OtterRuntimeError(RuntimeError):
+    """
+    A an error inheriting from ``RuntimeError`` for Otter to throw during a grading process.
+    """
+
 
 def replace_notebook_instances(nb_path):
     """

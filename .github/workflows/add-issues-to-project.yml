@@ -1,0 +1,14 @@
+# A workflow for automatically adding all new issues to a project
+name: Add issues to project
+on:
+  issues:
+    types: [ opened ]
+jobs:
+  createCard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create project card
+        uses: peter-evans/create-or-update-project-card@v1
+        with:
+          project-name: Otter-Grader Issues and Tasks
+          column-name: Icebox
