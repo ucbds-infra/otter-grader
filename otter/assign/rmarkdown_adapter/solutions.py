@@ -14,7 +14,7 @@ def is_markdown_solution_cell(cell):
     Returns whether any line of the cell matches `<!-- BEGIN SOLUTION -->`
     
     Args:
-        cell (``otter.assign.rmarkdown_adapter.utils.Cell``): notebook cell
+        cell (``nbformat.NotebookNode``): notebook cell
     
     Returns:
         ``bool``: whether the current cell is a Markdown solution cell
