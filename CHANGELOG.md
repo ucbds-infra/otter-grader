@@ -19,6 +19,10 @@
 * Removed metadata files for Otter Grade
 * Added flags for disabling file auto-inclusion in Otter Generate
 
+**v2.2.7:**
+
+* Added student-visible error reporting in Gradescope results
+
 **v2.2.6:**
 
 * Updated Otter Grade Dockerfile to simplify build process
