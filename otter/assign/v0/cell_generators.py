@@ -8,23 +8,23 @@ import nbformat
 from .constants import MD_RESPONSE_CELL_SOURCE
 from .utils import get_source, lock
 
-def gen_init_cell(nb_name):
+def gen_init_cell(nb_name, colab):
     """
-    Generates a cell to initialize Otter in the notebook. The code cell has the following contents:
-
-    .. code-block:: python
-
-        # Initialize Otter
-        import otter
-        grader = otter.Notebook()
+    Generates a cell to initialize Otter in the notebook.
 
     Args:
         nb_name (``str``): the name of the notebook being graded
+        colab (``bool``): whether the notebook will be run on Colab
     
     Returns:
         ``nbformat.NotebookNode``: the init cell
     """
-    cell = nbformat.v4.new_code_cell(f'# Initialize Otter\nimport otter\ngrader = otter.Notebook("{nb_name}")')
+    if colab:
+        args = "colab=True"
+    else:
+        args  = f"\"{nb_name}\""
+    contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
+    cell = nbformat.v4.new_code_cell(contents)
     lock(cell)
     return cell
 

@@ -129,6 +129,11 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
             "metadata",
         "default": True,
     },
+    {
+        "key": "colab",
+        "description": "whether this assignment will be run on Google Colab",
+        "default": False,
+    },
 ]
 
 class Assignment:
