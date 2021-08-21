@@ -1,4 +1,6 @@
-"""Plugin replacement for Otter Assign"""
+"""
+Plugin replacement for Otter Assign
+"""
 
 import re
 import yaml
@@ -6,12 +8,11 @@ import nbformat
 
 from .utils import get_source
 
-
 BEGIN = "# BEGIN PLUGIN"
 END = "# END PLUGIN"
 BEGIN_EXPORT = "# BEGIN PLUGIN EXPORT"
 
-
+# TODO: comments, docstrings
 def replace_plugins(lines):
     """
     Replaces plugins with calls in ``lines``
@@ -78,7 +79,6 @@ def replace_plugins(lines):
         lines.insert(s, call)
 
     return lines
-
 
 def replace_plugins_with_calls(nb):
     """

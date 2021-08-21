@@ -1,20 +1,33 @@
-"""Solution removal for Otter Assign"""
+"""
+Solution removal for Otter Assign
+"""
 
 import re
 import nbformat
 
-from .utils import get_source, has_tag, is_cell_type, remove_output, remove_tag
+from .constants import MD_SOLUTION_REGEX
+from .utils import get_source, remove_output
 
-
-SOLUTION_CELL_TAG = "otter_assign_solution_cell"
-
+def is_markdown_solution_cell(cell):
+    """
+    Returns whether any line of the cell matches MD_SOLUTION_REGEX
+    
+    Args:
+        cell (``nbformat.NotebookNode``): notebook cell
+    
+    Returns:
+        ``bool``: whether the current cell is a Markdown solution cell
+    """
+    if not cell.cell_type == 'markdown':
+        return False
+    source = get_source(cell)
+    return source and any([re.match(MD_SOLUTION_REGEX, l, flags=re.IGNORECASE) for l in source])
 
 def has_seed(cell):
-    if not is_cell_type(cell, "code"):
+    if not cell.cell_type == 'code':
         return False
     source = get_source(cell)
     return source and any([l.strip().endswith('# SEED') for l in source])
-
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
@@ -24,7 +37,6 @@ def solution_assignment_sub(match):
     prefix = match.group(1)
     return prefix + ' ...'
 
-
 solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
 def solution_line_sub(match):
     """
@@ -33,7 +45,6 @@ def solution_line_sub(match):
     prefix = match.group(1)
     return prefix + '...'
 
-
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
 skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT', '# SEED']
 
@@ -41,7 +52,6 @@ SUBSTITUTIONS = [
     (solution_assignment_regex, solution_assignment_sub),
     (solution_line_regex, solution_line_sub),
 ]
-
 
 # TODO: comments, docstrings
 def replace_solutions(lines):
@@ -92,7 +102,6 @@ def replace_solutions(lines):
     
     return stripped
 
-
 def remove_ignored_lines(lines):
     """
     Removes ignored lines in ``lines``
@@ -134,7 +143,6 @@ def remove_ignored_lines(lines):
     
     return stripped
 
-
 def strip_ignored_lines(nb):
     """
     Write a notebook with ignored lines stripped
@@ -144,8 +152,8 @@ def strip_ignored_lines(nb):
     """
     for i, cell in enumerate(nb['cells']):
         cell['source'] = '\n'.join(remove_ignored_lines(get_source(cell)))
-    return nb
 
+    return nb
 
 def strip_solutions_and_output(nb):
     """
@@ -156,13 +164,9 @@ def strip_solutions_and_output(nb):
     """
     md_solutions = []
     for i, cell in enumerate(nb['cells']):
-        if has_tag(cell, SOLUTION_CELL_TAG):
-            if is_cell_type(cell, "code"):
-                cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
-            elif is_cell_type(cell, "markdown"):
-                md_solutions.append(i)
-            nb['cells'][i] = remove_tag(cell, SOLUTION_CELL_TAG)
-
+        cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
+        if is_markdown_solution_cell(cell):
+            md_solutions.append(i)
     md_solutions.reverse()
     for i in md_solutions:
         del nb['cells'][i]

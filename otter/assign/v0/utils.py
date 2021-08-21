@@ -1,6 +1,5 @@
 """Utilities for Otter Assign"""
 
-import copy
 import json
 import os
 import pathlib
@@ -14,24 +13,16 @@ from textwrap import indent
 
 from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
-from ..execute import grade_notebook
-from ..generate import main as generate_autograder
-from ..generate.token import APIClient
-from ..utils import get_relpath, get_source
+from ...execute import grade_notebook
+from ...generate import main as generate_autograder
+from ...generate.token import APIClient
+from ...utils import get_relpath, get_source
 
 
 class EmptyCellException(Exception):
     """
     Exception for empty cells to indicate deletion
     """
-
-
-class AssignNotebookFormatException(Exception):
-    """
-    """
-    def __init__(self, message, cell_index, *args, **kwargs):
-        message = message + f" (cell number { cell_index + 1 })"
-        super().__init__(message, *args, **kwargs)
 
 
 #---------------------------------------------------------------------------------------------------
@@ -70,6 +61,18 @@ def get_spec(source, begin):
 # Cell Type Checkers
 #---------------------------------------------------------------------------------------------------
 
+def is_markdown_cell(cell):
+    """
+    Returns whether ``cell`` is Markdown cell
+    
+    Args:
+        cell (``nbformat.NotebookNode``): notebook cell
+    
+    Returns:
+        ``bool``: whether the cell is a Markdown cell
+    """
+    return cell.cell_type == 'markdown'
+
 def is_ignore_cell(cell):
     """
     Returns whether the current cell should be ignored
@@ -82,9 +85,6 @@ def is_ignore_cell(cell):
     """
     source = get_source(cell)
     return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
-
-def is_cell_type(cell, cell_type):
-    return cell["cell_type"] == cell_type
 
 
 #---------------------------------------------------------------------------------------------------
@@ -112,29 +112,6 @@ def lock(cell):
     m = cell['metadata']
     m["editable"] = False
     m["deletable"] = False
-
-def add_tag(cell, tag):
-    """
-    """
-    cell = copy.deepcopy(cell)
-    if "tags" not in cell["metadata"]:
-        cell["metadata"]["tags"] = []
-    cell["metadata"]["tags"].append(tag)
-    return cell
-
-def has_tag(cell, tag):
-    """
-    """
-    return tag in cell["metadata"].get("tags", [])
-
-def remove_tag(cell, tag):
-    """
-    """
-    cell = copy.deepcopy(cell)
-    if "tags" not in cell["metadata"] or tag not in cell["metadata"]["tags"]:
-        return cell
-    cell["metadata"]["tags"].remove(tag)
-    return cell
 
 
 #---------------------------------------------------------------------------------------------------

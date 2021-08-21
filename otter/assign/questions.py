@@ -7,6 +7,48 @@ import yaml
 
 from .constants import BLOCK_QUOTE, ALLOWED_NAME
 from .utils import get_source, lock, get_spec, EmptyCellException
+from ..utils import convert_config_description_dict
+
+
+_DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS = [
+    {
+        "key": "name",
+        "description": "(required) the path to a requirements.txt file",
+        "required": True,
+    },
+    {
+        "key": "manual",
+        "description": "whether this is a manually-graded question",
+        "default": False,
+    },
+    {
+        "key": "points",
+        "description": "how many points this question is worth; defaults to 1 internally",
+        "default": None,
+    },
+    {
+        "key": "check_cell",
+        "description": "whether to include a check cell after this question (for autograded questions only)",
+        "default": True,
+    },
+    {
+        "key": "export",
+        "description": "whether to force-include this question in the exported PDF",
+        "default": False,
+    },
+]
+
+DEFAULT_QUESTION_CONFIGURATIONS = convert_config_description_dict(_DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS)
+
+
+def create_question_config(parsed_config):
+    """
+    """
+    config = DEFAULT_QUESTION_CONFIGURATIONS.copy()
+    config.update(parsed_config)
+    if "name" not in config:
+        raise ValueError(f"Question name not specified in config YAML: {parsed_config}")
+    return config
 
 def is_question_cell(cell):
     """
@@ -22,43 +64,6 @@ def is_question_cell(cell):
         return False
     return get_spec(get_source(cell), "question") is not None
 
-def gen_question_cell(cell, manual, need_close_export):
-    """
-    Returns a locked question cell with metadata hidden in an HTML comment
-    
-    Args:
-        cell (``nbformat.NotebookNode``): the original question cell
-    
-    Returns:
-        ``nbformat.NotebookNode``: the updated question cell
-    """
-    cell = copy.deepcopy(cell)
-    source = get_source(cell)
-    if manual:
-        source = ["<!-- BEGIN QUESTION -->", ""] + source
-    if need_close_export:
-        source = ["<!-- END QUESTION -->", ""] + source
-    begin_question_line = get_spec(source, "question")
-    start = begin_question_line - 1
-    assert source[start].strip() == BLOCK_QUOTE
-    end = begin_question_line
-    while source[end].strip() != BLOCK_QUOTE:
-        end += 1
-    source[start] = "<!--"
-    source[end] = "-->"
-    cell['source'] = '\n'.join(source)
-
-    # check if cell is empty, and if so, throw error
-    cell_text = source[:start]
-    try:
-        cell_text += source[end+1:]
-    except IndexError:
-        pass
-    if not "".join(cell_text).strip():
-        raise EmptyCellException()
-
-    lock(cell)
-    return cell
 
 def read_question_metadata(cell):
     """

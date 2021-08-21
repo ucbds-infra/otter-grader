@@ -12,11 +12,27 @@ from collections import namedtuple
 from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGEX, OTTR_TEST_NAME_REGEX, \
     OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
-from ..test_files.abstract_test import TestFile
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
+from ...test_files.abstract_test import TestFile
+from ...test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
+
+
+def is_test_cell(cell):
+    """
+    Returns whether the current cell is a test cell
+    
+    Args:
+        cell (``nbformat.NotebookNode``): a notebook cell
+
+    Returns:
+        ``bool``: whether the cell is a test cell
+    """
+    if cell.cell_type != 'code':
+        return False
+    source = get_source(cell)
+    return source and re.match(TEST_REGEX, source[0], flags=re.IGNORECASE)
 
 
 def any_public_tests(test_cases):
@@ -45,14 +61,7 @@ def read_test(cell, question, assignment):
     Returns:
         ``Test``: test named tuple
     """
-    source = get_source(cell)
-    if source[0].lstrip().startswith("#"):
-        hidden = bool(re.match(r"#\s+hidden\s*", source[0], flags=re.IGNORECASE))
-    else:
-        hidden = False
-
-    i = 0 if hidden else -1
-
+    hidden = bool(re.search("hidden", get_source(cell)[0], flags=re.IGNORECASE))
     output = ''
     for o in cell['outputs']:
         output += ''.join(o.get('text', ''))
@@ -62,14 +71,17 @@ def read_test(cell, question, assignment):
         elif results:
             output += results
 
-    if re.match(BEGIN_TEST_CONFIG_REGEX, source[0], flags=re.IGNORECASE):
-        for i, line in enumerate(source):
+    lines = get_source(cell)
+
+    if re.match(BEGIN_TEST_CONFIG_REGEX, lines[0], flags=re.IGNORECASE):
+        for i, line in enumerate(lines):
             if re.match(END_TEST_CONFIG_REGEX, line, flags=re.IGNORECASE):
                 break
-        config = yaml.full_load("\n".join(source[1:i]))
+        config = yaml.full_load("\n".join(lines[1:i]))
         assert isinstance(config, dict), f"Invalid test config in cell {cell}"
     else:
         config = {}
+        i = 0
     
     hidden = config.get("hidden", hidden)
     points = config.get("points", None)

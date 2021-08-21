@@ -1,11 +1,12 @@
-"""Assignment configurations for Otter Assign"""
+"""
+Assignment configurations for Otter Assign
+"""
 
 import yaml
 
 from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
-from ..utils import convert_config_description_dict
-
+from ...utils import convert_config_description_dict
 
 _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {
@@ -126,7 +127,7 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "key": "test_files",
         "description": "whether to store tests in separate .py files rather than in the notebook " \
             "metadata",
-        "default": False,
+        "default": True,
     },
     {
         "key": "colab",
@@ -134,7 +135,6 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "default": False,
     },
 ]
-
 
 class Assignment:
     """
@@ -231,7 +231,6 @@ class Assignment:
         """
         return type(self).defaults.keys()
 
-
 def read_assignment_metadata(cell):
     """
     Return assignment metadata from an assignment cell
@@ -250,7 +249,6 @@ def read_assignment_metadata(cell):
         i = i + 1
     metadata = yaml.full_load('\n'.join(lines))
     return metadata
-
 
 def is_assignment_cell(cell):
     """

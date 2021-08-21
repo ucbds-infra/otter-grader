@@ -65,8 +65,6 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     cell.source = ['. = ottr::check("tests/{}.R")'.format(question['name'])]
 
     points = question.get('points', len(tests))
-    if points is None:
-        points = 1
     if isinstance(points, (int, float)):
         if points % len(tests) == 0:
             points = [points // len(tests) for _ in range(len(tests))]
