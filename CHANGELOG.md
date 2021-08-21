@@ -1,6 +1,6 @@
 # Changelog
 
-**3.0.0.b3:**
+**v3.0.0.b3:**
 
 * Added Colab support to `otter.Notebook` by disabling methods that require a notebook path and ensuring that a tests directory is present
 * Added Otter Assign format v1
