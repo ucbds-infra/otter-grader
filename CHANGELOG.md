@@ -1,11 +1,10 @@
 # Changelog
 
-**Unreleased (beta):**
+**3.0.0.b3:**
 
 * Added Colab support to `otter.Notebook` by disabling methods that require a notebook path and ensuring that a tests directory is present
 * Added Otter Assign format v1
-* Added flag ``--v0`` to `otter assign`` to indicate use of Otter Assign format v0
-* Deprecated Otter Assign format v0 for removal in Otter v4
+* Added `FutureWarning` for Otter Assign format v0
 * Default-disabled separate test files in Otter Assign v1 format
 
 **v3.0.0.b2:**
