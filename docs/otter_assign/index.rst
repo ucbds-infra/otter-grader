@@ -14,6 +14,12 @@ Creating Assignments
    v0/index
    v1/index
 
+Otter ships with an assignment development and distribution tool called Otter Assign, an 
+Otter-compliant fork of `jAssign <https://github.com/okpy/jassign>`_ that was designed for OkPy. 
+Otter Assign allows instructors to create assignments by writing questions, prompts, solutions, and 
+public and private tests all in a single notebook, which is then parsed and broken down into student 
+and autograder versions.
+
 Otter Assign currently supports two notebook formats: format v0, the original master notebook format,
 and format v1, which was released with Otter-Grader v3. Format v0 is currently the default format
 option but v1 will become the default in Otter-Grader v4.
