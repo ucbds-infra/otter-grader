@@ -45,7 +45,7 @@ sub-dictionaries (e.g. ``export_cell``, ``generate``) can have their behaviors t
 changing their value to ``false``. The only one that defaults to true (with the specified sub-key 
 defaults) is ``export_cell``.
 
-.. BEGIN YAML TARGET: otter.assign.assignment._DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS
+.. BEGIN YAML TARGET: otter.assign.v0.assignment._DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS
 
 .. code-block:: yaml
 
@@ -177,7 +177,7 @@ that defines metadata associated with the question.
 The rest of the code block within the description cell must be YAML-formatted with the following 
 fields (in any order):
 
-.. BEGIN YAML TARGET: otter.assign.questions._DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS
+.. BEGIN YAML TARGET: otter.assign.v0.questions._DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS
 
 .. code-block:: yaml
 
