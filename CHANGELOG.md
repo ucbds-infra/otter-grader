@@ -1,5 +1,10 @@
 # Changelog
 
+**v3.0.1:**
+
+* Updated the default version of Ottr to v1.0.0
+* Ensured that metadata tests for R notebooks are disabled
+
 **v3.0.0:**
 
 * Added Colab support to `otter.Notebook` by disabling methods that require a notebook path and ensuring that a tests directory is present

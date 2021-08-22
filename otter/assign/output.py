@@ -41,6 +41,9 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     # replace plugins
     transformed_nb = replace_plugins_with_calls(transformed_nb)
 
+    # update assignment.test_files for R notebooks
+    assignment.test_files |= assignment.is_r
+
     output_dir = output_nb_path.parent
     tests_dir = output_dir / 'tests'
     if assignment.test_files:
