@@ -1,23 +1,14 @@
 # Changelog
 
-**v3.0.0.b3:**
+**v3.0.0:**
 
 * Added Colab support to `otter.Notebook` by disabling methods that require a notebook path and ensuring that a tests directory is present
 * Added Otter Assign format v1
 * Added `FutureWarning` for Otter Assign format v0
 * Default-disabled separate test files in Otter Assign v1 format
-
-**v3.0.0.b2:**
-
 * Fixed bug in Otter Assign for R causing point values in test files not to render
 * Added the `check_cell` key to question metadata in Otter Assign
-
-**v3.0.0.b1:**
-
 * Fixed installation of `stringi` in Gradescope R build per [#259](https://github.com/ucbds-infra/otter-grader/issues/259)
-
-**v3.0.0.b0:**
-
 * Added support for Ottr v1.0.0.b0
 * Converted CLI to `click` from `argparse`
 * Converted documentation source from Markdown to RST, removing use of `recommonmark`
