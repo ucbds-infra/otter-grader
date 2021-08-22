@@ -441,4 +441,4 @@ Here is an example of plugin replacement in Otter Assign:
 Sample Notebook
 ---------------
 
-You can find a sample Python notebook `here<https://github.com/ucbds-infra/otter-grader/blob/master/docs/_static/notebooks/assign-full-example-v1.ipynb>`.
+You can find a sample Python notebook `here<https://github.com/ucbds-infra/otter-grader/blob/master/docs/_static/notebooks/assign-full-example-v1.ipynb>`_.
