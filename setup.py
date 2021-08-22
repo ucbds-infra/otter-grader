@@ -16,8 +16,8 @@ with open("requirements.txt") as f:
 setuptools.setup(
 	name = "otter-grader",
 	version = version,
-	author = "Chris Pyles",
-	author_email = "cpyles@berkeley.edu",
+	author = "Christopher Pyles",
+	author_email = "otter-grader@berkeley.edu",
 	description = "Python and Jupyter Notebook autograder",
 	long_description = long_description,
 	long_description_content_type = "text/markdown",
