@@ -174,13 +174,14 @@ QUESTION`` cell. The question metadata can contain the following fields (in any 
 
 .. END YAML TARGET
 
-As an example, the question metadata below indicates an autograded question ``q1`` worth 1 point.
+As an example, the question metadata below indicates an autograded question ``q1`` that should be
+included in the filtered PDF.
 
 .. code-block:: yaml
 
     # BEGIN QUESTION
     name: q1
-    manual: false
+    export: true
 
 
 .. _otter_assign_python_solution_removal:
