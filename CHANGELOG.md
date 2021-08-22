@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v3.0.1:**
 
 * Updated the default version of Ottr to v1.0.0
 * Ensured that metadata tests for R notebooks are disabled
