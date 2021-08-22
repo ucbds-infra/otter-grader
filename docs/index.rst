@@ -20,7 +20,7 @@ Otter-Grader Documentation
     api_reference
     cli_reference
     resources
-    Changelog <https://github.com/ucbds-infra/otter-grader/tree/beta/CHANGELOG.md>
+    Changelog <https://github.com/ucbds-infra/otter-grader/tree/master/CHANGELOG.md>
 
 Otter Grader is a light-weight, modular open-source autograder developed by the Data Science 
 Education Program at UC Berkeley. It is designed to grade Python and R assignments for classes at 
