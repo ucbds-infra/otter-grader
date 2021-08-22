@@ -205,7 +205,8 @@ texinfo_documents = [
 
 files_to_replace = [
     "workflow/otter_generate/index.rst",
-    "otter_assign/python_notebook_format.rst",
+    "otter_assign/v0/python_notebook_format.rst",
+    "otter_assign/v1/notebook_format.rst",
 ]
 
 def extract_descriptions_as_comments(config):
@@ -260,7 +261,7 @@ def update_yaml_block(file):
     lines[s+1:e] = to_replace.split("\n")
 
     with open(file, "w") as f:
-        f.write("\n".join(lines))
+        f.write("\n".join(lines) + "\n")
 
 for file in files_to_replace:
     print(f"Replacing YAML targets in: {file}")

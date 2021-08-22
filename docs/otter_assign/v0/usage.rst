@@ -5,34 +5,10 @@ Usage and Output
 
 Otter Assign is called using the ``otter assign`` command. This command takes in two required 
 arguments. The first is ``master``, the path to the master notebook (the one formatted as described 
-above), and the second is ``result``, the path at which output shoud be written. The optional 
-``files`` argument takes an arbitrary number of paths to files that should be shipped with notebooks 
-(e.g. data files, images, Python executables). **Otter Assign will automatically recognize the 
-language of the notebook** by looking at the kernel metadata; similarly, if using an Rmd file, it 
-will automatically choose the language as R. This behavior can be overridden using the ``-l`` flag 
-which takes the name of the language as its argument.
-
-**Note:** The path to the master notebook and to the result directory should be relative to the 
-*working* directory, but any paths in ``files`` should be relative to the parent directory of the 
-master notebook. To clarify, the following directory structure:
-
-.. code-block::
-
-    dev
-    ├── dist
-    │   └── lab
-    │       └── lab00/   # this is where we want the results to go
-    └── lab
-        └── lab00
-            ├── data
-            │   └── data.csv
-            └── lab00.ipynb
-
-would be run through Otter Assign from the ``dev`` directory with
-
-.. code-block:: bash
-
-    otter assign lab/lab00/lab00.ipynb dist/lab/lab00 data/data.csv
+above), and the second is ``result``, the path at which output shoud be written. **Otter Assign will 
+automatically recognize the language of the notebook** by looking at the kernel metadata; similarly, 
+if using an Rmd file, it will automatically choose the language as R. This behavior can be 
+overridden using the ``-l`` flag which takes the name of the language as its argument.
 
 The default behavior of Otter Assign is to do the following:
 
@@ -73,7 +49,7 @@ By default, Otter Assign adds an initialization cell at the *top* of the noteboo
     import otter
     grader = otter.Notebook()
 
-To prevent this behavior, add the ``--no-init-cell`` flag.
+To prevent this behavior, add the `init_cell: false` configuration in your assignment metadata.
 
 Otter Assign also automatically adds a check-all cell and an export cell to the end of the notebook. 
 The check-all cells consist of a Markdown cell:
@@ -104,10 +80,7 @@ and a code cell that calls ``otter.Notebook.export`` with HTML comment filtering
     # Save your notebook first, then run this cell to export.
     grader.export("/path/to/notebook.ipynb")
 
-To prevent the inclusion of a check-all cell, use the ``--no-check-all`` flag. To prevent cell 
-filtering in the export cell, use the ``--no-filter`` flag. To remove the export cells entirely, use 
-the ``--no-export-cell`` tag. If you have custom instructions for submission that you want to add to 
-the export cell, pass them to the ``--instructions`` flag.
+These behaviors can be changed with the corresponding assignment metadata configurations.
 
 **Note:** Otter Assign currently only supports :ref:`HTML comment filtering <pdfs>`. This means 
 that if you have other cells you want included in the export, you must delimit them using HTML 
@@ -159,41 +132,12 @@ as described above.
     │           └── q2.(py|R)  # etc.
     └── hw00.ipynb
 
-If I had wanted to include ``data.csv`` in the distribution folders, I would change my call to
-
-.. code-block::
-
-    otter assign hw00.ipynb dist data.csv
-
-The resulting directory structure would be:
-
-.. code-block::
-
-    hw00
-    ├── data.csv
-    ├── dist
-    │   ├── autograder
-    │   │   ├── data.csv
-    │   │   ├── hw00.ipynb
-    │   │   └── tests/
-    │   └── student
-    │       ├── data.csv
-    │       ├── hw00.ipynb
-    │       └── tests/
-    └── hw00.ipynb
-
 In generating the distribution versions, I can prevent Otter Assign from rerunning the tests using 
 the ``--no-run-tests`` flag:
 
 .. code-block::
 
-    otter assign --no-run-tests hw00.ipynb dist data.csv
+    otter assign --no-run-tests hw00.ipynb dist
 
 Because tests are not run on R notebooks, the above configuration would be ignored if ``hw00.ipynb`` 
 had an R kernel.
-
-If I wanted no initialization cell and no cell filtering in the export cell, I would run
-
-.. code-block::
-
-    otter assign --no-init-cell --no-filtering hw00.ipynb dist data.csv
