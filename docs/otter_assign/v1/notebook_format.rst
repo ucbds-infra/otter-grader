@@ -436,3 +436,9 @@ Here is an example of plugin replacement in Otter Assign:
     <iframe src="../../_static/notebooks/assign-plugin.html"></iframe>
 
 *Note that student-facing plugins are not supported with R assignments.*
+
+
+Sample Notebook
+---------------
+
+You can find a sample Python notebook `here<https://github.com/ucbds-infra/otter-grader/blob/master/docs/_static/notebooks/assign-full-example-v1.ipynb>`.
