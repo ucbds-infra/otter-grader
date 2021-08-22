@@ -9,7 +9,9 @@
 {{ super() }}
 {% if pagename == "test_files/index" %}
     <meta http-equiv="Refresh" content="0; url=ok_format.html" />
-{% elif pagename == "otter_assign/index" %}
+{% elif pagename == "otter_assign/v0/index" %}
+    <meta http-equiv="Refresh" content="0; url=python_notebook_format.html" />
+{% elif pagename == "otter_assign/v1/index" %}
     <meta http-equiv="Refresh" content="0; url=python_notebook_format.html" />
 {% elif pagename == "otter_generate/index" %}
     <meta http-equiv="Refresh" content="0; url=config_files.html" />
