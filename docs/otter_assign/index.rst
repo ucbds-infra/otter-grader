@@ -11,7 +11,15 @@ Creating Assignments
    :maxdepth: 1
    :hidden:
 
-   python_notebook_format
-   r_notebook_format
-   rmd_format
-   usage
+   v0/index
+   v1/index
+
+Otter Assign currently supports two notebook formats: format v0, the original master notebook format,
+and format v1, which was released with Otter-Grader v3. Format v0 is currently the default format
+option but v1 will become the default in Otter-Grader v4.
+
+To run Otter Assign on a v1-formatted notebook, add the ``--v1`` flag to the command:
+
+.. code-block:: console
+
+    otter assign lab00.ipynb dist --v1
