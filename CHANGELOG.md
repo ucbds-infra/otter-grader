@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Updated the default version of Ottr to v1.0.0
+
 **v3.0.0:**
 
 * Added Colab support to `otter.Notebook` by disabling methods that require a notebook path and ensuring that a tests directory is present
