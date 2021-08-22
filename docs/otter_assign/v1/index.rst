@@ -7,7 +7,6 @@ Otter Assign Format v1
    :maxdepth: 1
    :hidden:
 
-   python_notebook_format
-   r_notebook_format
+   notebook_format
    rmd_format
    usage

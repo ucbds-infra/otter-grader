@@ -1,5 +1,5 @@
-Python Notebook Format
-======================
+Notebook Format
+===============
 
 Otter's notebook format groups prompts, solutions, and tests together into questions. Autograder tests 
 are specified as cells in the notebook and their output is used as the expected output of the 
@@ -11,6 +11,10 @@ Note that the major difference between v0 format and v1 format is the use of raw
 delimeters. Each boundary cell denotes the start or end of a block and contains *valid YAML syntax*.
 First-line comments are used in these YAML raw cells to denote what type of block is being entered
 or ended.
+
+**In the v1 format, Python and R notebooks follow the same structure.** There are some features
+available in Python that are not available in R, and these are noted below, but otherwise the formats
+are the same.
 
 
 Assignment Metadata
@@ -147,6 +151,25 @@ cell, and passes the configurations ``points`` and ``seed`` to Otter Generate vi
     generate:
         points: 3
         seed: 0
+
+
+R Assignment Metadata
++++++++++++++++++++++
+
+Note that R notebooks only accept the following keys in the assignment metadata:
+
+.. code-block:: yaml
+
+    requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
+    overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
+    environment: environment.yml   # path to custom conda environment file
+    template_pdf: false            # whether to generate a manual question template PDF for Gradescope
+    generate:                      # configurations for running Otter Generate; defaults to false
+        points: null                 # number of points to scale assignment to on Gradescope
+        threshold: null              # a pass/fail threshold for the assignment on Gradescope
+        show_stdout: false           # whether to show grading stdout to students once grades are published
+        show_hidden: false           # whether to show hidden test results to students once grades are published
+    files: []                      # a list of file paths to include in the distribution directories
 
 
 Autograded Questions
@@ -336,6 +359,8 @@ if you are using seeds, make sure to use **the same seed** every time to ensure 
 every cell won't affect your tests. You will also be required to set this seed as a configuration of 
 the ``generate`` key of the assignment metadata if using Otter Generate with Otter Assign.
 
+*Note that intercell seeding is not supported with R assignments.*
+
 
 .. _otter_assign_v1_python_manual_questions:
 
@@ -409,3 +434,5 @@ Here is an example of plugin replacement in Otter Assign:
 .. raw:: html
 
     <iframe src="../../_static/notebooks/assign-plugin.html"></iframe>
+
+*Note that student-facing plugins are not supported with R assignments.*
