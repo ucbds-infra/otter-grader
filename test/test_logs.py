@@ -2,22 +2,21 @@
 ##### Tests for Otter Logs #####
 ################################
 
+import numpy as np
 import os
+import sys
 import unittest
 
-from otter.argparser import get_parser
+from sklearn.linear_model import LinearRegression
+
 from otter.check.logs import Log
 from otter.check.notebook import Notebook, _OTTER_LOG_FILENAME
 from otter.check.logs import LogEntry, EventType, Log
 from . import TestCase
 
-import numpy as np
-from sklearn.linear_model import LinearRegression
-import sys
-
-parser = get_parser()
 
 TEST_FILES_PATH = "test/test-logs/"
+
 
 class TestLogs(TestCase):
 
@@ -32,7 +31,7 @@ class TestLogs(TestCase):
         self.maxDiff = None
 
     def test_Notebook_check(self):
-        grader = Notebook(test_dir=self.test_directory)
+        grader = Notebook(tests_dir=self.test_directory)
 
         def square(x):
             return x**2
@@ -54,7 +53,7 @@ class TestLogs(TestCase):
 
 
     def test_grade_check(self):
-        grader = Notebook(test_dir=self.test_directory)
+        grader = Notebook(tests_dir=self.test_directory)
 
         def square(x):
             return x**2
@@ -75,7 +74,7 @@ class TestLogs(TestCase):
             self.assertEqual(logged_grade, actual_grade, f"Logged results for {question} are not correct")
 
     def test_question_entry(self):
-        grader = Notebook(test_dir=self.test_directory)
+        grader = Notebook(tests_dir=self.test_directory)
 
         def square(x):
             return x**2

@@ -34,7 +34,7 @@ conda run -n otter-env Rscript /autograder/source/requirements.r
 conda init --all
 
 # install ottr; not sure why it needs to happen twice but whatever
-git clone --single-branch -b stable https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
+git clone --single-branch -b 1.0.0.b0 https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
 cd /autograder/source/ottr 
 conda run -n otter-env Rscript -e "devtools::install\\(\\)"
 conda run -n otter-env Rscript -e "devtools::install\\(\\)"

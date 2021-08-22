@@ -1,5 +1,4 @@
-recommonmark
 sphinx_markdown_tables
 sphinx-book-theme==0.0.39
 sphinxcontrib-apidoc
-sphinx-argparse
+sphinx-click

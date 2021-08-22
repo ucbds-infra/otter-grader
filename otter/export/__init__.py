@@ -1,14 +1,13 @@
-"""
-IPython notebook PDF Exporter forked from nb2pdf and gsExport
-"""
+"""IPython notebook PDF Exporter forked from nb2pdf and gsExport"""
 
-import os
-import warnings
 import nbformat
 import nbconvert
+import os
 import pkg_resources
+import warnings
 
 from .exporters import get_exporter
+
 
 def export_notebook(nb_path, dest=None, debug=False, exporter_type=None, **kwargs):
     """
@@ -33,12 +32,13 @@ def export_notebook(nb_path, dest=None, debug=False, exporter_type=None, **kwarg
     Exporter = get_exporter(exporter_type=exporter_type)
     Exporter.convert_notebook(nb_path, pdf_name, debug=debug, **kwargs)
 
-def main(source, dest, exporter, filtering, pagebreaks, save, debug, **kwargs):
+
+def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, debug=False):
     """
     Runs Otter Export
 
     Args:
-        source (``str``): path to source notebook
+        src (``str``): path to source notebook
         dest (``Optional[str]``): path at which to write PDF
         exporter (``Optional[str]``): exporter name
         filtering (``bool``): whether to filter cells using HTML comments
@@ -49,7 +49,7 @@ def main(source, dest, exporter, filtering, pagebreaks, save, debug, **kwargs):
         **kwargs: ignored kwargs (a remnant of how the argument parser is built)
     """
     export_notebook(
-        source,
+        src,
         dest = dest,
         exporter_type = exporter,
         filtering = filtering,

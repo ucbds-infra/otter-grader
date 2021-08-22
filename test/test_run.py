@@ -15,18 +15,17 @@ from glob import glob
 from unittest import mock
 from shutil import copyfile
 
-# from otter.argparser import get_parser
-from otter.generate.autograder import main as autograder
 from otter.run.run_autograder import main as run_autograder
 
 from . import TestCase
 
-# parser = get_parser()
 
 NBFORMAT_VERSION = 4
 TEST_FILES_PATH = "test/test-run/"
 
+
 class TestRun(TestCase):
+
     def setUp(self):
         super().setUp()
 
@@ -89,7 +88,6 @@ class TestRun(TestCase):
         }
 
     def test_notebook(self):
-
         run_autograder(self.config['autograder_dir'])
 
         with open(TEST_FILES_PATH + "autograder/results/results.json") as f:
@@ -98,7 +96,6 @@ class TestRun(TestCase):
         self.assertEqual(actual_results, self.expected_results, f"Actual results did not matched expected:\n{actual_results}")
 
     def test_script(self):
-
         nb_path = TEST_FILES_PATH + "autograder/submission/fails2and6H.ipynb"
         nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
         os.remove(nb_path)

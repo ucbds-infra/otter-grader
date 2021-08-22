@@ -1,14 +1,16 @@
-library(testthat)
+test = list(
+  name = "q8",
+  cases = list(
+    ottr::TestCase$new(
+      hidden = FALSE,
+      name = NA,
+      points = 1,
+      code = {
+        test_that("q8a", {
+            expect_equal(length(z), 10)
+        })
+      }
+    )
 
-test_metadata = "
-cases:
-- hidden: false
-  name: q8a
-  points: 1
-name: q8
-
-"
-
-test_that("q8a", {
-    expect_equal(length(z), 10)
-})
+  )
+)

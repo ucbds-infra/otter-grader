@@ -1,16 +1,16 @@
-"""
-"""
+"""Non-containerized single notebook grading for Otter-Grader"""
 
-import os
 import json
-import shutil
+import os
 import pickle
-import zipfile
+import shutil
 import tempfile
+import zipfile
 
 from .run_autograder import main as run_autograder
 
-def main(submission, autograder, output_dir, no_logo, debug, **kwargs):
+
+def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=False, debug=False):
     """
     Grades a single submission using the autograder configuration ``autograder`` without containrization
 

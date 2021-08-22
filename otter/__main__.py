@@ -1,8 +1,6 @@
-"""
-otter module
-"""
+"""Python otter module"""
 
-from .runner import run_otter
+from .cli import cli
 
 if __name__ == "__main__":
-    run_otter()
+    cli()

@@ -2,6 +2,7 @@
 Solution removal for Otter Assign
 """
 
+import copy
 import re
 
 from .utils import rmd_to_cells, collapse_empty_cells
@@ -14,7 +15,7 @@ def is_markdown_solution_cell(cell):
     Returns whether any line of the cell matches `<!-- BEGIN SOLUTION -->`
     
     Args:
-        cell (``otter.assign.rmarkdown_adapter.utils.Cell``): notebook cell
+        cell (``nbformat.NotebookNode``): notebook cell
     
     Returns:
         ``bool``: whether the current cell is a Markdown solution cell
@@ -122,7 +123,9 @@ def strip_solutions_and_output(rmd_string):
     md_solutions = []
     cells = rmd_to_cells(rmd_string)
     for i, cell in enumerate(cells):
-        cells[i] = cell._replace(source='\n'.join(replace_solutions(get_source(cell))))
+        cell = copy.deepcopy(cells[i])
+        cell["source"] = '\n'.join(replace_solutions(get_source(cell)))
+        cells[i] = cell
     collapse_empty_cells(cells)
     rmd_string = "\n".join([c.source for c in cells])    
     return rmd_string

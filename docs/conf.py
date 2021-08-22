@@ -14,22 +14,25 @@
 #
 import os
 import sys
+import re
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
-import recommonmark
-from recommonmark.transform import AutoStructify
 
 from glob import glob
 import nbconvert
+from importlib import import_module
+import yaml
+from textwrap import indent
+from otter.utils import convert_config_description_dict
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'Otter-Grader'
-copyright = '2020, UC Berkeley Data Science Education Program'
+copyright = '2019-2021, UC Berkeley Data Science Education Program'
 author = 'UC Berkeley Data Science Education Program Infrastructure Team'
 
 # The short X.Y version
@@ -50,16 +53,12 @@ release = ''
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.githubpages',
-    'recommonmark',
-    # 'sphinx.ext.autodoc', 
     'sphinx.ext.coverage', 
     'sphinx.ext.napoleon',
     'sphinx_markdown_tables',
-    # 'sphinx.ext.autosummary',
-    # 'sphinxcontrib.apidoc',
-    'sphinxarg.ext',
     'IPython.sphinxext.ipython_console_highlighting',
-    'IPython.sphinxext.ipython_directive'
+    'IPython.sphinxext.ipython_directive',
+    'sphinx_click',
 ]
 
 napoleon_google_docstring = True
@@ -71,6 +70,13 @@ apidoc_excluded_paths = []
 
 autosummary_generate = False
 
+# imports for IPython
+ipython_execlines = [
+    "import json",
+    "import yaml",
+    "from otter.run.run_autograder.constants import DEFAULT_OPTIONS_WITH_DESCRIPTIONS",
+]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -78,11 +84,7 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = ['.rst', '.md']
-
-# source_parsers = {
-#    '.md': 'recommonmark.parser.CommonMarkParser',
-# }
+source_suffix = ['.rst']
 
 # The master toctree document.
 master_doc = 'index'
@@ -199,23 +201,79 @@ texinfo_documents = [
 ]
 
 
+# -- YAML Dictionary Replacement ---------------------------------------------
+
+files_to_replace = [
+    "workflow/otter_generate/index.rst",
+    "otter_assign/v0/python_notebook_format.rst",
+    "otter_assign/v1/notebook_format.rst",
+]
+
+def extract_descriptions_as_comments(config):
+    coms = []
+    for d in config:
+        coms.append("# " + d["description"])
+        default = d.get("default", None)
+        if isinstance(default, list) and len(default) > 0 and \
+                all(isinstance(e, dict) for e in default):
+            coms.extend(extract_descriptions_as_comments(default))
+    return coms
+
+def add_comments_to_yaml(yaml, comments):
+    lines = yaml.split("\n")
+    ret = []
+    pad_to = max(len(l) for l in lines) + 2
+    for l, c in zip(lines, comments):
+        pad = pad_to - len(l)
+        new_line = l + " " * pad + c
+        ret.append(new_line)
+    return "\n".join(ret)
+
+def update_yaml_block(file):
+    with open(file) as f:
+        lines = f.readlines()
+    lines = [l.strip("\n") for l in lines]
+
+    s, e = None, None
+    for i, line in enumerate(lines):
+        match = re.match(r"\.\. BEGIN YAML TARGET: ([\w.]+)\s*", line)
+        if match:
+            obj = match.group(1)
+            s = i
+        elif line.rstrip() == ".. END YAML TARGET":
+            e = i
+    assert s is not None and e is not None, f"Unable to replace YAML targets in {file}"
+    assert s < e, f"Unable to replace YAML targets in {file}"
+
+    if s + 1 == e:
+        lines.insert(e, "")
+        e += 1
+
+    module_path, member_name = obj.rsplit('.', 1)
+    member_data = getattr(import_module(module_path), member_name)
+
+    defaults = convert_config_description_dict(member_data, include_required=True)
+    code = yaml.safe_dump(defaults, indent=2, sort_keys=False)
+    comments = extract_descriptions_as_comments(member_data)
+    code = add_comments_to_yaml(code, comments)
+
+    to_replace = "\n.. code-block:: yaml\n\n" + indent(code.rstrip(), "    ") + "\n"
+    lines[s+1:e] = to_replace.split("\n")
+
+    with open(file, "w") as f:
+        f.write("\n".join(lines) + "\n")
+
+for file in files_to_replace:
+    print(f"Replacing YAML targets in: {file}")
+    update_yaml_block(file)
+
+
 # -- Extension configuration -------------------------------------------------
 def setup(app):
-    app.add_config_value('recommonmark_config', {
-        #'url_resolver': lambda url: github_doc_root + url,
-        # 'enable_auto_toc_tree': True,
-        # 'auto_toc_tree_section': 'Contents',
-        'enable_math': False,
-        'enable_inline_math': False,
-        'enable_eval_rst': True,
-        # 'enable_auto_doc_ref': True,
-    }, True)
-    app.add_transform(AutoStructify)
-
     # run nbconvert on all of the notebooks in _static/notebooks
     exporter = nbconvert.HTMLExporter()
     print("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15)
-    for file in glob("docs/_static/notebooks/*.ipynb"):
+    for file in glob("_static/notebooks/*.ipynb"):
         html, _ = exporter.from_filename(file)
         with open(os.path.splitext(file)[0] + ".html", "w+") as f:
             f.write(html)

@@ -1,6 +1,4 @@
-"""
-Otter Check command-line utility
-"""
+"""Otter Check command-line utility"""
 
 import os
 
@@ -9,6 +7,7 @@ from jinja2 import Template
 
 from .logs import LogEntry, EventType
 from .notebook import _OTTER_LOG_FILENAME
+
 from ..execute import grade_notebook, check
 from ..utils import block_print
 
@@ -33,7 +32,8 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 		error=error
 	).flush_to_file(_OTTER_LOG_FILENAME)
 
-def main(file, tests_path, question, seed, **kwargs):
+
+def main(file,  *, tests_path="./tests", question=None, seed=None):
 	"""
 	Runs Otter Check
 
@@ -44,7 +44,6 @@ def main(file, tests_path, question, seed, **kwargs):
 		seed (``int``): a seed to set before execution
 		**kwargs: ignored kwargs (a remnant of how the argument parser is built)
 	"""
-
 	try:
 		if question:
 			test_path = os.path.join(tests_path, question + ".py")

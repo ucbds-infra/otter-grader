@@ -9,14 +9,14 @@ import nbformat
 
 from .solutions import is_markdown_solution_cell
 from .tests import gen_test_cell, is_test_cell
-from .utils import rmd_to_cells, Cell, collapse_empty_cells
+from .utils import rmd_to_cells, collapse_empty_cells
 
 from ..assignment import is_assignment_cell, read_assignment_metadata
-from ..questions import is_question_cell, read_question_metadata, gen_question_cell
+from ..questions import is_question_cell, read_question_metadata
 from ..r_adapter.tests import read_test
 from ..solutions import has_seed
 from ..tests import any_public_tests
-from ..utils import is_ignore_cell, is_markdown_cell, EmptyCellException
+from ..utils import is_ignore_cell, EmptyCellException
 
 def transform_notebook(rmd_string, assignment):
     """
@@ -48,7 +48,7 @@ def get_transformed_cells(cells, assignment):
     among other things.
 
     Args:
-        cells (``list`` of ``otter.assign.rmarkdown_adapter.utils.Cell``): original code cells
+        cells (``list`` of ``nbformat.NotebookNode``): original code cells
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     
     Returns:

@@ -1,5 +1,4 @@
-"""
-"""
+"""A programmatic API for using Otter-Grader"""
 
 __all__ = ["export_notebook", "grade_submission"]
 
@@ -13,14 +12,11 @@ from contextlib import redirect_stdout
 try:
     from contextlib import nullcontext
 except ImportError:
-    from .utils import nullcontext # nullcontext is new in Python 3.7
+    from .utils import nullcontext  # nullcontext is new in Python 3.7
 
-from .argparser import get_parser
 from .export import export_notebook
 from .run import main as run_grader
 
-PARSER = get_parser()
-ARGS_STARTER = ["run"]
 
 def grade_submission(ag_path, submission_path, quiet=False, debug=False):
     """
@@ -49,27 +45,15 @@ def grade_submission(ag_path, submission_path, quiet=False, debug=False):
 
     dp = tempfile.mkdtemp()
 
-    args_list = ARGS_STARTER.copy()
-    args_list.extend([
-        "-a", ag_path,
-        "-o", dp,
-        submission_path,
-        "--no-logo",
-    ])
-
-    if debug:
-        args_list.append("--debug")
-
-    args = PARSER.parse_args(args_list)
-
     if quiet:
         f = open(os.devnull, "w")
         cm = redirect_stdout(f)
     else:
         cm = nullcontext()
-        
+
+    # TODO: is the output_dir argument of run_grader necessary here?
     with cm:
-        results = run_grader(**vars(args))
+        results = run_grader(submission_path, ag_path, dp, True, debug)
 
     if quiet:
         f.close()

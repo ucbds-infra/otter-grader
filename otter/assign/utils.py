@@ -1,7 +1,6 @@
-"""
-Utilities for Otter Assign
-"""
+"""Utilities for Otter Assign"""
 
+import copy
 import json
 import os
 import pathlib
@@ -15,7 +14,6 @@ from textwrap import indent
 
 from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 
-from ..argparser import get_parser
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
 from ..generate.token import APIClient
@@ -26,6 +24,14 @@ class EmptyCellException(Exception):
     """
     Exception for empty cells to indicate deletion
     """
+
+
+class AssignNotebookFormatException(Exception):
+    """
+    """
+    def __init__(self, message, cell_index, *args, **kwargs):
+        message = message + f" (cell number { cell_index + 1 })"
+        super().__init__(message, *args, **kwargs)
 
 
 #---------------------------------------------------------------------------------------------------
@@ -64,18 +70,6 @@ def get_spec(source, begin):
 # Cell Type Checkers
 #---------------------------------------------------------------------------------------------------
 
-def is_markdown_cell(cell):
-    """
-    Returns whether ``cell`` is Markdown cell
-    
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
-    
-    Returns:
-        ``bool``: whether the cell is a Markdown cell
-    """
-    return cell.cell_type == 'markdown'
-
 def is_ignore_cell(cell):
     """
     Returns whether the current cell should be ignored
@@ -88,6 +82,9 @@ def is_ignore_cell(cell):
     """
     source = get_source(cell)
     return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
+
+def is_cell_type(cell, cell_type):
+    return cell["cell_type"] == cell_type
 
 
 #---------------------------------------------------------------------------------------------------
@@ -115,6 +112,29 @@ def lock(cell):
     m = cell['metadata']
     m["editable"] = False
     m["deletable"] = False
+
+def add_tag(cell, tag):
+    """
+    """
+    cell = copy.deepcopy(cell)
+    if "tags" not in cell["metadata"]:
+        cell["metadata"]["tags"] = []
+    cell["metadata"]["tags"].append(tag)
+    return cell
+
+def has_tag(cell, tag):
+    """
+    """
+    return tag in cell["metadata"].get("tags", [])
+
+def remove_tag(cell, tag):
+    """
+    """
+    cell = copy.deepcopy(cell)
+    if "tags" not in cell["metadata"] or tag not in cell["metadata"]["tags"]:
+        return cell
+    cell["metadata"]["tags"].remove(tag)
+    return cell
 
 
 #---------------------------------------------------------------------------------------------------
@@ -159,7 +179,7 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     os.chdir(nb_path.parent)
 
     results = grade_notebook(
-        nb_path.name, glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
+        nb_path.name, tests_glob=glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
         plugin_collection=plugin_collection
     )
@@ -214,16 +234,21 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args is True:
         generate_args = {}
 
+    if assignment.is_r:
+        generate_args["lang"] = "r"
+
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
-    generate_cmd = ["generate"]
 
+    # TODO: make it so pdfs is not a key in the generate key, but matches the structure expected by
+    # run_autograder
     if generate_args.get('pdfs', {}):
         pdf_args = generate_args.pop('pdfs', {})
-        # token = APIClient.get_token()
-        # generate_args['token'] = token
         generate_args['course_id'] = str(pdf_args['course_id'])
         generate_args['assignment_id'] = str(pdf_args['assignment_id'])
+        
+        if pdf_args.get("token"):
+            generate_args['token'] = str(pdf_args['token'])
 
         if not pdf_args.get("filtering", True):
             generate_args['filtering'] = False
@@ -232,43 +257,31 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
             generate_args['pagebreaks'] = False
 
     # use temp tests dir
+    test_dir = "tests"
     if assignment.is_python and not assignment.test_files and assignment._temp_test_dir is None:
         raise RuntimeError("Failed to create temp tests directory for Otter Generate")
     elif assignment.is_python and not assignment.test_files:
-        generate_cmd += ["-t", str(assignment._temp_test_dir)]
-    
-    if assignment.is_r:
-        generate_cmd += ["-l", "r"]
-        generate_args['lang'] = 'r'
+        test_dir = str(assignment._temp_test_dir)
 
+    requirements = None
     if assignment.requirements:
         if assignment.is_r:
             requirements = 'requirements.R'
         else:
             requirements = 'requirements.txt'
-        generate_cmd += ["-r", str(requirements)]
-        if assignment.overwrite_requirements:
-            generate_cmd += ["--overwrite-requirements"]
 
-    if assignment.environment:
-        environment = 'environment.yml'
-        generate_cmd += ["-e", str(environment)]
-    
-    if gs_username is not None and gs_password is not None:
-        generate_cmd += ["--username", gs_username, "--password", gs_password]
-    
+    files = []
     if assignment.files:
-        generate_cmd += assignment.files
+        files += assignment.files
 
     if assignment.autograder_files:
-        ag_files = []
         res = (result / "autograder").resolve()
         for agf in assignment.autograder_files:
             fp = pathlib.Path(agf).resolve()
             rp = get_relpath(res, fp)
-            ag_files.append(str(rp))
-        generate_cmd += ag_files
+            files.append(str(rp))
 
+    # TODO: move this config out of the assignment metadata and into the generate key
     if assignment.variables:
         generate_args['serialized_variables'] = str(assignment.variables)
 
@@ -276,10 +289,22 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         with open("otter_config.json", "w+") as f:
             json.dump(generate_args, f, indent=2)
     
-    # TODO: change this to import and direct call
-    parser = get_parser()
-    args = parser.parse_args(generate_cmd)
-    generate_autograder(**vars(args), assignment=assignment, plugin_collection=plugin_collection)
+    # TODO: change generate_autograder so that only necessary kwargs are needed
+    generate_autograder(
+        tests_path=test_dir,
+        output_dir=".",
+        config="otter_config.json" if generate_args else None,
+        lang="python" if assignment.is_python else "r",
+        requirements=requirements,
+        overwrite_requirements=assignment.overwrite_requirements,
+        environment="environment.yml" if assignment.environment else None,
+        no_environment=False,
+        username=gs_username,
+        password=gs_password,
+        files=files,
+        plugin_collection=plugin_collection,
+        assignment=assignment,
+    )
 
     # clean up temp tests dir
     if assignment._temp_test_dir is not None:
