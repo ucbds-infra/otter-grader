@@ -18,9 +18,9 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     provided Google Service Account credentials to pull in the spreadsheet as a dataframe and edits
     test case scores by matching on the Gradescope assignment ID, student email, and test case name.
 
-    Implements the ``during_generate``, ``before_grading``, and ``after_grading`` events. **Make sure 
+    Implements the ``during_generate``, ``before_grading``, and ``after_grading`` events. Make sure 
     to list this plugin as ``otter.plugins.builtin.GoogleSheetsGradeOverride``, otherwise the 
-    ``during_generate`` event of this plugin will not work.**
+    ``during_generate`` event of this plugin will not work.
     
     The google sheet should have the following format:
 

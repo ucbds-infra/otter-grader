@@ -1,9 +1,7 @@
-"""
-Otter Assign command-line utility
-"""
+"""Assignment creation tool for Otter-Grader"""
 
-import os
 import json
+import os
 import pathlib
 import warnings
 
@@ -15,9 +13,11 @@ from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
 from ..utils import get_relpath, block_print
 
-def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwargs):
+
+def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
+         debug=False, v1=False):
     """
-    Runs Otter Assign on a master notebook
+    Runs Otter Assign on a master notebook.
     
     Args:
         master (``str``): path to master notebook
@@ -28,42 +28,33 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
-        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+        v1 (``bool``): whether to use Otter Assign Format v1 instead of v0
     """
+    if not v1:
+        warnings.warn(
+            "Otter Assign format v0 will be deprecated in Otter v4 and removed in a later release.",
+            FutureWarning)
+            
+        from .v0 import main as v0_main
+        return v0_main(master, result, no_pdfs=no_pdfs, no_run_tests=no_run_tests, username=username, 
+            password=password, debug=debug)
+
     master, result = pathlib.Path(os.path.abspath(master)), pathlib.Path(os.path.abspath(result))
     print("Generating views...")
 
     assignment = Assignment()
 
-    # # check language
-    # if lang is not None:
-    #     lang = lang.lower()
-    #     assert lang in ["r", "python"], f"Language {lang} is not valid"
-    #     assignment.lang = lang
-    
-    # TODO: update this condition
-    if True:
-        result = get_relpath(master.parent, result)
-        orig_dir = os.getcwd()
-        os.chdir(master.parent)
-        # master = pathlib.Path(master.name)
+    result = get_relpath(master.parent, result)
+    orig_dir = os.getcwd()
+    os.chdir(master.parent)
     
     assignment.master, assignment.result = master, result
-    # assignment.files = files
 
     if assignment.is_rmd:
         from .rmarkdown_adapter.output import write_output_directories
     else:
         from .output import write_output_directories
 
-    # # update requirements
-    # requirements = requirements
-    # if requirements is None and os.path.isfile("requirements.txt"):
-    #     requirements = "requirements.txt"
-    # if requirements:
-    #     assert os.path.isfile(requirements), f"Requirements file {requirements} not found"
-    # assignment.requirements = requirements
-    
     try:
         output_nb_path = write_output_directories(master, result, assignment)
 
@@ -87,6 +78,11 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
                 assignment.generate["plugins"].extend(plugins)
         else:
             pc = None
+
+        # generate Gradescope autograder zipfile
+        if assignment.generate:
+            print("Generating autograder zipfile...")
+            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
         
         # generate PDF of solutions
         if assignment.solutions_pdf and not assignment.is_rmd and not no_pdfs:
@@ -130,12 +126,6 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
             else:
                 write_otter_config_file(master, result, assignment)
 
-        # generate Gradescope autograder zipfile
-        if assignment.generate:
-            # TODO: move this to another function
-            print("Generating autograder zipfile...")
-            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
-
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:
             print("Running tests...")
@@ -153,16 +143,6 @@ def main(master, result, no_pdfs, no_run_tests, username, password, debug, **kwa
 
             run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
             print("All tests passed!")
-    
-    # for tests
-    except:
-        # TODO: change this condition
-        if True:
-            os.chdir(orig_dir)
 
-        raise
-
-    else:
-        # TODO: change this condition
-        if True:
-            os.chdir(orig_dir)
+    finally:
+        os.chdir(orig_dir)

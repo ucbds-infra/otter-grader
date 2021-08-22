@@ -1,17 +1,18 @@
 import re
 
-from .utils import Cell
+from .utils import create_cell
 
 from ..constants import TEST_REGEX
 from ..r_adapter.tests import gen_suite
 from ..utils import get_source
+
 
 def is_test_cell(cell):
     """
     Returns whether the current cell is a test cell
     
     Args:
-        cell (``otter.assign.rmarkdown_adapter.utils.Cell``): an Rmd file cell
+        cell (``nbformat.NotebookNode``): an Rmd file cell
 
     Returns:
         ``bool``: whether the cell is a test cell
@@ -20,6 +21,7 @@ def is_test_cell(cell):
         return False
     source = get_source(cell)
     return source and re.match(TEST_REGEX, source[1], flags=re.IGNORECASE)
+
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """
@@ -34,13 +36,13 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
 
     Returns:
-        ``otter.assign.rmarkdown_adapter.utils.Cell``: code cell calling ``ottr::check`` on this test
+        ``nbformat.NotebookNode``: code cell calling ``ottr::check`` on this test
     """
     source = f'```{{r}}\n. = ottr::check("tests/{question["name"]}.R")\n```'
-    cell = Cell("code", source)
+    cell = create_cell("code", source)
 
     points = question.get('points', len(tests))
-    if isinstance(points, int):
+    if isinstance(points, (int, float)):
         if points % len(tests) == 0:
             points = [points // len(tests) for _ in range(len(tests))]
         else:
@@ -48,6 +50,8 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     assert isinstance(points, list) and len(points) == len(tests), \
         f"Points for question {question['name']} could not be parsed:\n{points}"
 
+    # update point values
+    tests = [tc._replace(points=p) for tc, p in zip(tests, points)]
     test = gen_suite(question['name'], tests, points)
 
     tests_dict[question['name']] = test

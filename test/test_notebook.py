@@ -95,7 +95,7 @@ class TestNotebook(TestCase):
         """
         Checks that the otter.Notebook class works correctly
         """
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
 
         def square(x):
             return x ** 2
@@ -120,7 +120,7 @@ class TestNotebook(TestCase):
         """
         Checks that the ``Notebook`` class works correctly, with no global env input
         """
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
 
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
             q = os.path.split(q_path)[1][:-3]
@@ -135,7 +135,7 @@ class TestNotebook(TestCase):
         Checks that the otter.Notebook class check method correctly raises Exceptions
         when things go wrong
         """
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
         global_env = 0
         for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
             q = os.path.split(q_path)[1][:-3]
@@ -146,7 +146,7 @@ class TestNotebook(TestCase):
         """
         Checks that the representation of results as strings is correct
         """
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
 
         output = str(grader.check_all())
         output2 = grader.check_all()
@@ -174,7 +174,7 @@ class TestNotebook(TestCase):
         nb['cells'] = [nbformat.v4.new_markdown_cell(text)]
         with open(TEST_FILES_PATH + 'test-nb.ipynb', "w") as f:
             nbformat.write(nb, f)
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
         grader.to_pdf(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
 
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
@@ -198,7 +198,7 @@ class TestNotebook(TestCase):
             nbformat.write(nb1, f)
         with open('test-nb2.ipynb', "w") as f:
             nbformat.write(nb2, f)
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
         self.assertRaises(AssertionError,
                           lambda: grader.to_pdf(nb_path=None, filtering=False))
         os.remove('test-nb1.ipynb')
@@ -218,7 +218,7 @@ class TestNotebook(TestCase):
         os.mkdir(correct_directory)
         with open(correct_directory + 'test-nb.ipynb', "w") as f:
             nbformat.write(nb, f)
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
         grader.export(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
 
         self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
@@ -256,7 +256,7 @@ class TestNotebook(TestCase):
             nbformat.write(nb1, f)
         with open('test-nb2.ipynb', "w") as f:
             nbformat.write(nb2, f)
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
         self.assertRaises(AssertionError,
                           lambda: grader.export(nb_path=None, filtering=False))
         os.remove('test-nb1.ipynb')
@@ -283,7 +283,7 @@ class TestNotebook(TestCase):
         AssertionError for the case when the directory contains
         multiple .otter files.
         """
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
         self.assertRaises(ValueError, lambda: grader.export(nb_path=None, filtering=False))
 
     @patch.object(LogEntry, "shelve")
@@ -293,10 +293,38 @@ class TestNotebook(TestCase):
         """
 
         mock_log.return_value = LogEntry(EventType.CHECK)
-        grader = Notebook(test_dir=TEST_FILES_PATH + "tests")
+        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
         output = grader.check_all()
 
         self.assertTrue(os.path.isfile(_OTTER_LOG_FILENAME))
+
+    def test_colab(self):
+        """
+        Checks that the ``Notebook`` class correctly disables methods on Google Colab.
+        """
+        tests_dir = TEST_FILES_PATH + "tests"
+        with mock.patch("otter.check.notebook.os.path.isdir") as mocked_isdir:
+            mocked_isdir.return_value = False
+            with self.assertRaises(ValueError, msg=f"Tests directory {tests_dir} does not exist"):
+                grader = Notebook(tests_dir=tests_dir, colab=True)
+
+            mocked_isdir.assert_called_once_with(tests_dir)
+
+            mocked_isdir.return_value = True
+            grader = Notebook(tests_dir=tests_dir, colab=True)
+
+            # check for appropriate errors
+            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
+                grader.run_plugin()
+
+            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
+                grader.to_pdf()
+
+            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
+                grader.add_plugin_files()
+
+            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
+                grader.export()
 
     def tearDown(self):
         for i in range(1, 7):

@@ -147,7 +147,7 @@ def run_autograder(options):
         if plugins:
             with open("../submission_metadata.json") as f:
                 submission_metadata = json.load(f)
-            
+
             plugin_collection = PluginCollection(
                 plugins, os.path.abspath(nb_path), submission_metadata
             )
@@ -162,6 +162,7 @@ def run_autograder(options):
             client = APIClient(token=options["token"])
             generate_pdf = True
             has_token = True
+
         else:
             generate_pdf = options["pdf"]
             has_token = False
@@ -182,7 +183,7 @@ def run_autograder(options):
 
         scores = grade_notebook(
             nb_path, 
-            glob("./tests/*.py"), 
+            tests_glob=glob("./tests/*.py"), 
             name="submission", 
             cwd=".", 
             test_dir="./tests",

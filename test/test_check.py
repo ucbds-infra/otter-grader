@@ -14,9 +14,7 @@ from io import StringIO
 from unittest import mock
 
 from otter import Notebook
-# from otter.argparser import get_parser
 from otter.check import main as check
-from otter.runner import run_otter
 
 from . import TestCase
 
@@ -32,22 +30,18 @@ class TestCheck(TestCase):
         """
         # run for each individual test
         for file in glob(TEST_FILES_PATH + "tests/*.py"):
-            check_command = ["check",
-                TEST_FILES_PATH + "file0.py", 
-                "-q", os.path.split(file)[1][:-3],
-                "-t", os.path.split(file)[0]
-            ]
-            # args = parser.parse_args(check_command)
-            # args.func = check
-
             # capture stdout
             output = StringIO()
             with contextlib.redirect_stdout(output):
 
-                # mock block_print otherwise they interfere with capture of stdout
+                # mock block_print otherwise it interferes with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    # args.func(args)
-                    run_otter(check_command)
+                    check(
+                        TEST_FILES_PATH + "file0.py", 
+                        question = os.path.split(file)[1][:-3],
+                        tests_path = os.path.split(file)[0],
+                    )
+
                     if os.path.split(file)[1] != "q2.py":
                         self.assertEqual(
                             output.getvalue().strip().split("\n")[-1].strip(), 
@@ -55,21 +49,14 @@ class TestCheck(TestCase):
                             "Did not pass test at {}".format(file)
                         )
 
-        # run checker command
-        check_command = ["check",
-            TEST_FILES_PATH + "file0.py", 
-            "-t", TEST_FILES_PATH + "tests"
-        ]
-        # args = parser.parse_args(check_command)
-        # args.func = check
-
-        # capture stdout
+        # run the file for all questions
         output = StringIO()
         with contextlib.redirect_stdout(output):
-
-            # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                run_otter(check_command)
+                check(
+                    TEST_FILES_PATH + "file0.py", 
+                    tests_path = os.path.split(file)[0],
+                )
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\
@@ -98,29 +85,24 @@ class TestCheck(TestCase):
                     "Did not pass correct tests"
                 )
 
-
     def test_otter_check_notebook(self):
         """
         Checks that the script checker works
         """
         # run for each individual test
         for file in glob(TEST_FILES_PATH + "tests/*.py"):
-            check_command = ["check",
-                TEST_FILES_PATH + "test-nb.ipynb", 
-                "-q", os.path.split(file)[1][:-3],
-                "-t", os.path.split(file)[0]
-            ]
-            # args = parser.parse_args(check_command)
-            # args.func = check
-
             # capture stdout
             output = StringIO()
             with contextlib.redirect_stdout(output):
 
-                # mock block_print otherwise they interfere with capture of stdout
+                # mock block_print otherwise it interferes with capture of stdout
                 with mock.patch("otter.check.block_print"):
-                    # args.func(args)
-                    run_otter(check_command)
+                    check(
+                        TEST_FILES_PATH + "test-nb.ipynb", 
+                        question = os.path.split(file)[1][:-3],
+                        tests_path = os.path.split(file)[0],
+                    )
+
                     if os.path.split(file)[1] != "q2.py":
                         self.assertEqual(
                             output.getvalue().strip().split("\n")[-1].strip(), 
@@ -128,23 +110,15 @@ class TestCheck(TestCase):
                             "Did not pass test at {}".format(file)
                         )
 
-        # run checker command
-        check_command = ["check",
-            TEST_FILES_PATH + "test-nb.ipynb", 
-            "-t", TEST_FILES_PATH + "tests"
-        ]
-        # args = parser.parse_args(check_command)
-        # args.func = check
-
-        # capture stdout
+        # run the file for all questions
         output = StringIO()
         with contextlib.redirect_stdout(output):
-
-        # mock block_print otherwise they interfere with capture of stdout
             with mock.patch("otter.check.block_print"):
-                # print(output.getvalue())
+                check(
+                    TEST_FILES_PATH + "test-nb.ipynb", 
+                    tests_path = os.path.split(file)[0],
+                )
 
-                run_otter(check_command)
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\

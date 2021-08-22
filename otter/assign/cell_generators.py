@@ -1,6 +1,4 @@
-"""
-Miscellaneous cell generators for Otter Assign
-"""
+"""Miscellaneous cell generators for Otter Assign"""
 
 import copy
 import nbformat
@@ -8,25 +6,27 @@ import nbformat
 from .constants import MD_RESPONSE_CELL_SOURCE
 from .utils import get_source, lock
 
-def gen_init_cell(nb_name):
+
+def gen_init_cell(nb_name, colab):
     """
-    Generates a cell to initialize Otter in the notebook. The code cell has the following contents:
-
-    .. code-block:: python
-
-        # Initialize Otter
-        import otter
-        grader = otter.Notebook()
+    Generates a cell to initialize Otter in the notebook.
 
     Args:
         nb_name (``str``): the name of the notebook being graded
+        colab (``bool``): whether the notebook will be run on Colab
     
     Returns:
         ``nbformat.NotebookNode``: the init cell
     """
-    cell = nbformat.v4.new_code_cell(f'# Initialize Otter\nimport otter\ngrader = otter.Notebook("{nb_name}")')
+    if colab:
+        args = "colab=True"
+    else:
+        args  = f"\"{nb_name}\""
+    contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
+    cell = nbformat.v4.new_code_cell(contents)
     lock(cell)
     return cell
+
 
 def gen_markdown_response_cell():
     """
@@ -41,7 +41,8 @@ def gen_markdown_response_cell():
     """
     return nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)
 
-def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=False):
+
+def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=False, run_tests=False):
     """
     Generates export cells that instruct the student the run a code cell calling 
     ``otter.Notebook.export`` to generate and download their submission. The Markdown cell contains:
@@ -72,6 +73,8 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
         filtering (``bool``, optional): whether PDF filtering is needed
         force_save (``bool``, optional): whether or not to set the ``force_save`` argument of 
             ``otter.Notebook.export`` to ``True``
+        run_tests (``bool``, optional): whether to set the ``run_tests`` argument of 
+            ``otter.Notebook.export`` to ``True``
     
     Returns:
         ``list`` of ``nbformat.NotebookNode``: generated export cells
@@ -93,12 +96,9 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
         args += ["pdf=False"]
     if force_save:
         args += ["force_save=True"]
-    # if filtering and pdf:
-    #     source_lines.append(f"grader.export()")
-    # elif not filtering:
-    #     source_lines.append(f"grader.export(filtering=False)")
-    # else:
-    #     source_lines.append(f"grader.export(pdf=False)")
+    if run_tests:
+        args += ["run_tests=True"]
+
     source_lines.append(f"grader.export({', '.join(args)})")
     export.source = "\n".join(source_lines)
 
@@ -106,6 +106,7 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
     lock(export)
 
     return [instructions, export, nbformat.v4.new_markdown_cell(" ")]     # last cell is buffer
+
 
 def gen_check_all_cell():
     """
@@ -137,22 +138,8 @@ def gen_check_all_cell():
 
     return [instructions, check_all]
 
-def gen_close_export_cell():
-    """
-    Generates a Markdown cell to end question export for PDF filtering. The cell contains:
 
-    .. code-block:: markdown
-
-        <!-- END QUESTION -->
-    
-    Returns:
-        ``nbformat.NotebookNode``: new Markdown cell with ``<!-- END QUESTION -->``
-    """
-    cell = nbformat.v4.new_markdown_cell("<!-- END QUESTION -->")
-    lock(cell)
-    return cell
-
-def add_close_export_to_cell(cell):
+def add_export_tag_to_cell(cell, end=False):
     """
     Adds an HTML comment to close question export for PDF filtering to the top of ``cell``. ``cell``
     should be a Markdown cell. This adds ``<!-- END QUESTION-->`` as the first line of the cell.
@@ -165,7 +152,7 @@ def add_close_export_to_cell(cell):
     """
     cell = copy.deepcopy(cell)
     source = get_source(cell)
-    source = ["<!-- END QUESTION -->\n", "\n"] + source
+    tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
+    source = [tag, ""] + source
     cell['source'] = "\n".join(source)
     return cell
-

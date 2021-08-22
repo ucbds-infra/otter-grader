@@ -3,6 +3,7 @@
 import docker
 import os
 import pandas as pd
+import re
 
 from hashlib import md5
 
@@ -37,21 +38,26 @@ def merge_csv(dataframes):
     final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_index()
     return final_dataframe
 
-def prune_images():
+def prune_images(force=False):
     """
     Prunes all Docker images named ``otter-grade``
     """
-    # this is a fix for travis -- allows overriding docker client version
-    if os.environ.get("OTTER_DOCKER_CLIENT_VERSION") is not None:
-        client = docker.from_env(version=os.environ.get("OTTER_DOCKER_CLIENT_VERSION"))
+    if not force:
+        sure = input("Are you sure you want to prune Otter's grading images? This action cannot be undone [y/N] ")
+        sure = bool(re.match(r"ye?s?", sure, flags=re.IGNORECASE))
     else:
-        client = docker.from_env()
+        sure = True
     
-    images = client.images.list()
+    if sure:
+        # this is a fix for travis -- allows overriding docker client version
+        docker_version = os.environ.get("OTTER_DOCKER_CLIENT_VERSION", "auto")
+        client = docker.from_env(version=docker_version)
+        
+        images = client.images.list()
 
-    for img in images:
-        if any([OTTER_DOCKER_IMAGE_TAG in t for t in img.tags]):
-            client.images.remove(img.tags[0], force=True)
+        for img in images:
+            if any([t.startswith(OTTER_DOCKER_IMAGE_TAG + ":") for t in img.tags]):
+                client.images.remove(img.tags[0], force=True)
 
 def generate_hash(path):
     """

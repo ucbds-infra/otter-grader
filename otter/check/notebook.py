@@ -1,33 +1,31 @@
-"""
-IPython notebook API for Otter Check
-"""
+"""IPython notebook API for Otter Check"""
 
+import datetime as dt
 import inspect
-import requests
 import json
 import os
-import re
-import zipfile
 import pickle
+import re
 import time
 import warnings
-import datetime as dt
+import zipfile
 
 from getpass import getpass
 from glob import glob
-from urllib.parse import urljoin
 from IPython import get_ipython
 from IPython.display import display, HTML, Javascript
+from textwrap import indent
+from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import save_notebook
+from .utils import grade_zip_file, running_on_colab, save_notebook
+
 from ..execute import check
 from ..export import export_notebook
 from ..plugins import PluginCollection
 
 
 _ZIP_NAME_FILENAME = "__zip_filename__"
-_OTTER_STATE_FILENAME = ".OTTER_STATE"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
 
@@ -57,27 +55,46 @@ class TestsDisplay:
         return ret
 
 
+def _colab_incompatible(f):
+    """
+    """
+    def colab_only_method(self, *args, **kwargs):
+        if self._colab:
+            raise RuntimeError("This method is not compatible with Google Colab")
+        return f(self, *args, **kwargs)
+    return colab_only_method
+
+
+# TODO: make logging more elegent; maybe use metaclass to wrap every method?
 class Notebook:
     """
     Notebook class for in-notebook autograding
 
     Args:
         nb_path(``str``, optional): path to the notebook being run
-        test_dir (``str``, optional): path to tests directory
+        tests_dir (``str``, optional): path to tests directory
+        colab (``bool``, optional): whether this notebook is being run on Google Colab
     """
 
-    # overrides test_dir arg in __init__, used for changing tests dir during grading
+    # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
 
-    def __init__(self, nb_path=None, test_dir="./tests"):
+    def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
         try:
             global _SHELVE
-            # assert os.path.isdir(test_dir), "{} is not a directory".format(test_dir)
+
+            if colab is None:
+                colab = running_on_colab()
+
+            if colab and not os.path.isdir(tests_dir):
+                raise ValueError(f"Tests directory {tests_dir} does not exist")
 
             if type(self)._tests_dir_override is not None:
                 self._path = type(self)._tests_dir_override
             else:
-                self._path = test_dir
+                self._path = tests_dir
+
+            self._colab = colab
             self._notebook = nb_path
             self._addl_files = []
             self._plugin_collections = {}
@@ -101,6 +118,7 @@ class Notebook:
         except Exception as e:
             self._log_event(EventType.INIT, success=False, error=e)
             raise e
+
         else:
             self._log_event(EventType.INIT)
 
@@ -110,7 +128,7 @@ class Notebook:
 
         Args:
             event_type (``otter.logs.EventType``): the type of event
-            results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional):
+            results (``list[otter.test_files.abstract_test.TestFile]``, optional):
                 the results of any checks recorded by the entry
             question (``str``, optional): the question name for this check
             success (``bool``, optional): whether the operation was successful
@@ -159,7 +177,7 @@ class Notebook:
             nb_path = notebooks[0]
 
         elif nb_path is None:
-            raise ValueError("nb_path is None and no otter-service config is available")
+            raise ValueError("Could not resolve notebook path")
 
         return nb_path
 
@@ -174,12 +192,15 @@ class Notebook:
                 notebook
 
         Returns:
-            ``otter.test_files.abstract_test.TestCollectionResults``: the grade for the question
+            ``otter.test_files.abstract_test.TestFile``: the grade for the question
         """
         try:
             if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
                 test_path = os.path.join(self._path, question + ".py")
                 test_name = None
+
+            elif self._colab:
+                raise ValueError(f"Test {question} does not exist")
 
             else:
                 test_path = self._resolve_nb_path(None)
@@ -203,6 +224,7 @@ class Notebook:
 
         return result
 
+    @_colab_incompatible
     def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the plugin ``plugin_name`` with the specified arguments. Use ``nb_path`` if the path
@@ -224,7 +246,7 @@ class Notebook:
             self._plugin_collections[plugin_name] = pc
         pc.run("from_notebook", *args, **kwargs)
 
-    # @staticmethod
+    @_colab_incompatible
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
         """
         Exports a notebook to a PDF using Otter Export
@@ -268,6 +290,7 @@ class Notebook:
         else:
             self._log_event(EventType.TO_PDF)
 
+    @_colab_incompatible
     def add_plugin_files(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the ``notebook_export`` event of the plugin ``plugin_name`` and tracks the file paths
@@ -291,8 +314,9 @@ class Notebook:
             return
         self._addl_files.extend(addl_files)
 
+    @_colab_incompatible
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
-            display_link=True, force_save=False):
+            display_link=True, force_save=False, run_tests=False):
         """
         Exports a submission to a zip file. Creates a submission zipfile from a notebook at ``nb_path``,
         optionally including a PDF export of the notebook and any files in ``files``.
@@ -367,6 +391,14 @@ class Notebook:
                 zf.write(file)
 
             zf.close()
+
+            if run_tests:
+                print("Running your submission against local test cases...\n")
+                results = grade_zip_file(zip_path, nb_path, self._path)
+                print(
+                    "Your submission received the following results when run against " + \
+                    "available test cases:\n\n" + indent(results.summary(), "    ")
+                )
 
             if display_link:
                 # create and display output HTML
