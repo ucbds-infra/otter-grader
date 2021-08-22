@@ -1,4 +1,4 @@
-.. _otter_assign_usage:
+.. _otter_assign_v1_usage:
 
 Usage and Output
 ================
@@ -32,7 +32,7 @@ would be run through Otter Assign from the ``dev`` directory with
 
 .. code-block:: bash
 
-    otter assign lab/lab00/lab00.ipynb dist/lab/lab00 data/data.csv
+    otter assign lab/lab00/lab00.ipynb dist/lab/lab00 data/data.csv --v1
 
 The default behavior of Otter Assign is to do the following:
 
@@ -131,13 +131,13 @@ directory), I would run
 
 .. code-block::
 
-    otter assign hw00.ipynb dist
+    otter assign hw00.ipynb dist --v1
 
 If it was an Rmd file instead, I would run
 
 .. code-block::
 
-    otter assign hw00.Rmd dist
+    otter assign hw00.Rmd dist --v1
 
 This will create a new folder called ``dist`` with ``autograder`` and ``student`` as subdirectories, 
 as described above.
@@ -163,7 +163,7 @@ If I had wanted to include ``data.csv`` in the distribution folders, I would cha
 
 .. code-block::
 
-    otter assign hw00.ipynb dist data.csv
+    otter assign hw00.ipynb dist data.csv --v1
 
 The resulting directory structure would be:
 
@@ -187,7 +187,7 @@ the ``--no-run-tests`` flag:
 
 .. code-block::
 
-    otter assign --no-run-tests hw00.ipynb dist data.csv
+    otter assign --no-run-tests hw00.ipynb dist data.csv --v1
 
 Because tests are not run on R notebooks, the above configuration would be ignored if ``hw00.ipynb`` 
 had an R kernel.
@@ -196,4 +196,4 @@ If I wanted no initialization cell and no cell filtering in the export cell, I w
 
 .. code-block::
 
-    otter assign --no-init-cell --no-filtering hw00.ipynb dist data.csv
+    otter assign --no-init-cell --no-filtering hw00.ipynb dist data.csv --v1
