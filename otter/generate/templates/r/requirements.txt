@@ -14,4 +14,4 @@ dill
 rpy2
 jupytext
 numpy
-otter-grader==3.0.0.b3
+otter-grader==3.0.0
