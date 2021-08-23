@@ -405,6 +405,8 @@ class Notebook:
         # name collisions are accounted for
         self._log_event(EventType.BEGIN_CHECK_ALL)
 
+        # TODO: this is a janky way of resolving where the tests are. Formalize a method of 
+        # determining this and put it into a method in e.g. utils.py
         tests = [os.path.split(file)[1][:-3] for file in glob(os.path.join(self._path, "*.py")) \
             if "__init__.py" not in file]
         if len(tests) == 0:
