@@ -75,7 +75,7 @@ class Notebook:
                         shelve_env = {}
                         question = None
                 except Exception as e:
-                    self._log_event(event_type, question=question, success=False, error=e)
+                    self._log_event(event_type, success=False, error=e)
                     raise e
                 else:
                     self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
