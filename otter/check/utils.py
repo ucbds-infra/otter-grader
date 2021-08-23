@@ -83,3 +83,15 @@ def running_on_colab():
         ``bool``: whether the current environment is on Google Colab
     """
     return "google.colab" in str(get_ipython())
+
+
+def colab_incompatible(f):
+    """
+    A decator that raises an error if the wrapped function is called in an environment running on
+    Google Colab.
+    """
+    def colab_only_method(self, *args, **kwargs):
+        if self._colab:
+            raise RuntimeError("This method is not compatible with Google Colab")
+        return f(self, *args, **kwargs)
+    return colab_only_method

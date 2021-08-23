@@ -18,54 +18,20 @@ from textwrap import indent
 from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import grade_zip_file, running_on_colab, save_notebook
+from .utils import colab_incompatible, grade_zip_file, running_on_colab, save_notebook
 
 from ..execute import check
 from ..export import export_notebook
 from ..plugins import PluginCollection
+from ..test_files import GradingResults
+from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
-_ZIP_NAME_FILENAME = "__zip_filename__"
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
+_ZIP_NAME_FILENAME = "__zip_filename__"
 
 
-class TestsDisplay:
-    """
-    Class for stitching together TestCollectionResults objects and displaying them in HTML and plaintext
-
-    Args:
-        results (``list`` of ``tuple(str, TestCollectionResults)``): the test names and results for each test
-            to be displayed
-    """
-    def __init__(self, results):
-        self.test_names = [r[0] for r in results]
-        self.results = [r[1] for r in results]
-
-    def __repr__(self):
-        ret = ""
-        for name, result in zip(self.test_names, self.results):
-            ret += f"{repr(result)}\n\n"
-        return ret
-
-    def _repr_html_(self):
-        ret = ""
-        for name, result in zip(self.test_names, self.results):
-            ret += f"{result._repr_html_()}\n\n"
-        return ret
-
-
-def _colab_incompatible(f):
-    """
-    """
-    def colab_only_method(self, *args, **kwargs):
-        if self._colab:
-            raise RuntimeError("This method is not compatible with Google Colab")
-        return f(self, *args, **kwargs)
-    return colab_only_method
-
-
-# TODO: make logging more elegent; maybe use metaclass to wrap every method?
 class Notebook:
     """
     Notebook class for in-notebook autograding
@@ -73,54 +39,87 @@ class Notebook:
     Args:
         nb_path(``str``, optional): path to the notebook being run
         tests_dir (``str``, optional): path to tests directory
-        colab (``bool``, optional): whether this notebook is being run on Google Colab
+        colab (``bool``, optional): whether this notebook is being run on Google Colab; if ``None``,
+            this information is automatically parsed from IPython on creation
     """
 
     # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
 
+    def _logs_event(event_type):
+        """
+        A decorator that ensures each call is logged in the Otter log with type ``event_type``.
+
+        Events logging a ``EventType.CHECK`` should return a 3-tuple of the question name, the
+        ``TestFile`` and an environment to shelve. All other methods should just return their 
+        default return value, which will be logged.
+        """
+
+        def event_logger(f):
+            """
+            Wraps a function and ensures that the call's results are logged using 
+            ``Notebook._log_event``.
+            """
+
+            def run_function(self, *args, **kwargs):
+                """
+                Runs a method, catching any errors and logging the call. Returns the return value
+                of the function, unless ``EventType.CHECK`` is used, in which case the return value
+                is assumed to be a 3-tuple and the second value in the tuple is returned.
+                """
+                try:
+                    if event_type == EventType.CHECK:
+                        question, results, shelve_env = f(self, *args, **kwargs)
+                    else:
+                        results = f(self, *args, **kwargs)
+                        shelve_env = {}
+                        question = None
+                except Exception as e:
+                    self._log_event(event_type, success=False, error=e)
+                    raise e
+                else:
+                    self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
+                return results
+
+            return run_function
+
+        return event_logger
+
+    @_logs_event(EventType.INIT)
     def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
-        try:
-            global _SHELVE
+        global _SHELVE
 
-            if colab is None:
-                colab = running_on_colab()
+        if colab is None:
+            colab = running_on_colab()
 
-            if colab and not os.path.isdir(tests_dir):
-                raise ValueError(f"Tests directory {tests_dir} does not exist")
+        if colab and not os.path.isdir(tests_dir):
+            raise ValueError(f"Tests directory {tests_dir} does not exist")
 
-            if type(self)._tests_dir_override is not None:
-                self._path = type(self)._tests_dir_override
-            else:
-                self._path = tests_dir
-
-            self._colab = colab
-            self._notebook = nb_path
-            self._addl_files = []
-            self._plugin_collections = {}
-
-            # assume using otter service if there is a .otter file
-            otter_configs = glob("*.otter")
-            if otter_configs:
-                # check that there is only 1 config
-                assert len(otter_configs) == 1, "More than 1 otter config file found"
-
-                # load in config file
-                with open(otter_configs[0]) as f:
-                    self._config = json.load(f)
-
-                _SHELVE = self._config.get("save_environment", False)
-                self._ignore_modules = self._config.get("ignore_modules", [])
-                self._vars_to_store = self._config.get("variables", None)
-
-                self._notebook = self._config["notebook"]
-
-        except Exception as e:
-            self._log_event(EventType.INIT, success=False, error=e)
-            raise e
-
+        if type(self)._tests_dir_override is not None:
+            self._path = type(self)._tests_dir_override
         else:
-            self._log_event(EventType.INIT)
+            self._path = tests_dir
+
+        self._colab = colab
+        self._notebook = nb_path
+        self._addl_files = []
+        self._plugin_collections = {}
+
+        # assume using otter service if there is a .otter file
+        otter_configs = glob("*.otter")
+        if otter_configs:
+            # check that there is only 1 config
+            assert len(otter_configs) == 1, "More than 1 otter config file found"
+
+            # load in config file
+            with open(otter_configs[0]) as f:
+                self._config = json.load(f)
+
+            _SHELVE = self._config.get("save_environment", False)
+            self._ignore_modules = self._config.get("ignore_modules", [])
+            self._vars_to_store = self._config.get("variables", None)
+
+            self._notebook = self._config["notebook"]
 
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
@@ -181,6 +180,7 @@ class Notebook:
 
         return nb_path
 
+    @_logs_event(EventType.CHECK)
     def check(self, question, global_env=None):
         """
         Runs tests for a specific question against a global environment. If no global environment
@@ -194,37 +194,30 @@ class Notebook:
         Returns:
             ``otter.test_files.abstract_test.TestFile``: the grade for the question
         """
-        try:
-            if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
-                test_path = os.path.join(self._path, question + ".py")
-                test_name = None
+        if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
+            test_path = os.path.join(self._path, question + ".py")
+            test_name = None
 
-            elif self._colab:
-                raise ValueError(f"Test {question} does not exist")
+        elif self._colab:
+            raise ValueError(f"Test {question} does not exist")
 
-            else:
-                test_path = self._resolve_nb_path(None)
-                test_name = question
-
-            # ensure that desired test exists
-            assert os.path.isfile(test_path), "Test {} does not exist".format(question)
-
-            # pass the correct global environment
-            if global_env is None:
-                global_env = inspect.currentframe().f_back.f_globals
-
-            # run the check
-            result = check(test_path, test_name, global_env)
-
-        except Exception as e:
-            self._log_event(EventType.CHECK, question=question, success=False, error=e, shelve_env=global_env)
-            raise e
         else:
-            self._log_event(EventType.CHECK, [result], question=question, shelve_env=global_env)
+            test_path = self._resolve_nb_path(None)
+            test_name = question
 
-        return result
+        # ensure that desired test exists
+        assert os.path.isfile(test_path), "Test {} does not exist".format(question)
 
-    @_colab_incompatible
+        # pass the correct global environment
+        if global_env is None:
+            global_env = inspect.currentframe().f_back.f_back.f_globals
+
+        # run the check
+        result = check(test_path, test_name, global_env)
+
+        return question, result, global_env
+
+    @colab_incompatible
     def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the plugin ``plugin_name`` with the specified arguments. Use ``nb_path`` if the path
@@ -246,7 +239,8 @@ class Notebook:
             self._plugin_collections[plugin_name] = pc
         pc.run("from_notebook", *args, **kwargs)
 
-    @_colab_incompatible
+    @colab_incompatible
+    @_logs_event(EventType.TO_PDF)
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
         """
         Exports a notebook to a PDF using Otter Export
@@ -260,37 +254,30 @@ class Notebook:
             force_save (``bool``, optional): whether or not to display JavaScript that force-saves the
                 notebook (only works in Jupyter Notebook classic, not JupyterLab)
         """
-        # self._save_notebook()
-        try:
-            nb_path = self._resolve_nb_path(nb_path)
+        nb_path = self._resolve_nb_path(nb_path)
 
-            if force_save:
-                saved = save_notebook(nb_path)
-                if not saved:
-                    warnings.warn(
-                        "Could not force-save notebook; the results of this call will be based on the last "
-                        "saved version of this notebook."
-                    )
+        if force_save:
+            saved = save_notebook(nb_path)
+            if not saved:
+                warnings.warn(
+                    "Could not force-save notebook; the results of this call will be based on the last "
+                    "saved version of this notebook."
+                )
 
-            # convert(nb_path, filtering=filtering, filter_type=filter_type)
-            export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
+        # convert(nb_path, filtering=filtering, filter_type=filter_type)
+        export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 
-            if display_link:
-                # create and display output HTML
-                out_html = """
-                <p>Your file has been exported. Download it by right-clicking
-                <a href="{}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
-                """.format(nb_path[:-5] + "pdf")
+        if display_link:
+            # create and display output HTML
+            out_html = """
+            <p>Your file has been exported. Download it by right-clicking
+            <a href="{}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
+            """.format(nb_path[:-5] + "pdf")
 
-                display(HTML(out_html))
+            display(HTML(out_html))
+        self._log_event(EventType.TO_PDF)
 
-        except Exception as e:
-            self._log_event(EventType.TO_PDF, success=False, error=e)
-            raise e
-        else:
-            self._log_event(EventType.TO_PDF)
-
-    @_colab_incompatible
+    @colab_incompatible
     def add_plugin_files(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the ``notebook_export`` event of the plugin ``plugin_name`` and tracks the file paths
@@ -314,7 +301,8 @@ class Notebook:
             return
         self._addl_files.extend(addl_files)
 
-    @_colab_incompatible
+    @colab_incompatible
+    @_logs_event(EventType.END_EXPORT)
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
             display_link=True, force_save=False, run_tests=False):
         """
@@ -337,84 +325,77 @@ class Notebook:
                 notebook (only works in Jupyter Notebook classic, not JupyterLab)
         """
         self._log_event(EventType.BEGIN_EXPORT)
-        # self._save_notebook()
 
-        try:
-            nb_path = self._resolve_nb_path(nb_path)
+        nb_path = self._resolve_nb_path(nb_path)
 
-            if force_save:
-                saved = save_notebook(nb_path)
-                if not saved:
-                    warnings.warn(
-                        "Could not force-save notebook; the results of this call will be based on the last "
-                        "saved version of this notebook."
-                    )
-
-            try:
-                with open(nb_path) as f:
-                    assert len(f.read().strip()) > 0, \
-                        f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
-
-            except UnicodeDecodeError:
-                with open(nb_path, "r", encoding="utf-8") as f:
-                    assert len(f.read().strip()) > 0, \
-                        f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
-
-            timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
-            if export_path is None:
-                zip_path = ".".join(nb_path.split(".")[:-1]) + "_" + timestamp + ".zip"
-            else:
-                zip_path = export_path
-
-            zf = zipfile.ZipFile(zip_path, mode="w")
-            zf.write(nb_path)
-
-            if pdf:
-                pdf_path = ".".join(nb_path.split(".")[:-1]) + ".pdf"
-                # convert(nb_path, filtering=filtering, filter_type=filter_type)
-                export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
-                zf.write(pdf_path)
-
-            if os.path.isfile(_OTTER_LOG_FILENAME):
-                zf.write(_OTTER_LOG_FILENAME)
-
-            zf.writestr(_ZIP_NAME_FILENAME, os.path.basename(zip_path))
-
-            if glob("*.otter"):
-                assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
-                zf.write(glob("*.otter")[0])
-
-            for file in files:
-                zf.write(file)
-            
-            for file in self._addl_files:
-                zf.write(file)
-
-            zf.close()
-
-            if run_tests:
-                print("Running your submission against local test cases...\n")
-                results = grade_zip_file(zip_path, nb_path, self._path)
-                print(
-                    "Your submission received the following results when run against " + \
-                    "available test cases:\n\n" + indent(results.summary(), "    ")
+        if force_save:
+            saved = save_notebook(nb_path)
+            if not saved:
+                warnings.warn(
+                    "Could not force-save notebook; the results of this call will be based on the last "
+                    "saved version of this notebook."
                 )
 
-            if display_link:
-                # create and display output HTML
-                out_html = """
-                <p>Your submission has been exported. Click <a href="{}" target="_blank">here</a>
-                to download the zip file.</p>
-                """.format(zip_path)
+        try:
+            with open(nb_path) as f:
+                assert len(f.read().strip()) > 0, \
+                    f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
 
-                display(HTML(out_html))
+        except UnicodeDecodeError:
+            with open(nb_path, "r", encoding="utf-8") as f:
+                assert len(f.read().strip()) > 0, \
+                    f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
 
-        except Exception as e:
-            self._log_event(EventType.END_EXPORT, success=False, error=e)
-            raise e
+        timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
+        if export_path is None:
+            zip_path = ".".join(nb_path.split(".")[:-1]) + "_" + timestamp + ".zip"
         else:
-            self._log_event(EventType.END_EXPORT)
+            zip_path = export_path
 
+        zf = zipfile.ZipFile(zip_path, mode="w")
+        zf.write(nb_path)
+
+        if pdf:
+            pdf_path = ".".join(nb_path.split(".")[:-1]) + ".pdf"
+            # convert(nb_path, filtering=filtering, filter_type=filter_type)
+            export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
+            zf.write(pdf_path)
+
+        if os.path.isfile(_OTTER_LOG_FILENAME):
+            zf.write(_OTTER_LOG_FILENAME)
+
+        zf.writestr(_ZIP_NAME_FILENAME, os.path.basename(zip_path))
+
+        if glob("*.otter"):
+            assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
+            zf.write(glob("*.otter")[0])
+
+        for file in files:
+            zf.write(file)
+        
+        for file in self._addl_files:
+            zf.write(file)
+
+        zf.close()
+
+        if run_tests:
+            print("Running your submission against local test cases...\n")
+            results = grade_zip_file(zip_path, nb_path, self._path)
+            print(
+                "Your submission received the following results when run against " + \
+                "available test cases:\n\n" + indent(results.summary(), "    ")
+            )
+
+        if display_link:
+            # create and display output HTML
+            out_html = """
+            <p>Your submission has been exported. Click <a href="{}" target="_blank">here</a>
+            to download the zip file.</p>
+            """.format(zip_path)
+
+            display(HTML(out_html))
+
+    @_logs_event(EventType.END_CHECK_ALL)
     def check_all(self):
         """
         Runs all tests on this notebook. Tests are run against the current global environment, so any
@@ -424,34 +405,33 @@ class Notebook:
         # name collisions are accounted for
         self._log_event(EventType.BEGIN_CHECK_ALL)
 
-        try:
-            tests = glob(os.path.join(self._path, "*.py"))
-            global_env = inspect.currentframe().f_back.f_globals
-            results = []
-            if not _SHELVE:
-                for file in sorted(tests):
-                    if "__init__.py" not in file:
-                        test_name = os.path.split(file)[1][:-3]
-                        result = self.check(test_name, global_env)
-                        results.append((test_name, result))
-            else:
-                log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
-                for file in sorted(tests):
-                    if "__init__.py" not in file:
-                        test_name = os.path.splitext(os.path.split(file)[1])[0]
+        # TODO: this is a janky way of resolving where the tests are. Formalize a method of 
+        # determining this and put it into a method in e.g. utils.py
+        tests = [os.path.split(file)[1][:-3] for file in glob(os.path.join(self._path, "*.py")) \
+            if "__init__.py" not in file]
+        if len(tests) == 0:
+            nb_path = self._resolve_nb_path(None)
+            with open(nb_path) as f:
+                nb = json.load(f)
+            tests = list(nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"].keys())
 
-                        entry = log.get_question_entry(test_name)
-                        env = entry.unshelve()
-                        global_env.update(env)
-                        del locals()["env"]
-
-                        result = self.check(test_name, global_env)
-                        results.append((test_name, result))
-
-        except Exception as e:
-            self._log_event(EventType.END_CHECK_ALL, success=False, error=e)
-            raise e
+        global_env = inspect.currentframe().f_back.f_back.f_globals
+        results = []
+        if not _SHELVE:
+            for test_name in sorted(tests):
+                results.append(self.check(test_name, global_env))
         else:
-            self._log_event(EventType.END_CHECK_ALL)
+            log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+            for file in sorted(tests):
+                if "__init__.py" not in file:
+                    test_name = os.path.splitext(os.path.split(file)[1])[0]
 
-        return TestsDisplay(results)
+                    entry = log.get_question_entry(test_name)
+                    env = entry.unshelve()
+                    global_env.update(env)
+                    del locals()["env"]
+
+                    result = self.check(test_name, global_env)
+                    results.append((test_name, result))
+
+        return GradingResults(results)

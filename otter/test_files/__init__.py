@@ -52,7 +52,7 @@ class GradingResults:
         self.all_hidden = False
 
     def __repr__(self):
-        return pprint.pformat(self.to_dict(), indent=2)
+        return self.summary()
 
     @classmethod
     def from_ottr_json(cls, ottr_output):

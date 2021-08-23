@@ -1,5 +1,10 @@
 # Changelog
 
+**Unreleased:**
+
+* Made `otter.Notebook.check_all` compatible with metadata tests
+* Refactored logging in `otter.Notebook`
+
 **v3.0.1:**
 
 * Updated the default version of Ottr to v1.0.0
