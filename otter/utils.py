@@ -8,7 +8,7 @@ import pathlib
 import random
 import string
 import shutil
-
+import re
 from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
 
@@ -125,9 +125,9 @@ def get_source(cell):
     """
     source = cell.source
     if isinstance(source, str):
-        return source.splitlines()
+        return re.split("\r?\n", source)
     elif isinstance(source, list):
-        return [line.splitlines() for line in source]
+        return [re.split("\r?\n", line) for line in source]
     raise ValueError(f'unknown source type: {type(source)}')
 
 @contextmanager
