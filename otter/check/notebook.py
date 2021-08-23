@@ -50,9 +50,9 @@ class Notebook:
         """
         A decorator that ensures each call is logged in the Otter log with type ``event_type``.
 
-        Events logging a ``EventType.CHECK`` should return a 2-tuple of the ``TestFile`` and an
-        environment to shelve. All other methods should just return their default return value,
-        which will be logged.
+        Events logging a ``EventType.CHECK`` should return a 3-tuple of the question name, the
+        ``TestFile`` and an environment to shelve. All other methods should just return their 
+        default return value, which will be logged.
         """
 
         def event_logger(f):
@@ -65,19 +65,20 @@ class Notebook:
                 """
                 Runs a method, catching any errors and logging the call. Returns the return value
                 of the function, unless ``EventType.CHECK`` is used, in which case the return value
-                is assumed to be a 2-tuple and the first value in the tuple is returned.
+                is assumed to be a 3-tuple and the second value in the tuple is returned.
                 """
                 try:
                     if event_type == EventType.CHECK:
-                        results, shelve_env = f(self, *args, **kwargs)
+                        question, results, shelve_env = f(self, *args, **kwargs)
                     else:
                         results = f(self, *args, **kwargs)
                         shelve_env = {}
+                        question = None
                 except Exception as e:
-                    self._log_event(event_type, success=False, error=e)
+                    self._log_event(event_type, question=question, success=False, error=e)
                     raise e
                 else:
-                    self._log_event(event_type, results=results, shelve_env=shelve_env)
+                    self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
                 return results
 
             return run_function
@@ -214,7 +215,7 @@ class Notebook:
         # run the check
         result = check(test_path, test_name, global_env)
 
-        return result, global_env
+        return question, result, global_env
 
     @colab_incompatible
     def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
