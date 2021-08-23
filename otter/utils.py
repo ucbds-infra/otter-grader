@@ -125,9 +125,9 @@ def get_source(cell):
     """
     source = cell.source
     if isinstance(source, str):
-        return source.split('\n')
+        return source.splitlines()
     elif isinstance(source, list):
-        return [line.strip('\n') for line in source]
+        return [line.splitlines() for line in source]
     raise ValueError(f'unknown source type: {type(source)}')
 
 @contextmanager

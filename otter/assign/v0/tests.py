@@ -108,7 +108,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     """
     cell = nbformat.v4.new_code_cell()
 
-    cell.source = ['grader.check("{}")'.format(question['name'])]
+    cell.source = 'grader.check("{}")'.format(question['name'])
 
     points = question.get('points', None)
     if isinstance(points, dict):
