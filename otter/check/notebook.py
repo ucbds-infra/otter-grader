@@ -23,6 +23,8 @@ from .utils import colab_incompatible, grade_zip_file, running_on_colab, save_no
 from ..execute import check
 from ..export import export_notebook
 from ..plugins import PluginCollection
+from ..test_files import GradingResults
+from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -148,7 +150,6 @@ class Notebook:
             )
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
-        print("logged")
 
     def _resolve_nb_path(self, nb_path):
         """
@@ -403,15 +404,19 @@ class Notebook:
         # name collisions are accounted for
         self._log_event(EventType.BEGIN_CHECK_ALL)
 
-        tests = glob(os.path.join(self._path, "*.py"))
+        tests = [os.path.split(file)[1][:-3] for file in glob(os.path.join(self._path, "*.py")) \
+            if "__init__.py" not in file]
+        if len(tests) == 0:
+            nb_path = self._resolve_nb_path(None)
+            with open(nb_path) as f:
+                nb = json.load(f)
+            tests = list(nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"].keys())
+
         global_env = inspect.currentframe().f_back.f_back.f_globals
         results = []
         if not _SHELVE:
-            for file in sorted(tests):
-                if "__init__.py" not in file:
-                    test_name = os.path.split(file)[1][:-3]
-                    result = self.check(test_name, global_env)
-                    results.append((test_name, result))
+            for test_name in sorted(tests):
+                results.append(self.check(test_name, global_env))
         else:
             log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
             for file in sorted(tests):
@@ -426,4 +431,4 @@ class Notebook:
                     result = self.check(test_name, global_env)
                     results.append((test_name, result))
 
-        return TestsDisplay(results)
+        return GradingResults(results)
