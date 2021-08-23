@@ -7,7 +7,7 @@ docs:
 docker-test:
 	cp -r Dockerfile test-Dockerfile
 	printf "\nADD . /home/otter-grader\nRUN pip install /home/otter-grader" >> test-Dockerfile
-	docker build . -t otter-test -f test-Dockerfile
+	docker build . -t otter-test -f test-Dockerfile --cache-from ucbdsinfra/otter-grader:latest
 	rm test-Dockerfile
 
 tutorial:
