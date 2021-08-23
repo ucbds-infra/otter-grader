@@ -72,24 +72,6 @@ class TestNotebook(TestCase):
     """
     Test cases for the ``Notebook`` class
     """
-
-    def test_repr(self):
-
-        #class to mock TestCollectionResults
-        class FakeTestCollectionResult:
-
-            def _repr_html_(self):
-                return "Fake test collection result"
-
-        #result variable
-        test = [("t1", FakeTestCollectionResult()), ("t2", FakeTestCollectionResult())]
-        
-        try:
-            a = notebook.TestsDisplay(test)
-            a._repr_html_()
-        except Exception:
-            self.fail("test_repr failed")
-
     @mock.patch('builtins.input', return_value='fakekey')
     def test_check(self, mock_input):
         """
@@ -157,7 +139,7 @@ class TestNotebook(TestCase):
             'q2 results:\n    q2 - 1 result:\n        Trying:',
             'q3 results: All test cases passed!\n',
             'q4 results: All test cases passed!\n',
-            'q5 results: All test cases passed!\n'
+            'q5 results: All test cases passed!'
         ]
 
         for result in output_lst:
