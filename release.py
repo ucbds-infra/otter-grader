@@ -129,12 +129,13 @@ if __name__ == "__main__":
 
     if args.new_version is not None:
         contents = re.sub(
-            r"version:\s*\"\d+.\d+.\d+(?:\.\w+)?\"",
+            r"^version:\s*\"\d+.\d+.\d+(?:\.\w+)?\"",
             f"version: \"{new_version_number}\"",
-            contents
+            contents,
+            flags = re.MULTILINE
         )
 
-    with open("otter/version.py", "w") as f:
+    with open("CITATION.cff", "w") as f:
         f.write(contents)
 
     if to_git:
