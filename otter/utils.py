@@ -6,6 +6,7 @@ import os
 import sys
 import pathlib
 import random
+import re
 import string
 import shutil
 
@@ -125,9 +126,9 @@ def get_source(cell):
     """
     source = cell.source
     if isinstance(source, str):
-        return source.split('\n')
+        return re.split("\r?\n", source)
     elif isinstance(source, list):
-        return [line.strip('\n') for line in source]
+        return [line.strip("\r\n") for line in source]
     raise ValueError(f'unknown source type: {type(source)}')
 
 @contextmanager

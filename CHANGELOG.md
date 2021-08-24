@@ -1,8 +1,15 @@
 # Changelog
 
-**Unreleased:**
+**v3.0.2:**
+
+* Made `otter.Notebook.check_all` compatible with metadata tests
+* Refactored logging in `otter.Notebook`
+* Fixed parsing of Windows newlines in Otter Assign
+
+**v3.0.1:**
 
 * Updated the default version of Ottr to v1.0.0
+* Ensured that metadata tests for R notebooks are disabled
 
 **v3.0.0:**
 
