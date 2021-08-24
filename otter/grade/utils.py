@@ -58,6 +58,7 @@ def prune_images(force=False):
         for img in images:
             if any([t.startswith(OTTER_DOCKER_IMAGE_TAG + ":") for t in img.tags]):
                 client.images.remove(img.tags[0], force=True)
+        client.close()
 
 def generate_hash(path):
     """

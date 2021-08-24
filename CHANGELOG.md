@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Fix some minor bugs using docker for grading
+
 **v3.0.2:**
 
 * Made `otter.Notebook.check_all` compatible with metadata tests

@@ -42,7 +42,7 @@ def build_image(zip_path, base_image, tag):
         generator = client.api.build(buildargs={
             "ZIPPATH": zip_path,
             "BASE_IMAGE": base_image
-        }, tag=image, dockerfile=dockerfile, path=".")
+        }, tag=image, dockerfile=dockerfile, rm=True, path=".")
         
         result_stream, internal_stream = itertools.tee(json_stream(generator))
         for chunk in internal_stream:
