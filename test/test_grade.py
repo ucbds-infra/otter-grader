@@ -89,6 +89,9 @@ class TestGrade(TestCase):
             autograder = TEST_FILES_PATH + "autograder.zip",
             containers = 5,
             image = "otter-test",
+            pdfs = True,
+            debug = True,
+            verbose = True
         )
 
         # read the output and expected output

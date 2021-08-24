@@ -149,7 +149,7 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             (results_path, "/autograder/results/results.pkl")
         ]
         if pdfs:
-            volumes.append(pdf_path, f"/autograder/submission/{nb_name}.pdf")
+            volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
         container = docker.container.run(image, command=["/autograder/run_autograder"], volumes=volumes, detach=True)
 
         if verbose:
