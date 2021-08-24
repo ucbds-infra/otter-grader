@@ -62,7 +62,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         ``nbformat.NotebookNode``: code cell calling ``ottr::check`` on this test
     """
     cell = nbformat.v4.new_code_cell()
-    cell.source = '. = ottr::check("tests/{}.R")'.format(question['name'])
+    cell.source = ['. = ottr::check("tests/{}.R")'.format(question['name'])]
 
     points = question.get('points', len(tests))
     if points is None:

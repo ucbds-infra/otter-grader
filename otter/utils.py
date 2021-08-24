@@ -6,9 +6,10 @@ import os
 import sys
 import pathlib
 import random
+import re
 import string
 import shutil
-import re
+
 from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
 
@@ -127,7 +128,7 @@ def get_source(cell):
     if isinstance(source, str):
         return re.split("\r?\n", source)
     elif isinstance(source, list):
-        return [re.split("\r?\n", line) for line in source]
+        return [line.strip("\r\n") for line in source]
     raise ValueError(f'unknown source type: {type(source)}')
 
 @contextmanager
