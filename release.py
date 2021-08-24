@@ -123,6 +123,20 @@ if __name__ == "__main__":
     with open("otter/version.py", "w") as f:
         f.write(contents)
 
+    # fix CITATION.cff
+    with open("CITATION.cff") as f:
+        contents = f.read()
+
+    if args.new_version is not None:
+        contents = re.sub(
+            r"version:\s*\"\d+.\d+.\d+(?:\.\w+)?\"",
+            f"version: \"{new_version_number}\"",
+            contents
+        )
+
+    with open("otter/version.py", "w") as f:
+        f.write(contents)
+
     if to_git:
         print(f"Versions updated. Release commit hash is {new_hash} -- commit and push to release")
         sys.exit()

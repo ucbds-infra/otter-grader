@@ -12,4 +12,3 @@ message: "If you use this software, please cite it as below."
 repository-code: "https://github.com/ucbds-infra/otter-grader"
 title: "Otter-Grader"
 version: "3.0.1"
-...
