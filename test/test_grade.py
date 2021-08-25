@@ -28,9 +28,6 @@ class TestGrade(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         
-        create_image_cmd = ["make", "docker-test"]
-        subprocess.run(create_image_cmd, check=True)
-
         create_image_cmd = ["make", "docker-grade-test"]
         subprocess.run(create_image_cmd, check=True)
 
