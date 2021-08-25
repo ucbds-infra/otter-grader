@@ -217,22 +217,6 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
 
-    # TODO: make it so pdfs is not a key in the generate key, but matches the structure expected by
-    # run_autograder
-    if generate_args.get('pdfs', {}):
-        pdf_args = generate_args.pop('pdfs', {})
-        generate_args['course_id'] = str(pdf_args['course_id'])
-        generate_args['assignment_id'] = str(pdf_args['assignment_id'])
-        
-        if pdf_args.get("token"):
-            generate_args['token'] = str(pdf_args['token'])
-
-        if not pdf_args.get("filtering", True):
-            generate_args['filtering'] = False
-
-        if not pdf_args.get('pagebreaks', True):
-            generate_args['pagebreaks'] = False
-
     # use temp tests dir
     test_dir = "tests"
     if assignment.is_python and not assignment.test_files and assignment._temp_test_dir is None:
