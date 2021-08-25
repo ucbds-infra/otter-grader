@@ -118,11 +118,17 @@ Gradescope assignment by setting the necessary keys in the ``pdfs`` subkey of ``
 .. code-block:: yaml
 
     generate:
-        pdfs:
-            token: YOUR_GS_TOKEN   # required
-            course_id: 1234        # required
-            assignment_id: 5678    # required
-            filtering: true        # true is the default
+        token: ''
+        course_id: 1234        # required
+        assignment_id: 5678    # required
+        filtering: true        # true is the default
+
+If you don't specify a token, you will be prompted for your username and password when you run Otter
+Assign; optionally, you can specify these via the command line with the ``--username`` and 
+``--password`` flags.
+
+Any configurations in your ``generate`` key will be put into an ``otter_config.json`` and used when
+running Otter Generate.
 
 If you are grading from the log or would like to store students' environments in the log, use the 
 ``save_environment`` key. If this key is set to ``true``, Otter will serialize the stuednt's 
@@ -146,7 +152,8 @@ cell, and passes the configurations ``points`` and ``seed`` to Otter Generate vi
 .. code-block:: yaml
 
     # ASSIGNMENT CONFIG
-    filtering: false
+    export_cell:
+        filtering: false
     init_cell: false
     generate:
         points: 3
