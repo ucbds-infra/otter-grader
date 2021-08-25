@@ -1,9 +1,10 @@
-import re
-import sys
-import shutil
-import warnings
 import argparse
+import datetime as dt
+import re
+import shutil
 import subprocess
+import sys
+import warnings
 
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
@@ -131,6 +132,13 @@ if __name__ == "__main__":
         contents = re.sub(
             r"^version:\s*\"\d+.\d+.\d+(?:\.\w+)?\"",
             f"version: \"{new_version_number}\"",
+            contents,
+            flags = re.MULTILINE
+        )
+
+        contents = re.sub(
+            r"^date-released:\s*\d{4}-\d{2}-\d{2}",
+            f"date-released: {dt.date.today().stftime('%Y-%m-%d')}",
             contents,
             flags = re.MULTILINE
         )
