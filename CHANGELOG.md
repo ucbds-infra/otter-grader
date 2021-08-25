@@ -2,7 +2,9 @@
 
 **Unreleased:**
 
+* Fix some minor bugs using docker for grading
 * Added support for test config blocks in R assignments
+* Fixed use of `autograder_files` in Otter Assign
 
 **v3.0.2:**
 
