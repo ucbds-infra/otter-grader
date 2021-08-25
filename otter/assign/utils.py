@@ -234,6 +234,10 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args is True:
         generate_args = {}
 
+    if "pdfs" in generate_args:
+        raise ValueError("The 'pdfs' key of 'generate' is no longer supported. Put any " + \
+                         "'pdfs' configurations inside the 'generate' key itself.")
+
     if assignment.is_r:
         generate_args["lang"] = "r"
 

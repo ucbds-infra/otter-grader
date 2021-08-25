@@ -214,6 +214,10 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if assignment.is_r:
         generate_args["lang"] = "r"
 
+    if "pdfs" in generate_args:
+        raise ValueError("The 'pdfs' key of 'generate' is no longer supported. Put any " + \
+                         "'pdfs' configurations inside the 'generate' key itself.")
+
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
 
