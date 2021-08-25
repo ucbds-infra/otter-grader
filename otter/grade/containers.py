@@ -1,6 +1,6 @@
 """Docker container management for Otter Grade"""
 
-import docker
+from python_on_whales import docker
 import glob
 import itertools
 import os
@@ -11,8 +11,6 @@ import shutil
 import tempfile
 
 from concurrent.futures import ThreadPoolExecutor, wait
-from docker.errors import BuildError, ImageNotFound
-from docker.utils.json_stream import json_stream
 
 from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
 
@@ -31,29 +29,14 @@ def build_image(zip_path, base_image, tag):
     """
     image = OTTER_DOCKER_IMAGE_TAG + ":" + tag
     dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
-    docker_version = os.environ.get("OTTER_DOCKER_CLIENT_VERSION", "auto")
-    client = docker.from_env(version=docker_version)
-
-    try:
-        client.images.get(image)
-
-    except ImageNotFound:
+    
+    if not docker.image.exists(image): 
         print(f"Building new image using {base_image} as base image")
-        generator = client.api.build(buildargs={
+        docker.build(".", build_args={
             "ZIPPATH": zip_path,
             "BASE_IMAGE": base_image
-        }, tag=image, dockerfile=dockerfile, rm=True, path=".")
-        
-        result_stream, internal_stream = itertools.tee(json_stream(generator))
-        for chunk in internal_stream:
-            if 'error' in chunk:
-                raise BuildError(chunk['error'], result_stream)
-            if 'stream' in chunk:
-                line = chunk['stream'].strip("\r\n")
-                if len(line) != 0:
-                    print(line)
+        }, tags=[image], file=dockerfile)
 
-    client.close()
     return image
 
 
@@ -148,9 +131,6 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
     Returns:
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
-    # this is a fix for travis -- allows overriding docker client version
-    docker_version = os.environ.get("OTTER_DOCKER_CLIENT_VERSION", "auto")
-    client = docker.from_env(version=docker_version)
 
     _, temp_subm_path = tempfile.mkstemp()
     shutil.copyfile(submission_path, temp_subm_path)
@@ -164,22 +144,20 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         nb_basename = os.path.basename(submission_path)
         nb_name = os.path.splitext(nb_basename)[0]
 
-        volumes = {
-            f"{temp_subm_path}": {'bind': f"/autograder/submission/{nb_basename}"},
-            f"{results_path}": {'bind': "/autograder/results/results.pkl"}
-        }
+        volumes = [
+            (temp_subm_path, f"/autograder/submission/{nb_basename}"),
+            (results_path, "/autograder/results/results.pkl")
+        ]
         if pdfs:
-            volumes.update({f"{pdf_path}": {"bind": f"/autograder/submission/{nb_name}.pdf"}})
-        container = client.containers.run(image, "/autograder/run_autograder", volumes=volumes,
-                                          detach=True, tty=False)
+            volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
+        container = docker.container.run(image, command=["/autograder/run_autograder"], volumes=volumes, detach=True)
 
         if verbose:
             print(f"Grading {submission_path} in container {container.id}...")
 
-        container.wait()
-
+        docker.container.wait(container)
         if debug:
-            print(container.logs(stderr=True, stdout=True).decode("utf-8"))
+            print(docker.container.logs(container))
 
         if not no_kill:
             container.remove()
@@ -200,7 +178,6 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             shutil.copy(pdf_path, local_pdf_path)
 
     finally:
-        client.close()
         os.remove(results_path)
         os.remove(temp_subm_path)
         if pdfs:

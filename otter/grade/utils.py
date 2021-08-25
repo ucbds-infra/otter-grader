@@ -1,6 +1,6 @@
 """Utilities for Otter Grade"""
 
-import docker
+from python_on_whales import docker
 import os
 import pandas as pd
 import re
@@ -48,17 +48,12 @@ def prune_images(force=False):
     else:
         sure = True
     
-    if sure:
-        # this is a fix for travis -- allows overriding docker client version
-        docker_version = os.environ.get("OTTER_DOCKER_CLIENT_VERSION", "auto")
-        client = docker.from_env(version=docker_version)
-        
-        images = client.images.list()
+    if sure:        
+        images = docker.images()
 
         for img in images:
-            if any([t.startswith(OTTER_DOCKER_IMAGE_TAG + ":") for t in img.tags]):
-                client.images.remove(img.tags[0], force=True)
-        client.close()
+            if any([t.startswith(OTTER_DOCKER_IMAGE_TAG + ":") for t in img.repo_tags]):
+                img.remove(force=True)
 
 def generate_hash(path):
     """
