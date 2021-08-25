@@ -1,4 +1,5 @@
 OS := $(shell uname -s)
+DOCKER_VERSION := $(shell docker version --format '{{.Server.Version}}')
 
 .PHONY: docs
 docs:
@@ -7,6 +8,9 @@ docs:
 docker-test:
 	cp -r Dockerfile test-Dockerfile
 	printf "\nADD . /home/otter-grader\nRUN pip install /home/otter-grader" >> test-Dockerfile
+	printf "\nRUN cd /tmp && curl -sSL -O https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz && tar zxf docker-${DOCKER_VERSION}.tgz && mv ./docker/docker /usr/local/bin && chmod +x /usr/local/bin/docker && rm -rf /tmp/*" >> test-Dockerfile
+	printf "\nCOPY --from=docker/buildx-bin /buildx /usr/libexec/docker/cli-plugins/docker-buildx" >> test-Dockerfile
+	
 	docker build . -t otter-test -f test-Dockerfile --cache-from ucbdsinfra/otter-grader:latest
 	rm test-Dockerfile
 

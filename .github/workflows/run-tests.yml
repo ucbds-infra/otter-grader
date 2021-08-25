@@ -19,42 +19,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v1
-
-      - name: Install Python and R packages
-        run: |
-          sudo apt install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
-          $CONDA/bin/conda env update -n base -f environment.yml
-          $CONDA/bin/Rscript -e "install.packages('devtools')"
-          tmp_dir=$(mktemp -d)
-          git clone --single-branch -b beta https://github.com/ucbds-infra/ottr.git $tmp_dir
-          cd $tmp_dir
-          $CONDA/bin/Rscript -e "devtools::install()" || $CONDA/bin/Rscript -e "devtools::install()"
-
-      - name: Install nbconvert dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y pandoc texlive-xetex texlive-fonts-recommended fonts-lmodern
-
-      - name: Docker, Conda version info
-        run: |
-          docker version
-          docker-compose version
-          $CONDA/bin/conda info -a
-
       - name: Build testing Docker image
         run: |
           make docker-test
 
       - name: Run tests
         run: |
-          $CONDA/bin/coverage run -m test
+          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp -v ./.coverage:/home/otter-grader/.coverage otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt; coverage run -m test"
 
       - name: Send to Codecov
         run: |
