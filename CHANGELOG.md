@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Added support for test config blocks in R assignments
+
 **v3.0.2:**
 
 * Made `otter.Notebook.check_all` compatible with metadata tests
