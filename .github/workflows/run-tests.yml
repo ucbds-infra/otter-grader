@@ -30,4 +30,5 @@ jobs:
 
       - name: Send to Codecov
         run: |
-          $CONDA/bin/codecov
+          pip install codecov
+          codecov
