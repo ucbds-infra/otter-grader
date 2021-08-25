@@ -115,6 +115,17 @@ class TestGrade(TestCase):
                 else:
                     self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["file"], test))
 
+        self.assertTrue(os.path.exists("test/submission_pdfs"), "PDF folder is missing")
+
+        # check that an pdf exists for each submission
+        dir1_contents, dir2_contents = (
+            [os.path.splitext(f)[0] for f in os.listdir(TEST_FILES_PATH + "notebooks/") if not (os.path.isdir(os.path.join(TEST_FILES_PATH + "notebooks/", f)))],
+            [os.path.splitext(f)[0] for f in os.listdir("test/submission_pdfs") if not (os.path.isdir(os.path.join("test/submission_pdfs", f)))],
+        )
+        self.assertEqual(sorted(dir1_contents), sorted(dir2_contents), f"'{TEST_FILES_PATH}notebooks/' and 'test/submission_pdfs' have different contents")
+
+
+
         # remove the extra output
         cleanup_command = ["rm", "-rf", "test/final_grades.csv", "test/submission_pdfs", "test/final_grades.csv", TEST_FILES_PATH + "autograder.zip"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
