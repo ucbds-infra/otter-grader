@@ -252,11 +252,29 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         files += assignment.files
 
     if assignment.autograder_files:
-        res = (result / "autograder").resolve()
-        for agf in assignment.autograder_files:
-            fp = pathlib.Path(agf).resolve()
-            rp = get_relpath(res, fp)
-            files.append(str(rp))
+        ag_dir = os.getcwd()
+        os.chdir(curr_dir)
+        output_dir  = result / 'autograder'
+
+        # copy files
+        for file in assignment.autograder_files:
+
+            # if a directory, copy the entire dir
+            if os.path.isdir(file):
+                shutil.copytree(file, str(output_dir / os.path.basename(file)))
+
+            else:
+                # check that file is in subdir
+                assert os.getcwd() in os.path.abspath(file), \
+                    f"{file} is not in a subdirectory of the master notebook directory"
+                file_path = pathlib.Path(file).resolve()
+                rel_path = file_path.parent.relative_to(pathlib.Path(os.getcwd()))
+                os.makedirs(output_dir / rel_path, exist_ok=True)
+                shutil.copy(file, str(output_dir / rel_path))
+
+        os.chdir(ag_dir)
+
+        files += assignment.autograder_files
 
     # TODO: move this config out of the assignment metadata and into the generate key
     if assignment.variables:
