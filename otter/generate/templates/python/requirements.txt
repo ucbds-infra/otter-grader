@@ -13,6 +13,6 @@ nbformat
 dill
 jupytext
 numpy
-otter-grader==3.0.2
+otter-grader==3.0.3
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
