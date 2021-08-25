@@ -5,6 +5,8 @@
 * Fix some minor bugs using docker for grading
 * Added support for test config blocks in R assignments
 * Fixed use of `autograder_files` in Otter Assign
+* Removed the `generate: pdfs` key from Otter Assign assignment configurations
+* Converted from Docker-py to Python on Whales for containerized grading
 
 **v3.0.2:**
 
