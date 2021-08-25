@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
         contents = re.sub(
             r"^date-released:\s*\d{4}-\d{2}-\d{2}",
-            f"date-released: {dt.date.today().stftime('%Y-%m-%d')}",
+            f"date-released: {dt.date.today().strftime('%Y-%m-%d')}",
             contents,
             flags = re.MULTILINE
         )
