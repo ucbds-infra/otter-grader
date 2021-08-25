@@ -9,7 +9,7 @@ import nbformat
 
 from collections import namedtuple
 
-from ..constants import TEST_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
+from ..constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, OTTR_TEST_FILE_TEMPLATE, OTTR_TEST_NAME_REGEX, TEST_REGEX
 from ..tests import write_test
 from ..utils import get_source, lock
 
@@ -33,9 +33,31 @@ def read_test(cell, question, assignment, rmd=False):
         source = get_source(cell)[1:-1]
     else:
         source = get_source(cell)
-    hidden = bool(re.search("hidden", source[0], flags=re.IGNORECASE))
-    lines = source[1:]
-    test_name = None
+
+    if source[0].lstrip().startswith("#"):
+        hidden = bool(re.search(r"hidden", source[0], flags=re.IGNORECASE))
+    else:
+        hidden = False
+
+    i = 0 if hidden else -1
+    if rmd:
+        i = 0
+
+    if re.match(BEGIN_TEST_CONFIG_REGEX, source[0], flags=re.IGNORECASE):
+        for i, line in enumerate(source):
+            if re.match(END_TEST_CONFIG_REGEX, line, flags=re.IGNORECASE):
+                break
+        config = yaml.full_load("\n".join(source[1:i]))
+        assert isinstance(config, dict), f"Invalid test config in cell {cell}"
+    else:
+        config = {}
+
+    test_name = config.get("name", None)
+    hidden = config.get("hidden", hidden)
+    points = config.get("points", None)
+    success_message = config.get("success_message", None)
+    failure_message = config.get("failure_message", None)
+
     # for line in lines:
     #     match = re.match(OTTR_TEST_NAME_REGEX, line)
     #     if match:
@@ -44,7 +66,7 @@ def read_test(cell, question, assignment, rmd=False):
     # assert test_name is not None, f"Could not parse test name:\n{cell}"
     # TODO: hook up success_message and failure_message
     # TODO: add parsing for TEST CONFIG blocks
-    return Test(test_name, hidden, None, '\n'.join(lines), "", "")
+    return Test(test_name, hidden, None, '\n'.join(source[i+1:]), success_message, failure_message)
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """
