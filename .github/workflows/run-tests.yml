@@ -25,7 +25,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp -v ./.coverage:/home/otter-grader/.coverage otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt; coverage run -m test"
+          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp -v $(pwd)/.coverage:/home/otter-grader/.coverage otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt; coverage run -m test"
 
       - name: Send to Codecov
         run: |
