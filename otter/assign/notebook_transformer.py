@@ -182,7 +182,10 @@ def get_transformed_cells(cells, assignment):
                 no_solution = True
 
             elif block_type is BlockType.QUESTION:
-                question_metadata = create_question_config(get_cell_config(cell))
+                question_metadata = get_cell_config(cell)
+                if not isinstance(question_metadata, dict):
+                    raise AssignNotebookFormatException("Found a begin question cell with no config", i)
+                question_metadata = create_question_config(question_metadata)
                 if question_metadata["manual"] or question_metadata["export"]:
                     need_begin_export = True
 
