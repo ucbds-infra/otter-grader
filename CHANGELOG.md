@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v3.0.3:**
 
 * Fix some minor bugs using docker for grading
 * Added support for test config blocks in R assignments
