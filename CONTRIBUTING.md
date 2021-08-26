@@ -29,7 +29,7 @@ To run the tests for Otter-Grader, the `test` directory can be run as a Python m
 python3 -m test
 ```
 
-To run the tests for a specific tool, add the command-line path for that tool to the command. For 
+To run the tests for a specific tool, add the subcommand for that tool to the command. For 
 example, to run the tests for `otter assign`, run
 
 ```
