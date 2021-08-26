@@ -68,7 +68,7 @@ make docker-grade-test
 pip install .
 ```
 
-**Do not commit any changes made my this Makefile target.**
+**Do not commit any changes made by this Makefile target.**
 
 Once you finish, make sure to run the `cleanup-docker-grade-test` target to undo your changes. 
 
