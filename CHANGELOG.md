@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Fixed bug in Otter Assign format v1 for closing exports when the last question is manuall-graded
+
 **v3.0.3:**
 
 * Fix some minor bugs using docker for grading
