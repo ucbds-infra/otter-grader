@@ -1,7 +1,7 @@
 # Contributing
 
 This project welcomes contributions and suggestions. Please submit a PR to the `master` branch with 
-any updates. Make sure to update the `CHANGELOG.md` with any information about the contribution.
+any updates. Make sure to update the changelog with any information about the contribution.
 
 
 ## Environment Setup
