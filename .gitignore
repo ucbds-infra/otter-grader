@@ -18,3 +18,4 @@ gs-testing-stuff
 .mypy.cache
 .OTTER_LOG
 docs/tutorial/dist
+docs/_static/notebooks/html

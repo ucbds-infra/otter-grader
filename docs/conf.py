@@ -11,22 +11,24 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
+
 import os
 import sys
-import re
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 
-from glob import glob
 import nbconvert
-from importlib import import_module
+import re
+import shutil
 import yaml
+
+from glob import glob
+from importlib import import_module
 from textwrap import indent
-from otter.utils import convert_config_description_dict
+from otter.utils import convert_config_description_dict, print_full_width
 
 
 # -- Project information -----------------------------------------------------
@@ -263,19 +265,35 @@ def update_yaml_block(file):
     with open(file, "w") as f:
         f.write("\n".join(lines) + "\n")
 
-for file in files_to_replace:
-    print(f"Replacing YAML targets in: {file}")
-    update_yaml_block(file)
+
+def convert_static_notebooks():
+    exporter = nbconvert.HTMLExporter()
+
+    print_full_width("=", "CONVERTING NOTEBOOKS")
+
+    for file in glob("_static/notebooks/*.ipynb"):
+        html, _ = exporter.from_filename(file)
+        parent, path = os.path.split(file)
+
+        new_parent = os.path.join(parent, "html")
+        os.makedirs(new_parent, exist_ok=True)
+
+        new_path = os.path.join(new_parent, os.path.splitext(path)[0] + ".html")
+
+        with open(new_path, "w+") as f:
+            f.write(html)
+
+        print(f"Converted {file} to HTML")
+
+    print_full_width("=")
 
 
 # -- Extension configuration -------------------------------------------------
 def setup(app):
     # run nbconvert on all of the notebooks in _static/notebooks
-    exporter = nbconvert.HTMLExporter()
-    print("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15)
-    for file in glob("_static/notebooks/*.ipynb"):
-        html, _ = exporter.from_filename(file)
-        with open(os.path.splitext(file)[0] + ".html", "w+") as f:
-            f.write(html)
-        print(f"Converted {file} to HTML")
-    print("=" * len("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15))
+    convert_static_notebooks()
+
+    # update the YAML blocks in the docs files
+    for file in files_to_replace:
+        print(f"Replacing YAML targets in: {file}")
+        update_yaml_block(file)
