@@ -389,9 +389,9 @@ class Notebook:
         if display_link:
             # create and display output HTML
             out_html = """
-            <p>Your submission has been exported. Click <a href="{}" target="_blank">here</a>
+            <p>Your submission has been exported. Click <a href="{}" download="{}" target="_blank">here</a>
             to download the zip file.</p>
-            """.format(zip_path)
+            """.format(zip_path, zip_path)
 
             display(HTML(out_html))
 
