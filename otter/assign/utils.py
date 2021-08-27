@@ -102,6 +102,17 @@ def remove_output(nb):
         if 'outputs' in cell:
             cell['outputs'] = []
 
+def remove_cell_ids(nb):
+    """
+    Removes all cell IDs from a notebook in-place
+    
+    Args:
+        nb (``nbformat.NotebookNode``): a notebook
+    """
+    for cell in nb['cells']:
+        if 'id' in cell:
+            cell.pop('id')
+
 def lock(cell):
     """
     Makes a cell non-editable and non-deletable in-place
