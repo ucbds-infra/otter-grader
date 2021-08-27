@@ -2,7 +2,7 @@
 
 **Unreleased:**
 
-* Fixed bug in Otter Assign format v1 for closing exports when the last question is manuall-graded
+* Fixed bug in Otter Assign format v1 for closing exports when the last question is manually-graded
 
 **v3.0.3:**
 
