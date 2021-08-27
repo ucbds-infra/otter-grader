@@ -274,7 +274,11 @@ def convert_static_notebooks():
     for file in glob("_static/notebooks/*.ipynb"):
         html, _ = exporter.from_filename(file)
         parent, path = os.path.split(file)
-        new_path = os.path.join(parent, "html", os.path.splitext(path)[0] + ".html")
+
+        new_parent = os.path.join(parent, "html")
+        os.makedirs(new_parent, exist_ok=True)
+
+        new_path = os.path.join(new_parent, os.path.splitext(path)[0] + ".html")
 
         with open(new_path, "w+") as f:
             f.write(html)
