@@ -191,7 +191,7 @@ Here is an example question in an Otter Assign-formatted question:
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-code-question-v1.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-code-question-v1.html"></iframe>
 
 
 Note the use of the delimiting raw cells and the placement of question metadata in the ``# BEGIN
@@ -385,7 +385,7 @@ metadata.
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-written-question-v1.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-written-question-v1.html"></iframe>
 
 A manually-graded question can have an optional prompt block and a required solution block. If the
 solution has any code cells, they will have their syntax transformed by the solution removal rules
@@ -399,7 +399,7 @@ Here is an example of a manually-graded code question:
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-manual-code-question-v1.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-manual-code-question-v1.html"></iframe>
 
 Manually graded questions are automatically enclosed in ``<!-- BEGIN QUESTION -->`` and ``<!-- END 
 QUESTION -->`` tags by Otter Assign so that only these questions are exported to the PDF when 
@@ -445,7 +445,7 @@ Here is an example of plugin replacement in Otter Assign:
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-plugin.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-plugin.html"></iframe>
 
 *Note that student-facing plugins are not supported with R assignments.*
 
