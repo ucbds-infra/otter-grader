@@ -3,6 +3,8 @@
 **Unreleased:**
 
 * Fixed bug in Otter Assign format v1 for closing exports when the last question is manuall-graded
+* Removed cell IDs in Otter Assign output notebooks per [#340](https://github.com/ucbds-infra/otter-grader/issues/340)
+* Changed submission zip download link to use the HTML `download` attribute per [#339](https://github.com/ucbds-infra/otter-grader/issues/339)
 
 **v3.0.3:**
 
