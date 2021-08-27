@@ -3,7 +3,7 @@ ipykernel
 matplotlib
 pandas
 jinja2
-docker
+python-on-whales
 requests
 nbconvert
 nbformat

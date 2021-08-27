@@ -34,8 +34,9 @@ test = list(
     ),
     ottr::TestCase$new(
       hidden = TRUE,
-      name = NA,
+      name = "q1d",
       points = 2,
+      success_message = "congrats",
       code = {
         test_that("q1d", {
             expect_equal(as.character(x), "2")

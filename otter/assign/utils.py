@@ -102,6 +102,17 @@ def remove_output(nb):
         if 'outputs' in cell:
             cell['outputs'] = []
 
+def remove_cell_ids(nb):
+    """
+    Removes all cell IDs from a notebook in-place
+    
+    Args:
+        nb (``nbformat.NotebookNode``): a notebook
+    """
+    for cell in nb['cells']:
+        if 'id' in cell:
+            cell.pop('id')
+
 def lock(cell):
     """
     Makes a cell non-editable and non-deletable in-place
@@ -234,27 +245,15 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args is True:
         generate_args = {}
 
+    if "pdfs" in generate_args:
+        raise ValueError("The 'pdfs' key of 'generate' is no longer supported. Put any " + \
+                         "'pdfs' configurations inside the 'generate' key itself.")
+
     if assignment.is_r:
         generate_args["lang"] = "r"
 
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
-
-    # TODO: make it so pdfs is not a key in the generate key, but matches the structure expected by
-    # run_autograder
-    if generate_args.get('pdfs', {}):
-        pdf_args = generate_args.pop('pdfs', {})
-        generate_args['course_id'] = str(pdf_args['course_id'])
-        generate_args['assignment_id'] = str(pdf_args['assignment_id'])
-        
-        if pdf_args.get("token"):
-            generate_args['token'] = str(pdf_args['token'])
-
-        if not pdf_args.get("filtering", True):
-            generate_args['filtering'] = False
-
-        if not pdf_args.get('pagebreaks', True):
-            generate_args['pagebreaks'] = False
 
     # use temp tests dir
     test_dir = "tests"
@@ -275,11 +274,29 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         files += assignment.files
 
     if assignment.autograder_files:
-        res = (result / "autograder").resolve()
-        for agf in assignment.autograder_files:
-            fp = pathlib.Path(agf).resolve()
-            rp = get_relpath(res, fp)
-            files.append(str(rp))
+        ag_dir = os.getcwd()
+        os.chdir(curr_dir)
+        output_dir  = result / 'autograder'
+
+        # copy files
+        for file in assignment.autograder_files:
+
+            # if a directory, copy the entire dir
+            if os.path.isdir(file):
+                shutil.copytree(file, str(output_dir / os.path.basename(file)))
+
+            else:
+                # check that file is in subdir
+                assert os.getcwd() in os.path.abspath(file), \
+                    f"{file} is not in a subdirectory of the master notebook directory"
+                file_path = pathlib.Path(file).resolve()
+                rel_path = file_path.parent.relative_to(pathlib.Path(os.getcwd()))
+                os.makedirs(output_dir / rel_path, exist_ok=True)
+                shutil.copy(file, str(output_dir / rel_path))
+
+        os.chdir(ag_dir)
+
+        files += assignment.autograder_files
 
     # TODO: move this config out of the assignment metadata and into the generate key
     if assignment.variables:

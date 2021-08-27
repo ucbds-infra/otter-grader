@@ -182,7 +182,10 @@ def get_transformed_cells(cells, assignment):
                 no_solution = True
 
             elif block_type is BlockType.QUESTION:
-                question_metadata = create_question_config(get_cell_config(cell))
+                question_metadata = get_cell_config(cell)
+                if not isinstance(question_metadata, dict):
+                    raise AssignNotebookFormatException("Found a begin question cell with no config", i)
+                question_metadata = create_question_config(question_metadata)
                 if question_metadata["manual"] or question_metadata["export"]:
                     need_begin_export = True
 
@@ -230,5 +233,9 @@ def get_transformed_cells(cells, assignment):
 
         # this is just a normal cell so add it to transformed_cells
         transformed_cells.append(cell)
+
+    # if the last cell was the end of a manually-graded question, add a close export tag
+    if need_end_export:
+        transformed_cells.append(add_export_tag_to_cell(nbformat.v4.new_markdown_cell(), end=True))
 
     return transformed_cells, test_files

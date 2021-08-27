@@ -1,5 +1,19 @@
 # Changelog
 
+**v3.0.4:**
+
+* Fixed bug in Otter Assign format v1 for closing exports when the last question is manually-graded
+* Removed cell IDs in Otter Assign output notebooks per [#340](https://github.com/ucbds-infra/otter-grader/issues/340)
+* Changed submission zip download link to use the HTML `download` attribute per [#339](https://github.com/ucbds-infra/otter-grader/issues/339)
+
+**v3.0.3:**
+
+* Fix some minor bugs using docker for grading
+* Added support for test config blocks in R assignments
+* Fixed use of `autograder_files` in Otter Assign
+* Removed the `generate: pdfs` key from Otter Assign assignment configurations
+* Converted from Docker-py to Python on Whales for containerized grading
+
 **v3.0.2:**
 
 * Made `otter.Notebook.check_all` compatible with metadata tests

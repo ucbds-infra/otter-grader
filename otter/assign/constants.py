@@ -15,8 +15,8 @@ NB_VERSION = 4
 
 MD_RESPONSE_CELL_SOURCE = "_Type your answer here, replacing this text._"
 
-BEGIN_TEST_CONFIG_REGEX = r'"""\s*#\s*BEGIN\s*TEST\s*CONFIG'
-END_TEST_CONFIG_REGEX = r'"""\s*#\s*END\s*TEST\s*CONFIG'
+BEGIN_TEST_CONFIG_REGEX = r'""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
+END_TEST_CONFIG_REGEX = r'""?"?\s*#\s*END\s*TEST\s*CONFIG'
 TEST_REGEX = rf"(##\s*(hidden\s*)?test\s*##\s*|#\s*(hidden\s*)?test\s*|{BEGIN_TEST_CONFIG_REGEX})"
 OTTR_TEST_NAME_REGEX = r'''(?:testthat::)?test_that\(['"]([A-Za-z0-9_]+)['"],'''
 MD_SOLUTION_REGEX = r"(<strong>|\*{2})solution:?(<\/strong>|\*{2})"
@@ -32,8 +32,8 @@ test = list(
       hidden = {% if tc.hidden %}TRUE{% else %}FALSE{% endif %},
       name = {% if tc.name %}"{{ tc.name }}"{% else %}NA{% endif %},
       points = {{ tc.points }},{% if tc.success_message %}
-      success_message = {{ tc.success_message }}{% endif %}{% if tc.failure_message %}
-      failure_message = {{ tc.failure_message }}{% endif %}
+      success_message = "{{ tc.success_message }}",{% endif %}{% if tc.failure_message %}
+      failure_message = "{{ tc.failure_message }}",{% endif %}
       code = {
         {{ indent(tc.body, "        ").lstrip() }}{# lstrip so that the first line indent is correct #}
       }

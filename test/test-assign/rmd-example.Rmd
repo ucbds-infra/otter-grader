@@ -64,7 +64,11 @@ test_that("q1c", {
 ```
 
 ```{r}
-## HIDDEN test ##
+" # BEGIN TEST CONFIG
+name: q1d
+hidden: true
+success_message: congrats
+" # END TEST CONFIG
 test_that("q1d", {
     expect_equal(as.character(x), "2")
 })

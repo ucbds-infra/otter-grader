@@ -6,7 +6,7 @@ test = list(
       name = NA,
       points = 1,
       code = {
-        
+        testthat::expect_true(is.numeric(x))
       }
     ),
     ottr::TestCase$new(
@@ -14,6 +14,7 @@ test = list(
       name = NA,
       points = 1,
       code = {
+        testthat::expect_true(0 < x)
         testthat::expect_true(x < 100)
       }
     )

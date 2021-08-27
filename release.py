@@ -1,9 +1,10 @@
-import re
-import sys
-import shutil
-import warnings
 import argparse
+import datetime as dt
+import re
+import shutil
 import subprocess
+import sys
+import warnings
 
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
@@ -30,9 +31,9 @@ def run_release_commands(test, beta, new_version, no_twine=False):
         "python3 setup.py sdist bdist_wheel",
         f"python3 -m twine upload dist/*{' --repository-url https://test.pypi.org/legacy/' if test else ''}",
         "sleep 10", # this allows time for PyPI to update before we try to install the new version
-        f"docker build . -t ucbdsinfra/otter-grader:{new_version}",
+        f"docker build . -t ucbdsinfra/otter-grader:{new_version} --build-arg BUILDKIT_INLINE_CACHE=1",
         f"docker push ucbdsinfra/otter-grader:{new_version}",
-        f"docker build . -t ucbdsinfra/otter-grader{':beta' if beta else ''}",
+        f"docker build . -t ucbdsinfra/otter-grader{':beta' if beta else ''} --build-arg BUILDKIT_INLINE_CACHE=1",
         f"docker push ucbdsinfra/otter-grader{':beta' if beta else ''}",
         "make tutorial",
         f"git commit -am 'release v{new_version}'",
@@ -131,6 +132,13 @@ if __name__ == "__main__":
         contents = re.sub(
             r"^version:\s*\"\d+.\d+.\d+(?:\.\w+)?\"",
             f"version: \"{new_version_number}\"",
+            contents,
+            flags = re.MULTILINE
+        )
+
+        contents = re.sub(
+            r"^date-released:\s*\d{4}-\d{2}-\d{2}",
+            f"date-released: {dt.date.today().strftime('%Y-%m-%d')}",
             contents,
             flags = re.MULTILINE
         )

@@ -6,7 +6,7 @@ test = list(
       name = NA,
       points = 0.5,
       code = {
-        
+        testthat::expect_equal(length(z), 10)
       }
     ),
     ottr::TestCase$new(

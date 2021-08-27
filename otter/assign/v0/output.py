@@ -15,6 +15,7 @@ from .plugins import replace_plugins_with_calls
 from .solutions import strip_ignored_lines, strip_solutions_and_output
 from .tests import write_test
 from .utils import patch_copytree
+from ..utils import remove_cell_ids
 
 def write_autograder_dir(nb_path, output_nb_path, assignment):
     """
@@ -75,6 +76,10 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
         for test_name, test_file in test_files.items():
             test_path = assignment._temp_test_dir / (test_name + test_ext)
             write_test(transformed_nb, test_path, test_file, use_file=True)
+
+    # TODO: this is a bad practice and only a monkey-patch for #340. we shold do some better parsing
+    # of the nbformat version info to determine if this is necessary.
+    remove_cell_ids(transformed_nb)
 
     # write notebook
     nbformat.write(transformed_nb, str(output_nb_path))

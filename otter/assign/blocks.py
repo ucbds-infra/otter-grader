@@ -78,7 +78,7 @@ def get_cell_config(cell):
     """
     source = get_source(cell)
     config = yaml.full_load("\n".join(source))
-    if not isinstance(config, dict):
+    if not isinstance(config, dict) and config is not None:
         # TODO: make this error nicer?
         raise TypeError(f"Found a begin cell configuration that is not a dictionary: {cell}")
     return config
