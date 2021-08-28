@@ -18,7 +18,7 @@ def script_to_notebook(script):
     Returns:
         ``nbformat.NotebookNode``: a notebook with a single code cell containing the script
     """
-    nb = nbformat.v4.new_notebook
+    nb = nbformat.v4.new_notebook()
     nb.cells.append(nbformat.v4.new_code_cell(script))
     return nb
 
