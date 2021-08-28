@@ -174,7 +174,7 @@ Intercell Seeding
 Python assignments support intercell seeding, and there are two flavors of this. The first involves
 the use of a seed variable, and is configured in the assignment metadata; this allows you to use
 tools like ``np.random.default_rng`` instead of just ``np.random.seed``. The second flavor involves
-comments in code cells, and is described below.
+comments in code cells, and is described :ref:`below <otter_assign_v1_python_seeding>`.
 
 To use a seed variable, specify the name of the variable, the autograder seed value, and the student
 seed value in your assignment metadata.
@@ -421,11 +421,13 @@ are run *at the end of execution*, and therefore are not robust to variable name
 
 Intercell Seeding
 +++++++++++++++++
+:ref:`intercell seeding <seeding>`
 
-Otter Assign maintains support for :ref:`intercell seeding <seeding>` by allowing seeds to be set 
-in solution cells. To add a seed, write a line that ends with ``# SEED``; when Otter runs, this line 
-will be removed from the student version of the notebook. This allows instructors to write code with 
-deterministic output, with which hidden tests can be generated.
+The second flavor of intercell seeding involves writing a line that ends with ``# SEED``; when Otter 
+Assign runs, this line will be removed from the student version of the notebook. This allows 
+instructors to write code with deterministic output, with which hidden tests can be generated.
+
+For example, the first line of the cell below would be removed in the student version of the notebook.
 
 .. code-block:: python
 
