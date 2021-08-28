@@ -50,6 +50,7 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
             subm_zip = zipfile.ZipFile(submission)
             subm_zip.extractall(os.path.join(ag_dir, "submission"))
             subm_zip.close()
+
         else:
             shutil.copy(submission, os.path.join(ag_dir, "submission"))
 
