@@ -13,6 +13,6 @@ nbformat
 dill
 jupytext
 numpy
-otter-grader==3.0.4
+git+https://github.com/ucbds-infra/otter-grader.git@943bf0580f6bd2e1e61666c87d43ccab8b0a4942
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
