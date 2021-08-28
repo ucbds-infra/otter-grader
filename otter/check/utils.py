@@ -12,6 +12,8 @@ from IPython import get_ipython
 from IPython.display import display, Javascript
 from subprocess import run, PIPE
 
+from .logs import EventType
+
 
 def save_notebook(filename, timeout=10):
     """
@@ -95,3 +97,43 @@ def colab_incompatible(f):
             raise RuntimeError("This method is not compatible with Google Colab")
         return f(self, *args, **kwargs)
     return colab_only_method
+
+
+def logs_event(event_type):
+        """
+        A decorator that ensures each call is logged in the Otter log with type ``event_type``.
+
+        Events logging a ``EventType.CHECK`` should return a 3-tuple of the question name, the
+        ``TestFile`` and an environment to shelve. All other methods should just return their 
+        default return value, which will be logged.
+        """
+
+        def event_logger(f):
+            """
+            Wraps a function and ensures that the call's results are logged using 
+            ``Notebook._log_event``.
+            """
+
+            def run_function(self, *args, **kwargs):
+                """
+                Runs a method, catching any errors and logging the call. Returns the return value
+                of the function, unless ``EventType.CHECK`` is used, in which case the return value
+                is assumed to be a 3-tuple and the second value in the tuple is returned.
+                """
+                try:
+                    if event_type == EventType.CHECK:
+                        question, results, shelve_env = f(self, *args, **kwargs)
+                    else:
+                        results = f(self, *args, **kwargs)
+                        shelve_env = {}
+                        question = None
+                except Exception as e:
+                    self._log_event(event_type, success=False, error=e)
+                    raise e
+                else:
+                    self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
+                return results
+
+            return run_function
+
+        return event_logger

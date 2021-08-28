@@ -1,7 +1,8 @@
 """Solution removal for Otter Assign"""
 
-import re
+import copy
 import nbformat
+import re
 
 from .utils import get_source, has_tag, is_cell_type, remove_output, remove_tag
 
@@ -10,10 +11,43 @@ SOLUTION_CELL_TAG = "otter_assign_solution_cell"
 
 
 def has_seed(cell):
+    """
+    Determine whether a cell contains a seed line (a line ending in ``# SEED``).
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell
+
+    Returns:
+        ``bool``: whether the cell has a seed line
+    """
     if not is_cell_type(cell, "code"):
         return False
     source = get_source(cell)
     return source and any([l.strip().endswith('# SEED') for l in source])
+
+
+def overwrite_seed_vars(nb, seed_variable, seed):
+    """
+    Overwrite any assignments of the variable named ``seed_variable`` with the value ``seed`` in a
+    notebook.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to edit
+        seed_variable (``str``): the variable to look for
+        seed (``int``): the value to set for ``seed_variable``
+
+    Returns:
+        ``nbformat.NotebookNode``: the notebook with the variable substitutions made
+    """
+    nb = copy.deepcopy(nb)
+    for cell in nb["cells"]:
+        source = get_source(cell)
+        for i, line in enumerate(source):
+            match = re.match(fr"(\s*){seed_variable}\s*=\s*", line.lstrip())
+            if  match:
+                source[i] = match.group(1) + f"{seed_variable} = {seed}"
+        cell["source"] = "\n".join(source)
+    return nb
 
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")

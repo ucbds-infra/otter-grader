@@ -1,8 +1,7 @@
-"""
-Test result collection via abstract syntax tree transformation
-"""
+"""Test result collection via abstract syntax tree transformation"""
 
 import ast
+
 
 class CheckCallWrapper(ast.NodeTransformer):
     """
@@ -13,22 +12,22 @@ class CheckCallWrapper(ast.NodeTransformer):
     to ``otter.Notebook.check_all``, `otter.Notebook.export``, and ``otter.Notebook.to_pdf``.
     
     Args:
-        secret (``str``): random digits string that prevents check function from being modified
+        list_name (``str``): the name of the list to collect check results in
     
     Attributes:
-        secret (``str``): random digits string that prevents check function from being modified
+        list_name (``str``): the name of the list to collect check results in
     """
     OTTER_IMPORT_SYNTAX = "import"
     OTTER_IMPORT_NAME = "otter"
     OTTER_CLASS_NAME = "Notebook"
     OTTER_INSTANCE_NAME = "grader"
 
-    def __init__(self, secret):
-        self.secret = secret
+    def __init__(self, list_name):
+        self.list_name = list_name
 
     def check_node_constructor(self, expression):
         """
-        Creates node that wraps expression in a list (``check_results_XX``) append call
+        Creates node that wraps expression in a list append call.
         
         Args:
             expression (``ast.Name``): name for check function
@@ -40,7 +39,7 @@ class CheckCallWrapper(ast.NodeTransformer):
         args = [expression]
         func = ast.Attribute(
             attr='append',
-            value=ast.Name(id='check_results_{}'.format(self.secret), ctx=ast.Load()),
+            value=ast.Name(id=self.list_name, ctx=ast.Load()),
             ctx=ast.Load(),
             keywords=[]
         )
