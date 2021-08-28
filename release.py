@@ -37,6 +37,7 @@ def run_release_commands(test, beta, new_version, no_twine=False):
         f"docker push ucbdsinfra/otter-grader{':beta' if beta else ''}",
         "make tutorial",
         f"git commit -am 'release v{new_version}'",
+        f"git push upstream master",
         f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}' {' -p' if beta else ''} {new_version}",
     ]
 
@@ -93,6 +94,18 @@ if __name__ == "__main__":
             .strip()
         )
         new_version = f"git+https://github.com/ucbds-infra/otter-grader.git@{new_hash}"
+
+    # do not allow non-git non-beta releases from any branch other than master
+    if not to_git and not to_beta:
+        branch = (
+            subprocess
+            .run(["git", "rev-parse", "--abbrev-ref", "HEAD"], stdout=subprocess.PIPE)
+            .stdout
+            .decode("utf-8")
+            .strip()
+        )
+        if branch != "master":
+            raise RuntimeError("Cannot create a release from a branch other than mater")
 
     assert "new_version" in vars(), "Could not find a version -- did you specify one?"
 
