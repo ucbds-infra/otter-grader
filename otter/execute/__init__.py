@@ -58,7 +58,8 @@ def check(nb_or_test_path, test_name=None, global_env=None):
 
 
 def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    cwd=None, test_dir=None, seed=None, log=None, variables=None, plugin_collection=None):
+    cwd=None, test_dir=None, seed=None, seed_variable=None, log=None, variables=None, 
+    plugin_collection=None):
     """
     Grade an assignment file and return grade information
 
@@ -72,6 +73,7 @@ def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors
             grading environment
         test_dir (``str``, optional): path to directory of tests in grading environment
         seed (``int``, optional): random seed for intercell seeding
+        seed_variable (``str``, optional): a variable name to override with the seed
         log (``otter.check.logs.Log``, optional): log from which to grade questions
         variables (``dict``, optional): map of variable names -> type string to check type of deserialized
             object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
@@ -107,10 +109,14 @@ def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors
         initial_env["__name__"] = name
 
     if log is not None:
-        global_env = execute_log(nb, log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, variables=variables)
+        global_env = execute_log(
+            nb, log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, 
+            variables=variables)
 
     else:
-        global_env = execute_notebook(nb, results_array, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, seed=seed)
+        global_env = execute_notebook(
+            nb, results_array, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, 
+            seed=seed, seed_variable=seed_variable)
 
     if plugin_collection is not None:
         plugin_collection.run("after_execution", global_env)

@@ -22,7 +22,7 @@ from ..utils import id_generator
 
 
 def execute_notebook(nb, check_results_list_name="check_results_secret", initial_env=None, 
-                     ignore_errors=False, cwd=None, test_dir=None, seed=None):
+                     ignore_errors=False, cwd=None, test_dir=None, seed=None, seed_variable=None):
     """
     Execute a notebook and return the global environment that results from execution.
 
@@ -37,6 +37,7 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
             grading environment
         test_dir (``str``, optional): path to directory of tests in grading environment
         seed (``int``, optional): random seed for intercell seeding
+        seed_variable (``str``, optional): a variable name to override with the seed
 
     Results:
         ``dict``: global environment resulting from executing all code of the input notebook
@@ -64,7 +65,7 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
         source = f"import sys\nsys.path.append(r\"{cwd}\")\n"
         exec(source, global_env)
     
-    if seed is not None:
+    if seed is not None and seed_variable is None:
         import numpy as np
         import random
         global_env["np"] = np
@@ -94,10 +95,13 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
                         if source_is_str_bool:
                             code_lines.append('\n')
 
-                # TODO: refactor to support np.default_rng
                 if seed is not None:
-                    cell_source = "np.random.seed({})\nrandom.seed({})\n".format(seed, seed) + \
-                        isp.transform_cell(''.join(code_lines))
+                    if seed_variable is None:
+                        cell_source = f"np.random.seed({seed})\nrandom.seed({seed})\n" + \
+                            isp.transform_cell(''.join(code_lines))
+                    else:
+                        cell_source = f"{seed_variable} = {seed}\n" + \
+                            isp.transform_cell(''.join(code_lines))
 
                 else:
                     cell_source = isp.transform_cell(''.join(code_lines))

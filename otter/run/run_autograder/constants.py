@@ -38,6 +38,11 @@ DEFAULT_OPTIONS_WITH_DESCRIPTIONS = [
         "default": None,
     },
     {
+        "key": "seed_variable",
+        "description": "a variable name to override with the seed",
+        "default": None,
+    },
+    {
         "key": "grade_from_log",
         "description": "whether to re-assemble the student's environment from the log rather than by re-executing their submission",
         "default": False,
