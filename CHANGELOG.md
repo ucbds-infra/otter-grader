@@ -1,6 +1,8 @@
 # Changelog
 
-**Unreleased:**
+**v3.0.6:** re-release of v3.0.5
+
+**v3.0.5:**
 
 * Refactored Otter's execution internals
 * Added intercell seeding via seed variables per [#346](https://github.com/ucbds-infra/otter-grader/issues/346)
