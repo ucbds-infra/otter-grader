@@ -26,6 +26,17 @@ def run_release_commands(test, beta, new_version, no_twine=False):
         "https://github.com/github/hub to install it."
     )
 
+    # check that the upstream remote is correct
+    upstream = (
+        subprocess
+        .run(["git", "config", "--get", "remote.upstream.url"], stdout=subprocess.PIPE)
+        .stdout
+        .decode("utf-8")
+        .strip()
+    )
+    if branch != "https://github.com/ucbds-infra/otter-grader":
+        raise RuntimeError("You do not have the correct upstream repository configured")
+
     commands = [
         "rm dist/* || :",
         "python3 setup.py sdist bdist_wheel",
