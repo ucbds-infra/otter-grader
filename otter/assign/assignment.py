@@ -78,13 +78,29 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
                 "description": "whether to run student submissions against local tests during export",
                 "default": False,
             },
-
         ],
     },
     {
         "key": "seed",
-        "description": "a seed for intercell seeding",
+        "description": "intercell seeding configurations",
         "default": None,
+        "subkeys": [
+            {
+                "key": "variable",
+                "description": "a variable name to override with the autograder seed during grading",
+                "default": None,
+            },
+            {
+                "key": "autograder_value",
+                "description": "the value of the autograder seed",
+                "default": None,
+            },
+            {
+                "key": "student_value",
+                "description": "the value of the student seed",
+                "default": None,
+            },
+        ],
     },
     {
         "key": "generate",
