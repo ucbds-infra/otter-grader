@@ -166,6 +166,67 @@ cell, and passes the configurations ``points`` and ``seed`` to Otter Generate vi
         seed: 0
 
 
+.. _otter_assign_v1_seed_variables:
+
+Intercell Seeding
++++++++++++++++++
+
+Python assignments support intercell seeding, and there are two flavors of this. The first involves
+the use of a seed variable, and is configured in the assignment metadata; this allows you to use
+tools like ``np.random.default_rng`` instead of just ``np.random.seed``. The second flavor involves
+comments in code cells, and is described below.
+
+To use a seed variable, specify the name of the variable, the autograder seed value, and the student
+seed value in your assignment metadata.
+
+.. code-block:: yaml
+
+    # ASSIGNMENT CONFIG
+    seed:
+        variable: rng_seed
+        autograder_value: 42
+        student_value: 713
+
+With this type of seeding, you do not need to specify the seed inside the ``generate`` key; this
+automatically taken care of by Otter Assign.
+
+Then, in a cell of your notebook, define the seed variable *with the autograder value*. This value
+needs to be defined in a separate cell from any of its uses and the variable name cannot be used
+for anything other than seeding RNGs. This is because it the variable will be redefined in the 
+student's submission at the top of every cell. We recommend defining it in, for example, your 
+imports cell.
+
+.. code-block:: python
+
+    import numpy as np
+    rng_seed = 42
+
+To use the seed, just use the variable as normal:
+
+.. code-block:: python
+
+    rng = np.random.default_rng(rng_seed)
+    rvs = [rng.random() for _ in range(1000)] # SOLUTION
+
+If you use this method of intercell seeding, the solutions notebook will contain the original value
+of the seed, but the student notebook will contain the student value:
+
+.. code-block:: python
+
+    # from the student notebook
+    import numpy as np
+    rng_seed = 713
+
+When you do this, Otter Generate will be configured to overwrite the seed variable in each submission,
+allowing intercell seeding to function as normal.
+
+Remember that the student seed is different from the autograder seed, so any public tests cannot be
+deterministic otherwise they will fail on the student's machine. Also note that only one seed is
+available, so each RNG must use the same seed.
+
+You can find more information about intercell seeding :ref:`here <seeding>`.
+
+
 R Assignment Metadata
 +++++++++++++++++++++
 
@@ -366,11 +427,12 @@ in solution cells. To add a seed, write a line that ends with ``# SEED``; when O
 will be removed from the student version of the notebook. This allows instructors to write code with 
 deterministic output, with which hidden tests can be generated.
 
-Note that seed cells are removed in student outputs, so any results in that notebook may be 
-different from the provided tests. However, when grading, seeds are executed between each cell, so 
-if you are using seeds, make sure to use **the same seed** every time to ensure that seeding before 
-every cell won't affect your tests. You will also be required to set this seed as a configuration of 
-the ``generate`` key of the assignment metadata if using Otter Generate with Otter Assign.
+.. code-block:: python
+
+    np.random.seed(42) # SEED
+    rvs = [np.random.random() for _ in range(1000)] # SOLUTION
+
+The same caveats apply for this type of seeding as :ref:`above <otter_assign_v1_seed_variables>`.
 
 *Note that intercell seeding is not supported with R assignments.*
 
