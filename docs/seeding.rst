@@ -123,8 +123,6 @@ and
     random.seed(42)
     y = np.random.normal(100)
 
-where ``SEED`` is the seed you passed to Otter.
-
 
 Python Scripts
 ??????????????
