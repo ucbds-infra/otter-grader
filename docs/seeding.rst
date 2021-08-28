@@ -67,6 +67,9 @@ and
     rng = np.random.default_rng(rng_seed)
     y = rng.normal(100)
 
+Note that the initial value of the seed variable must be set in a separate cell from any of its uses,
+or the original value will override autograder value.
+
 
 Python Scripts
 ??????????????
