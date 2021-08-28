@@ -13,5 +13,5 @@ license: "BSD-3-Clause"
 message: "If you use this software, please cite it as below."
 repository-code: "https://github.com/ucbds-infra/otter-grader"
 title: "Otter-Grader: A Python and R autograding solution"
-version: "3.0.5"
+version: "3.0.6"
 doi: 10.5281/zenodo.5259955
