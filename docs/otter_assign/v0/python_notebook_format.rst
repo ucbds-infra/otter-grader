@@ -129,7 +129,7 @@ Assign; optionally, you can specify these via the command line with the ``--user
 .. code-block:: python
 
     from otter.generate.token import APIClient
-    ​print(APIClient.get_token())
+    print(APIClient.get_token())
 
 Any configurations in your ``generate`` key will be put into an ``otter_config.json`` and used when
 running Otter Generate.
