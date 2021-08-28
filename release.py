@@ -26,17 +26,6 @@ def run_release_commands(test, beta, new_version, no_twine=False):
         "https://github.com/github/hub to install it."
     )
 
-    # check that the upstream remote is correct
-    upstream = (
-        subprocess
-        .run(["git", "config", "--get", "remote.upstream.url"], stdout=subprocess.PIPE)
-        .stdout
-        .decode("utf-8")
-        .strip()
-    )
-    if upstream != "https://github.com/ucbds-infra/otter-grader":
-        raise RuntimeError("You do not have the correct upstream repository configured")
-
     commands = [
         "rm dist/* || :",
         "python3 setup.py sdist bdist_wheel",
@@ -106,17 +95,29 @@ if __name__ == "__main__":
         )
         new_version = f"git+https://github.com/ucbds-infra/otter-grader.git@{new_hash}"
 
-    # do not allow non-git non-beta releases from any branch other than master
-    if not to_git and not to_beta:
-        branch = (
+    if not to_git:
+        if not to_beta:
+            # do not allow non-git non-beta releases from any branch other than master
+            branch = (
+                subprocess
+                .run(["git", "rev-parse", "--abbrev-ref", "HEAD"], stdout=subprocess.PIPE)
+                .stdout
+                .decode("utf-8")
+                .strip()
+            )
+            if branch != "master":
+                raise RuntimeError("Cannot create a release from a branch other than mater")
+
+        # check that the upstream remote is correct
+        upstream = (
             subprocess
-            .run(["git", "rev-parse", "--abbrev-ref", "HEAD"], stdout=subprocess.PIPE)
+            .run(["git", "config", "--get", "remote.upstream.url"], stdout=subprocess.PIPE)
             .stdout
             .decode("utf-8")
             .strip()
         )
-        if branch != "master":
-            raise RuntimeError("Cannot create a release from a branch other than mater")
+        if upstream != "https://github.com/ucbds-infra/otter-grader":
+            raise RuntimeError("You do not have the correct upstream repository configured")
 
     assert "new_version" in vars(), "Could not find a version -- did you specify one?"
 
