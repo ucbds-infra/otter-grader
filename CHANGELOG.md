@@ -4,6 +4,7 @@
 
 * Refactored Otter's execution internals
 * Added intercell seeding via seed variables per [#346](https://github.com/ucbds-infra/otter-grader/issues/346)
+* Made Otter Run compatible with ZIP submissions
 
 **v3.0.4:**
 
