@@ -18,7 +18,7 @@ from textwrap import indent
 from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import colab_incompatible, grade_zip_file, running_on_colab, save_notebook
+from .utils import colab_incompatible, grade_zip_file, logs_event, running_on_colab, save_notebook
 
 from ..execute import check
 from ..export import export_notebook
@@ -46,46 +46,7 @@ class Notebook:
     # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
 
-    def _logs_event(event_type):
-        """
-        A decorator that ensures each call is logged in the Otter log with type ``event_type``.
-
-        Events logging a ``EventType.CHECK`` should return a 3-tuple of the question name, the
-        ``TestFile`` and an environment to shelve. All other methods should just return their 
-        default return value, which will be logged.
-        """
-
-        def event_logger(f):
-            """
-            Wraps a function and ensures that the call's results are logged using 
-            ``Notebook._log_event``.
-            """
-
-            def run_function(self, *args, **kwargs):
-                """
-                Runs a method, catching any errors and logging the call. Returns the return value
-                of the function, unless ``EventType.CHECK`` is used, in which case the return value
-                is assumed to be a 3-tuple and the second value in the tuple is returned.
-                """
-                try:
-                    if event_type == EventType.CHECK:
-                        question, results, shelve_env = f(self, *args, **kwargs)
-                    else:
-                        results = f(self, *args, **kwargs)
-                        shelve_env = {}
-                        question = None
-                except Exception as e:
-                    self._log_event(event_type, success=False, error=e)
-                    raise e
-                else:
-                    self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
-                return results
-
-            return run_function
-
-        return event_logger
-
-    @_logs_event(EventType.INIT)
+    @logs_event(EventType.INIT)
     def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
         global _SHELVE
 
@@ -180,7 +141,7 @@ class Notebook:
 
         return nb_path
 
-    @_logs_event(EventType.CHECK)
+    @logs_event(EventType.CHECK)
     def check(self, question, global_env=None):
         """
         Runs tests for a specific question against a global environment. If no global environment
@@ -240,7 +201,7 @@ class Notebook:
         pc.run("from_notebook", *args, **kwargs)
 
     @colab_incompatible
-    @_logs_event(EventType.TO_PDF)
+    @logs_event(EventType.TO_PDF)
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
         """
         Exports a notebook to a PDF using Otter Export
@@ -302,7 +263,7 @@ class Notebook:
         self._addl_files.extend(addl_files)
 
     @colab_incompatible
-    @_logs_event(EventType.END_EXPORT)
+    @logs_event(EventType.END_EXPORT)
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
             display_link=True, force_save=False, run_tests=False):
         """
@@ -395,7 +356,7 @@ class Notebook:
 
             display(HTML(out_html))
 
-    @_logs_event(EventType.END_CHECK_ALL)
+    @logs_event(EventType.END_CHECK_ALL)
     def check_all(self):
         """
         Runs all tests on this notebook. Tests are run against the current global environment, so any
