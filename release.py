@@ -34,7 +34,7 @@ def run_release_commands(test, beta, new_version, no_twine=False):
         .decode("utf-8")
         .strip()
     )
-    if branch != "https://github.com/ucbds-infra/otter-grader":
+    if upstream != "https://github.com/ucbds-infra/otter-grader":
         raise RuntimeError("You do not have the correct upstream repository configured")
 
     commands = [
