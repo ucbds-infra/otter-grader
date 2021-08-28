@@ -51,6 +51,9 @@ Otter Assign on this notebook, run
     Running tests...
     All tests passed!
 
+The use of the ``--v1`` flag indicates that this is an :ref:`Otter Assign format v1 formatted 
+notebook <otter_assign>`.
+
 Otter Assign should create a ``dist`` directory which contains two further subdirectories: 
 ``autograder`` and ``student``. The ``autograder`` directory contains the Gradescope autograder, 
 solutions PDF, and the notebook with solutions. The ``student`` directory contains just the 
