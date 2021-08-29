@@ -48,9 +48,9 @@ Here is an example question in an Otter Assign for R formatted notebook:
 
 .. TODO: update screenshot
 
-.. image:: images/R_assign_sample_question.png
-    :target: images/R_assign_sample_question.png
-    :alt: 
+.. raw:: html
+
+    <iframe src="../../_static/notebooks/html/assign-r-code-question.html"></iframe>
 
 For code questions, a question is a description *Markdown* cell, followed by a solution *code* cell 
 and zero or more test *code* cells. The description cell must contain a code block (enclosed in 
