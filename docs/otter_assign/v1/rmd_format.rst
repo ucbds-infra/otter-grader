@@ -47,7 +47,8 @@ Here is an example question in an Otter Assign-formatted Rmd file:
 
 .. code-block:: markdown
 
-    **Question 1:** Find the radius of a circle that has a 90 deg. arc of length 2. Assign this value to `ans.1`
+    **Question 1:** Find the radius of a circle that has a 90 deg. arc of length 2. Assign this 
+    value to `ans.1`
 
     ```
     BEGIN QUESTION
@@ -122,6 +123,7 @@ assigning these to a dummy variable so that there is no undesired output below t
     . = " # BEGIN PROMPT
     some.var <- ...
     " # END PROMPT
+
 
 Test Cells
 ++++++++++

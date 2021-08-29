@@ -47,7 +47,8 @@ Here is an example question in an Otter Assign-formatted Rmd file:
 
 .. code-block:: markdown
 
-    **Question 1:** Find the radius of a circle that has a 90 deg. arc of length 2. Assign this value to `ans.1`
+    **Question 1:** Find the radius of a circle that has a 90 deg. arc of length 2. Assign this 
+    value to `ans.1`
 
     ```
     BEGIN QUESTION
@@ -64,16 +65,16 @@ Here is an example question in an Otter Assign-formatted Rmd file:
 
     ```{r}
     ## Test ##
-    expect_true(ans.1 > 1)
-    expect_true(ans.1 < 2)
+    testthat::expect_true(ans.1 > 1)
+    testthat::expect_true(ans.1 < 2)
     ```
 
     ```{r}
     ## Hidden Test ##
     tol = 1e-5
     actual_answer = 1.27324
-    expect_true(ans.1 > actual_answer - tol)
-    expect_true(ans.1 < actual_answer + tol)
+    testthat::expect_true(ans.1 > actual_answer - tol)
+    testthat::expect_true(ans.1 < actual_answer + tol)
     ```
 
 For code questions, a question is a some description markup, followed by a solution code blocks and 
