@@ -9,7 +9,13 @@ if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
     apt-get install -y /tmp/wkhtmltopdf.deb
 
-    # update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+    # install fandol font for xeCJK
+    wget -nv -O /tmp/fandol.zip https://mirrors.ctan.org/fonts/fandol.zip
+    unzip -d /tmp/fandol /tmp/fandol.zip
+    mkdir -p /usr/share/texlive/texmf-dist/fonts/opentype/public/fandol
+    cp /tmp/fandol/fandol/*.otf /usr/share/texlive/texmf-dist/fonts/opentype/public/fandol
+    mktexlsr
+    fc-cache
 
     # try to set up R
     apt-get clean
