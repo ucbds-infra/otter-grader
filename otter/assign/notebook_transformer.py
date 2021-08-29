@@ -70,7 +70,7 @@ def get_transformed_cells(cells, assignment):
     Args:
         cells (``list[nbformat.NotebookNode]``): original code cells
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-    
+
     Returns:
         ``tuple[list, dict]``: list of cleaned notebook cells and a dictionary mapping test names to 
         their parsed contents

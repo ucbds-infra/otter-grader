@@ -14,7 +14,6 @@ from textwrap import dedent
 
 from .abstract_test import TestCase
 from .ok_test import OKTestFile
-from ..utils import hide_outputs
 
 
 NOTEBOOK_METADATA_KEY = "otter"

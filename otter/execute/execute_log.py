@@ -1,26 +1,24 @@
-"""
-Execution of a submission through log deserialization
-"""
+"""Execution of a submission through log deserialization"""
 
 import re
 
-from unittest import mock
 from IPython.core.inputsplitter import IPythonInputSplitter
+from unittest import mock
 
-from ..utils import hide_outputs
+from ..utils import get_variable_type
 
-def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False, cwd=None, test_dir=None, variables=None):
+
+def execute_log(nb, log, check_results_list_name="check_results_secret", initial_env=None, 
+                ignore_errors=False, cwd=None, test_dir=None, variables=None):
     """
-    Executes a notebook from logged environments and returns the global environment that results from execution
+    Execute a notebook from logged environments and return the global environment that results.
 
-    Execute notebook & return the global environment that results from execution. If ``ignore_errors`` 
-    is ``True``, exceptions are swallowed. ``secret`` contains random digits so ``check_results`` and 
-    ``check`` are not easily modifiable. ``nb`` is passed in as a dictionary that's a parsed notebook
+    If ``ignore_errors`` is true, exceptions are swallowed.
 
     Args:
-        nb (``dict``): JSON representation of a notebook
+        nb (``nbformat.NotebookNode``): the notebook to execute
         log (``otter.check.logs.Log``): log from notebook execution
-        secret (``str``, optional): randomly generated integer used to rebind check function
+        check_results_list_name (``str``, optional): the name of the list to collect check results in
         initial_env (``str``, optional): name of initial environment
         ignore_errors (``bool``, optional): whether exceptions should be ignored
         cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
@@ -32,64 +30,63 @@ def execute_log(nb, log, secret='secret', initial_env=None, ignore_errors=False,
     Results:
         ``dict``: global environment resulting from executing all code of the input notebook
     """
-    with hide_outputs():
-        if initial_env:
-            global_env = initial_env.copy()
-        else:
-            global_env = {}
+    if initial_env:
+        global_env = initial_env.copy()
+    else:
+        global_env = {}
 
-        if test_dir:
-            source = f"import otter\ngrader = otter.Notebook(\"{test_dir}\")\n"
-        else:
-            source = f"import otter\ngrader = otter.Notebook()\n"
-        
-        if cwd:
-            source +=  f"import sys\nsys.path.append(\"{cwd}\")\n"
+    if test_dir:
+        source = f"import otter\ngrader = otter.Notebook(\"{test_dir}\")\n"
+    else:
+        source = f"import otter\ngrader = otter.Notebook()\n"
+    
+    if cwd:
+        source +=  f"import sys\nsys.path.append(\"{cwd}\")\n"
 
-        logged_questions = []
-        m = mock.mock_open()
-        with mock.patch("otter.Notebook._log_event", m):
-            exec(source, global_env)
+    logged_questions = []
+    m = mock.mock_open()
+    with mock.patch("otter.Notebook._log_event", m):
+        exec(source, global_env)
 
-            for cell in nb['cells']:
-                if cell['cell_type'] == 'code':
-                    # transform the input to executable Python
-                    # FIXME: use appropriate IPython functions here
-                    isp = IPythonInputSplitter(line_input_checker=False)
-                    
-                    code_lines = []
-                    cell_source_lines = cell['source']
-                    source_is_str_bool = False
-                    if isinstance(cell_source_lines, str):
-                        source_is_str_bool = True
-                        cell_source_lines = cell_source_lines.split('\n')
+        for cell in nb['cells']:
+            if cell['cell_type'] == 'code':
+                # transform the input to executable Python
+                # FIXME: use appropriate IPython functions here
+                isp = IPythonInputSplitter(line_input_checker=False)
+                
+                code_lines = []
+                cell_source_lines = cell['source']
+                source_is_str_bool = False
+                if isinstance(cell_source_lines, str):
+                    source_is_str_bool = True
+                    cell_source_lines = cell_source_lines.split('\n')
 
-                    # only execute import statements
-                    cell_source_lines = [re.sub(r"^\s+", "", l) for l in cell_source_lines if "import" in l]                                
-                    
-                    for line in cell_source_lines:
-                        try:
-                            exec(line, global_env)
-                    # source += cell_source
-                        except:
-                            if not ignore_errors:
-                                raise
+                # only execute import statements
+                cell_source_lines = [re.sub(r"^\s+", "", l) for l in cell_source_lines if "import" in l]                                
+                
+                for line in cell_source_lines:
+                    try:
+                        exec(line, global_env)
 
+                    except:
+                        if not ignore_errors:
+                            raise
 
-            for entry in log.question_iterator():
-                shelf = entry.unshelve(global_env)
+        for entry in log.question_iterator():
+            shelf = entry.unshelve(global_env)
 
-                if variables is not None:
-                    for k, v in shelf.items():
-                        full_type = type(v).__module__ + "." + type(v).__name__
-                        if not (k in variables and variables[k] == full_type):
-                            del shelf[k]
-                            print(f"Found variable of different type than expected: {k}")
+            if variables is not None:
+                for k, v in shelf.items():
+                    full_type = get_variable_type(v)
+                    if not (k in variables and variables[k] == full_type):
+                        del shelf[k]
+                        print(f"Found variable of different type than expected: {k}")
 
-                global_env.update(shelf)
-                global_env[f"check_results_{secret}"].append(global_env["grader"].check(entry.question, global_env=global_env))
-                logged_questions.append(entry.question)
+            global_env.update(shelf)
+            global_env[check_results_list_name].append(
+                global_env["grader"].check(entry.question, global_env=global_env))
+            logged_questions.append(entry.question)
 
-        print("Questions executed from log: {}".format(", ".join(logged_questions)))
-        
-        return global_env
+    print("Questions executed from log: {}".format(", ".join(logged_questions)))
+    
+    return global_env

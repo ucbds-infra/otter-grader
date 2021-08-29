@@ -44,18 +44,20 @@ Otter Assign on this notebook, run
 
 .. code-block:: console
 
-    $ otter assign demo.ipynb dist
+    $ otter assign demo.ipynb dist --v1
     Generating views...
     Generating solutions PDF...
     Generating autograder zipfile...
     Running tests...
     All tests passed!
 
+The use of the ``--v1`` flag indicates that this is an :ref:`Otter Assign format v1 formatted 
+notebook <otter_assign>`.
+
 Otter Assign should create a ``dist`` directory which contains two further subdirectories: 
 ``autograder`` and ``student``. The ``autograder`` directory contains the Gradescope autograder, 
 solutions PDF, and the notebook with solutions. The ``student`` directory contains just the 
-sanitized student notebook. Both contain a ``tests`` subdirectory that contains tests, but only 
-``autograder/tests`` has the hidden tests.
+sanitized student notebook.
 
 .. code-block::
 
@@ -65,17 +67,9 @@ sanitized student notebook. Both contain a ``tests`` subdirectory that contains 
     │   ├── demo-sol.pdf
     │   ├── demo.ipynb
     │   ├── otter_config.json
-    │   ├── requirements.txt
-    │   └── tests
-    │       ├── q1.py
-    │       ├── q2.py
-    │       └── q3.py
+    │   └── requirements.txt
     └── student
-        ├── demo.ipynb
-        └── tests
-            ├── q1.py
-            ├── q2.py
-            └── q3.py
+        └── demo.ipynb
 
 For more information about the configurations for Otter Assign and its output format, see 
 :reF:`otter_assign`.

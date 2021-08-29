@@ -189,6 +189,7 @@ def run_autograder(options):
             test_dir="./tests",
             ignore_errors=not options["debug"], 
             seed=options["seed"],
+            seed_variable=options["seed_variable"],
             log=log if options["grade_from_log"] else None,
             variables=options["serialized_variables"],
             plugin_collection=plugin_collection,

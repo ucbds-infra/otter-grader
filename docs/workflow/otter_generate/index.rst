@@ -125,6 +125,7 @@ printed below for documenting each option.
     show_hidden: false                # whether to display the results of hidden tests to students on Gradescope
     show_all_public: false            # whether to display all test results if all tests are public tests
     seed: null                        # a random seed for intercell seeding
+    seed_variable: null               # a variable name to override with the seed
     grade_from_log: false             # whether to re-assemble the student's environment from the log rather than by re-executing their submission
     serialized_variables: {}          # a mapping of variable names to type strings for validating a deserialized student environment
     pdf: false                        # whether to generate a PDF of the notebook when not using Gradescope auto-upload

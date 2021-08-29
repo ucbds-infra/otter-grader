@@ -185,7 +185,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
 
     print(out, **kwargs)
 
-def convert_config_description_dict(configs, include_required=False):
+def convert_config_description_dict(configs, for_docs=False):
     """
     Recursively converts a documented list of dictionary configurations into a dictionary with the 
     default values loaded.
@@ -208,7 +208,8 @@ def convert_config_description_dict(configs, include_required=False):
             {
                 "key": "nested_config_name",
                 "description": "a description of the config for documentation",
-                "default": [  # note that a list is used for nested dict configs
+                "default": None,
+                "subkeys": [  # note that a list is used for nested dict configs
                     {
                         "key": "subconfig",
                         "description": "a nested key",
@@ -224,6 +225,17 @@ def convert_config_description_dict(configs, include_required=False):
 
         {
             "config_name": True,
+            "nested_config_name": None,
+        }
+
+    If ``for_docs`` is true, then any specified subkeys are set as the mapped value in the dictionary,
+    and if the config is required, its default is set to ``None``.
+
+    .. code-block:: python
+
+        {
+            "config_name": True,
+            "required_config_name": None,
             "nested_config_name": {
                 "subconfig": None,
             },
@@ -241,11 +253,15 @@ def convert_config_description_dict(configs, include_required=False):
     """
     res = {}
     for d in configs:
-        default = d.get("default", None)
+        default = d.get("default")
+        subkeys = d.get("subkeys")
         if isinstance(default, list) and len(default) > 0 and \
                 all(isinstance(e, dict) for e in default):
-            default = convert_config_description_dict(d["default"])
-        if not d.get("required", False) or include_required:
+            default = convert_config_description_dict(default)
+        elif for_docs and isinstance(subkeys, list) and len(subkeys) > 0 and \
+                all(isinstance(e, dict) for e in subkeys):
+            default = convert_config_description_dict(subkeys)
+        if not d.get("required", False) or for_docs:
             res[d["key"]] = default
     return res
 

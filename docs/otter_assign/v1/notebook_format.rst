@@ -60,15 +60,16 @@ defaults) is ``export_cell``.
       filtering: true              # whether the generated PDF should be filtered
       force_save: false            # whether to force-save the notebook with JavaScript (only works in classic notebook)
       run_tests: false             # whether to run student submissions against local tests during export
-    seed: null                     # a seed for intercell seeding
-    generate: false                # grading configurations to be passed to Otter Generate as an otter_config.json; if false, Otter Generate is disabled
-    save_environment: false        # whether to save the student's environment in the log
-    variables: {}                  # a mapping of variable names to type strings for serlizing environments
-    ignore_modules: []             # a list of modules to ignore variables from during environment serialization
-    files: []                      # a list of other files to include in the output directories and autograder
-    autograder_files: []           # a list of other files only to include in the autograder
-    plugins: []                    # a list of plugin names and configurations
-    test_files: true               # whether to store tests in separate .py files rather than in the notebook metadata
+    seed:                          # intercell seeding configurations
+      variable: null               # grading configurations to be passed to Otter Generate as an otter_config.json; if false, Otter Generate is disabled
+      autograder_value: null       # whether to save the student's environment in the log
+      student_value: null          # a mapping of variable names to type strings for serlizing environments
+    generate: false                # a list of modules to ignore variables from during environment serialization
+    save_environment: false        # a list of other files to include in the output directories and autograder
+    variables: {}                  # a list of other files only to include in the autograder
+    ignore_modules: []             # a list of plugin names and configurations
+    files: []                      # whether to store tests in separate .py files rather than in the notebook metadata
+    autograder_files: []           # whether this assignment will be run on Google Colab
 
 .. END YAML TARGET
 
@@ -130,7 +131,7 @@ Assign; optionally, you can specify these via the command line with the ``--user
 .. code-block:: python
 
     from otter.generate.token import APIClient
-    ​print(APIClient.get_token())
+    print(APIClient.get_token())
 
 Any configurations in your ``generate`` key will be put into an ``otter_config.json`` and used when
 running Otter Generate.
@@ -165,6 +166,68 @@ cell, and passes the configurations ``points`` and ``seed`` to Otter Generate vi
         seed: 0
 
 
+.. _otter_assign_v1_seed_variables:
+
+Intercell Seeding
++++++++++++++++++
+
+Python assignments support :ref:`intercell seeding <seeding>`, and there are two flavors of this. 
+The first involves the use of a seed variable, and is configured in the assignment metadata; this 
+allows you to use tools like ``np.random.default_rng`` instead of just ``np.random.seed``. The 
+second flavor involves comments in code cells, and is described 
+:ref:`below <otter_assign_v1_python_seeding>`.
+
+To use a seed variable, specify the name of the variable, the autograder seed value, and the student
+seed value in your assignment metadata.
+
+.. code-block:: yaml
+
+    # ASSIGNMENT CONFIG
+    seed:
+        variable: rng_seed
+        autograder_value: 42
+        student_value: 713
+
+With this type of seeding, you do not need to specify the seed inside the ``generate`` key; this
+automatically taken care of by Otter Assign.
+
+Then, in a cell of your notebook, define the seed variable *with the autograder value*. This value
+needs to be defined in a separate cell from any of its uses and the variable name cannot be used
+for anything other than seeding RNGs. This is because it the variable will be redefined in the 
+student's submission at the top of every cell. We recommend defining it in, for example, your 
+imports cell.
+
+.. code-block:: python
+
+    import numpy as np
+    rng_seed = 42
+
+To use the seed, just use the variable as normal:
+
+.. code-block:: python
+
+    rng = np.random.default_rng(rng_seed)
+    rvs = [rng.random() for _ in range(1000)] # SOLUTION
+
+If you use this method of intercell seeding, the solutions notebook will contain the original value
+of the seed, but the student notebook will contain the student value:
+
+.. code-block:: python
+
+    # from the student notebook
+    import numpy as np
+    rng_seed = 713
+
+When you do this, Otter Generate will be configured to overwrite the seed variable in each submission,
+allowing intercell seeding to function as normal.
+
+Remember that the student seed is different from the autograder seed, so any public tests cannot be
+deterministic otherwise they will fail on the student's machine. Also note that only one seed is
+available, so each RNG must use the same seed.
+
+You can find more information about intercell seeding :ref:`here <seeding>`.
+
+
 R Assignment Metadata
 +++++++++++++++++++++
 
@@ -191,7 +254,7 @@ Here is an example question in an Otter Assign-formatted question:
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-code-question-v1.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-code-question-v1.html"></iframe>
 
 
 Note the use of the delimiting raw cells and the placement of question metadata in the ``# BEGIN
@@ -360,16 +423,18 @@ are run *at the end of execution*, and therefore are not robust to variable name
 Intercell Seeding
 +++++++++++++++++
 
-Otter Assign maintains support for :ref:`intercell seeding <seeding>` by allowing seeds to be set 
-in solution cells. To add a seed, write a line that ends with ``# SEED``; when Otter runs, this line 
-will be removed from the student version of the notebook. This allows instructors to write code with 
-deterministic output, with which hidden tests can be generated.
+The second flavor of intercell seeding involves writing a line that ends with ``# SEED``; when Otter 
+Assign runs, this line will be removed from the student version of the notebook. This allows 
+instructors to write code with deterministic output, with which hidden tests can be generated.
 
-Note that seed cells are removed in student outputs, so any results in that notebook may be 
-different from the provided tests. However, when grading, seeds are executed between each cell, so 
-if you are using seeds, make sure to use **the same seed** every time to ensure that seeding before 
-every cell won't affect your tests. You will also be required to set this seed as a configuration of 
-the ``generate`` key of the assignment metadata if using Otter Generate with Otter Assign.
+For example, the first line of the cell below would be removed in the student version of the notebook.
+
+.. code-block:: python
+
+    np.random.seed(42) # SEED
+    rvs = [np.random.random() for _ in range(1000)] # SOLUTION
+
+The same caveats apply for this type of seeding as :ref:`above <otter_assign_v1_seed_variables>`.
 
 *Note that intercell seeding is not supported with R assignments.*
 
@@ -385,7 +450,7 @@ metadata.
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-written-question-v1.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-written-question-v1.html"></iframe>
 
 A manually-graded question can have an optional prompt block and a required solution block. If the
 solution has any code cells, they will have their syntax transformed by the solution removal rules
@@ -399,7 +464,7 @@ Here is an example of a manually-graded code question:
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-manual-code-question-v1.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-manual-code-question-v1.html"></iframe>
 
 Manually graded questions are automatically enclosed in ``<!-- BEGIN QUESTION -->`` and ``<!-- END 
 QUESTION -->`` tags by Otter Assign so that only these questions are exported to the PDF when 
@@ -445,7 +510,7 @@ Here is an example of plugin replacement in Otter Assign:
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-plugin.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-plugin.html"></iframe>
 
 *Note that student-facing plugins are not supported with R assignments.*
 

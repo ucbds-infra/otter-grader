@@ -129,7 +129,7 @@ Assign; optionally, you can specify these via the command line with the ``--user
 .. code-block:: python
 
     from otter.generate.token import APIClient
-    ​print(APIClient.get_token())
+    print(APIClient.get_token())
 
 Any configurations in your ``generate`` key will be put into an ``otter_config.json`` and used when
 running Otter Generate.
@@ -173,7 +173,7 @@ Here is an example question in an Otter Assign-formatted notebook:
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-code-question.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-code-question.html"></iframe>
 
 
 For code questions, a question is a description *Markdown* cell, followed by a solution *code* cell 
@@ -476,4 +476,4 @@ Here is an example of plugin replacement in Otter Assign:
 
 .. raw:: html
 
-    <iframe src="../../_static/notebooks/assign-plugin.html"></iframe>
+    <iframe src="../../_static/notebooks/html/assign-plugin.html"></iframe>

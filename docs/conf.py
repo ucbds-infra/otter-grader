@@ -11,22 +11,24 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
+
 import os
 import sys
-import re
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('..'))
 
-from glob import glob
 import nbconvert
-from importlib import import_module
+import re
+import shutil
 import yaml
+
+from glob import glob
+from importlib import import_module
 from textwrap import indent
-from otter.utils import convert_config_description_dict
+from otter.utils import convert_config_description_dict, print_full_width
 
 
 # -- Project information -----------------------------------------------------
@@ -234,48 +236,66 @@ def update_yaml_block(file):
         lines = f.readlines()
     lines = [l.strip("\n") for l in lines]
 
-    s, e = None, None
+    s, e, obj = [], [], []
     for i, line in enumerate(lines):
         match = re.match(r"\.\. BEGIN YAML TARGET: ([\w.]+)\s*", line)
         if match:
-            obj = match.group(1)
-            s = i
+            obj.append(match.group(1))
+            s.append(i)
         elif line.rstrip() == ".. END YAML TARGET":
-            e = i
-    assert s is not None and e is not None, f"Unable to replace YAML targets in {file}"
-    assert s < e, f"Unable to replace YAML targets in {file}"
+            e.append(i)
+    assert len(s) > 0 and len(e) > 0, f"Unable to replace YAML targets in {file}"
+    assert all(si < ei for si, ei in zip(s, e)), f"Unable to replace YAML targets in {file}"
 
-    if s + 1 == e:
-        lines.insert(e, "")
-        e += 1
+    for si, ei, obji in list(zip(s, e, obj))[::-1]:
+        if si + 1 == ei:
+            lines.insert(ei, "")
+            ei += 1
 
-    module_path, member_name = obj.rsplit('.', 1)
-    member_data = getattr(import_module(module_path), member_name)
+        module_path, member_name = obji.rsplit('.', 1)
+        member_data = getattr(import_module(module_path), member_name)
 
-    defaults = convert_config_description_dict(member_data, include_required=True)
-    code = yaml.safe_dump(defaults, indent=2, sort_keys=False)
-    comments = extract_descriptions_as_comments(member_data)
-    code = add_comments_to_yaml(code, comments)
+        defaults = convert_config_description_dict(member_data, for_docs=True)
+        # breakpoint()
+        code = yaml.safe_dump(defaults, indent=2, sort_keys=False)
+        comments = extract_descriptions_as_comments(member_data)
+        code = add_comments_to_yaml(code, comments)
 
-    to_replace = "\n.. code-block:: yaml\n\n" + indent(code.rstrip(), "    ") + "\n"
-    lines[s+1:e] = to_replace.split("\n")
+        to_replace = "\n.. code-block:: yaml\n\n" + indent(code.rstrip(), "    ") + "\n"
+        lines[si+1:ei] = to_replace.split("\n")
 
     with open(file, "w") as f:
         f.write("\n".join(lines) + "\n")
 
-for file in files_to_replace:
-    print(f"Replacing YAML targets in: {file}")
-    update_yaml_block(file)
+
+def convert_static_notebooks():
+    exporter = nbconvert.HTMLExporter()
+
+    print_full_width("=", "CONVERTING NOTEBOOKS")
+
+    for file in glob("_static/notebooks/*.ipynb"):
+        html, _ = exporter.from_filename(file)
+        parent, path = os.path.split(file)
+
+        new_parent = os.path.join(parent, "html")
+        os.makedirs(new_parent, exist_ok=True)
+
+        new_path = os.path.join(new_parent, os.path.splitext(path)[0] + ".html")
+
+        with open(new_path, "w+") as f:
+            f.write(html)
+
+        print(f"Converted {file} to HTML")
+
+    print_full_width("=")
 
 
 # -- Extension configuration -------------------------------------------------
 def setup(app):
     # run nbconvert on all of the notebooks in _static/notebooks
-    exporter = nbconvert.HTMLExporter()
-    print("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15)
-    for file in glob("_static/notebooks/*.ipynb"):
-        html, _ = exporter.from_filename(file)
-        with open(os.path.splitext(file)[0] + ".html", "w+") as f:
-            f.write(html)
-        print(f"Converted {file} to HTML")
-    print("=" * len("=" * 15 + " CONVERTING NOTEBOOKS " + "=" * 15))
+    convert_static_notebooks()
+
+    # update the YAML blocks in the docs files
+    for file in files_to_replace:
+        print(f"Replacing YAML targets in: {file}")
+        update_yaml_block(file)
