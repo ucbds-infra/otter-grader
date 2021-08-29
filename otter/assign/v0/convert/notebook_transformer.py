@@ -15,11 +15,30 @@ from ...blocks import BlockType
 
 
 def generate_delim_cell(block_type, end=False):
+    """
+    Generates a block boundary cell for the specified block type.
+
+    Args:
+        block_type (``BlockType``): the block type to deliminate
+        end (``bool``): wheter this is an end block cell
+
+    Returns:
+        ``nbformat.NotebookNode``: the generated boundary cell
+    """
     source = f"# {'END' if end else 'BEGIN'} { block_type.value.upper() }"
     return nbformat.v4.new_raw_cell(source)
 
 
 def transform_test_cell(cell):
+    """
+    Transform a test cell from v0 to v1 format.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to transform
+
+    Returns:
+        ``nbformat.NotebookNode``: the transformed cell
+    """
     cell = copy.deepcopy(cell)
     source = get_source(cell)
     if re.match(BEGIN_TEST_CONFIG_REGEX, source[0]):
@@ -34,6 +53,15 @@ def transform_test_cell(cell):
 
 
 def transform_assignment_cell(cell):
+    """
+    Transform an assignment config cell from v0 to v1 format.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to transform
+
+    Returns:
+        ``nbformat.NotebookNode``: the transformed cell
+    """
     source = get_source(cell)
     begin_assignment_line = get_spec(source, "assignment")
     i, lines = begin_assignment_line + 1, []
@@ -44,6 +72,16 @@ def transform_assignment_cell(cell):
 
 
 def extract_question_metadata(cell):
+    """
+    Extract the question metadata lines from a question cell and return the original source lines
+    stripped of the metadata block as well as the lines of YAML metadata.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to transform
+
+    Returns:
+        ``tuple[list[str], list[str]]``: the stripped question and the YAML lines
+    """
     source = get_source(cell)
     begin_question_line = get_spec(source, "question")
     i, lines = begin_question_line + 1, []
@@ -56,14 +94,13 @@ def extract_question_metadata(cell):
 
 def get_transformed_cells(cells):
     """
-    
+    Transform a list of cells defining a v0-formatted notebook into a v1-formatted notebook.
+
     Args:
-        cells (``list`` of ``nbformat.NotebookNode``): original code cells
-        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-    
+        cells (``list[nbformat.NotebookNode]``): the original notebook cells
+
     Returns:
-        ``tuple(list, dict)``: list of cleaned notebook cells and a dictionary mapping test names to 
-            their parsed contents
+        ``list[nbformat.NotebookNode]``: the transformed notebook cells
     """
     transformed_cells = []
     question_metadata, processed_solution, tests_started = False, False, False
@@ -81,11 +118,6 @@ def get_transformed_cells(cells):
                 transformed_cells.append(cell)
                 transformed_cells.append(generate_delim_cell(BlockType.PROMPT, end=True))
                 continue
-            
-            # # if this a manual question but not MD solution, it has a code solution cell
-            # elif question_metadata.get('manual', False) and not is_markdown_solution_cell(cell):
-            #     md_has_prompt = True
-            #     transformed_cells.append(cell)
 
             # if this is a test cell, this question has no response cell for the students, so we don't
             # include it in the output notebook but we need a test file
@@ -137,18 +169,13 @@ def get_transformed_cells(cells):
 
                 question_metadata = read_question_metadata(cell)
 
-            # TODO: I don't think this can ever be executed?
-            # elif is_markdown_solution_cell(cell):
-            #     transformed_cells.append(gen_markdown_response_cell())
-            #     transformed_cells.append(cell)
-
             else:
                 assert not is_test_cell(cell), f"Test outside of a question: {cell}"
-
                 transformed_cells.append(cell)
 
     if tests_started:
         transformed_cells.append(generate_delim_cell(BlockType.TESTS, end=True))
+
     if question_metadata is not False:
         transformed_cells.append(generate_delim_cell(BlockType.QUESTION, end=True))
 
