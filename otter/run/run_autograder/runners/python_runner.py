@@ -1,4 +1,4 @@
-""""""
+"""Autograder runner for Python assignments"""
 
 import json
 import os
@@ -11,7 +11,7 @@ from glob import glob
 
 from .abstract_runner import AbstractLanguageRunner
 from ..utils import OtterRuntimeError
-from ....check.logs import Log, QuestionNotInLogException
+from ....check.logs import Log
 from ....check.notebook import _OTTER_LOG_FILENAME
 from ....execute import grade_notebook
 from ....export import export_notebook

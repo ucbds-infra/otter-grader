@@ -1,4 +1,4 @@
-""""""
+"""Autograder runner for R assignments"""
 
 import json
 import jupytext
@@ -10,8 +10,10 @@ import shutil
 from glob import glob
 from rpy2.robjects import r
 
-from ..constants import DEFAULT_OPTIONS
-from ..utils import get_source, OtterRuntimeError
+from .abstract_runner import AbstractLanguageRunner
+from ..utils import OtterRuntimeError
+from ....export import export_notebook
+from ....generate.token import APIClient
 from ....test_files import GradingResults
 from ....utils import chdir
 
@@ -54,17 +56,34 @@ class RRunner(AbstractLanguageRunner):
 
         return scripts[0]
 
-    # TODO
-    def write_pdf(self, subm_path):
+    def write_pdf(self):
         """
         Generate a PDF of a notebook at ``subm_path`` using the options in ``self.options`` and 
         return the that to the PDF.
         """
         try:
+            nbs = glob("*.ipynb")
+            if nbs:
+                subm_path = nbs[0]
+                ipynb = True
+
+            else:
+                rmds = glob("*.Rmd")
+                if rmds:
+                    subm_path = rmds[0]
+                    ipynb = False
+
+                else:
+                    raise OtterRuntimeError("Could not find a file that can be converted to a PDF")
+
             pdf_path = os.path.splitext(subm_path)[0] + ".pdf"
-            export_notebook(
-                subm_path, dest=pdf_path, filtering=self.options["filtering"], 
-                pagebreaks=self.options["pagebreaks"], exporter_type="latex")
+            if ipynb:
+                export_notebook(
+                    subm_path, dest=pdf_path, filtering=self.options["filtering"], 
+                    pagebreaks=self.options["pagebreaks"], exporter_type="latex")
+
+            else:
+                r(f"rmarkdown::render('{subm_path}', 'pdf_document', '{pdf_path}')")
 
         except Exception as e:
             print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
@@ -102,8 +121,24 @@ class RRunner(AbstractLanguageRunner):
         os.environ["PATH"] = f"{self.options['miniconda_path']}/bin:" + os.environ.get("PATH")
 
         with chdir("./submission"):
+            if self.options["token"] is not None:
+                client = APIClient(token=self.options["token"])
+                generate_pdf = True
+                has_token = True
+
+            else:
+                generate_pdf = self.options["pdf"]
+                has_token = False
+                client = None
+
             subm_path = self.resolve_submission_path()
             output = r(f"""ottr::run_autograder("{subm_path}")""")[0]
             scores = GradingResults.from_ottr_json(output)
+
+            if generate_pdf:
+                pdf_path = self.write_pdf(subm_path)
+
+                if has_token:
+                    self.submit_pdf(client, pdf_path)
 
         return scores

@@ -3,7 +3,8 @@ install.packages(c(
     "gert",
     "usethis",
     "testthat",
-    "startup"
+    "startup",
+    "rmarkdown"
 ), dependencies=TRUE, repos="http://cran.us.r-project.org")
 
 install.packages(
