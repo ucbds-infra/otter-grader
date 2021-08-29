@@ -15,7 +15,7 @@ NB_VERSION = 4
 
 MD_RESPONSE_CELL_SOURCE = "_Type your answer here, replacing this text._"
 
-BEGIN_TEST_CONFIG_REGEX = r'""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
+BEGIN_TEST_CONFIG_REGEX = r'(?:.\s*=\s*)?""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
 END_TEST_CONFIG_REGEX = r'""?"?\s*#\s*END\s*TEST\s*CONFIG'
 TEST_REGEX = rf"(##\s*(hidden\s*)?test\s*##\s*|#\s*(hidden\s*)?test\s*|{BEGIN_TEST_CONFIG_REGEX})"
 OTTR_TEST_NAME_REGEX = r'''(?:testthat::)?test_that\(['"]([A-Za-z0-9_]+)['"],'''
