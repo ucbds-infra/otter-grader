@@ -29,3 +29,16 @@ To run Otter Assign on a v1-formatted notebook, add the ``--v1`` flag to the com
 .. code-block:: console
 
     otter assign lab00.ipynb dist --v1
+
+
+Converting to v1
+----------------
+
+Otter includes a tool that will help you convert a v0-formatted notebook to v1 format. To convert
+a notebook, use the module ``otter.assign.v0.convert`` from the Python CLI. This tool takes two
+position arguments: the path to the original notebook and the path at which to write the new
+notebook. For example,
+
+.. code-block:: console
+
+    python3 -m otter.assign.v0.convert lab01.ipynb lab01-v1.ipynb
