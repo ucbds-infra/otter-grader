@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Added a tool to convert Assign v0-formatted notebooks to v1 format
+
 **v3.0.6:** re-release of v3.0.5
 
 **v3.0.5:**
