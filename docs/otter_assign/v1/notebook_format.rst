@@ -439,6 +439,16 @@ The same caveats apply for this type of seeding as :ref:`above <otter_assign_v1_
 *Note that intercell seeding is not supported with R assignments.*
 
 
+R Example
++++++++++
+
+Here is an example autograded question for R:
+
+.. raw:: html
+
+    <iframe src="../../_static/notebooks/html/assign-r-code-question-v1.html"></iframe>
+
+
 .. _otter_assign_v1_python_manual_questions:
 
 Manually Graded Questions
