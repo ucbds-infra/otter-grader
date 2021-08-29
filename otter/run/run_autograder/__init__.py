@@ -40,6 +40,7 @@ def main(autograder_dir, **kwargs):
     abs_ag_path = os.path.abspath(runner.get_option("autograder_dir"))
     with chdir(abs_ag_path):        
         try:
+            runner.prepare_files()
             scores = runner.run()
             with open("results/results.pkl", "wb+") as f:
                     pickle.dump(scores, f)
