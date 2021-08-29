@@ -7,6 +7,7 @@ import pandas as pd
 from .constants import DEFAULT_OPTIONS
 from .utils import OtterRuntimeError
 from ...version import LOGO_WITH_VERSION
+from ...utils import chdir
 
 
 def main(autograder_dir, **kwargs):
@@ -39,34 +40,34 @@ def main(autograder_dir, **kwargs):
 
     options["autograder_dir"] = autograder_dir
 
-    curr_dir = os.getcwd()
+    abs_ag_path = os.path.abspath(options["autograder_dir"])
+    with chdir(abs_ag_path):
+        if options["lang"].lower() == "r":
+            from .r_adapter.run_autograder import run_autograder
+        
+        else:
+            from .run_autograder import run_autograder
+        
+        try:
+            output = run_autograder(options)
 
-    if options["lang"].lower() == "r":
-        from .r_adapter.run_autograder import run_autograder
-    
-    else:
-        from .run_autograder import run_autograder
-    
-    try:
-        output = run_autograder(options)
+        except OtterRuntimeError as e:
+            output = {
+                "score": 0,
+                "stdout_visibility": "hidden",
+                "tests": [
+                    {
+                        "name": "Autograder Error",
+                        "output": f"Otter encountered an error when grading this submission:\n\n{e}",
+                    },
+                ],
+            }
+            raise e
 
-    except OtterRuntimeError as e:
-        output = {
-            "score": 0,
-            "stdout_visibility": "hidden",
-            "tests": [
-                {
-                    "name": "Autograder Error",
-                    "output": f"Otter encountered an error when grading this submission:\n\n{e}",
-                },
-            ],
-        }
-        raise e
-
-    finally:
-        if "output" in vars():
-            with open("./results/results.json", "w+") as f:
-                json.dump(output, f, indent=4)
+        finally:
+            if "output" in vars():
+                with open("./results/results.json", "w+") as f:
+                    json.dump(output, f, indent=4)
 
     print("\n\n", end="")
 
@@ -87,5 +88,3 @@ def main(autograder_dir, **kwargs):
             df.drop(columns=["visibility"], inplace=True)
 
         print(df)
-
-    os.chdir(curr_dir)

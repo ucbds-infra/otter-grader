@@ -15,6 +15,7 @@ from rpy2.robjects import r
 from ..constants import DEFAULT_OPTIONS
 from ..utils import get_source
 from ....test_files import GradingResults
+from ....utils import chdir
 
 NBFORMAT_VERSION = 4
 
@@ -45,9 +46,6 @@ def run_autograder(options):
     Returns:
         ``dict``: the results of grading as a JSON object
     """
-    # options = DEFAULT_OPTIONS.copy()
-    # options.update(config)
-
     abs_ag_path = os.path.abspath(options["autograder_dir"])
     os.chdir(abs_ag_path)
 
@@ -62,42 +60,40 @@ def run_autograder(options):
                 shutil.copy(fp, "./submission")
 
     os.chdir("./submission")
+    with chdir("./submission"):
+        # convert ipynb files to Rmd files
+        if glob("*.ipynb"):
+            fp = glob("*.ipynb")[0]
+            if options["seed"] is not None:
+                assert isinstance(options["seed"], int), f"{options['seed']} is an invalid seed"
+                insert_seeds(fp, options["seed"])
+            nb = jupytext.read(fp)
+            jupytext.write(nb, os.path.splitext(fp)[0] + ".Rmd")
+        
+        # convert Rmd files to R files
+        if glob("*.Rmd"):
+            fp = glob("*.Rmd")[0]
+            fp, wp = os.path.abspath(fp), os.path.abspath(os.path.splitext(fp)[0] + ".r")
+            r(f"knitr::purl('{fp}', '{wp}')")
 
-    # convert ipynb files to Rmd files
-    if glob("*.ipynb"):
-        fp = glob("*.ipynb")[0]
-        if options["seed"] is not None:
-            assert isinstance(options["seed"], int), f"{options['seed']} is an invalid seed"
-            insert_seeds(fp, options["seed"])
-        nb = jupytext.read(fp)
-        jupytext.write(nb, os.path.splitext(fp)[0] + ".Rmd")
-    
-    # convert Rmd files to R files
-    if glob("*.Rmd"):
-        fp = glob("*.Rmd")[0]
-        fp, wp = os.path.abspath(fp), os.path.abspath(os.path.splitext(fp)[0] + ".r")
-        r(f"knitr::purl('{fp}', '{wp}')")
+        # get the R script
+        if len(glob("*.[Rr]")) > 1:
+            raise RuntimeError("More than one R script found")
 
-    # get the R script
-    if len(glob("*.[Rr]")) > 1:
-        raise RuntimeError("More than one R script found")
+        fp = glob("*.[Rr]")[0]
 
-    fp = glob("*.[Rr]")[0]
+        os.makedirs("./tests", exist_ok=True)
+        tests_glob = glob("../source/tests/*.[Rr]")
+        for file in tests_glob:
+            shutil.copy(file, "./tests")
 
-    os.makedirs("./tests", exist_ok=True)
-    tests_glob = glob("../source/tests/*.[Rr]")
-    for file in tests_glob:
-        shutil.copy(file, "./tests")
+        output = r(f"""ottr::run_autograder("{fp}")""")[0]
+        scores = GradingResults.from_ottr_json(output)
 
-    output = r(f"""ottr::run_autograder("{fp}")""")[0]
-    scores = GradingResults.from_ottr_json(output)
-
-    output = scores.to_gradescope_dict(options)
-    
-    if options["show_stdout"]:
-        output["stdout_visibility"] = "after_published"
-
-    os.chdir(abs_ag_path)
+        output = scores.to_gradescope_dict(options)
+        
+        if options["show_stdout"]:
+            output["stdout_visibility"] = "after_published"
 
     with open("results/results.pkl", "wb+") as f:
         pickle.dump(scores, f)

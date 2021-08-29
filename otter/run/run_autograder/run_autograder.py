@@ -19,7 +19,7 @@ from ...execute import grade_notebook
 from ...export import export_notebook
 from ...generate.token import APIClient
 from ...plugins import PluginCollection
-from ...utils import print_full_width
+from ...utils import chdir, print_full_width
 
 def prepare_files():
     """
@@ -98,20 +98,11 @@ def run_autograder(options):
     Returns:
         ``dict``: the results of grading as a JSON object
     """
-    # options = DEFAULT_OPTIONS.copy()
-    # options.update(config)
-
-    # add miniconda back to path
     os.environ["PATH"] = f"{options['miniconda_path']}/bin:" + os.environ.get("PATH")
-    
-    abs_ag_path = os.path.abspath(options["autograder_dir"])
-    os.chdir(abs_ag_path)
 
     prepare_files()
 
-    os.chdir("./submission")
-
-    try:
+    with chdir("./submission"):
         if options["zips"]:
             zips = glob("*.zip")
             if len(zips) > 1:
@@ -227,12 +218,7 @@ def run_autograder(options):
             if report.strip():
                 print("\n\n" + report)
 
-        os.chdir(abs_ag_path)
+    with open("results/results.pkl", "wb+") as f:
+        pickle.dump(scores, f)
 
-        with open("results/results.pkl", "wb+") as f:
-            pickle.dump(scores, f)
-
-        return output
-
-    finally:
-        os.chdir(abs_ag_path)
+    return output
