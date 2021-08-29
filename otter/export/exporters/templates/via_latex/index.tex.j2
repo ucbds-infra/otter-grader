@@ -20,6 +20,11 @@
 \setlength{\parskip}{2em}
 \setlength{\parindent}{0em}
 
+\usepackage{xeCJK}
+\setCJKmainfont{IPAMincho}
+\setCJKsansfont{IPAGothic}
+\setCJKmonofont{IPAGothic}
+
 ((* endblock docclass *))
 
 ((* block maketitle *))
