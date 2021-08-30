@@ -21,8 +21,42 @@ from ....utils import chdir
 NBFORMAT_VERSION = 4
 
 
-# TODO: push seeding down into ottr
 class RRunner(AbstractLanguageRunner):
+
+    def add_seeds_to_rmd_file(self, rmd_path):
+        """
+        Add intercell seeding to an Rmd file.
+        """
+        with open(rmd_path) as f:
+            rmd = f.read()
+
+        lines = rmd.split("\n")
+        insertions = []
+        for i, line in enumerate(lines):
+            if line.startswith("```{r"):
+                insertions.append(i)
+
+        seed = f"set.seed({self.options['seed']})"
+        if self.options["seed_variable"]:
+            seed = f"{self.options['seed_variable']} = {self.options['seed']}"
+
+        for i in insertions[::-1]:
+            lines.insert(i + 1, seed)
+
+        with open(rmd_path, "w") as f:
+            f.write("\n".join(lines))
+
+    def add_seed_to_script(self, script_path):
+        """
+        Add intercell seeding to an Rmd file.
+        """
+        with open(script_path) as f:
+            script = f.read()
+
+        script = f"set.seed({self.options['seed']})\n" + script
+
+        with open(script_path, "w") as f:
+            f.write(script)
 
     def resolve_submission_path(self):
         # convert IPYNB files to Rmd files
@@ -37,11 +71,15 @@ class RRunner(AbstractLanguageRunner):
 
         # convert Rmd files to R files
         rmds = glob("*.Rmd")
+        seeded = False
         if len(rmds) > 1:
             raise OtterRuntimeError("More than one Rmd file found in submission")
 
         elif len(rmds) == 1:
             rmd_path = rmds[0]
+            if self.options["seed"] is not None:
+                self.add_seeds_to_rmd_file(rmd_path)
+                seeded = True
             rmd_path, script_path = \
                 os.path.abspath(rmd_path), os.path.abspath(os.path.splitext(rmd_path)[0] + ".r")
             r(f"knitr::purl('{rmd_path}', '{script_path}')")
@@ -53,6 +91,9 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(scripts) == 0:
             raise OtterRuntimeError("No gradable files found in submission")
+
+        if self.options["seed"] is not None and not seeded:
+            self.add_seed_to_script(scripts[0]) 
 
         return scripts[0]
 
