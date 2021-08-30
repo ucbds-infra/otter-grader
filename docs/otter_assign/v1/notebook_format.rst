@@ -17,6 +17,8 @@ available in Python that are not available in R, and these are noted below, but 
 are the same.
 
 
+.. _otter_assign_v1_assignment_metadata:
+
 Assignment Metadata
 -------------------
 
@@ -209,6 +211,13 @@ To use the seed, just use the variable as normal:
     rng = np.random.default_rng(rng_seed)
     rvs = [rng.random() for _ in range(1000)] # SOLUTION
 
+Or, in R:
+
+.. code-block:: r
+
+    set.seed(rng_seed)
+    runif(1000)
+
 If you use this method of intercell seeding, the solutions notebook will contain the original value
 of the seed, but the student notebook will contain the student value:
 
@@ -226,25 +235,6 @@ deterministic otherwise they will fail on the student's machine. Also note that 
 available, so each RNG must use the same seed.
 
 You can find more information about intercell seeding :ref:`here <seeding>`.
-
-
-R Assignment Metadata
-+++++++++++++++++++++
-
-Note that R notebooks only accept the following keys in the assignment metadata:
-
-.. code-block:: yaml
-
-    requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
-    overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
-    environment: environment.yml   # path to custom conda environment file
-    template_pdf: false            # whether to generate a manual question template PDF for Gradescope
-    generate:                      # configurations for running Otter Generate; defaults to false
-        points: null                 # number of points to scale assignment to on Gradescope
-        threshold: null              # a pass/fail threshold for the assignment on Gradescope
-        show_stdout: false           # whether to show grading stdout to students once grades are published
-        show_hidden: false           # whether to show hidden test results to students once grades are published
-    files: []                      # a list of file paths to include in the distribution directories
 
 
 Autograded Questions
@@ -435,8 +425,6 @@ For example, the first line of the cell below would be removed in the student ve
     rvs = [np.random.random() for _ in range(1000)] # SOLUTION
 
 The same caveats apply for this type of seeding as :ref:`above <otter_assign_v1_seed_variables>`.
-
-*Note that intercell seeding is not supported with R assignments.*
 
 
 R Example
