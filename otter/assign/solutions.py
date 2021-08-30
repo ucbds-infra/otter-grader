@@ -43,7 +43,7 @@ def overwrite_seed_vars(nb, seed_variable, seed):
     for cell in nb["cells"]:
         source = get_source(cell)
         for i, line in enumerate(source):
-            match = re.match(fr"(\s*){seed_variable}\s*(=|<-)\s*", line.lstrip())
+            match = re.match(fr"(\s*){seed_variable}\s*(=|<-)\s*", line)
             if  match:
                 source[i] = match.group(1) + f"{seed_variable} {match.group(2)} {seed}"
         cell["source"] = "\n".join(source)

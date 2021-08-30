@@ -25,6 +25,33 @@ def is_markdown_solution_cell(cell):
     source = get_source(cell)
     return source and any([re.match(r"\s*<!-- BEGIN SOLUTION -->\s*", l, flags=re.IGNORECASE) for l in source])
 
+
+def overwrite_seed_vars(rmd_string, seed_variable, seed):
+    """
+    Overwrite any assignments of the variable named ``seed_variable`` with the value ``seed`` in a
+    notebook.
+
+    Args:
+        rmd_string (``str``): the Rmd document as a string
+        seed_variable (``str``): the variable to look for
+        seed (``int``): the value to set for ``seed_variable``
+
+    Returns:
+        ``nbformat.NotebookNode``: the notebook with the variable substitutions made
+    """
+    lines = rmd_string.split("\n")
+    in_code_block = False
+    for i, line in enumerate(lines):
+        if line.startswith("```{r"):
+            in_code_block = True
+        elif in_code_block and line.startswith("```"):
+            in_code_block = False
+        elif in_code_block:
+            match = re.match(fr"(\s*){seed_variable}\s*(=|<-)\s*", line)
+            if match:
+                lines[i] = match.group(1) + f"{seed_variable} {match.group(2)} {seed}"
+    return "\n".join(lines)
+
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
 def solution_assignment_sub(match):
     """
@@ -33,6 +60,7 @@ def solution_assignment_sub(match):
     prefix = match.group(1)
     return prefix + ' NULL # YOUR CODE HERE'
 
+
 solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
 def solution_line_sub(match):
     """
@@ -40,6 +68,7 @@ def solution_line_sub(match):
     """
     prefix = match.group(1)
     return prefix + '# YOUR CODE HERE'
+
 
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
 skip_suffixes = [
@@ -54,7 +83,7 @@ SUBSTITUTIONS = [
     (solution_line_regex, solution_line_sub),
 ]
 
-# TODO: comments, docstrings
+
 def replace_solutions(lines):
     """
     Replaces solutions in ``lines``
@@ -112,6 +141,7 @@ def replace_solutions(lines):
     assert not solution, f"BEGIN SOLUTION without END SOLUTION in {lines}"
     
     return stripped
+
 
 def strip_solutions_and_output(rmd_string):
     """
