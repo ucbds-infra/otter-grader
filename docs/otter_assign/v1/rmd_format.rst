@@ -18,26 +18,11 @@ arguments in an assignment metadata code block.
     BEGIN ASSIGNMENT
     init_cell: false
     export_cell: true
-    ...
+    # etc.
     ```
 
-This block is removed from both output files. Any unspecified keys will keep their default values. 
-For more information about many of these arguments, see :ref:`otter_assign_usage`. 
-The YAML block below lists all configurations **supported with Rmd files** 
-and their defaults. Any keys that appear in the Python or R Juptyer notebook sections but not below 
-will be ignored when using Otter Assign with Rmd files.
-
-.. code-block:: yaml
-
-    requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
-    overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
-    environment: environment.yml   # path to custom conda environment file
-    generate:                      # configurations for running Otter Generate; defaults to false
-        points: null               # number of points to scale assignment to on Gradescope
-        threshold: null            # a pass/fail threshold for the assignment on Gradescope
-        show_stdout: false         # whether to show grading stdout to students once grades are published
-        show_hidden: false         # whether to show hidden test results to students once grades are published
-    files: []                      # a list of file paths to include in the distribution directories
+You can find a list of available metadata keys and their defaults in the :ref:`notebook format 
+section <otter_assign_v1_assignment_metadata>`.
 
 
 Autograded Questions
