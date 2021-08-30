@@ -155,12 +155,15 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         if verbose:
             print(f"Grading {submission_path} in container {container.id}...")
 
-        docker.container.wait(container)
+        exit = docker.container.wait(container)
         if debug:
             print(docker.container.logs(container))
 
         if not no_kill:
             container.remove()
+
+        if exit != 0:
+            raise Exception(f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
 
         with open(results_file, "rb") as f:
             scores = pickle.load(f)
