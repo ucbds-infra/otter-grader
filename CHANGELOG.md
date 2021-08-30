@@ -3,6 +3,8 @@
 **Unreleased:**
 
 * Added a tool to convert Assign v0-formatted notebooks to v1 format
+* Added PDF generation and submission in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
+* Updated intercell seeding in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
 
 **v3.0.6:** re-release of v3.0.5
 
