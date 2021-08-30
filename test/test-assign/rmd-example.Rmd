@@ -12,6 +12,10 @@ template_pdf: true
 solutions_pdf: true
 files:
     - data.csv
+seed:
+    variable: rng_seed
+    autograder_value: 42
+    student_value: 90
 ```
 
 ```{r setup, include=FALSE}
@@ -23,6 +27,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(testthat)
 library(ggplot2)
+rng_seed <- 42
 ```
 
 **Question 1.** Assign x to the smallest prime number.

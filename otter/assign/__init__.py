@@ -58,6 +58,14 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
     try:
         output_nb_path = write_output_directories(master, result, assignment)
 
+        # update seed variables
+        if isinstance(assignment.seed, dict):
+            if assignment.generate:
+                if assignment.generate is True:
+                    assignment.generate = {}
+                assignment.generate["seed"] = assignment.seed["autograder_value"]
+                assignment.generate["seed_variable"] = assignment.seed["variable"]
+
         # check that we have a seed if needed
         if assignment.seed_required:
             generate_args = assignment.generate

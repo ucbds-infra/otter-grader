@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(testthat)
 library(ggplot2)
+rng_seed <- 90
 ```
 
 **Question 1.** Assign x to the smallest prime number.

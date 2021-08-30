@@ -1,3 +1,5 @@
 {
+  "seed": 42,
+  "seed_variable": "rng_seed",
   "lang": "r"
 }

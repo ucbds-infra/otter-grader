@@ -65,14 +65,6 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     # strip out ignored lines
     transformed_nb = strip_ignored_lines(transformed_nb)
 
-    # update seed variables
-    if isinstance(assignment.seed, dict):
-        if assignment.generate:
-            if assignment.generate is True:
-                assignment.generate = {}
-            assignment.generate["seed"] = assignment.seed["autograder_value"]
-            assignment.generate["seed_variable"] = assignment.seed["variable"]
-
     # write tests
     test_ext = (".R", ".py")[assignment.is_python]
     for test_name, test_file in test_files.items():
