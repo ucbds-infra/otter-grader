@@ -104,6 +104,6 @@ class TestAssign(TestCase):
         """
         Removes assign output
         """
-        # # cleanup
-        # if os.path.exists(TEST_FILES_PATH + "output"):
-        #     shutil.rmtree(TEST_FILES_PATH + "output")
+        # cleanup
+        if os.path.exists(TEST_FILES_PATH + "output"):
+            shutil.rmtree(TEST_FILES_PATH + "output")
