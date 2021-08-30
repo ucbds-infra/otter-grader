@@ -173,7 +173,8 @@ class RRunner(AbstractLanguageRunner):
                 client = None
 
             subm_path = self.resolve_submission_path()
-            output = r(f"""ottr::run_autograder("{subm_path}")""")[0]
+            ignore_errors = "FALSE" if self.options["debug"] else "TRUE"
+            output = r(f"""ottr::run_autograder("{subm_path}", ignore_errors={ignore_errors})""")[0]
             scores = GradingResults.from_ottr_json(output)
 
             if generate_pdf:
