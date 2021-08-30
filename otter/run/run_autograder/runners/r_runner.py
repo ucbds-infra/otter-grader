@@ -58,8 +58,8 @@ class RRunner(AbstractLanguageRunner):
 
     def write_pdf(self):
         """
-        Generate a PDF of a notebook at ``subm_path`` using the options in ``self.options`` and 
-        return the that to the PDF.
+        Generate a PDF of a submission using the options in ``self.options`` and return the that to 
+        the PDF.
         """
         try:
             nbs = glob("*.ipynb")
@@ -136,7 +136,7 @@ class RRunner(AbstractLanguageRunner):
             scores = GradingResults.from_ottr_json(output)
 
             if generate_pdf:
-                pdf_path = self.write_pdf(subm_path)
+                pdf_path = self.write_pdf()
 
                 if has_token:
                     self.submit_pdf(client, pdf_path)
