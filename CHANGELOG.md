@@ -3,6 +3,7 @@
 **Unreleased:**
 
 * Added a tool to convert Assign v0-formatted notebooks to v1 format
+* Added `xeCJK` to the LaTeX exporter template and Docker images
 * Added PDF generation and submission in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
 * Updated intercell seeding in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
 
