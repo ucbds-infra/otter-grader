@@ -113,7 +113,6 @@ class PythonRunner(AbstractLanguageRunner):
         with chdir("./submission"):
 
             subm_path = self.resolve_submission_path()
-            # replace_notebook_instances(nb_path)
 
             # load plugins
             plugins = self.options["plugins"]

@@ -63,6 +63,8 @@ class AbstractLanguageRunner(ABC):
                     shutil.copy(fp, "./submission")
 
         # copy the tests directory
+        if os.path.exists("./submission/tests"):
+            shutil.rmtree("./submission/tests")
         shutil.copytree("./source/tests", "./submission/tests")
 
     @abstractmethod
