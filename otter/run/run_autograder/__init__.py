@@ -1,11 +1,10 @@
-"""Gradescope autograding internals"""
+"""Autograding process internals for Otter-Grader"""
 
 import os
 import json
 import pandas as pd
 import pickle
 
-# from .constants import DEFAULT_OPTIONS
 from .runners import create_runner
 from .utils import OtterRuntimeError
 from ...version import LOGO_WITH_VERSION
@@ -14,7 +13,7 @@ from ...utils import chdir
 
 def main(autograder_dir, **kwargs):
     """
-    Runs autograder based on predefined configurations
+    Run the autograding process.
 
     Args:
         autograder_dir (``str``): the absolute path of the directory in which autograding is occurring
@@ -28,7 +27,9 @@ def main(autograder_dir, **kwargs):
         with open(config_fp) as f:
             config = json.load(f)
     else:
-        config = {"autograder_dir": autograder_dir}
+        config = {}
+
+    config["autograder_dir"] = autograder_dir
 
     runner = create_runner(config, **kwargs)
 
