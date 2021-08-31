@@ -6,6 +6,7 @@
 * Added `xeCJK` to the LaTeX exporter template and Docker images
 * Added PDF generation and submission in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
 * Updated intercell seeding in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
+* Added options to limit execution time of grading and permit network access
 
 **v3.0.6:** re-release of v3.0.5
 
