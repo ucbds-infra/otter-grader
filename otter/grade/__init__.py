@@ -12,7 +12,7 @@ from ..utils import assert_path_exists
 
 def main(*, path="./", output_dir="./", autograder="./autograder.zip", containers=None, 
          scripts=False, no_kill=False, debug=False, zips=False, image="ucbdsinfra/otter-grader", 
-         pdfs=False, verbose=False, prune=False, force=False):
+         pdfs=False, verbose=False, prune=False, force=False, timeout=None, network=True):
     """
     Runs Otter Grade
 
@@ -29,11 +29,13 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
         no_kill (``bool``): whether to keep containers after grading is finished
         debug (``bool``): whether to print the stdout of each container
         zips (``bool``): whether the submissions are Otter-exported zip files
-        image (``bool``): base image from which to build grading image
+        image (``str``): base image from which to build grading image
         pdfs (``bool``): whether to copy notebook PDFs out of the containers
         verbose (``bool``): whether to log status messages to stdout
         prune (``bool``): whether to prune the grading images; if true, no grading is performed
         force (``bool``): whether to force-prune the images (do not ask for confirmation)
+        timeout (``int``): timeout in seconds for each container
+        network (``bool``): whether to enable networking in the containers
 
     Raises:
         ``AssertionError``: if invalid arguments are provided
@@ -63,7 +65,9 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
         debug=debug,
         zips=zips,
         image=image,
-        pdfs=pdfs
+        pdfs=pdfs,
+        timeout=timeout,
+        network=network
     )
 
     if verbose:

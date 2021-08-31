@@ -47,7 +47,8 @@ RUN wget -nv -O /tmp/fandol.zip https://mirrors.ctan.org/fonts/fandol.zip && \
     mkdir -p /usr/share/texlive/texmf-dist/fonts/opentype/public/fandol && \
     cp /tmp/fandol/fandol/*.otf /usr/share/texlive/texmf-dist/fonts/opentype/public/fandol && \
     mktexlsr && \
-    fc-cache
+    fc-cache && \
+    rm -rf /tmp/fandol /tmp/fandol.zip
 
 # Set the locale to UTF-8 to ensure that Unicode output is encoded correctly
 ENV LANG C.UTF-8

@@ -1,16 +1,15 @@
 """Docker container management for Otter Grade"""
-
-from python_on_whales import docker
 import glob
-import itertools
 import os
-import pandas as pd
 import pickle
-import pkg_resources
 import shutil
 import tempfile
-
 from concurrent.futures import ThreadPoolExecutor, wait
+from typing import Optional
+
+import pandas as pd
+import pkg_resources
+from python_on_whales import docker
 
 from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
 
@@ -29,8 +28,8 @@ def build_image(zip_path, base_image, tag):
     """
     image = OTTER_DOCKER_IMAGE_TAG + ":" + tag
     dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
-    
-    if not docker.image.exists(image): 
+
+    if not docker.image.exists(image):
         print(f"Building new image using {base_image} as base image")
         docker.build(".", build_args={
             "ZIPPATH": zip_path,
@@ -43,7 +42,7 @@ def build_image(zip_path, base_image, tag):
 def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
                  scripts=False, no_kill=False, output_path="./", debug=False, zips=False,
                  image="ucbdsinfra/otter-grader",
-                 pdfs=False):
+                 pdfs=False, timeout=None, network=True):
     """
     Grades notebooks in parallel Docker containers
 
@@ -66,6 +65,8 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
         zips (``bool``, optional): whether the submissions are zip files formatted from ``Notebook.export``
         image (``str``, optional): a base image to use for building Docker images
         pdfs (``bool``, optional): whether to copy PDFs out of the containers
+        timeout (``int``): timeout in seconds for each container
+        network (``bool``): whether to enable networking in the containers
 
     Returns:
         ``list`` of ``pandas.core.frame.DataFrame``: the grades returned by each container spawned during
@@ -97,6 +98,8 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
                 output_path=output_path,
                 debug=debug,
                 pdfs=pdfs,
+                timeout=timeout,
+                network=network,
             )
         ]
 
@@ -110,7 +113,8 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
 # TODO: these arguments need to be updated. replace notebooks_dir with the path to the notebook that
 # this container will be grading
 def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=False,
-                      scripts=False, no_kill=False, output_path="./", debug=False, pdfs=False):
+                      scripts=False, no_kill=False, output_path="./", debug=False, pdfs=False,
+                      timeout: Optional[int] = None, network=True):
     """
     Grades multiple submissions in a directory using a single docker container. If no PDF assignment is
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
@@ -127,6 +131,8 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR
             from each container to the command line)
         pdfs (``bool``, optional): whether to copy PDFs out of the containers
+        timeout (``int``): timeout in seconds for each container
+        network (``bool``): whether to enable networking in the containers
 
     Returns:
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
@@ -150,12 +156,31 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         ]
         if pdfs:
             volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
-        container = docker.container.run(image, command=["/autograder/run_autograder"], volumes=volumes, detach=True)
+
+        args = {}
+
+        if network is not None and not network:
+            args['networks'] = 'none'
+
+        container = docker.container.run(image, command=["/autograder/run_autograder"], volumes=volumes, detach=True, **args )
+
+        if timeout:
+            import threading
+
+            def kill_container():
+                docker.container.kill(container)
+
+            timer = threading.Timer(timeout,kill_container)
+            timer.start()
 
         if verbose:
             print(f"Grading {submission_path} in container {container.id}...")
 
         exit = docker.container.wait(container)
+
+        if timeout:
+            timer.cancel()
+
         if debug:
             print(docker.container.logs(container))
 
