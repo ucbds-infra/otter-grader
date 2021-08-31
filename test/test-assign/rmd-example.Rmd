@@ -8,7 +8,6 @@ output: pdf_document
 ```
 BEGIN ASSIGNMENT
 generate: true
-template_pdf: true
 solutions_pdf: true
 files:
     - data.csv
