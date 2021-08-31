@@ -4,7 +4,7 @@ test = list(
     ottr::TestCase$new(
       hidden = FALSE,
       name = NA,
-      points = 1,
+      points = 0.5,
       code = {
         test_that("q8a", {
             expect_equal(length(z), 10)
@@ -14,7 +14,7 @@ test = list(
     ottr::TestCase$new(
       hidden = TRUE,
       name = NA,
-      points = 1,
+      points = 0.5,
       code = {
         test_that("q8b", {
             actual = c(
