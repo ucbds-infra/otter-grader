@@ -29,6 +29,7 @@ RUN apt-get clean && \
     apt-get update && \
     conda install -y r-base r-essentials && \
     conda install -c r r-irkernel r-essentials r-devtools -c conda-forge && \
+    conda run Rscript -e 'install.packages("testthat", repos="https://cloud.r-project.org")' && \
     rm -rf /var/lib/apt/lists/*
 
 # install wkhtmltopdf for otter export
