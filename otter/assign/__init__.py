@@ -93,25 +93,36 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
         
         # generate PDF of solutions
-        if assignment.solutions_pdf and not assignment.is_rmd and not no_pdfs:
+        if assignment.solutions_pdf and not no_pdfs:
             print("Generating solutions PDF...")
             filtering = assignment.solutions_pdf == 'filtered'
 
-            try:
-                export_notebook(
-                    str(result / 'autograder' / master.name),
-                    dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
-                    filtering=filtering,
-                    pagebreaks=filtering,
-                    exporter_type="html",
-                )
-            except WkhtmltopdfNotFoundError:
-                export_notebook(
-                    str(result / 'autograder' / master.name),
-                    dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
-                    filtering=filtering,
-                    pagebreaks=filtering,
-                )
+            src = os.path.abspath(str(result / 'autograder' / master.name))
+            dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-sol.pdf')))
+        
+            if not assignment.is_rmd:
+                try:
+                    export_notebook(
+                        src,
+                        dest=dst,
+                        filtering=filtering,
+                        pagebreaks=filtering,
+                        exporter_type="html",
+                    )
+                except WkhtmltopdfNotFoundError:
+                    export_notebook(
+                        src,
+                        dest=dst,
+                        filtering=filtering,
+                        pagebreaks=filtering,
+                    )
+
+            else:
+                if filtering:
+                    raise ValueError("Filtering is not supported with RMarkdown assignments")
+
+                from rpy2.robjects import r
+                r(f"""rmarkdown::render("{src}", "pdf_document", "{dst}")""")
 
         # generate a tempalte PDF for Gradescope
         if not assignment.is_rmd and assignment.template_pdf and not no_pdfs:
