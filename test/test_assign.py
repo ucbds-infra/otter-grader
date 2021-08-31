@@ -93,7 +93,7 @@ class TestAssign(TestCase):
         """
         assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output", v1=True)
 
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", ignore_ext=[".zip"])
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", ignore_ext=[".zip", ".pdf"])
         
         # check gradescope zip file
         self.check_gradescope_zipfile(
