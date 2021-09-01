@@ -74,8 +74,10 @@ class TestGrade(TestCase):
         # assert that it didn't fail, it will fail if it is not installed
         self.assertEqual(len(inspect.stderr), 0, inspect.stderr.decode("utf-8"))
 
-
     def test_timeout(self):
+        """
+        Check that the notebook `20s.ipynb` is killed due to exceeding the defined timeout.
+        """
         with self.assertRaises(Exception) as e:
             grade(
                 path=TEST_FILES_PATH + "timeout/",
@@ -90,6 +92,10 @@ class TestGrade(TestCase):
         self.assertEqual(str(e.exception),"Executing 'test/test-grade/timeout/20s.ipynb' in docker container failed! Exit code: 137")
 
     def test_network(self):
+        """
+        Check that the notebook `network.ipynb` is unable to do some network requests with disabled networking
+        """
+
         grade(
             path = TEST_FILES_PATH + "network/",
             output_dir = "test/",
@@ -110,7 +116,6 @@ class TestGrade(TestCase):
                     self.assertEqual(row[test],0,"{} supposed to fail {} but passed".format(row["file"], test))
                 else:
                     self.assertEqual(row[test], self.test_points[test], "{} supposed to pass {} but failed".format(row["file"], test))
-
 
     def test_notebooks_with_pdfs(self):
         """
@@ -166,6 +171,7 @@ class TestGrade(TestCase):
         # remove the extra output
         cleanup_command = ["rm", "-rf", "test/final_grades.csv", "test/submission_pdfs", "test/final_grades.csv"]
         cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
+        self.assertEqual(len(cleanup.stderr), 0, cleanup.stderr.decode("utf-8"))
 
     @classmethod
     def tearDownClass(cls):

@@ -1,14 +1,14 @@
 """Docker container management for Otter Grade"""
 import glob
 import os
+import pandas as pd
 import pickle
+import pkg_resources
 import shutil
 import tempfile
+
 from concurrent.futures import ThreadPoolExecutor, wait
 from typing import Optional
-
-import pandas as pd
-import pkg_resources
 from python_on_whales import docker
 
 from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
@@ -162,7 +162,7 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         if network is not None and not network:
             args['networks'] = 'none'
 
-        container = docker.container.run(image, command=["/autograder/run_autograder"], volumes=volumes, detach=True, **args )
+        container = docker.container.run(image, command=["/autograder/run_autograder"], volumes=volumes, detach=True, **args)
 
         if timeout:
             import threading
@@ -170,7 +170,7 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             def kill_container():
                 docker.container.kill(container)
 
-            timer = threading.Timer(timeout,kill_container)
+            timer = threading.Timer(timeout, kill_container)
             timer.start()
 
         if verbose:
