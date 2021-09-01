@@ -11,7 +11,7 @@ from .utils import run_tests, write_otter_config_file, run_generate_autograder
 from ..export import export_notebook
 from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
-from ..utils import get_relpath, block_print
+from ..utils import block_print, get_relpath, knit_rmd_file
 
 
 def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
@@ -93,36 +93,55 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
         
         # generate PDF of solutions
-        if assignment.solutions_pdf and not assignment.is_rmd and not no_pdfs:
+        if assignment.solutions_pdf and not no_pdfs:
             print("Generating solutions PDF...")
             filtering = assignment.solutions_pdf == 'filtered'
 
-            try:
-                export_notebook(
-                    str(result / 'autograder' / master.name),
-                    dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
-                    filtering=filtering,
-                    pagebreaks=filtering,
-                    exporter_type="html",
-                )
-            except WkhtmltopdfNotFoundError:
-                export_notebook(
-                    str(result / 'autograder' / master.name),
-                    dest=str(result / 'autograder' / (master.stem + '-sol.pdf')),
-                    filtering=filtering,
-                    pagebreaks=filtering,
-                )
+            src = os.path.abspath(str(result / 'autograder' / master.name))
+            dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-sol.pdf')))
+        
+            if not assignment.is_rmd:
+                try:
+                    export_notebook(
+                        src,
+                        dest=dst,
+                        filtering=filtering,
+                        pagebreaks=filtering,
+                        exporter_type="html",
+                    )
+                except WkhtmltopdfNotFoundError:
+                    export_notebook(
+                        src,
+                        dest=dst,
+                        filtering=filtering,
+                        pagebreaks=filtering,
+                    )
+
+            else:
+                if filtering:
+                    raise ValueError("Filtering is not supported with RMarkdown assignments")
+
+                knit_rmd_file(src, dst)
 
         # generate a tempalte PDF for Gradescope
-        if not assignment.is_rmd and assignment.template_pdf and not no_pdfs:
+        if assignment.template_pdf and not no_pdfs:
             print("Generating template PDF...")
-            export_notebook(
-                str(result / 'autograder' / master.name),
-                dest=str(result / 'autograder' / (master.stem + '-template.pdf')), 
-                filtering=True, 
-                pagebreaks=True, 
-                exporter_type="latex",
-            )
+            
+            src = os.path.abspath(str(result / 'autograder' / master.name))
+            dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-template.pdf')))
+
+            if not assignment.is_rmd:
+                export_notebook(
+                    src,
+                    dest=dst, 
+                    filtering=True, 
+                    pagebreaks=True, 
+                    exporter_type="latex",
+                )
+
+            else:
+                raise ValueError(f"Filtering is not supported with RMarkdown assignments; use " + \
+                    "solutions_pdf to generate a Gradescope template instead.")
 
         # generate the .otter file if needed
         if not assignment.is_rmd and assignment.save_environment:

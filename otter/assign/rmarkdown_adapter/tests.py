@@ -6,6 +6,8 @@ from ..constants import TEST_REGEX
 from ..r_adapter.tests import gen_suite
 from ..utils import get_source
 
+from ...test_files.abstract_test import TestFile
+
 
 def is_test_cell(cell):
     """
@@ -41,17 +43,18 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     source = f'```{{r}}\n. = ottr::check("tests/{question["name"]}.R")\n```'
     cell = create_cell("code", source)
 
-    points = question.get('points', len(tests))
-    if isinstance(points, (int, float)):
-        if points % len(tests) == 0:
-            points = [points // len(tests) for _ in range(len(tests))]
-        else:
-            points = [points / len(tests) for _ in range(len(tests))]
-    assert isinstance(points, list) and len(points) == len(tests), \
-        f"Points for question {question['name']} could not be parsed:\n{points}"
+    points = question.get('points', None)
+    if isinstance(points, dict):
+        points = points.get('each', 1) * len(tests)
+    elif isinstance(points, list):
+        if len(points) != len(tests):
+            raise ValueError(
+                f"Error in question {question['name']}: length of 'points' is {len(points)} but there "
+                f"are {len(tests)} tests")
 
-    # update point values
-    tests = [tc._replace(points=p) for tc, p in zip(tests, points)]
+    # check for errors in resolving points
+    tests = TestFile.resolve_test_file_points(points, tests)
+
     test = gen_suite(question['name'], tests, points)
 
     tests_dict[question['name']] = test
