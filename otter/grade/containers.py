@@ -8,8 +8,8 @@ import shutil
 import tempfile
 
 from concurrent.futures import ThreadPoolExecutor, wait
-from typing import Optional
 from python_on_whales import docker
+from typing import Optional
 
 from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
 
