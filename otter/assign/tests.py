@@ -105,8 +105,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         if len(points) != len(tests):
             raise ValueError(
                 f"Error in question {question['name']}: length of 'points' is {len(points)} but there "
-                f"are {len(tests)} tests"
-            )
+                f"are {len(tests)} tests")
 
     # check for errors in resolving points
     TestFile.resolve_test_file_points(points, tests)

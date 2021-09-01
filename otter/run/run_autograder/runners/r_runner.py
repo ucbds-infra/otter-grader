@@ -15,7 +15,7 @@ from ..utils import OtterRuntimeError
 from ....export import export_notebook
 from ....generate.token import APIClient
 from ....test_files import GradingResults
-from ....utils import chdir
+from ....utils import chdir, knit_rmd_file
 
 
 NBFORMAT_VERSION = 4
@@ -124,7 +124,7 @@ class RRunner(AbstractLanguageRunner):
                     pagebreaks=self.options["pagebreaks"], exporter_type="latex")
 
             else:
-                r(f"rmarkdown::render('{subm_path}', 'pdf_document', '{pdf_path}')")
+                knit_rmd_file(subm_path, pdf_path)
 
         except Exception as e:
             print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
