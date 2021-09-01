@@ -7,6 +7,7 @@ import random
 import re
 import string
 import shutil
+import tempfile
 
 from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
@@ -286,3 +287,25 @@ def assert_path_exists(path_tuples):
             raise ValueError(f"Path {path} is not a directory")
         if is_dir is False and not os.path.isfile(path):
             raise ValueError(f"Path {path} is not a file")
+
+
+def knit_rmd_file(rmd_path, pdf_path):
+    """
+    Use ``rpy2`` and ``rmarkdown::render`` to knit an RMarkdown file to a PDF, allowing errors.
+
+    Args:
+        rmd_path (``str``): the path to the Rmd file
+        pdf_path (``str``): the path at which to write the PDF
+    """
+    from rpy2.robjects import r
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".Rmd",) as ntf:
+        with open(rmd_path) as f:
+            contents = f.read()
+
+        contents = "```{r cache = F, include = F}\nknitr::opts_chunk$set(error = TRUE)\n```\n" + contents
+        ntf.write(contents)
+        ntf.seek(0)
+
+        pdf_path = os.path.abspath(pdf_path)
+        r(f"""rmarkdown::render("{ntf.name}", "pdf_document", "{pdf_path}")""")

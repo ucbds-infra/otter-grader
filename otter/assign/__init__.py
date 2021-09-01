@@ -11,7 +11,7 @@ from .utils import run_tests, write_otter_config_file, run_generate_autograder
 from ..export import export_notebook
 from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
-from ..utils import get_relpath, block_print
+from ..utils import block_print, get_relpath, knit_rmd_file
 
 
 def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
@@ -121,8 +121,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 if filtering:
                     raise ValueError("Filtering is not supported with RMarkdown assignments")
 
-                from rpy2.robjects import r
-                r(f"""rmarkdown::render("{src}", "pdf_document", "{dst}")""")
+                knit_rmd_file(src, dst)
 
         # generate a tempalte PDF for Gradescope
         if assignment.template_pdf and not no_pdfs:
