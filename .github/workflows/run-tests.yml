@@ -18,10 +18,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      
+      - uses: docker/setup-buildx-action@v1
+        id: buildx
+        with:
+          install: true
+
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v1
 
       - name: Build testing Docker image
         run: |
-          make docker-test
+          make docker-ci-test
 
       - name: Run tests
         run: docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt; coverage run -m test && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml" && cp /tmp/coverage.xml ./coverage.xml

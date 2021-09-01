@@ -8,6 +8,7 @@
 * Updated intercell seeding in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
 * Fixed bug in test case point values for Assign R assignments per [#360](https://github.com/ucbds-infra/otter-grader/issues/360)
 * Enabled `solutions_pdf` and `template_pdf` in Assign R assignments per [#364](https://github.com/ucbds-infra/otter-grader/issues/364)
+* Added options to limit execution time of grading and permit network access
 
 **v3.0.6:** re-release of v3.0.5
 
