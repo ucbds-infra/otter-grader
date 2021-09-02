@@ -27,9 +27,6 @@ def gen_export_cells(nb_name, instruction_text):
         # Save your notebook first, then run this cell to export your submission.
         ottr::export("path/to/notebook.ipynb")
     
-    The call to ``grader.export()`` contains different arguments based on the values passed to ``pdf``
-    and ``filtering``. 
-    
     Args:
         instruction_text (``str``): extra instructions for students when exporting
         **kwargs: a catch-all so that the API matches 
