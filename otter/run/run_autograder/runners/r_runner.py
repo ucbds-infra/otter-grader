@@ -1,13 +1,14 @@
 """Autograder runner for R assignments"""
 
 import json
-import jupytext
 import nbformat
 import os
 import pickle
 import shutil
+import tempfile
 
 from glob import glob
+from nbconvert.exporters import ScriptExporter
 from rpy2.robjects import r
 
 from .abstract_runner import AbstractLanguageRunner
@@ -22,6 +23,9 @@ NBFORMAT_VERSION = 4
 
 
 class RRunner(AbstractLanguageRunner):
+
+    subm_path_deletion_reauired = False
+    """whether the submission path needs to be deleted (because it was created with tempfile)"""
 
     def add_seeds_to_rmd_file(self, rmd_path):
         """
@@ -59,6 +63,9 @@ class RRunner(AbstractLanguageRunner):
             f.write(script)
 
     def resolve_submission_path(self):
+        # create a temporary file at which to write a script if necessary
+        _, script_path = tempfile.mkstemp(suffix=".R")
+
         # convert IPYNB files to Rmd files
         nbs = glob("*.ipynb")
         if len(nbs) > 1:
@@ -66,23 +73,35 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(nbs) == 1:
             nb_path = nbs[0]
-            nb = jupytext.read(nb_path)
-            jupytext.write(nb, os.path.splitext(nb_path)[0] + ".Rmd")
+
+            # create the R script
+            script, _ = ScriptExporter().from_filename(nb_path)
+            with open(script_path, "w") as f:
+                f.write(script)
+
+            self.subm_path_deletion_reauired = True
+            return script_path
 
         # convert Rmd files to R files
         rmds = glob("*.Rmd")
-        seeded = False
         if len(rmds) > 1:
             raise OtterRuntimeError("More than one Rmd file found in submission")
 
         elif len(rmds) == 1:
             rmd_path = rmds[0]
+
+            # add seeds
             if self.options["seed"] is not None:
                 self.add_seeds_to_rmd_file(rmd_path)
-                seeded = True
-            rmd_path, script_path = \
-                os.path.abspath(rmd_path), os.path.abspath(os.path.splitext(rmd_path)[0] + ".r")
+
+            # create the R script
+            rmd_path = os.path.abspath(rmd_path)
             r(f"knitr::purl('{rmd_path}', '{script_path}')")
+
+            self.subm_path_deletion_reauired = True
+            return script_path
+
+        os.remove(script_path)
 
         # get the R script
         scripts = glob("*.[Rr]")
@@ -92,7 +111,7 @@ class RRunner(AbstractLanguageRunner):
         elif len(scripts) == 0:
             raise OtterRuntimeError("No gradable files found in submission")
 
-        if self.options["seed"] is not None and not seeded:
+        if self.options["seed"] is not None:
             self.add_seed_to_script(scripts[0]) 
 
         return scripts[0]
@@ -182,5 +201,10 @@ class RRunner(AbstractLanguageRunner):
 
                 if has_token:
                     self.submit_pdf(client, pdf_path)
+
+        # delete the script if necessary
+        if self.subm_path_deletion_reauired:
+            os.remove(subm_path)
+            self.subm_path_deletion_reauired = False
 
         return scores

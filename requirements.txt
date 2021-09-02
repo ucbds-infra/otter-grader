@@ -10,13 +10,10 @@ nbformat
 dill
 pdfkit
 PyPDF2
+PyYAML
 
 # plugins
 gspread
 google-auth-oauthlib
 google-api-python-client
 six
-
-# ottr requirements
-jupytext
-# rpy2 is also required but not included here because R is required for its installation

@@ -187,6 +187,7 @@ class Assignment:
         "_otter_config": None,
         "lang": None,
         "_temp_test_dir": None, # path to a temp dir for tests for otter generate
+        "notebook_basename": None,
         **convert_config_description_dict(_DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS),
     }
 
