@@ -25,6 +25,8 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
         output_nb_path (``pathlib.Path``): path to output file
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     """
+    assignment.notebook_basename = os.path.basename(str(output_nb_path))
+
     with open(nb_path) as f:
         nb = nbformat.read(f, as_version=NB_VERSION)
 
