@@ -10,6 +10,7 @@ nbformat
 dill
 pdfkit
 PyPDF2
+PyYAML
 
 # plugins
 gspread
