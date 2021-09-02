@@ -11,7 +11,6 @@ jinja2
 nbconvert
 nbformat
 dill
-jupytext
 numpy
 git+https://github.com/ucbds-infra/otter-grader.git@f762e882c76ac31f08440eae317a1c1dc650cf3b
 {% endif %}{% if other_requirements %}
