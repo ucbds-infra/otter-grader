@@ -8,6 +8,7 @@ import re
 from .utils import rmd_to_cells, collapse_empty_cells
 
 from ..constants import MD_RESPONSE_CELL_SOURCE
+from ..r_adapter.solutions import solution_assignment_sub, solution_line_sub
 from ..utils import get_source
 
 def is_markdown_solution_cell(cell):
@@ -53,22 +54,7 @@ def overwrite_seed_vars(rmd_string, seed_variable, seed):
     return "\n".join(lines)
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
-def solution_assignment_sub(match):
-    """
-    Substitutes the first matching group  with ` NULL # YOUR CODE HERE`
-    """
-    prefix = match.group(1)
-    return prefix + ' NULL # YOUR CODE HERE'
-
-
 solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
-def solution_line_sub(match):
-    """
-    Substitutes the first matching group  with `# YOUR CODE HERE`
-    """
-    prefix = match.group(1)
-    return prefix + '# YOUR CODE HERE'
-
 
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
 skip_suffixes = [
