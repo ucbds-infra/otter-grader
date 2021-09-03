@@ -34,10 +34,11 @@ class RRunner(AbstractLanguageRunner):
         """
         new_cells = []
         for cell in nb["cells"]:
-            source = add_quote_escapes("\n".join(get_source(cell)))
-            valid_syntax = r(f"""ottr::valid_syntax("{source}")""")[0]
-            if valid_syntax:
-                new_cells.append(cell)
+            if cell["cell_type"] == "code":
+                source = add_quote_escapes("\n".join(get_source(cell)))
+                valid_syntax = r(f"""ottr::valid_syntax("{source}")""")[0]
+                if valid_syntax:
+                    new_cells.append(cell)
         nb = copy.deepcopy(nb)
         nb["cells"] = new_cells
         return nb
@@ -88,9 +89,11 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(nbs) == 1:
             nb_path = nbs[0]
+            nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
+            nb = self.filter_cells_with_syntax_errors(nb)
 
             # create the R script
-            script, _ = ScriptExporter().from_filename(nb_path)
+            script, _ = ScriptExporter().from_notebook_node(nb)
             with open(script_path, "w") as f:
                 f.write(script)
 
