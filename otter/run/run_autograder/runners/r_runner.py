@@ -1,5 +1,6 @@
 """Autograder runner for R assignments"""
 
+import copy
 import json
 import nbformat
 import os
@@ -12,11 +13,11 @@ from nbconvert.exporters import ScriptExporter
 from rpy2.robjects import r
 
 from .abstract_runner import AbstractLanguageRunner
-from ..utils import OtterRuntimeError
+from ..utils import add_quote_escapes, OtterRuntimeError
 from ....export import export_notebook
 from ....generate.token import APIClient
 from ....test_files import GradingResults
-from ....utils import chdir, knit_rmd_file
+from ....utils import chdir, get_source, knit_rmd_file
 
 
 NBFORMAT_VERSION = 4
@@ -26,6 +27,20 @@ class RRunner(AbstractLanguageRunner):
 
     subm_path_deletion_reauired = False
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
+
+    def filter_cells_with_syntax_errors(self, nb):
+        """
+        Filter out cells in an R notebook with syntax errors.
+        """
+        new_cells = []
+        for cell in nb["cells"]:
+            source = add_quote_escapes("\n".join(get_source(cell)))
+            valid_syntax = r(f"""ottr::valid_syntax("{source}")""")[0]
+            if valid_syntax:
+                new_cells.append(cell)
+        nb = copy.deepcopy(nb)
+        nb["cells"] = new_cells
+        return nb
 
     def add_seeds_to_rmd_file(self, rmd_path):
         """
