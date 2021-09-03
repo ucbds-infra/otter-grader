@@ -281,17 +281,19 @@ Solution cells contain code formatted in such a way that the assign parser repla
 of lines with prespecified prompts. Otter uses the same solution replacement rules as jAssign. From 
 the `jAssign docs <https://github.com/okpy/jassign/blob/master/docs/notebook-format.md>`_:
 
-* A line ending in ``# SOLUTION`` will be replaced by ``...``, properly indented. If
-  that line is an assignment statement, then only the expression(s) after the
-  ``=`` symbol will be replaced.
+* A line ending in ``# SOLUTION`` will be replaced by ``...`` (or ``NULL # YOUR CODE HERE`` in R), 
+  properly indented. If that line is an assignment statement, then only the expression(s) after the
+  ``=`` symbol (or the ``<-`` symbol in R) will be replaced.
 * A line ending in ``# SOLUTION NO PROMPT`` or ``# SEED`` will be removed.
 * A line ``# BEGIN SOLUTION`` or ``# BEGIN SOLUTION NO PROMPT`` must be paired with
-  a later line ``# END SOLUTION``. All lines in between are replaced with ``...`` or
-  removed completely in the case of ``NO PROMPT``.
+  a later line ``# END SOLUTION``. All lines in between are replaced with ``...`` 
+  (or ``# YOUR CODE HERE`` in R) or removed completely in the case of ``NO PROMPT``.
 * A line ``""" # BEGIN PROMPT`` must be paired with a later line ``""" # END
   PROMPT``. The contents of this multiline string (excluding the ``# BEGIN
   PROMPT``) appears in the student cell. Single or double quotes are allowed.
   Optionally, a semicolon can be used to suppress output: ``"""; # END PROMPT``
+
+
 
 .. code-block:: python
 
@@ -343,6 +345,24 @@ would be presented to students as
     def circumference(r):
         # Next, define a circumference function.
         pass
+
+For R,
+
+.. code-block:: r
+
+    # BEGIN SOLUTION
+    square = function(x) {
+        return(x ^ 2)
+    }
+    # END SOLUTION
+    x2 = square(25)
+
+would be presented to students  as
+
+.. code-block:: r
+
+    # YOUR CODE HERE
+    x2 = NULL # YOUR CODE HERE
 
 
 Test Cells
