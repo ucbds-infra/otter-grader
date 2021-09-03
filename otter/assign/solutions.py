@@ -4,7 +4,9 @@ import copy
 import nbformat
 import re
 
-from .utils import get_source, has_tag, is_cell_type, remove_output, remove_tag
+from .r_adapter import solutions as r_solutions
+from .utils import get_notebook_language, get_source, has_tag, is_cell_type, remove_output, \
+    remove_tag
 
 
 SOLUTION_CELL_TAG = "otter_assign_solution_cell"
@@ -71,14 +73,20 @@ def solution_line_sub(match):
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
 skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT', '# SEED']
 
-SUBSTITUTIONS = [
-    (solution_assignment_regex, solution_assignment_sub),
-    (solution_line_regex, solution_line_sub),
-]
+SUBSTITUTIONS = {
+    "python":  [
+        (solution_assignment_regex, solution_assignment_sub),
+        (solution_line_regex, solution_line_sub),
+    ],
+    "r":  [
+        (solution_assignment_regex, r_solutions.solution_assignment_sub),
+        (solution_line_regex, r_solutions.solution_line_sub),
+    ],
+}
 
 
 # TODO: comments, docstrings
-def replace_solutions(lines):
+def replace_solutions(lines, lang):
     """
     Replaces solutions in ``lines``
     
@@ -115,7 +123,7 @@ def replace_solutions(lines):
                 line = begin_solution.group(1) + '...'
             else:
                 continue
-        for exp, sub in SUBSTITUTIONS:
+        for exp, sub in SUBSTITUTIONS[lang]:
             m = exp.match(line)
             if m:
                 line = sub(m)
@@ -189,10 +197,11 @@ def strip_solutions_and_output(nb):
         nb (``nbformat.NotebookNode``): the notebook to have solutions stripped
     """
     md_solutions = []
+    lang = get_notebook_language(nb)
     for i, cell in enumerate(nb['cells']):
         if has_tag(cell, SOLUTION_CELL_TAG):
             if is_cell_type(cell, "code"):
-                cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
+                cell['source'] = '\n'.join(replace_solutions(get_source(cell), lang))
             elif is_cell_type(cell, "markdown"):
                 md_solutions.append(i)
             nb['cells'][i] = remove_tag(cell, SOLUTION_CELL_TAG)
