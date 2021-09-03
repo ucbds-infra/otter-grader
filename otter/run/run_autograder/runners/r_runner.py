@@ -1,5 +1,6 @@
 """Autograder runner for R assignments"""
 
+import copy
 import json
 import nbformat
 import os
@@ -9,23 +10,42 @@ import tempfile
 
 from glob import glob
 from nbconvert.exporters import ScriptExporter
-from rpy2.robjects import r
+from rpy2.robjects.packages import importr
 
 from .abstract_runner import AbstractLanguageRunner
 from ..utils import OtterRuntimeError
 from ....export import export_notebook
 from ....generate.token import APIClient
 from ....test_files import GradingResults
-from ....utils import chdir, knit_rmd_file
+from ....utils import chdir, get_source, knit_rmd_file
 
 
 NBFORMAT_VERSION = 4
+R_PACKAGES = {
+    "knitr": importr("knitr"),
+    "ottr": importr("ottr"),
+}
 
 
 class RRunner(AbstractLanguageRunner):
 
     subm_path_deletion_reauired = False
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
+
+    def filter_cells_with_syntax_errors(self, nb):
+        """
+        Filter out cells in an R notebook with syntax errors.
+        """
+        new_cells = []
+        for cell in nb["cells"]:
+            if cell["cell_type"] == "code":
+                source = "\n".join(get_source(cell))
+                valid_syntax = R_PACKAGES["ottr"].valid_syntax(source)[0]
+                if valid_syntax:
+                    new_cells.append(cell)
+        nb = copy.deepcopy(nb)
+        nb["cells"] = new_cells
+        return nb
 
     def add_seeds_to_rmd_file(self, rmd_path):
         """
@@ -73,9 +93,11 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(nbs) == 1:
             nb_path = nbs[0]
+            nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
+            nb = self.filter_cells_with_syntax_errors(nb)
 
             # create the R script
-            script, _ = ScriptExporter().from_filename(nb_path)
+            script, _ = ScriptExporter().from_notebook_node(nb)
             with open(script_path, "w") as f:
                 f.write(script)
 
@@ -96,7 +118,7 @@ class RRunner(AbstractLanguageRunner):
 
             # create the R script
             rmd_path = os.path.abspath(rmd_path)
-            r(f"knitr::purl('{rmd_path}', '{script_path}')")
+            R_PACKAGES["knitr"].purl(rmd_path, script_path)
 
             self.subm_path_deletion_reauired = True
             return script_path
@@ -193,7 +215,8 @@ class RRunner(AbstractLanguageRunner):
 
             subm_path = self.resolve_submission_path()
             ignore_errors = "FALSE" if self.options["debug"] else "TRUE"
-            output = r(f"""ottr::run_autograder("{subm_path}", ignore_errors={ignore_errors})""")[0]
+            output = R_PACKAGES["ottr"].run_autograder(
+                subm_path, ignore_errors = not self.options["debug"])[0]
             scores = GradingResults.from_ottr_json(output)
 
             if generate_pdf:
