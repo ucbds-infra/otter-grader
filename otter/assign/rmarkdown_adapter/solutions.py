@@ -11,6 +11,7 @@ from ..constants import MD_RESPONSE_CELL_SOURCE
 from ..r_adapter.solutions import solution_assignment_sub, solution_line_sub
 from ..utils import get_source
 
+
 def is_markdown_solution_cell(cell):
     """
     Returns whether any line of the cell matches `<!-- BEGIN SOLUTION -->`
@@ -52,6 +53,7 @@ def overwrite_seed_vars(rmd_string, seed_variable, seed):
             if match:
                 lines[i] = match.group(1) + f"{seed_variable} {match.group(2)} {seed}"
     return "\n".join(lines)
+
 
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
 solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
