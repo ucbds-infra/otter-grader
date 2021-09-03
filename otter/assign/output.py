@@ -12,7 +12,7 @@ from .notebook_transformer import transform_notebook
 from .plugins import replace_plugins_with_calls
 from .solutions import overwrite_seed_vars, strip_ignored_lines, strip_solutions_and_output
 from .tests import write_test
-from .utils import patch_copytree, remove_cell_ids
+from .utils import get_notebook_language, patch_copytree, remove_cell_ids
 
 
 def write_autograder_dir(nb_path, output_nb_path, assignment):
@@ -32,8 +32,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
 
     if assignment.lang is None:
         try:
-            lang = nb["metadata"]["kernelspec"]["language"].lower()
-            assignment.lang = lang
+            assignment.lang = get_notebook_language(nb)
         except KeyError:
             warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
             assignment.lang = "python"

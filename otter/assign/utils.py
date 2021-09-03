@@ -65,6 +65,18 @@ def get_spec(source, begin):
     
     return begins[0] if begins else None
 
+def get_notebook_language(nb):
+    """
+    Parse the notebook kernel language and return it as a string.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook
+
+    Returns:
+        ``str``: the name of the language as a lowercased string
+    """
+    return nb["metadata"]["kernelspec"]["language"].lower()
+
 
 #---------------------------------------------------------------------------------------------------
 # Cell Type Checkers
