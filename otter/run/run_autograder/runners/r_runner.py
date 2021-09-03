@@ -10,10 +10,10 @@ import tempfile
 
 from glob import glob
 from nbconvert.exporters import ScriptExporter
-from rpy2.robjects import r
+from rpy2.robjects.packages import importr
 
 from .abstract_runner import AbstractLanguageRunner
-from ..utils import add_quote_escapes, OtterRuntimeError
+from ..utils import OtterRuntimeError
 from ....export import export_notebook
 from ....generate.token import APIClient
 from ....test_files import GradingResults
@@ -21,6 +21,10 @@ from ....utils import chdir, get_source, knit_rmd_file
 
 
 NBFORMAT_VERSION = 4
+R_PACKAGES = {
+    "knitr": importr("knitr"),
+    "ottr": importr("ottr"),
+}
 
 
 class RRunner(AbstractLanguageRunner):
@@ -35,8 +39,8 @@ class RRunner(AbstractLanguageRunner):
         new_cells = []
         for cell in nb["cells"]:
             if cell["cell_type"] == "code":
-                source = add_quote_escapes("\n".join(get_source(cell)))
-                valid_syntax = r(f"""ottr::valid_syntax("{source}")""")[0]
+                source = "\n".join(get_source(cell))
+                valid_syntax = R_PACKAGES["ottr"].valid_syntax(source)[0]
                 if valid_syntax:
                     new_cells.append(cell)
         nb = copy.deepcopy(nb)
@@ -114,7 +118,7 @@ class RRunner(AbstractLanguageRunner):
 
             # create the R script
             rmd_path = os.path.abspath(rmd_path)
-            r(f"knitr::purl('{rmd_path}', '{script_path}')")
+            R_PACKAGES["knitr"].purl(rmd_path, script_path)
 
             self.subm_path_deletion_reauired = True
             return script_path
@@ -211,7 +215,8 @@ class RRunner(AbstractLanguageRunner):
 
             subm_path = self.resolve_submission_path()
             ignore_errors = "FALSE" if self.options["debug"] else "TRUE"
-            output = r(f"""ottr::run_autograder("{subm_path}", ignore_errors={ignore_errors})""")[0]
+            output = R_PACKAGES["ottr"].run_autograder(
+                subm_path, ignore_errors = not self.options["debug"])[0]
             scores = GradingResults.from_ottr_json(output)
 
             if generate_pdf:

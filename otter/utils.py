@@ -297,7 +297,7 @@ def knit_rmd_file(rmd_path, pdf_path):
         rmd_path (``str``): the path to the Rmd file
         pdf_path (``str``): the path at which to write the PDF
     """
-    from rpy2.robjects import r
+    from rpy2.robjects.packages import importr
 
     with tempfile.NamedTemporaryFile(mode="w", suffix=".Rmd",) as ntf:
         with open(rmd_path) as f:
@@ -308,4 +308,5 @@ def knit_rmd_file(rmd_path, pdf_path):
         ntf.seek(0)
 
         pdf_path = os.path.abspath(pdf_path)
-        r(f"""rmarkdown::render("{ntf.name}", "pdf_document", "{pdf_path}")""")
+        rmarkdown = importr("rmarkdown")
+        rmarkdown.render(ntf.name, "pdf_document", pdf_path)
