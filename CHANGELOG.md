@@ -14,6 +14,7 @@
 * Updated the default version of Ottr to v1.1.1
 * Changed prompts in R notebooks to match Rmd documents
 * Added filtering of notebook cells with syntax errors during R notebook execution
+* Enured that "empty" tokens are ignored in Otter Generate per [#361](https://github.com/ucbds-infra/otter-grader/issues/361)
 
 **v3.0.6:** re-release of v3.0.5
 
