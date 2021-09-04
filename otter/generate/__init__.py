@@ -73,6 +73,10 @@ def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False,
     else:
         otter_config = {}
 
+    # if an empty/null token is specified, delete it
+    if "token" in otter_config and not otter_config["token"]:
+        otter_config.pop("token")
+
     # ensure that a token is present if necessary
     if "token" not in otter_config and token is not None:
         otter_config["token"] = token
