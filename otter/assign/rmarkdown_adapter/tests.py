@@ -59,3 +59,35 @@ def gen_test_cell(question, tests, tests_dict, assignment):
 
     tests_dict[question['name']] = test
     return cell
+
+
+def write_test(test_path, test):
+    """
+    Write the test file ``test`` at ``test_path``.
+
+    Args:
+        test_path (``str``): the path to the test file
+        test (``str``): the test to write
+    """
+    with open(test_path, "w+") as f:
+        f.write(test)
+
+
+def remove_hidden_tests_from_dir(test_dir):
+    """
+    Rewrites test files in a directory to remove hidden tests
+    
+    Args:
+        test_dir (``pathlib.Path``): path to test files directory
+    """
+    for f in test_dir.iterdir():
+        if f.suffix != '.R':
+            continue
+
+        with open(f) as f2:
+            test = f2.read()
+        
+        test = re.sub(r"    ottr::TestCase\$new\(\s*hidden = TRUE[\w\W]+?^    \),?", "", test, flags=re.MULTILINE)
+        test = re.sub(r",(\s*  \))", r"\1", test, flags=re.MULTILINE)  # removes a trailing comma if present
+
+        write_test(f, test)

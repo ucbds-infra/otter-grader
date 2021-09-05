@@ -11,7 +11,6 @@ from collections import namedtuple
 
 from ..constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, OTTR_TEST_FILE_TEMPLATE, \
     OTTR_TEST_NAME_REGEX, TEST_REGEX
-from ..tests import write_test
 from ..utils import get_source, lock
 
 from ...test_files.abstract_test import TestFile
