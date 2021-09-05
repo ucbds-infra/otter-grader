@@ -142,20 +142,34 @@ class ExceptionTestFile(TestFile):
 
         self.test_case_results = test_case_results
 
-    @classmethod
-    def from_file(cls, path):
+    @staticmethod
+    def compile_test_file(path):
         """
-        Parse an exception-based test file and return an ``ExceptionTestFile``.
+        Compile a test file for execution.
 
         Args:
             path (``str``): the path to the test file
 
         Returns:
-            ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
+            ``code``: the compiled code of the file
         """
         with open(path) as f:
             code = compile(f.read(), path, "exec")
 
+        return code
+
+    @classmethod
+    def from_compiled_code(cls, code, path=""):
+        """
+        Parse an exception-based test file and return an ``ExceptionTestFile``.
+
+        Args:
+            code (``code``): the compiled code of the test file
+            path (``str``): the path to the test file
+
+        Returns:
+            ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
+        """
         env = {}
         exec(code, env)
 
@@ -176,3 +190,17 @@ class ExceptionTestFile(TestFile):
 
         path = str(pathlib.Path(path).as_posix())
         return cls(name, points, test_cases, all_or_nothing=False)
+
+    @classmethod
+    def from_file(cls, path):
+        """
+        Parse an exception-based test file and return an ``ExceptionTestFile``.
+
+        Args:
+            path (``str``): the path to the test file
+
+        Returns:
+            ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
+        """
+        code = cls.compile_test_file(path)
+        return cls.from_compiled_code(code, path=path)

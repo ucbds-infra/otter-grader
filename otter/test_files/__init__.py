@@ -8,8 +8,8 @@ import pickle
 from collections import namedtuple
 
 from .abstract_test import TestCase, TestCaseResult
-from .exception_test import ExceptionTestFile
-from .metadata_test import NotebookMetadataOKTestFile
+from .exception_test import ExceptionTestFile, test_case
+from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
