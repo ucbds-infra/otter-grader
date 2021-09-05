@@ -1,7 +1,4 @@
-"""
-Abstract base classes for working with test files and classes to represent collections of test and 
-their results
-"""
+"""Abstract test objects for providing a schema to write and parse test cases"""
 
 from abc import ABC, abstractmethod
 from collections import namedtuple

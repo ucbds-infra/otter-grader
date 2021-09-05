@@ -1,11 +1,8 @@
-"""
-Classes for working with test files
-"""
+"""Classes for working with test files"""
 
-import os
-import math
 import json
-import pprint
+import math
+import os
 import pickle
 
 from collections import namedtuple

@@ -1,6 +1,4 @@
-"""
-Support for OK-formatted test files
-"""
+"""Support for OK-formatted test files"""
 
 import os
 import io

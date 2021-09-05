@@ -1,6 +1,4 @@
-"""
-Support for notebook metadata test files
-"""
+"""Support for notebook metadata test files"""
 
 import os
 import io
