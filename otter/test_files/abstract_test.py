@@ -5,12 +5,7 @@ their results
 
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from textwrap import dedent, indent
-from typing import Tuple, List, Dict, Any
-from jinja2 import Template
-from pygments import highlight
-from pygments.lexers import PythonConsoleLexer
-from pygments.formatters import HtmlFormatter
+from textwrap import indent
 
 
 # class for storing the test cases themselves
