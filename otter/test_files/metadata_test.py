@@ -6,7 +6,7 @@ import io
 import json
 import os
 import pathlib
-import pickle
+import dill
 import warnings
 
 from contextlib import redirect_stderr, redirect_stdout
@@ -72,7 +72,7 @@ class NotebookMetadataExceptionTestFile(ExceptionTestFile):
             ``str``: the compiled code encoded in base-64
         """
         code = ExceptionTestFile.compile_test_file(path)
-        return base64.b64encode(pickle.dumps(code)).decode("utf-8")
+        return base64.b64encode(dill.dumps(code)).decode("utf-8")
 
     @staticmethod
     def decode_test_file(code):
@@ -85,7 +85,7 @@ class NotebookMetadataExceptionTestFile(ExceptionTestFile):
         Returns:
             ``code``: the compiled code from the test file
         """
-        return pickle.loads(base64.b64decode(code.encode("utf-8")))
+        return dill.loads(base64.b64decode(code.encode("utf-8")))
 
     @classmethod
     def from_file(cls, path, test_name):
