@@ -75,6 +75,21 @@ class NotebookMetadataExceptionTestFile(ExceptionTestFile):
         return base64.b64encode(dill.dumps(code)).decode("utf-8")
 
     @staticmethod
+    def encode_string(s, path="<string>"):
+        """
+        Compile a string and return the compiled code as a base-64-encoded string.
+
+        Args:
+            s (``str``): the string to compile
+            path (``str``, optional): the path to the test file
+
+        Returns:
+            ``str``: the compiled code encoded in base-64
+        """
+        code = ExceptionTestFile.compile_string(s, path=path)
+        return base64.b64encode(dill.dumps(code)).decode("utf-8")
+
+    @staticmethod
     def decode_test_file(code):
         """
         Decode and unpickle the compiled code from a base-64-encoded string.

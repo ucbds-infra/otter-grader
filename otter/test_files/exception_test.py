@@ -143,7 +143,21 @@ class ExceptionTestFile(TestFile):
         self.test_case_results = test_case_results
 
     @staticmethod
-    def compile_test_file(path):
+    def compile_string(s, path="<string>"):
+        """
+        Compile a string for execution.
+
+        Args:
+            s (``str``): the string to compile
+            path (``str``, optional): the path to the test file
+
+        Returns:
+            ``code``: the compiled code of the file
+        """
+        return compile(s, path, "exec")
+
+    @classmethod
+    def compile_test_file(cls, path):
         """
         Compile a test file for execution.
 
@@ -154,7 +168,7 @@ class ExceptionTestFile(TestFile):
             ``code``: the compiled code of the file
         """
         with open(path) as f:
-            code = compile(f.read(), path, "exec")
+            code = cls.compile_string(f.read(), path=path)
 
         return code
 

@@ -23,6 +23,19 @@ MD_SOLUTION_REGEX = r"(<strong>|\*{2})solution:?(<\/strong>|\*{2})"
 SEED_REGEX = r"##\s*seed\s*##"
 IGNORE_REGEX = r"(##\s*ignore\s*##\s*|#\s*ignore\s*)"
 
+EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template("""\
+from otter.test_files import test_case
+
+name = {{ name }}
+points = {{ points }}
+
+{% for tc in test_cases %}@test_case(points={{ tc.points }}, hidden={{ tc.hidden }}, 
+    success_message="{{ tc.success_message }}", 
+    failure_message="{{ tc.failure_message }}")
+{{ tc.input }}
+{% endfor %}
+""")
+
 # DON'T change this template or the regex that removes hidden tests will break in the R adapter!
 OTTR_TEST_FILE_TEMPLATE = Template("""\
 test = list(

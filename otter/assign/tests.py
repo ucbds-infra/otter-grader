@@ -1,19 +1,19 @@
-"""
-OK-formatted test parsers and builders for Otter Assign
-"""
+"""OK-formatted test parsers and builders for Otter Assign"""
 
-import re
-import pprint
-import yaml
 import nbformat
+import os
+import pprint
+import re
+import yaml
 
 from collections import namedtuple
 
-from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGEX, OTTR_TEST_NAME_REGEX, \
-    OTTR_TEST_FILE_TEMPLATE
+from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, EXCEPTION_BASED_TEST_FILE_TEMPLATE
+from .r_adapter.tests import gen_suite as gen_suite_ottr
 from .utils import get_source, lock, str_to_doctest
+
 from ..test_files.abstract_test import TestFile
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
+from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY, NotebookMetadataExceptionTestFile
 
 
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
@@ -110,14 +110,24 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     # check for errors in resolving points
     TestFile.resolve_test_file_points(points, tests)
 
-    suites = [gen_suite(tests)]
-    test = {
-        'name': question['name'],
-        'points': points,
-        'suites': suites,
+    test_info = {
+        "name": question["name"],
+        "points": points,
+        "test_cases": tests,
     }
 
-    tests_dict[question['name']] = test
+    # if assignment.tests["ok_format"]:
+    #     suites = [gen_suite(tests)]
+    #     test = {
+    #         'name': question['name'],
+    #         'points': points,
+    #         'suites': suites,
+    #     }
+
+    # else:
+    #     test = EXCEPTION_BASED_TEST_FILE_TEMPLATE.render(name=question['name'], points=points, test_cases=tests)
+
+    tests_dict[question['name']] = test_info
     lock(cell)
     return cell
 
@@ -168,60 +178,114 @@ def gen_case(test):
     return ret
 
 
-def write_test(nb, path, test, use_file=False):
+def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force_files=False):
     """
-    Writes an OK test file
-    
-    Args:
-        nb (``dict``): the notebook being written
-        path (``str``): path of file to be written or the name of the test
-        test (``dict``): OK test to be written
-        use_file (``bool``): whether to write to a file instead of putting the test in the notebook
-            metadata
     """
-    if use_file:
-        with open(path, 'w+') as f:
-            if isinstance(test, dict):
-                f.write('test = ')
-                pprint.pprint(test, f, indent=4, width=200, depth=None)
-            else:
-                f.write(test)
-    else:
+    # TODO: move this notebook to the notebook metadata test classes
+    if isinstance(nb, dict):
         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
             nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
-        if "tests" not in nb["metadata"][NOTEBOOK_METADATA_KEY]:
-            nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"] = {}
-        nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"][path] = test
+        nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"] = {}
+
+    test_ext = ".py" if assignment.is_python else ".R"
+    for test_name, test_info in test_files.items():
+        test_path = os.path.join(test_dir, test_name + test_ext)
+        name, points, test_cases = test_info["name"], test_info["points"], test_info["test_cases"]
+
+        if not include_hidden:
+            test_cases = [tc for tc in test_cases if not tc.hidden]
+
+        if assignment.is_r:
+            test = gen_suite_ottr(name, test_cases, points)
+
+        elif assignment.tests["ok_format"]:
+            test = {
+                "name": name,
+                "points": points,
+                "suites": gen_suite(test_cases),
+            }
+
+        else:
+            test = EXCEPTION_BASED_TEST_FILE_TEMPLATE.render(name=name, points=points, test_cases=test_cases)
+
+        if assignment.tests["files"] or force_files:
+            with open(test_path, "w+") as f:
+                if assignment.tests["ok_format"]:
+                    f.write("test = ")
+                    pprint.pprint(test, f, indent=4, width=200, depth=None)
+
+                else:
+                    f.write(test)
+
+        else:
+            if not assignment.tests["ok_format"]:
+                test = NotebookMetadataExceptionTestFile.encode_string(test)
+
+            # TODO: move this notebook to the notebook metadata test classes
+            nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"][path] = test
 
 
-def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=False):
-    """
-    Rewrites test files in a directory to remove hidden tests
+# def write_test(nb, path, test, use_file=False):
+#     """
+#     Writes an OK test file
     
-    Args:
-        nb (``dict``): the notebook being written
-        test_dir (``pathlib.Path``): path to test files directory
-        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        use_file (``bool``): whether separate test files were written instead of notebook metadata
-    """
-    if use_files:
-        for f in test_dir.iterdir():
-            if f.name == '__init__.py' or f.suffix != '.py':
-                continue
-            locals = {}
-            with open(f) as f2:
-                exec(f2.read(), globals(), locals)
-            test = locals['test']
-            for suite in test['suites']:
-                for i, case in list(enumerate(suite['cases']))[::-1]:
-                    if case['hidden']:
-                        suite['cases'].pop(i)
-                        if isinstance(test['points'], list):
-                            test['points'].pop(i)
-            write_test({}, f, test, use_file=True)
-    else:
-        tests = nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"]
-        for tn, test in tests.items():
-            for i, tc in list(enumerate(test["suites"][0]["cases"]))[::-1]:
-                if tc["hidden"]:
-                    test["suites"][0]["cases"].pop(i)
+#     Args:
+#         nb (``dict``): the notebook being written
+#         path (``str``): path of file to be written or the name of the test
+#         test (``dict``): OK test to be written
+#         use_file (``bool``): whether to write to a file instead of putting the test in the notebook
+#             metadata
+#     """
+#     if use_file:
+#         with open(path, 'w+') as f:
+#             if isinstance(test, dict):
+#                 f.write('test = ')
+#                 pprint.pprint(test, f, indent=4, width=200, depth=None)
+
+#             else:
+#                 f.write(test)
+
+#     else:
+#         if isinstance(test, str):
+#             test = NotebookMetadataExceptionTestFile.encode_string(test)
+
+#         # TODO: move this notebook to the notebook metadata test classes
+#         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+#             nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
+#         if "tests" not in nb["metadata"][NOTEBOOK_METADATA_KEY]:
+#             nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"] = {}
+#         nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"][path] = test
+
+
+# def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=False):
+#     """
+#     Rewrites test files in a directory to remove hidden tests
+    
+#     Args:
+#         nb (``dict``): the notebook being written
+#         test_dir (``pathlib.Path``): path to test files directory
+#         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+#         use_file (``bool``): whether separate test files were written instead of notebook metadata
+#     """
+#     if use_files:
+#         for f in test_dir.iterdir():
+#             if f.name == '__init__.py' or f.suffix != '.py':
+#                 continue
+#             locals = {}
+#             with open(f) as f2:
+#                 exec(f2.read(), globals(), locals)
+#             test = locals['test']
+#             for suite in test['suites']:
+#                 for i, case in list(enumerate(suite['cases']))[::-1]:
+#                     if case['hidden']:
+#                         suite['cases'].pop(i)
+#                         if isinstance(test['points'], list):
+#                             test['points'].pop(i)
+#             write_test({}, f, test, use_file=True)
+
+#     else:
+#         tests = nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"]
+#         for tn, test in tests.items():
+#             for i, tc in list(enumerate(test["suites"][0]["cases"]))[::-1]:
+#                 if tc["hidden"]:
+#                     test["suites"][0]["cases"].pop(i)
