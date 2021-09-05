@@ -1,4 +1,4 @@
-"""Classes for working with test files"""
+"""Classes for working with test files and test results"""
 
 import json
 import math
