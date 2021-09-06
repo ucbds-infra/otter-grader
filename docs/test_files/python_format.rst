@@ -1,6 +1,8 @@
 Python Format
 =============
 
+Python test files can follow one of two formats: exception-based or the OK format.
+
 
 Exception-Based Format
 ----------------------
@@ -21,7 +23,9 @@ holds metadata about the test case. The ``test_case`` decorator takes (optional)
 The test file should also declare the global variable ``name``, which should be a string containing
 the name of the test case, and (optionally) ``points``, which should be the total point value of the
 question. If this is absent (or set to ``None``), it will be inferred from the point values of each
-test case as described :ref:`below <test_files_python_resolve_point_values>`.
+test case as described :ref:`below <test_files_python_resolve_point_values>`. Because Otter supports
+OK-formatted test files, the global variable ``OK_FORMAT`` must be set to ``False`` in exception-based
+test files.
 
 When a test case fails and an error is raised, the full stack trace and error message will be shown
 to the student. This means that you can use the error message to provide the students with information
@@ -68,6 +72,8 @@ which uses the Sieve of Eratosthenes to return a set of the ``n`` first prime nu
 .. code-block:: python
 
     from otter.test_files import test_case
+
+    OK_FORMAT = False
 
     name = "q1"
     points = 2
@@ -142,6 +148,9 @@ which will generate these test files for you. If you already have assignments or
 write them yourself, you can find an online `OK test generator <https://oktests.chrispyles.io>`_ 
 that will assist you in generating these test files without using Otter Assign.
 
+Because Otter also supports exception-based test files, the global variable ``OK_FORMAT`` must be 
+set to ``True`` in OK-formatted test files.
+
 
 Sample Test
 +++++++++++
@@ -149,6 +158,8 @@ Sample Test
 Here is an annotated sample OK test:
 
 .. code-block:: python
+
+    OK_FORMAT = True
 
     test = {
         "name": "q1",       # name of the test
