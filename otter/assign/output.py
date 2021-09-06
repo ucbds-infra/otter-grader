@@ -139,11 +139,12 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
         nb = overwrite_seed_vars(nb, assignment.seed["variable"], assignment.seed["student_value"])
 
     # remove hidden tests from student directory
-    test_dir = str(student_dir / "tests")
+    tests_dir = str(student_dir / "tests")
     if assignment.tests["files"]:
-        shutil.rmtree(test_dir)
+        shutil.rmtree(tests_dir)
+        os.makedirs(tests_dir)
 
-    write_tests(nb, test_dir, assignment.test_files, assignment, include_hidden=False)
+    write_tests(nb, tests_dir, assignment.test_files, assignment, include_hidden=False)
 
     with open(student_nb_path, "w") as f:
         nbformat.write(nb, f)
