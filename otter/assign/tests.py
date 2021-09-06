@@ -210,7 +210,7 @@ def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force
 
         if assignment.tests["files"] or force_files:
             with open(test_path, "w+") as f:
-                if assignment.tests["ok_format"]:
+                if isinstance(test, dict):
                     f.write("test = ")
                     pprint.pprint(test, f, indent=4, width=200, depth=None)
 
