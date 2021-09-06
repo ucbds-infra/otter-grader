@@ -4,6 +4,7 @@ import inspect
 import pathlib
 
 from functools import lru_cache
+from textwrap import indent
 
 from .abstract_test import TestCase, TestCaseResult, TestFile
 
@@ -133,13 +134,23 @@ class ExceptionTestFile(TestFile):
         """
         return self.source.split("\n")
 
-    def _generate_error_message(self, excp):
+    def _generate_error_message(self, excp, context=0):
         """
+        Generate an error message including the line that errored from ``self.source``.
+
+        Args:
+            excp (``Exception``): the exception to generate the message for
+            context (``int``, optional): a number of extra lines of context to include from above
+                and below the line that caused the exception
+
+        Returns:
+            ``str``: the error message
         """
-        lineno = excp.__traceback__.tb_lineno
-        line = self.source_lines[lineno - 1]
+        line_idx = excp.__traceback__.tb_next.tb_next.tb_lineno - 1
+        l, h = max(0, line_idx - context), min(len(self.source_lines), line_idx + context + 1)
+        lines = indent("\n".join(self.source_lines[l:h]), "  ")
         err_msg = str(excp).strip("'")
-        return f"Error at line {lineno}:\n  {line}\n{type(excp).__name__}: {err_msg}"
+        return f"Error at line {line_idx + 1} in test {self.name}:\n{lines}\n{type(excp).__name__}: {err_msg}"
 
     def run(self, global_environment):
         """
@@ -197,7 +208,7 @@ class ExceptionTestFile(TestFile):
         name = env["name"]
         points = env.get("points", None)
         test_cases = []
-        for _, v in sorted(env.items(), key=lambda t: t[0]):
+        for _, v in env.items():
             if isinstance(v, test_case):
                 tc = v.to_namedtuple()
                 if tc.name is None:
