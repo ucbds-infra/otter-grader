@@ -1,12 +1,10 @@
 """Support for notebook metadata test files"""
 
-import base64
 import doctest
 import io
 import json
 import os
 import pathlib
-import dill
 import warnings
 
 from contextlib import redirect_stderr, redirect_stdout
@@ -60,48 +58,6 @@ class NotebookMetadataExceptionTestFile(ExceptionTestFile):
         grade (``float``): the percentage of ``points`` earned for this test file as a decimal
     """
 
-    @staticmethod
-    def encode_test_file(path):
-        """
-        Compile a test file and return the compiled code as a base-64-encoded string.
-
-        Args:
-            path (``str``): the path to the test file
-
-        Returns:
-            ``str``: the compiled code encoded in base-64
-        """
-        code = ExceptionTestFile.compile_test_file(path)
-        return base64.b64encode(dill.dumps(code)).decode("utf-8")
-
-    @staticmethod
-    def encode_string(s, path="<string>"):
-        """
-        Compile a string and return the compiled code as a base-64-encoded string.
-
-        Args:
-            s (``str``): the string to compile
-            path (``str``, optional): the path to the test file
-
-        Returns:
-            ``str``: the compiled code encoded in base-64
-        """
-        code = ExceptionTestFile.compile_string(s, path=path)
-        return base64.b64encode(dill.dumps(code)).decode("utf-8")
-
-    @staticmethod
-    def decode_test_file(code):
-        """
-        Decode and unpickle the compiled code from a base-64-encoded string.
-
-        Args:
-            code (``str``): the compiled code encoded in base-64
-
-        Returns:
-            ``code``: the compiled code from the test file
-        """
-        return dill.loads(base64.b64decode(code.encode("utf-8")))
-
     @classmethod
     def from_file(cls, path, test_name):
         """
@@ -123,9 +79,7 @@ class NotebookMetadataExceptionTestFile(ExceptionTestFile):
             raise ValueError(f"Test {test_name} not found")
         
         test_spec = test_spec[test_name]
-        test_code = cls.decode_test_file(test_spec)
-
-        return cls.from_spec(test_code, path=path)
+        return cls.from_string(test_spec, path=path)
 
 
 class NotebookMetadataOKTestFile(OKTestFile):

@@ -13,8 +13,8 @@ from .r_adapter.tests import gen_suite as gen_suite_ottr
 from .solutions import remove_ignored_lines
 from .utils import get_source, lock, str_to_doctest
 
-from ..test_files.abstract_test import TestFile, OK_FORMAT_VARNAME
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY, NotebookMetadataExceptionTestFile
+from ..test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
+from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
 Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
@@ -119,17 +119,6 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         "test_cases": tests,
     }
 
-    # if assignment.tests["ok_format"]:
-    #     suites = [gen_suite(tests)]
-    #     test = {
-    #         'name': question['name'],
-    #         'points': points,
-    #         'suites': suites,
-    #     }
-
-    # else:
-    #     test = EXCEPTION_BASED_TEST_FILE_TEMPLATE.render(name=question['name'], points=points, test_cases=tests)
-
     tests_dict[question['name']] = test_info
     lock(cell)
     return cell
@@ -228,8 +217,5 @@ def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force
                     f.write(test)
 
         else:
-            if not assignment.tests["ok_format"]:
-                test = NotebookMetadataExceptionTestFile.encode_string(test)
-
             # TODO: move this notebook to the notebook metadata test classes
             nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"][name] = test

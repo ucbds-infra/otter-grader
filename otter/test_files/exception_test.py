@@ -206,6 +206,21 @@ class ExceptionTestFile(TestFile):
         return cls(name, path, test_cases, all_or_nothing=False)
 
     @classmethod
+    def from_string(cls, s, path="<string>"):
+        """
+        Parse an exception-based test file as a string and return an ``ExceptionTestFile``.
+
+        Args:
+            s (``str``): the test file
+            path (``str``, optional): the path to the test file
+
+        Returns:
+            ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
+        """
+        code = cls.compile_string(s, path=path)
+        return cls.from_compiled_code(s, path=path)
+
+    @classmethod
     def from_file(cls, path):
         """
         Parse an exception-based test file and return an ``ExceptionTestFile``.
