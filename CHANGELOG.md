@@ -6,6 +6,10 @@ _This section contains features that will be released into a pre-release version
 
 * Added a new test file format based on raising exceptions per [#95](https://github.com/ucbds-infra/otter-grader/issues/95)
 
+**Unreleased:**
+
+* Added `libgomp` to R `environment.yml`
+
 **v3.1.0:**
 
 * Added a tool to convert Assign v0-formatted notebooks to v1 format
