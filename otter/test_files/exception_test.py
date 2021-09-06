@@ -193,11 +193,11 @@ class ExceptionTestFile(TestFile):
         name = env["name"]
         points = env.get("points", None)
         test_cases = []
-        for i, (_, v) in enumerate(sorted(env.items(), key=lambda t: t[0])):
+        for _, v in sorted(env.items(), key=lambda t: t[0]):
             if isinstance(v, test_case):
                 tc = v.to_namedtuple()
                 if tc.name is None:
-                    tc =  tc._replace(name=f"{name} - {i + 1}")
+                    tc =  tc._replace(name=f"{name} - {len(test_cases) + 1}")
                 test_cases.append(tc)
 
         test_cases = cls.resolve_test_file_points(points, test_cases)
