@@ -4,7 +4,7 @@ import yaml
 
 from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
-from ..utils import convert_config_description_dict
+from ..utils import convert_config_description_dict, recursive_dict_update
 
 
 _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
@@ -229,7 +229,7 @@ class Assignment:
         for k in config.keys():
             if k not in self.allowed_configs:
                 raise ValueError(f"Unexpected assignment config: '{k}'")
-        self.config.update(config)
+        recursive_dict_update(self.config, config)
 
     @property
     def is_r(self):
