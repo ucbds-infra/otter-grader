@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Added `libgomp` to R `environment.yml`
+
 **v3.1.0:**
 
 * Added a tool to convert Assign v0-formatted notebooks to v1 format
