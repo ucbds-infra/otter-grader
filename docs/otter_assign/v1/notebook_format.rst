@@ -420,6 +420,7 @@ a test case function as described :ref:`here <test_files_python_exception_based>
 test in the master notebook by calling the function, but you should make  sure that this call is 
 "ignored" by Otter Assign so that it's not included in the test file by appending ``# IGNORE`` to the
 end of line. You should *not* add the ``test_case`` decorator; Otter Assign will do this for you. 
+
 For example,
 
 .. code-block:: python
@@ -433,6 +434,24 @@ For example,
 
     test_validity(arr)  # IGNORE
 
+It is important to note that the exception-based test files are executed before the student's global
+environment is provided, so no work should be performed outside the test case function that relies
+on student code, and any libraries or other variables declared in the student's environment must be
+passed in as arguments, otherwise the test will fail.
+
+For example,
+
+.. code-block:: python
+
+    def test_values(arr):
+        assert np.allclose(arr, [1.2, 3.4, 5.6])  # this will fail, because np is not in the test file
+
+    def test_values(np, arr):
+        assert np.allclose(arr, [1.2, 3.4, 5.6])  # this works
+
+    def test_values(env):
+        assert env["np"].allclose(env["arr"], [1.2, 3.4, 5.6])  # this also works
+
 
 OK-Formatted Test Cells
 ???????????????????????
@@ -442,6 +461,22 @@ To use OK-formatted tests, which are no longer the default for Otter Assign, you
 cell; Otter Assign will parse the output of the cell to write a doctest for the question, which will 
 be used for the test case. **Make sure that only the last line of the cell produces any output, 
 otherwise the test will fail.**
+
+
+R Test Cells
+????????????
+
+Test cells in R notebooks are like a cross between exception-based test cells and OK-formatted test
+cells: the checks in the cell do not need to be wrapped in a function, but the passing or failing of
+the test is determined by whether it raises an error, not by checking the output. For example,
+
+.. code-block:: r
+
+    . = " # BEGIN TEST CONFIG
+    hidden: true
+    points: 1
+    " # END TEST CONFIG
+    testthat::expect_equal(sieve(3), c(2, 3))
 
 
 .. _otter_assign_v1_python_seeding:
