@@ -96,21 +96,21 @@ which uses the Sieve of Eratosthenes to return a set of the ``n`` first prime nu
 Resolving Point Values
 ++++++++++++++++++++++
 
-Point values for each test case and the question will be resolved as follows:
+Point values for each test case and the question defined by the test file will be resolved as follows:
 
-* If one or more test cases specify a point value and no point value is specified for the question, 
+* If one or more test cases specify a point value and no point value is specified for the test file, 
   each test case with unspecified point values is assumed to be worth 0 points.
-* If one or more test cases specify a point value and a point value *is* specified for the question, 
+* If one or more test cases specify a point value and a point value *is* specified for the test file, 
   each test case with unspecified point values is assumed to be equally weighted and together are 
-  worth the question point value less the sum of specified point values. For example, in a 6-point 
-  question with 4 test cases where two test cases are each specified to be worth 2 points, each of 
+  worth the test file point value less the sum of specified point values. For example, in a 6-point 
+  test file with 4 test cases where two test cases are each specified to be worth 2 points, each of 
   the other test cases is worth :math:`\frac{6-(2 + 2)}{2} = 1` point.)
-* If no test cases specify a point value and a point value *is* specified for the question, each 
+* If no test cases specify a point value and a point value *is* specified for the test file, each 
   test case is assumed to be equally weighted and is assigned a point value of :math:`\frac{p}{n}` 
-  where :math:`p` is the number of points for the question and :math:`n` is the number of test 
+  where :math:`p` is the number of points for the test file and :math:`n` is the number of test 
   cases.
-* If no test cases specify a point value and no point value is specified for the question, the 
-  question is assumed to be worth 1 point and each test case is equally weighted.
+* If no test cases specify a point value and no point value is specified for the test file, the 
+  test file is assumed to be worth 1 point and each test case is equally weighted.
 
 
 OK Format
