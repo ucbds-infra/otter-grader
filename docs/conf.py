@@ -213,12 +213,27 @@ files_to_replace = [
 
 def extract_descriptions_as_comments(config):
     coms = []
+    # for d in config:
+    #     coms.append("# " + d["description"])
+    #     default = d.get("default", None)
+    #     if isinstance(default, list) and len(default) > 0 and \
+    #             all(isinstance(e, dict) for e in default):
+    #         coms.extend(extract_descriptions_as_comments(default))
+    # return coms
+
     for d in config:
         coms.append("# " + d["description"])
-        default = d.get("default", None)
+        default = d.get("default")
+        subkeys = d.get("subkeys")
         if isinstance(default, list) and len(default) > 0 and \
                 all(isinstance(e, dict) for e in default):
-            coms.extend(extract_descriptions_as_comments(default))
+            subcoms = extract_descriptions_as_comments(default)
+        elif isinstance(subkeys, list) and len(subkeys) > 0 and \
+                all(isinstance(e, dict) for e in subkeys):
+            subcoms = extract_descriptions_as_comments(subkeys)
+        else:
+            subcoms = []
+        coms.extend(subcoms)
     return coms
 
 def add_comments_to_yaml(yaml, comments):
@@ -256,7 +271,6 @@ def update_yaml_block(file):
         member_data = getattr(import_module(module_path), member_name)
 
         defaults = convert_config_description_dict(member_data, for_docs=True)
-        # breakpoint()
         code = yaml.safe_dump(defaults, indent=2, sort_keys=False)
         comments = extract_descriptions_as_comments(member_data)
         code = add_comments_to_yaml(code, comments)

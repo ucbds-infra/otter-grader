@@ -4,6 +4,8 @@ Python Format
 Python test files can follow one of two formats: exception-based or the OK format.
 
 
+.. _test_files_python_exception_based:
+
 Exception-Based Format
 ----------------------
 
