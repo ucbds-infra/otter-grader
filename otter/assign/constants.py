@@ -26,6 +26,8 @@ IGNORE_REGEX = r"(##\s*ignore\s*##\s*|#\s*ignore\s*)"
 EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template("""\
 from otter.test_files import test_case
 
+{{ OK_FORMAT_VARNAME }} = True
+
 name = "{{ name }}"
 points = {{ points }}
 

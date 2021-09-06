@@ -5,6 +5,9 @@ from collections import namedtuple
 from textwrap import indent
 
 
+OK_FORMAT_VARNAME = "OK_FORMAT"
+
+
 # class for storing the test cases themselves
 #   - body is the string that gets run for the test
 #   - hidden is the visibility of the test case

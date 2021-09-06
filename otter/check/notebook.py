@@ -155,6 +155,7 @@ class Notebook:
         Returns:
             ``otter.test_files.abstract_test.TestFile``: the grade for the question
         """
+        # TODO: formalize this logic and put into a utils function
         if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
             test_path = os.path.join(self._path, question + ".py")
             test_name = None

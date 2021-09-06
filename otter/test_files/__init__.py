@@ -2,19 +2,61 @@
 
 import json
 import math
+import nbformat
 import os
 import pickle
 
 from collections import namedtuple
 
-from .abstract_test import TestCase, TestCaseResult
+from .abstract_test import OK_FORMAT_VARNAME, TestCase, TestCaseResult
 from .exception_test import ExceptionTestFile, test_case
-from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
+from .metadata_test import NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY, \
+    NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
 from ..check.logs import QuestionNotInLogException
 from ..run.run_autograder.constants import DEFAULT_OPTIONS
+
+
+def create_test_file(path, test_name=None):
+    """
+    Read a test file or a notebook file and determine the correct ``TestFile`` subclass for this test.
+
+    If ``path`` is not a notebook, the file is executed as a Python script and a global variable is
+    used to determine whether the test is OK-formatted or not.
+
+    Args:
+        path (``str``): the path to the test file or notebook
+        test_name (``str``, optional): the name of the test in the notebook metadata, if ``path`` is
+            the path to a Jupyter notebook
+
+    Returns:
+        ``TestFile``: an instance of the correct test file
+    """
+    if os.path.splitext(path)[1] == ".ipynb":
+        if test_name is None:
+            raise ValueError("You must specify a test name when using notebook metadata tests")
+
+        nb = nbformat.read(path, as_version=NBFORMAT_VERSION)
+        if nb["metadata"][NOTEBOOK_METADATA_KEY][OK_FORMAT_VARNAME]:
+            return NotebookMetadataOKTestFile.from_file(path, test_name)
+
+        else:
+            return NotebookMetadataExceptionTestFile.from_file(path, test_name)
+
+    env = {}
+    with open(path) as f:
+        exec(f.read(), env)
+
+    if OK_FORMAT_VARNAME not in env:
+        raise RuntimeError(f"Malformed test file: does not define the global variable '{OK_FORMAT_VARNAME}'")
+
+    if env[OK_FORMAT_VARNAME]:
+        return OKTestFile.from_file(path)
+
+    else:
+        return ExceptionTestFile.from_file(path)
 
 
 GradingTestCaseResult = namedtuple(

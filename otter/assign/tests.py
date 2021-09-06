@@ -13,7 +13,7 @@ from .r_adapter.tests import gen_suite as gen_suite_ottr
 from .solutions import remove_ignored_lines
 from .utils import get_source, lock, str_to_doctest
 
-from ..test_files.abstract_test import TestFile
+from ..test_files.abstract_test import TestFile, OK_FORMAT_VARNAME
 from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY, NotebookMetadataExceptionTestFile
 
 
@@ -189,6 +189,7 @@ def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force
         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
             nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
         nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"] = {}
+        nb["metadata"][NOTEBOOK_METADATA_KEY][OK_FORMAT_VARNAME] = assignment.tests["ok_format"]
 
     test_ext = ".py" if assignment.is_python else ".R"
     for test_name, test_info in test_files.items():
@@ -209,12 +210,18 @@ def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force
             }
 
         else:
-            test = EXCEPTION_BASED_TEST_FILE_TEMPLATE.render(name=name, points=points, test_cases=test_cases)
+            template_kwargs = {
+                "name": name, 
+                "points": points, 
+                "test_cases": test_cases, 
+                "OK_FORMAT_VARNAME": OK_FORMAT_VARNAME,
+            }
+            test = EXCEPTION_BASED_TEST_FILE_TEMPLATE.render(**template_kwargs)
 
         if assignment.tests["files"] or force_files:
             with open(test_path, "w+") as f:
                 if isinstance(test, dict):
-                    f.write("test = ")
+                    f.write(f"{OK_FORMAT_VARNAME} = False\n\ntest = ")
                     pprint.pprint(test, f, indent=4, width=200, depth=None)
 
                 else:
