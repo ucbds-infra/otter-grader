@@ -1,5 +1,6 @@
 """Assignment configurations for Otter Assign"""
 
+import copy
 import yaml
 
 from .constants import BLOCK_QUOTE
@@ -203,7 +204,7 @@ class Assignment:
     }
 
     def __init__(self):
-        self.config = type(self).defaults.copy()
+        self.config = copy.deepcopy(type(self).defaults)
 
     def __getattr__(self, attr):
         if attr in type(self).defaults:
