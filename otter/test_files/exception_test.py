@@ -126,7 +126,7 @@ class ExceptionTestFile(TestFile):
     source = None
 
     @property
-    @lru_cache
+    @lru_cache(1)
     def source_lines(self):
         """
         The lines of ``self.source``
