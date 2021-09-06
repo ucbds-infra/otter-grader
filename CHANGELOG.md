@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v3.1.0:**
 
 * Added a tool to convert Assign v0-formatted notebooks to v1 format
 * Added `xeCJK` to the LaTeX exporter template and Docker images
