@@ -3,8 +3,9 @@
 import inspect
 import pathlib
 
+from functools import lru_cache
+
 from .abstract_test import TestCase, TestCaseResult, TestFile
-from .utils import get_traceback
 
 
 class test_case:
@@ -119,7 +120,26 @@ class ExceptionTestFile(TestFile):
         test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
             ``test_cases``
         grade (``float``): the percentage of ``points`` earned for this test file as a decimal
+        source (``str``): the test file contents
     """
+
+    source = None
+
+    @property
+    @lru_cache
+    def source_lines(self):
+        """
+        The lines of ``self.source``
+        """
+        return self.source.split("\n")
+
+    def _generate_error_message(self, excp):
+        """
+        """
+        lineno = excp.__traceback__.tb_lineno
+        line = self.source_lines[lineno - 1]
+        err_msg = str(excp).strip("'")
+        return f"Error at line {lineno}:\n  {line}\n{type(excp).__name__}: {err_msg}"
 
     def run(self, global_environment):
         """
@@ -136,14 +156,14 @@ class ExceptionTestFile(TestFile):
             try:
                 test_case.call_func(global_environment)
             except Exception as e:
-                passed, message = False, get_traceback(e)
+                passed, message = False, self._generate_error_message(e)
 
             test_case_results.append(TestCaseResult(test_case=tc, message=message, passed=passed))
 
         self.test_case_results = test_case_results
 
     @staticmethod
-    def compile_string(s, path="<string>"):
+    def _compile_string(s, path="<string>"):
         """
         Compile a string for execution.
 
@@ -157,25 +177,9 @@ class ExceptionTestFile(TestFile):
         return compile(s, path, "exec")
 
     @classmethod
-    def compile_test_file(cls, path):
+    def _from_compiled_code(cls, code, path=""):
         """
-        Compile a test file for execution.
-
-        Args:
-            path (``str``): the path to the test file
-
-        Returns:
-            ``code``: the compiled code of the file
-        """
-        with open(path) as f:
-            code = cls.compile_string(f.read(), path=path)
-
-        return code
-
-    @classmethod
-    def from_compiled_code(cls, code, path=""):
-        """
-        Parse an exception-based test file and return an ``ExceptionTestFile``.
+        Parse a compiled exception-based test file and return an ``ExceptionTestFile``.
 
         Args:
             code (``code``): the compiled code of the test file
@@ -217,8 +221,10 @@ class ExceptionTestFile(TestFile):
         Returns:
             ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
         """
-        code = cls.compile_string(s, path=path)
-        return cls.from_compiled_code(s, path=path)
+        code = cls._compile_string(s, path=path)
+        instc = cls._from_compiled_code(s, path=path)
+        instc.source = s
+        return instc
 
     @classmethod
     def from_file(cls, path):
@@ -231,5 +237,6 @@ class ExceptionTestFile(TestFile):
         Returns:
             ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
         """
-        code = cls.compile_test_file(path)
-        return cls.from_compiled_code(code, path=path)
+        with open(path) as f:
+            source = f.read()
+        return cls.from_string(source, path=path)
