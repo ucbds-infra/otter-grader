@@ -221,7 +221,7 @@ def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force
         if assignment.tests["files"] or force_files:
             with open(test_path, "w+") as f:
                 if isinstance(test, dict):
-                    f.write(f"{OK_FORMAT_VARNAME} = False\n\ntest = ")
+                    f.write(f"{OK_FORMAT_VARNAME} = True\n\ntest = ")
                     pprint.pprint(test, f, indent=4, width=200, depth=None)
 
                 else:

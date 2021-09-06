@@ -4,7 +4,6 @@ import copy
 import json
 import nbformat
 import os
-import pickle
 import shutil
 import tempfile
 

@@ -10,13 +10,16 @@ from collections import namedtuple
 
 from .abstract_test import OK_FORMAT_VARNAME, TestCase, TestCaseResult
 from .exception_test import ExceptionTestFile, test_case
-from .metadata_test import NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY, \
-    NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
+from .metadata_test import NOTEBOOK_METADATA_KEY, NotebookMetadataExceptionTestFile, \
+    NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
 from ..check.logs import QuestionNotInLogException
 from ..run.run_autograder.constants import DEFAULT_OPTIONS
+
+
+NBFORMAT_VERSION = 4
 
 
 def create_test_file(path, test_name=None):

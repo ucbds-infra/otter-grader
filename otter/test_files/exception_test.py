@@ -203,7 +203,7 @@ class ExceptionTestFile(TestFile):
         test_cases = cls.resolve_test_file_points(points, test_cases)
 
         path = str(pathlib.Path(path).as_posix())
-        return cls(name, points, test_cases, all_or_nothing=False)
+        return cls(name, path, test_cases, all_or_nothing=False)
 
     @classmethod
     def from_file(cls, path):

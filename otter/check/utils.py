@@ -4,7 +4,7 @@ Utils for Otter Check
 
 import hashlib
 import os
-import pickle
+import dill
 import tempfile
 import time
 
@@ -68,7 +68,7 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
             raise RuntimeError(results.stderr)
 
         with open(results_path, "rb") as f:
-            results = pickle.load(f)
+            results = dill.load(f)
 
         return results
 

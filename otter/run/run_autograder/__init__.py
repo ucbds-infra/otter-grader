@@ -3,7 +3,7 @@
 import os
 import json
 import pandas as pd
-import pickle
+import dill
 
 from .runners import create_runner
 from .utils import OtterRuntimeError
@@ -44,7 +44,7 @@ def main(autograder_dir, **kwargs):
             runner.prepare_files()
             scores = runner.run()
             with open("results/results.pkl", "wb+") as f:
-                    pickle.dump(scores, f)
+                    dill.dump(scores, f)
 
             output = scores.to_gradescope_dict(runner.get_options())
 

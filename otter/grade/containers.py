@@ -2,7 +2,7 @@
 import glob
 import os
 import pandas as pd
-import pickle
+import dill
 import pkg_resources
 import shutil
 import tempfile
@@ -191,7 +191,7 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             raise Exception(f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
 
         with open(results_file, "rb") as f:
-            scores = pickle.load(f)
+            scores = dill.load(f)
 
         scores = scores.to_dict()
         scores = {t: [scores[t]["score"]] if type(scores[t]) == dict else scores[t] for t in scores}
