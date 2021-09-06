@@ -150,7 +150,7 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
             {
                 "key": "ok_format",
                 "description": "whether the test cases are in OK-format (instead of the exception-based format)",
-                "default": True,
+                "default": False,
             },
         ],
     },

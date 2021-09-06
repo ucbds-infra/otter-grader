@@ -10,6 +10,7 @@ from collections import namedtuple
 
 from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, EXCEPTION_BASED_TEST_FILE_TEMPLATE
 from .r_adapter.tests import gen_suite as gen_suite_ottr
+from .solutions import remove_ignored_lines
 from .utils import get_source, lock, str_to_doctest
 
 from ..test_files.abstract_test import TestFile
@@ -76,7 +77,9 @@ def read_test(cell, question, assignment):
     success_message = config.get("success_message", None)
     failure_message = config.get("failure_message", None)
 
-    return Test('\n'.join(get_source(cell)[i+1:]), output, hidden, points, success_message, failure_message)
+    test_source = "\n".join(remove_ignored_lines(get_source(cell)[i+1:]))
+
+    return Test(test_source, output, hidden, points, success_message, failure_message)
 
 
 def gen_test_cell(question, tests, tests_dict, assignment):

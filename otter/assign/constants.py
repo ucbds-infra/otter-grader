@@ -26,12 +26,12 @@ IGNORE_REGEX = r"(##\s*ignore\s*##\s*|#\s*ignore\s*)"
 EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template("""\
 from otter.test_files import test_case
 
-name = {{ name }}
+name = "{{ name }}"
 points = {{ points }}
 
-{% for tc in test_cases %}@test_case(points={{ tc.points }}, hidden={{ tc.hidden }}, 
-    success_message="{{ tc.success_message }}", 
-    failure_message="{{ tc.failure_message }}")
+{% for tc in test_cases %}@test_case(points={{ tc.points }}, hidden={{ tc.hidden }}{% if tc.success_message is not none %}, 
+    success_message="{{ tc.success_message }}"{% endif %}{% if tc.failure_message is not none %}, 
+    failure_message="{{ tc.failure_message }}"{% endif %})
 {{ tc.input }}
 {% endfor %}
 """)
