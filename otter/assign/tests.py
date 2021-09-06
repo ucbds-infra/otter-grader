@@ -182,7 +182,7 @@ def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force
     """
     """
     # TODO: move this notebook to the notebook metadata test classes
-    if isinstance(nb, dict):
+    if isinstance(nb, dict) and not assignment.tests["files"]:
         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
             nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
         nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"] = {}
