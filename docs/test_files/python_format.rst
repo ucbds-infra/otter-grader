@@ -23,7 +23,7 @@ holds metadata about the test case. The ``test_case`` decorator takes (optional)
 The test file should also declare the global variable ``name``, which should be a string containing
 the name of the test case, and (optionally) ``points``, which should be the total point value of the
 question. If this is absent (or set to ``None``), it will be inferred from the point values of each
-test case as described :ref:`below <test_files_python_resolve_point_values>`. Because Otter supports
+test case as described :ref:`below <test_files_python_resolve_point_values>`. Because Otter also supports
 OK-formatted test files, the global variable ``OK_FORMAT`` must be set to ``False`` in exception-based
 test files.
 
