@@ -140,7 +140,9 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
 
     # remove hidden tests from student directory
     test_dir = str(student_dir / "tests")
-    shutil.rmtree(test_dir)
+    if assignment.tests["files"]:
+        shutil.rmtree(test_dir)
+
     write_tests(nb, test_dir, assignment.test_files, assignment, include_hidden=False)
 
     with open(student_nb_path, "w") as f:

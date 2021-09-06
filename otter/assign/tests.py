@@ -202,7 +202,7 @@ def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force
             test = {
                 "name": name,
                 "points": points,
-                "suites": gen_suite(test_cases),
+                "suites": [gen_suite(test_cases)],
             }
 
         else:
