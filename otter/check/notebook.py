@@ -113,14 +113,15 @@ class Notebook:
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
-    def _resolve_nb_path(self, nb_path):
+    def _resolve_nb_path(self, nb_path, fail_silently=False):
         """
         Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``, ``self._notebook``
-        is checked, then the working directory is searched for ``.ipynb`` files. If none are found, or 
-        more than one is found, a ``ValueError`` is raised.
+        is checked, then the working directory is searched for ``.ipynb`` files.
 
         Args:
             nb_path (``Optional[str]``): path to the notebook
+            fail_silently (``bool``): if true, the method does not fail the notebook path can't be
+                resolved
         
         Returns:
             ``str``: resolved notebook path
@@ -133,10 +134,10 @@ class Notebook:
 
         elif nb_path is None and glob("*.ipynb"):
             notebooks = glob("*.ipynb")
-            assert len(notebooks) == 1, "nb_path not specified and > 1 notebook in working directory"
-            nb_path = notebooks[0]
+            if len(notebooks) == 1:
+                nb_path = notebooks[0]
 
-        elif nb_path is None:
+        if nb_path is None and not fail_silently:
             raise ValueError("Could not resolve notebook path")
 
         return nb_path
@@ -155,7 +156,8 @@ class Notebook:
         Returns:
             ``otter.test_files.abstract_test.TestFile``: the grade for the question
         """
-        test_path, test_name = resolve_test_info(self._path, self._resolve_nb_path(None), question)
+        test_path, test_name = resolve_test_info(
+            self._path, self._resolve_nb_path(None, fail_silently=True), question)
 
         # raise an error for a metadata test on Colab
         if test_name is not None and self._colab:
@@ -359,7 +361,7 @@ class Notebook:
         """
         self._log_event(EventType.BEGIN_CHECK_ALL)
 
-        tests = list_available_tests(self._path, self._resolve_nb_path(None))
+        tests = list_available_tests(self._path, self._resolve_nb_path(None, fail_silently=True))
 
         global_env = inspect.currentframe().f_back.f_back.f_globals
 

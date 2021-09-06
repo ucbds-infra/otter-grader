@@ -160,6 +160,9 @@ def list_available_tests(tests_dir, nb_path):
             if file != "__init__.py"]
 
     else:
+        if nb_path is None:
+            raise ValueError("Tests directory does not exist and no notebook path provided")
+
         with open(nb_path) as f:
             nb = json.load(f)
 
@@ -188,6 +191,9 @@ def resolve_test_info(tests_dir, nb_path, question):
         test_name = None
 
     else:
+        if nb_path is None:
+            raise ValueError("Tests directory does not exist and no notebook path provided")
+
         test_path = nb_path
         test_name = question
 
