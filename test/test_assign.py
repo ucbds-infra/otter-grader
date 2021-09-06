@@ -43,6 +43,15 @@ class TestAssign(TestCase):
         assign(TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v1=True)
        
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
+
+    def test_exception_example(self):
+        """
+        Checks that otter assign filters and outputs correctly
+        """
+        # run otter assign
+        assign(TEST_FILES_PATH + "exception-example.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v1=True)
+       
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "exception-correct")
         
     def test_otter_example(self):
         """
