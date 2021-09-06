@@ -70,8 +70,10 @@ defaults) is ``export_cell``.
     save_environment: false        # a list of other files to include in the output directories and autograder
     variables: {}                  # a list of other files only to include in the autograder
     ignore_modules: []             # a list of plugin names and configurations
-    files: []                      # whether to store tests in separate .py files rather than in the notebook metadata
-    autograder_files: []           # whether this assignment will be run on Google Colab
+    files: []                      # information about the structure and storage of tests
+    autograder_files: []           # whether to store tests in separate files, instead of the notebook metadata
+    plugins: []                    # whether the test cases are in OK-format (instead of the exception-based format)
+    tests:                         # whether this assignment will be run on Google Colab
 
 .. END YAML TARGET
 
