@@ -10,5 +10,6 @@ dependencies:
     - r-essentials 
     - r-devtools
     - libgit2
+    - libgomp
     - pip:
         - -r requirements.txt{% else %}{{ other_environment }}{% endif %}
