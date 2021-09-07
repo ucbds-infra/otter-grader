@@ -1,10 +1,11 @@
 """Assignment configurations for Otter Assign"""
 
+import copy
 import yaml
 
 from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
-from ..utils import convert_config_description_dict
+from ..utils import convert_config_description_dict, recursive_dict_update
 
 
 _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
@@ -139,10 +140,20 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "default": [],
     },
     {
-        "key": "test_files",
-        "description": "whether to store tests in separate .py files rather than in the notebook " \
-            "metadata",
-        "default": False,
+        "key": "tests",
+        "description": "information about the structure and storage of tests",
+        "default": [
+            {
+                "key": "files",
+                "description": "whether to store tests in separate files, instead of the notebook metadata",
+                "default": False,
+            },
+            {
+                "key": "ok_format",
+                "description": "whether the test cases are in OK-format (instead of the exception-based format)",
+                "default": True,
+            },
+        ],
     },
     {
         "key": "colab",
@@ -188,11 +199,12 @@ class Assignment:
         "lang": None,
         "_temp_test_dir": None, # path to a temp dir for tests for otter generate
         "notebook_basename": None,
+        "test_files": {},  # test file name -> test file info
         **convert_config_description_dict(_DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS),
     }
 
     def __init__(self):
-        self.config = type(self).defaults.copy()
+        self.config = copy.deepcopy(type(self).defaults)
 
     def __getattr__(self, attr):
         if attr in type(self).defaults:
@@ -218,7 +230,7 @@ class Assignment:
         for k in config.keys():
             if k not in self.allowed_configs:
                 raise ValueError(f"Unexpected assignment config: '{k}'")
-        self.config.update(config)
+        recursive_dict_update(self.config, config)
 
     @property
     def is_r(self):

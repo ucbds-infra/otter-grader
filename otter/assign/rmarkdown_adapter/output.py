@@ -10,9 +10,8 @@ import nbformat
 
 from .notebook_transformer import transform_notebook
 from .solutions import overwrite_seed_vars, strip_solutions_and_output
+from .tests import remove_hidden_tests_from_dir, write_test
 
-from ..r_adapter.tests import remove_hidden_tests_from_dir
-from ..tests import write_test
 
 def write_autograder_dir(rmd_path, output_rmd_path, assignment):
     """
@@ -44,7 +43,6 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
     if assignment.requirements:
         shutil.copy(requirements, str(output_dir / 'requirements.R'))
 
-
     environment = assignment.environment
     if environment is None and os.path.isfile("environment.yml"):
         environment = "environment.yml"
@@ -64,7 +62,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
     # write tests
     test_ext =".R"
     for test_name, test_file in test_files.items():
-        write_test({}, tests_dir / (test_name + test_ext), test_file, use_file=True)
+        write_test(tests_dir / (test_name + test_ext), test_file)
 
     # copy files
     for file in assignment.files:
@@ -81,6 +79,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
             rel_path = file_path.parent.relative_to(rmd_path.parent)
             os.makedirs(output_dir / rel_path, exist_ok=True)
             shutil.copy(file, str(output_dir / rel_path))
+
 
 def write_student_dir(rmd_name, autograder_dir, student_dir, assignment):
     """
@@ -123,7 +122,8 @@ def write_student_dir(rmd_name, autograder_dir, student_dir, assignment):
         f.write(rmd_string)
 
     # remove hidden tests from student directory
-    remove_hidden_tests_from_dir({}, student_dir / 'tests', assignment)
+    remove_hidden_tests_from_dir(student_dir / 'tests')
+
 
 def write_output_directories(master_rmd_path, result_dir, assignment):
     """

@@ -18,7 +18,5 @@ test = list(
         testthat::expect_true(x < 100)
       }
     )
-
-
   )
 )

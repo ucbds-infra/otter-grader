@@ -1,6 +1,6 @@
 import argparse
+import dill
 import os
-import pickle
 import shutil
 import tempfile
 import zipfile
@@ -35,7 +35,7 @@ def main():
         )
 
         with open(args.results_path, "wb") as f:
-            pickle.dump(results, f)
+            dill.dump(results, f)
     
     finally:
         shutil.rmtree(nb_dir)

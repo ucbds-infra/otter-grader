@@ -3,7 +3,6 @@ Logging for Otter Check
 """
 
 import os
-import pickle
 import types
 import dill
 import tempfile
@@ -134,7 +133,7 @@ class LogEntry:
         """
         try:
             file = open(filename, "ab+")
-            pickle.dump(self, file)
+            dill.dump(self, file)
 
         except OSError:
             raise Exception(
@@ -179,7 +178,7 @@ class LogEntry:
                     os.system(f"rm -f {filename}")
                     while True:
                         try:
-                            entry = pickle.load(tf)
+                            entry = dill.load(tf)
 
                             if entry.question == self.question and entry.shelf is not None:
 
@@ -277,7 +276,7 @@ class LogEntry:
             log = []
             while True:
                 try:
-                    log.append(pickle.load(file))
+                    log.append(dill.load(file))
                 except EOFError:
                     break
 

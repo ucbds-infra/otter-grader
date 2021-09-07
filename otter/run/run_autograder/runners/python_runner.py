@@ -2,7 +2,6 @@
 
 import json
 import os
-import pickle
 import shutil
 import warnings
 import zipfile

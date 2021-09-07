@@ -13,7 +13,7 @@ from .execute_log import execute_log
 from .execute_notebook import execute_notebook
 from .transforms import filter_ignored_cells, script_to_notebook
 
-from ..test_files import GradingResults, NotebookMetadataOKTestFile, OKTestFile
+from ..test_files import create_test_file, GradingResults
 from ..utils import id_generator
 
 
@@ -28,7 +28,7 @@ def check(nb_or_test_path, test_name=None, global_env=None):
     .. code-block:: python
 
         check('tests/q1.py')
-        check('tests/q1.py', globals())
+        check('tests/q1.py', global_env=globals())
     
     Args:
         nb_or_test_path (``str``): path to test file or notebook
@@ -40,10 +40,11 @@ def check(nb_or_test_path, test_name=None, global_env=None):
         ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
         given global environment
     """
-    if test_name is None:
-        test = OKTestFile.from_file(nb_or_test_path)
-    else:
-        test = NotebookMetadataOKTestFile.from_file(nb_or_test_path, test_name)
+    # if test_name is None:
+    #     test = OKTestFile.from_file(nb_or_test_path)
+    # else:
+    #     test = NotebookMetadataOKTestFile.from_file(nb_or_test_path, test_name)
+    test = create_test_file(nb_or_test_path, test_name=test_name)
 
     if global_env is None:
         # Get the global env of our callers - one level below us in the stack
@@ -136,7 +137,7 @@ def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors
                     include = False
 
             if include:
-                extra_tests.append(OKTestFile.from_file(t))
+                extra_tests.append(create_test_file(t))
                 extra_tests[-1].run(global_env)
 
         tests_run += extra_tests

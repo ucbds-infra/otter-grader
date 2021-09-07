@@ -2,7 +2,7 @@
 
 import json
 import os
-import pickle
+import dill
 import shutil
 import tempfile
 import zipfile
@@ -61,7 +61,7 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
 
         results_pkl_path = os.path.join(ag_dir, "results", "results.pkl")
         with open(results_pkl_path, "rb") as f:
-            results = pickle.load(f)
+            results = dill.load(f)
 
     finally:
         shutil.rmtree(dp)

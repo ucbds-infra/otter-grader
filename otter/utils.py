@@ -9,6 +9,7 @@ import string
 import shutil
 import tempfile
 
+from collections.abc import Mapping
 from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
 
@@ -310,3 +311,24 @@ def knit_rmd_file(rmd_path, pdf_path):
         pdf_path = os.path.abspath(pdf_path)
         rmarkdown = importr("rmarkdown")
         rmarkdown.render(ntf.name, "pdf_document", pdf_path)
+
+
+def recursive_dict_update(d, u):
+    """
+    Recursively update a possibly-nested ``dict`` in-place.
+
+    Args:
+        d (``dict``): the original dictionary to be updated
+        u (``dict``): the dictionary of new values to override in ``d``
+
+    Returns:
+        ``dict``: the original dictionary
+    """
+    for k, v in u.items():
+        d_v = d.get(k)
+        if isinstance(v, Mapping) and isinstance(d_v, Mapping):
+            d[k] = recursive_dict_update(d_v, v)
+        else:
+            d[k] = v
+
+    return d

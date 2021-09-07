@@ -4,7 +4,6 @@ import datetime as dt
 import inspect
 import json
 import os
-import pickle
 import re
 import time
 import warnings
@@ -18,7 +17,8 @@ from textwrap import indent
 from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import colab_incompatible, grade_zip_file, logs_event, running_on_colab, save_notebook
+from .utils import colab_incompatible, grade_zip_file, list_available_tests, logs_event, \
+    resolve_test_info, running_on_colab, save_notebook
 
 from ..execute import check
 from ..export import export_notebook
@@ -113,14 +113,15 @@ class Notebook:
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
-    def _resolve_nb_path(self, nb_path):
+    def _resolve_nb_path(self, nb_path, fail_silently=False):
         """
         Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``, ``self._notebook``
-        is checked, then the working directory is searched for ``.ipynb`` files. If none are found, or 
-        more than one is found, a ``ValueError`` is raised.
+        is checked, then the working directory is searched for ``.ipynb`` files.
 
         Args:
             nb_path (``Optional[str]``): path to the notebook
+            fail_silently (``bool``): if true, the method does not fail the notebook path can't be
+                resolved
         
         Returns:
             ``str``: resolved notebook path
@@ -133,10 +134,10 @@ class Notebook:
 
         elif nb_path is None and glob("*.ipynb"):
             notebooks = glob("*.ipynb")
-            assert len(notebooks) == 1, "nb_path not specified and > 1 notebook in working directory"
-            nb_path = notebooks[0]
+            if len(notebooks) == 1:
+                nb_path = notebooks[0]
 
-        elif nb_path is None:
+        if nb_path is None and not fail_silently:
             raise ValueError("Could not resolve notebook path")
 
         return nb_path
@@ -155,19 +156,16 @@ class Notebook:
         Returns:
             ``otter.test_files.abstract_test.TestFile``: the grade for the question
         """
-        if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
-            test_path = os.path.join(self._path, question + ".py")
-            test_name = None
+        test_path, test_name = resolve_test_info(
+            self._path, self._resolve_nb_path(None, fail_silently=True), question)
 
-        elif self._colab:
+        # raise an error for a metadata test on Colab
+        if test_name is not None and self._colab:
             raise ValueError(f"Test {question} does not exist")
 
-        else:
-            test_path = self._resolve_nb_path(None)
-            test_name = question
-
         # ensure that desired test exists
-        assert os.path.isfile(test_path), "Test {} does not exist".format(question)
+        if not os.path.isfile(test_path):
+            raise FileNotFoundError(f"Test {question} does not exist")
 
         # pass the correct global environment
         if global_env is None:
@@ -344,8 +342,7 @@ class Notebook:
             results = grade_zip_file(zip_path, nb_path, self._path)
             print(
                 "Your submission received the following results when run against " + \
-                "available test cases:\n\n" + indent(results.summary(), "    ")
-            )
+                "available test cases:\n\n" + indent(results.summary(), "    "))
 
         if display_link:
             # create and display output HTML
@@ -362,25 +359,17 @@ class Notebook:
         Runs all tests on this notebook. Tests are run against the current global environment, so any
         tests with variable name collisions will fail.
         """
-        # TODO: this should use functions in execute.py to run tests in-sequence so that variable
-        # name collisions are accounted for
         self._log_event(EventType.BEGIN_CHECK_ALL)
 
-        # TODO: this is a janky way of resolving where the tests are. Formalize a method of 
-        # determining this and put it into a method in e.g. utils.py
-        tests = [os.path.split(file)[1][:-3] for file in glob(os.path.join(self._path, "*.py")) \
-            if "__init__.py" not in file]
-        if len(tests) == 0:
-            nb_path = self._resolve_nb_path(None)
-            with open(nb_path) as f:
-                nb = json.load(f)
-            tests = list(nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"].keys())
+        tests = list_available_tests(self._path, self._resolve_nb_path(None, fail_silently=True))
 
         global_env = inspect.currentframe().f_back.f_back.f_globals
+
         results = []
         if not _SHELVE:
             for test_name in sorted(tests):
                 results.append(self.check(test_name, global_env))
+
         else:
             log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
             for file in sorted(tests):

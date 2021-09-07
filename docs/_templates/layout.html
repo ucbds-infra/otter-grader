@@ -7,9 +7,7 @@
     MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
 </script>
 {{ super() }}
-{% if pagename == "test_files/index" %}
-    <meta http-equiv="Refresh" content="0; url=ok_format.html" />
-{% elif pagename == "otter_assign/v0/index" %}
+{% if pagename == "otter_assign/v0/index" %}
     <meta http-equiv="Refresh" content="0; url=python_notebook_format.html" />
 {% elif pagename == "otter_assign/v1/index" %}
     <meta http-equiv="Refresh" content="0; url=notebook_format.html" />

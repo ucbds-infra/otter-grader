@@ -1,16 +1,11 @@
-"""
-Abstract base classes for working with test files and classes to represent collections of test and 
-their results
-"""
+"""Abstract test objects for providing a schema to write and parse test cases"""
 
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from textwrap import dedent, indent
-from typing import Tuple, List, Dict, Any
-from jinja2 import Template
-from pygments import highlight
-from pygments.lexers import PythonConsoleLexer
-from pygments.formatters import HtmlFormatter
+from textwrap import indent
+
+
+OK_FORMAT_VARNAME = "OK_FORMAT"
 
 
 # class for storing the test cases themselves
@@ -83,6 +78,7 @@ class TestFile(ABC):
                 raise ValueError("Points specified in test has different length than number of test cases")
             test_cases = [tc._replace(points=pt) for tc, pt in zip(test_cases, total_points)]
             total_points = None
+
         elif total_points is not None and not isinstance(total_points, (int, float)):
             raise TypeError(f"Test spec points has invalid type: {total_points}")
 
@@ -91,6 +87,7 @@ class TestFile(ABC):
             if test_case.points is not None:
                 assert type(test_case.points) in (int, float), f"Invalid point type: {type(test_case.points)}"
                 point_values.append(test_case.points)
+
             else:
                 point_values.append(None)
 
@@ -98,11 +95,13 @@ class TestFile(ABC):
         if total_points is not None:
             if pre_specified > total_points:
                 raise ValueError(f"More points specified in test cases that allowed for test")
+
             else:
                 try:
                     per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
                 except ZeroDivisionError:
                     per_remaining = 0.0
+
         else:
             if pre_specified == 0 and all(p in (0, None) for p in point_values):
                 # if only zeros specified, assume test worth 1 pt and divide amongst nonzero cases
@@ -110,8 +109,10 @@ class TestFile(ABC):
                     per_remaining = 1 / sum(p is None for p in point_values)
                 except ZeroDivisionError:
                     per_remaining = 0.0
+
             elif pre_specified == 0:
                 per_remaining = 1 / len(point_values)
+
             else:
                 # assume all other tests are worth 0 points
                 per_remaining = 0.0
