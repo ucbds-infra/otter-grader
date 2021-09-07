@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v3.1.1:**
 
 * Added `libgomp` to R `environment.yml`
 
