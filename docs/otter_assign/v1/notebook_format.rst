@@ -412,10 +412,20 @@ Because Otter supports two different types of test files, test cells can be writ
 ways.
 
 
+OK-Formatted Test Cells
+???????????????????????
+
+To use OK-formatted tests, which are the default for Otter Assign, you can write the test code in a test 
+cell; Otter Assign will parse the output of the cell to write a doctest for the question, which will 
+be used for the test case. **Make sure that only the last line of the cell produces any output, 
+otherwise the test will fail.**
+
+
 Exception-Based Test Cells
 ??????????????????????????
 
-To use Otter's exception-based tests (the default for Otter Assign), your test cells should define
+To use Otter's exception-based tests, you must set ``tests: ok_format: false`` in your assignment 
+config. Your test cells should define
 a test case function as described :ref:`here <test_files_python_exception_based>`. You can run the
 test in the master notebook by calling the function, but you should make  sure that this call is 
 "ignored" by Otter Assign so that it's not included in the test file by appending ``# IGNORE`` to the
@@ -451,16 +461,6 @@ For example,
 
     def test_values(env):
         assert env["np"].allclose(env["arr"], [1.2, 3.4, 5.6])  # this also works
-
-
-OK-Formatted Test Cells
-???????????????????????
-
-To use OK-formatted tests, which are no longer the default for Otter Assign, you must set 
-``tests: ok_format: true`` in your assignment config. Then, you can write the test code in  a test 
-cell; Otter Assign will parse the output of the cell to write a doctest for the question, which will 
-be used for the test case. **Make sure that only the last line of the cell produces any output, 
-otherwise the test will fail.**
 
 
 R Test Cells
