@@ -1,13 +1,11 @@
 """Execution of a Jupyter Notebook"""
 
-import ast
 import copy
 import os
 import tempfile
 
 from contextlib import redirect_stdout, redirect_stderr
 from IPython.display import display
-from unittest import mock
 
 try:
     from IPython.core.inputtransformer2 import TransformerManager

@@ -10,21 +10,18 @@ import warnings
 import zipfile
 
 from contextlib import contextmanager
-from getpass import getpass
 from glob import glob
-from IPython import get_ipython
-from IPython.display import display, HTML, Javascript
+from IPython.display import display, HTML
 from textwrap import indent
-from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
 from .utils import colab_incompatible, grade_zip_file, grading_mode_disabled, list_available_tests, \
     logs_event, resolve_test_info, running_on_colab, save_notebook
+
 from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"

@@ -1,13 +1,6 @@
-"""
-Execution and grading internals for Otter-Grader
-"""
+"""Execution and grading internals for Otter-Grader"""
 
-import json
-import inspect
-import itertools
 import nbformat
-
-from IPython import get_ipython
 
 from .checker import Checker
 from .execute_log import execute_log
