@@ -70,7 +70,7 @@ class NotebookMetadataOKTestFile(OKTestFile):
         Returns:
             ``otter.ok_parser.OKTest``: new ``OKTest`` object created from the given file
         """
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             nb = json.load(f)
         
         test_spec = nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"]
