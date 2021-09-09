@@ -1,4 +1,4 @@
-""""""
+"""Class for running tests from test files"""
 
 import inspect
 
