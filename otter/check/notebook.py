@@ -9,6 +9,7 @@ import time
 import warnings
 import zipfile
 
+from contextlib import contextmanager
 from getpass import getpass
 from glob import glob
 from IPython import get_ipython
@@ -17,10 +18,9 @@ from textwrap import indent
 from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import colab_incompatible, grade_zip_file, list_available_tests, logs_event, \
-    resolve_test_info, running_on_colab, save_notebook
-
-from ..execute import check
+from .utils import grade_zip_file, list_available_tests, resolve_test_info, running_on_colab, \
+    save_notebook
+from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
@@ -30,6 +30,78 @@ from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
 _ZIP_NAME_FILENAME = "__zip_filename__"
+
+
+class _NotebookDecorators:
+    """
+    A class housing static methods that serve as decorators for the ``Notebook`` class.
+    """
+
+    # TODO: maintain wrapped function docstrings
+
+    @staticmethod
+    def colab_incompatible(f):
+        """
+        A decator that raises an error if the wrapped function is called in an environment running on
+        Google Colab.
+        """
+        def colab_only_method(self, *args, **kwargs):
+            if self._colab:
+                raise RuntimeError("This method is not compatible with Google Colab")
+            return f(self, *args, **kwargs)
+        return colab_only_method
+
+    @staticmethod
+    def grading_mode_disabled(f):
+        """
+        A decorator that returns without calling the wrapped function if the Notebook grading mode
+        is enabled.
+        """
+        def non_grading_mode_method(self, *args, **kwargs):
+            if type(self)._grading_mode:
+                return
+            return f(self, *args, **kwargs)
+        return non_grading_mode_method
+
+    @staticmethod
+    def logs_event(event_type):
+        """
+        A decorator that ensures each call is logged in the Otter log with type ``event_type``.
+
+        Events logging a ``EventType.CHECK`` should return a 3-tuple of the question name, the
+        ``TestFile`` and an environment to shelve. All other methods should just return their 
+        default return value, which will be logged.
+        """
+
+        def event_logger(f):
+            """
+            Wraps a function and ensures that the call's results are logged using 
+            ``Notebook._log_event``.
+            """
+
+            def run_function(self, *args, **kwargs):
+                """
+                Runs a method, catching any errors and logging the call. Returns the return value
+                of the function, unless ``EventType.CHECK`` is used, in which case the return value
+                is assumed to be a 3-tuple and the second value in the tuple is returned.
+                """
+                try:
+                    if event_type == EventType.CHECK:
+                        question, results, shelve_env = f(self, *args, **kwargs)
+                    else:
+                        results = f(self, *args, **kwargs)
+                        shelve_env = {}
+                        question = None
+                except Exception as e:
+                    self._log_event(event_type, success=False, error=e)
+                    raise e
+                else:
+                    self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
+                return results
+
+            return run_function
+
+        return event_logger
 
 
 class Notebook:
@@ -45,8 +117,9 @@ class Notebook:
 
     # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
+    _grading_mode = False
 
-    @logs_event(EventType.INIT)
+    @_NotebookDecorators.logs_event(EventType.INIT)
     def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
         global _SHELVE
 
@@ -81,6 +154,26 @@ class Notebook:
             self._vars_to_store = self._config.get("variables", None)
 
             self._notebook = self._config["notebook"]
+
+    @classmethod
+    @contextmanager
+    def grading_mode(cls, tests_dir):
+        """
+        A context manager for the ``Notebook`` grading mode. Yields a pointer to the list of results
+        that will be populated during grading.
+
+        **It is the caller's responsibility to maintain the pointer.** The pointer in the ``Checker``
+        class will be overwritten when the context exits.
+        """
+        cls._grading_mode = True
+        cls._tests_dir_override = tests_dir
+        Checker.clear_results()
+        Checker.enable_tracking()
+        yield Checker.get_results()
+        cls._grading_mode = False
+        cls._tests_dir_override = None
+        Checker.disable_tracking()
+        Checker.clear_results()
 
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
@@ -142,7 +235,7 @@ class Notebook:
 
         return nb_path
 
-    @logs_event(EventType.CHECK)
+    @_NotebookDecorators.logs_event(EventType.CHECK)
     def check(self, question, global_env=None):
         """
         Runs tests for a specific question against a global environment. If no global environment
@@ -172,11 +265,11 @@ class Notebook:
             global_env = inspect.currentframe().f_back.f_back.f_globals
 
         # run the check
-        result = check(test_path, test_name, global_env)
+        result = Checker.check(test_path, test_name, global_env)
 
         return question, result, global_env
 
-    @colab_incompatible
+    @_NotebookDecorators.colab_incompatible
     def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the plugin ``plugin_name`` with the specified arguments. Use ``nb_path`` if the path
@@ -198,8 +291,9 @@ class Notebook:
             self._plugin_collections[plugin_name] = pc
         pc.run("from_notebook", *args, **kwargs)
 
-    @colab_incompatible
-    @logs_event(EventType.TO_PDF)
+    @_NotebookDecorators.grading_mode_disabled
+    @_NotebookDecorators.colab_incompatible
+    @_NotebookDecorators.logs_event(EventType.TO_PDF)
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
         """
         Exports a notebook to a PDF using Otter Export
@@ -236,7 +330,8 @@ class Notebook:
             display(HTML(out_html))
         self._log_event(EventType.TO_PDF)
 
-    @colab_incompatible
+    @_NotebookDecorators.grading_mode_disabled
+    @_NotebookDecorators.colab_incompatible
     def add_plugin_files(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the ``notebook_export`` event of the plugin ``plugin_name`` and tracks the file paths
@@ -260,8 +355,9 @@ class Notebook:
             return
         self._addl_files.extend(addl_files)
 
-    @colab_incompatible
-    @logs_event(EventType.END_EXPORT)
+    @_NotebookDecorators.grading_mode_disabled
+    @_NotebookDecorators.colab_incompatible
+    @_NotebookDecorators.logs_event(EventType.END_EXPORT)
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
             display_link=True, force_save=False, run_tests=False):
         """
@@ -353,7 +449,8 @@ class Notebook:
 
             display(HTML(out_html))
 
-    @logs_event(EventType.END_CHECK_ALL)
+    @_NotebookDecorators.grading_mode_disabled
+    @_NotebookDecorators.logs_event(EventType.END_CHECK_ALL)
     def check_all(self):
         """
         Runs all tests on this notebook. Tests are run against the current global environment, so any
@@ -363,7 +460,7 @@ class Notebook:
 
         tests = list_available_tests(self._path, self._resolve_nb_path(None, fail_silently=True))
 
-        global_env = inspect.currentframe().f_back.f_back.f_globals
+        global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
 
         results = []
         if not _SHELVE:
