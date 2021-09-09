@@ -42,6 +42,7 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
     """
     if initial_env:
         global_env = initial_env.copy()
+
     else:
         global_env = {}
 
@@ -92,6 +93,7 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
                             if source_is_str_bool:
                                 code_lines.append('\n')
 
+                    # TODO: move to helper function
                     if seed is not None:
                         if seed_variable is None:
                             cell_source = f"np.random.seed({seed})\nrandom.seed({seed})\n" + \
@@ -106,6 +108,7 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
 
                     with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
                         exec(cell_source, global_env)
+
                     source += cell_source
 
                 except:

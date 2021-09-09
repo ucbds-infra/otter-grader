@@ -312,6 +312,21 @@ class TestNotebook(TestCase):
             with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
                 grader.export()
 
+    @mock.patch.object(Notebook, "_resolve_nb_path")
+    def test_grading_mode(self, mocked_resolve_nb_path):
+        """
+        Check that a call to a grading-mode-disabled method is not executed.
+        """
+        with Notebook.grading_mode(tests_dir="foo"):
+            grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
+            grader.export()
+
+            # TODO: find a better way of doing this than accessing a private field
+            self.assertEqual(grader._path, "foo")
+
+            # if export is called, this method would be called first
+            mocked_resolve_nb_path.assert_not_called()
+
     def tearDown(self):
         for i in range(1, 7):
             file = "demofile{}.otter".format(i)

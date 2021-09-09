@@ -94,7 +94,9 @@ class Notebook:
         cls._tests_dir_override = tests_dir
         Checker.clear_results()
         Checker.enable_tracking()
+
         yield Checker.get_results()
+
         cls._grading_mode = False
         cls._tests_dir_override = None
         Checker.disable_tracking()
