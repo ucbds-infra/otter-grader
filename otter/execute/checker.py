@@ -7,6 +7,9 @@ from ..test_files import create_test_file
 
 class Checker:
     """
+    A class for running and optionally tracking checks against test files.
+
+    This class is not meant to be instantiated and is composed solely of class methods.
     """
 
     _track_results = False
@@ -17,24 +20,39 @@ class Checker:
 
     @classmethod
     def enable_tracking(cls):
+        """
+        Enable the tracking of test results from calls to ``check``.
+        """
         cls._track_results = True
 
     @classmethod
     def disable_tracking(cls):
+        """
+        Disable the tracking of test results from calls to ``check``.
+        """
         cls._track_results = False
 
     @classmethod
     def get_results(cls):
+        """
+        Get a pointer to the list into which check results are being collected.
+        """
         return cls._test_files
 
     @classmethod
     def clear_results(cls):
+        """
+        Overwrite the pointer to the check result collection list.
+
+        Does not affect the original list, only overwrites the field in the ``Checker`` class that
+        points to it.
+        """
         cls._test_files = []
 
     @classmethod
     def check(cls, nb_or_test_path, test_name=None, global_env=None):
         """
-        Checks a global environment against given test file. If global_env is ``None``, the global 
+        Checks a global environment against given test file. If ``global_env`` is ``None``, the global 
         environment of the calling frame is used; i.e., the following two calls are equivalent:
 
         .. code-block:: python
