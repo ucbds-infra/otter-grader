@@ -47,7 +47,7 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {
         "key": "check_all_cell",
         "description": "whether to include an Otter check-all cell in the output notebooks",
-        "default": True,
+        "default": False,
     },
     {
         "key": "export_cell",
@@ -77,7 +77,7 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
             {
                 "key": "run_tests",
                 "description": "whether to run student submissions against local tests during export",
-                "default": False,
+                "default": True,
             },
         ],
     },
