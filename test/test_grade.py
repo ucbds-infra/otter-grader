@@ -85,7 +85,7 @@ class TestGrade(TestCase):
                 autograder=TEST_FILES_PATH + "autograder.zip",
                 containers=5,
                 image="otter-test",
-                timeout=40,
+                timeout=20,
                 debug=True,
                 verbose=True,
             )
