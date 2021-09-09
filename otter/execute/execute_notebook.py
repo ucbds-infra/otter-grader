@@ -112,7 +112,7 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
                     if not ignore_errors:
                         raise
 
-            # TODO: don't need to collect
+            # add any required checks from this cell
             source += create_collected_check_cell(cell, notebook_class_name, test_dir)
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py") as ntf:
