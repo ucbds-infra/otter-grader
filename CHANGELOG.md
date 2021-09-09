@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Specify UTF-8 encoding in all `open` calls used for reading JSON for Windows compatibility per [#380](https://github.com/ucbds-infra/otter-grader/issues/380)
+
 **v3.1.1:**
 
 * Added `libgomp` to R `environment.yml`
