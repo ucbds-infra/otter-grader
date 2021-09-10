@@ -41,6 +41,10 @@ def run_release_commands(test, beta, new_version, no_twine=False):
         f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}' {' -p' if beta else ''} {new_version}",
     ]
 
+    if not beta:
+        commands.append(f"gh pr create --base 'stable' --head 'master' --title 'Release v{new_version}'" \
+            " --milestone 'v{new_version}' --project ' Otter-Grader Issues and Tasks' --repo 'ucbds-infra/otter-grader'")
+
     if no_twine:
         del commands[2]
 

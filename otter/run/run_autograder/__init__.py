@@ -24,7 +24,7 @@ def main(autograder_dir, **kwargs):
     """
     config_fp = os.path.join(autograder_dir, "source", "otter_config.json")
     if os.path.isfile(config_fp):
-        with open(config_fp) as f:
+        with open(config_fp, encoding="utf-8") as f:
             config = json.load(f)
     else:
         config = {}

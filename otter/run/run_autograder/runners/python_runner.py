@@ -90,7 +90,7 @@ class PythonRunner(AbstractLanguageRunner):
         """
         try:
             # get student email
-            with open("../submission_metadata.json") as f:
+            with open("../submission_metadata.json", encoding="utf-8") as f:
                 metadata = json.load(f)
 
             student_emails = []
@@ -117,7 +117,7 @@ class PythonRunner(AbstractLanguageRunner):
             plugins = self.options["plugins"]
 
             if plugins:
-                with open("../submission_metadata.json") as f:
+                with open("../submission_metadata.json", encoding="utf-8") as f:
                     submission_metadata = json.load(f)
 
                 plugin_collection = PluginCollection(
