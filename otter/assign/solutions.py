@@ -52,7 +52,7 @@ def overwrite_seed_vars(nb, seed_variable, seed):
     return nb
 
 
-solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
+solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*=).* ?# ?SOLUTION")
 def solution_assignment_sub(match):
     """
     Substitutes the first matching group  with ` ...`
@@ -61,7 +61,7 @@ def solution_assignment_sub(match):
     return prefix + ' ...'
 
 
-solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
+solution_line_regex = re.compile(r"(\s*).* ?# ?SOLUTION")
 def solution_line_sub(match):
     """
     Substitutes the first matching group  with `...`
@@ -78,10 +78,7 @@ SUBSTITUTIONS = {
         (solution_assignment_regex, solution_assignment_sub),
         (solution_line_regex, solution_line_sub),
     ],
-    "r":  [
-        (solution_assignment_regex, r_solutions.solution_assignment_sub),
-        (solution_line_regex, r_solutions.solution_line_sub),
-    ],
+    "r":  r_solutions.SUBSTITUTIONS,
 }
 
 
@@ -127,6 +124,7 @@ def replace_solutions(lines, lang):
             m = exp.match(line)
             if m:
                 line = sub(m)
+                break
         
         stripped.append(line)
     
