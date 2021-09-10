@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Fixed [#389](https://github.com/ucbds-infra/otter-grader/issues/389) by closing file handles in Otter Grade before removing them
+
 **v3.1.2:**
 
 * Specify UTF-8 encoding in all `open` calls used for reading JSON for Windows compatibility per [#380](https://github.com/ucbds-infra/otter-grader/issues/380)
