@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v3.1.2:**
 
 * Specify UTF-8 encoding in all `open` calls used for reading JSON for Windows compatibility per [#380](https://github.com/ucbds-infra/otter-grader/issues/380)
 * Fixed incorrect prompt substitution in R notebooks and Rmd assignments
