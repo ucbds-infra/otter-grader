@@ -138,13 +138,13 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
 
-    _, temp_subm_path = tempfile.mkstemp()
+    temp_subm_file, temp_subm_path = tempfile.mkstemp()
     shutil.copyfile(submission_path, temp_subm_path)
 
     results_file, results_path = tempfile.mkstemp(suffix=".pkl")
     pdf_path = None
     if pdfs:
-        _, pdf_path = tempfile.mkstemp(suffix=".pdf")
+        pdf_file, pdf_path = tempfile.mkstemp(suffix=".pdf")
 
     try:
         nb_basename = os.path.basename(submission_path)
@@ -206,9 +206,12 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             shutil.copy(pdf_path, local_pdf_path)
 
     finally:
+        os.close(results_file)
         os.remove(results_path)
+        os.close(temp_subm_file)
         os.remove(temp_subm_path)
         if pdfs:
+            os.close(pdf_file)
             os.remove(pdf_path)
 
     return df
