@@ -1,19 +1,20 @@
-jupyter_client
+dill
 ipykernel
-matplotlib
-pandas
 jinja2
-python-on-whales
-requests
+jupyter_client
+matplotlib
 nbconvert
 nbformat
-dill
+pandas
 pdfkit
 PyPDF2
 PyYAML
+python-on-whales
+requests
+wrapt
 
 # plugins
-gspread
-google-auth-oauthlib
 google-api-python-client
+google-auth-oauthlib
+gspread
 six

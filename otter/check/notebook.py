@@ -9,22 +9,19 @@ import time
 import warnings
 import zipfile
 
-from getpass import getpass
+from contextlib import contextmanager
 from glob import glob
-from IPython import get_ipython
-from IPython.display import display, HTML, Javascript
+from IPython.display import display, HTML
 from textwrap import indent
-from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import colab_incompatible, grade_zip_file, list_available_tests, logs_event, \
-    resolve_test_info, running_on_colab, save_notebook
+from .utils import colab_incompatible, grade_zip_file, grading_mode_disabled, list_available_tests, \
+    logs_event, resolve_test_info, running_on_colab, save_notebook
 
-from ..execute import check
+from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -45,6 +42,7 @@ class Notebook:
 
     # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
+    _grading_mode = False
 
     @logs_event(EventType.INIT)
     def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
@@ -81,6 +79,28 @@ class Notebook:
             self._vars_to_store = self._config.get("variables", None)
 
             self._notebook = self._config["notebook"]
+
+    @classmethod
+    @contextmanager
+    def grading_mode(cls, tests_dir):
+        """
+        A context manager for the ``Notebook`` grading mode. Yields a pointer to the list of results
+        that will be populated during grading.
+
+        **It is the caller's responsibility to maintain the pointer.** The pointer in the ``Checker``
+        class will be overwritten when the context exits.
+        """
+        cls._grading_mode = True
+        cls._tests_dir_override = tests_dir
+        Checker.clear_results()
+        Checker.enable_tracking()
+
+        yield Checker.get_results()
+
+        cls._grading_mode = False
+        cls._tests_dir_override = None
+        Checker.disable_tracking()
+        Checker.clear_results()
 
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
@@ -172,7 +192,7 @@ class Notebook:
             global_env = inspect.currentframe().f_back.f_back.f_globals
 
         # run the check
-        result = check(test_path, test_name, global_env)
+        result = Checker.check(test_path, test_name, global_env)
 
         return question, result, global_env
 
@@ -198,6 +218,7 @@ class Notebook:
             self._plugin_collections[plugin_name] = pc
         pc.run("from_notebook", *args, **kwargs)
 
+    @grading_mode_disabled
     @colab_incompatible
     @logs_event(EventType.TO_PDF)
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
@@ -236,6 +257,7 @@ class Notebook:
             display(HTML(out_html))
         self._log_event(EventType.TO_PDF)
 
+    @grading_mode_disabled
     @colab_incompatible
     def add_plugin_files(self, plugin_name, *args, nb_path=None, **kwargs):
         """
@@ -260,6 +282,7 @@ class Notebook:
             return
         self._addl_files.extend(addl_files)
 
+    @grading_mode_disabled
     @colab_incompatible
     @logs_event(EventType.END_EXPORT)
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
@@ -353,6 +376,7 @@ class Notebook:
 
             display(HTML(out_html))
 
+    @grading_mode_disabled
     @logs_event(EventType.END_CHECK_ALL)
     def check_all(self):
         """
@@ -363,7 +387,7 @@ class Notebook:
 
         tests = list_available_tests(self._path, self._resolve_nb_path(None, fail_silently=True))
 
-        global_env = inspect.currentframe().f_back.f_back.f_globals
+        global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
 
         results = []
         if not _SHELVE:

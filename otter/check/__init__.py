@@ -8,7 +8,7 @@ from jinja2 import Template
 from .logs import LogEntry, EventType
 from .notebook import _OTTER_LOG_FILENAME
 
-from ..execute import grade_notebook, check
+from ..execute import grade_notebook
 from ..utils import block_print
 
 

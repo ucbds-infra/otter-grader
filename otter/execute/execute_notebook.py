@@ -1,12 +1,11 @@
 """Execution of a Jupyter Notebook"""
 
-import os
-import ast
 import copy
+import os
+import tempfile
 
 from contextlib import redirect_stdout, redirect_stderr
 from IPython.display import display
-from unittest import mock
 
 try:
     from IPython.core.inputtransformer2 import TransformerManager
@@ -15,7 +14,6 @@ except ImportError:
     from IPython.core.inputsplitter import IPythonInputSplitter
     _IPYTHON_7 = False
 
-from .check_wrapper import CheckCallWrapper
 from .transforms import create_collected_check_cell
 
 from ..utils import id_generator
@@ -44,100 +42,96 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
     """
     if initial_env:
         global_env = initial_env.copy()
+
     else:
         global_env = {}
 
     # add display from IPython
     global_env["display"] = display
 
+    test_dir = test_dir if test_dir is not None else './tests'
+
     from ..check.notebook import Notebook
-    Notebook._tests_dir_override = test_dir if test_dir is not None else './tests'
+    with Notebook.grading_mode(tests_dir = test_dir if test_dir is not None else './tests') as check_results:
+        # add dummy Notebook class so that we can collect results
+        secret = id_generator()
+        notebook_class_name = f"Notebook_{secret}"
+        global_env[notebook_class_name] = Notebook
 
-    # add dummy Notebook class so that we can collect results w/out altering how the CheckCallWrapper
-    # needs to function
-    secret = id_generator()
-    notebook_class_name = f"Notebook_{secret}"
-    global_env[notebook_class_name] = Notebook
+        source = ""
 
-    source = ""
+        if cwd:
+            source = f"import sys\nsys.path.append(r\"{cwd}\")\n"
+            exec(source, global_env)
+        
+        if seed is not None and seed_variable is None:
+            import numpy as np
+            import random
+            global_env["np"] = np
+            global_env["random"] = random
 
-    if cwd:
-        source = f"import sys\nsys.path.append(r\"{cwd}\")\n"
-        exec(source, global_env)
-    
-    if seed is not None and seed_variable is None:
-        import numpy as np
-        import random
-        global_env["np"] = np
-        global_env["random"] = random
-
-    if test_dir is None:
-        test_dir = "/home/tests"
-
-    for cell in nb['cells']:
-        if cell['cell_type'] == 'code':
-            if _IPYTHON_7:
-                isp = TransformerManager()
-            else:
-                isp = IPythonInputSplitter(line_input_checker=False)
-
-            try:
-                code_lines = []
-                cell_source_lines = cell['source']
-                source_is_str_bool = False
-                if isinstance(cell_source_lines, str):
-                    source_is_str_bool = True
-                    cell_source_lines = cell_source_lines.split('\n')
-
-                for line in cell_source_lines:
-                    if not line.startswith('%') and  "interact(" not in line:
-                        code_lines.append(line)
-                        if source_is_str_bool:
-                            code_lines.append('\n')
-
-                if seed is not None:
-                    if seed_variable is None:
-                        cell_source = f"np.random.seed({seed})\nrandom.seed({seed})\n" + \
-                            isp.transform_cell(''.join(code_lines))
-                    else:
-                        cell_source = f"{seed_variable} = {seed}\n" + \
-                            isp.transform_cell(''.join(code_lines))
+        for cell in nb['cells']:
+            if cell['cell_type'] == 'code':
+                if _IPYTHON_7:
+                    isp = TransformerManager()
 
                 else:
-                    cell_source = isp.transform_cell(''.join(code_lines))
+                    isp = IPythonInputSplitter(line_input_checker=False)
 
-                # patch otter.Notebook.export so that we don't create PDFs in notebooks
-                # TODO: move this patch into CheckCallWrapper
-                m = mock.mock_open()
-                with mock.patch('otter.Notebook.export', m), mock.patch("otter.Notebook._log_event", m):
-                    exec(cell_source, global_env)
-                source += cell_source
+                try:
+                    code_lines = []
+                    cell_source_lines = cell['source']
+                    # TODO: use otter.utils.get_source
+                    source_is_str_bool = False
+                    if isinstance(cell_source_lines, str):
+                        source_is_str_bool = True
+                        cell_source_lines = cell_source_lines.split('\n')
+
+                    for line in cell_source_lines:
+                        if not line.startswith('%') and  "interact(" not in line:
+                            code_lines.append(line)
+                            if source_is_str_bool:
+                                code_lines.append('\n')
+
+                    # TODO: move to helper function
+                    if seed is not None:
+                        if seed_variable is None:
+                            cell_source = f"np.random.seed({seed})\nrandom.seed({seed})\n" + \
+                                isp.transform_cell(''.join(code_lines))
+
+                        else:
+                            cell_source = f"{seed_variable} = {seed}\n" + \
+                                isp.transform_cell(''.join(code_lines))
+
+                    else:
+                        cell_source = isp.transform_cell(''.join(code_lines))
+
+                    with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
+                        exec(cell_source, global_env)
+
+                    source += cell_source
+
+                except:
+                    if not ignore_errors:
+                        raise
+
+            # add any required checks from this cell
+            source += create_collected_check_cell(cell, notebook_class_name, test_dir)
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py") as ntf:
+            ntf.write(source)
+            ntf.seek(0)
+
+            try:
+                cleaned_source = compile(source, filename=ntf.name, mode="exec")
+                with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
+                    exec(cleaned_source, global_env)
 
             except:
                 if not ignore_errors:
                     raise
 
-        source += create_collected_check_cell(
-            cell, check_results_list_name, notebook_class_name, test_dir)
-
-    tree = ast.parse(source)
-    transformer = CheckCallWrapper(check_results_list_name)
-    tree = transformer.visit(tree)
-    ast.fix_missing_locations(tree)
-
-    try:
-        cleaned_source = compile(tree, filename="nb-ast", mode="exec")
-        with open(os.devnull, 'w') as f, redirect_stdout(f), redirect_stderr(f):
-            # patch otter.Notebook.export so that we don't create PDFs in notebooks
-            m = mock.mock_open()
-            with mock.patch("otter.Notebook.export", m), mock.patch("otter.Notebook._log_event", m):
-                exec(cleaned_source, global_env)
-
-    except:
-        if not ignore_errors:
-            raise
-    
-    # reset tests dir
-    Notebook._tests_dir_override = None
+        # add the collected results to the global env
+        global_env[check_results_list_name] = check_results
 
     return global_env

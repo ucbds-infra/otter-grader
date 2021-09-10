@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import time
+import wrapt
 
 from glob import glob
 from IPython import get_ipython
@@ -89,56 +90,62 @@ def running_on_colab():
     return "google.colab" in str(get_ipython())
 
 
-def colab_incompatible(f):
+@wrapt.decorator
+def colab_incompatible(wrapped, self, args, kwargs):
     """
     A decator that raises an error if the wrapped function is called in an environment running on
     Google Colab.
     """
-    def colab_only_method(self, *args, **kwargs):
-        if self._colab:
-            raise RuntimeError("This method is not compatible with Google Colab")
-        return f(self, *args, **kwargs)
-    return colab_only_method
+    if self._colab:
+        raise RuntimeError("This method is not compatible with Google Colab")
+    return wrapped(*args, **kwargs)
+
+
+@wrapt.decorator
+def grading_mode_disabled(wrapped, self, args, kwargs):
+    """
+    A decorator that returns without calling the wrapped function if the Notebook grading mode
+    is enabled.
+    """
+    if type(self)._grading_mode:
+        return
+    return wrapped(*args, **kwargs)
 
 
 def logs_event(event_type):
+    """
+    A decorator that ensures each call is logged in the Otter log with type ``event_type``.
+
+    Events logging a ``EventType.CHECK`` should return a 3-tuple of the question name, the
+    ``TestFile`` and an environment to shelve. All other methods should just return their 
+    default return value, which will be logged.
+    """
+    @wrapt.decorator        
+    def event_logger(wrapped, self, args, kwargs):
         """
-        A decorator that ensures each call is logged in the Otter log with type ``event_type``.
-
-        Events logging a ``EventType.CHECK`` should return a 3-tuple of the question name, the
-        ``TestFile`` and an environment to shelve. All other methods should just return their 
-        default return value, which will be logged.
+        Runs a method, catching any errors and logging the call. Returns the return value
+        of the function, unless ``EventType.CHECK`` is used, in which case the return value
+        is assumed to be a 3-tuple and the second value in the tuple is returned.
         """
+        try:
+            if event_type == EventType.CHECK:
+                question, results, shelve_env = wrapped(*args, **kwargs)
 
-        def event_logger(f):
-            """
-            Wraps a function and ensures that the call's results are logged using 
-            ``Notebook._log_event``.
-            """
+            else:
+                results = wrapped(*args, **kwargs)
+                shelve_env = {}
+                question = None
 
-            def run_function(self, *args, **kwargs):
-                """
-                Runs a method, catching any errors and logging the call. Returns the return value
-                of the function, unless ``EventType.CHECK`` is used, in which case the return value
-                is assumed to be a 3-tuple and the second value in the tuple is returned.
-                """
-                try:
-                    if event_type == EventType.CHECK:
-                        question, results, shelve_env = f(self, *args, **kwargs)
-                    else:
-                        results = f(self, *args, **kwargs)
-                        shelve_env = {}
-                        question = None
-                except Exception as e:
-                    self._log_event(event_type, success=False, error=e)
-                    raise e
-                else:
-                    self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
-                return results
+        except Exception as e:
+            self._log_event(event_type, success=False, error=e)
+            raise e
 
-            return run_function
+        else:
+            self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
 
-        return event_logger
+        return results
+
+    return event_logger
 
 
 def list_available_tests(tests_dir, nb_path):

@@ -60,7 +60,6 @@ class TestCheck(TestCase):
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\
-                        [0.         0.02002002 0.04004004 0.06006006 0.08008008]
                         q1 results: All test cases passed!
                         q2 results:
                             q2 - 1 result:
@@ -122,7 +121,6 @@ class TestCheck(TestCase):
                 self.assertEqual(
                     output.getvalue().strip(), 
                     dedent("""\
-                        [0.         0.02002002 0.04004004 0.06006006 0.08008008]
                         q1 results: All test cases passed!
                         q2 results:
                             q2 - 1 result:

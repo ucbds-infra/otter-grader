@@ -15,7 +15,7 @@ from ..utils import block_print, get_relpath, knit_rmd_file
 
 
 def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
-         debug=False, v1=False):
+         debug=False, v0=False):
     """
     Runs Otter Assign on a master notebook.
     
@@ -28,11 +28,11 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
-        v1 (``bool``): whether to use Otter Assign Format v1 instead of v0
+        v0 (``bool``): whether to use Otter Assign Format v0 instead of v1
     """
-    if not v1:
+    if v0:
         warnings.warn(
-            "Otter Assign format v0 will be deprecated in Otter v4 and removed in a later release.",
+            "The Otter Assign v0 format is now deprecated and will be removed in Otter v5.",
             FutureWarning)
             
         from .v0 import main as v0_main
