@@ -73,7 +73,7 @@ class Notebook:
             assert len(otter_configs) == 1, "More than 1 otter config file found"
 
             # load in config file
-            with open(otter_configs[0]) as f:
+            with open(otter_configs[0], encoding="utf-8") as f:
                 self._config = json.load(f)
 
             _SHELVE = self._config.get("save_environment", False)

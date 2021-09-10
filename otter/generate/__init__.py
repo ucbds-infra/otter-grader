@@ -68,7 +68,7 @@ def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False,
         raise FileNotFoundError(f"Could not find otter configuration file {config}")
 
     if config:
-        with open(config) as f:
+        with open(config, encoding="utf-8") as f:
             otter_config = json.load(f)
     else:
         otter_config = {}
