@@ -29,7 +29,6 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
     Returns:
         ``otter.test_files.GradingResults``: the grading results object
     """
-
     dp = tempfile.mkdtemp()
 
     try:
@@ -41,7 +40,7 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
 
         with open(os.path.join(ag_dir, "submission_metadata.json"), "w+") as f:
             json.dump({}, f)
-        
+
         ag_zip = zipfile.ZipFile(autograder)
         ag_zip.extractall(os.path.join(ag_dir, "source"))
         ag_zip.close()

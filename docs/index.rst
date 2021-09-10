@@ -32,6 +32,16 @@ that allows students to check and instructors to grade assignments their own mac
 designed to grade Pyhon and R executables, Jupyter Notebooks, and RMarkdown documents and is 
 compatible with a few different LMSs, including Canvas and Gradescope.
 
+The core abstraction of Otter, as compared to other autograders like nbgrader_ and OkPy_, is this:
+you provide the compute, and Otter takes care of the rest. All a instructor needs to do in order to 
+autograde is find a place to run Otter (a server, a JupyterHub, their laptop, etc.) and Otter will
+take care of generating assignments and tests, creating and managing grading environents, and 
+grading submissions. Otter is platform-agnostic, allowing you to put and grade your assignments 
+anywhere you want.
+
+.. _nbgrader: https://nbgrader.readthedocs.io/en/stable/
+.. _OkPy: https://okpy.org/
+
 Otter is organized into six components based on the different stages of the assignment pipeline, 
 each with a command-line interface:
 

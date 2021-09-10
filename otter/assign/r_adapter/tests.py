@@ -9,11 +9,16 @@ import nbformat
 
 from collections import namedtuple
 
-from ..constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, OTTR_TEST_FILE_TEMPLATE, OTTR_TEST_NAME_REGEX, TEST_REGEX
+from ..constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, OTTR_TEST_FILE_TEMPLATE, \
+    OTTR_TEST_NAME_REGEX, TEST_REGEX
 from ..tests import write_test
 from ..utils import get_source, lock
 
+from ...test_files.abstract_test import TestFile
+
+
 Test = namedtuple('Test', ['name', 'hidden', 'points', 'body', 'success_message', 'failure_message'])
+
 
 def read_test(cell, question, assignment, rmd=False):
     """
@@ -58,15 +63,8 @@ def read_test(cell, question, assignment, rmd=False):
     success_message = config.get("success_message", None)
     failure_message = config.get("failure_message", None)
 
-    # for line in lines:
-    #     match = re.match(OTTR_TEST_NAME_REGEX, line)
-    #     if match:
-    #         test_name = match.group(1)
-    #         break
-    # assert test_name is not None, f"Could not parse test name:\n{cell}"
-    # TODO: hook up success_message and failure_message
-    # TODO: add parsing for TEST CONFIG blocks
-    return Test(test_name, hidden, None, '\n'.join(source[i+1:]), success_message, failure_message)
+    return Test(test_name, hidden, points, '\n'.join(source[i+1:]), success_message, failure_message)
+
 
 def gen_test_cell(question, tests, tests_dict, assignment):
     """
@@ -86,24 +84,24 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     cell = nbformat.v4.new_code_cell()
     cell.source = ['. = ottr::check("tests/{}.R")'.format(question['name'])]
 
-    points = question.get('points', len(tests))
-    if points is None:
-        points = 1
-    if isinstance(points, (int, float)):
-        if points % len(tests) == 0:
-            points = [points // len(tests) for _ in range(len(tests))]
-        else:
-            points = [points / len(tests) for _ in range(len(tests))]
-    assert isinstance(points, list) and len(points) == len(tests), \
-        f"Points for question {question['name']} could not be parsed:\n{points}"
+    points = question.get('points', None)
+    if isinstance(points, dict):
+        points = points.get('each', 1) * len(tests)
+    elif isinstance(points, list):
+        if len(points) != len(tests):
+            raise ValueError(
+                f"Error in question {question['name']}: length of 'points' is {len(points)} but there "
+                f"are {len(tests)} tests")
 
-    # update point values
-    tests = [tc._replace(points=p) for tc, p in zip(tests, points)]
+    # check for errors in resolving points
+    tests = TestFile.resolve_test_file_points(points, tests)
+
     test = gen_suite(question['name'], tests, points)
 
     tests_dict[question['name']] = test
     lock(cell)
     return cell
+
 
 def gen_suite(name, tests, points):
     """
@@ -119,6 +117,7 @@ def gen_suite(name, tests, points):
     """
     template_data = {'name': name, 'test_cases': tests}
     return OTTR_TEST_FILE_TEMPLATE.render(**template_data)
+
 
 def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=True):
     """

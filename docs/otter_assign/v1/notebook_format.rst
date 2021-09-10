@@ -17,6 +17,8 @@ available in Python that are not available in R, and these are noted below, but 
 are the same.
 
 
+.. _otter_assign_v1_assignment_metadata:
+
 Assignment Metadata
 -------------------
 
@@ -209,6 +211,13 @@ To use the seed, just use the variable as normal:
     rng = np.random.default_rng(rng_seed)
     rvs = [rng.random() for _ in range(1000)] # SOLUTION
 
+Or, in R:
+
+.. code-block:: r
+
+    set.seed(rng_seed)
+    runif(1000)
+
 If you use this method of intercell seeding, the solutions notebook will contain the original value
 of the seed, but the student notebook will contain the student value:
 
@@ -226,25 +235,6 @@ deterministic otherwise they will fail on the student's machine. Also note that 
 available, so each RNG must use the same seed.
 
 You can find more information about intercell seeding :ref:`here <seeding>`.
-
-
-R Assignment Metadata
-+++++++++++++++++++++
-
-Note that R notebooks only accept the following keys in the assignment metadata:
-
-.. code-block:: yaml
-
-    requirements: requirements.txt # path to a requirements file for Gradescope; appended by default
-    overwrite_requirements: false  # whether to overwrite Otter's default requirements rather than appending
-    environment: environment.yml   # path to custom conda environment file
-    template_pdf: false            # whether to generate a manual question template PDF for Gradescope
-    generate:                      # configurations for running Otter Generate; defaults to false
-        points: null                 # number of points to scale assignment to on Gradescope
-        threshold: null              # a pass/fail threshold for the assignment on Gradescope
-        show_stdout: false           # whether to show grading stdout to students once grades are published
-        show_hidden: false           # whether to show hidden test results to students once grades are published
-    files: []                      # a list of file paths to include in the distribution directories
 
 
 Autograded Questions
@@ -291,17 +281,19 @@ Solution cells contain code formatted in such a way that the assign parser repla
 of lines with prespecified prompts. Otter uses the same solution replacement rules as jAssign. From 
 the `jAssign docs <https://github.com/okpy/jassign/blob/master/docs/notebook-format.md>`_:
 
-* A line ending in ``# SOLUTION`` will be replaced by ``...``, properly indented. If
-  that line is an assignment statement, then only the expression(s) after the
-  ``=`` symbol will be replaced.
+* A line ending in ``# SOLUTION`` will be replaced by ``...`` (or ``NULL # YOUR CODE HERE`` in R), 
+  properly indented. If that line is an assignment statement, then only the expression(s) after the
+  ``=`` symbol (or the ``<-`` symbol in R) will be replaced.
 * A line ending in ``# SOLUTION NO PROMPT`` or ``# SEED`` will be removed.
 * A line ``# BEGIN SOLUTION`` or ``# BEGIN SOLUTION NO PROMPT`` must be paired with
-  a later line ``# END SOLUTION``. All lines in between are replaced with ``...`` or
-  removed completely in the case of ``NO PROMPT``.
+  a later line ``# END SOLUTION``. All lines in between are replaced with ``...`` 
+  (or ``# YOUR CODE HERE`` in R) or removed completely in the case of ``NO PROMPT``.
 * A line ``""" # BEGIN PROMPT`` must be paired with a later line ``""" # END
   PROMPT``. The contents of this multiline string (excluding the ``# BEGIN
   PROMPT``) appears in the student cell. Single or double quotes are allowed.
   Optionally, a semicolon can be used to suppress output: ``"""; # END PROMPT``
+
+
 
 .. code-block:: python
 
@@ -353,6 +345,24 @@ would be presented to students as
     def circumference(r):
         # Next, define a circumference function.
         pass
+
+For R,
+
+.. code-block:: r
+
+    # BEGIN SOLUTION
+    square = function(x) {
+        return(x ^ 2)
+    }
+    # END SOLUTION
+    x2 = square(25)
+
+would be presented to students  as
+
+.. code-block:: r
+
+    # YOUR CODE HERE
+    x2 = NULL # YOUR CODE HERE
 
 
 Test Cells
@@ -436,7 +446,15 @@ For example, the first line of the cell below would be removed in the student ve
 
 The same caveats apply for this type of seeding as :ref:`above <otter_assign_v1_seed_variables>`.
 
-*Note that intercell seeding is not supported with R assignments.*
+
+R Example
++++++++++
+
+Here is an example autograded question for R:
+
+.. raw:: html
+
+    <iframe src="../../_static/notebooks/html/assign-r-code-question-v1.html"></iframe>
 
 
 .. _otter_assign_v1_python_manual_questions:

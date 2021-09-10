@@ -11,6 +11,7 @@ from .cell_generators import (
     gen_check_all_cell
 )
 from .questions import create_question_config
+from .r_adapter.cell_generators import gen_export_cells as gen_ottr_export_cells
 from .solutions import has_seed, SOLUTION_CELL_TAG
 from .tests import any_public_tests
 from .utils import add_tag, AssignNotebookFormatException, EmptyCellException, is_cell_type, is_ignore_cell
@@ -38,19 +39,24 @@ def transform_notebook(nb, assignment):
     if assignment.check_all_cell and assignment.is_python:
         transformed_cells += gen_check_all_cell()
 
-    if assignment.export_cell and assignment.is_python:
+    if assignment.export_cell:
         export_cell = assignment.export_cell
         if export_cell is True:
             export_cell = {}
 
         # TODO: convert export_cell to default dict
-        transformed_cells += gen_export_cells(
-            export_cell.get('instructions', ''), 
-            pdf = export_cell.get('pdf', True),
-            filtering = export_cell.get('filtering', True),
-            force_save = export_cell.get('force_save', False),
-            run_tests = export_cell.get('run_tests', False)
-        )
+        if assignment.is_python:
+            transformed_cells += gen_export_cells(
+                export_cell.get('instructions', ''), 
+                pdf = export_cell.get('pdf', True),
+                filtering = export_cell.get('filtering', True),
+                force_save = export_cell.get('force_save', False),
+                run_tests = export_cell.get('run_tests', False))
+
+        elif assignment.is_r:
+            transformed_cells += gen_ottr_export_cells(
+                assignment.notebook_basename,
+                export_cell.get('instructions', ''))
 
     transformed_nb = copy.deepcopy(nb)
     transformed_nb['cells'] = transformed_cells

@@ -17,6 +17,8 @@ This section describes at a high-level how seeding is implemented in the autogra
 code execution. There are two methods of seeding: the use of a seed variable, and seeding the 
 libraries themselves.
 
+The examples in this section are all in Python, but they also work the same in R.
+
 
 Seed Variables
 ++++++++++++++

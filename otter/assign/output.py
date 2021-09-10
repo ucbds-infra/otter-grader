@@ -12,7 +12,7 @@ from .notebook_transformer import transform_notebook
 from .plugins import replace_plugins_with_calls
 from .solutions import overwrite_seed_vars, strip_ignored_lines, strip_solutions_and_output
 from .tests import write_test
-from .utils import patch_copytree, remove_cell_ids
+from .utils import get_notebook_language, patch_copytree, remove_cell_ids
 
 
 def write_autograder_dir(nb_path, output_nb_path, assignment):
@@ -25,13 +25,14 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
         output_nb_path (``pathlib.Path``): path to output file
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     """
+    assignment.notebook_basename = os.path.basename(str(output_nb_path))
+
     with open(nb_path) as f:
         nb = nbformat.read(f, as_version=NB_VERSION)
 
     if assignment.lang is None:
         try:
-            lang = nb["metadata"]["kernelspec"]["language"].lower()
-            assignment.lang = lang
+            assignment.lang = get_notebook_language(nb)
         except KeyError:
             warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
             assignment.lang = "python"
@@ -64,14 +65,6 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     
     # strip out ignored lines
     transformed_nb = strip_ignored_lines(transformed_nb)
-
-    # update seed variables
-    if isinstance(assignment.seed, dict):
-        if assignment.generate:
-            if assignment.generate is True:
-                assignment.generate = {}
-            assignment.generate["seed"] = assignment.seed["autograder_value"]
-            assignment.generate["seed_variable"] = assignment.seed["variable"]
 
     # write tests
     test_ext = (".R", ".py")[assignment.is_python]

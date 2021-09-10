@@ -24,7 +24,7 @@ from ..utils import load_default_file
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
-OTTR_BRANCH = "1.0.0"  # this should match a release tag on GitHub
+OTTR_BRANCH = "1.1.1"  # this should match a release tag on GitHub
 
 
 def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False, lang="python", 
@@ -68,10 +68,14 @@ def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False,
         raise FileNotFoundError(f"Could not find otter configuration file {config}")
 
     if config:
-        with open(config) as f:
+        with open(config, encoding="utf-8") as f:
             otter_config = json.load(f)
     else:
         otter_config = {}
+
+    # if an empty/null token is specified, delete it
+    if "token" in otter_config and not otter_config["token"]:
+        otter_config.pop("token")
 
     # ensure that a token is present if necessary
     if "token" not in otter_config and token is not None:

@@ -82,13 +82,22 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before " \
     "running the cell below, so that all images/graphs appear in the output. The cell below will generate " \
-    "a zip file for you to submit. **Please save before exporting!**"
+    "a zip file for you to submit."
+
+    # only include save text if force_save is false
+    if not force_save:
+        instructions.source += " **Please save before exporting!**"
     
     if instruction_text:
         instructions.source += '\n\n' + instruction_text
 
     export = nbformat.v4.new_code_cell()
-    source_lines = ["# Save your notebook first, then run this cell to export your submission."]
+    source_lines = []
+
+    # only include save text if force_save is false
+    if not force_save:
+        source_lines.append("# Save your notebook first, then run this cell to export your submission.")
+
     args = []
     if not filtering:
         args += ["filtering=False"]

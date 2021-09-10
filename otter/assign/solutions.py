@@ -4,7 +4,9 @@ import copy
 import nbformat
 import re
 
-from .utils import get_source, has_tag, is_cell_type, remove_output, remove_tag
+from .r_adapter import solutions as r_solutions
+from .utils import get_notebook_language, get_source, has_tag, is_cell_type, remove_output, \
+    remove_tag
 
 
 SOLUTION_CELL_TAG = "otter_assign_solution_cell"
@@ -43,14 +45,14 @@ def overwrite_seed_vars(nb, seed_variable, seed):
     for cell in nb["cells"]:
         source = get_source(cell)
         for i, line in enumerate(source):
-            match = re.match(fr"(\s*){seed_variable}\s*=\s*", line.lstrip())
+            match = re.match(fr"(\s*){seed_variable}\s*(=|<-)\s*", line)
             if  match:
-                source[i] = match.group(1) + f"{seed_variable} = {seed}"
+                source[i] = match.group(1) + f"{seed_variable} {match.group(2)} {seed}"
         cell["source"] = "\n".join(source)
     return nb
 
 
-solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*(=|<-))(.*)[ ]?#[ ]?SOLUTION")
+solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*=).* ?# ?SOLUTION")
 def solution_assignment_sub(match):
     """
     Substitutes the first matching group  with ` ...`
@@ -59,7 +61,7 @@ def solution_assignment_sub(match):
     return prefix + ' ...'
 
 
-solution_line_regex = re.compile(r"(\s*)([^#\n]+)[ ]?#[ ]?SOLUTION")
+solution_line_regex = re.compile(r"(\s*).* ?# ?SOLUTION")
 def solution_line_sub(match):
     """
     Substitutes the first matching group  with `...`
@@ -71,14 +73,17 @@ def solution_line_sub(match):
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
 skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT', '# SEED']
 
-SUBSTITUTIONS = [
-    (solution_assignment_regex, solution_assignment_sub),
-    (solution_line_regex, solution_line_sub),
-]
+SUBSTITUTIONS = {
+    "python":  [
+        (solution_assignment_regex, solution_assignment_sub),
+        (solution_line_regex, solution_line_sub),
+    ],
+    "r":  r_solutions.SUBSTITUTIONS,
+}
 
 
 # TODO: comments, docstrings
-def replace_solutions(lines):
+def replace_solutions(lines, lang):
     """
     Replaces solutions in ``lines``
     
@@ -115,10 +120,11 @@ def replace_solutions(lines):
                 line = begin_solution.group(1) + '...'
             else:
                 continue
-        for exp, sub in SUBSTITUTIONS:
+        for exp, sub in SUBSTITUTIONS[lang]:
             m = exp.match(line)
             if m:
                 line = sub(m)
+                break
         
         stripped.append(line)
     
@@ -189,10 +195,11 @@ def strip_solutions_and_output(nb):
         nb (``nbformat.NotebookNode``): the notebook to have solutions stripped
     """
     md_solutions = []
+    lang = get_notebook_language(nb)
     for i, cell in enumerate(nb['cells']):
         if has_tag(cell, SOLUTION_CELL_TAG):
             if is_cell_type(cell, "code"):
-                cell['source'] = '\n'.join(replace_solutions(get_source(cell)))
+                cell['source'] = '\n'.join(replace_solutions(get_source(cell), lang))
             elif is_cell_type(cell, "markdown"):
                 md_solutions.append(i)
             nb['cells'][i] = remove_tag(cell, SOLUTION_CELL_TAG)

@@ -80,6 +80,13 @@ and a code cell that calls ``otter.Notebook.export`` with HTML comment filtering
     # Save your notebook first, then run this cell to export.
     grader.export("/path/to/notebook.ipynb")
 
+For R assignments, the export cell looks like:
+
+.. code-block:: r
+
+    # Save your notebook first, then run this cell to export.
+    ottr::export("/path/to/notebook.ipynb")
+
 These behaviors can be changed with the corresponding assignment metadata configurations.
 
 **Note:** Otter Assign currently only supports :ref:`HTML comment filtering <pdfs>`. This means 

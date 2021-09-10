@@ -1,6 +1,4 @@
-"""
-Default configurations for autograding
-"""
+"""Default configurations for autograding"""
 
 from ...utils import convert_config_description_dict
 

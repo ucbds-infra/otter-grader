@@ -9,7 +9,7 @@ import warnings
 import nbformat
 
 from .notebook_transformer import transform_notebook
-from .solutions import strip_solutions_and_output
+from .solutions import overwrite_seed_vars, strip_solutions_and_output
 
 from ..r_adapter.tests import remove_hidden_tests_from_dir
 from ..tests import write_test
@@ -113,6 +113,11 @@ def write_student_dir(rmd_name, autograder_dir, student_dir, assignment):
         rmd_string = f.read()
 
     rmd_string = strip_solutions_and_output(rmd_string)
+
+    # overwrite seed variable
+    if isinstance(assignment.seed, dict):
+        rmd_string = overwrite_seed_vars(
+            rmd_string, assignment.seed["variable"], assignment.seed["student_value"])
 
     with open(student_rmd_path, "w") as f:
         f.write(rmd_string)

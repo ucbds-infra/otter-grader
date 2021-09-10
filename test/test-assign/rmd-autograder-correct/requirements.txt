@@ -12,6 +12,5 @@ nbconvert
 nbformat
 dill
 rpy2
-jupytext
 numpy
-otter-grader==3.0.6
+otter-grader==3.1.2

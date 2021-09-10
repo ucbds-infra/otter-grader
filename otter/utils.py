@@ -1,6 +1,4 @@
-"""
-Utilities for Otter-Grader
-"""
+"""Various utilities for Otter-Grader"""
 
 import os
 import sys
@@ -9,6 +7,7 @@ import random
 import re
 import string
 import shutil
+import tempfile
 
 from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
@@ -21,30 +20,6 @@ def block_print():
     with open(os.devnull, "w") as f, redirect_stdout(f):
         yield
 
-def flush_inline_matplotlib_plots():
-    """
-    Flush matplotlib plots immediately, rather than asynchronously
-    
-    Basically, the inline backend only shows the plot after the entire cell executes, which means we 
-    can't easily use a context manager to suppress displaying it. See https://github.com/jupyter-widgets/ipywidgets/issues/1181/ 
-    and https://github.com/ipython/ipython/issues/10376 for more details. This function displays flushes 
-    any pending matplotlib plots if we are using the inline backend. Stolen from 
-    https://github.com/jupyter-widgets/ipywidgets/blob/4cc15e66d5e9e69dac8fc20d1eb1d7db825d7aa2/ipywidgets/widgets/interaction.py#L35
-    """
-    if 'matplotlib' not in sys.modules:
-        # matplotlib hasn't been imported, nothing to do.
-        return
-
-    try:
-        import matplotlib as mpl
-        from ipykernel.pylab.backend_inline import flush_figures
-    except ImportError:
-        return
-    # except KeyError:
-    #     return
-
-    if mpl.get_backend() == 'module://ipykernel.pylab.backend_inline':
-        flush_figures()
 
 @contextmanager
 def hide_outputs():
@@ -62,8 +37,8 @@ def hide_outputs():
     try:
         yield
     finally:
-        # flush_inline_matplotlib_plots()
         ipy.display_formatter.formatters = old_formatters
+
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     """
@@ -80,6 +55,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     """
     return ''.join(random.choice(chars) for _ in range(size))
 
+
 def get_variable_type(obj):
     """
     Returns the fully-qualified type string of an object ``obj``
@@ -91,6 +67,7 @@ def get_variable_type(obj):
         ``str``: the fully-qualified type string
     """
     return type(obj).__module__ + "." + type(obj).__name__
+
 
 def get_relpath(src, dst):
     """
@@ -114,6 +91,25 @@ def get_relpath(src, dst):
             ups += 1
     return pathlib.Path(("../" * ups) / dst.relative_to(src))
 
+
+@contextmanager
+def chdir(new_dir):
+    """
+    Create a context with a different working directory, resetting the working directory on exit.
+
+    Args:
+        new_dir (path-like): the directory for the context
+    """
+    curr_dir = os.getcwd()
+    os.chdir(new_dir)
+
+    try: 
+        yield
+
+    finally: 
+        os.chdir(curr_dir)
+
+
 def get_source(cell):
     """
     Returns the source code of a cell in a way that works for both nbformat and JSON
@@ -131,6 +127,7 @@ def get_source(cell):
         return [line.strip("\r\n") for line in source]
     raise ValueError(f'unknown source type: {type(source)}')
 
+
 @contextmanager
 def nullcontext():
     """
@@ -138,6 +135,7 @@ def nullcontext():
     earlier versions of Python require this patch.
     """
     yield
+
 
 @contextmanager
 def load_default_file(provided_fn, default_fn, default_disabled=False):
@@ -156,6 +154,7 @@ def load_default_file(provided_fn, default_fn, default_disabled=False):
             yield f.read()
     else:
         yield None
+
 
 def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs):
     """
@@ -184,6 +183,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
         return out
 
     print(out, **kwargs)
+
 
 def convert_config_description_dict(configs, for_docs=False):
     """
@@ -265,6 +265,7 @@ def convert_config_description_dict(configs, for_docs=False):
             res[d["key"]] = default
     return res
 
+
 def assert_path_exists(path_tuples):
     """
     Ensure that a series of file paths exist and are of a specific type, or raise a ``ValueError``.
@@ -286,3 +287,26 @@ def assert_path_exists(path_tuples):
             raise ValueError(f"Path {path} is not a directory")
         if is_dir is False and not os.path.isfile(path):
             raise ValueError(f"Path {path} is not a file")
+
+
+def knit_rmd_file(rmd_path, pdf_path):
+    """
+    Use ``rpy2`` and ``rmarkdown::render`` to knit an RMarkdown file to a PDF, allowing errors.
+
+    Args:
+        rmd_path (``str``): the path to the Rmd file
+        pdf_path (``str``): the path at which to write the PDF
+    """
+    from rpy2.robjects.packages import importr
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".Rmd",) as ntf:
+        with open(rmd_path) as f:
+            contents = f.read()
+
+        contents = "```{r cache = F, include = F}\nknitr::opts_chunk$set(error = TRUE)\n```\n" + contents
+        ntf.write(contents)
+        ntf.seek(0)
+
+        pdf_path = os.path.abspath(pdf_path)
+        rmarkdown = importr("rmarkdown")
+        rmarkdown.render(ntf.name, "pdf_document", pdf_path)

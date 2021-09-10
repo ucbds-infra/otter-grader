@@ -41,6 +41,15 @@ RUN apt-get clean && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# install fandol font for xeCJK
+RUN wget -nv -O /tmp/fandol.zip https://mirrors.ctan.org/fonts/fandol.zip && \
+    unzip -d /tmp/fandol /tmp/fandol.zip && \
+    mkdir -p /usr/share/texlive/texmf-dist/fonts/opentype/public/fandol && \
+    cp /tmp/fandol/fandol/*.otf /usr/share/texlive/texmf-dist/fonts/opentype/public/fandol && \
+    mktexlsr && \
+    fc-cache && \
+    rm -rf /tmp/fandol /tmp/fandol.zip
+
 # Set the locale to UTF-8 to ensure that Unicode output is encoded correctly
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -52,4 +61,4 @@ RUN mkdir /autograder
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-RUN pip install otter-grader==3.0.6
+RUN pip install otter-grader==3.1.2

@@ -1,5 +1,31 @@
 # Changelog
 
+**v3.1.2:**
+
+* Specify UTF-8 encoding in all `open` calls used for reading JSON for Windows compatibility per [#380](https://github.com/ucbds-infra/otter-grader/issues/380)
+* Fixed incorrect prompt substitution in R notebooks and Rmd assignments
+
+**v3.1.1:**
+
+* Added `libgomp` to R `environment.yml`
+
+**v3.1.0:**
+
+* Added a tool to convert Assign v0-formatted notebooks to v1 format
+* Added `xeCJK` to the LaTeX exporter template and Docker images
+* Added PDF generation and submission in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
+* Updated intercell seeding in R per [#302](https://github.com/ucbds-infra/otter-grader/issues/302)
+* Fixed bug in test case point values for Assign R assignments per [#360](https://github.com/ucbds-infra/otter-grader/issues/360)
+* Enabled `solutions_pdf` and `template_pdf` in Assign R assignments per [#364](https://github.com/ucbds-infra/otter-grader/issues/364)
+* Added options to limit execution time of grading and permit network access
+* Refactored R submission reformatting per [#369](https://github.com/ucbds-infra/otter-grader/issues/369)
+* Added export cells for R notebooks in Otter Assign per [#369](https://github.com/ucbds-infra/otter-grader/issues/369)
+* Updated the default version of Ottr to v1.1.1
+* Changed prompts in R notebooks to match Rmd documents
+* Added filtering of notebook cells with syntax errors during R notebook execution
+* Enured that "empty" tokens are ignored in Otter Generate per [#361](https://github.com/ucbds-infra/otter-grader/issues/361)
+* Prevented save text when `export_cell: force_save: true` is specified in Otter Assign assignment metadata per [#332](https://github.com/ucbds-infra/otter-grader/issues/332)
+
 **v3.0.6:** re-release of v3.0.5
 
 **v3.0.5:**
