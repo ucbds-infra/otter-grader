@@ -183,7 +183,7 @@ class RRunner(AbstractLanguageRunner):
         """
         try:
             # get student email
-            with open("../submission_metadata.json") as f:
+            with open("../submission_metadata.json", encoding="utf-8") as f:
                 metadata = json.load(f)
 
             student_emails = []
