@@ -12,4 +12,4 @@ nbconvert
 nbformat
 dill
 numpy
-git+https://github.com/ucbds-infra/otter-grader.git@6ee10a36b4267f924cceaf21f684f44fc5ab76bb
+git+https://github.com/ucbds-infra/otter-grader.git@6bc9682296fce1667430b5286ebcb285cc2668de
