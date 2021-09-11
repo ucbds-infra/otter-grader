@@ -173,8 +173,9 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             timer = threading.Timer(timeout, kill_container)
             timer.start()
 
+        container_id = container.id[:12]
         if verbose:
-            print(f"Grading {submission_path} in container {container.id}...")
+            print(f"Grading {submission_path} in container {container_id}...")
 
         exit = docker.container.wait(container)
 
