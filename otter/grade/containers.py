@@ -39,10 +39,9 @@ def build_image(zip_path, base_image, tag):
     return image
 
 
-def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
-                 scripts=False, no_kill=False, output_path="./", debug=False, zips=False,
-                 image="ucbdsinfra/otter-grader",
-                 pdfs=False, timeout=None, network=True):
+def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None, scripts=False, 
+                 no_kill=False, output_path="./", debug=False, zips=False,
+                 image="ucbdsinfra/otter-grader", pdfs=False, timeout=None, network=True):
     """
     Grades notebooks in parallel Docker containers
 
@@ -91,7 +90,6 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
                 grade_assignments,
                 submission_path=nb_path,
                 verbose=verbose,
-                # TODO:check if path is not default for generate hash
                 image=img,
                 scripts=scripts,
                 no_kill=no_kill,
@@ -138,13 +136,13 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
 
-    _, temp_subm_path = tempfile.mkstemp()
+    temp_subm_file, temp_subm_path = tempfile.mkstemp()
     shutil.copyfile(submission_path, temp_subm_path)
 
     results_file, results_path = tempfile.mkstemp(suffix=".pkl")
     pdf_path = None
     if pdfs:
-        _, pdf_path = tempfile.mkstemp(suffix=".pdf")
+        pdf_file, pdf_path = tempfile.mkstemp(suffix=".pdf")
 
     try:
         nb_basename = os.path.basename(submission_path)
@@ -173,8 +171,9 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             timer = threading.Timer(timeout, kill_container)
             timer.start()
 
+        container_id = container.id[:12]
         if verbose:
-            print(f"Grading {submission_path} in container {container.id}...")
+            print(f"Grading {submission_path} in container {container_id}...")
 
         exit = docker.container.wait(container)
 
@@ -190,7 +189,7 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         if exit != 0:
             raise Exception(f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
 
-        with open(results_file, "rb") as f:
+        with open(results_path, "rb") as f:
             scores = pickle.load(f)
 
         scores = scores.to_dict()
@@ -206,9 +205,12 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             shutil.copy(pdf_path, local_pdf_path)
 
     finally:
+        os.close(results_file)
         os.remove(results_path)
+        os.close(temp_subm_file)
         os.remove(temp_subm_path)
         if pdfs:
+            os.close(pdf_file)
             os.remove(pdf_path)
 
     return df
