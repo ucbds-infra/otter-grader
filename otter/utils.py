@@ -1,6 +1,6 @@
 """Various utilities for Otter-Grader"""
 
-import logging as py_logging
+import logging
 import os
 import sys
 import pathlib
@@ -340,31 +340,38 @@ def recursive_dict_update(d, u):
     return d
 
 
-class logging:
+class loggers:
 
     _format = "[%(levelname)s %(name)s] %(message)s"
     _instances = {}
-    _log_level = py_logging.WARNING
+    _log_level = logging.WARNING
 
     def __new__(cls, *args, **kwargs):
         raise NotImplementedError("This class is not meant to be instantiated")
 
     @classmethod
-    def get_logger(cls, name):
+    def get(cls, name):
         """
         Retrieve ``logging.Logger`` with name ``name`` and return it, setting the log level to the 
         class log level.
         """
         if name in cls._instances:
             return cls._instances[name]
-        logger = py_logging.getLogger(name)
+        logger = logging.getLogger(name)
         logger.setLevel(cls._log_level)
-        handler = py_logging.StreamHandler()
-        formatter = py_logging.Formatter(cls._format)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(cls._format)
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         cls._instances[name] = logger
         return logger
+
+    @classmethod
+    def get_level(cls):
+        """
+        Return the current log level of these loggers.
+        """
+        return cls._log_level
 
     @classmethod
     def set_level(cls, log_level):
@@ -376,9 +383,20 @@ class logging:
             logger.setLevel(log_level)
 
     @classmethod
+    @contextmanager
+    def level_context(cls, log_level):
+        """
+        Set the log level to a new value temporarily in a context.
+        """
+        curr_level = cls.get_level()
+        cls.set_level(log_level)
+        yield
+        cls.set_level(curr_level)
+
+    @classmethod
     def reset_level(cls):
         """
         Set the log levels for all ``Loggers`` created by this class (existing and future) back to
         ``logging.WARNING``.
         """
-        cls.set_level(py_logging.WARNING)
+        cls.set_level(logging.WARNING)

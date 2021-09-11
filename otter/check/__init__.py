@@ -9,11 +9,11 @@ from .logs import LogEntry, EventType
 from .notebook import _OTTER_LOG_FILENAME
 
 from ..execute import grade_notebook
-from ..utils import block_print, logging
+from ..utils import block_print, loggers
 
 
 _ALLOWED_EXTENSIONS = {".py", ".ipynb"}
-LOGGER = logging.get_logger(__name__)
+LOGGER = loggers.get_logger(__name__)
 
 
 def _log_event(event_type, results=[], question=None, success=True, error=None):

@@ -2,7 +2,7 @@
 
 import click
 import functools
-import logging as py_logging
+import logging
 
 from .assign import main as assign
 from .check import main as check
@@ -10,14 +10,14 @@ from .export import main as export
 from .generate import main as generate
 from .grade import main as grade
 from .run import main as run
-from .utils import logging
+from .utils import loggers
 from .version import print_version_info
 
 
 _VERBOSITY_LEVELS = {
-    0: py_logging.WARNING,
-    1: py_logging.INFO,
-    2: py_logging.DEBUG,
+    0: logging.WARNING,
+    1: logging.INFO,
+    2: logging.DEBUG,
 }
 
 
@@ -27,7 +27,7 @@ def _verbosity(f):
     def wrapper(*args, **kwargs):
         # set the log level
         verbosity = kwargs.pop("verbosity")
-        logging.set_level(_VERBOSITY_LEVELS[min(verbosity, max(_VERBOSITY_LEVELS.keys()))])
+        loggers.set_level(_VERBOSITY_LEVELS[min(verbosity, max(_VERBOSITY_LEVELS.keys()))])
         return f(*args, **kwargs)
     return wrapper
 

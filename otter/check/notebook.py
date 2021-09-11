@@ -22,10 +22,10 @@ from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..utils import logging
+from ..utils import loggers
 
 
-LOGGER = logging.get_logger(__name__)
+LOGGER = loggers.get_logger(__name__)
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
 _ZIP_NAME_FILENAME = "__zip_filename__"

@@ -8,10 +8,10 @@ import dill
 from .runners import create_runner
 from .utils import OtterRuntimeError
 from ...version import LOGO_WITH_VERSION
-from ...utils import chdir, logging
+from ...utils import chdir, loggers
 
 
-LOGGER = logging.get_logger(__name__)
+LOGGER = loggers.get_logger(__name__)
 
 
 def main(autograder_dir, **kwargs):
@@ -37,8 +37,9 @@ def main(autograder_dir, **kwargs):
     runner = create_runner(config, **kwargs)
 
     if runner.get_option("log_level") is not None:
-        logging.set_level(runner.get_option("log_level"))
+        loggers.set_level(runner.get_option("log_level"))
         # TODO: log above calls
+        # TODO: use loggers.level_context
 
     if runner.get_option("logo"):
         # ASCII 8207 is an invisible non-whitespace character; this should prevent gradescope from
