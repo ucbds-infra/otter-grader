@@ -350,7 +350,7 @@ class loggers:
         raise NotImplementedError("This class is not meant to be instantiated")
 
     @classmethod
-    def get(cls, name):
+    def get_logger(cls, name):
         """
         Retrieve ``logging.Logger`` with name ``name`` and return it, setting the log level to the 
         class log level.
