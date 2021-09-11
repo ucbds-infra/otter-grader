@@ -39,10 +39,9 @@ def build_image(zip_path, base_image, tag):
     return image
 
 
-def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
-                 scripts=False, no_kill=False, output_path="./", debug=False, zips=False,
-                 image="ucbdsinfra/otter-grader",
-                 pdfs=False, timeout=None, network=True):
+def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None, scripts=False, 
+                 no_kill=False, output_path="./", debug=False, zips=False,
+                 image="ucbdsinfra/otter-grader", pdfs=False, timeout=None, network=True):
     """
     Grades notebooks in parallel Docker containers
 
@@ -91,7 +90,6 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None,
                 grade_assignments,
                 submission_path=nb_path,
                 verbose=verbose,
-                # TODO:check if path is not default for generate hash
                 image=img,
                 scripts=scripts,
                 no_kill=no_kill,
@@ -191,7 +189,7 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         if exit != 0:
             raise Exception(f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
 
-        with open(results_file, "rb") as f:
+        with open(results_path, "rb") as f:
             scores = pickle.load(f)
 
         scores = scores.to_dict()
