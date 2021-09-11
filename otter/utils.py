@@ -12,7 +12,6 @@ import tempfile
 
 from collections.abc import Mapping
 from contextlib import contextmanager, redirect_stdout
-from functools import lru_cache
 from IPython import get_ipython
 
 
@@ -129,7 +128,7 @@ def get_source(cell):
         return re.split("\r?\n", source)
     elif isinstance(source, list):
         return [line.strip("\r\n") for line in source]
-    raise ValueError(f'unknown source type: {type(source)}')
+    raise TypeError(f"Unknown cell source type: {type(source)}")
 
 
 @contextmanager
@@ -145,19 +144,22 @@ def nullcontext():
 def load_default_file(provided_fn, default_fn, default_disabled=False):
     """
     Reads the contents of a file with an optional default path. If ``proivided_fn`` is not specified
-    and ``expected_fn`` is a existing file path, the contents of ``expected_fn`` are read in place
-    of ``provided_fn``. The use of ``expected_fn`` can be disabled by setting ``default_disabled``
+    and ``default_fn`` is an existing file path, the contents of ``default_fn`` are read in place
+    of ``provided_fn``. The use of ``default_fn`` can be disabled by setting ``default_disabled``
     to ``True``.
     """
     if provided_fn is None and os.path.isfile(default_fn) and not default_disabled:
         provided_fn = default_fn
     
     if provided_fn is not None:
-        assert os.path.isfile(provided_fn), f"Could not find specified file: {provided_fn}"
+        if not os.path.isfile(provided_fn):
+            raise FileNotFoundError(f"Could not find specified file: {provided_fn}")
+
         with open(provided_fn) as f:
             yield f.read()
+
     else:
-        yield None
+        yield
 
 
 def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs):
@@ -168,7 +170,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
 
     If ``ret_str`` is true, the string is returned; if not, it is printed directly to the console.
     """
-    cols, rows = shutil.get_terminal_size()
+    cols, _ = shutil.get_terminal_size()
 
     if mid_text:
         left = cols - len(mid_text) - 2 * len(whitespace)
@@ -282,15 +284,15 @@ def assert_path_exists(path_tuples):
         path_tuples (``list[tuple[str, bool]]``): the list of paths as described above
 
     Raises:
-        ``ValueError``: if the path does not exist or it is not of the correct type
+        ``FileNotFoundError``: if the path does not exist or it is not of the correct type
     """
     for path, is_dir in path_tuples:
         if not os.path.exists(path):
-            raise ValueError(f"Path {path} does not exist")
+            raise FileNotFoundError(f"Path {path} does not exist")
         if is_dir and not os.path.isdir(path):
-            raise ValueError(f"Path {path} is not a directory")
+            raise FileNotFoundError(f"Path {path} is not a directory")
         if is_dir is False and not os.path.isfile(path):
-            raise ValueError(f"Path {path} is not a file")
+            raise FileNotFoundError(f"Path {path} is not a file")
 
 
 def knit_rmd_file(rmd_path, pdf_path):
@@ -303,11 +305,12 @@ def knit_rmd_file(rmd_path, pdf_path):
     """
     from rpy2.robjects.packages import importr
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".Rmd",) as ntf:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".Rmd") as ntf:
         with open(rmd_path) as f:
             contents = f.read()
 
-        contents = "```{r cache = F, include = F}\nknitr::opts_chunk$set(error = TRUE)\n```\n" + contents
+        contents = "```{r cache = F, include = F}\nknitr::opts_chunk$set(error = TRUE)\n```\n" + \
+            contents
         ntf.write(contents)
         ntf.seek(0)
 
@@ -347,12 +350,13 @@ class logging:
         raise NotImplementedError("This class is not meant to be instantiated")
 
     @classmethod
-    @lru_cache(10)
     def get_logger(cls, name):
         """
         Retrieve ``logging.Logger`` with name ``name`` and return it, setting the log level to the 
         class log level.
         """
+        if name in cls._instances:
+            return cls._instances[name]
         logger = py_logging.getLogger(name)
         logger.setLevel(cls._log_level)
         handler = py_logging.StreamHandler()

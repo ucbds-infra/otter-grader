@@ -124,7 +124,12 @@ DEFAULT_OPTIONS_WITH_DESCRIPTIONS = [
         "key": "zips",
         "description": "whether zip files are being graded",
         "default": False,
-    }
+    },
+    {
+        "key": "log_level",
+        "description": "a log level for logging messages; any value suitable for ``logging.Logger.setLevel``",
+        "default": None,
+    },
 ]
 
 DEFAULT_OPTIONS = convert_config_description_dict(DEFAULT_OPTIONS_WITH_DESCRIPTIONS)
