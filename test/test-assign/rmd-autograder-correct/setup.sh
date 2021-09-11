@@ -33,6 +33,7 @@ if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
 fi
 
 # install dependencies with conda
+conda config --set channel_priority strict
 conda env create -f /autograder/source/environment.yml
 conda run -n otter-env Rscript /autograder/source/requirements.r
 
