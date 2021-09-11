@@ -1,6 +1,6 @@
 """Various utilities for Otter-Grader"""
 
-import logging
+import logging as py_logging
 import os
 import sys
 import pathlib
@@ -12,6 +12,7 @@ import tempfile
 
 from collections.abc import Mapping
 from contextlib import contextmanager, redirect_stdout
+from functools import lru_cache
 from IPython import get_ipython
 
 
@@ -336,32 +337,36 @@ def recursive_dict_update(d, u):
     return d
 
 
-class Logger:
-    """
-    A class that wraps ``logging.Logger`` to track a global logging level. Instantiating this class
-    returns an instance of ``logging.Logger`` corresponding to the passed name with the correct 
-    logging level set.
-    """
+class logging:
 
-    _log_format = "[%(levelname)s %(name)s] %(message)s"
-    _log_level = logging.WARNING
+    _format = "[%(levelname)s %(name)s] %(message)s"
+    _instances = {}
+    _log_level = py_logging.WARNING
 
-    def __new__(cls, name):
-        logger = logging.getLogger(name)
-        logger.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(cls._log_format)
+    def __new__(cls, *args, **kwargs):
+        raise NotImplementedError("This class is not meant to be instantiated")
+
+    @classmethod
+    @lru_cache(10)
+    def get_logger(cls, name):
+        """
+        Retrieve ``logging.Logger`` with name ``name`` and return it, setting the log level to the 
+        class log level.
+        """
+        logger = py_logging.getLogger(name)
+        logger.setLevel(cls._log_level)
+        handler = py_logging.StreamHandler()
+        formatter = py_logging.Formatter(cls._format)
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+        cls._instances[name] = logger
         return logger
 
     @classmethod
-    def set_level(cls, level):
+    def set_level(cls, log_level):
         """
-        Set the global logging level of all loggers created via this class.
-
-        Args:
-            level (``int`` or ``str``): the new logging level; any value that can be passed to
-                ``logging.Logger.setLevel``
+        Set the log levels for all future ``Logger``s created by this class.
         """
-        cls._log_level = level
+        cls._log_level = log_level
+        for logger in cls._instances.values():
+            logger.setLevel(log_level)
