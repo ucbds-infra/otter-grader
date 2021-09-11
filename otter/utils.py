@@ -369,8 +369,16 @@ class logging:
     @classmethod
     def set_level(cls, log_level):
         """
-        Set the log levels for all future ``Logger``s created by this class.
+        Set the log levels for all ``Logger``s created by this class (existing and future).
         """
         cls._log_level = log_level
         for logger in cls._instances.values():
             logger.setLevel(log_level)
+
+    @classmethod
+    def reset_level(cls):
+        """
+        Set the log levels for all ``Loggers`` created by this class (existing and future) back to
+        ``logging.WARNING``.
+        """
+        cls.set_level(py_logging.WARNING)
