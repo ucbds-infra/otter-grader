@@ -1,5 +1,6 @@
 """Various utilities for Otter-Grader"""
 
+import logging
 import os
 import sys
 import pathlib
@@ -12,6 +13,7 @@ import tempfile
 from collections.abc import Mapping
 from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
+
 
 @contextmanager
 def block_print():
@@ -332,3 +334,34 @@ def recursive_dict_update(d, u):
             d[k] = v
 
     return d
+
+
+class Logger:
+    """
+    A class that wraps ``logging.Logger`` to track a global logging level. Instantiating this class
+    returns an instance of ``logging.Logger`` corresponding to the passed name with the correct 
+    logging level set.
+    """
+
+    _log_format = "[%(levelname)s %(name)s] %(message)s"
+    _log_level = logging.WARNING
+
+    def __new__(cls, name):
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(cls._log_format)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        return logger
+
+    @classmethod
+    def set_level(cls, level):
+        """
+        Set the global logging level of all loggers created via this class.
+
+        Args:
+            level (``int`` or ``str``): the new logging level; any value that can be passed to
+                ``logging.Logger.setLevel``
+        """
+        cls._log_level = level
