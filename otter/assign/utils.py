@@ -29,8 +29,12 @@ class EmptyCellException(Exception):
 class AssignNotebookFormatException(Exception):
     """
     """
-    def __init__(self, message, cell_index, *args, **kwargs):
-        message = message + f" (cell number { cell_index + 1 })"
+    def __init__(self, message, question_metadata, cell_index, *args, **kwargs):
+        question = question_metadata.get("name")
+        message += " ("
+        if question is not None:
+            message += f"question { question_metadata }, "
+        message = message + f"cell number { cell_index + 1 })"
         super().__init__(message, *args, **kwargs)
 
 
