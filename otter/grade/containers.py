@@ -34,7 +34,7 @@ def build_image(zip_path, base_image, tag):
         docker.build(".", build_args={
             "ZIPPATH": zip_path,
             "BASE_IMAGE": base_image
-        }, tags=[image], file=dockerfile)
+        }, tags=[image], file=dockerfile, load=True)
 
     return image
 
