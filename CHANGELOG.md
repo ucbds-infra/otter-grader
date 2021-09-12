@@ -11,6 +11,12 @@ _This section contains features that will be released into a pre-release version
 * Set `export_cell: run_tests: true` and `check_all_cell: false` as new defaults for Otter Assign per [#378](https://github.com/ucbds-infra/otter-grader/issues/378)
 * Made the v1 format of Otter Assign the default and added the `--v0` flag to the CLI
 
+**Unreleased:**
+
+* Fixed [#389](https://github.com/ucbds-infra/otter-grader/issues/389) by closing file handles in Otter Grade before removing them
+* Fixed R image builds by setting Conda `channel_priority` to `strict` in R `setup.sh` files per [#386](https://github.com/ucbds-infra/otter-grader/issues/386)
+* Fix loading docker images after building
+
 **v3.1.2:**
 
 * Specify UTF-8 encoding in all `open` calls used for reading JSON for Windows compatibility per [#380](https://github.com/ucbds-infra/otter-grader/issues/380)
