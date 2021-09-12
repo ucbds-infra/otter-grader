@@ -2,6 +2,10 @@
 
 **Unreleased:**
 
+* Added the question name to the `otter.assign.utils.AssignNotebookFormatException` per [#398](https://github.com/ucbds-infra/otter-grader/issues/398)
+
+**v3.1.3:**
+
 * Fixed [#389](https://github.com/ucbds-infra/otter-grader/issues/389) by closing file handles in Otter Grade before removing them
 * Fixed R image builds by setting Conda `channel_priority` to `strict` in R `setup.sh` files per [#386](https://github.com/ucbds-infra/otter-grader/issues/386)
 * Fix loading docker images after building
