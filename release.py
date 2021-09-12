@@ -42,8 +42,8 @@ def run_release_commands(test, beta, new_version, no_twine=False):
     ]
 
     if not beta:
-        commands.append(f"gh pr create --base 'stable' --head 'master' --title 'Release v{new_version}'" \
-            f" --milestone 'v{new_version}' --project 'Otter-Grader Issues and Tasks' " \
+        commands.append(f"gh pr create --base 'stable' --head 'master' --title 'Release v{new_version}' " \
+            f"--milestone 'v{new_version}' --project 'Otter-Grader Issues and Tasks' " \
             f"--repo 'ucbds-infra/otter-grader' --body ''")
 
     if no_twine:
