@@ -4,6 +4,9 @@ import os
 import json
 import pandas as pd
 import pickle
+import zipfile
+
+from glob import glob
 
 from .runners import create_runner
 from .utils import OtterRuntimeError
@@ -39,8 +42,17 @@ def main(autograder_dir, **kwargs):
         print(f"{chr(8207)}\n", LOGO_WITH_VERSION, "\n", sep="")
 
     abs_ag_path = os.path.abspath(runner.get_option("autograder_dir"))
-    with chdir(abs_ag_path):        
+    with chdir(abs_ag_path):
         try:
+            if runner.get_option("zips"):
+                with chdir("./submission"):
+                    zips = glob("*.zip")
+                    if len(zips) > 1:
+                        raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
+
+                    with zipfile.ZipFile(zips[0])  as zf:
+                        zf.extractall()
+
             runner.prepare_files()
             scores = runner.run()
             with open("results/results.pkl", "wb+") as f:
