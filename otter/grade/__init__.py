@@ -10,8 +10,11 @@ from .utils import merge_csv, prune_images
 from ..utils import assert_path_exists
 
 
+_ALLOWED_EXTENSIONS = ["ipynb", "py", "Rmd", "R", "r"]
+
+
 def main(*, path="./", output_dir="./", autograder="./autograder.zip", containers=None, 
-         scripts=False, no_kill=False, debug=False, zips=False, image="ucbdsinfra/otter-grader", 
+         ext="ipynb", no_kill=False, debug=False, zips=False, image="ucbdsinfra/otter-grader", 
          pdfs=False, verbose=False, prune=False, force=False, timeout=None, network=True):
     """
     Runs Otter Grade
@@ -25,7 +28,7 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
         output_dir (``str``): directory in which to write ``final_grades.csv``
         autograder (``str``): path to Otter autograder configuration zip file
         containers (``int``): number of containers to run in parallel
-        scripts (``bool``): whether Python scripts are being graded
+        ext (``str``): the submission file extension for globbing
         no_kill (``bool``): whether to keep containers after grading is finished
         debug (``bool``): whether to print the stdout of each container
         zips (``bool``): whether the submissions are Otter-exported zip files
@@ -51,15 +54,18 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
         (autograder, False),
     ])
 
+    if ext not in _ALLOWED_EXTENSIONS:
+        raise ValueError(f"Invalid submission extension specified: {ext}")
+
     if verbose:
         print("Launching docker containers...")
 
     #Docker
     grade_dfs = launch_grade(autograder,
-        notebooks_dir=path,
+        submissions_dir=path,
         verbose=verbose,
         num_containers=containers,
-        scripts=scripts,
+        ext=ext,
         no_kill=no_kill,
         output_path=output_dir,
         debug=debug,

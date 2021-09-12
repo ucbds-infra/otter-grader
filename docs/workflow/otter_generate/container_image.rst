@@ -57,7 +57,6 @@ manually.
 This file specifies the conda environment that Otter creates in ``setup.sh``.
 
 .. literalinclude:: ../../../otter/generate/templates/r/environment.yml
-    :language: yaml
 
 
 ``requirements.txt``

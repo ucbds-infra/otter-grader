@@ -1,5 +1,12 @@
 # Changelog
 
+**Unreleased:**
+
+* Fixed [#389](https://github.com/ucbds-infra/otter-grader/issues/389) by closing file handles in Otter Grade before removing them
+* Fixed R image builds by setting Conda `channel_priority` to `strict` in R `setup.sh` files per [#386](https://github.com/ucbds-infra/otter-grader/issues/386)
+* Fix loading docker images after building
+* Added the `--ext` option to Otter Grade per [#386](https://github.com/ucbds-infra/otter-grader/issues/386)
+
 **v3.1.2:**
 
 * Specify UTF-8 encoding in all `open` calls used for reading JSON for Windows compatibility per [#380](https://github.com/ucbds-infra/otter-grader/issues/380)
