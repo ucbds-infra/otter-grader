@@ -25,7 +25,6 @@ from ..test_files import GradingResults
 from ..utils import loggers
 
 
-LOGGER = loggers.get_logger(__name__)
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
 _ZIP_NAME_FILENAME = "__zip_filename__"
@@ -42,12 +41,18 @@ class Notebook:
             this information is automatically parsed from IPython on creation
     """
 
+    _grading_mode = False
+    _logger = None
+
     # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
-    _grading_mode = False
 
     @logs_event(EventType.INIT)
     def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
+        if self._logger is None:
+            self._load_logger()
+            self._logger = type(self)._logger
+
         global _SHELVE
 
         if colab is None:
@@ -92,8 +97,9 @@ class Notebook:
         **It is the caller's responsibility to maintain the pointer.** The pointer in the ``Checker``
         class will be overwritten when the context exits.
         """
-        LOGGER.info("Entering Notebook grading mode")
-        LOGGER.debug(f"Overriding tests directory: {tests_dir}")
+        cls._load_logger()
+        cls._logger.info("Entering Notebook grading mode")
+        cls._logger.debug(f"Overriding tests directory: {tests_dir}")
         cls._grading_mode = True
         cls._tests_dir_override = tests_dir
         Checker.clear_results()
@@ -101,11 +107,20 @@ class Notebook:
 
         yield Checker.get_results()
 
-        LOGGER.info("Exiting Notebook grading mode")
+        cls._logger.info("Exiting Notebook grading mode")
         cls._grading_mode = False
         cls._tests_dir_override = None
         Checker.disable_tracking()
         Checker.clear_results()
+
+    @classmethod
+    def _load_logger(cls):
+        """
+        Set-up the ``_logger`` field of the ``Notebook``.
+        """
+        if cls._logger is None:
+            name = cls.__module__ + "." + cls.__name__
+            cls._logger = loggers.get_logger(name)
 
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
@@ -181,12 +196,12 @@ class Notebook:
         Returns:
             ``otter.test_files.abstract_test.TestFile``: the grade for the question
         """
-        LOGGER.info(f"Running check for question: {question}")
+        self._logger.info(f"Running check for question: {question}")
         test_path, test_name = resolve_test_info(
             self._path, self._resolve_nb_path(None, fail_silently=True), question)
 
-        LOGGER.debug(f"Resolved test path: {test_path}")
-        LOGGER.debug(f"Resolved test name: {test_name}")
+        self._logger.debug(f"Resolved test path: {test_path}")
+        self._logger.debug(f"Resolved test name: {test_name}")
 
         # raise an error for a metadata test on Colab
         if test_name is not None and self._colab:
@@ -198,11 +213,11 @@ class Notebook:
 
         # pass the correct global environment
         if global_env is None:
-            LOGGER.debug(f"Collecting calling global environment")
+            self._logger.debug(f"Collecting calling global environment")
             global_env = inspect.currentframe().f_back.f_back.f_globals
 
         # run the check
-        LOGGER.debug(f"Calling checker")
+        self._logger.debug(f"Calling checker")
         result = Checker.check(test_path, test_name, global_env)
 
         return question, result, global_env
@@ -221,8 +236,8 @@ class Notebook:
             **kwargs: keyword arguments to be passed to the plugin
 
         """
-        LOGGER.info(f"Running plugin {plugin_name}")
-        LOGGER.debug(f"Running plugin {plugin_name} with args {args} and kwargs {kwargs}")
+        self._logger.info(f"Running plugin {plugin_name}")
+        self._logger.debug(f"Running plugin {plugin_name} with args {args} and kwargs {kwargs}")
         nb_path = self._resolve_nb_path(nb_path)
         if plugin_name in self._plugin_collections:
             pc = self._plugin_collections[plugin_name]
@@ -248,10 +263,10 @@ class Notebook:
                 notebook (only works in Jupyter Notebook classic, not JupyterLab)
         """
         nb_path = self._resolve_nb_path(nb_path)
-        LOGGER.debug(f"Resolved notebook path: {nb_path}")
+        self._logger.debug(f"Resolved notebook path: {nb_path}")
 
         if force_save:
-            LOGGER.debug("Attempting to force-save notebook")
+            self._logger.debug("Attempting to force-save notebook")
             saved = save_notebook(nb_path)
             if not saved:
                 warnings.warn(
@@ -259,10 +274,10 @@ class Notebook:
                     "saved version of this notebook."
                 )
             else:
-                LOGGER.debug("Force-save successful")
+                self._logger.debug("Force-save successful")
 
         pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
-        LOGGER.debug(f"Wrote PDF to zip file: {pdf_path}")
+        self._logger.debug(f"Wrote PDF to zip file: {pdf_path}")
 
         if display_link:
             # create and display output HTML
@@ -325,10 +340,10 @@ class Notebook:
         self._log_event(EventType.BEGIN_EXPORT)
 
         nb_path = self._resolve_nb_path(nb_path)
-        LOGGER.debug(f"Resolved notebook path: {nb_path}")
+        self._logger.debug(f"Resolved notebook path: {nb_path}")
 
         if force_save:
-            LOGGER.debug("Attempting to force-save notebook")
+            self._logger.debug("Attempting to force-save notebook")
             saved = save_notebook(nb_path)
             if not saved:
                 warnings.warn(
@@ -336,7 +351,7 @@ class Notebook:
                     "saved version of this notebook."
                 )
             else:
-                LOGGER.debug("Force-save successful")
+                self._logger.debug("Force-save successful")
 
         with open(nb_path, "r", encoding="utf-8") as f:
             if len(f.read().strip()) == 0:
@@ -349,7 +364,7 @@ class Notebook:
         else:
             zip_path = export_path
 
-        LOGGER.debug(f"Determined export zip path: {zip_path}")
+        self._logger.debug(f"Determined export zip path: {zip_path}")
 
         zf = zipfile.ZipFile(zip_path, mode="w")
         zf.write(nb_path)
@@ -357,15 +372,15 @@ class Notebook:
         if pdf:
             pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
             zf.write(pdf_path)
-            LOGGER.debug(f"Wrote PDF to zip file: {pdf_path}")
+            self._logger.debug(f"Wrote PDF to zip file: {pdf_path}")
 
         if os.path.isfile(_OTTER_LOG_FILENAME):
             zf.write(_OTTER_LOG_FILENAME)
-            LOGGER.debug("Added Otter log to zip file")
+            self._logger.debug("Added Otter log to zip file")
 
         zip_basename = os.path.basename(zip_path)
         zf.writestr(_ZIP_NAME_FILENAME, zip_basename)
-        LOGGER.debug(f"Added {_ZIP_NAME_FILENAME} to zip file: '{zip_basename}'")
+        self._logger.debug(f"Added {_ZIP_NAME_FILENAME} to zip file: '{zip_basename}'")
 
         dot_otter = glob("*.otter")
         if dot_otter:
@@ -373,15 +388,15 @@ class Notebook:
                 raise ValueError("Too many .otter files (max 1 allowed)")
             dot_otter = dot_otter[0]
             zf.write(dot_otter)
-            LOGGER.debug(f"Added .otter file to zip file: {dot_otter}")
+            self._logger.debug(f"Added .otter file to zip file: {dot_otter}")
 
         for file in files:
             zf.write(file)
-            LOGGER.debug(f"Added file to zip file: {file}")
+            self._logger.debug(f"Added file to zip file: {file}")
         
         for file in self._addl_files:
             zf.write(file)
-            LOGGER.debug(f"Added plugin file to zip file: {file}")
+            self._logger.debug(f"Added plugin file to zip file: {file}")
 
         zf.close()
 
@@ -414,7 +429,7 @@ class Notebook:
 
         global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
 
-        LOGGER.debug(f"Found available tests: {', '.join(tests)}")
+        self._logger.debug(f"Found available tests: {', '.join(tests)}")
 
         results = []
         if not _SHELVE:

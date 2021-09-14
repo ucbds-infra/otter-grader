@@ -342,7 +342,7 @@ def recursive_dict_update(d, u):
 
 class loggers:
 
-    _format = "[%(levelname)s %(name)s %(funcName)s] %(message)s"
+    _format = "[%(levelname)s %(name)s.%(funcName)s] %(message)s"
     _instances = {}
     _log_level = logging.WARNING
 
