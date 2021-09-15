@@ -96,7 +96,8 @@ class TestCase(unittest.TestCase):
 
             for f1, f2 in zip(dir1_contents, dir2_contents):
                 f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
-                self.assertDirsEqual(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs)
+                self.assertDirsEqual(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs, 
+                    variable_path_exts=variable_path_exts)
 
     def deletePaths(self, paths):
         for p in paths:

@@ -325,7 +325,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
 
     # TODO: change generate_autograder so that only necessary kwargs are needed
     timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
-    notebook_name = os.path.splitext(assignment.notebook_basename)[0]
+    notebook_name = assignment.master.stem
     output_path = f"{notebook_name}-autograder_{timestamp}.zip"
     generate_autograder(
         tests_dir=test_dir,

@@ -78,7 +78,8 @@ class TestAssign(TestCase):
 
         # check gradescope zip file
         self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "gs-autograder-correct",
+            glob(TEST_FILES_PATH + "output/autograder/*.zip")[0], 
+            TEST_FILES_PATH + "gs-autograder-correct",
         )
 
     def test_r_example(self):
@@ -101,7 +102,8 @@ class TestAssign(TestCase):
         
         # check gradescope zip file
         self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "rmd-autograder-correct",
+            glob(TEST_FILES_PATH + "output/autograder/*.zip")[0], 
+            TEST_FILES_PATH + "rmd-autograder-correct",
         )
 
     def tearDown(self):
