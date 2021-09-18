@@ -17,8 +17,7 @@ docker-test: docker-test-prepare
 	rm test-Dockerfile
 
 docker-ci-test:	docker-test-prepare
-	DOCKER_BUILDKIT=0 docker bild . -t otter-test -f test-Dockerfile
-	# docker buildx build . --load -t otter-test -f test-Dockerfile --cache-from=type=gha --cache-to=type=gha,mode=max
+	docker buildx build . --load -t otter-test -f test-Dockerfile --cache-from=type=gha --cache-to=type=gha,mode=max
 	rm test-Dockerfile
 
 tutorial:
