@@ -1,6 +1,13 @@
 # Changelog
 
-**Unreleased:**
+**v3.1.4:**
+
+* Added the question name to the `otter.assign.utils.AssignNotebookFormatException` per [#398](https://github.com/ucbds-infra/otter-grader/issues/398)
+* Switched from manual install of the fandol font in grading images to installing the `texlive-lang-chinese` package
+* Allowed submission zip to be exported even when PDF generation fails per [#403](https://github.com/ucbds-infra/otter-grader/issues/403)
+* Fixed bug in Otter Assign that fails when a notebook has no tests
+
+**v3.1.3:**
 
 * Fixed [#389](https://github.com/ucbds-infra/otter-grader/issues/389) by closing file handles in Otter Grade before removing them
 * Fixed R image builds by setting Conda `channel_priority` to `strict` in R `setup.sh` files per [#386](https://github.com/ucbds-infra/otter-grader/issues/386)

@@ -149,12 +149,13 @@ def get_transformed_cells(cells, assignment):
                 if block_type in curr_block:
                     raise AssignNotebookFormatException(
                         f"Found an end { block_type.value } cell with an un-ended child " + \
-                            f"{ curr_block[-1].value } block", i)
+                            f"{ curr_block[-1].value } block", question_metadata, i)
 
                 # otherwise raise an error for an end with no begin
                 else:
                     raise AssignNotebookFormatException(
-                        f"Found an end { block_type.value } cell with no begin block cell", i)
+                        f"Found an end { block_type.value } cell with no begin block cell",
+                        question_metadata, i)
 
         # check for begin blocks
         found_begin = False
@@ -166,16 +167,19 @@ def get_transformed_cells(cells, assignment):
         if found_begin:
             if len(curr_block) == 0 and block_type is not BlockType.QUESTION:
                 raise AssignNotebookFormatException(
-                    f"Found a begin { block_type.value } cell outside a question", i)
+                    f"Found a begin { block_type.value } cell outside a question", 
+                    question_metadata, i)
             elif len(curr_block) > 0 and block_type is BlockType.QUESTION:
                 raise AssignNotebookFormatException(
-                    f"Found a begin { block_type.value } cell inside another question", i)
+                    f"Found a begin { block_type.value } cell inside another question", 
+                    question_metadata, i)
             elif len(curr_block) > 1:
                 raise AssignNotebookFormatException(
                     f"Found a begin { block_type.value } cell inside a { curr_block[-1].value } " + \
-                        f"block", i)
+                        f"block", question_metadata, i)
             elif block_type is BlockType.PROMPT and has_prompt:  # has_prompt was set by the solution block
-                raise AssignNotebookFormatException("Found a prompt block after a solution block", i)
+                raise AssignNotebookFormatException(
+                    "Found a prompt block after a solution block", question_metadata, i)
 
             # if not an invalid begin cell, update state
             if block_type is BlockType.PROMPT:
@@ -190,7 +194,8 @@ def get_transformed_cells(cells, assignment):
             elif block_type is BlockType.QUESTION:
                 question_metadata = get_cell_config(cell)
                 if not isinstance(question_metadata, dict):
-                    raise AssignNotebookFormatException("Found a begin question cell with no config", i)
+                    raise AssignNotebookFormatException(
+                        "Found a begin question cell with no config", question_metadata, i)
                 question_metadata = create_question_config(question_metadata)
                 if question_metadata["manual"] or question_metadata["export"]:
                     need_begin_export = True
@@ -202,7 +207,8 @@ def get_transformed_cells(cells, assignment):
         if len(curr_block) > 0:
             if curr_block[-1] == BlockType.TESTS:
                 if not is_cell_type(cell, "code"):
-                    raise AssignNotebookFormatException("Found a non-code cell in tests block", i)
+                    raise AssignNotebookFormatException(
+                        "Found a non-code cell in tests block", question_metadata, i)
                 test_case = read_test(cell, question_metadata, assignment)
                 test_cases.append(test_case)
                 continue
