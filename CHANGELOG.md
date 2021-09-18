@@ -4,6 +4,8 @@
 
 * Added the question name to the `otter.assign.utils.AssignNotebookFormatException` per [#398](https://github.com/ucbds-infra/otter-grader/issues/398)
 * Switched from manual install of the fandol font in grading images to installing the `texlive-lang-chinese` package
+* Allowed submission zip to be exported even when PDF generation fails per [#403](https://github.com/ucbds-infra/otter-grader/issues/403)
+* Fixed bug in Otter Assign that fails when a notebook has no tests
 
 **v3.1.3:**
 
