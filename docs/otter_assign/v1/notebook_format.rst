@@ -48,7 +48,7 @@ defaults) is ``export_cell``.
 
 .. code-block:: yaml
 
-    requirements: null             # the path to a requirements.txt file
+    requirements: null             # the path to a requirements.txt file or a list of packages
     overwrite_requirements: false  # whether to overwrite Otter's default requirement.txt in Otter Generate
     environment: null              # the path to a conda environment.yml file
     run_tests: true                # whether to run the assignment tests against the autograder notebook
@@ -99,6 +99,18 @@ look something like this:
     files:
         - data/data.csv
         - utils.py
+
+The `requirements` key of the assignment config can also be formatted as a list of package names in
+lieu of a path to a `requirements.txt` file; for exmaple:
+
+.. code-block:: yaml
+
+    requirements:
+        - pandas
+        - numpy
+        - scipy
+
+This structure is also compatible with the `overwrite_requirements` key.
 
 A note about Otter Generate: the ``generate`` key of the assignment metadata has two forms. If you 
 just want to generate and require no additional arguments, set ``generate: true`` in the YAML and 

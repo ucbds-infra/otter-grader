@@ -35,20 +35,11 @@ RUN apt-get clean && \
 RUN apt-get clean && \
     apt-get update && \ 
     apt-get install -y pandoc && \
-    apt-get install -y -f texlive-xetex texlive-fonts-recommended && \
+    apt-get install -y -f texlive-xetex texlive-fonts-recommended texlive-lang-chinese && \
     wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb && \
     apt-get install -y /tmp/wkhtmltopdf.deb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# install fandol font for xeCJK
-RUN wget -nv -O /tmp/fandol.zip https://mirrors.ctan.org/fonts/fandol.zip && \
-    unzip -d /tmp/fandol /tmp/fandol.zip && \
-    mkdir -p /usr/share/texlive/texmf-dist/fonts/opentype/public/fandol && \
-    cp /tmp/fandol/fandol/*.otf /usr/share/texlive/texmf-dist/fonts/opentype/public/fandol && \
-    mktexlsr && \
-    fc-cache && \
-    rm -rf /tmp/fandol /tmp/fandol.zip
 
 # Set the locale to UTF-8 to ensure that Unicode output is encoded correctly
 ENV LANG C.UTF-8
@@ -61,4 +52,4 @@ RUN mkdir /autograder
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-RUN pip install otter-grader==3.1.3
+RUN pip install otter-grader==3.1.4

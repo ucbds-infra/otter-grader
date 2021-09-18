@@ -320,7 +320,10 @@ class Notebook:
             pdf_path = ".".join(nb_path.split(".")[:-1]) + ".pdf"
             # convert(nb_path, filtering=filtering, filter_type=filter_type)
             export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
-            zf.write(pdf_path)
+            if os.path.isfile(pdf_path):
+                zf.write(pdf_path)
+            else:
+                warnings.warn("Could not locate a PDF to include")
 
         if os.path.isfile(_OTTER_LOG_FILENAME):
             zf.write(_OTTER_LOG_FILENAME)

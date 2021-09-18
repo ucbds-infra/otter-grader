@@ -220,7 +220,7 @@ def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=False):
                             test['points'].pop(i)
             write_test({}, f, test, use_file=True)
     else:
-        tests = nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"]
+        tests = nb["metadata"].get(NOTEBOOK_METADATA_KEY, {}).get("tests", {})
         for tn, test in tests.items():
             for i, tc in list(enumerate(test["suites"][0]["cases"]))[::-1]:
                 if tc["hidden"]:
