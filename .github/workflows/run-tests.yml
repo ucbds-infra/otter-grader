@@ -32,7 +32,7 @@ jobs:
           make docker-ci-test
 
       - name: Run tests
-        run: docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt; coverage run -m test && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml" && cp /tmp/coverage.xml ./coverage.xml
+        run: pwd && docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt; coverage run -m test && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml" && cp /tmp/coverage.xml ./coverage.xml
 
       - name: Send to Codecov
         run: |
