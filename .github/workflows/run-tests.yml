@@ -30,7 +30,6 @@ jobs:
       - name: Build testing Docker image
         run: |
           pwd
-          ls
           make docker-ci-test
 
       - name: Run tests
