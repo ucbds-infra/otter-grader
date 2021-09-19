@@ -11,7 +11,7 @@ from ..utils import convert_config_description_dict, recursive_dict_update
 _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {
         "key": "requirements",
-        "description": "the path to a requirements.txt file",
+        "description": "the path to a requirements.txt file or a list of packages",
         "default": None,
     },
     {

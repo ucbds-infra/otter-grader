@@ -107,6 +107,14 @@ and at the end of grading we would have
         ├── q2.py
         └── q3.py    # etc.
 
+To grade submissions that aren't notebook files, use the ``--ext`` flag, which accepts the file 
+extension to search for submissions with. For example, if we had the same example as above but with 
+Rmd files:
+
+.. code-block:: console
+
+    otter grade --ext Rmd
+
 
 Requirements
 ++++++++++++

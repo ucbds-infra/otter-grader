@@ -14,13 +14,13 @@ The available keys in a ``.otter`` file are listed below, along with their defau
 required key is ``notebook`` (i.e. if you use ``.otter`` file it must specify a value for 
 ``notebook``).
 
-.. code-block:: json
+.. code-block:: python
 
     {
-        "notebook": "",            // the notebook filename
-        "save_environment": false, // whether to serialize the environment in the log during checks
-        "ignore_modules": [],      // a list of modules whose functions to ignore during serialization
-        "variables": {}            // a mapping of variable names -> types to resitrct during serialization
+        "notebook": "",            # the notebook filename
+        "save_environment": false, # whether to serialize the environment in the log during checks
+        "ignore_modules": [],      # a list of modules whose functions to ignore during serialization
+        "variables": {}            # a mapping of variable names -> types to resitrct during serialization
     }
 
 
