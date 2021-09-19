@@ -14,11 +14,11 @@ docker-test-prepare:
 	printf "\nENV PYTHONUNBUFFERED 1" >> test-Dockerfile
 
 docker-test: docker-test-prepare
-	cd .. && docker build . -t otter-test -f otter-grader/test-Dockerfile --cache-from ucbdsinfra/otter-grader:latest
+	cd .. && docker build . -t otter-test -f test-Dockerfile --cache-from ucbdsinfra/otter-grader:latest
 	rm test-Dockerfile
 
 docker-ci-test:	docker-test-prepare
-	cd .. && docker buildx build . --load -t otter-test -f otter-grader/test-Dockerfile --cache-from=type=gha --cache-to=type=gha,mode=max
+	cd .. && docker buildx build . --load -t otter-test -f test-Dockerfile --cache-from=type=gha --cache-to=type=gha,mode=max
 	rm test-Dockerfile
 
 tutorial:
