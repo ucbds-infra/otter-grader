@@ -8,17 +8,17 @@ docs:
 docker-test-prepare: 
 	cp -r Dockerfile test-Dockerfile
 	printf "\nRUN mkdir -p /home" >> test-Dockerfile
-	printf "\nADD ./otter-grader /home/otter-grader\nRUN pip install /home/otter-grader" >> test-Dockerfile
+	printf "\nADD . /home/otter-grader\nRUN pip install /home/otter-grader" >> test-Dockerfile
 	printf "\nRUN cd /tmp && curl -sSL -O https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz && tar zxf docker-${DOCKER_VERSION}.tgz && mv ./docker/docker /usr/local/bin && chmod +x /usr/local/bin/docker && rm -rf /tmp/*" >> test-Dockerfile
 	printf "\nCOPY --from=docker/buildx-bin /buildx /usr/libexec/docker/cli-plugins/docker-buildx" >> test-Dockerfile
 	printf "\nENV PYTHONUNBUFFERED 1" >> test-Dockerfile
 
 docker-test: docker-test-prepare
-	cd .. && docker build . -t otter-test -f test-Dockerfile --cache-from ucbdsinfra/otter-grader:latest
+	docker build . -t otter-test -f test-Dockerfile --cache-from ucbdsinfra/otter-grader:latest
 	rm test-Dockerfile
 
 docker-ci-test:	docker-test-prepare
-	cd .. && docker buildx build . --load -t otter-test -f test-Dockerfile --cache-from=type=gha --cache-to=type=gha,mode=max
+	docker buildx build . --load -t otter-test -f test-Dockerfile --cache-from=type=gha --cache-to=type=gha,mode=max
 	rm test-Dockerfile
 
 tutorial:
