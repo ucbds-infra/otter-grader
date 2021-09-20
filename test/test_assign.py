@@ -29,7 +29,7 @@ class TestAssign(TestCase):
         unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
         self.assertEqual(len(unzip.stderr), 0, unzip.stderr.decode("utf-8"))
 
-        self.assertDirsEqual(TEST_FILES_PATH + "autograder", correct_dir_path, ignore_ext=[])
+        self.assertDirsEqual(TEST_FILES_PATH + "autograder", correct_dir_path)
 
         # cleanup
         if os.path.exists(TEST_FILES_PATH + "autograder"):
@@ -67,7 +67,8 @@ class TestAssign(TestCase):
         """
         assign(TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v0=True)
       
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", ignore_ext=[".pdf",".zip"])
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", 
+            ignore_ext=[".pdf"], variable_path_exts=[".zip"])
     
     @patch.object(APIClient, "get_token")
     def test_gradescope_example(self, mocked_client):
@@ -81,11 +82,13 @@ class TestAssign(TestCase):
 
         assign(TEST_FILES_PATH + "generate-gradescope.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v0=True)
       
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", ignore_ext=[".pdf",".zip"])
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", 
+            ignore_ext=[".pdf"], variable_path_exts=[".zip"])
 
         # check gradescope zip file
         self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "gs-autograder-correct",
+            glob(TEST_FILES_PATH + "output/autograder/*.zip")[0], 
+            TEST_FILES_PATH + "gs-autograder-correct",
         )
 
     def test_r_example(self):
@@ -94,7 +97,8 @@ class TestAssign(TestCase):
         """
         assign(TEST_FILES_PATH + "r-example.ipynb", TEST_FILES_PATH + "output")
 
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", ignore_ext=[".pdf",".zip"])
+        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", 
+            ignore_ext=[".pdf"], variable_path_exts=[".zip"])
 
     def test_rmd_example(self):
         """
@@ -103,11 +107,12 @@ class TestAssign(TestCase):
         assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output")
 
         self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", 
-            ignore_ext=[".zip", ".pdf"], ignore_dirs=["rmd-example-sol_files"])
+            ignore_ext=[".pdf"], ignore_dirs=["rmd-example-sol_files"], variable_path_exts=[".zip"])
         
         # check gradescope zip file
         self.check_gradescope_zipfile(
-            TEST_FILES_PATH + "output/autograder/autograder.zip", TEST_FILES_PATH + "rmd-autograder-correct",
+            glob(TEST_FILES_PATH + "output/autograder/*.zip")[0], 
+            TEST_FILES_PATH + "rmd-autograder-correct",
         )
 
     def tearDown(self):

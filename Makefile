@@ -16,8 +16,7 @@ docker-test: docker-test-prepare
 	docker build . -t otter-test -f test-Dockerfile --cache-from ucbdsinfra/otter-grader:latest
 	rm test-Dockerfile
 
-docker-ci-test:	docker-test-prepare
-	docker buildx build . --load -t otter-test -f test-Dockerfile --cache-from=type=gha --cache-to=type=gha,mode=max
+docker-ci-test-cleanup:
 	rm test-Dockerfile
 
 tutorial:
