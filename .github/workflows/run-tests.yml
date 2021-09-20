@@ -27,9 +27,25 @@ jobs:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v1
 
-      - name: Build testing Docker image
+      - name: Prepare for Docker image build
         run: |
-          make docker-ci-test
+          docker pull ucbdsinfra/otter-grader
+          make docker-test-prepare
+
+      # Temporarily caching from remote image due to https://github.com/docker/buildx/issues/681
+      - name: Build Docker image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: test-Dockerfile
+          load: true
+          push: false
+          tags: otter-test
+          cache-from: ucbdsinfra/otter-grader:latest
+
+      - name: Clean up Docker image build
+        run: make docker-ci-test-cleanup
 
       - name: Run tests
         run: docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt; coverage run -m test && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml" && cp /tmp/coverage.xml ./coverage.xml

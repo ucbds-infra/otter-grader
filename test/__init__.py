@@ -53,7 +53,21 @@ class TestCase(unittest.TestCase):
                 with open(p2, "rb") as f2:
                     self.assertEqual(f1.read(), f2.read(), f"Contents of {p1} did not equal contents of {p2}")
 
-    def assertDirsEqual(self, dir1, dir2, ignore_ext=[], ignore_dirs=[]):
+    def assertDirsEqual(self, dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_exts=[]):
+        """
+        Assert that the contents of two directories are equal recursively.
+
+        Args:
+            dir1 (``str``): the first directory
+            dir1 (``str``): the second directory
+            ignore_ext (``list[str]``, optional): a list of extensions for which the contents of any
+                such files will not be compared when checking directories
+            ignore_dirs (``list[str]``, optional): a list of directory names whose contents should
+                be assumed to be the same (i.e. not to check)
+            variable_path_exts(``list[str]``. optional): a list of extensions for paths whose stems
+                may be different; if present, the number of files with these extensions is compared,
+                although their contents and stems are ignored
+        """
         self.assertTrue(os.path.exists(dir1), f"{dir1} does not exist")
         self.assertTrue(os.path.exists(dir2), f"{dir2} does not exist")
         self.assertTrue(os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type")
@@ -64,13 +78,26 @@ class TestCase(unittest.TestCase):
 
         else:
             dir1_contents, dir2_contents = (
-                [f for f in os.listdir(dir1) if not (os.path.isdir(os.path.join(dir1, f)) and f in ignore_dirs)], 
-                [f for f in os.listdir(dir2) if not (os.path.isdir(os.path.join(dir2, f)) and f in ignore_dirs)], 
+                [f for f in os.listdir(dir1) if not (os.path.isdir(os.path.join(dir1, f)) and f in ignore_dirs) \
+                    and os.path.splitext(f)[1] not in variable_path_exts], 
+                [f for f in os.listdir(dir2) if not (os.path.isdir(os.path.join(dir2, f)) and f in ignore_dirs) \
+                    and os.path.splitext(f)[1] not in variable_path_exts], 
             )
             self.assertEqual(sorted(dir1_contents), sorted(dir2_contents), f"{dir1} and {dir2} have different contents")
+
+            # check that for each variable path ext, there are the same number of files in each dir
+            # with that ext
+            for ext in variable_path_exts:
+                self.assertEqual(
+                    len([f for f in os.listdir(dir1) if os.path.splitext(f)[1] == ext]),
+                    len([f for f in os.listdir(dir2) if os.path.splitext(f)[1] == ext]),
+                    f"Variable path extension check failed for {dir1} and {dir2} with ext {ext}",
+                )
+
             for f1, f2 in zip(dir1_contents, dir2_contents):
                 f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
-                self.assertDirsEqual(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs)
+                self.assertDirsEqual(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs, 
+                    variable_path_exts=variable_path_exts)
 
     def deletePaths(self, paths):
         for p in paths:
