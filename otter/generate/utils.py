@@ -2,6 +2,7 @@
 
 import os
 
+
 def zip_folder(zf, path, prefix=""):
     """
     Recursively add the contents of a directory into a ``zipfile.ZipFile``.
