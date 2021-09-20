@@ -1,5 +1,10 @@
 # Changelog
 
+**Unreleased:**
+
+* Made `xeCJK` in Otter Export's LaTeX templates optional per [#411](https://github.com/ucbds-infra/otter-grader/issues/411)
+* Removed concise error messages and debug mode from Otter Export, instead opting to always display the full error message, per [#407](https://github.com/ucbds-infra/otter-grader/issues/407)
+
 **v3.1.4:**
 
 * Added the question name to the `otter.assign.utils.AssignNotebookFormatException` per [#398](https://github.com/ucbds-infra/otter-grader/issues/398)
