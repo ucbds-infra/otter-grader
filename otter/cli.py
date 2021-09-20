@@ -76,8 +76,8 @@ def export_cli(*args, **kwargs):
 
 defaults = generate.__kwdefaults__
 @cli.command("generate")
-@click.option("-t", "--tests-path", default=defaults["tests_path"], type=click.Path(exists=True, file_okay=False), help="Path to test files")
-@click.option("-o", "--output-dir", default=defaults["output_dir"], type=click.Path(exists=True, file_okay=False), help="Path to which to write zipfile")
+@click.option("-t", "--tests-dir", default=defaults["tests_dir"], type=click.Path(exists=True, file_okay=False), help="Path to test files")
+@click.option("-o", "--output-path", default=defaults["output_path"], type=click.Path(), help="Path at which to write autograder zip file")
 @click.option("-c", "--config", type=click.Path(exists=True, file_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
 @click.option("--no-config", is_flag=True, help="Disable auto-inclusion of unspecified Otter config file at ./otter_config.json")
 @click.option("-r", "--requirements", type=click.Path(exists=True, file_okay=False), help="Path to requirements.txt file; ./requirements.txt automatically checked")
