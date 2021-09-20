@@ -21,10 +21,14 @@ from ..run.run_autograder.constants import DEFAULT_OPTIONS
 from ..utils import load_default_file
 
 
-TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "1.1.1"  # this should match a release tag on GitHub
+TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
+TEST_FILE_PATTERNS = {
+    "python": "*.py",
+    "r": "*.[Rr]",
+}
 
 
 def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_config=False, 
@@ -45,7 +49,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
             adding to them
         environment (``str``): path to a conda environment file for this assignment
-        no_environment (``bool``): whether ``./evironment.yml`` should be automatically checked if 
+        no_environment (``bool``): whether ``./environment.yml`` should be automatically checked if 
             ``environment`` is unspecified
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
@@ -117,70 +121,58 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
     if plugin_collection is None:
         plugin_collection = PluginCollection(otter_config.get("plugins", []), None, {})
+
     else:
         plugin_collection.add_new_plugins(otter_config.get("plugins", []))
     
     plugin_collection.run("during_generate", otter_config, assignment)
 
-    # create tmp directory to zip inside
-    with tempfile.TemporaryDirectory() as td:
+    # open requirements if it exists
+    with load_default_file(requirements, f"requirements.{'R' if options['lang'] == 'r' else 'txt'}", 
+                           default_disabled=no_requirements,) as reqs:
+        template_context["other_requirements"] = reqs if reqs is not None else ""
 
-        # try:
-        # copy tests into tmp
-        test_dir = os.path.join(td, "tests")
-        os.mkdir(test_dir)
-        pattern = ("*.py", "*.[Rr]")[options["lang"] == "r"]
-        for file in glob(os.path.join(tests_dir, pattern)):
-            shutil.copy(file, test_dir)
+    template_context["overwrite_requirements"] = overwrite_requirements
 
-        # open requirements if it exists
-        with load_default_file(
-            requirements, 
-            f"requirements.{'R' if options['lang'] == 'r' else 'txt'}", 
-            default_disabled=no_requirements
-        ) as reqs:
-            template_context["other_requirements"] = reqs if reqs is not None else ""
+    # open environment if it exists
+    # unlike requirements.txt, we will always overwrite, not append by default
+    with load_default_file(environment, "environment.yml", default_disabled=no_environment) as env_contents:
+        template_context["other_environment"] = env_contents
+        if env_contents is not None:
+            data = yaml.safe_load(env_contents)
+            data['name'] = template_context["otter_env_name"]
+            template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
 
-        template_context["overwrite_requirements"] = overwrite_requirements
-
-        # open environment if it exists
-        # unlike requirements.txt, we will always overwrite, not append by default
-        with load_default_file(environment, "environment.yml", default_disabled=no_environment) as env_contents:
-            template_context["other_environment"] = env_contents
-            if env_contents is not None:
-                data = yaml.safe_load(env_contents)
-                data['name'] = template_context["otter_env_name"]
-                template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
-  
-        rendered = {}
-        for fn, tmpl in templates.items():
-            rendered[fn] = tmpl.render(**template_context)
-        
-        if os.path.exists(output_path):
-            os.remove(output_path)
-
-        with zipfile.ZipFile(output_path, mode="w") as zf:
-            for fn, contents in rendered.items():
-                zf.writestr(fn, contents)
-
-            test_dir = "tests"
-            pattern = ("*.py", "*.[Rr]")[options["lang"] == "r"]
-            for file in glob(os.path.join(tests_dir, pattern)):
-                zf.write(file, arcname=os.path.join(test_dir, os.path.basename(file)))
-            
-            zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))
-
-            # copy files into tmp
-            if len(files) > 0:
-                for file in files:
-                    full_fp = os.path.abspath(file)
-                    assert os.getcwd() in full_fp, f"{file} is not in a subdirectory of the working directory"
-                    if os.path.isfile(full_fp):
-                        zf.write(file, arcname=os.path.join("files", file))
-                    elif os.path.isdir(full_fp):
-                        zip_folder(zf, full_fp, prefix="files")
-                    else:
-                        raise ValueError(f"Could not find file or directory '{full_fp}'")
+    rendered = {}
+    for fn, template in templates.items():
+        rendered[fn] = template.render(**template_context)
     
+    if os.path.exists(output_path):
+        os.remove(output_path)
+
+    with zipfile.ZipFile(output_path, mode="w") as zf:
+        for fn, contents in rendered.items():
+            zf.writestr(fn, contents)
+
+        arc_test_dir = "tests"
+        pattern = TEST_FILE_PATTERNS[options["lang"]]
+        for file in glob(os.path.join(tests_dir, pattern)):
+            zf.write(file, arcname=os.path.join(arc_test_dir, os.path.basename(file)))
+
+        zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))
+
+        # copy files into tmp
+        if len(files) > 0:
+            for file in files:
+                full_fp = os.path.abspath(file)
+                if os.getcwd() not in full_fp:
+                    raise ValueError(f"{file} is not in the working directory")
+                if os.path.isfile(full_fp):
+                    zf.write(file, arcname=os.path.join("files", file))
+                elif os.path.isdir(full_fp):
+                    zip_folder(zf, full_fp, prefix="files")
+                else:
+                    raise ValueError(f"Could not find file or directory '{full_fp}'")
+
     if assignment is not None:
         assignment._otter_config = otter_config
