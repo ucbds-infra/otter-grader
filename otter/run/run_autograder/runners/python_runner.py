@@ -9,7 +9,9 @@ import zipfile
 from glob import glob
 
 from .abstract_runner import AbstractLanguageRunner
+
 from ..utils import OtterRuntimeError
+
 from ....check.logs import Log
 from ....check.notebook import _OTTER_LOG_FILENAME
 from ....execute import grade_notebook

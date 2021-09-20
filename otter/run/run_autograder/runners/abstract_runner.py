@@ -14,7 +14,7 @@ class AbstractLanguageRunner(ABC):
 
     Args:
         otter_config (``dict[str:object]``): user-specified configurations to override the defaults
-        **kwargs: other user-specified confirations to override the defaults
+        **kwargs: other user-specified configurations to override the defaults
 
     Attributes:
         options (``dict[str:object]``): the grading options, including default values from 
@@ -86,7 +86,7 @@ class AbstractLanguageRunner(ABC):
         When this method is invoked, the working directory is assumed to already be 
         ``self.options["autograder_dir"]``.
 
-        Retuns:
+        Returns:
             ``otter.test_files.GradingResults``: the results from grading the submission
         """
         ...
