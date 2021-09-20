@@ -84,6 +84,10 @@ class PDFViaLatexExporter(BaseExporter):
                 print_full_width("=")
                 print(error.output)
                 print_full_width("=")
+                if xecjk:
+                    print("If the error above is related to xeCJK or fandol in LaTeX and you don't "
+                        "require this functionality, try running again with no_xecjk set to True "
+                        "or the --no-xecjk flag.")
 
                 if NBCONVERT_6:
                     nbconvert.TemplateExporter.template_name = orig_template_name
