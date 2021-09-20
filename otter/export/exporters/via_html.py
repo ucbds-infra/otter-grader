@@ -35,7 +35,7 @@ class PDFViaHTMLExporter(BaseExporter):
     })
 
     @classmethod
-    def convert_notebook(cls, nb_path, dest, debug=False, **kwargs):
+    def convert_notebook(cls, nb_path, dest, **kwargs):
         assert shutil.which("wkhtmltopdf") is not None, "Cannot export via HTML without wkhtmltopdf"
 
         options = cls.default_options.copy()

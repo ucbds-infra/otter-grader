@@ -7,6 +7,8 @@ import warnings
 
 from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
 
+from ...utils import print_full_width
+
 
 class PDFViaLatexExporter(BaseExporter):
     """
@@ -28,7 +30,7 @@ class PDFViaLatexExporter(BaseExporter):
     })
 
     @classmethod
-    def convert_notebook(cls, nb_path, dest, debug=False, xecjk=False, no_xecjk=False, **kwargs):
+    def convert_notebook(cls, nb_path, dest, xecjk=False, no_xecjk=False, **kwargs):
         warnings.filterwarnings("ignore", r"invalid escape sequence '\\c'", DeprecationWarning)
 
         if xecjk and no_xecjk:
@@ -75,21 +77,13 @@ class PDFViaLatexExporter(BaseExporter):
 
         except nbconvert.pdf.LatexFailed as error:
             if not xecjk and not no_xecjk:
-                success = cls.convert_notebook(nb_path, dest, debug=debug, xecjk=True, **kwargs)
+                success = cls.convert_notebook(nb_path, dest, xecjk=True, **kwargs)
 
             elif not success:
-                print("There was an error generating your LaTeX")
-                output = error.output
-                if debug:
-                    print("Showing full error message from PDFTex")
-
-                else:
-                    print("Showing concise error message")
-                    output = "\n".join(error.output.split("\n")[-15:])
-
-                print("=" * 60)
-                print(output)
-                print("=" * 60)
+                print("There was an error generating your LaTeX; showing full error message:")
+                print_full_width("=")
+                print(error.output)
+                print_full_width("=")
 
                 if NBCONVERT_6:
                     nbconvert.TemplateExporter.template_name = orig_template_name

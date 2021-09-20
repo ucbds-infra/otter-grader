@@ -65,7 +65,6 @@ defaults = export.__kwdefaults__
 @click.option("-s", "--save", is_flag=True, help="Save intermediate file(s) as well")
 @click.option("-e", "--exporter", default=defaults["exporter"], type=click.Choice(["latex", "html"]), help="Type of PDF exporter to use")
 @click.option("--no-xecjk", is_flag=True, help="Force-disable xeCJK in Otter's LaTeX template")
-@click.option("--debug", is_flag=True, help="Export in debug mode")
 def export_cli(*args, **kwargs):
     """
     Export a Jupyter Notebook SRC as a PDF at DEST with optional filtering.
