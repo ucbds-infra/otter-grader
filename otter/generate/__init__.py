@@ -25,9 +25,19 @@ MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.1
 OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "1.1.1"  # this should match a release tag on GitHub
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
-TEST_FILE_PATTERNS = {
-    "python": "*.py",
-    "r": "*.[Rr]",
+
+
+LANGUAGE_BASED_CONFIGURATIONS = {
+    "python": {
+        "test_file_pattern": "*.py",
+        "requirements_filename": "requirements.txt",
+        "template_dir": os.path.join(TEMPLATE_DIR, "python"),
+    },
+    "r": {
+        "test_file_pattern": "*.[Rr]",
+        "requirements_filename": "requirements.R",
+        "template_dir": os.path.join(TEMPLATE_DIR, "r"),
+    },
 }
 
 
@@ -57,7 +67,6 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         files (``list[str]``): list of file paths to add to the zip file
         assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
             if used with Otter Assign
-        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
 
     Raises:
         ``FileNotFoundError``: if the specified Otter configuration JSON file could not be found
@@ -102,8 +111,12 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
     # update language
     options["lang"] = lang.lower()
+    if options["lang"] not in LANGUAGE_BASED_CONFIGURATIONS.keys():
+        raise ValueError(f"Invalid language specified: {options['lang']}")
 
-    template_dir = os.path.join(TEMPLATE_DIR, options["lang"])
+    lang_config = LANGUAGE_BASED_CONFIGURATIONS[options["lang"]]
+
+    template_dir = lang_config["template_dir"]
 
     templates = {}
     for fn in os.listdir(template_dir):
@@ -128,7 +141,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     plugin_collection.run("during_generate", otter_config, assignment)
 
     # open requirements if it exists
-    with load_default_file(requirements, f"requirements.{'R' if options['lang'] == 'r' else 'txt'}", 
+    with load_default_file(requirements, lang_config["requirements_filename"], 
                            default_disabled=no_requirements,) as reqs:
         template_context["other_requirements"] = reqs if reqs is not None else ""
 
@@ -155,7 +168,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
             zf.writestr(fn, contents)
 
         arc_test_dir = "tests"
-        pattern = TEST_FILE_PATTERNS[options["lang"]]
+        pattern = lang_config["test_file_pattern"]
         for file in glob(os.path.join(tests_dir, pattern)):
             zf.write(file, arcname=os.path.join(arc_test_dir, os.path.basename(file)))
 
