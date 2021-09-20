@@ -358,6 +358,7 @@ class loggers:
         if name in cls._instances:
             return cls._instances[name]
         logger = logging.getLogger(name)
+        logger.propagate = False  # prevent child loggers from inheriting the handler
         logger.setLevel(cls._log_level)
         handler = logging.StreamHandler()
         formatter = logging.Formatter(cls._format)
