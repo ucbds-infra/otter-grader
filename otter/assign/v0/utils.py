@@ -274,8 +274,8 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     
     # TODO: change generate_autograder so that only necessary kwargs are needed
     generate_autograder(
-        tests_path=test_dir,
-        output_dir=".",
+        tests_dir=test_dir,
+        output_path="autograder.zip",
         config="otter_config.json" if generate_args else None,
         lang="python" if assignment.is_python else "r",
         requirements=requirements,

@@ -1,6 +1,7 @@
 """Utilities for Otter Assign"""
 
 import copy
+import datetime as dt
 import json
 import os
 import pathlib
@@ -322,11 +323,14 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args:
         with open("otter_config.json", "w+") as f:
             json.dump(generate_args, f, indent=2)
-    
+
     # TODO: change generate_autograder so that only necessary kwargs are needed
+    timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
+    notebook_name = assignment.master.stem
+    output_path = f"{notebook_name}-autograder_{timestamp}.zip"
     generate_autograder(
-        tests_path=test_dir,
-        output_dir=".",
+        tests_dir=test_dir,
+        output_path=output_path,
         config="otter_config.json" if generate_args else None,
         lang="python" if assignment.is_python else "r",
         requirements=requirements,

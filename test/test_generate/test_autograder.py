@@ -28,8 +28,8 @@ class TestAutograder(TestCase):
         """
         # create the zipfile
         generate(
-            tests_path = TEST_FILES_PATH + "tests",
-            output_dir = TEST_FILES_PATH,
+            tests_dir = TEST_FILES_PATH + "tests",
+            output_path = TEST_FILES_PATH + "autograder.zip",
             requirements = TEST_FILES_PATH + "requirements.txt",
             files = [TEST_FILES_PATH + "data/test-df.csv"],
             no_environment = True,  # don't use the environment.yml in the root of the repo
@@ -45,8 +45,8 @@ class TestAutograder(TestCase):
         # create the zipfile
         with mock.patch("otter.generate.APIClient") as mocked_client:
             generate(
-                tests_path = TEST_FILES_PATH + "tests",
-                output_dir = TEST_FILES_PATH,
+                tests_dir = TEST_FILES_PATH + "tests",
+                output_path = TEST_FILES_PATH + "autograder.zip",
                 requirements = TEST_FILES_PATH + "requirements.txt",
                 config = TEST_FILES_PATH + "otter_config.json",
                 files = [TEST_FILES_PATH + "data/test-df.csv"],
@@ -63,8 +63,8 @@ class TestAutograder(TestCase):
         """
         # create the zipfile
         generate(
-            tests_path = TEST_FILES_PATH + "tests",
-            output_dir = TEST_FILES_PATH,
+            tests_dir = TEST_FILES_PATH + "tests",
+            output_path = TEST_FILES_PATH + "autograder.zip",
             requirements = TEST_FILES_PATH + "requirements.txt",
             environment = TEST_FILES_PATH + "environment.yml",
             files = [TEST_FILES_PATH + "data/test-df.csv"],
