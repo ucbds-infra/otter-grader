@@ -22,7 +22,7 @@ from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..utils import loggers
+from ..utils import Loggable, loggers
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -30,7 +30,7 @@ _SHELVE = False
 _ZIP_NAME_FILENAME = "__zip_filename__"
 
 
-class Notebook:
+class Notebook(Loggable):
     """
     Notebook class for in-notebook autograding
 
@@ -42,17 +42,12 @@ class Notebook:
     """
 
     _grading_mode = False
-    _logger = None
 
     # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
 
     @logs_event(EventType.INIT)
     def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
-        if self._logger is None:
-            self._load_logger()
-            self._logger = type(self)._logger
-
         global _SHELVE
 
         if colab is None:
@@ -97,9 +92,9 @@ class Notebook:
         **It is the caller's responsibility to maintain the pointer.** The pointer in the ``Checker``
         class will be overwritten when the context exits.
         """
-        cls._load_logger()
-        cls._logger.info("Entering Notebook grading mode")
-        cls._logger.debug(f"Overriding tests directory: {tests_dir}")
+        logger = cls._get_logger()
+        logger.info("Entering Notebook grading mode")
+        logger.debug(f"Overriding tests directory: {tests_dir}")
         cls._grading_mode = True
         cls._tests_dir_override = tests_dir
         Checker.clear_results()
@@ -107,20 +102,11 @@ class Notebook:
 
         yield Checker.get_results()
 
-        cls._logger.info("Exiting Notebook grading mode")
+        logger.info("Exiting Notebook grading mode")
         cls._grading_mode = False
         cls._tests_dir_override = None
         Checker.disable_tracking()
         Checker.clear_results()
-
-    @classmethod
-    def _load_logger(cls):
-        """
-        Set-up the ``_logger`` field of the ``Notebook``.
-        """
-        if cls._logger is None:
-            name = cls.__module__ + "." + cls.__name__
-            cls._logger = loggers.get_logger(name)
 
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """

@@ -400,3 +400,40 @@ class loggers:
         ``logging.WARNING``.
         """
         cls.set_level(logging.WARNING)
+
+
+class Loggable:
+    """
+    A class for inheriting from which provides a logger via a class- and instance-accessible field.
+    """
+
+    _logger_instance = None
+
+    @classmethod
+    def _load_logger(cls):
+        """
+        Set-up the ``_logger`` field of the ``Notebook``.
+        """
+        if cls._logger_instance is None:
+            name = cls.__module__ + "." + cls.__name__
+            cls._logger_instance = loggers.get_logger(name)
+
+    @property
+    def _logger(self):
+        """
+        ``logging.Logger``: the logger instance for this class
+        """
+        self._load_logger()
+        return type(self)._logger_instance
+
+
+    @classmethod
+    def _get_logger(cls):
+        """
+        Load and return the logger for this class.
+
+        Returns:
+            ``logging.Logger``: the logger instance for this class
+        """
+        cls._load_logger()
+        return cls._logger_instance
