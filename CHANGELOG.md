@@ -11,11 +11,19 @@ _This section contains features that will be released into a pre-release version
 * Set `export_cell: run_tests: true` and `check_all_cell: false` as new defaults for Otter Assign per [#378](https://github.com/ucbds-infra/otter-grader/issues/378)
 * Made the v1 format of Otter Assign the default and added the `--v0` flag to the CLI
 
-**Unreleased:**
+**v3.1.4:**
+
+* Added the question name to the `otter.assign.utils.AssignNotebookFormatException` per [#398](https://github.com/ucbds-infra/otter-grader/issues/398)
+* Switched from manual install of the fandol font in grading images to installing the `texlive-lang-chinese` package
+* Allowed submission zip to be exported even when PDF generation fails per [#403](https://github.com/ucbds-infra/otter-grader/issues/403)
+* Fixed bug in Otter Assign that fails when a notebook has no tests
+
+**v3.1.3:**
 
 * Fixed [#389](https://github.com/ucbds-infra/otter-grader/issues/389) by closing file handles in Otter Grade before removing them
 * Fixed R image builds by setting Conda `channel_priority` to `strict` in R `setup.sh` files per [#386](https://github.com/ucbds-infra/otter-grader/issues/386)
 * Fix loading docker images after building
+* Added the `--ext` option to Otter Grade per [#386](https://github.com/ucbds-infra/otter-grader/issues/386)
 
 **v3.1.2:**
 

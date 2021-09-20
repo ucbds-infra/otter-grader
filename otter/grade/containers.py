@@ -3,7 +3,7 @@
 import glob
 import os
 import pandas as pd
-import dill
+import pickle
 import pkg_resources
 import shutil
 import tempfile
@@ -40,23 +40,22 @@ def build_image(zip_path, base_image, tag):
     return image
 
 
-def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None, scripts=False, 
+def launch_grade(zip_path, submissions_dir, verbose=False, num_containers=None, ext="ipynb", 
                  no_kill=False, output_path="./", debug=False, zips=False,
                  image="ucbdsinfra/otter-grader", pdfs=False, timeout=None, network=True):
     """
     Grades notebooks in parallel Docker containers
 
     This function runs ``num_containers`` Docker containers in parallel to grade the student submissions
-    in ``notebooks_dir`` using the autograder configuration file at ``zip_path``. It can additionally 
+    in ``submissions_dir`` using the autograder configuration file at ``zip_path``. It can additionally 
     generate PDFs for the parts of the assignment needing manual grading.
 
     Args:
         zip_path(``str``): path to zip file used to set up container
-        notebooks_dir (``str``): path to directory of student submissions to be graded
+        submissions_dir (``str``): path to directory of student submissions to be graded
         verbose (``bool``, optional): whether status messages should be printed to the command line
         num_containers (``int``, optional): The number of parallel containers that will be run
-        scripts (``bool``, optional): whether student submissions are Python scripts rather than
-            Jupyter notebooks
+        ext (``str``, optional): the submission file extension for globbing
         no_kill (``bool``, optional): whether the grading containers should be kept running after
             grading finishes
         output_path (``str``, optional): path at which to write grades CSVs copied from the container
@@ -82,19 +81,20 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None, sc
     if zips:
         pattern = "*.zip"
     else:
-        pattern = "*.ipynb"
+        pattern = f"*.{ext}"
 
-    notebooks = glob.glob(os.path.join(notebooks_dir, pattern))
-    for nb_path in notebooks:
+    submissions = glob.glob(os.path.join(submissions_dir, pattern))
+    pdf_dir = os.path.join(output_path, "submission_pdfs")
+
+    for subm_path in submissions:
         futures += [
             pool.submit(
                 grade_assignments,
-                submission_path=nb_path,
+                submission_path=subm_path,
                 verbose=verbose,
                 image=img,
-                scripts=scripts,
                 no_kill=no_kill,
-                output_path=output_path,
+                pdf_dir=pdf_dir,
                 debug=debug,
                 pdfs=pdfs,
                 timeout=timeout,
@@ -109,24 +109,19 @@ def launch_grade(zip_path, notebooks_dir, verbose=False, num_containers=None, sc
     return [df.result() for df in finished_futures[0]]
 
 
-# TODO: these arguments need to be updated. replace notebooks_dir with the path to the notebook that
-# this container will be grading
-def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=False,
-                      scripts=False, no_kill=False, output_path="./", debug=False, pdfs=False,
-                      timeout: Optional[int] = None, network=True):
+def grade_assignments(submission_path, image, verbose=False, no_kill=False, pdf_dir=None, 
+                      debug=False, pdfs=False, timeout: Optional[int] = None, network=True):
     """
     Grades multiple submissions in a directory using a single docker container. If no PDF assignment is
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
 
     Args:
         submission_path (``str``): path to the submission to be graded
-        image (``str``, optional): a Docker image tag to be used for grading environment
+        image (``str``): a Docker image tag to be used for grading environment
         verbose (``bool``, optional): whether status messages should be printed to the command line
-        scripts (``bool``, optional): whether student submissions are Python scripts rather than
-            Jupyter notebooks
         no_kill (``bool``, optional): whether the grading containers should be kept running after
             grading finishes
-        output_path (``str``, optional): path at which to write grades CSVs copied from the container
+        pdf_dir (``str``, optional): directory in which to put notebook PDFs, if applicable
         debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR
             from each container to the command line)
         pdfs (``bool``, optional): whether to copy PDFs out of the containers
@@ -136,7 +131,6 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
     Returns:
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
-
     temp_subm_file, temp_subm_path = tempfile.mkstemp()
     shutil.copyfile(submission_path, temp_subm_path)
 
@@ -191,7 +185,7 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
             raise Exception(f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
 
         with open(results_path, "rb") as f:
-            scores = dill.load(f)
+            scores = pickle.load(f)
 
         scores = scores.to_dict()
         scores = {t: [scores[t]["score"]] if type(scores[t]) == dict else scores[t] for t in scores}
@@ -199,10 +193,9 @@ def grade_assignments(submission_path, image="ucbdsinfra/otter-grader", verbose=
         df = pd.DataFrame(scores)
 
         if pdfs:
-            pdf_folder = os.path.join(os.path.abspath(output_path), "submission_pdfs")
-            os.makedirs(pdf_folder, exist_ok=True)
+            os.makedirs(pdf_dir, exist_ok=True)
 
-            local_pdf_path = os.path.join(pdf_folder, f"{nb_name}.pdf")
+            local_pdf_path = os.path.join(pdf_dir, f"{nb_name}.pdf")
             shutil.copy(pdf_path, local_pdf_path)
 
     finally:

@@ -371,8 +371,11 @@ class Notebook:
 
         if pdf:
             pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
-            zf.write(pdf_path)
-            self._logger.debug(f"Wrote PDF to zip file: {pdf_path}")
+            if os.path.isfile(pdf_path):
+                zf.write(pdf_path)
+                self._logger.debug(f"Wrote PDF to zip file: {pdf_path}")
+            else:
+                warnings.warn("Could not locate a PDF to include")
 
         if os.path.isfile(_OTTER_LOG_FILENAME):
             zf.write(_OTTER_LOG_FILENAME)

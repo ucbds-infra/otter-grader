@@ -34,14 +34,6 @@ class PythonRunner(AbstractLanguageRunner):
         open("submission/__init__.py", "a").close()
 
     def resolve_submission_path(self):
-        if self.options["zips"]:
-            zips = glob("*.zip")
-            if len(zips) > 1:
-                raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
-
-            with zipfile.ZipFile(zips[0])  as zf:
-                zf.extractall()
-
         nbs = glob("*.ipynb")
 
         if len(nbs) > 1:
