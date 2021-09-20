@@ -2,16 +2,12 @@
 
 import json
 import os
-import pathlib
 import pkg_resources
-import shutil
-import tempfile
 import yaml
 import zipfile
 
 from glob import glob
 from jinja2 import Template
-from subprocess import PIPE
 
 from .token import APIClient
 from .utils import zip_folder
