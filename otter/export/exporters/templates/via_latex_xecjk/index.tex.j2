@@ -20,6 +20,8 @@
 \setlength{\parskip}{2em}
 \setlength{\parindent}{0em}
 
+\usepackage{xeCJK}
+
 ((* endblock docclass *))
 
 ((* block maketitle *))

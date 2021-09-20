@@ -1,21 +1,20 @@
-"""
-PDF via HTML exporter
-"""
+"""PDF via HTML exporter"""
 
-import os
-import tempfile
-import shutil
-import pdfkit
 import nbconvert
+import os
+import pdfkit
 import pkg_resources
+import shutil
+import tempfile
 
-from io import StringIO, BytesIO
 from contextlib import redirect_stdout, redirect_stderr
+from io import StringIO, BytesIO
 from nbconvert.exporters import export
 from PyPDF2 import PdfFileMerger
 
 from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
 from .utils import notebook_pdf_generator
+
 
 class PDFViaHTMLExporter(BaseExporter):
     """

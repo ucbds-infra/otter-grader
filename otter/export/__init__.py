@@ -33,7 +33,8 @@ def export_notebook(nb_path, dest=None, debug=False, exporter_type=None, **kwarg
     Exporter.convert_notebook(nb_path, pdf_name, debug=debug, **kwargs)
 
 
-def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, debug=False):
+def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, 
+         no_xecjk=False, debug=False):
     """
     Runs Otter Export
 
@@ -45,8 +46,8 @@ def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, sa
         pagebreaks (``bool``): whether to pagebreak between filtered regions; ignored if ``filtering``
             is ``False``
         save (``bool``): whether to save any intermediate files (e.g. ``.tex``, ``.html``)
+        no_xecjk (``bool``): whether to disable xeCJK in the LaTeX template
         debug (``bool``): whether to run in debug mode (print full error messages)
-        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
     """
     export_notebook(
         src,
@@ -56,5 +57,6 @@ def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, sa
         pagebreaks = pagebreaks,
         save_tex = save,
         save_html = save,
+        no_xecjk=no_xecjk,
         debug = debug
     )
