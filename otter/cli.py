@@ -139,11 +139,9 @@ defaults = grade.__kwdefaults__
 @click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
 
 # other settings and optional arguments
-@click.option("-v", "--verbose", is_flag=True, help="Flag for verbose output")
 @click.option("--containers", type=click.INT, help="Specify number of containers to run in parallel")
 @click.option("--image", default=defaults["image"], help="Custom docker image to run on")
 @click.option("--no-kill", is_flag=True, help="Do not kill containers after grading")
-@click.option("--debug", is_flag=True, help="Print stdout/stderr from grading for debugging")
 
 @click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
 @click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
