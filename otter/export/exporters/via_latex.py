@@ -1,13 +1,14 @@
-"""
-PDF via LaTeX exporter
-"""
+"""PDF via LaTeX exporter"""
 
-import os
-import warnings
-import pkg_resources
 import nbconvert
+import os
+import pkg_resources
+import warnings
 
 from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
+
+from ...utils import print_full_width
+
 
 class PDFViaLatexExporter(BaseExporter):
     """
@@ -29,11 +30,18 @@ class PDFViaLatexExporter(BaseExporter):
     })
 
     @classmethod
-    def convert_notebook(cls, nb_path, dest, debug=False, **kwargs):
+    def convert_notebook(cls, nb_path, dest, xecjk=False, no_xecjk=False, **kwargs):
         warnings.filterwarnings("ignore", r"invalid escape sequence '\\c'", DeprecationWarning)
+
+        if xecjk and no_xecjk:
+            raise ValueError("xeCJK LaTeX template indicated but disallowed")
 
         options = cls.default_options.copy()
         options.update(kwargs)
+
+        # choose the template to allow Chinese, Japanese, and Korean characters if necessary
+        if xecjk:
+            options["template"] = "via_latex_xecjk"
 
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
@@ -47,6 +55,7 @@ class PDFViaLatexExporter(BaseExporter):
             if not NBCONVERT_6:
                 latex_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
+        success = False
         pdf_exporter = nbconvert.PDFExporter()
         if not NBCONVERT_6:
             pdf_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
@@ -55,6 +64,8 @@ class PDFViaLatexExporter(BaseExporter):
             pdf_output = pdf_exporter.from_notebook_node(nb)
             with open(dest, "wb") as output_file:
                 output_file.write(pdf_output[0])
+
+            success = True
 
             if options["save_tex"]:
                 latex_output = latex_exporter.from_notebook_node(nb)
@@ -65,18 +76,20 @@ class PDFViaLatexExporter(BaseExporter):
                 nbconvert.TemplateExporter.template_name = orig_template_name
 
         except nbconvert.pdf.LatexFailed as error:
-            print("There was an error generating your LaTeX")
-            output = error.output
-            if debug:
-                print("Showing full error message from PDFTex")
+            if not xecjk and not no_xecjk:
+                success = cls.convert_notebook(nb_path, dest, xecjk=True, **kwargs)
 
-            else:
-                print("Showing concise error message")
-                output = "\n".join(error.output.split("\n")[-15:])
+            elif not success:
+                print("There was an error generating your LaTeX; showing full error message:")
+                print_full_width("=")
+                print(error.output)
+                print_full_width("=")
+                if xecjk:
+                    print("If the error above is related to xeCJK or fandol in LaTeX and you don't "
+                        "require this functionality, try running again with no_xecjk set to True "
+                        "or the --no-xecjk flag.")
 
-            print("=" * 60)
-            print(output)
-            print("=" * 60)
+                if NBCONVERT_6:
+                    nbconvert.TemplateExporter.template_name = orig_template_name
 
-            if NBCONVERT_6:
-                nbconvert.TemplateExporter.template_name = orig_template_name
+        return success

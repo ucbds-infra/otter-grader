@@ -1,6 +1,6 @@
 % Default to the notebook output style
 ((* if not cell_style is defined *))
-    ((* set cell_style = 'style_ipython.tex.j2' *))
+    ((* set cell_style = 'style_ipython.tplx' *))
 ((* endif *))
 
 % Inherit from the specified cell style.
@@ -19,6 +19,8 @@
 \renewcommand{\linethickness}{0.05em}
 \setlength{\parskip}{2em}
 \setlength{\parindent}{0em}
+
+\usepackage{xeCJK}
 
 ((* endblock docclass *))
 
