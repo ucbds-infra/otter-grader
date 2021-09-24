@@ -7,13 +7,13 @@ import os
 import re
 import shutil
 import subprocess
-import unittest
+import zipfile
 
 from glob import glob
 from subprocess import PIPE
-from unittest import mock
 
 from otter.generate import main as generate
+from otter.generate import utils
 from otter.grade import main as grade
 
 from . import TestCase
@@ -35,8 +35,7 @@ class TestGrade(TestCase):
         with open("otter/grade/Dockerfile", "r+") as f:
             lines = f.readlines()
 
-            idx = max([i if "ARG" in lines[i] else -1 for i in range(len(lines))])
-            lines.insert(idx + 1, "ADD . /home/otter-grader\n")
+            lines.append("\nRUN conda run -n otter-env pip install /autograder/source/otter-grader")
 
             f.seek(0)
             f.write("".join(lines))
@@ -63,6 +62,8 @@ class TestGrade(TestCase):
             config = TEST_FILES_PATH + "otter_config.json" if pdfs else None,
             no_environment = True,
         )
+        with zipfile.ZipFile(TEST_FILES_PATH + "autograder.zip", "a") as zip_ref:
+            utils.zip_folder(zip_ref, os.path.dirname(os.path.dirname(os.path.abspath(__file__))), exclude=[".git", "logo", "test"])
 
     def test_docker(self):
         """

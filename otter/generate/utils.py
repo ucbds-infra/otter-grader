@@ -3,13 +3,15 @@
 
 import os
 
-def zip_folder(zf, path, prefix=""):
+def zip_folder(zf, path, prefix="", exclude=[]):
     """
     """
     if not os.path.isabs(path):
         raise ValueError("'path' must be absolute path")
     parent_basename = os.path.basename(path)
     for file in os.listdir(path):
+        if file in exclude:
+            continue
         child_path = os.path.join(path, file)
         if os.path.isfile(child_path):
             arcname = os.path.join(prefix, parent_basename, file)
