@@ -10,6 +10,7 @@ _This section contains features that will be released into a pre-release version
 * Added use of `wrapt` for `otter.Notebook` method decorators
 * Set `export_cell: run_tests: true` and `check_all_cell: false` as new defaults for Otter Assign per [#378](https://github.com/ucbds-infra/otter-grader/issues/378)
 * Made the v1 format of Otter Assign the default and added the `--v0` flag to the CLI
+* Converted logging in some of Otter's tooling from `print` statements to the `logging` library, and added verbosity flags to each command
 
 **Unreleased:**
 
