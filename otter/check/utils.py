@@ -104,7 +104,7 @@ def colab_incompatible(wrapped, self, args, kwargs):
 @wrapt.decorator
 def grading_mode_disabled(wrapped, self, args, kwargs):
     """
-    A decorator that returns without calling the wrapped function if the Notebook grading mode
+    A decorator that returns without calling the wrapped function if the ``Notebook`` grading mode
     is enabled.
     """
     if type(self)._grading_mode:
@@ -158,7 +158,7 @@ def list_available_tests(tests_dir, nb_path):
         nb_path (``str``): the path to the notebook
 
     Returns:
-        ``list[str]``: the list of question names
+        ``list[str]``: the sorted list of question names
     """
     get_stem = lambda p: os.path.splitext(os.path.basename(p))[0]
 
@@ -175,7 +175,7 @@ def list_available_tests(tests_dir, nb_path):
 
         tests = list(nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"].keys())
 
-    return tests
+    return sorted(tests)
 
 
 def resolve_test_info(tests_dir, nb_path, question):

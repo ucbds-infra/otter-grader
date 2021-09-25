@@ -1,16 +1,15 @@
-"""
-Logging for Otter Check
-"""
+"""Logging for Otter Check"""
 
+import datetime as dt
+import dill
+import numpy as np
 import os
 import types
-import dill
 import tempfile
-import datetime as dt
-import numpy as np
 
 from enum import Enum, auto
 from glob import glob
+
 
 class QuestionNotInLogException(Exception):
     """
@@ -457,6 +456,7 @@ class Log:
             ``QuestionNotInLogException``: if the question is not found
         """
         return self.get_question_entry(question).get_results()
+
 
 class QuestionLogIterator:
     """

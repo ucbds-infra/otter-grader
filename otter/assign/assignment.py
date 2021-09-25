@@ -5,7 +5,7 @@ import yaml
 
 from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
-from ..utils import convert_config_description_dict, recursive_dict_update
+from ..utils import convert_config_description_dict, Loggable, loggers, recursive_dict_update
 
 
 _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
@@ -161,9 +161,10 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "default": False,
     },
 ]
+LOGGER = loggers.get_logger(__name__)
 
 
-class Assignment:
+class Assignment(Loggable):
     """
     A class that houses configurations for an assignment. Contains a dictionary of default arguments
     that can be updated in an instance using the ``update()`` method. Functions similarly to an 
@@ -212,6 +213,7 @@ class Assignment:
         raise AttributeError(f"Assignment has no attribute {attr}")
 
     def __setattr__(self, attr, value):
+        self._logger.debug(f"Attempting to set attribute '{attr}': {value}")
         if attr == "config":
             self.__dict__[attr] = value
         elif attr in type(self).defaults:
@@ -227,6 +229,7 @@ class Assignment:
         Args:
             config (``dict``): new configurations
         """
+        self._logger.debug(f"Updating configurations: {config}")
         for k in config.keys():
             if k not in self.allowed_configs:
                 raise ValueError(f"Unexpected assignment config: '{k}'")
@@ -271,6 +274,7 @@ def read_assignment_metadata(cell):
     Returns:
         ``dict``: assignment metadata
     """
+    LOGGER.debug(f"Parsing assignment metadata from cell: {cell}")
     source = get_source(cell)
     begin_assignment_line = get_spec(source, "assignment")
     i, lines = begin_assignment_line + 1, []
@@ -278,6 +282,7 @@ def read_assignment_metadata(cell):
         lines.append(source[i])
         i = i + 1
     metadata = yaml.full_load('\n'.join(lines))
+    LOGGER.debug(f"Parsed assignment metadata: {metadata}")
     return metadata
 
 
