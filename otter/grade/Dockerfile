@@ -11,4 +11,6 @@ RUN dos2unix /autograder/run_autograder /autograder/source/setup.sh && \
     apt-get update && bash /autograder/source/setup.sh && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     mkdir -p /autograder/submission && \
     mkdir -p /autograder/results
-ADD . /autograder/source
+ADD otter_config.json run_otter.py /autograder/source/
+ADD files* /autograder/source/files/
+ADD tests /autograder/source/tests/

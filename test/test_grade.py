@@ -35,7 +35,7 @@ class TestGrade(TestCase):
         with open("otter/grade/Dockerfile", "r+") as f:
             lines = f.readlines()
 
-            lines.append("\nRUN conda run -n otter-env pip install /autograder/source/otter-grader")
+            lines.append("\nADD otter-grader /autograder/source/otter-grader\nRUN conda run -n otter-env pip install /autograder/source/otter-grader")
 
             f.seek(0)
             f.write("".join(lines))
@@ -63,7 +63,7 @@ class TestGrade(TestCase):
             no_environment = True,
         )
         with zipfile.ZipFile(TEST_FILES_PATH + "autograder.zip", "a") as zip_ref:
-            utils.zip_folder(zip_ref, os.path.dirname(os.path.dirname(os.path.abspath(__file__))), exclude=[".git", "logo", "test"])
+            utils.zip_folder(zip_ref, os.getcwd(), exclude=[".git", "logo", "test"])
 
     def test_docker(self):
         """
