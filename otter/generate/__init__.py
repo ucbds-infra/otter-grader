@@ -24,7 +24,7 @@ from ..utils import load_default_file
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
-OTTR_BRANCH = "1.1.1"  # this should match a release tag on GitHub
+OTTR_BRANCH = "1.1.2"  # this should match a release tag on GitHub
 
 
 def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_config=False, 
