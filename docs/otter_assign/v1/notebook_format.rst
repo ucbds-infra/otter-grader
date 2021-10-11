@@ -363,18 +363,18 @@ For R,
 .. code-block:: r
 
     # BEGIN SOLUTION
-    square = function(x) {
+    square <- function(x) {
         return(x ^ 2)
     }
     # END SOLUTION
-    x2 = square(25)
+    x2 <- square(25)
 
 would be presented to students  as
 
 .. code-block:: r
 
-    # YOUR CODE HERE
-    x2 = NULL # YOUR CODE HERE
+    ...
+    x2 <- square(25)
 
 
 Test Cells
