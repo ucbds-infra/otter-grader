@@ -97,7 +97,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     options.update(otter_config)
 
     # update language
-    options["lang"] = lang.lower()
+    options["lang"] = options.get("lang", lang.lower())
 
     template_dir = os.path.join(TEMPLATE_DIR, options["lang"])
 
