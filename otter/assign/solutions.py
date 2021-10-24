@@ -200,7 +200,6 @@ def strip_solutions_and_output(nb):
         if has_tag(cell, SOLUTION_CELL_TAG):
             if is_cell_type(cell, "code"):
                 cell['source'] = '\n'.join(replace_solutions(get_source(cell), lang))
-                cell['execution_count'] = None
             elif is_cell_type(cell, "markdown"):
                 md_solutions.append(i)
             nb['cells'][i] = remove_tag(cell, SOLUTION_CELL_TAG)
