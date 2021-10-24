@@ -189,7 +189,7 @@ def strip_ignored_lines(nb):
 
 def strip_solutions_and_output(nb):
     """
-    Write a notebook with solutions stripped and outputs cleared
+    Write a notebook with solutions stripped and outputs cleared.
     
     Args:
         nb (``nbformat.NotebookNode``): the notebook to have solutions stripped

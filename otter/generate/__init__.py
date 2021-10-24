@@ -97,7 +97,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     options.update(otter_config)
 
     # update language
-    options["lang"] = lang.lower()
+    options["lang"] = options.get("lang", lang.lower())
 
     template_dir = os.path.join(TEMPLATE_DIR, options["lang"])
 
@@ -113,6 +113,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_branch": OTTR_BRANCH,
+        "channel_priority_strict": options["channel_priority_strict"],
     }
 
     if plugin_collection is None:
