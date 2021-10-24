@@ -40,6 +40,7 @@ class TestGrade(TestCase):
 
             f.seek(0)
             f.write("".join(lines))
+
         cls.generate_autograder_zip(pdfs=True)
         
     def setUp(self):
@@ -64,7 +65,7 @@ class TestGrade(TestCase):
             no_environment = True,
         )
         with zipfile.ZipFile(TEST_FILES_PATH + "autograder.zip", "a") as zip_ref:
-            utils.zip_folder(zip_ref, os.getcwd(), exclude=[".git", "logo", "test"])
+            utils.zip_folder(zip_ref, os.getcwd(), exclude=[".git", "logo", "test", "dist", "build", "otter_grader.egg-info"])
 
     def test_docker(self):
         """
