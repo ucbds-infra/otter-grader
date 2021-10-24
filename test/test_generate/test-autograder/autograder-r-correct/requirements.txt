@@ -1,0 +1,16 @@
+datascience
+jupyter_client
+ipykernel
+matplotlib
+pandas
+ipywidgets
+scipy
+seaborn
+sklearn
+jinja2
+nbconvert
+nbformat
+dill
+rpy2
+numpy
+otter-grader==3.1.4

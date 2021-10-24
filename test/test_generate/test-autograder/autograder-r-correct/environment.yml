@@ -1,0 +1,15 @@
+name: otter-env
+channels:
+    - defaults
+    - conda-forge
+dependencies:
+    - python=3.7
+    - pip
+    - nb_conda_kernels
+    - r-base 
+    - r-essentials 
+    - r-devtools
+    - libgit2
+    - libgomp
+    - pip:
+        - -r requirements.txt
