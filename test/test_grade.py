@@ -36,7 +36,6 @@ class TestGrade(TestCase):
             lines = f.readlines()
 
             idx = max([i if "ARG" in lines[i] else -1 for i in range(len(lines))])
-
             lines.insert(idx + 1, "ADD otter-grader /home/otter-grader\n")
 
             f.seek(0)
