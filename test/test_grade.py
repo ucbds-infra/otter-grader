@@ -35,7 +35,9 @@ class TestGrade(TestCase):
         with open("otter/grade/Dockerfile", "r+") as f:
             lines = f.readlines()
 
-            lines.append("\nADD otter-grader /autograder/source/otter-grader\nRUN conda run -n otter-env pip install /autograder/source/otter-grader")
+            idx = max([i if "ARG" in lines[i] else -1 for i in range(len(lines))])
+
+            lines.insert(idx + 1, "ADD otter-grader /home/otter-grader\n")
 
             f.seek(0)
             f.write("".join(lines))

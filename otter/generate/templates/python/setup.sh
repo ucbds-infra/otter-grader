@@ -24,3 +24,5 @@ conda env create -f {{ autograder_dir }}/source/environment.yml
 
 # set conda shell
 conda init --all
+
+conda run -n otter-env pip install /home/otter-grader

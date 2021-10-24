@@ -1,5 +1,5 @@
 OS := $(shell uname -s)
-DOCKER_VERSION := $(shell docker version --format '{{.Server.Version}}' | sed "s/+azure//")
+DOCKER_VERSION := $(shell docker version --format '{{.Server.Version}}' | sed "s/+azure//" | sed "s/-1$//")
 
 .PHONY: docs
 docs:
@@ -26,6 +26,8 @@ tutorial:
 	rm tutorial.zip
 
 docker-grade-test:
+	cp otter/generate/templates/python/setup.sh otter/generate/templates/python/old-setup.sh
+	printf "\nconda run -n otter-env pip install /home/otter-grader" >> otter/generate/templates/python/setup.sh
 ifeq ($(OS), Darwin)
 	sed -i '' -e "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/setup.sh
 	sed -i '' -e "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/run_autograder
@@ -35,6 +37,8 @@ else
 endif
 
 cleanup-docker-grade-test:
+	rm otter/generate/templates/python/setup.sh
+	mv otter/generate/templates/python/old-setup.sh otter/generate/templates/python/setup.sh
 ifeq ($(OS), Darwin)
 	sed -i '' -e "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/setup.sh
 	sed -i '' -e "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/run_autograder
