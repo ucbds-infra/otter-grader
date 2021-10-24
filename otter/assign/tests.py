@@ -240,10 +240,10 @@ def determine_question_point_value(question_metadata, test_cases):
         number: the point value of the question
     """
     if len(test_cases) == 0:
-        if question_metadata["points"] is None:
+        if question_metadata["points"] is None and question_metadata["manual"]:
             raise ValueError(f"Point value unspecified for question with no test cases: {question_metadata['name']}")
 
-        return question_metadata["points"]
+        return question_metadata["points"] if question_metadata["points"] is not None else 1
 
     resolved_test_cases = TestFile.resolve_test_file_points(question_metadata["points"], test_cases)
     points = sum(tc.points for tc in resolved_test_cases)
