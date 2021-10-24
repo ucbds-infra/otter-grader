@@ -86,4 +86,4 @@ class TestAutograder(TestCase):
         )
 
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
-            self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-r")
+            self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-r-correct")
