@@ -8,6 +8,7 @@
 * Removed concise error messages and debug mode from Otter Export, instead opting to always display the full error message, per [#407](https://github.com/ucbds-infra/otter-grader/issues/407)
 * Upgraded to Ottr v1.1.3
 * Set the default for the `--ext` option for Otter Grade to `ipynb` per [#418](https://github.com/ucbds-infra/otter-grader/pull/418)
+* Fixed the display of success messages when all tests cases pass per [#425](https://github.com/ucbds-infra/otter-grader/issues/425)
 
 **v3.1.4:**
 
