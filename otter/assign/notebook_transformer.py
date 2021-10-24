@@ -10,7 +10,7 @@ from .cell_generators import (
     add_export_tag_to_cell, gen_init_cell, gen_markdown_response_cell, gen_export_cells, 
     gen_check_all_cell
 )
-from .questions import create_question_config
+from .questions import add_point_value_info_to_cell, create_question_config
 from .r_adapter.cell_generators import gen_export_cells as gen_ottr_export_cells
 from .solutions import has_seed, SOLUTION_CELL_TAG
 from .tests import any_public_tests, determine_question_point_value
@@ -130,9 +130,8 @@ def get_transformed_cells(cells, assignment):
                 # add points to question cell if specified
                 if assignment.show_question_points and last_question_md_cell is not None:
                     points = determine_question_point_value(question_metadata, test_cases)
-                    source = get_source(transformed_cells[last_question_md_cell])
-                    source.extend(["", f"**Points:** {points}"])
-                    transformed_cells[last_question_md_cell] = nbformat.v4.new_markdown_cell("\n".join(source))
+                    transformed_cells[last_question_md_cell] = \
+                        add_point_value_info_to_cell(transformed_cells[last_question_md_cell], points)
 
                 # TODO: reformat this state update
                 question_metadata, test_cases, has_prompt, no_solution, last_question_md_cell = \

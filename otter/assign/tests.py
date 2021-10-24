@@ -247,4 +247,4 @@ def determine_question_point_value(question_metadata, test_cases):
 
     resolved_test_cases = TestFile.resolve_test_file_points(question_metadata["points"], test_cases)
     points = sum(tc.points for tc in resolved_test_cases)
-    return points // 1 if points // 1 == points else points
+    return int(points) if points % 1 == 0 else points
