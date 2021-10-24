@@ -11,6 +11,7 @@
 * Fixed the display of success messages when all tests cases pass per [#425](https://github.com/ucbds-infra/otter-grader/issues/425)
 * Added an error when the expected notebook file does not exist in `otter.Notebook` per [#433](https://github.com/ucbds-infra/otter-grader/issues/433)
 * Allow unset conda `channel_priority` in R setup.sh files per [#430](https://github.com/ucbds-infra/otter-grader/issues/430)
+* Reset all cell execution counts in Assign student notebook per [#422](https://github.com/ucbds-infra/otter-grader/issues/422)
 
 **v3.1.4:**
 
