@@ -1,5 +1,5 @@
 OS := $(shell uname -s)
-DOCKER_VERSION := $(shell docker version --format '{{.Server.Version}}+azure-1' | sed "s/+azure\(\-1\)\?//")
+DOCKER_VERSION := "20.10.8"
 
 .PHONY: docs
 docs:
