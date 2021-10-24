@@ -118,6 +118,8 @@ def remove_output(nb):
     for cell in nb['cells']:
         if 'outputs' in cell:
             cell['outputs'] = []
+        if 'execution_count' in cell:
+            cell['execution_count'] = None
 
 def remove_cell_ids(nb):
     """
