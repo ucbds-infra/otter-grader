@@ -189,7 +189,7 @@ def strip_ignored_lines(nb):
 
 def strip_solutions_and_output(nb):
     """
-    Write a notebook with solutions stripped and outputs cleared
+    Write a notebook with solutions stripped and outputs cleared.
     
     Args:
         nb (``nbformat.NotebookNode``): the notebook to have solutions stripped
@@ -200,6 +200,7 @@ def strip_solutions_and_output(nb):
         if has_tag(cell, SOLUTION_CELL_TAG):
             if is_cell_type(cell, "code"):
                 cell['source'] = '\n'.join(replace_solutions(get_source(cell), lang))
+                cell['execution_count'] = None
             elif is_cell_type(cell, "markdown"):
                 md_solutions.append(i)
             nb['cells'][i] = remove_tag(cell, SOLUTION_CELL_TAG)
