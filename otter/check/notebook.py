@@ -130,6 +130,8 @@ class Notebook:
         """
         if nb_path is None and self._notebook is not None:
             nb_path = self._notebook
+            if not os.path.isfile(nb_path):
+                raise ValueError(f"Expected a notebook file named '{nb_path}' but no such file found")
 
         elif nb_path is None and glob("*.ipynb"):
             notebooks = glob("*.ipynb")
