@@ -7,13 +7,13 @@ import os
 import re
 import shutil
 import subprocess
-import unittest
+import zipfile
 
 from glob import glob
 from subprocess import PIPE
-from unittest import mock
 
 from otter.generate import main as generate
+from otter.generate import utils
 from otter.grade import main as grade
 
 from . import TestCase
@@ -36,10 +36,11 @@ class TestGrade(TestCase):
             lines = f.readlines()
 
             idx = max([i if "ARG" in lines[i] else -1 for i in range(len(lines))])
-            lines.insert(idx + 1, "ADD . /home/otter-grader\n")
+            lines.insert(idx + 1, "ADD otter-grader /home/otter-grader\n")
 
             f.seek(0)
             f.write("".join(lines))
+
         cls.generate_autograder_zip(pdfs=True)
         
     def setUp(self):
@@ -63,6 +64,8 @@ class TestGrade(TestCase):
             config = TEST_FILES_PATH + "otter_config.json" if pdfs else None,
             no_environment = True,
         )
+        with zipfile.ZipFile(TEST_FILES_PATH + "autograder.zip", "a") as zip_ref:
+            utils.zip_folder(zip_ref, os.getcwd(), exclude=[".git", "logo", "test", "dist", "build", "otter_grader.egg-info"])
 
     def test_docker(self):
         """
@@ -103,7 +106,7 @@ class TestGrade(TestCase):
             containers = 5,
             image = "otter-test",
             pdfs = True,
-            network=False
+            no_network=True
         )
         df_test = pd.read_csv("test/final_grades.csv")
 

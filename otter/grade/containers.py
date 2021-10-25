@@ -6,6 +6,7 @@ import pickle
 import pkg_resources
 import shutil
 import tempfile
+import zipfile
 
 from concurrent.futures import ThreadPoolExecutor, wait
 from python_on_whales import docker
@@ -31,11 +32,15 @@ def build_image(zip_path, base_image, tag):
 
     if not docker.image.exists(image):
         print(f"Building new image using {base_image} as base image")
-        docker.build(".", build_args={
-            "ZIPPATH": zip_path,
+
+        tmp_dir = tempfile.mkdtemp()
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(tmp_dir)
+
+        docker.build(tmp_dir, build_args={
             "BASE_IMAGE": base_image
         }, tags=[image], file=dockerfile, load=True)
-
+        shutil.rmtree(tmp_dir)
     return image
 
 
