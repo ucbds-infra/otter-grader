@@ -106,7 +106,7 @@ class TestGrade(TestCase):
             containers = 5,
             image = "otter-test",
             pdfs = True,
-            network=False
+            no_network=True
         )
         df_test = pd.read_csv("test/final_grades.csv")
 
