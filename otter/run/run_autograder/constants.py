@@ -124,7 +124,12 @@ DEFAULT_OPTIONS_WITH_DESCRIPTIONS = [
         "key": "zips",
         "description": "whether zip files are being graded",
         "default": False,
-    }
+    },
+    {
+        "key": "channel_priority_strict",
+        "description": "whether to set conda's channel_priority config to strict in the setup.sh file",
+        "default": True,
+    },
 ]
 
 DEFAULT_OPTIONS = convert_config_description_dict(DEFAULT_OPTIONS_WITH_DESCRIPTIONS)

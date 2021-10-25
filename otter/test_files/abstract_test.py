@@ -52,6 +52,12 @@ class TestFile(ABC):
 
     def _repr_html_(self):
         if self.passed_all:
+            if any(tcr.test_case.success_message is not None for tcr in self.test_case_results):
+                ret = f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed!</p>"
+                for tcr in self.test_case_results:
+                    if tcr.test_case.success_message is not None:
+                        ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.success_message}</p>"
+                return ret
             return f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed!</p>"
         else:
             ret = f"<p><strong style='color: red;'><pre style='display: inline;'>{self.name}</pre> results:</strong></p>"
@@ -167,7 +173,13 @@ class TestFile(ABC):
 
     def summary(self, public_only=False):
         if (not public_only and self.passed_all) or (public_only and self.passed_all_public):
-            return f"{self.name} results: All test cases passed!"
+            ret = f"{self.name} results: All test cases passed!"
+            if (not public_only and self.passed_all) and \
+                    any(tcr.test_case.success_message is not None for tcr in self.test_case_results):
+                for tcr in self.test_case_results:
+                    if tcr.test_case.success_message is not None:
+                        ret += f"\n{tcr.test_case.name} message: {tcr.test_case.success_message}"
+            return ret
 
         tcrs = self.test_case_results
         if public_only:
