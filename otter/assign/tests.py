@@ -225,3 +225,26 @@ def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=False):
             for i, tc in list(enumerate(test["suites"][0]["cases"]))[::-1]:
                 if tc["hidden"]:
                     test["suites"][0]["cases"].pop(i)
+
+
+def determine_question_point_value(question_metadata, test_cases):
+    """
+    Determine the point value of a question using the question metadata and list of test cases.
+
+    Args:
+        question_metadata (``dict[str, object]``): the question metadata
+        test_cases (``list[Test]``): the test cases for the question; if a manual question, this list
+            should be empty
+
+    Returns:
+        number: the point value of the question
+    """
+    if len(test_cases) == 0:
+        if question_metadata["points"] is None and question_metadata["manual"]:
+            raise ValueError(f"Point value unspecified for question with no test cases: {question_metadata['name']}")
+
+        return question_metadata["points"] if question_metadata["points"] is not None else 1
+
+    resolved_test_cases = TestFile.resolve_test_file_points(question_metadata["points"], test_cases)
+    points = sum(tc.points for tc in resolved_test_cases)
+    return int(points) if points % 1 == 0 else points
