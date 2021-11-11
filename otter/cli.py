@@ -64,7 +64,7 @@ defaults = export.__kwdefaults__
 @click.option("--pagebreaks", is_flag=True, help="Whether the PDF should have pagebreaks between questions")
 @click.option("-s", "--save", is_flag=True, help="Save intermediate file(s) as well")
 @click.option("-e", "--exporter", default=defaults["exporter"], type=click.Choice(["latex", "html"]), help="Type of PDF exporter to use")
-@click.option("--debug", is_flag=True, help="Export in debug mode")
+@click.option("--no-xecjk", is_flag=True, help="Force-disable xeCJK in Otter's LaTeX template")
 def export_cli(*args, **kwargs):
     """
     Export a Jupyter Notebook SRC as a PDF at DEST with optional filtering.
@@ -76,14 +76,14 @@ def export_cli(*args, **kwargs):
 
 defaults = generate.__kwdefaults__
 @cli.command("generate")
-@click.option("-t", "--tests-path", default=defaults["tests_path"], type=click.Path(exists=True, file_okay=False), help="Path to test files")
-@click.option("-o", "--output-dir", default=defaults["output_dir"], type=click.Path(exists=True, file_okay=False), help="Path to which to write zipfile")
-@click.option("-c", "--config", type=click.Path(exists=True, file_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
+@click.option("-t", "--tests-dir", default=defaults["tests_dir"], type=click.Path(exists=True, file_okay=False), help="Path to test files")
+@click.option("-o", "--output-path", default=defaults["output_path"], type=click.Path(), help="Path at which to write autograder zip file")
+@click.option("-c", "--config", type=click.Path(exists=True, dir_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
 @click.option("--no-config", is_flag=True, help="Disable auto-inclusion of unspecified Otter config file at ./otter_config.json")
-@click.option("-r", "--requirements", type=click.Path(exists=True, file_okay=False), help="Path to requirements.txt file; ./requirements.txt automatically checked")
+@click.option("-r", "--requirements", type=click.Path(exists=True, dir_okay=False), help="Path to requirements.txt file; ./requirements.txt automatically checked")
 @click.option("--no-requirements", is_flag=True, help="Disable auto-inclusion of unespecified requirements file at ./requirements.txt")
 @click.option("--overwrite-requirements", is_flag=True, help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
-@click.option("-e", "--environment", type=click.Path(exists=True, file_okay=False), help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
+@click.option("-e", "--environment", type=click.Path(exists=True, dir_okay=False), help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
 @click.option("--no-environment", is_flag=True, help="Disable auto-inclusion of unespecified environment file at ./environment.yml")
 @click.option("-l", "--lang", default=defaults["lang"], type=click.Choice(["python", "r"], case_sensitive=False), help="Assignment programming language; defaults to Python")
 @click.option("--username", help="Gradescope username for generating a token")
@@ -107,7 +107,7 @@ defaults = grade.__kwdefaults__
 
 # submission format arguments
 @click.option("-z", "--zips", is_flag=True, help="Whether submissions are zip files from Notebook.export")
-@click.option("--ext", type=click.Choice(_ALLOWED_EXTENSIONS), help="The extension to glob for submissions")
+@click.option("--ext", default=defaults["ext"], type=click.Choice(_ALLOWED_EXTENSIONS), help="The extension to glob for submissions")
 
 # PDF export options
 @click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
@@ -116,6 +116,8 @@ defaults = grade.__kwdefaults__
 @click.option("-v", "--verbose", is_flag=True, help="Flag for verbose output")
 @click.option("--containers", type=click.INT, help="Specify number of containers to run in parallel")
 @click.option("--image", default=defaults["image"], help="Custom docker image to run on")
+@click.option("--timeout", type=click.INT, help="Submission execution timeout in seconds")
+@click.option("--no-network", is_flag=True, help="Disable networking in the containers")
 @click.option("--no-kill", is_flag=True, help="Do not kill containers after grading")
 @click.option("--debug", is_flag=True, help="Print stdout/stderr from grading for debugging")
 

@@ -24,19 +24,19 @@ from ..utils import load_default_file
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
-OTTR_BRANCH = "1.1.1"  # this should match a release tag on GitHub
+OTTR_BRANCH = "1.1.3"  # this should match a release tag on GitHub
 
 
-def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False, lang="python", 
-         requirements=None, no_requirements=False, overwrite_requirements=False, environment=None, 
-         no_environment=False, username=None, password=None, token=None, files=[], assignment=None, 
-         plugin_collection=None):
+def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_config=False, 
+         lang="python", requirements=None, no_requirements=False, overwrite_requirements=False, 
+         environment=None, no_environment=False, username=None, password=None, token=None, files=[], 
+         assignment=None, plugin_collection=None):
     """
     Runs Otter Generate
 
     Args:
-        tests_path (``str``): path to directory of test files for this assignment
-        output_dir (``str``): directory in which to write output zip file
+        tests_dir (``str``): path to directory of test files for this assignment
+        output_path (``str``): the path at which to write the output zip file
         config (``str``): path to an Otter configuration JSON file
         no_config (``bool``): disables auto-inclusion of Otter config file at ./otter_config.json
         lang (``str``): the language of the assignment; one of ``["python", "r"]``
@@ -97,7 +97,7 @@ def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False,
     options.update(otter_config)
 
     # update language
-    options["lang"] = lang.lower()
+    options["lang"] = options.get("lang", lang.lower())
 
     template_dir = os.path.join(TEMPLATE_DIR, options["lang"])
 
@@ -113,6 +113,7 @@ def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False,
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_branch": OTTR_BRANCH,
+        "channel_priority_strict": options["channel_priority_strict"],
     }
 
     if plugin_collection is None:
@@ -130,7 +131,7 @@ def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False,
         test_dir = os.path.join(td, "tests")
         os.mkdir(test_dir)
         pattern = ("*.py", "*.[Rr]")[options["lang"] == "r"]
-        for file in glob(os.path.join(tests_path, pattern)):
+        for file in glob(os.path.join(tests_dir, pattern)):
             shutil.copy(file, test_dir)
 
         # open requirements if it exists
@@ -155,22 +156,17 @@ def main(*, tests_path="./tests", output_dir="./", config=None, no_config=False,
         rendered = {}
         for fn, tmpl in templates.items():
             rendered[fn] = tmpl.render(**template_context)
-
-        if os.path.isabs(output_dir):
-            zip_path = os.path.join(output_dir, "autograder.zip")
-        else:
-            zip_path = os.path.join(os.getcwd(), output_dir, "autograder.zip")
         
-        if os.path.exists(zip_path):
-            os.remove(zip_path)
+        if os.path.exists(output_path):
+            os.remove(output_path)
 
-        with zipfile.ZipFile(zip_path, mode="w") as zf:
+        with zipfile.ZipFile(output_path, mode="w") as zf:
             for fn, contents in rendered.items():
                 zf.writestr(fn, contents)
 
             test_dir = "tests"
             pattern = ("*.py", "*.[Rr]")[options["lang"] == "r"]
-            for file in glob(os.path.join(tests_path, pattern)):
+            for file in glob(os.path.join(tests_dir, pattern)):
                 zf.write(file, arcname=os.path.join(test_dir, os.path.basename(file)))
             
             zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))

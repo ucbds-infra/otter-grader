@@ -12,6 +12,6 @@ nbconvert
 nbformat
 dill
 numpy
-otter-grader==3.1.4
+otter-grader==3.2.0
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}

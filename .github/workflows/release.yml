@@ -1,0 +1,107 @@
+name: Publish release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New version number'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      TAR: /bin/tar
+      DOCKER_BUILDKIT: 1 
+
+    steps:
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Only allow releases off of master
+        run: |
+          python3 -c 'import os, sys; sys.exit(os.environ["GITHUB_REF"] != "refs/heads/master")'
+
+      - uses: actions/checkout@v2
+      
+      - uses: docker/setup-buildx-action@v1
+        id: buildx
+        with:
+          install: true
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v1
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install -r requirements.txt twine wheel setuptools
+
+      - name: Checkout to stable
+        uses: actions/checkout@v2
+        with:
+          ref: stable
+      
+      - name: Merge master -> stable
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git merge origin/master -Xtheirs --allow-unrelated-histories
+
+      - name: Update versions
+        run: |
+          python3 release.py ${{ github.event.inputs.version }}
+
+      - name: Build tutorial
+        run: |
+          make tutorial
+
+      - name: Commit and push
+        run: |
+          git commit -am 'release v${{ github.event.inputs.version }}'
+          git push origin stable
+
+      - name: Create dist and push to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python3 setup.py sdist bdist_wheel
+          python3 -m twine upload dist/* --repository-url https://test.pypi.org/legacy/'
+          sleep 10
+
+      - name: Create a release on GitHub
+        env:
+          GITHUB_USER: ${{ secrets.GITHUB_USER }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            hub release create -a dist/*.tar.gz -a dist/*.whl \
+            -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          load: true
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
+            ucbdsinfra/otter-grader:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: PR stable -> main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          hub pull-request -b ucbds-infra:main -h ucbds-infra:stable -l "release" \
+            -m "Release v${{ github.event.inputs.version }}"$'\n'$'\n'"Updates from the release of version ${{ github.event.inputs.version }}"

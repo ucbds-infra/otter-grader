@@ -113,7 +113,7 @@ Let's run Otter on the notebooks:
 
 .. code-block:: console
 
-    otter grade -p submissions/ipynbs -a dist/autograder/autograder.zip --pdfs -v
+    otter grade -p submissions/ipynbs -a dist/autograder/demo-autograder_*.zip --pdfs -v
 
 (The ``-v`` flag so that we get verbose output.) After this finishes running, there 
 should be a new file and a new folder in the working directory: ``final_grades.csv`` and 
@@ -180,7 +180,7 @@ grade those:
 
 .. code-block:: console
 
-    otter grade -p submissions/zips -a dist/autograder/autograder.zip -vz
+    otter grade -p submissions/zips -a dist/autograder/demo-autograder_*.zip -vz
 
 This should have the same CSV output as above but no ``submission_pdfs`` directory since we didn't 
 tell Otter to generate PDFs.

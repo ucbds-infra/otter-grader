@@ -14,45 +14,11 @@ FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",
     "test/test_generate/test-autograder/autograder-token-correct/requirements.txt",
     "test/test_generate/test-autograder/autograder-custom-env/requirements.txt",
+    "test/test_generate/test-autograder/autograder-r-correct/requirements.txt",
     "test/test-run/autograder/source/requirements.txt",
     "test/test-assign/gs-autograder-correct/requirements.txt",
     "test/test-assign/rmd-autograder-correct/requirements.txt",
 ]
-
-
-def run_release_commands(test, beta, new_version, no_twine=False):
-    assert shutil.which("hub") is not None, (
-        "You must have the GitHub CLI installed to use this script. Please see "
-        "https://github.com/github/hub to install it."
-    )
-
-    commands = [
-        "rm dist/* || :",
-        "python3 setup.py sdist bdist_wheel",
-        f"python3 -m twine upload dist/*{' --repository-url https://test.pypi.org/legacy/' if test else ''}",
-        "sleep 10", # this allows time for PyPI to update before we try to install the new version
-        f"docker build . -t ucbdsinfra/otter-grader:{new_version} --build-arg BUILDKIT_INLINE_CACHE=1",
-        f"docker push ucbdsinfra/otter-grader:{new_version}",
-        f"docker build . -t ucbdsinfra/otter-grader{':beta' if beta else ''} --build-arg BUILDKIT_INLINE_CACHE=1",
-        f"docker push ucbdsinfra/otter-grader{':beta' if beta else ''}",
-        "make tutorial",
-        f"git commit -am 'release v{new_version}'",
-        f"git push upstream master",
-        f"hub release create -a dist/*.tar.gz -a dist/*.whl -m 'v{new_version}' {' -p' if beta else ''} {new_version}",
-    ]
-
-    if not beta:
-        commands.append(f"gh pr create --base 'stable' --head 'master' --title 'Release v{new_version}' " \
-            f"--milestone 'v{new_version}' --project 'Otter-Grader Issues and Tasks' " \
-            f"--repo 'ucbds-infra/otter-grader' --body ''")
-
-    if no_twine:
-        del commands[2]
-
-    for cmd in commands:
-        subprocess.run(cmd, shell=True, check=True)
-
-    print("Releases pushed to PyPI, DockerHub, and GitHub. Commit and push to release documentation.")
 
 
 PARSER = argparse.ArgumentParser()
@@ -99,30 +65,6 @@ if __name__ == "__main__":
             .strip()
         )
         new_version = f"git+https://github.com/ucbds-infra/otter-grader.git@{new_hash}"
-
-    if not to_git:
-        if not to_beta:
-            # do not allow non-git non-beta releases from any branch other than master
-            branch = (
-                subprocess
-                .run(["git", "rev-parse", "--abbrev-ref", "HEAD"], stdout=subprocess.PIPE)
-                .stdout
-                .decode("utf-8")
-                .strip()
-            )
-            if branch != "master":
-                raise RuntimeError("Cannot create a release from a branch other than mater")
-
-        # check that the upstream remote is correct
-        upstream = (
-            subprocess
-            .run(["git", "config", "--get", "remote.upstream.url"], stdout=subprocess.PIPE)
-            .stdout
-            .decode("utf-8")
-            .strip()
-        )
-        if upstream != "https://github.com/ucbds-infra/otter-grader":
-            raise RuntimeError("You do not have the correct upstream repository configured")
 
     assert "new_version" in vars(), "Could not find a version -- did you specify one?"
 
@@ -182,8 +124,3 @@ if __name__ == "__main__":
 
     else:
         print(f"Versions updated. Release version is {new_version_number}")
-
-    if args.dry_run:
-        sys.exit()
-        
-    run_release_commands(args.test, to_beta, new_version_number, no_twine=args.no_twine)
