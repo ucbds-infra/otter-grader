@@ -75,7 +75,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           python3 setup.py sdist bdist_wheel
-          python3 -m twine upload dist/* --repository-url 'https://test.pypi.org/legacy/'
+          # python3 -m twine upload dist/* --repository-url 'https://test.pypi.org/legacy/'
           sleep 10
 
       - name: Create a release on GitHub
@@ -95,7 +95,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
-            ucbdsinfra/otter-grader:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
