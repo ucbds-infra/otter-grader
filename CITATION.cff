@@ -8,7 +8,7 @@ authors:
   -
     name: UC Berkeley Data Science Education Program
 cff-version: "1.1.0"
-date-released: 2021-11-10
+date-released: 2021-11-11
 license: "BSD-3-Clause"
 message: "If you use this software, please cite it as below."
 repository-code: "https://github.com/ucbds-infra/otter-grader"
