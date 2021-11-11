@@ -95,7 +95,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
-            ucbdsinfra/otter-grader:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
