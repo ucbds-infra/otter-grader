@@ -13,4 +13,4 @@ nbformat
 dill
 rpy2
 numpy
-otter-grader==3.1.4
+otter-grader==3.2.0
