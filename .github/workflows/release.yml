@@ -23,7 +23,7 @@ jobs:
 
       - name: Only allow releases off of master
         run: |
-          python3 -c 'import os, sys; sys.exit(os.environ["GITHUB_REF"] != "master")'
+          python3 -c 'import os, sys; sys.exit(os.environ["GITHUB_REF"] != "refs/heads/master")'
 
       - uses: actions/checkout@v2
       
