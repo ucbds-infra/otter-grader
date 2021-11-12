@@ -41,17 +41,6 @@ jobs:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v1
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: |
-            ucbdsinfra/otter-grader
-          tags: |
-            type=raw,value=${{ github.events.inputs.version }}
-          flavor: |
-            latest=true
-
       - name: Install dependencies
         run: |
           python3 -m pip install -r requirements.txt twine wheel setuptools
@@ -103,8 +92,9 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
+            ucbdsinfra/otter-grader:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
