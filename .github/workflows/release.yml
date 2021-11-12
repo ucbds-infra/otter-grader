@@ -89,13 +89,13 @@ jobs:
           # python3 -m twine upload dist/* --repository-url 'https://test.pypi.org/legacy/'
           sleep 10
 
-      - name: Create a release on GitHub
-        env:
-          GITHUB_USER: ${{ secrets.GITHUB_USER }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-            hub release create -a dist/*.tar.gz -a dist/*.whl \
-            -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
+      # - name: Create a release on GitHub
+      #   env:
+      #     GITHUB_USER: ${{ secrets.GITHUB_USER }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #       hub release create -a dist/*.tar.gz -a dist/*.whl \
+      #       -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
 
       - name: Build Docker image
         uses: docker/build-push-action@v2
