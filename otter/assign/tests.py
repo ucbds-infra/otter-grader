@@ -219,3 +219,59 @@ def write_tests(nb, test_dir, test_files, assignment, include_hidden=True, force
         else:
             # TODO: move this notebook to the notebook metadata test classes
             nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"][name] = test
+
+
+def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=False):
+    """
+    Rewrites test files in a directory to remove hidden tests
+    
+    Args:
+        nb (``dict``): the notebook being written
+        test_dir (``pathlib.Path``): path to test files directory
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        use_file (``bool``): whether separate test files were written instead of notebook metadata
+    """
+    if use_files:
+        for f in test_dir.iterdir():
+            if f.name == '__init__.py' or f.suffix != '.py':
+                continue
+            locals = {}
+            with open(f) as f2:
+                exec(f2.read(), globals(), locals)
+            test = locals['test']
+            for suite in test['suites']:
+                for i, case in list(enumerate(suite['cases']))[::-1]:
+                    if case['hidden']:
+                        suite['cases'].pop(i)
+                        if isinstance(test['points'], list):
+                            test['points'].pop(i)
+            write_test({}, f, test, use_file=True)
+    else:
+        tests = nb["metadata"].get(NOTEBOOK_METADATA_KEY, {}).get("tests", {})
+        for tn, test in tests.items():
+            for i, tc in list(enumerate(test["suites"][0]["cases"]))[::-1]:
+                if tc["hidden"]:
+                    test["suites"][0]["cases"].pop(i)
+
+
+def determine_question_point_value(question_metadata, test_cases):
+    """
+    Determine the point value of a question using the question metadata and list of test cases.
+
+    Args:
+        question_metadata (``dict[str, object]``): the question metadata
+        test_cases (``list[Test]``): the test cases for the question; if a manual question, this list
+            should be empty
+
+    Returns:
+        number: the point value of the question
+    """
+    if len(test_cases) == 0:
+        if question_metadata["points"] is None and question_metadata["manual"]:
+            raise ValueError(f"Point value unspecified for question with no test cases: {question_metadata['name']}")
+
+        return question_metadata["points"] if question_metadata["points"] is not None else 1
+
+    resolved_test_cases = TestFile.resolve_test_file_points(question_metadata["points"], test_cases)
+    points = sum(tc.points for tc in resolved_test_cases)
+    return int(points) if points % 1 == 0 else points

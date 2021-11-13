@@ -72,3 +72,18 @@ class TestAutograder(TestCase):
 
         with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
             self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-custom-env")
+
+    def test_lang_r(self):
+        """
+        Check that a correct R autograder is built
+        """
+        # create the zipfile
+        generate(
+            tests_dir = TEST_FILES_PATH + "tests",
+            output_path = TEST_FILES_PATH + "autograder.zip",
+            config = TEST_FILES_PATH + "r_otter_config.json",
+            no_environment = True,
+        )
+
+        with self.unzip_to_temp(TEST_FILES_PATH + "autograder.zip", delete=True) as unzipped_dir:
+            self.assertDirsEqual(unzipped_dir, TEST_FILES_PATH + "autograder-r-correct")

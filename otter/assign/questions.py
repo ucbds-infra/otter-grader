@@ -84,3 +84,14 @@ def read_question_metadata(cell):
     metadata = yaml.full_load('\n'.join(lines))
     assert ALLOWED_NAME.match(metadata.get('name', '')), metadata
     return metadata
+
+
+def add_point_value_info_to_cell(cell, points):
+    """
+    Adds the point value information to the provided cell, returning a copy.
+    """
+    cell = copy.deepcopy(cell)
+    source = get_source(cell)
+    source.extend(["", f"_Points:_ {points}"])
+    cell["source"] = "\n".join(source)
+    return cell

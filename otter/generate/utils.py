@@ -3,7 +3,7 @@
 import os
 
 
-def zip_folder(zf, path, prefix=""):
+def zip_folder(zf, path, prefix="", exclude=[]):
     """
     Recursively add the contents of a directory into a ``zipfile.ZipFile``.
 
@@ -17,6 +17,8 @@ def zip_folder(zf, path, prefix=""):
 
     parent_basename = os.path.basename(path)
     for file in os.listdir(path):
+        if file in exclude:
+            continue
         child_path = os.path.join(path, file)
 
         if os.path.isfile(child_path):

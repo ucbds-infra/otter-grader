@@ -29,10 +29,8 @@ jobs:
 
       - name: Prepare for Docker image build
         run: |
-          docker pull ucbdsinfra/otter-grader
           make docker-test-prepare
 
-      # Temporarily caching from remote image due to https://github.com/docker/buildx/issues/681
       - name: Build Docker image
         id: docker_build
         uses: docker/build-push-action@v2
@@ -42,7 +40,8 @@ jobs:
           load: true
           push: false
           tags: otter-test
-          cache-from: ucbdsinfra/otter-grader:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Clean up Docker image build
         run: make docker-ci-test-cleanup

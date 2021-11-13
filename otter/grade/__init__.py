@@ -15,8 +15,8 @@ LOGGER = loggers.get_logger(__name__)
 
 
 def main(*, path="./", output_dir="./", autograder="./autograder.zip", containers=None, 
-         ext="ipynb", no_kill=False, zips=False, image="ucbdsinfra/otter-grader", 
-         pdfs=False, prune=False, force=False, timeout=None, network=True):
+         ext="ipynb", no_kill=False, debug=False, zips=False, image="ucbdsinfra/otter-grader", 
+         pdfs=False, verbose=False, prune=False, force=False, timeout=None, no_network=False):
     """
     Runs Otter Grade
 
@@ -37,7 +37,7 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
         prune (``bool``): whether to prune the grading images; if true, no grading is performed
         force (``bool``): whether to force-prune the images (do not ask for confirmation)
         timeout (``int``): timeout in seconds for each container
-        network (``bool``): whether to enable networking in the containers
+        no_network (``bool``): whether to disable networking in the containers
 
     Raises:
         ``AssertionError``: if invalid arguments are provided
@@ -69,7 +69,7 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
         image=image,
         pdfs=pdfs,
         timeout=timeout,
-        network=network
+        network=not no_network,
     )
 
     LOGGER.info("Combining grades and saving")

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
+    export PATH="/root/miniconda3/bin:$PATH"
+    source /root/miniconda3/etc/profile.d/conda.sh
+else
+    export PATH="/opt/conda/bin:$PATH"
+    source /opt/conda/etc/profile.d/conda.sh
+fi
+conda activate otter-env
+python /autograder/source/run_otter.py

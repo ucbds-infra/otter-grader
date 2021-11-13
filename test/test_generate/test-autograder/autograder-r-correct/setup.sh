@@ -15,9 +15,9 @@ if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/'
 
     # install conda
-    wget -nv -O {{ autograder_dir }}/source/miniconda_install.sh "{{ miniconda_install_url }}"
-    chmod +x {{ autograder_dir }}/source/miniconda_install.sh
-    {{ autograder_dir }}/source/miniconda_install.sh -b
+    wget -nv -O /autograder/source/miniconda_install.sh "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
+    chmod +x /autograder/source/miniconda_install.sh
+    /autograder/source/miniconda_install.sh -b
     echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
 
     export PATH=/root/miniconda3/bin:$PATH
@@ -25,15 +25,14 @@ if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
 fi
 
 # install dependencies with conda
-{% if channel_priority_strict %}conda config --set channel_priority strict
-{% endif %}conda env create -f {{ autograder_dir }}/source/environment.yml
-conda run -n {{ otter_env_name }} Rscript {{ autograder_dir }}/source/requirements.r
+conda env create -f /autograder/source/environment.yml
+conda run -n otter-env Rscript /autograder/source/requirements.r
 
 # set conda shell
 conda init --all
 
 # install ottr; not sure why it needs to happen twice but whatever
-git clone --single-branch -b {{ ottr_branch }} https://github.com/ucbds-infra/ottr.git {{ autograder_dir }}/source/ottr
-cd {{ autograder_dir }}/source/ottr 
-conda run -n {{ otter_env_name }} Rscript -e "devtools::install\\(\\)"
-conda run -n {{ otter_env_name }} Rscript -e "devtools::install\\(\\)"
+git clone --single-branch -b 1.1.3 https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
+cd /autograder/source/ottr 
+conda run -n otter-env Rscript -e "devtools::install\\(\\)"
+conda run -n otter-env Rscript -e "devtools::install\\(\\)"

@@ -160,6 +160,11 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "description": "whether this assignment will be run on Google Colab",
         "default": False,
     },
+    {
+        "key": "show_question_points",
+        "description": "whether to add the question point values to the last cell of each question",
+        "default": False,
+    },
 ]
 LOGGER = loggers.get_logger(__name__)
 

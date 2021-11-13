@@ -130,6 +130,11 @@ DEFAULT_OPTIONS_WITH_DESCRIPTIONS = [
         "description": "a log level for logging messages; any value suitable for ``logging.Logger.setLevel``",
         "default": None,
     },
+    {
+        "key": "channel_priority_strict",
+        "description": "whether to set conda's channel_priority config to strict in the setup.sh file",
+        "default": True,
+    },
 ]
 
 DEFAULT_OPTIONS = convert_config_description_dict(DEFAULT_OPTIONS_WITH_DESCRIPTIONS)

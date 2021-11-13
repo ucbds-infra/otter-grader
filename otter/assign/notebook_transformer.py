@@ -10,11 +10,12 @@ from .cell_generators import (
     add_export_tag_to_cell, gen_init_cell, gen_markdown_response_cell, gen_export_cells, 
     gen_check_all_cell
 )
-from .questions import create_question_config
+from .questions import add_point_value_info_to_cell, create_question_config
 from .r_adapter.cell_generators import gen_export_cells as gen_ottr_export_cells
 from .solutions import has_seed, SOLUTION_CELL_TAG
-from .tests import any_public_tests
-from .utils import add_tag, AssignNotebookFormatException, EmptyCellException, is_cell_type, is_ignore_cell
+from .tests import any_public_tests, determine_question_point_value
+from .utils import add_tag, AssignNotebookFormatException, EmptyCellException, get_source, \
+    is_cell_type, is_ignore_cell
 
 
 def transform_notebook(nb, assignment):
@@ -90,8 +91,8 @@ def get_transformed_cells(cells, assignment):
     transformed_cells = []
     test_files = {}
 
-    question_metadata, test_cases, has_prompt, no_solution = \
-        {}, [], False, False
+    question_metadata, test_cases, has_prompt, no_solution, last_question_md_cell = \
+        {}, [], False, False, None
 
     solution_has_md_cells, prompt_insertion_index = False, None
 
@@ -126,9 +127,15 @@ def get_transformed_cells(cells, assignment):
                             question_metadata["check_cell"]:
                         transformed_cells.append(check_cell)
 
+                # add points to question cell if specified
+                if assignment.show_question_points and last_question_md_cell is not None:
+                    points = determine_question_point_value(question_metadata, test_cases)
+                    transformed_cells[last_question_md_cell] = \
+                        add_point_value_info_to_cell(transformed_cells[last_question_md_cell], points)
+
                 # TODO: reformat this state update
-                question_metadata, test_cases, has_prompt, no_solution = \
-                    {}, [], False, False
+                question_metadata, test_cases, has_prompt, no_solution, last_question_md_cell = \
+                    {}, [], False, False, None
                 solution_has_md_cells, prompt_insertion_index = False, None
 
             elif block_type is BlockType.SOLUTION:
@@ -218,6 +225,9 @@ def get_transformed_cells(cells, assignment):
 
                 if is_cell_type(cell, "markdown"):
                     solution_has_md_cells = True
+
+            elif curr_block[-1] == BlockType.QUESTION and is_cell_type(cell, "markdown"):
+                last_question_md_cell = len(transformed_cells)
 
         # add export tags if needed
         export_delim_cell = None
