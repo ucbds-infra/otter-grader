@@ -9,6 +9,8 @@ on:
 
 jobs:
   build:
+    if: contains('["chrispyles"]', github.actor)
+  
     runs-on: ubuntu-latest
 
     env:
