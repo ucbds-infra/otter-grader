@@ -13,4 +13,4 @@ nbformat
 dill
 rpy2
 numpy
-otter-grader==3.2.0
+git+https://github.com/ucbds-infra/otter-grader.git@6bc9682296fce1667430b5286ebcb285cc2668de
