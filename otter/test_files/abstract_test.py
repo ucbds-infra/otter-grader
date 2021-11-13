@@ -62,12 +62,13 @@ class TestFile(ABC):
         else:
             ret = f"<p><strong style='color: red;'><pre style='display: inline;'>{self.name}</pre> results:</strong></p>"
             for tcr in self.test_case_results:
-                ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> result:</strong></p>"
-                ret += f"<pre>{indent(tcr.message, '    ')}</pre>"
                 if tcr.passed and tcr.test_case.success_message is not None:
                     ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.success_message}</p>"
                 if not tcr.passed and tcr.test_case.failure_message is not None:
                     ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.failure_message}</p>"
+                ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> result:</strong></p>"
+                ret += f"<pre>{indent(tcr.message, '    ')}</pre>"
+
             return ret
 
     def __repr__(self):
@@ -187,12 +188,13 @@ class TestFile(ABC):
         
         tcr_summaries = []
         for tcr in tcrs:
-            smry = f"{tcr.test_case.name} result:\n"
-            smry += f"{indent(tcr.message.strip(), '    ')}\n\n"
+            smry = ""
             if tcr.passed and tcr.test_case.success_message is not None:
                 smry += f"{tcr.test_case.name} message: {tcr.test_case.success_message}\n\n"
             if not tcr.passed and tcr.test_case.failure_message is not None:
                 smry += f"{tcr.test_case.name} message: {tcr.test_case.failure_message}\n\n"
+            smry += f"{tcr.test_case.name} result:\n"
+            smry += f"{indent(tcr.message.strip(), '    ')}\n\n"
 
             tcr_summaries.append(smry.strip())
 
