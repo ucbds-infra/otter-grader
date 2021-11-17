@@ -99,15 +99,17 @@ class TestGrade(TestCase):
         Check that the notebook `network.ipynb` is unable to do some network requests with disabled networking
         """
 
-        grade(
-            path = TEST_FILES_PATH + "network/",
-            output_dir = "test/",
-            autograder = TEST_FILES_PATH + "autograder.zip",
-            containers = 5,
-            image = "otter-test",
-            pdfs = True,
-            no_network=True
-        )
+        with loggers.level_context(logging.DEBUG):
+            grade(
+                path = TEST_FILES_PATH + "network/",
+                output_dir = "test/",
+                autograder = TEST_FILES_PATH + "autograder.zip",
+                containers = 5,
+                image = "otter-test",
+                pdfs = True,
+                no_network=True,
+            )
+
         df_test = pd.read_csv("test/final_grades.csv")
 
         # sort by filename

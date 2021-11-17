@@ -72,6 +72,6 @@ def create_collected_check_cell(cell, notebook_class_name, test_dir):
     if otter_config.get("tests", []):
         tests = otter_config.get("tests", [])
         for test in tests:
-            source += f"\n{notebook_class_name}(tests_dir='{test_dir}').check('{test}'))\n"
+            source += f"\n{notebook_class_name}(tests_dir='{test_dir}').check('{test}')\n"
 
     return source
