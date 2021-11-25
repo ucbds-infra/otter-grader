@@ -61,7 +61,7 @@ would run
 .. code-block:: python
 
     from otter.api import grade_submission
-    grade_submission("autograder.zip", "hw00.ipynb")
+    grade_submission("hw00.ipynb", "autograder.zip")
 
 ``grade_submission`` has an optional argument ``quiet`` which will suppress anything printed to the 
 console by the grading process during execution when set to ``True`` (default ``False``).
