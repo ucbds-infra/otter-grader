@@ -90,7 +90,7 @@ class TestGrade(TestCase):
                 autograder=TEST_FILES_PATH + "autograder.zip",
                 containers=5,
                 image="otter-test",
-                timeout=30,
+                timeout=35,
             )
         self.assertEqual(str(e.exception),"Executing 'test/test-grade/timeout/20s.ipynb' in docker container failed! Exit code: 137")
 
