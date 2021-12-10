@@ -13,6 +13,7 @@ from glob import glob
 from unittest.mock import patch
 
 from otter.assign import main as assign
+from otter.assign.tests import determine_question_point_value, Test
 from otter.generate.token import APIClient
 
 from . import TestCase
@@ -105,6 +106,18 @@ class TestAssign(TestCase):
             glob(TEST_FILES_PATH + "output/autograder/*.zip")[0], 
             TEST_FILES_PATH + "rmd-autograder-correct",
         )
+
+    def test_point_value_rounding(self):
+        """
+        Tests that point values are rounded appropriately.
+        """
+        # sum(4 / 11 for _ in range(11)) evaluates to 4.000000000000001 in Python, so this will
+        # check that the per-test-case point values are correctly rounded.
+        points = determine_question_point_value({
+            "points": None,
+            "manual": False,
+        }, [Test("", "", False, 4 / 11, "", "") for _ in range(11)])
+        self.assertEqual(points, 4)
 
     def tearDown(self):
         """
