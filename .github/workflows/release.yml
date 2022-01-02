@@ -71,14 +71,6 @@ jobs:
           git commit -am 'release v${{ github.event.inputs.version }}'
           git push origin stable
 
-      - name: Create a release on GitHub
-        env:
-          GITHUB_USER: ${{ secrets.GITHUB_USER }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-            hub release create -a dist/*.tar.gz -a dist/*.whl \
-            -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
-
       - name: Build Docker image
         uses: docker/build-push-action@v2
         with:
@@ -98,6 +90,14 @@ jobs:
 #           python3 setup.py sdist bdist_wheel
 #           python3 -m twine upload dist/*
 #           sleep 10
+#
+#       - name: Create a release on GitHub
+#         env:
+#           GITHUB_USER: ${{ secrets.GITHUB_USER }}
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#             hub release create -a dist/*.tar.gz -a dist/*.whl \
+#             -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
 
       - name: PR stable -> main
         env:
