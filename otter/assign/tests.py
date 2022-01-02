@@ -246,5 +246,5 @@ def determine_question_point_value(question_metadata, test_cases):
         return question_metadata["points"] if question_metadata["points"] is not None else 1
 
     resolved_test_cases = TestFile.resolve_test_file_points(question_metadata["points"], test_cases)
-    points = sum(tc.points for tc in resolved_test_cases)
+    points = round(sum(tc.points for tc in resolved_test_cases), 5)
     return int(points) if points % 1 == 0 else points

@@ -1,5 +1,10 @@
 # Changelog
 
+**v3.2.1:**
+
+* Display instructor-specified messages ahead of doctest messages per [#441](https://github.com/ucbds-infra/otter-grader/issues/441)
+* Round point values for display to 5 decimal places in Otter Assign per [#457](https://github.com/ucbds-infra/otter-grader/issues/457)
+
 **v3.2.0:**
 
 * Changed Otter Generate to accept the path to the zip file to write as the output argument rather than a directory in which to write a file called `autograder.zip`
