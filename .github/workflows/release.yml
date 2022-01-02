@@ -71,6 +71,17 @@ jobs:
           git commit -am 'release v${{ github.event.inputs.version }}'
           git push origin stable
 
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
+            ucbdsinfra/otter-grader:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Create dist and push to PyPI
         env:
           TWINE_USERNAME: __token__
@@ -87,23 +98,6 @@ jobs:
         run: |
             hub release create -a dist/*.tar.gz -a dist/*.whl \
             -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
-
-      - name: Close milestone
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo '{"state": "closed"}' | gh api --method PATCH repos/ucbds-infra/otter-grader/milestones/v${{ github.event.inputs.version }} --input -
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: |
-            ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
-            ucbdsinfra/otter-grader:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: PR stable -> main
         env:
