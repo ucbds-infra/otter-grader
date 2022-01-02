@@ -100,8 +100,10 @@ Resolving Point Values
 
 Point values for each test case and the question defined by the test file will be resolved as follows:
 
-* If one or more test cases specify a point value and no point value is specified for the test file, 
-  each test case with unspecified point values is assumed to be worth 0 points.
+* If one or more test cases specify a point value and no point value is specified for the question, 
+  each test case with unspecified point values is assumed to be worth 0 points unless all test cases 
+  with specified points are worth 0 points; in this case, the question is assumed to be worth 1 point 
+  and the test cases with unspecified points are equally weighted.
 * If one or more test cases specify a point value and a point value *is* specified for the test file, 
   each test case with unspecified point values is assumed to be equally weighted and together are 
   worth the test file point value less the sum of specified point values. For example, in a 6-point 
