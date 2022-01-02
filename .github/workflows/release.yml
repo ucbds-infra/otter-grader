@@ -82,22 +82,22 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-#       - name: Create dist and push to PyPI
-#         env:
-#           TWINE_USERNAME: __token__
-#           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-#         run: |
-#           python3 setup.py sdist bdist_wheel
-#           python3 -m twine upload dist/*
-#           sleep 10
-#
-#       - name: Create a release on GitHub
-#         env:
-#           GITHUB_USER: ${{ secrets.GITHUB_USER }}
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         run: |
-#             hub release create -a dist/*.tar.gz -a dist/*.whl \
-#             -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
+      - name: Create dist and push to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python3 setup.py sdist bdist_wheel
+          python3 -m twine upload dist/*
+          sleep 10
+
+      - name: Create a release on GitHub
+        env:
+          GITHUB_USER: ${{ secrets.GITHUB_USER }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            hub release create -a dist/*.tar.gz -a dist/*.whl \
+            -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
 
       - name: PR stable -> main
         env:
