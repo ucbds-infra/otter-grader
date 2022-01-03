@@ -22,6 +22,10 @@ from .. import TestCase
 client = APIClient('token1')
 
 
+# TEST_FILES_PATH \+ (["'].*["'])
+# FILE_MANAGER.get_path($1)
+
+
 # mock input
 def get_input(text):
     return input(text)

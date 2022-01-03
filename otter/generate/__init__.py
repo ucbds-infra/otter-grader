@@ -2,6 +2,7 @@
 
 import json
 import os
+import pathlib
 import pkg_resources
 import yaml
 import zipfile
@@ -177,10 +178,12 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
                 full_fp = os.path.abspath(file)
                 if os.getcwd() not in full_fp:
                     raise ValueError(f"{file} is not in the working directory")
+
+                relative_fp = pathlib.Path(full_fp).relative_to(pathlib.Path(os.getcwd()))
                 if os.path.isfile(full_fp):
-                    zf.write(file, arcname=os.path.join("files", file))
+                    zf.write(file, arcname=os.path.join("files", relative_fp))
                 elif os.path.isdir(full_fp):
-                    zip_folder(zf, full_fp, prefix="files")
+                    zip_folder(zf, full_fp, prefix=os.path.join("files", os.path.split(relative_fp)[0]))
                 else:
                     raise ValueError(f"Could not find file or directory '{full_fp}'")
 

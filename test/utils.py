@@ -4,6 +4,8 @@ import os
 import pathlib
 import pytest
 import shutil
+import tempfile
+import zipfile
 
 from contextlib import contextmanager
 
@@ -107,3 +109,17 @@ def delete_paths(paths, error_if_absent=False):
             os.remove(p)
         elif error_if_absent:
             raise RuntimeError(f"Attempted to delete '{p}' but the file or directory does not exist")
+
+
+@contextmanager
+def unzip_to_temp(zf_path, delete_zip=False):
+    tempdir = tempfile.mkdtemp()
+    zf = zipfile.ZipFile(zf_path)
+    zf.extractall(path=tempdir)
+    zf.close()
+
+    yield tempdir
+
+    shutil.rmtree(tempdir)
+    if delete_zip:
+        os.remove(zf_path)
