@@ -20,3 +20,4 @@ gs-testing-stuff
 docs/tutorial/dist
 docs/_static/notebooks/html
 arm-Dockerfile
+htmlcov/

@@ -1,5 +1,18 @@
-OS := $(shell uname -s)
-DOCKER_VERSION := $(shell docker version --format '{{.Server.Version}}' | sed "s/+azure//" | sed  -e "s/-[0-9]*//g")
+PYTEST           = pytest
+TESTPATH         = tests
+PYTESTOPTS       = -v
+COVERAGE         = coverage
+OS              := $(shell uname -s)
+DOCKER_VERSION  := $(shell docker version --format '{{.Server.Version}}' | sed "s/+azure//" | sed  -e "s/-[0-9]*//g")
+
+test:
+	$(PYTEST) $(TESTPATH) $(PYTESTOPTS)
+
+testcov:
+	$(COVERAGE) run -m pytest $(TESTPATH) $(PYTESTOPTS)
+
+htmlcov: testcov
+	$(COVERAGE) html
 
 .PHONY: docs
 docs:
