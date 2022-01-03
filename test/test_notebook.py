@@ -9,7 +9,6 @@ from textwrap import dedent
 from unittest import mock
 
 from otter import Notebook
-from otter.check.logs import LogEntry, EventType
 from otter.check.notebook import _OTTER_LOG_FILENAME, _ZIP_NAME_FILENAME
 
 from .utils import TestFileManager
@@ -29,7 +28,7 @@ def negate(x):
 
 
 @pytest.fixture(autouse=True)
-def cleanup_output(cleanup_enabled):
+def cleanup_output(cleanup_enabled):  # TODO: refactor this and similar to use delete_paths
     yield
     if cleanup_enabled and os.path.isfile(_OTTER_LOG_FILENAME):
         os.remove(_OTTER_LOG_FILENAME)

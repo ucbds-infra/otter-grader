@@ -3,6 +3,7 @@
 import os
 import pathlib
 import pytest
+import shutil
 
 from contextlib import contextmanager
 
@@ -16,7 +17,7 @@ class TestFileManager:
 
     @contextmanager
     def open(self, path, *args, **kwargs):
-        f = open(path, *args, **kwargs)
+        f = open(self.get_path(path), *args, **kwargs)
         yield f
         f.close()
 
@@ -96,3 +97,13 @@ def assert_dirs_equal(dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_e
             f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
             assert_dirs_equal(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs, 
                 variable_path_exts=variable_path_exts)
+
+
+def delete_paths(paths, error_if_absent=False):
+    for p in paths:
+        if os.path.isdir(p):
+            shutil.rmtree(p)
+        elif os.path.isfile(p):
+            os.remove(p)
+        elif error_if_absent:
+            raise RuntimeError(f"Attempted to delete '{p}' but the file or directory does not exist")
