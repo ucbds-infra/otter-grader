@@ -7,18 +7,12 @@ import filecmp
 import nbformat
 import os
 import pytest
-import subprocess
 
-# from io import StringIO
-# from unittest import mock
-# from subprocess import Popen, PIPE
 from glob import glob
-# from textwrap import dedent
 
 from otter.export import main as export
 from otter.export.exporters.base_exporter import BaseExporter
 
-from . import TestCase
 from .utils import TestFileManager
 
 
