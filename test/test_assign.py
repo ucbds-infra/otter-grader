@@ -1,6 +1,4 @@
-##################################
-##### Tests for otter assign #####
-##################################
+"""Tests for ``otter.assign``"""
 
 import os
 import pytest

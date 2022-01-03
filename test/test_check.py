@@ -1,6 +1,4 @@
-#################################
-##### Tests for otter check #####
-#################################
+"""Tests for ``otter.check``"""
 
 import contextlib
 import os

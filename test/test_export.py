@@ -1,104 +1,104 @@
-##################################
-##### Tests for Otter Export #####
-##################################
+"""Tests for ``otter.export``"""
 
 # NOTES:
 # - tests do not check for PDF equality
 
-import os
-import unittest
-import subprocess
-import json
-import re
-import contextlib
-import nbconvert
 import filecmp
 import nbformat
+import os
+import pytest
+import subprocess
 
-from io import StringIO
-from unittest import mock
-from subprocess import Popen, PIPE
+# from io import StringIO
+# from unittest import mock
+# from subprocess import Popen, PIPE
 from glob import glob
-from textwrap import dedent
+# from textwrap import dedent
 
-from otter.export import export_notebook
 from otter.export import main as export
 from otter.export.exporters.base_exporter import BaseExporter
 
 from . import TestCase
+from .utils import TestFileManager
 
 
-TEST_FILES_PATH = "test/test-export/"
+FILE_MANAGER = TestFileManager("test/test-export")
 
 
-class TestExport(TestCase):
+@pytest.fixture(autouse=True)
+def cleanup_output(cleanup_enabled):
+    """
+    Removes export output
+    """
+    yield
+    if cleanup_enabled:
+        for file in glob(FILE_MANAGER.get_path("*.pdf")) + glob(FILE_MANAGER.get_path("*.tex")) + \
+                [FILE_MANAGER.get_path("output.ipynb")]:
+            if os.path.exists(file):
+                os.remove(file)
 
-    @staticmethod
-    def run_export(notebook_stem, **kwargs):
-        export(TEST_FILES_PATH + notebook_stem + ".ipynb", **kwargs)
 
-    def test_success_HTML(self):
-        """
-        Tests a successful export with filtering and no pagebreaks
-        """
-        test_file = "successful-html-test"
-        self.run_export(test_file, filtering=True, save=True, exporter="latex")
+def run_export(notebook_path, **kwargs):
+    export(notebook_path, **kwargs)
 
-        # check existence of pdf and tex
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".tex"))
 
-        # cleanup
-        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
-        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(cleanup.returncode, 0,"Error in cleanup: " + str(cleanup.stderr))
-        
-    def test_success_pagebreak(self):
-        """
-        Tests a successful filter with pagebreaks
-        """
-        test_file = "success-pagebreak-test"
-        self.run_export(test_file, filtering=True, exporter="latex", pagebreaks=True, save=True)
+def test_success_HTML():
+    """
+    Tests a successful export with filtering and no pagebreaks
+    """
+    test_file = "successful-html-test"
+    run_export(
+        FILE_MANAGER.get_path(f"{test_file}.ipynb"), filtering=True, save=True, exporter="latex")
 
-        # check existence of pdf and tex
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".tex"))
+    # check existence of pdf and tex
+    FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.pdf"), dir_okay=False)
+    FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.tex"), dir_okay=False)
 
-        # cleanup
-        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
-        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(cleanup.returncode, 0,"Error in cleanup: " + str(cleanup.stderr))
+    
+def test_success_pagebreak():
+    """
+    Tests a successful filter with pagebreaks
+    """
+    test_file = "success-pagebreak-test"
+    run_export(
+        FILE_MANAGER.get_path(f"{test_file}.ipynb"), 
+        filtering=True, 
+        exporter="latex", 
+        pagebreaks=True, 
+        save=True,
+    )
 
-    def test_no_close(self):
-        """
-        Tests a filtered export without a closing comment
-        """
-        test_file = "no-close-tag-test"
-        self.run_export(test_file, filtering=True, exporter="latex", pagebreaks=True, save=True)
+    # check existence of pdf and tex
+    FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.pdf"), dir_okay=False)
+    FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.tex"), dir_okay=False)
 
-        # check existence of pdf and tex
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".pdf"))
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file + ".tex"))
 
-        # cleanup
-        cleanup_command = ["rm", TEST_FILES_PATH + test_file + ".pdf", TEST_FILES_PATH + test_file + ".tex"]
-        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(cleanup.returncode, 0,"Error in cleanup:" + str(cleanup.stderr))
+def test_no_close():
+    """
+    Tests a filtered export without a closing comment
+    """
+    test_file = "no-close-tag-test"
+    run_export(
+        FILE_MANAGER.get_path(f"{test_file}.ipynb"), 
+        filtering=True, 
+        exporter="latex", 
+        pagebreaks=True, 
+        save=True,
+    )
 
-    def test_load_notebook(self):
-        """
-        Tests a successful load_notebook
-        """
-        test_file = "successful-html-test"
-        node = BaseExporter.load_notebook(TEST_FILES_PATH + test_file + ".ipynb", filtering=True)
+    # check existence of pdf and tex
+    FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.pdf"), dir_okay=False)
+    FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.tex"), dir_okay=False)
 
-        nbformat.write(node, TEST_FILES_PATH + test_file)
 
-        # check existence of file
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + test_file))
-        self.assertTrue(filecmp.cmp(TEST_FILES_PATH + test_file, TEST_FILES_PATH + "correct/" + test_file))
-        
-        # cleanup
-        cleanup_command = ["rm", TEST_FILES_PATH + test_file]
-        cleanup = subprocess.run(cleanup_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(cleanup.returncode, 0,"Error in cleanup: " + str(cleanup.stderr))
+def test_load_notebook():
+    """
+    Tests a successful load_notebook
+    """
+    test_file = "successful-html-test"
+    node = BaseExporter.load_notebook(FILE_MANAGER.get_path(f"{test_file}.ipynb"), filtering=True)
+
+    nbformat.write(node, FILE_MANAGER.get_path("output.ipynb"))
+
+    # check file contents
+    assert filecmp.cmp(FILE_MANAGER.get_path("output.ipynb"), FILE_MANAGER.get_path(f"correct/{test_file}.ipynb"))

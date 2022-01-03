@@ -2,6 +2,7 @@
 
 import os
 import pathlib
+import pytest
 
 from contextlib import contextmanager
 
@@ -18,6 +19,21 @@ class TestFileManager:
         f = open(path, *args, **kwargs)
         yield f
         f.close()
+
+    def assert_path_exists(self, path, file_okay=True, dir_okay=True):
+        path = self.get_path(path)
+        assert os.path.exists(path) and (file_okay or os.path.isdir(path)) and \
+            (dir_okay or os.path.isfile(path))
+
+    @classmethod
+    def create_fixture(cls, file_dir):
+        @pytest.fixture
+        def file_manager():
+            return cls(file_dir)
+        return file_manager
+
+
+# def create_cleanup_fixture() # TODO
 
 
 def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
