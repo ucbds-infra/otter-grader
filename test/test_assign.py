@@ -20,7 +20,7 @@ from .utils import assert_dirs_equal, TestFileManager
 FILE_MANAGER = TestFileManager("test/test-assign")
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def cleanup_assign_output(cleanup_enabled):
     """
     Removes assign output
@@ -53,7 +53,7 @@ def assign_and_check_output(nb_path, correct_dir, assign_kwargs={}, assert_dirs_
     assert_dirs_equal(output_path, correct_dir, **assert_dirs_equal_kwargs)
 
 
-def test_convert_example(cleanup_assign_output):
+def test_convert_example():
     """
     Checks that otter assign filters and outputs correctly
     """
@@ -67,7 +67,7 @@ def test_convert_example(cleanup_assign_output):
     )
 
     
-def test_otter_example(cleanup_assign_output):
+def test_otter_example():
     """
     Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
     """
@@ -77,7 +77,7 @@ def test_otter_example(cleanup_assign_output):
     )
 
 
-def test_pdf_example(cleanup_assign_output):
+def test_pdf_example():
     """
     Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
     """
@@ -90,7 +90,7 @@ def test_pdf_example(cleanup_assign_output):
 
 
 @patch.object(APIClient, "get_token")
-def test_gradescope_example(mocked_client, cleanup_assign_output):
+def test_gradescope_example(mocked_client, ):
     """
     Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs.
     Additionally, includes testing Gradescope integration.
@@ -113,7 +113,7 @@ def test_gradescope_example(mocked_client, cleanup_assign_output):
     )
 
 
-def test_r_example(cleanup_assign_output):
+def test_r_example():
     """
     Checks that otter assign works for R notebooks correctly
     """
@@ -125,7 +125,7 @@ def test_r_example(cleanup_assign_output):
     )
 
 
-def test_rmd_example(cleanup_assign_output):
+def test_rmd_example():
     """
     Checks that otter assign works for Rmd files
     """
@@ -147,7 +147,7 @@ def test_rmd_example(cleanup_assign_output):
     )
 
 
-def test_point_value_rounding(cleanup_assign_output):
+def test_point_value_rounding():
     """
     Tests that point values are rounded appropriately.
     """
