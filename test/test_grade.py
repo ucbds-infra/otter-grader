@@ -91,6 +91,8 @@ def expected_points():
     return test_points
 
 
+@pytest.mark.slow
+@pytest.mark.docker
 def test_docker():
     """
     Check that we have the right container installed and that docker is running
@@ -106,6 +108,8 @@ def test_docker():
     assert len(inspect.stderr) == 0, inspect.stderr.decode("utf-8")
 
 
+@pytest.mark.slow
+@pytest.mark.docker
 def test_timeout():
     """
     Check that the notebook `20s.ipynb` is killed due to exceeding the defined timeout.
@@ -122,6 +126,8 @@ def test_timeout():
         )
 
 
+@pytest.mark.slow
+@pytest.mark.docker
 def test_network(expected_points):
     """
     Check that the notebook `network.ipynb` is unable to do some network requests with disabled networking
@@ -150,6 +156,8 @@ def test_network(expected_points):
                 assert row[test] == expected_points[test], "{} supposed to pass {} but failed".format(row["file"], test)
 
 
+@pytest.mark.slow
+@pytest.mark.docker
 def test_notebooks_with_pdfs(expected_points):
     """
     Check that the example of 100 notebooks runs correctely locally.

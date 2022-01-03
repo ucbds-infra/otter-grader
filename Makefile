@@ -1,9 +1,19 @@
 PYTEST           = pytest
-TESTPATH         = tests
+TESTPATH         = test
 PYTESTOPTS       = -v
 COVERAGE         = coverage
+DOCKER           = true
+SLOW             = true
 OS              := $(shell uname -s)
 DOCKER_VERSION  := $(shell docker version --format '{{.Server.Version}}' | sed "s/+azure//" | sed  -e "s/-[0-9]*//g")
+
+ifeq ($(DOCKER), false)
+	PYTESTOPTS := $(PYTESTOPTS) -m "not docker"
+endif
+
+ifeq ($(SLOW), false)
+	PYTESTOPTS := $(PYTESTOPTS) -m "not slow"
+endif
 
 .PHONY: test
 test:

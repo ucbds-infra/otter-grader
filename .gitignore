@@ -21,3 +21,4 @@ docs/tutorial/dist
 docs/_static/notebooks/html
 arm-Dockerfile
 htmlcov/
+.pytest_cache/

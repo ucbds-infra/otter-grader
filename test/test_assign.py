@@ -84,6 +84,7 @@ def test_otter_example():
     )
 
 
+@pytest.mark.slow
 def test_pdf_example():
     """
     Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
@@ -91,11 +92,12 @@ def test_pdf_example():
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-pdf.ipynb"),
         FILE_MANAGER.get_path("pdf-correct"),
-        assign_kwargs=dict(no_run_tests=True),
+        assign_kwargs=dict(no_run_tests=True, v0=True),
         assert_dirs_equal_kwargs=dict(ignore_ext=[".pdf"], variable_path_exts=[".zip"]),
     )
 
 
+@pytest.mark.slow
 @patch.object(APIClient, "get_token")
 def test_gradescope_example(mocked_client):
     """
@@ -120,6 +122,7 @@ def test_gradescope_example(mocked_client):
     )
 
 
+@pytest.mark.slow
 def test_r_example():
     """
     Checks that otter assign works for R notebooks correctly
@@ -131,6 +134,7 @@ def test_r_example():
     )
 
 
+@pytest.mark.slow
 def test_rmd_example():
     """
     Checks that otter assign works for Rmd files

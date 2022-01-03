@@ -36,6 +36,7 @@ def run_export(notebook_path, **kwargs):
     export(notebook_path, **kwargs)
 
 
+@pytest.mark.slow
 def test_success_HTML():
     """
     Tests a successful export with filtering and no pagebreaks
@@ -48,7 +49,8 @@ def test_success_HTML():
     FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.pdf"), dir_okay=False)
     FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.tex"), dir_okay=False)
 
-    
+
+@pytest.mark.slow
 def test_success_pagebreak():
     """
     Tests a successful filter with pagebreaks
@@ -67,6 +69,7 @@ def test_success_pagebreak():
     FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.tex"), dir_okay=False)
 
 
+@pytest.mark.slow
 def test_no_close():
     """
     Tests a filtered export without a closing comment
