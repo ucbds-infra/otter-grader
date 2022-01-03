@@ -1,6 +1,8 @@
 """Argument parser for Otter command-line tools"""
 
 import click
+import functools
+import logging
 
 from .assign import main as assign
 from .check import main as check
@@ -9,7 +11,26 @@ from .generate import main as generate
 from .grade import _ALLOWED_EXTENSIONS
 from .grade import main as grade
 from .run import main as run
+from .utils import loggers
 from .version import print_version_info
+
+
+_VERBOSITY_LEVELS = {
+    0: logging.WARNING,
+    1: logging.INFO,
+    2: logging.DEBUG,
+}
+
+
+def _verbosity(f):
+    @click.option("-v", "--verbose", "verbosity", count=True, help="Verbosity of the logged output")
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        # set the log level
+        verbosity = kwargs.pop("verbosity")
+        loggers.set_level(_VERBOSITY_LEVELS[min(verbosity, max(_VERBOSITY_LEVELS.keys()))])
+        return f(*args, **kwargs)
+    return wrapper
 
 
 @click.group(invoke_without_command=True)
@@ -27,6 +48,7 @@ def cli(version):
 
 defaults = assign.__kwdefaults__
 @cli.command("assign")
+@_verbosity
 @click.argument("master", type=click.Path(exists=True, dir_okay=False))
 @click.argument("result", type=click.Path())
 @click.option("--no-run-tests", is_flag=True, help="Do not run the tests against the autograder notebook")
@@ -34,7 +56,7 @@ defaults = assign.__kwdefaults__
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--debug", is_flag=True, help="Do not ignore errors in running tests for debugging")
-@click.option("--v1", is_flag=True, help="Use Otter Assign format v1 instead of v0")
+@click.option("--v0", is_flag=True, help="Use Otter Assign format v0 instead of v1")
 def assign_cli(*args, **kwargs):
     """
     Create distribution versions of the Otter Assign formatted notebook MASTER and write the
@@ -45,19 +67,21 @@ def assign_cli(*args, **kwargs):
 
 defaults = check.__kwdefaults__
 @cli.command("check")
+@_verbosity
 @click.argument("file", type=click.Path(exists=True, dir_okay=False))
 @click.option("-q", "--question", help="A specific quetsion to grade")
 @click.option("-t", "--tests-path", default=defaults["tests_path"], type=click.Path(exists=True, file_okay=False), help="Path to the direcotry of test files")
 @click.option("--seed", type=click.INT, help="A random seed to be executed before each cell")
 def check_cli(*args, **kwargs):
-	"""
-	Check the Python script or Jupyter Notebook FILE against tests.
-	"""
-	return check(*args, **kwargs)
+    """
+    Check the Python script or Jupyter Notebook FILE against tests.
+    """
+    return check(*args, **kwargs)
 
 
 defaults = export.__kwdefaults__
 @cli.command("export")
+@_verbosity
 @click.argument("src", type=click.Path(exists=True, dir_okay=False))
 @click.argument("dest", required=False, type=click.Path())
 @click.option("--filtering", is_flag=True, help="Whether the PDF should be filtered")
@@ -76,6 +100,7 @@ def export_cli(*args, **kwargs):
 
 defaults = generate.__kwdefaults__
 @cli.command("generate")
+@_verbosity
 @click.option("-t", "--tests-dir", default=defaults["tests_dir"], type=click.Path(exists=True, file_okay=False), help="Path to test files")
 @click.option("-o", "--output-path", default=defaults["output_path"], type=click.Path(), help="Path at which to write autograder zip file")
 @click.option("-c", "--config", type=click.Path(exists=True, dir_okay=False), help="Path to otter configuration file; ./otter_config.json automatically checked")
@@ -99,6 +124,7 @@ def generate_cli(*args, **kwargs):
 
 defaults = grade.__kwdefaults__
 @cli.command("grade")
+@_verbosity
 
 # necessary path arguments
 @click.option("-p", "--path", default=defaults["path"], help="Path to directory of submissions")
@@ -113,13 +139,11 @@ defaults = grade.__kwdefaults__
 @click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
 
 # other settings and optional arguments
-@click.option("-v", "--verbose", is_flag=True, help="Flag for verbose output")
 @click.option("--containers", type=click.INT, help="Specify number of containers to run in parallel")
 @click.option("--image", default=defaults["image"], help="Custom docker image to run on")
 @click.option("--timeout", type=click.INT, help="Submission execution timeout in seconds")
 @click.option("--no-network", is_flag=True, help="Disable networking in the containers")
 @click.option("--no-kill", is_flag=True, help="Do not kill containers after grading")
-@click.option("--debug", is_flag=True, help="Print stdout/stderr from grading for debugging")
 
 @click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
 @click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
@@ -132,6 +156,7 @@ def grade_cli(*args, **kwargs):
 
 defaults = run.__kwdefaults__
 @cli.command("run")
+@_verbosity
 @click.argument("submission")
 @click.option("-a", "--autograder", default=defaults["autograder"], type=click.Path(exists=True, dir_okay=False), help="Path to autograder zip file")
 @click.option("-o", "--output-dir", default=defaults["output_dir"], type=click.Path(exists=True, file_okay=False), help="Directory to which to write output")

@@ -51,18 +51,15 @@ def filter_ignored_cells(nb):
     return nb
 
 
-def create_collected_check_cell(cell, check_results_list_name, notebook_class_name, test_dir):
+def create_collected_check_cell(cell, notebook_class_name, test_dir):
     """
-    Generate a string of calls to ``otter.Notebook.check`` collecting the results in a list called
-    ``check_results_list_name`` based on the cell metadata.
+    Generate a string of calls to ``otter.Notebook.check``.
 
     Note that this string is formatted with surrounding newlines, so it can be inserted into any
     Python script as-is.
 
     Args:
         cell (``nbformat.NotebookNode``): the code cell to which checks should be appended
-        check_results_list_name (``check_results_list_name``): the name of the list to append the 
-            results to
         notebook_class_name(``str``): the name of the ``otter.Notebook`` class in the environment
         test_dir (``str``): the path to the directory of tests.       
 
@@ -75,7 +72,6 @@ def create_collected_check_cell(cell, check_results_list_name, notebook_class_na
     if otter_config.get("tests", []):
         tests = otter_config.get("tests", [])
         for test in tests:
-            source += f"\n{check_results_list_name}.append({notebook_class_name}(" + \
-                f"tests_dir='{test_dir}').check('{test}'))\n"
+            source += f"\n{notebook_class_name}(tests_dir='{test_dir}').check('{test}')\n"
 
     return source

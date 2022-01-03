@@ -19,6 +19,9 @@ def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
         dest (``str``, optional): path to write PDF
         exporter_type (``str``, optional): the type of exporter to use; one of ``['html', 'latex']``
         **kwargs: additional configurations passed to exporter
+
+    Returns:
+        ``str``: the path at which the PDF was written
     """
     # notebook = load_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
 
@@ -29,6 +32,8 @@ def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
 
     Exporter = get_exporter(exporter_type=exporter_type)
     Exporter.convert_notebook(nb_path, pdf_name, **kwargs)
+
+    return pdf_name
 
 
 def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, 

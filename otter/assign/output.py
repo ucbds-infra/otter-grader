@@ -11,7 +11,7 @@ from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
 from .plugins import replace_plugins_with_calls
 from .solutions import overwrite_seed_vars, strip_ignored_lines, strip_solutions_and_output
-from .tests import write_test
+from .tests import write_tests
 from .utils import get_notebook_language, patch_copytree, remove_cell_ids
 
 
@@ -37,17 +37,17 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
             warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
             assignment.lang = "python"
 
-    transformed_nb, test_files = transform_notebook(nb, assignment)
+    transformed_nb, assignment.test_files = transform_notebook(nb, assignment)
 
     # replace plugins
     transformed_nb = replace_plugins_with_calls(transformed_nb)
 
-    # update assignment.test_files for R notebooks
-    assignment.test_files |= assignment.is_r
+    # update assignment.tests["files"] for R notebooks
+    assignment.tests["files"] |= assignment.is_r
 
     output_dir = output_nb_path.parent
     tests_dir = output_dir / 'tests'
-    if assignment.test_files:
+    if assignment.tests["files"]:
         os.makedirs(tests_dir, exist_ok=True)
 
     if assignment.requirements:
@@ -67,17 +67,14 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     transformed_nb = strip_ignored_lines(transformed_nb)
 
     # write tests
-    test_ext = (".R", ".py")[assignment.is_python]
-    for test_name, test_file in test_files.items():
-        test_path = tests_dir / (test_name + test_ext) if assignment.test_files else test_name
-        write_test(transformed_nb, test_path, test_file, use_file=assignment.test_files)
+    write_tests(transformed_nb, str(tests_dir), assignment.test_files, assignment, include_hidden=True)
 
     # write a temp dir for otter generate tests
     if assignment.generate:
         assignment._temp_test_dir = pathlib.Path(tempfile.mkdtemp())
-        for test_name, test_file in test_files.items():
-            test_path = assignment._temp_test_dir / (test_name + test_ext)
-            write_test(transformed_nb, test_path, test_file, use_file=True)
+        write_tests(
+            None, str(assignment._temp_test_dir), assignment.test_files, assignment, 
+            include_hidden=True, force_files=True)
 
     # TODO: this is a bad practice and only a monkey-patch for #340. we shold do some better parsing
     # of the nbformat version info to determine if this is necessary.
@@ -114,11 +111,6 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
         student_dir (``pathlib.Path``): the path to the student directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     """
-    if assignment.is_r:
-        from .r_adapter.tests import remove_hidden_tests_from_dir
-    else:
-        from .tests import remove_hidden_tests_from_dir
-
     # copy autograder dir
     with patch_copytree():
         shutil.copytree(autograder_dir, student_dir, copy_function=shutil.copy)
@@ -147,7 +139,12 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
         nb = overwrite_seed_vars(nb, assignment.seed["variable"], assignment.seed["student_value"])
 
     # remove hidden tests from student directory
-    remove_hidden_tests_from_dir(nb, student_dir / 'tests', assignment, use_files=assignment.test_files)
+    tests_dir = str(student_dir / "tests")
+    if assignment.tests["files"]:
+        shutil.rmtree(tests_dir)
+        os.makedirs(tests_dir)
+
+    write_tests(nb, tests_dir, assignment.test_files, assignment, include_hidden=False)
 
     with open(student_nb_path, "w") as f:
         nbformat.write(nb, f)

@@ -5,6 +5,7 @@ COVERAGE         = coverage
 OS              := $(shell uname -s)
 DOCKER_VERSION  := $(shell docker version --format '{{.Server.Version}}' | sed "s/+azure//" | sed  -e "s/-[0-9]*//g")
 
+.PHONY: test
 test:
 	$(PYTEST) $(TESTPATH) $(PYTESTOPTS)
 

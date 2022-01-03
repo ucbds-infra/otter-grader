@@ -1,5 +1,6 @@
 """Various utilities for Otter-Grader"""
 
+import logging
 import os
 import sys
 import pathlib
@@ -9,8 +10,10 @@ import string
 import shutil
 import tempfile
 
+from collections.abc import Mapping
 from contextlib import contextmanager, redirect_stdout
 from IPython import get_ipython
+
 
 @contextmanager
 def block_print():
@@ -125,7 +128,7 @@ def get_source(cell):
         return re.split("\r?\n", source)
     elif isinstance(source, list):
         return [line.strip("\r\n") for line in source]
-    raise ValueError(f'unknown source type: {type(source)}')
+    raise TypeError(f"Unknown cell source type: {type(source)}")
 
 
 @contextmanager
@@ -141,19 +144,22 @@ def nullcontext():
 def load_default_file(provided_fn, default_fn, default_disabled=False):
     """
     Reads the contents of a file with an optional default path. If ``proivided_fn`` is not specified
-    and ``expected_fn`` is a existing file path, the contents of ``expected_fn`` are read in place
-    of ``provided_fn``. The use of ``expected_fn`` can be disabled by setting ``default_disabled``
+    and ``default_fn`` is an existing file path, the contents of ``default_fn`` are read in place
+    of ``provided_fn``. The use of ``default_fn`` can be disabled by setting ``default_disabled``
     to ``True``.
     """
     if provided_fn is None and os.path.isfile(default_fn) and not default_disabled:
         provided_fn = default_fn
     
     if provided_fn is not None:
-        assert os.path.isfile(provided_fn), f"Could not find specified file: {provided_fn}"
+        if not os.path.isfile(provided_fn):
+            raise FileNotFoundError(f"Could not find specified file: {provided_fn}")
+
         with open(provided_fn) as f:
             yield f.read()
+
     else:
-        yield None
+        yield
 
 
 def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs):
@@ -164,7 +170,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
 
     If ``ret_str`` is true, the string is returned; if not, it is printed directly to the console.
     """
-    cols, rows = shutil.get_terminal_size()
+    cols, _ = shutil.get_terminal_size()
 
     if mid_text:
         left = cols - len(mid_text) - 2 * len(whitespace)
@@ -278,15 +284,15 @@ def assert_path_exists(path_tuples):
         path_tuples (``list[tuple[str, bool]]``): the list of paths as described above
 
     Raises:
-        ``ValueError``: if the path does not exist or it is not of the correct type
+        ``FileNotFoundError``: if the path does not exist or it is not of the correct type
     """
     for path, is_dir in path_tuples:
         if not os.path.exists(path):
-            raise ValueError(f"Path {path} does not exist")
+            raise FileNotFoundError(f"Path {path} does not exist")
         if is_dir and not os.path.isdir(path):
-            raise ValueError(f"Path {path} is not a directory")
+            raise FileNotFoundError(f"Path {path} is not a directory")
         if is_dir is False and not os.path.isfile(path):
-            raise ValueError(f"Path {path} is not a file")
+            raise FileNotFoundError(f"Path {path} is not a file")
 
 
 def knit_rmd_file(rmd_path, pdf_path):
@@ -299,14 +305,136 @@ def knit_rmd_file(rmd_path, pdf_path):
     """
     from rpy2.robjects.packages import importr
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".Rmd",) as ntf:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".Rmd") as ntf:
         with open(rmd_path) as f:
             contents = f.read()
 
-        contents = "```{r cache = F, include = F}\nknitr::opts_chunk$set(error = TRUE)\n```\n" + contents
+        contents = "```{r cache = F, include = F}\nknitr::opts_chunk$set(error = TRUE)\n```\n" + \
+            contents
         ntf.write(contents)
         ntf.seek(0)
 
         pdf_path = os.path.abspath(pdf_path)
         rmarkdown = importr("rmarkdown")
         rmarkdown.render(ntf.name, "pdf_document", pdf_path)
+
+
+def recursive_dict_update(d, u):
+    """
+    Recursively update a possibly-nested ``dict`` in-place.
+
+    Args:
+        d (``dict``): the original dictionary to be updated
+        u (``dict``): the dictionary of new values to override in ``d``
+
+    Returns:
+        ``dict``: the original dictionary
+    """
+    for k, v in u.items():
+        d_v = d.get(k)
+        if isinstance(v, Mapping) and isinstance(d_v, Mapping):
+            d[k] = recursive_dict_update(d_v, v)
+        else:
+            d[k] = v
+
+    return d
+
+
+class loggers:
+
+    _format = "[%(levelname)s %(name)s.%(funcName)s] %(message)s"
+    _instances = {}
+    _log_level = logging.WARNING
+
+    def __new__(cls, *args, **kwargs):
+        raise NotImplementedError("This class is not meant to be instantiated")
+
+    @classmethod
+    def get_logger(cls, name):
+        """
+        Retrieve ``logging.Logger`` with name ``name`` and return it, setting the log level to the 
+        class log level.
+        """
+        if name in cls._instances:
+            return cls._instances[name]
+        logger = logging.getLogger(name)
+        logger.propagate = False  # prevent child loggers from inheriting the handler
+        logger.setLevel(cls._log_level)
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(cls._format)
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        cls._instances[name] = logger
+        return logger
+
+    @classmethod
+    def get_level(cls):
+        """
+        Return the current log level of these loggers.
+        """
+        return cls._log_level
+
+    @classmethod
+    def set_level(cls, log_level):
+        """
+        Set the log levels for all ``Logger``s created by this class (existing and future).
+        """
+        cls._log_level = log_level
+        for logger in cls._instances.values():
+            logger.setLevel(log_level)
+
+    @classmethod
+    @contextmanager
+    def level_context(cls, log_level):
+        """
+        Set the log level to a new value temporarily in a context.
+        """
+        curr_level = cls.get_level()
+        cls.set_level(log_level)
+        yield
+        cls.set_level(curr_level)
+
+    @classmethod
+    def reset_level(cls):
+        """
+        Set the log levels for all ``Loggers`` created by this class (existing and future) back to
+        ``logging.WARNING``.
+        """
+        cls.set_level(logging.WARNING)
+
+
+class Loggable:
+    """
+    A class for inheriting from which provides a logger via a class- and instance-accessible field.
+    """
+
+    _logger_instance = None
+
+    @classmethod
+    def _load_logger(cls):
+        """
+        Set-up the ``_logger`` field of the ``Notebook``.
+        """
+        if cls._logger_instance is None:
+            name = cls.__module__ + "." + cls.__name__
+            cls._logger_instance = loggers.get_logger(name)
+
+    @property
+    def _logger(self):
+        """
+        ``logging.Logger``: the logger instance for this class
+        """
+        self._load_logger()
+        return type(self)._logger_instance
+
+
+    @classmethod
+    def _get_logger(cls):
+        """
+        Load and return the logger for this class.
+
+        Returns:
+            ``logging.Logger``: the logger instance for this class
+        """
+        cls._load_logger()
+        return cls._logger_instance

@@ -1,10 +1,11 @@
 """Assignment configurations for Otter Assign"""
 
+import copy
 import yaml
 
 from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
-from ..utils import convert_config_description_dict
+from ..utils import convert_config_description_dict, Loggable, loggers, recursive_dict_update
 
 
 _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
@@ -46,7 +47,7 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {
         "key": "check_all_cell",
         "description": "whether to include an Otter check-all cell in the output notebooks",
-        "default": True,
+        "default": False,
     },
     {
         "key": "export_cell",
@@ -76,7 +77,7 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
             {
                 "key": "run_tests",
                 "description": "whether to run student submissions against local tests during export",
-                "default": False,
+                "default": True,
             },
         ],
     },
@@ -139,10 +140,20 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "default": [],
     },
     {
-        "key": "test_files",
-        "description": "whether to store tests in separate .py files rather than in the notebook " \
-            "metadata",
-        "default": False,
+        "key": "tests",
+        "description": "information about the structure and storage of tests",
+        "default": [
+            {
+                "key": "files",
+                "description": "whether to store tests in separate files, instead of the notebook metadata",
+                "default": False,
+            },
+            {
+                "key": "ok_format",
+                "description": "whether the test cases are in OK-format (instead of the exception-based format)",
+                "default": True,
+            },
+        ],
     },
     {
         "key": "colab",
@@ -155,9 +166,10 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "default": False,
     },
 ]
+LOGGER = loggers.get_logger(__name__)
 
 
-class Assignment:
+class Assignment(Loggable):
     """
     A class that houses configurations for an assignment. Contains a dictionary of default arguments
     that can be updated in an instance using the ``update()`` method. Functions similarly to an 
@@ -193,11 +205,12 @@ class Assignment:
         "lang": None,
         "_temp_test_dir": None, # path to a temp dir for tests for otter generate
         "notebook_basename": None,
+        "test_files": {},  # test file name -> test file info
         **convert_config_description_dict(_DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS),
     }
 
     def __init__(self):
-        self.config = type(self).defaults.copy()
+        self.config = copy.deepcopy(type(self).defaults)
 
     def __getattr__(self, attr):
         if attr in type(self).defaults:
@@ -205,6 +218,7 @@ class Assignment:
         raise AttributeError(f"Assignment has no attribute {attr}")
 
     def __setattr__(self, attr, value):
+        self._logger.debug(f"Attempting to set attribute '{attr}': {value}")
         if attr == "config":
             self.__dict__[attr] = value
         elif attr in type(self).defaults:
@@ -220,10 +234,11 @@ class Assignment:
         Args:
             config (``dict``): new configurations
         """
+        self._logger.debug(f"Updating configurations: {config}")
         for k in config.keys():
             if k not in self.allowed_configs:
                 raise ValueError(f"Unexpected assignment config: '{k}'")
-        self.config.update(config)
+        recursive_dict_update(self.config, config)
 
     @property
     def is_r(self):
@@ -264,6 +279,7 @@ def read_assignment_metadata(cell):
     Returns:
         ``dict``: assignment metadata
     """
+    LOGGER.debug(f"Parsing assignment metadata from cell: {cell}")
     source = get_source(cell)
     begin_assignment_line = get_spec(source, "assignment")
     i, lines = begin_assignment_line + 1, []
@@ -271,6 +287,7 @@ def read_assignment_metadata(cell):
         lines.append(source[i])
         i = i + 1
     metadata = yaml.full_load('\n'.join(lines))
+    LOGGER.debug(f"Parsed assignment metadata: {metadata}")
     return metadata
 
 

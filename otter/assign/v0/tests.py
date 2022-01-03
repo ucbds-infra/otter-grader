@@ -12,7 +12,7 @@ from collections import namedtuple
 from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGEX, OTTR_TEST_NAME_REGEX, \
     OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
-from ...test_files.abstract_test import TestFile
+from ...test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
 from ...test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
@@ -195,7 +195,7 @@ def write_test(nb, path, test, use_file=False):
     if use_file:
         with open(path, 'w+') as f:
             if isinstance(test, dict):
-                f.write('test = ')
+                f.write(f'{OK_FORMAT_VARNAME} = True\n\ntest = ')
                 pprint.pprint(test, f, indent=4, width=200, depth=None)
             else:
                 f.write(test)

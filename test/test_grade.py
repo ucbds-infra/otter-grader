@@ -2,6 +2,7 @@
 ##### Tests for otter grade #####
 #################################
 
+import logging
 import pandas as pd
 import os
 import re
@@ -15,6 +16,7 @@ from subprocess import PIPE
 from otter.generate import main as generate
 from otter.generate import utils
 from otter.grade import main as grade
+from otter.utils import loggers
 
 from . import TestCase
 
@@ -81,16 +83,14 @@ class TestGrade(TestCase):
         """
         Check that the notebook `20s.ipynb` is killed due to exceeding the defined timeout.
         """
-        with self.assertRaises(Exception) as e:
+        with self.assertRaises(Exception) as e, loggers.level_context(logging.DEBUG):
             grade(
                 path=TEST_FILES_PATH + "timeout/",
                 output_dir="test/",
                 autograder=TEST_FILES_PATH + "autograder.zip",
                 containers=5,
                 image="otter-test",
-                timeout=40,
-                debug=True,
-                verbose=True,
+                timeout=35,
             )
         self.assertEqual(str(e.exception),"Executing 'test/test-grade/timeout/20s.ipynb' in docker container failed! Exit code: 137")
 
@@ -99,15 +99,17 @@ class TestGrade(TestCase):
         Check that the notebook `network.ipynb` is unable to do some network requests with disabled networking
         """
 
-        grade(
-            path = TEST_FILES_PATH + "network/",
-            output_dir = "test/",
-            autograder = TEST_FILES_PATH + "autograder.zip",
-            containers = 5,
-            image = "otter-test",
-            pdfs = True,
-            no_network=True
-        )
+        with loggers.level_context(logging.DEBUG):
+            grade(
+                path = TEST_FILES_PATH + "network/",
+                output_dir = "test/",
+                autograder = TEST_FILES_PATH + "autograder.zip",
+                containers = 5,
+                image = "otter-test",
+                pdfs = True,
+                no_network=True,
+            )
+
         df_test = pd.read_csv("test/final_grades.csv")
 
         # sort by filename
@@ -124,18 +126,16 @@ class TestGrade(TestCase):
         """
         Check that the example of 100 notebooks runs correctely locally.
         """
-
         # grade the 100 notebooks
-        grade(
-            path = TEST_FILES_PATH + "notebooks/", 
-            output_dir = "test/",
-            autograder = TEST_FILES_PATH + "autograder.zip",
-            containers = 5,
-            image = "otter-test",
-            pdfs = True,
-            debug = True,
-            verbose = True
-        )
+        with loggers.level_context(logging.DEBUG):
+            grade(
+                path = TEST_FILES_PATH + "notebooks/", 
+                output_dir = "test/",
+                autograder = TEST_FILES_PATH + "autograder.zip",
+                containers = 5,
+                image = "otter-test",
+                pdfs = True,
+            )
 
         # read the output and expected output
         df_test = pd.read_csv("test/final_grades.csv")

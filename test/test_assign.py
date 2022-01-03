@@ -60,20 +60,29 @@ def test_convert_example():
     assign_and_check_output(
         FILE_MANAGER.get_path("example.ipynb"), 
         FILE_MANAGER.get_path("example-correct"), 
-        assign_kwargs=dict(
-            no_run_tests=True, 
-            v1=True,
-        ),
+        assign_kwargs=dict(no_run_tests=True),
     )
 
-    
+
+def test_exception_example():
+    """
+    Checks that otter assign filters and outputs correctly
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("exception-example.ipynb"), 
+        FILE_MANAGER.get_path("exception-correct"), 
+        assign_kwargs=dict(no_run_tests=True),
+    )
+
+
 def test_otter_example():
     """
     Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
     """
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-otter.ipynb"), 
-        FILE_MANAGER.get_path("otter-correct"), 
+        FILE_MANAGER.get_path("otter-correct"),
+        assign_kwargs=dict(v0=True),
     )
 
 
@@ -90,7 +99,7 @@ def test_pdf_example():
 
 
 @patch.object(APIClient, "get_token")
-def test_gradescope_example(mocked_client, ):
+def test_gradescope_example(mocked_client):
     """
     Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs.
     Additionally, includes testing Gradescope integration.
@@ -102,7 +111,7 @@ def test_gradescope_example(mocked_client, ):
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-gradescope.ipynb"),
         FILE_MANAGER.get_path("gs-correct"),
-        assign_kwargs=dict(no_run_tests=True),
+        assign_kwargs=dict(no_run_tests=True, v0=True),
         assert_dirs_equal_kwargs=dict(ignore_ext=[".pdf"], variable_path_exts=[".zip"]),
     )
 
@@ -120,7 +129,6 @@ def test_r_example():
     assign_and_check_output(
         FILE_MANAGER.get_path("r-example.ipynb"),
         FILE_MANAGER.get_path("r-correct"),
-        assign_kwargs=dict(v1=True),
         assert_dirs_equal_kwargs=dict(ignore_ext=[".pdf"], variable_path_exts=[".zip"]),
     )
 
@@ -132,7 +140,6 @@ def test_rmd_example():
     assign_and_check_output(
         FILE_MANAGER.get_path("rmd-example.Rmd"),
         FILE_MANAGER.get_path("rmd-correct"),
-        assign_kwargs=dict(v1=True),
         assert_dirs_equal_kwargs=dict(
             ignore_ext=[".pdf"],
             ignore_dirs=["rmd-example-sol_files"],

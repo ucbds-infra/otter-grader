@@ -1,6 +1,4 @@
-"""
-Support for OK-formatted test files
-"""
+"""Support for OK-formatted test files"""
 
 import os
 import io
@@ -83,14 +81,11 @@ class OKTestFile(TestFile):
 
     def run(self, global_environment):
         """
-        Runs tests on a given ``global_environment``
+        Run the test cases on ``global_environment``, saving the results in 
+        ``self.test_case_results``.
 
         Arguments:
             ``global_environment`` (``dict``): result of executing a Python notebook/script
-
-        Returns:
-            ``tuple`` of (``bool``, ``float`` ``otter.ok_parser.OKTest``): whether the test passed,
-                the percentage score on this test, and a pointer to the current ``otter.ok_parser.OKTest`` object
         """
         for i, test_case in enumerate(self.test_cases):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
@@ -105,6 +100,16 @@ class OKTestFile(TestFile):
 
     @classmethod
     def from_spec(cls, test_spec, path=""):
+        """
+        Parse an OK-formatted ``dict`` and return an ``OKTestFile``.
+
+        Args:
+            test_spec (``dict[str: object]``): the OK-formatted ``dict``
+            path (``str``, optional): the path to the test file this ``dict`` was parsed from
+
+        Returns:
+            ``OKTestFile``: the new ``OKTestFile`` object created from the given file
+        """
         # Make sure there is a name
         assert 'name' in test_spec
 
@@ -146,13 +151,13 @@ class OKTestFile(TestFile):
     @classmethod
     def from_file(cls, path):
         """
-        Parse an ok test file & return an ``OKTest``
+        Parse an OK-formatted test file & return an ``OKTestFile``.
 
         Args:
-            path (``str``): path to ok test file
+            path (``str``): the path to the test file
 
         Returns:
-            ``otter.ok_parser.OKTest``: new ``OKTest`` object created from the given file
+            ``OKTestFile``: the new ``OKTestFile`` object created from the given file
         """
         # ok test files are python files, with a global 'test' defined
         test_globals = {}

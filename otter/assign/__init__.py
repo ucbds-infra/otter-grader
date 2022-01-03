@@ -11,11 +11,14 @@ from .utils import run_tests, write_otter_config_file, run_generate_autograder
 from ..export import export_notebook
 from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
-from ..utils import block_print, get_relpath, knit_rmd_file
+from ..utils import block_print, chdir, get_relpath, knit_rmd_file, loggers
+
+
+LOGGER = loggers.get_logger(__name__)
 
 
 def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
-         debug=False, v1=False):
+         debug=False, v0=False):
     """
     Runs Otter Assign on a master notebook.
     
@@ -28,80 +31,93 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
-        v1 (``bool``): whether to use Otter Assign Format v1 instead of v0
+        v0 (``bool``): whether to use Otter Assign Format v0 instead of v1
     """
-    if not v1:
+    if v0:
         warnings.warn(
-            "Otter Assign format v0 will be deprecated in Otter v4 and removed in a later release.",
+            "The Otter Assign v0 format is now deprecated and will be removed in Otter v5.",
             FutureWarning)
             
         from .v0 import main as v0_main
         return v0_main(master, result, no_pdfs=no_pdfs, no_run_tests=no_run_tests, username=username, 
             password=password, debug=debug)
 
+    LOGGER.debug(f"User-specified master path: {master}")
+    LOGGER.debug(f"User-specified result path: {result}")
     master, result = pathlib.Path(os.path.abspath(master)), pathlib.Path(os.path.abspath(result))
-    print("Generating views...")
 
     assignment = Assignment()
 
     result = get_relpath(master.parent, result)
-    orig_dir = os.getcwd()
-    os.chdir(master.parent)
     
     assignment.master, assignment.result = master, result
+    LOGGER.debug(f"Normalized master path: {master}")
+    LOGGER.debug(f"Normalized result path: {result}")
 
     if assignment.is_rmd:
         from .rmarkdown_adapter.output import write_output_directories
     else:
         from .output import write_output_directories
 
-    try:
+    with chdir(master.parent):
+        LOGGER.info("Generating views")
         output_nb_path = write_output_directories(master, result, assignment)
 
         # update seed variables
         if isinstance(assignment.seed, dict):
+            LOGGER.debug("Processing seed dict")
             if assignment.generate:
+                LOGGER.debug("Otter Generate configuration found while processing seed dict")
                 if assignment.generate is True:
                     assignment.generate = {}
+                    LOGGER.debug("Re-assigning assignment.generate to an empty dict")
+
                 assignment.generate["seed"] = assignment.seed["autograder_value"]
                 assignment.generate["seed_variable"] = assignment.seed["variable"]
+                LOGGER.debug("Added seed information to assignment.generate")
 
         # check that we have a seed if needed
         if assignment.seed_required:
+            LOGGER.debug("Assignment seed is required")
+
             generate_args = assignment.generate
             if generate_args is True:
+                LOGGER.debug("Substituting Otter Generate configuration for dict with unspecified seed")
                 generate_args = {'seed': None}
-            assert not generate_args or generate_args.get('seed', None) is not None or \
-                not assignment.is_python, "Seeding cell found but no seed provided"
 
-        plugins = assignment.plugins
+            if generate_args and not isinstance(generate_args.get('seed', None), int):
+                raise RuntimeError("Seeding cell found but no or invalid seed provided")
+
+        plugins, pc = assignment.plugins, None
         if plugins:
+            LOGGER.debug("Processing plugins")
             pc = PluginCollection(plugins, "", {})
             pc.run("during_assign", assignment)
             if assignment.generate is True:
                 assignment.generate = {"plugins": []}
             if assignment.generate is not False:
+                LOGGER.debug("Adding plugin configurations to Otter Generate configuration")
                 if not assignment.generate.get("plugins"):
                     assignment.generate["plugins"] = []
                 assignment.generate["plugins"].extend(plugins)
-        else:
-            pc = None
 
         # generate Gradescope autograder zipfile
         if assignment.generate:
-            print("Generating autograder zipfile...")
+            LOGGER.info("Generating autograder zipfile")
             run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
         
         # generate PDF of solutions
         if assignment.solutions_pdf and not no_pdfs:
-            print("Generating solutions PDF...")
+            LOGGER.info("Generating solutions PDF")
             filtering = assignment.solutions_pdf == 'filtered'
 
             src = os.path.abspath(str(result / 'autograder' / master.name))
             dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-sol.pdf')))
         
             if not assignment.is_rmd:
+                LOGGER.debug(f"Exporting {src} as notebook to {dst}")
                 try:
+                    LOGGER.debug("Attempting PDF via HTML export")
                     export_notebook(
                         src,
                         dest=dst,
@@ -109,15 +125,20 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                         pagebreaks=filtering,
                         exporter_type="html",
                     )
+                    LOGGER.debug("PDF via HTML export successful")
+
                 except WkhtmltopdfNotFoundError:
+                    LOGGER.debug("PDF via HTML export failed; attempting PDF via LaTeX export")
                     export_notebook(
                         src,
                         dest=dst,
                         filtering=filtering,
                         pagebreaks=filtering,
                     )
+                    LOGGER.debug("PDF via LaTeX export successful")
 
             else:
+                LOGGER.debug(f"Knitting {src} to {dst}")
                 if filtering:
                     raise ValueError("Filtering is not supported with RMarkdown assignments")
 
@@ -125,12 +146,13 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
         # generate a tempalte PDF for Gradescope
         if assignment.template_pdf and not no_pdfs:
-            print("Generating template PDF...")
+            LOGGER.info("Generating template PDF")
             
             src = os.path.abspath(str(result / 'autograder' / master.name))
             dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-template.pdf')))
 
             if not assignment.is_rmd:
+                LOGGER.debug("Attempting PDF via LaTeX export")
                 export_notebook(
                     src,
                     dest=dst, 
@@ -138,6 +160,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                     pagebreaks=True, 
                     exporter_type="latex",
                 )
+                LOGGER.debug("PDF via LaTeX export successful")
 
             else:
                 raise ValueError(f"Filtering is not supported with RMarkdown assignments; use " + \
@@ -145,31 +168,33 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
         # generate the .otter file if needed
         if not assignment.is_rmd and assignment.save_environment:
+            LOGGER.debug("Processing environment serialization configuration")
             if assignment.is_r:
                 warnings.warn(
                     "Otter Service and serialized environments are unsupported with R, "
-                    "configurations ignored"
-                )
+                    "configurations ignored")
             else:
                 write_otter_config_file(master, result, assignment)
 
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:
-            print("Running tests...")
-            # with block_print():
+            LOGGER.info("Running tests against the solutions notebook")
+
             if isinstance(assignment.generate, bool):
                 seed = None
+
             else:
                 seed = assignment.generate.get('seed', None)
+
+            LOGGER.debug(f"Resolved seed for running tests: {seed}")
             
             if assignment._otter_config is not None:
+                LOGGER.debug("Retrieving updated plugins from otter_config.json for running tests")
                 test_pc = PluginCollection(assignment._otter_config.get("plugins", []), output_nb_path, {})
 
             else:
+                LOGGER.debug("Using pre-configured plugins for running tests")
                 test_pc = pc
 
             run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
-            print("All tests passed!")
-
-    finally:
-        os.chdir(orig_dir)
+            LOGGER.info("All autograder tests passed.")  # TODO: should this be a direct print?

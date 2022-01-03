@@ -23,15 +23,17 @@ from otter.check import notebook
 
 from . import TestCase
 
+
 TEST_FILES_PATH = "test/test-notebook/"
 
 
-# functions used in one of the tests below
 def square(x):
     return x ** 2
 
+
 def negate(x):
     return not x
+
 
 def mocked_requests_get(*args, **kwargs):
     class MockResponse:
@@ -48,6 +50,7 @@ def mocked_requests_get(*args, **kwargs):
         return MockResponse({"text": "this is the fake post response"}, 200)
 
     return MockResponse(None, 404)
+
 
 def mock_auth_get():
     class AuthResponse:
@@ -72,6 +75,7 @@ class TestNotebook(TestCase):
     """
     Test cases for the ``Notebook`` class
     """
+
     @mock.patch('builtins.input', return_value='fakekey')
     def test_check(self, mock_input):
         """
@@ -181,7 +185,7 @@ class TestNotebook(TestCase):
         with open('test-nb2.ipynb', "w") as f:
             nbformat.write(nb2, f)
         grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        self.assertRaises(AssertionError,
+        self.assertRaises(ValueError,
                           lambda: grader.to_pdf(nb_path=None, filtering=False))
         os.remove('test-nb1.ipynb')
         os.remove('test-nb2.ipynb')
@@ -239,7 +243,7 @@ class TestNotebook(TestCase):
         with open('test-nb2.ipynb', "w") as f:
             nbformat.write(nb2, f)
         grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        self.assertRaises(AssertionError,
+        self.assertRaises(ValueError,
                           lambda: grader.export(nb_path=None, filtering=False))
         os.remove('test-nb1.ipynb')
         os.remove('test-nb2.ipynb')
@@ -307,6 +311,21 @@ class TestNotebook(TestCase):
 
             with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
                 grader.export()
+
+    @mock.patch.object(Notebook, "_resolve_nb_path")
+    def test_grading_mode(self, mocked_resolve_nb_path):
+        """
+        Check that a call to a grading-mode-disabled method is not executed.
+        """
+        with Notebook.grading_mode(tests_dir="foo"):
+            grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
+            grader.export()
+
+            # TODO: find a better way of doing this than accessing a private field
+            self.assertEqual(grader._path, "foo")
+
+            # if export is called, this method would be called first
+            mocked_resolve_nb_path.assert_not_called()
 
     def tearDown(self):
         for i in range(1, 7):

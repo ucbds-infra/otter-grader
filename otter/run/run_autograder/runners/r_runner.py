@@ -4,7 +4,6 @@ import copy
 import json
 import nbformat
 import os
-import pickle
 import shutil
 import tempfile
 
@@ -13,7 +12,9 @@ from nbconvert.exporters import ScriptExporter
 from rpy2.robjects.packages import importr
 
 from .abstract_runner import AbstractLanguageRunner
+
 from ..utils import OtterRuntimeError
+
 from ....export import export_notebook
 from ....generate.token import APIClient
 from ....test_files import GradingResults
@@ -29,7 +30,7 @@ R_PACKAGES = {
 
 class RRunner(AbstractLanguageRunner):
 
-    subm_path_deletion_reauired = False
+    subm_path_deletion_required = False
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
 
     def filter_cells_with_syntax_errors(self, nb):
@@ -101,7 +102,7 @@ class RRunner(AbstractLanguageRunner):
             with open(script_path, "w") as f:
                 f.write(script)
 
-            self.subm_path_deletion_reauired = True
+            self.subm_path_deletion_required = True
             return script_path
 
         # convert Rmd files to R files
@@ -120,7 +121,7 @@ class RRunner(AbstractLanguageRunner):
             rmd_path = os.path.abspath(rmd_path)
             R_PACKAGES["knitr"].purl(rmd_path, script_path)
 
-            self.subm_path_deletion_reauired = True
+            self.subm_path_deletion_required = True
             return script_path
 
         os.remove(script_path)
@@ -226,8 +227,8 @@ class RRunner(AbstractLanguageRunner):
                     self.submit_pdf(client, pdf_path)
 
         # delete the script if necessary
-        if self.subm_path_deletion_reauired:
+        if self.subm_path_deletion_required:
             os.remove(subm_path)
-            self.subm_path_deletion_reauired = False
+            self.subm_path_deletion_required = False
 
         return scores

@@ -58,7 +58,6 @@ def test_otter_check_script():
             )
             assert output.getvalue().strip() == \
                 dedent("""\
-                    [0.         0.02002002 0.04004004 0.06006006 0.08008008]
                     q1 results: All test cases passed!
                     q2 results:
                         q2 - 1 result:
@@ -81,6 +80,7 @@ def test_otter_check_script():
                     q4 results: All test cases passed!
                     q5 results: All test cases passed!"""), \
                 "Did not pass correct tests"
+
 
 def test_otter_check_notebook():
     """
@@ -116,7 +116,6 @@ def test_otter_check_notebook():
 
             assert output.getvalue().strip() == \
                 dedent("""\
-                    [0.         0.02002002 0.04004004 0.06006006 0.08008008]
                     q1 results: All test cases passed!
                     q2 results:
                         q2 - 1 result:

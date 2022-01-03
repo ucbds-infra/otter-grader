@@ -1,17 +1,15 @@
-"""
-Logging for Otter Check
-"""
+"""Logging for Otter Check"""
 
-import os
-import pickle
-import types
-import dill
-import tempfile
 import datetime as dt
+import dill
 import numpy as np
+import os
+import types
+import tempfile
 
 from enum import Enum, auto
 from glob import glob
+
 
 class QuestionNotInLogException(Exception):
     """
@@ -134,7 +132,7 @@ class LogEntry:
         """
         try:
             file = open(filename, "ab+")
-            pickle.dump(self, file)
+            dill.dump(self, file)
 
         except OSError:
             raise Exception(
@@ -179,7 +177,7 @@ class LogEntry:
                     os.system(f"rm -f {filename}")
                     while True:
                         try:
-                            entry = pickle.load(tf)
+                            entry = dill.load(tf)
 
                             if entry.question == self.question and entry.shelf is not None:
 
@@ -277,7 +275,7 @@ class LogEntry:
             log = []
             while True:
                 try:
-                    log.append(pickle.load(file))
+                    log.append(dill.load(file))
                 except EOFError:
                     break
 
@@ -458,6 +456,7 @@ class Log:
             ``QuestionNotInLogException``: if the question is not found
         """
         return self.get_question_entry(question).get_results()
+
 
 class QuestionLogIterator:
     """
