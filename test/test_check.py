@@ -19,6 +19,7 @@ FILE_MANAGER = TestFileManager("test/test-check")
 
 @pytest.fixture(autouse=True)
 def cleanup_check_output(cleanup_enabled):
+    yield
     if cleanup_enabled and os.path.exists(".OTTER_LOG"):
         os.remove(".OTTER_LOG")
 

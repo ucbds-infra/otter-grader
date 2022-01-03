@@ -1,6 +1,4 @@
-################################
-##### Tests for Otter Logs #####
-################################
+"""Tests for ``otter.check.logs``"""
 
 import os
 import pytest
@@ -20,6 +18,7 @@ FILE_MANAGER = TestFileManager("test/test-logs/")
 
 @pytest.fixture(autouse=True)
 def cleanup_output(cleanup_enabled):
+    yield
     if cleanup_enabled and os.path.isfile(_OTTER_LOG_FILENAME):
         os.remove(_OTTER_LOG_FILENAME)
 

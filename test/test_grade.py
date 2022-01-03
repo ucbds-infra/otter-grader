@@ -1,6 +1,4 @@
-#################################
-##### Tests for otter grade #####
-#################################
+"""Tests for ``otter.grade``"""
 
 import logging
 import os
