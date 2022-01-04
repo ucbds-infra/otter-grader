@@ -5,7 +5,8 @@ def pytest_addoption(parser):
     parser.addoption(
         "--nocleanup", action="store_true", default=False, help="no cleanup")
     parser.addoption(
-        "--generate-pdfs", action="store_true", default=False, help="no PDFs")
+        "--generate-pdfs", action="store_true", default=False, 
+        help="force PDF generation instead of blocking it where it is mocked")
 
 
 def pytest_configure(config):
