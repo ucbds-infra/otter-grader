@@ -32,7 +32,7 @@ def cleanup_output(cleanup_enabled):
 
 
 @pytest.fixture(autouse=True)
-def generate_pdfs(pdfs_enabled):
+def disable_pdf_generation(pdfs_enabled):
     if not pdfs_enabled:
         def create_fake_pdf(src, dest, **kwargs):
             if dest is None:
