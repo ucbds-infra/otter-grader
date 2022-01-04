@@ -11,6 +11,8 @@ from contextlib import contextmanager
 
 
 class TestFileManager:
+    __test__ = False
+
     def __init__(self, file_dir):
         self.dir = pathlib.Path(file_dir).resolve()
 
