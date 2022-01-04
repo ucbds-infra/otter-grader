@@ -3,13 +3,9 @@
 import nbconvert
 import os
 import pdfkit
-import pkg_resources
 import shutil
-import tempfile
 
-from contextlib import redirect_stdout, redirect_stderr
-from io import StringIO, BytesIO
-from nbconvert.exporters import export
+from io import BytesIO
 from PyPDF2 import PdfFileMerger
 
 from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
@@ -53,14 +49,14 @@ class PDFViaHTMLExporter(BaseExporter):
             exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         if options["save_html"]:
-            html, _ = export(exporter, nb)
+            html, _ = nbconvert.export(exporter, nb)
             html_path = os.path.splitext(dest)[0] + ".html"
             with open(html_path, "wb+") as f:
                 f.write(html.encode("utf-8"))
         
         merger = PdfFileMerger()
         for subnb in notebook_pdf_generator(nb):
-            html, _ = export(exporter, subnb)
+            html, _ = nbconvert.export(exporter, subnb)
 
             pdfkit_options = {
                 'enable-local-file-access': None, 

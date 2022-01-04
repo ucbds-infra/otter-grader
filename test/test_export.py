@@ -4,14 +4,17 @@
 # - tests do not check for PDF equality
 
 import filecmp
+import nbconvert
 import nbformat
 import os
 import pytest
 
 from glob import glob
+from unittest import mock
 
 from otter.export import main as export
 from otter.export.exporters.base_exporter import BaseExporter
+from otter.utils import nullcontext
 
 from .utils import TestFileManager
 
@@ -32,11 +35,29 @@ def cleanup_output(cleanup_enabled):
                 os.remove(file)
 
 
+@pytest.fixture(autouse=True)
+def disable_pdf_generation(pdfs_enabled):
+    if not pdfs_enabled:
+        def create_fake_pdf(exporter, nb):
+            contents = "pdf contents"
+            if isinstance(exporter, nbconvert.PDFExporter):
+                contents = contents.encode("utf-8")
+            return contents, {}
+
+        cm = mock.patch("otter.export.exporters.via_html.nbconvert.export", side_effect=create_fake_pdf)
+        cm2 = mock.patch("otter.export.exporters.via_latex.nbconvert.export", side_effect=create_fake_pdf)
+
+    else:
+        cm, cm2 = nullcontext(), nullcontext()
+
+    with cm, cm2:
+        yield
+
+
 def run_export(notebook_path, **kwargs):
     export(notebook_path, **kwargs)
 
 
-@pytest.mark.slow
 def test_success_HTML():
     """
     Tests a successful export with filtering and no pagebreaks
@@ -50,7 +71,6 @@ def test_success_HTML():
     FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.tex"), dir_okay=False)
 
 
-@pytest.mark.slow
 def test_success_pagebreak():
     """
     Tests a successful filter with pagebreaks
@@ -69,7 +89,6 @@ def test_success_pagebreak():
     FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.tex"), dir_okay=False)
 
 
-@pytest.mark.slow
 def test_no_close():
     """
     Tests a filtered export without a closing comment
