@@ -4,6 +4,8 @@ import pytest
 def pytest_addoption(parser):
     parser.addoption(
         "--nocleanup", action="store_true", default=False, help="no cleanup")
+    parser.addoption(
+        "--generate-pdfs", action="store_true", default=False, help="no PDFs")
 
 
 def pytest_configure(config):
@@ -16,3 +18,8 @@ def pytest_configure(config):
 @pytest.fixture
 def cleanup_enabled(pytestconfig):
     return not pytestconfig.getoption("--nocleanup")
+
+
+@pytest.fixture
+def pdfs_enabled(pytestconfig):
+    return pytestconfig.getoption("--generate-pdfs")

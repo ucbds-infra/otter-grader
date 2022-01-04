@@ -1,16 +1,19 @@
 """Tests for ``otter.assign``"""
 
 import os
+import pathlib
 import pytest
 import shutil
 import subprocess
 
 from glob import glob
+from unittest import mock
 from unittest.mock import patch
 
 from otter.assign import main as assign
 from otter.assign.tests import determine_question_point_value, Test
 from otter.generate.token import APIClient
+from otter.utils import nullcontext
 
 from .utils import assert_dirs_equal, TestFileManager
 
@@ -19,13 +22,34 @@ FILE_MANAGER = TestFileManager("test/test-assign")
 
 
 @pytest.fixture(autouse=True)
-def cleanup_assign_output(cleanup_enabled):
+def cleanup_output(cleanup_enabled):
     """
     Removes assign output
     """
     yield
     if cleanup_enabled and os.path.exists(FILE_MANAGER.get_path("output")):
             shutil.rmtree(FILE_MANAGER.get_path("output"))
+
+
+@pytest.fixture(autouse=True)
+def generate_pdfs(pdfs_enabled):
+    if not pdfs_enabled:
+        def create_fake_pdf(src, dest, **kwargs):
+            if dest is None:
+                dest = f"{pathlib.Path(src).stem}.pdf"
+
+            open(dest, "wb+").close()
+            return mock.DEFAULT
+
+        cm = patch("otter.assign.export_notebook", side_effect=create_fake_pdf)
+        cm2 = patch("otter.assign.v0.export_notebook", side_effect=create_fake_pdf)
+        cm3 = patch("otter.assign.knit_rmd_file", side_effect=create_fake_pdf)
+
+    else:
+        cm, cm2 = nullcontext(), nullcontext()
+
+    with cm, cm2, cm3:
+        yield
 
 
 def check_gradescope_zipfile(path, correct_dir_path):
@@ -84,7 +108,6 @@ def test_otter_example():
     )
 
 
-@pytest.mark.slow
 def test_pdf_example():
     """
     Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
@@ -97,7 +120,6 @@ def test_pdf_example():
     )
 
 
-@pytest.mark.slow
 @patch.object(APIClient, "get_token")
 def test_gradescope_example(mocked_client):
     """
@@ -122,7 +144,6 @@ def test_gradescope_example(mocked_client):
     )
 
 
-@pytest.mark.slow
 def test_r_example():
     """
     Checks that otter assign works for R notebooks correctly
@@ -134,7 +155,6 @@ def test_r_example():
     )
 
 
-@pytest.mark.slow
 def test_rmd_example():
     """
     Checks that otter assign works for Rmd files
