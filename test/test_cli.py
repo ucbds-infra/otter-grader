@@ -6,10 +6,11 @@ import pytest
 from click.testing import CliRunner
 from unittest import mock
 
+from otter import __version__
 from otter.cli import cli
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def run_cli():
     """
     Create a function to invoke Otter's CLI with the specified command.
@@ -24,6 +25,20 @@ def run_cli():
     runner = CliRunner()
     with runner.isolated_filesystem():
         yield lambda cmd: runner.invoke(cli, cmd)
+
+
+def test_version(run_cli):
+    """
+    Tests the ``otter --version`` CLI command.
+    """
+    with mock.patch("otter.cli.print_version_info") as mocked_version:
+        result = run_cli([])
+        assert result.exit_code == 0
+        mocked_version.assert_not_called()
+
+        result = run_cli(["--version"])
+        assert result.exit_code == 0
+        mocked_version.assert_called_once_with(logo=True)
 
 
 def test_assign(run_cli):
