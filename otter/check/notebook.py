@@ -343,7 +343,7 @@ class Notebook(Loggable):
 
         with open(nb_path, "r", encoding="utf-8") as f:
             if len(f.read().strip()) == 0:
-                raise ValueError(f"Notebook '{nb_path}'' is empty. Please save and checkpoint your "
+                raise ValueError(f"Notebook '{nb_path}' is empty. Please save and checkpoint your "
                     "notebook and rerun this cell.")
 
         timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")

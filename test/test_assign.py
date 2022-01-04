@@ -1,137 +1,189 @@
-##################################
-##### Tests for otter assign #####
-##################################
+"""Tests for ``otter.assign``"""
 
-import unittest
-import sys
 import os
+import pathlib
+import pytest
 import shutil
 import subprocess
 
-from subprocess import PIPE
 from glob import glob
+from unittest import mock
 from unittest.mock import patch
 
 from otter.assign import main as assign
 from otter.assign.tests import determine_question_point_value, Test
 from otter.generate.token import APIClient
+from otter.utils import nullcontext
 
-from . import TestCase
-
-
-TEST_FILES_PATH = "test/test-assign/"
+from .utils import assert_dirs_equal, TestFileManager
 
 
-class TestAssign(TestCase):
+FILE_MANAGER = TestFileManager("test/test-assign")
 
-    def check_gradescope_zipfile(self, path, correct_dir_path):
-        # unzip the zipfile
-        unzip_command = ["unzip", "-o", path, "-d", TEST_FILES_PATH + "autograder"]
-        unzip = subprocess.run(unzip_command, stdout=PIPE, stderr=PIPE)
-        self.assertEqual(len(unzip.stderr), 0, unzip.stderr.decode("utf-8"))
 
-        self.assertDirsEqual(TEST_FILES_PATH + "autograder", correct_dir_path)
+@pytest.fixture(autouse=True)
+def cleanup_output(cleanup_enabled):
+    """
+    Removes assign output
+    """
+    yield
+    if cleanup_enabled and os.path.exists(FILE_MANAGER.get_path("output")):
+            shutil.rmtree(FILE_MANAGER.get_path("output"))
 
-        # cleanup
-        if os.path.exists(TEST_FILES_PATH + "autograder"):
-            shutil.rmtree(TEST_FILES_PATH + "autograder")
 
-    def test_convert_example(self):
-        """
-        Checks that otter assign filters and outputs correctly
-        """
-        # run otter assign
-        assign(TEST_FILES_PATH + "example.ipynb", TEST_FILES_PATH + "output", no_run_tests=True)
-       
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "example-correct")
+@pytest.fixture(autouse=True)
+def disable_pdf_generation(pdfs_enabled):
+    if not pdfs_enabled:
+        def create_fake_pdf(src, dest, **kwargs):
+            if dest is None:
+                dest = f"{pathlib.Path(src).stem}.pdf"
 
-    def test_exception_example(self):
-        """
-        Checks that otter assign filters and outputs correctly
-        """
-        # run otter assign
-        assign(TEST_FILES_PATH + "exception-example.ipynb", TEST_FILES_PATH + "output", no_run_tests=True)
-       
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "exception-correct")
-        
-    def test_otter_example(self):
-        """
-        Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
-        """
-        assign(TEST_FILES_PATH + "generate-otter.ipynb", TEST_FILES_PATH + "output", v0=True)
-        
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "otter-correct")     
+            open(dest, "wb+").close()
+            return mock.DEFAULT
 
-    def test_pdf_example(self):
-        """
-        Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
-        """
-        assign(TEST_FILES_PATH + "generate-pdf.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v0=True)
-      
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "pdf-correct", 
-            ignore_ext=[".pdf"], variable_path_exts=[".zip"])
+        cm = patch("otter.assign.export_notebook", side_effect=create_fake_pdf)
+        cm2 = patch("otter.assign.v0.export_notebook", side_effect=create_fake_pdf)
+        cm3 = patch("otter.assign.knit_rmd_file", side_effect=create_fake_pdf)
+
+    else:
+        cm, cm2 = nullcontext(), nullcontext()
+
+    with cm, cm2, cm3:
+        yield
+
+
+def check_gradescope_zipfile(path, correct_dir_path):
+    ag_path = FILE_MANAGER.get_path("autograder")
+
+    # unzip the zipfile
+    unzip_command = ["unzip", "-o", path, "-d", ag_path]
+    unzip = subprocess.run(unzip_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert len(unzip.stderr) == 0, unzip.stderr.decode("utf-8")
+
+    assert_dirs_equal(ag_path, correct_dir_path)
+
+    # cleanup
+    if os.path.exists(ag_path):
+        shutil.rmtree(ag_path)
+
+
+def assign_and_check_output(nb_path, correct_dir, assign_kwargs={}, assert_dirs_equal_kwargs={}):
+    """
+    """
+    output_path = FILE_MANAGER.get_path("output")
+    assign(nb_path, output_path, **assign_kwargs)
+    assert_dirs_equal(output_path, correct_dir, **assert_dirs_equal_kwargs)
+
+
+def test_convert_example():
+    """
+    Checks that otter assign filters and outputs correctly
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("example.ipynb"), 
+        FILE_MANAGER.get_path("example-correct"), 
+        assign_kwargs=dict(no_run_tests=True),
+    )
+
+
+def test_exception_example():
+    """
+    Checks that otter assign filters and outputs correctly
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("exception-example.ipynb"), 
+        FILE_MANAGER.get_path("exception-correct"), 
+        assign_kwargs=dict(no_run_tests=True),
+    )
+
+
+def test_otter_example():
+    """
+    Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("generate-otter.ipynb"), 
+        FILE_MANAGER.get_path("otter-correct"),
+        assign_kwargs=dict(v0=True),
+    )
+
+
+def test_pdf_example():
+    """
+    Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("generate-pdf.ipynb"),
+        FILE_MANAGER.get_path("pdf-correct"),
+        assign_kwargs=dict(no_run_tests=True, v0=True),
+        assert_dirs_equal_kwargs=dict(ignore_ext=[".pdf"], variable_path_exts=[".zip"]),
+    )
+
+
+@patch.object(APIClient, "get_token")
+def test_gradescope_example(mocked_client):
+    """
+    Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs.
+    Additionally, includes testing Gradescope integration.
+    """
+    # set a return value that does not match the token in the notebook, so we'll know if APIClient
+    # is called
+    mocked_client.return_value = 'token'
+
+    assign_and_check_output(
+        FILE_MANAGER.get_path("generate-gradescope.ipynb"),
+        FILE_MANAGER.get_path("gs-correct"),
+        assign_kwargs=dict(no_run_tests=True, v0=True),
+        assert_dirs_equal_kwargs=dict(ignore_ext=[".pdf"], variable_path_exts=[".zip"]),
+    )
+
+    # check gradescope zip file
+    check_gradescope_zipfile(
+        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 
+        FILE_MANAGER.get_path("gs-autograder-correct"),
+    )
+
+
+def test_r_example():
+    """
+    Checks that otter assign works for R notebooks correctly
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("r-example.ipynb"),
+        FILE_MANAGER.get_path("r-correct"),
+        assert_dirs_equal_kwargs=dict(ignore_ext=[".pdf"], variable_path_exts=[".zip"]),
+    )
+
+
+def test_rmd_example():
+    """
+    Checks that otter assign works for Rmd files
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("rmd-example.Rmd"),
+        FILE_MANAGER.get_path("rmd-correct"),
+        assert_dirs_equal_kwargs=dict(
+            ignore_ext=[".pdf"],
+            ignore_dirs=["rmd-example-sol_files"],
+            variable_path_exts=[".zip"],
+        ),
+    )
     
-    @patch.object(APIClient, "get_token")
-    def test_gradescope_example(self, mocked_client):
-        """
-        Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs.
-        Additionally, includes testing Gradescope integration.
-        """
-        # set a return value that does not match the token in the notebook, so we'll know if APIClient
-        # is called
-        mocked_client.return_value = 'token'  
+    # check gradescope zip file
+    check_gradescope_zipfile(
+        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 
+        FILE_MANAGER.get_path("rmd-autograder-correct"),
+    )
 
-        assign(TEST_FILES_PATH + "generate-gradescope.ipynb", TEST_FILES_PATH + "output", no_run_tests=True, v0=True)
-      
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "gs-correct", 
-            ignore_ext=[".pdf"], variable_path_exts=[".zip"])
 
-        # check gradescope zip file
-        self.check_gradescope_zipfile(
-            glob(TEST_FILES_PATH + "output/autograder/*.zip")[0], 
-            TEST_FILES_PATH + "gs-autograder-correct",
-        )
-
-    def test_r_example(self):
-        """
-        Checks that otter assign works for R notebooks correctly
-        """
-        assign(TEST_FILES_PATH + "r-example.ipynb", TEST_FILES_PATH + "output")
-
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "r-correct", 
-            ignore_ext=[".pdf"], variable_path_exts=[".zip"])
-
-    def test_rmd_example(self):
-        """
-        Checks that otter assign works for Rmd files
-        """
-        assign(TEST_FILES_PATH + "rmd-example.Rmd", TEST_FILES_PATH + "output")
-
-        self.assertDirsEqual(TEST_FILES_PATH + "output", TEST_FILES_PATH + "rmd-correct", 
-            ignore_ext=[".pdf"], ignore_dirs=["rmd-example-sol_files"], variable_path_exts=[".zip"])
-        
-        # check gradescope zip file
-        self.check_gradescope_zipfile(
-            glob(TEST_FILES_PATH + "output/autograder/*.zip")[0], 
-            TEST_FILES_PATH + "rmd-autograder-correct",
-        )
-
-    def test_point_value_rounding(self):
-        """
-        Tests that point values are rounded appropriately.
-        """
-        # sum(4 / 11 for _ in range(11)) evaluates to 4.000000000000001 in Python, so this will
-        # check that the per-test-case point values are correctly rounded.
-        points = determine_question_point_value({
-            "points": None,
-            "manual": False,
-        }, [Test("", "", False, 4 / 11, "", "") for _ in range(11)])
-        self.assertEqual(points, 4)
-
-    def tearDown(self):
-        """
-        Removes assign output
-        """
-        # cleanup
-        if os.path.exists(TEST_FILES_PATH + "output"):
-            shutil.rmtree(TEST_FILES_PATH + "output")
+def test_point_value_rounding():
+    """
+    Tests that point values are rounded appropriately.
+    """
+    # sum(4 / 11 for _ in range(11)) evaluates to 4.000000000000001 in Python, so this will
+    # check that the per-test-case point values are correctly rounded.
+    points = determine_question_point_value({
+        "points": None,
+        "manual": False,
+    }, [Test("", "", False, 4 / 11, "", "") for _ in range(11)])
+    assert points == 4

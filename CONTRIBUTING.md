@@ -23,30 +23,31 @@ Python and R.
 
 ## Running Tests
 
-To run the tests for Otter-Grader, the `test` directory can be run as a Python module:
+To run the tests for Otter-Grader, use the `test` `Makefile` target:
 
 ```
-python3 -m test
+make test
 ```
 
-To run the tests for a specific tool, add the subcommand for that tool to the command. For 
-example, to run the tests for `otter assign`, run
+Tests that require Docker or which run slowly are marked as such. To disable these tests when running
+the test suite, use `DOCKER=false` and `SLOW=false`, resp. Note that all Docker tests are also marked
+as slow, so `SLOW=false` will also skip Docker tests.
 
 ```
-python3 -m test assign
+make test DOCKER=false
+make test SLOW=false
 ```
 
-The one notable exception here is `otter generate`. To run the tests for `otter generate`, run
+To run a specific test file or function, use the `TESTPATH` argument:
 
 ```
-python3 -m test generate autograder
+make test TESTPATH=test/test_assign.py
 ```
 
-To run a specific test within a command, e.g. `test.test_assign.TestAssign.test_r_example`, add
-the suffix of the method name to the command:
+To run the coverage, use the `testcov` target.
 
 ```
-python3 -m test assign r_example
+make testcov
 ```
 
 

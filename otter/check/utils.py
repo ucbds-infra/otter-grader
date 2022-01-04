@@ -111,6 +111,14 @@ def grading_mode_disabled(wrapped, self, args, kwargs):
     return wrapped(*args, **kwargs)
 
 
+# TODO: use this class to replace tuple return values in logs_event
+# class LoggedEventReturnValue:
+#     def __init__(self, return_value, results=None, shelve_env=None):
+#         self.return_value = return_value
+#         self.results = results
+#         self.shelve_env = shelve_env
+
+
 def logs_event(event_type):
     """
     A decorator that ensures each call is logged in the Otter log with type ``event_type``.
