@@ -15,8 +15,8 @@ LOGGER = loggers.get_logger(__name__)
 
 
 def main(*, path="./", output_dir="./", autograder="./autograder.zip", containers=None, 
-         ext="ipynb", no_kill=False, debug=False, zips=False, image="ucbdsinfra/otter-grader", 
-         pdfs=False, verbose=False, prune=False, force=False, timeout=None, no_network=False):
+         ext="ipynb", no_kill=False,zips=False, image="ucbdsinfra/otter-grader", pdfs=False, 
+         prune=False, force=False, timeout=None, no_network=False):
     """
     Runs Otter Grade
 

@@ -9,6 +9,8 @@ from unittest import mock
 
 from otter import __version__
 from otter.cli import cli
+from otter.generate import main as generate
+from otter.grade import _ALLOWED_EXTENSIONS, main as grade
 
 
 @pytest.fixture()
@@ -38,6 +40,12 @@ def test_version(run_cli):
         result = run_cli(["--version"])
         assert result.exit_code == 0
         mocked_version.assert_called_once_with(logo=True)
+
+
+def test_verbosity(run_cli):
+    """
+    """
+    # TODO
 
 
 def test_assign(run_cli):
@@ -235,3 +243,222 @@ def test_export(run_cli):
         assert result.exit_code != 0
         assert re.search(r"Error: Invalid value for '-e' / '--exporter': invalid choice: .*\. " \
             r"\(choose from latex, html\)", result.output)
+
+
+def test_generate(run_cli):
+    """
+    Tests the ``otter generate`` CLI command.
+    """
+    cmd_start = ["generate"]
+
+    os.mkdir("tests")
+    open("otter_config.json", "w+").close()
+    open("requirements.txt", "w+").close()
+    open("environment.yml", "w+").close()
+
+    std_kwargs = dict(
+        **generate.__kwdefaults__,
+    )
+    std_kwargs["files"] = tuple()
+    std_kwargs.pop("assignment")
+    std_kwargs.pop("plugin_collection")
+
+    with mock.patch("otter.cli.generate") as mocked_generate:
+        result = run_cli([*cmd_start])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**std_kwargs)
+
+        os.mkdir("tests2")
+        result = run_cli([*cmd_start, "-t", "tests2"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "tests_dir": "tests2"})
+
+        result = run_cli([*cmd_start, "--tests-dir", "tests2"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "tests_dir": "tests2"})
+
+        result = run_cli([*cmd_start, "-o", "output.zip"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "output_path": "output.zip"})
+
+        result = run_cli([*cmd_start, "--output-path", "output.zip"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "output_path": "output.zip"})
+
+        result = run_cli([*cmd_start, "-c", "otter_config.json"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "config": "otter_config.json"})
+
+        result = run_cli([*cmd_start, "--config", "otter_config.json"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "config": "otter_config.json"})
+
+        result = run_cli([*cmd_start, "--no-config"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "no_config": True})
+
+        result = run_cli([*cmd_start, "-r", "requirements.txt"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "requirements": "requirements.txt"})
+
+        result = run_cli([*cmd_start, "--requirements", "requirements.txt"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "requirements": "requirements.txt"})
+
+        result = run_cli([*cmd_start, "--no-requirements"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "no_requirements": True})
+
+        result = run_cli([*cmd_start, "-e", "environment.yml"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "environment": "environment.yml"})
+
+        result = run_cli([*cmd_start, "--environment", "environment.yml"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "environment": "environment.yml"})
+
+        result = run_cli([*cmd_start, "--no-environment"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "no_environment": True})
+
+        result = run_cli([*cmd_start, "-l", "python"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "lang": "python"})
+
+        result = run_cli([*cmd_start, "--lang", "r"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "lang": "r"})
+
+        result = run_cli([*cmd_start, "--username", "foo", "--password", "bar"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "username": "foo", "password": "bar"})
+
+        result = run_cli([*cmd_start, "--token", "abc123"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "token": "abc123"})
+
+        result = run_cli([*cmd_start, "foo", "bar", "baz"])
+        assert result.exit_code == 0
+        mocked_generate.assert_called_with(**{**std_kwargs, "files": ("foo", "bar", "baz")})
+
+        # test invalid calls
+        result = run_cli(["generate", "-t", "tests3"])
+        assert result.exit_code != 0
+
+        result = run_cli(["generate", "-t", "otter_config.json"])
+        assert result.exit_code != 0
+
+        result = run_cli(["generate", "-c", "tests"])
+        assert result.exit_code != 0
+
+        result = run_cli(["generate", "-c", "bar.txt"])
+        assert result.exit_code != 0
+
+        result = run_cli(["generate", "-r", "tests"])
+        assert result.exit_code != 0
+
+        result = run_cli(["generate", "-r", "bar.txt"])
+        assert result.exit_code != 0
+
+        result = run_cli(["generate", "-e", "tests"])
+        assert result.exit_code != 0
+
+        result = run_cli(["generate", "-e", "bar.txt"])
+        assert result.exit_code != 0
+
+        result = run_cli(["generate", "-l", "bar"])
+        assert result.exit_code != 0
+
+
+def test_grade(run_cli):
+    """
+    Tests the ``otter grade`` CLI command.
+    """
+    cmd_start = ["grade"]
+
+    open("autograder.zip", "wb+").close()
+
+    std_kwargs = dict(
+        **grade.__kwdefaults__,
+    )
+
+    with mock.patch("otter.cli.grade") as mocked_grade:
+        result = run_cli([*cmd_start])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**std_kwargs)
+
+        os.mkdir("notebooks")
+        result = run_cli([*cmd_start, "-p", "notebooks"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "path": "notebooks"})
+
+        result = run_cli([*cmd_start, "--path", "notebooks"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "path": "notebooks"})
+
+        open("ag2.zip", "wb+").close()
+        result = run_cli([*cmd_start, "-a", "ag2.zip"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "autograder": "ag2.zip"})
+
+        result = run_cli([*cmd_start, "--autograder", "ag2.zip"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "autograder": "ag2.zip"})
+
+        os.mkdir("output")
+        result = run_cli([*cmd_start, "-o", "output"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "output_dir": "output"})
+
+        result = run_cli([*cmd_start, "--output-dir", "output"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "output_dir": "output"})
+
+        result = run_cli([*cmd_start, "-z"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "zips": True})
+
+        result = run_cli([*cmd_start, "--zips"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "zips": True})
+
+        for ext in _ALLOWED_EXTENSIONS:
+            result = run_cli([*cmd_start, "--ext", ext])
+            assert result.exit_code == 0
+            mocked_grade.assert_called_with(**{**std_kwargs, "ext": ext})
+
+        result = run_cli([*cmd_start, "--pdfs"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "pdfs": True})
+
+        
+
+
+
+        # # test invalid calls
+        # result = run_cli(["generate", "-t", "tests3"])
+        # assert result.exit_code != 0
+
+        # result = run_cli(["generate", "-t", "otter_config.json"])
+        # assert result.exit_code != 0
+
+        # result = run_cli(["generate", "-c", "tests"])
+        # assert result.exit_code != 0
+
+        # result = run_cli(["generate", "-c", "bar.txt"])
+        # assert result.exit_code != 0
+
+        # result = run_cli(["generate", "-r", "tests"])
+        # assert result.exit_code != 0
+
+        # result = run_cli(["generate", "-r", "bar.txt"])
+        # assert result.exit_code != 0
+
+        # result = run_cli(["generate", "-e", "tests"])
+        # assert result.exit_code != 0
+
+        # result = run_cli(["generate", "-e", "bar.txt"])
+        # assert result.exit_code != 0
+
+        # result = run_cli(["generate", "-l", "bar"])
+        # assert result.exit_code != 0
