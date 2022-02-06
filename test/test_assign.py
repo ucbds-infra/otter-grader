@@ -21,6 +21,10 @@ from .utils import assert_dirs_equal, TestFileManager
 FILE_MANAGER = TestFileManager("test/test-assign")
 
 
+# prevent pytest from trying to collect the Test class
+Test.__test__ = False
+
+
 @pytest.fixture(autouse=True)
 def cleanup_output(cleanup_enabled):
     """

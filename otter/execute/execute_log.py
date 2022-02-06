@@ -2,7 +2,12 @@
 
 import re
 
-from IPython.core.inputsplitter import IPythonInputSplitter
+try:
+    from IPython.core.inputtransformer2 import TransformerManager
+    _IPYTHON_7 = True
+except ImportError:
+    from IPython.core.inputsplitter import IPythonInputSplitter
+    _IPYTHON_7 = False
 from unittest import mock
 
 from ..utils import get_variable_type
@@ -52,8 +57,12 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
             if cell['cell_type'] == 'code':
                 # transform the input to executable Python
                 # FIXME: use appropriate IPython functions here
-                isp = IPythonInputSplitter(line_input_checker=False)
-                
+                if _IPYTHON_7:
+                    isp = TransformerManager()
+
+                else:
+                    isp = IPythonInputSplitter(line_input_checker=False)
+
                 code_lines = []
                 cell_source_lines = cell['source']
                 source_is_str_bool = False
@@ -62,6 +71,8 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
                     cell_source_lines = cell_source_lines.split('\n')
 
                 # only execute import statements
+                # TODO: this is a horrible implementation, make it better! maybe use an AST and
+                # astunparse?
                 cell_source_lines = [re.sub(r"^\s+", "", l) for l in cell_source_lines if "import" in l]                                
                 
                 for line in cell_source_lines:
