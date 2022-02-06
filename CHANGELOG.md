@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Made `otter.check.utils.save_notebook` compatible with JupyterLab and RetroLab per [#448](https://github.com/ucbds-infra/otter-grader/issues/448)
+
 **v3.2.1:**
 
 * Display instructor-specified messages ahead of doctest messages per [#441](https://github.com/ucbds-infra/otter-grader/issues/441)
