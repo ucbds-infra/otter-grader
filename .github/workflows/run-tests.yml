@@ -4,9 +4,15 @@ name: Run tests
 
 on:
   push:
-    branches: [master, stable, beta]
+    branches:
+      - master
+      - stable
+      - beta
   pull_request:
-    branches: [master, stable, beta]
+    branches:
+      - master
+      - stable
+      - beta
 
 jobs:
   build:
