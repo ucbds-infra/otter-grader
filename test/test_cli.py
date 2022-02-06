@@ -1,5 +1,6 @@
 """Tests for ``otter.cli``"""
 
+import logging
 import os
 import pytest
 import re
@@ -11,6 +12,7 @@ from otter import __version__
 from otter.cli import cli
 from otter.generate import main as generate
 from otter.grade import _ALLOWED_EXTENSIONS, main as grade
+from otter.run import main as run
 
 
 @pytest.fixture()
@@ -44,8 +46,24 @@ def test_version(run_cli):
 
 def test_verbosity(run_cli):
     """
+    Tests setting the verbosity of Otter's message logging system.
     """
-    # TODO
+    open("foo.ipynb", "w+").close()
+
+    with mock.patch("otter.cli.loggers") as mocked_loggers, \
+            mock.patch("otter.cli.assign"):
+        run_cli(["assign", "foo.ipynb", "dist"])
+        mocked_loggers.set_level.assert_called_with(logging.WARNING)
+
+        run_cli(["assign", "foo.ipynb", "dist", "-v"])
+        mocked_loggers.set_level.assert_called_with(logging.INFO)
+
+        run_cli(["assign", "foo.ipynb", "dist", "-vv"])
+        mocked_loggers.set_level.assert_called_with(logging.DEBUG)
+
+        run_cli(["assign", "foo.ipynb", "dist", "-vvv"])
+        mocked_loggers.set_level.assert_called_with(logging.DEBUG)
+
 
 
 def test_assign(run_cli):
@@ -95,15 +113,20 @@ def test_assign(run_cli):
         mocked_assign.assert_called_with(**{**std_kwargs, "v0": True})
 
         # test invalid calls
+        mocked_assign.reset_mock()
+
         result = run_cli(["assign", "bar.ipynb", result])
         assert result.exit_code != 0
+        mocked_assign.assert_not_called()
 
         os.mkdir("bar")
         result = run_cli(["assign", "bar", result])
         assert result.exit_code != 0
+        mocked_assign.assert_not_called()
 
         result = run_cli(["assign", "foo.ipynb"])
         assert result.exit_code != 0
+        mocked_assign.assert_not_called()
 
 
 def test_check(run_cli):
@@ -150,14 +173,19 @@ def test_check(run_cli):
         mocked_check.assert_called_with(**{**std_kwargs, "seed": 1})
 
         # test invalid calls
+        mocked_check.reset_mock()
+
         result = run_cli(["check"])
         assert result.exit_code != 0
+        mocked_check.assert_not_called()
 
         result = run_cli(["check", "tests2"])
         assert result.exit_code != 0
+        mocked_check.assert_not_called()
 
         result = run_cli(["check", file, "-t", "tests3"])
         assert result.exit_code != 0
+        mocked_check.assert_not_called()
 
         open("foo.txt", "w+").close()
         result = run_cli(["check", file, "-t", "foo.txt"])
@@ -168,6 +196,7 @@ def test_check(run_cli):
         result = run_cli(["check", file, "--seed", "foo"])
         assert result.exit_code != 0
         assert "Error: Invalid value for '--seed': foo is not a valid integer" in result.output
+        mocked_check.assert_not_called()
 
 
 def test_export(run_cli):
@@ -227,22 +256,28 @@ def test_export(run_cli):
         mocked_export.assert_called_with(**{**std_kwargs, "exporter": "html"})
 
         # test invalid calls
+        mocked_export.reset_mock()
+
         result = run_cli(["export"])
         assert result.exit_code != 0
+        mocked_export.assert_not_called()
 
         result = run_cli(["export", "bar.ipynb"])
         assert result.exit_code != 0
         assert re.search(r"Error: Invalid value for 'SRC': File '.*' does not exist\.", result.output)
+        mocked_export.assert_not_called()
 
         os.mkdir("bar")
         result = run_cli(["export", "bar"])
         assert result.exit_code != 0
         assert re.search(r"Error: Invalid value for 'SRC': File '.*' is a directory\.", result.output)
+        mocked_export.assert_not_called()
 
         result = run_cli(["export", src, "-e", "foo"])
         assert result.exit_code != 0
         assert re.search(r"Error: Invalid value for '-e' / '--exporter': invalid choice: .*\. " \
             r"\(choose from latex, html\)", result.output)
+        mocked_export.assert_not_called()
 
 
 def test_generate(run_cli):
@@ -342,32 +377,43 @@ def test_generate(run_cli):
         mocked_generate.assert_called_with(**{**std_kwargs, "files": ("foo", "bar", "baz")})
 
         # test invalid calls
+        mocked_generate.reset_mock()
+
         result = run_cli(["generate", "-t", "tests3"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
         result = run_cli(["generate", "-t", "otter_config.json"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
         result = run_cli(["generate", "-c", "tests"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
         result = run_cli(["generate", "-c", "bar.txt"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
         result = run_cli(["generate", "-r", "tests"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
         result = run_cli(["generate", "-r", "bar.txt"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
         result = run_cli(["generate", "-e", "tests"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
         result = run_cli(["generate", "-e", "bar.txt"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
         result = run_cli(["generate", "-l", "bar"])
         assert result.exit_code != 0
+        mocked_generate.assert_not_called()
 
 
 def test_grade(run_cli):
@@ -431,34 +477,94 @@ def test_grade(run_cli):
         assert result.exit_code == 0
         mocked_grade.assert_called_with(**{**std_kwargs, "pdfs": True})
 
-        
+        result = run_cli([*cmd_start, "--containers", "10"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "containers": 10})
+
+        result = run_cli([*cmd_start, "--image", "foo"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "image": "foo"})
+
+        result = run_cli([*cmd_start, "--timeout", "300"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "timeout": 300})
+
+        result = run_cli([*cmd_start, "--no-network"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "no_network": True})
+
+        result = run_cli([*cmd_start, "--no-kill"])
+        assert result.exit_code == 0
+        mocked_grade.assert_called_with(**{**std_kwargs, "no_kill": True})
+
+        # test invalid calls
+        mocked_grade.reset_mock()
+
+        result = run_cli([*cmd_start, "--ext", "foo"])
+        assert result.exit_code != 0
+        mocked_grade.assert_not_called()
+
+        result = run_cli([*cmd_start, "--containers", "foo"])
+        assert result.exit_code != 0
+        mocked_grade.assert_not_called()
+
+        result = run_cli([*cmd_start, "--timeout", "foo"])
+        assert result.exit_code != 0
+        mocked_grade.assert_not_called()
 
 
+def test_run(run_cli):
+    """
+    Tests the ``otter run`` CLI command.
+    """
+    cmd_start = ["run", "foo.ipynb"]
 
-        # # test invalid calls
-        # result = run_cli(["generate", "-t", "tests3"])
-        # assert result.exit_code != 0
+    open("foo.ipynb", "w+").close()
+    open("autograder.zip", "wb+").close()
 
-        # result = run_cli(["generate", "-t", "otter_config.json"])
-        # assert result.exit_code != 0
+    std_kwargs = dict(
+        submission="foo.ipynb",
+        **run.__kwdefaults__,
+    )
 
-        # result = run_cli(["generate", "-c", "tests"])
-        # assert result.exit_code != 0
+    with mock.patch("otter.cli.run") as mocked_run:
+        result = run_cli([*cmd_start])
+        assert result.exit_code == 0
+        mocked_run.assert_called_with(**std_kwargs)
 
-        # result = run_cli(["generate", "-c", "bar.txt"])
-        # assert result.exit_code != 0
+        open("foo.zip", "wb+").close()
+        result = run_cli([*cmd_start, "-a", "foo.zip"])
+        assert result.exit_code == 0
+        mocked_run.assert_called_with(**{**std_kwargs, "autograder": "foo.zip"})
 
-        # result = run_cli(["generate", "-r", "tests"])
-        # assert result.exit_code != 0
+        result = run_cli([*cmd_start, "--autograder", "foo.zip"])
+        assert result.exit_code == 0
+        mocked_run.assert_called_with(**{**std_kwargs, "autograder": "foo.zip"})
 
-        # result = run_cli(["generate", "-r", "bar.txt"])
-        # assert result.exit_code != 0
+        os.mkdir("out")
+        result = run_cli([*cmd_start, "-o", "out"])
+        assert result.exit_code == 0
+        mocked_run.assert_called_with(**{**std_kwargs, "output_dir": "out"})
 
-        # result = run_cli(["generate", "-e", "tests"])
-        # assert result.exit_code != 0
+        result = run_cli([*cmd_start, "--output-dir", "out"])
+        assert result.exit_code == 0
+        mocked_run.assert_called_with(**{**std_kwargs, "output_dir": "out"})
 
-        # result = run_cli(["generate", "-e", "bar.txt"])
-        # assert result.exit_code != 0
+        result = run_cli([*cmd_start, "--no-logo"])
+        assert result.exit_code == 0
+        mocked_run.assert_called_with(**{**std_kwargs, "no_logo": True})
 
-        # result = run_cli(["generate", "-l", "bar"])
-        # assert result.exit_code != 0
+        result = run_cli([*cmd_start, "--debug"])
+        assert result.exit_code == 0
+        mocked_run.assert_called_with(**{**std_kwargs, "debug": True})
+
+        # test invalid calls
+        mocked_run.reset_mock()
+
+        result = run_cli([*cmd_start, "-a", "bar.zip"])
+        assert result.exit_code != 0
+        mocked_run.assert_not_called()
+
+        result = run_cli([*cmd_start, "-o", "bar"])
+        assert result.exit_code != 0
+        mocked_run.assert_not_called()
