@@ -8,3 +8,7 @@ exclude_lines =
 
     # Don't complain if tests don't hit defensive assertion code:
     raise NotImplementedError
+
+omit =
+    # This file is just calls otter.cli.cli
+    otter/__main__.py
