@@ -3,7 +3,6 @@
 import logging
 import os
 import pytest
-import re
 
 from click.testing import CliRunner
 from unittest import mock
@@ -190,12 +189,10 @@ def test_check(run_cli):
         open("foo.txt", "w+").close()
         result = run_cli(["check", file, "-t", "foo.txt"])
         assert result.exit_code != 0
-        assert re.search(
-            r"Invalid value for '-t' / '--tests-path': Directory '.*' is a file\.", result.output)
+        mocked_check.assert_not_called()
 
         result = run_cli(["check", file, "--seed", "foo"])
         assert result.exit_code != 0
-        assert "Error: Invalid value for '--seed': foo is not a valid integer" in result.output
         mocked_check.assert_not_called()
 
 
@@ -264,19 +261,15 @@ def test_export(run_cli):
 
         result = run_cli(["export", "bar.ipynb"])
         assert result.exit_code != 0
-        assert re.search(r"Error: Invalid value for 'SRC': File '.*' does not exist\.", result.output)
         mocked_export.assert_not_called()
 
         os.mkdir("bar")
         result = run_cli(["export", "bar"])
         assert result.exit_code != 0
-        assert re.search(r"Error: Invalid value for 'SRC': File '.*' is a directory\.", result.output)
         mocked_export.assert_not_called()
 
         result = run_cli(["export", src, "-e", "foo"])
         assert result.exit_code != 0
-        assert re.search(r"Error: Invalid value for '-e' / '--exporter': invalid choice: .*\. " \
-            r"\(choose from latex, html\)", result.output)
         mocked_export.assert_not_called()
 
 
