@@ -19,3 +19,4 @@ gs-testing-stuff
 .OTTER_LOG
 docs/tutorial/dist
 docs/_static/notebooks/html
+arm-Dockerfile
