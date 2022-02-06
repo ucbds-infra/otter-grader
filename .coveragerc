@@ -12,3 +12,6 @@ exclude_lines =
 omit =
     # This file is just calls otter.cli.cli
     otter/__main__.py
+
+    # This file is a copy of an external script and is not tested as part of Otter
+    otter/plugins/builtin/gmail_notifications/bin/gmail_oauth2.py
