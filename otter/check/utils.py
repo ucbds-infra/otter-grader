@@ -26,21 +26,26 @@ def save_notebook(filename, timeout=10):
     Returns
         ``bool``: whether the notebook was saved successfully
     """
-    timeout = timeout * 10**9
     if get_ipython() is not None:
-        with open(filename, "rb") as f:
-            md5 = hashlib.md5(f.read()).hexdigest()
-        start = time.time_ns()
-        display(Javascript("Jupyter.notebook.save_checkpoint();"))
+        orig_mod_time = os.path.getmtime(filename)
+        start = time.time()
+        display(Javascript("""
+            if (typeof Jupyter !== 'undefined') {
+                Jupyter.notebook.save_checkpoint();
+            }
+            else {
+                document.querySelector('[data-command="docmanager:save"]').click();
+            }
+        """))
 
-        curr = md5
-        while curr == md5 and time.time_ns() - start <= timeout:
-            time.sleep(1)
-            with open(filename, "rb") as f:
-                curr = hashlib.md5(f.read()).hexdigest()
+        while time.time() - start < timeout:
+            curr_mod_time = os.path.getmtime(filename)
+            if orig_mod_time < curr_mod_time and os.path.getsize(filename) > 0:
+                return True
 
+            time.sleep(0.2)
 
-        return curr != md5
+        return False
 
     return True
 
