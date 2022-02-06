@@ -15,3 +15,6 @@ omit =
 
     # This file is a copy of an external script and is not tested as part of Otter
     otter/plugins/builtin/gmail_notifications/bin/gmail_oauth2.py
+
+    # The Assign v0 format is deprecated and will be removed in v5
+    otter/assign/v0/*
