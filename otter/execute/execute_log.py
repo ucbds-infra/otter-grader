@@ -50,7 +50,7 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
 
     logged_questions = []
     m = mock.mock_open()
-    with mock.patch("otter.Notebook._log_event", m):
+    with mock.patch("otter.Notebook._log_event", m):  # TODO: switch to grading_mode
         exec(source, global_env)
 
         for cell in nb['cells']:
@@ -63,6 +63,7 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
                 else:
                     isp = IPythonInputSplitter(line_input_checker=False)
 
+                # TODO: use otter.utils.get_source
                 code_lines = []
                 cell_source_lines = cell['source']
                 source_is_str_bool = False
