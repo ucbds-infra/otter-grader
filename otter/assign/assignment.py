@@ -83,8 +83,7 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {
         "key": "seed",
         "description": "intercell seeding configurations",
-        "default": None,
-        "subkeys": [
+        "default": [
             {
                 "key": "variable",
                 "description": "a variable name to override with the autograder seed during grading",
