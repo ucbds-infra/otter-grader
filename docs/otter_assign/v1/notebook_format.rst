@@ -63,15 +63,19 @@ defaults) is ``export_cell``.
       force_save: false            # whether to force-save the notebook with JavaScript (only works in classic notebook)
       run_tests: false             # whether to run student submissions against local tests during export
     seed:                          # intercell seeding configurations
-      variable: null               # grading configurations to be passed to Otter Generate as an otter_config.json; if false, Otter Generate is disabled
-      autograder_value: null       # whether to save the student's environment in the log
-      student_value: null          # a mapping of variable names to type strings for serlizing environments
-    generate: false                # a list of modules to ignore variables from during environment serialization
-    save_environment: false        # a list of other files to include in the output directories and autograder
-    variables: {}                  # a list of other files only to include in the autograder
-    ignore_modules: []             # a list of plugin names and configurations
-    files: []                      # whether to store tests in separate .py files rather than in the notebook metadata
-    autograder_files: []           # whether this assignment will be run on Google Colab
+      variable: null               # a variable name to override with the autograder seed during grading
+      autograder_value: null       # the value of the autograder seed
+      student_value: null          # the value of the student seed
+    generate: false                # grading configurations to be passed to Otter Generate as an otter_config.json; if false, Otter Generate is disabled
+    save_environment: false        # whether to save the student's environment in the log
+    variables: {}                  # a mapping of variable names to type strings for serlizing environments
+    ignore_modules: []             # a list of modules to ignore variables from during environment serialization
+    files: []                      # a list of other files to include in the output directories and autograder
+    autograder_files: []           # a list of other files only to include in the autograder
+    plugins: []                    # a list of plugin names and configurations
+    test_files: false              # whether to store tests in separate .py files rather than in the notebook metadata
+    colab: false                   # whether this assignment will be run on Google Colab
+    show_question_points: false    # whether to add the question point values to the last cell of each question
 
 .. END YAML TARGET
 

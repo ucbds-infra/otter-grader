@@ -143,6 +143,7 @@ printed below for documenting each option.
     print_summary: true               # whether to print the grading summary
     print_score: true                 # whether to print out the submission score in the grading summary
     zips: false                       # whether zip files are being graded
+    channel_priority_strict: true     # whether to set conda's channel_priority config to strict in the setup.sh file
 
 .. END YAML TARGET
 
