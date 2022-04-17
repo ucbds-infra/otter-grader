@@ -9,6 +9,7 @@ PyYAML
 python-on-whales
 requests
 wrapt
+click
 
 # plugins
 google-api-python-client
