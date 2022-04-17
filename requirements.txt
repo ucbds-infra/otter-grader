@@ -3,11 +3,8 @@ ipykernel
 jinja2
 jupyter_client
 matplotlib
-nbconvert
 nbformat
 pandas
-pdfkit
-PyPDF2
 PyYAML
 python-on-whales
 requests

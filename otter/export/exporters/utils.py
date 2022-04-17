@@ -1,6 +1,4 @@
-"""
-Utils for Otter Export exporterss
-"""
+"""Utilities for Otter Export exporters"""
 
 import re
 import copy
@@ -8,12 +6,14 @@ import nbformat
 
 from ...utils import get_source
 
+
 BEGIN_QUESTION_REGEX = r"<!--\s*BEGIN QUESTION\s*-->"
 END_QUESTION_REGEX = r"<!--\s*END QUESTION\s*-->"
 NEW_PAGE_REGEX = r"<!--\s*NEW PAGE\s*-->"
 NEW_PAGE_MARKER = "#newpage"
 NEW_PAGE_CELL_SOURCE = f"<!-- {NEW_PAGE_MARKER} -->"
 NEW_PAGE_CLASS_NAME = "otter-page-break-after"
+
 
 def has_begin(line):
     """
@@ -34,6 +34,7 @@ def has_begin(line):
     """
     return bool(re.search(BEGIN_QUESTION_REGEX, line, flags=re.IGNORECASE))
 
+
 def has_end(line):
     """
     Returns whether a string contains an end question comment
@@ -53,6 +54,7 @@ def has_end(line):
     """
     return bool(re.search(END_QUESTION_REGEX, line, flags=re.IGNORECASE))
 
+
 def sub_end_for_new_page(line):
     """
     Subsitutes an end question comment for a newpage comment
@@ -71,6 +73,7 @@ def sub_end_for_new_page(line):
         ``str``: the line with the end question match substituted for the newpage comment
     """
     return re.sub(END_QUESTION_REGEX, NEW_PAGE_CELL_SOURCE, line)
+
 
 def notebook_pdf_generator(nb):
     """
