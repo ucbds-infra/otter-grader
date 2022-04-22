@@ -1,8 +1,5 @@
 dill
-ipykernel
 jinja2
-jupyter_client
-matplotlib
 nbformat
 pandas
 PyYAML
