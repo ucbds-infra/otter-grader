@@ -4,8 +4,6 @@ import datetime as dt
 import inspect
 import json
 import os
-import re
-import time
 import warnings
 import zipfile
 
@@ -15,8 +13,8 @@ from IPython.display import display, HTML
 from textwrap import indent
 
 from .logs import LogEntry, EventType, Log
-from .utils import colab_incompatible, grade_zip_file, grading_mode_disabled, list_available_tests, \
-    logs_event, resolve_test_info, running_on_colab, save_notebook
+from .utils import grade_zip_file, grading_mode_disabled, incompatible_with, IPythonInterpreter, \
+     list_available_tests, logs_event, resolve_test_info, save_notebook
 
 from ..execute import Checker
 from ..export import export_notebook
@@ -39,6 +37,8 @@ class Notebook(Loggable):
         tests_dir (``str``, optional): path to tests directory
         colab (``bool``, optional): whether this notebook is being run on Google Colab; if ``None``,
             this information is automatically parsed from IPython on creation
+        jupyterlite (``bool``, optional): whether this notebook is being run on JupyterLite; if
+            ``None``, this information is automatically parsed from IPython on creation
     """
 
     _grading_mode = False
@@ -47,13 +47,18 @@ class Notebook(Loggable):
     _tests_dir_override = None
 
     @logs_event(EventType.INIT)
-    def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
+    def __init__(self, nb_path=None, tests_dir="./tests", colab=None, jupyterlite=None):
         global _SHELVE
 
-        if colab is None:
-            colab = running_on_colab()
+        interpreter = None
+        if colab or IPythonInterpreter.COLAB.value.running():
+            interpreter = IPythonInterpreter.COLAB
+        elif jupyterlite or IPythonInterpreter.PYOLITE.value.running():
+            interpreter = IPythonInterpreter.PYOLITE
 
-        if colab and not os.path.isdir(tests_dir):
+        self._interpreter = interpreter
+
+        if self._interpreter is IPythonInterpreter.COLAB and not os.path.isdir(tests_dir):
             raise ValueError(f"Tests directory {tests_dir} does not exist")
 
         if type(self)._tests_dir_override is not None:
@@ -61,7 +66,6 @@ class Notebook(Loggable):
         else:
             self._path = tests_dir
 
-        self._colab = colab
         self._notebook = nb_path
         self._addl_files = []
         self._plugin_collections = {}
@@ -108,6 +112,7 @@ class Notebook(Loggable):
         Checker.disable_tracking()
         Checker.clear_results()
 
+    @incompatible_with(IPythonInterpreter.PYOLITE, throw_error=False)
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
         Logs an event
@@ -192,7 +197,7 @@ class Notebook(Loggable):
         self._logger.debug(f"Resolved test name: {test_name}")
 
         # raise an error for a metadata test on Colab
-        if test_name is not None and self._colab:
+        if test_name is not None and self._interpreter is IPythonInterpreter.COLAB:
             raise ValueError(f"Test {question} does not exist")
 
         # ensure that desired test exists
@@ -210,7 +215,7 @@ class Notebook(Loggable):
 
         return question, result, global_env
 
-    @colab_incompatible
+    @incompatible_with(IPythonInterpreter.COLAB)
     def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the plugin ``plugin_name`` with the specified arguments. Use ``nb_path`` if the path
@@ -235,7 +240,7 @@ class Notebook(Loggable):
         pc.run("from_notebook", *args, **kwargs)
 
     @grading_mode_disabled
-    @colab_incompatible
+    @incompatible_with(IPythonInterpreter.COLAB)
     @logs_event(EventType.TO_PDF)
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
         """
@@ -277,7 +282,7 @@ class Notebook(Loggable):
             display(HTML(out_html))
 
     @grading_mode_disabled
-    @colab_incompatible
+    @incompatible_with(IPythonInterpreter.COLAB)
     def add_plugin_files(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the ``notebook_export`` event of the plugin ``plugin_name`` and tracks the file paths
@@ -302,7 +307,7 @@ class Notebook(Loggable):
         self._addl_files.extend(addl_files)
 
     @grading_mode_disabled
-    @colab_incompatible
+    @incompatible_with(IPythonInterpreter.COLAB)
     @logs_event(EventType.END_EXPORT)
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
             display_link=True, force_save=False, run_tests=False):

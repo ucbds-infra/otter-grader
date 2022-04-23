@@ -8,6 +8,7 @@ import tempfile
 import time
 import wrapt
 
+from enum import Enum
 from glob import glob
 from IPython import get_ipython
 from IPython.display import display, Javascript
@@ -78,26 +79,48 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
         os.remove(results_path)
 
 
-def running_on_colab():
+class IPythonInterpreter(Enum):
     """
-    Determine whether the current environment is running on Google Colab by checking the IPython
-    interpreter.
+    An enum of different types of IPython interpreters.
+    """
 
-    Returns:
-        ``bool``: whether the current environment is on Google Colab
-    """
-    return "google.colab" in str(get_ipython())
+    class Interpreter:
+        """
+        """
+
+        def __init__(self, check_str):
+            self.check_str = check_str
+
+        def running(self):
+            """
+            """
+            return self.check_str in str(get_ipython())
+
+    COLAB = Interpreter("google.colab")
+    """the Google Colab interpreter"""
+
+    PYOLITE = Interpreter("pyolite.")
+    """the JupyterLite interpreter"""
 
 
-@wrapt.decorator
-def colab_incompatible(wrapped, self, args, kwargs):
+def incompatible_with(interpreter, throw_error = True):
     """
-    A decator that raises an error if the wrapped function is called in an environment running on
-    Google Colab.
+    Create a decorator indicating that a method is incompatible with a specific interpreter.
     """
-    if self._colab:
-        raise RuntimeError("This method is not compatible with Google Colab")
-    return wrapped(*args, **kwargs)
+    @wrapt.decorator
+    def incompatible(wrapped, self, args, kwargs):
+        """
+        A decorator that raises an error or performs no action (depending on ``throw_error``) if the
+        wrapped function is called in an environment running on the specified interpreter.
+        """
+        if self._interpreter is interpreter:
+            if throw_error:
+                raise RuntimeError("This method is not compatible with Google Colab")
+            else:
+                return
+        return wrapped(*args, **kwargs)
+
+    return incompatible
 
 
 @wrapt.decorator

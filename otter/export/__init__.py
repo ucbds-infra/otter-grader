@@ -5,6 +5,7 @@ import os
 from .utils import WkhtmltopdfNotFoundError
 
 
+# TODO: convert to import_or_raise?
 # check for nbconvert and disable otter.export if it's not installed -- #458
 _MISSING_NBCONVERT = False
 try:
