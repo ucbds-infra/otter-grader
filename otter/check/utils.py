@@ -1,6 +1,5 @@
 """Utilities for Otter Check"""
 
-import dill
 import hashlib
 import json
 import os
@@ -17,6 +16,7 @@ from subprocess import run, PIPE
 from .logs import EventType
 
 from ..test_files import NOTEBOOK_METADATA_KEY
+from ..utils import import_or_raise
 
 
 def save_notebook(filename, timeout=10):
@@ -53,6 +53,8 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
     """
     Grade a submission zip file in a separate process and return the ``GradingResults`` object.
     """
+    dill = import_or_raise("dill")
+
     _, results_path = tempfile.mkstemp(suffix=".pkl")
 
     try:
