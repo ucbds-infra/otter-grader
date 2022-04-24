@@ -47,7 +47,14 @@ class Notebook(Loggable):
     _tests_dir_override = None
 
     @logs_event(EventType.INIT)
-    def __init__(self, nb_path=None, tests_dir="./tests", colab=None, jupyterlite=None):
+    def __init__(
+        self,
+        nb_path=None,
+        tests_dir="./tests",
+        tests_url_prefix=None,
+        colab=None,
+        jupyterlite=None,
+    ):
         global _SHELVE
 
         interpreter = None
@@ -67,6 +74,7 @@ class Notebook(Loggable):
             self._path = tests_dir
 
         self._notebook = nb_path
+        self._tests_url_prefix = tests_url_prefix
         self._addl_files = []
         self._plugin_collections = {}
 
@@ -191,7 +199,11 @@ class Notebook(Loggable):
         """
         self._logger.info(f"Running check for question: {question}")
         test_path, test_name = resolve_test_info(
-            self._path, self._resolve_nb_path(None, fail_silently=True), question)
+            self._path,
+            self._resolve_nb_path(None, fail_silently=True),
+            self._tests_url_prefix,
+            question,
+        )
 
         self._logger.debug(f"Resolved test path: {test_path}")
         self._logger.debug(f"Resolved test name: {test_name}")

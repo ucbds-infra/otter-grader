@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import requests
 import tempfile
 import time
 import wrapt
@@ -210,19 +211,38 @@ def list_available_tests(tests_dir, nb_path):
     return sorted(tests)
 
 
-def resolve_test_info(tests_dir, nb_path, question):
+def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
     """
     Determine the test path and test name.
+
+    If ``tests_url_prefix`` is specified, the test file is downloaded from the URL
+    ``{tests_url_prefix}/{question}.py`` and saved to the file ``{tests_dir}/{question}.py``. If
+    ``tests_dir`` does not already exist, it is created.
 
     Args:
         tests_dir (``str``): the path to the directory of tests
         nb_path (``str``): the path to the notebook
+        tests_url_prefix (``str | None``): the prefix of a URL to the test file
         question (``str``): the question name
 
     Returns:
         ``tuple[str, str]``: the test path and test name
     """
-    if tests_dir and os.path.isdir(tests_dir):
+    if tests_url_prefix is not None:
+        test_url = f"{tests_url_prefix}{'/' if not tests_url_prefix.endswith('/') else ''}{question}.py"
+        res = requests.get(test_url)
+        if res.status != 200:
+            raise ValueError(f"Unable to download test at {test_url}")
+
+        os.makedirs(tests_dir, exist_ok=True)
+
+        test_path = os.path.join(tests_dir, f"{question}.py")
+        test_name = None
+
+        with open(test_path, "w+") as f:
+            f.write(res.text)
+
+    elif tests_dir and os.path.isdir(tests_dir):
         if not os.path.isfile(os.path.join(tests_dir, question + ".py")):
             raise FileNotFoundError(f"Test {question} does not exist")
 
