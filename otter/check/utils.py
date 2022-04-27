@@ -229,10 +229,13 @@ def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
         ``tuple[str, str]``: the test path and test name
     """
     if tests_url_prefix is not None:
+        if not IPythonInterpreter.PYOLITE.value.running():
+            raise ValueError("Downloading test files from URLs is only supported on JupyterLite")
+
+        pyodide = import_or_raise("pyodide")
+
         test_url = f"{tests_url_prefix}{'/' if not tests_url_prefix.endswith('/') else ''}{question}.py"
-        res = requests.get(test_url)
-        if res.status != 200:
-            raise ValueError(f"Unable to download test at {test_url}")
+        text = pyodide.open_url(test_url).getvalue()
 
         os.makedirs(tests_dir, exist_ok=True)
 
@@ -240,7 +243,7 @@ def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
         test_name = None
 
         with open(test_path, "w+") as f:
-            f.write(res.text)
+            f.write(text)
 
     elif tests_dir and os.path.isdir(tests_dir):
         if not os.path.isfile(os.path.join(tests_dir, question + ".py")):
