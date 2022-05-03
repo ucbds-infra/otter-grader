@@ -46,6 +46,14 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
         prune_images(force=force)
         return
 
+    # if path leads to single file this indicates
+    # the case and changes path to the directory
+    # Note: path will not be changed if the path
+    # is a directory and not a file
+    single_file = False
+    if path.endswith(".ipynb"):
+        single_file = True
+    path = os.path.dirname(path)
     # check file paths
     assert_path_exists([
         (path, True),
@@ -81,3 +89,5 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
 
     # write to CSV file
     output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
+    if single_file:
+        return output_df["percent_correct"][0]
