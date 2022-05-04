@@ -189,19 +189,12 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
         with open(results_path, "rb") as f:
             scores = pickle.load(f)
 
-        scores = scores.to_dict()
+        scores_dict = scores.to_dict()
+        scores_dict["percent_correct"] = scores.total / scores.possible
 
-        scores_to_process = list(filter(lambda key: type(scores[key]) == dict, scores))
-        possible_points = 0
-        raw_score = 0
-        for q in scores_to_process:
-            possible_points += scores[q]["possible"]
-            raw_score += scores[q]["score"]
-        scores["percent_correct"] = round(raw_score / possible_points, 4)
-
-        scores = {t: [scores[t]["score"]] if type(scores[t]) == dict else scores[t] for t in scores}
-        scores["file"] = os.path.split(submission_path)[1]
-        df = pd.DataFrame(scores)
+        scores_dict = {t: [scores_dict[t]["score"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
+        scores_dict["file"] = os.path.split(submission_path)[1]
+        df = pd.DataFrame(scores_dict)
 
         if pdfs:
             os.makedirs(pdf_dir, exist_ok=True)

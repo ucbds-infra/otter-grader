@@ -7,6 +7,7 @@ import pytest
 import re
 import shutil
 import subprocess
+import tempfile
 import zipfile
 
 from glob import glob
@@ -205,3 +206,24 @@ def test_notebooks_with_pdfs(expected_points):
         [os.path.splitext(f)[0] for f in os.listdir("test/submission_pdfs") if not (os.path.isdir(os.path.join("test/submission_pdfs", f)))],
     )
     assert sorted(dir1_contents) == sorted(dir2_contents), f"'{FILE_MANAGER.get_path('notebooks/')}' and 'test/submission_pdfs' have different contents"
+
+@pytest.mark.slow
+@pytest.mark.docker
+def test_single_notebook_grade(expected_points):
+    """
+    Check that single notebook passed to grade returns percent.
+    """
+    test_single_file_path = f"{tempfile.gettempdir()}/passesAll.ipynb"
+    shutil.copy(FILE_MANAGER.get_path("notebooks/passesAll.ipynb"), test_single_file_path)
+    # grade the single notebook
+    with loggers.level_context(logging.DEBUG):
+        output = grade(
+            path = test_single_file_path, 
+            output_dir = "test/",
+            autograder = FILE_MANAGER.get_path("autograder.zip"),
+            containers = 1,
+            image = "otter-test",
+            pdfs = False,
+        )
+        os.remove(test_single_file_path)
+        assert output == 1.0

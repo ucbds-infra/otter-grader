@@ -48,12 +48,13 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
 
     # if path leads to single file this indicates
     # the case and changes path to the directory
-    # Note: path will not be changed if the path
-    # is a directory and not a file
+    # as well as updates the ext argument
     single_file = False
-    if path.endswith(".ipynb"):
+    if os.path.isfile(path):
         single_file = True
-    path = os.path.dirname(path)
+        ext = os.path.splitext(path)[1][1:] # remove the period from extension
+        path = os.path.dirname(path)
+
     # check file paths
     assert_path_exists([
         (path, True),
