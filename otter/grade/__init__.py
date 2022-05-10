@@ -3,6 +3,8 @@
 import os
 import pandas as pd
 import re
+import shutil
+import tempfile
 
 from .containers import launch_grade
 from .utils import merge_csv, prune_images
@@ -50,10 +52,16 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
     # the case and changes path to the directory
     # as well as updates the ext argument
     single_file = False
+    temp_file_path = ""
     if os.path.isfile(path):
         single_file = True
         ext = os.path.splitext(path)[1][1:] # remove the period from extension
-        path = os.path.dirname(path)
+        file = os.path.split(path)[1]
+        temp_dir = tempfile.gettempdir()
+        temp_file_path = f"{temp_dir}/{file}"
+        shutil.copy(path, temp_file_path)
+        path = temp_dir
+
 
     # check file paths
     assert_path_exists([
@@ -91,4 +99,5 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
     # write to CSV file
     output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
     if single_file:
+        os.remove(temp_file_path)
         return output_df["percent_correct"][0]

@@ -217,9 +217,8 @@ def test_single_notebook_grade(expected_points):
                     'q2b':2.0, 'q7':1.0, 'percent_correct':1.0, 'file':'passesAll.ipynb'}]
     df = pd.DataFrame(data)
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
-    expected_notebook_path_dir = os.path.dirname(notebook_path)
     kw_expected = {
-             "submissions_dir": expected_notebook_path_dir, 
+             "submissions_dir": mock.ANY, 
              "num_containers": 1, 
              "ext": 'ipynb', 
              "no_kill":False, 
