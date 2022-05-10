@@ -7,7 +7,7 @@ import pytest
 import re
 import shutil
 import subprocess
-import tempfile
+from unittest import mock
 import zipfile
 
 from glob import glob
@@ -213,17 +213,35 @@ def test_single_notebook_grade(expected_points):
     """
     Check that single notebook passed to grade returns percent.
     """
-    test_single_file_path = f"{tempfile.gettempdir()}/passesAll.ipynb"
-    shutil.copy(FILE_MANAGER.get_path("notebooks/passesAll.ipynb"), test_single_file_path)
-    # grade the single notebook
-    with loggers.level_context(logging.DEBUG):
-        output = grade(
-            path = test_single_file_path, 
-            output_dir = "test/",
-            autograder = FILE_MANAGER.get_path("autograder.zip"),
-            containers = 1,
-            image = "otter-test",
-            pdfs = False,
-        )
-        os.remove(test_single_file_path)
+    data =  [{'q1': 2.0, 'q2':2.0, 'q3':2.0, 'q4':1.0, 'q6':5.0, \
+                    'q2b':2.0, 'q7':1.0, 'percent_correct':1.0, 'file':'passesAll.ipynb'}]
+    df = pd.DataFrame(data)
+    notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
+    expected_notebook_path_dir = os.path.dirname(notebook_path)
+    kw_expected = {
+             "submissions_dir": expected_notebook_path_dir, 
+             "num_containers": 1, 
+             "ext": 'ipynb', 
+             "no_kill":False, 
+             "output_path":'test/', 
+             "zips":False, 
+             "image":'otter-test', 
+             "pdfs":False, 
+             "timeout": None, 
+             "network": True
+    }
+
+    kws = {
+        "path": notebook_path, 
+        "output_dir": "test/",
+        "autograder": notebook_path,
+        "containers": 1,
+        "image" : "otter-test",
+        "pdfs" : False
+    }
+
+    with mock.patch("otter.grade.launch_grade") as mocked_launch_grade:
+        mocked_launch_grade.return_value = [df]
+        output = grade(**kws)
+        mocked_launch_grade.assert_called_with(notebook_path, **kw_expected)
         assert output == 1.0
