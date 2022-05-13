@@ -55,13 +55,12 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
     temp_file_path = ""
     if os.path.isfile(path):
         single_file = True
-        ext = os.path.splitext(path)[1][1:] # remove the period from extension
+        ext = os.path.splitext(path)[1][1:]  # remove the period from extension
         file = os.path.split(path)[1]
-        temp_dir = tempfile.gettempdir()
+        temp_dir = tempfile.mkdtemp(prefix="otter_")
         temp_file_path = f"{temp_dir}/{file}"
         shutil.copy(path, temp_file_path)
         path = temp_dir
-
 
     # check file paths
     assert_path_exists([
@@ -99,5 +98,5 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
     # write to CSV file
     output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
     if single_file:
-        os.remove(temp_file_path)
+        shutil.rmtree(temp_dir)
         return output_df["percent_correct"][0]

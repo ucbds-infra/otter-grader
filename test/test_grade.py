@@ -207,8 +207,7 @@ def test_notebooks_with_pdfs(expected_points):
     )
     assert sorted(dir1_contents) == sorted(dir2_contents), f"'{FILE_MANAGER.get_path('notebooks/')}' and 'test/submission_pdfs' have different contents"
 
-@pytest.mark.slow
-@pytest.mark.docker
+
 def test_single_notebook_grade(expected_points):
     """
     Check that single notebook passed to grade returns percent.
@@ -218,16 +217,16 @@ def test_single_notebook_grade(expected_points):
     df = pd.DataFrame(data)
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
     kw_expected = {
-             "submissions_dir": mock.ANY, 
-             "num_containers": 1, 
-             "ext": 'ipynb', 
-             "no_kill":False, 
-             "output_path":'test/', 
-             "zips":False, 
-             "image":'otter-test', 
-             "pdfs":False, 
-             "timeout": None, 
-             "network": True
+        "submissions_dir": mock.ANY,
+        "num_containers": 1,
+        "ext": 'ipynb',
+        "no_kill": False,
+        "output_path": 'test/',
+        "zips": False,
+        "image": 'otter-test',
+        "pdfs": False,
+        "timeout": None,
+        "network": True
     }
 
     kws = {
