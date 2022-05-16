@@ -245,7 +245,7 @@ def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=False):
                         suite['cases'].pop(i)
                         if isinstance(test['points'], list):
                             test['points'].pop(i)
-            write_test({}, f, test, use_file=True)
+            write_test({}, f, test, use_file=True) # TODO: fix
     else:
         tests = nb["metadata"].get(NOTEBOOK_METADATA_KEY, {}).get("tests", {})
         for tn, test in tests.items():

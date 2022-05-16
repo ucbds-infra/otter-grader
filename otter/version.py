@@ -1,12 +1,12 @@
-"""
-Otter-Grader version and printable logo
-"""
+"""Version and printable logo"""
 
 import sys
 
 from textwrap import dedent
 
+
 __version__ = "3.2.1"
+
 
 LOGO_WITH_VERSION = f"""\
   _________        __          __               
@@ -19,6 +19,7 @@ LOGO_WITH_VERSION = f"""\
  \_________/       \ __|       \ __|    \______|  |__|
                                                 v{__version__}
 """
+
 
 def print_version_info(logo=False):
     """

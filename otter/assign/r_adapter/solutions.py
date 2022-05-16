@@ -1,10 +1,7 @@
 """Solution removal for Otter Assign for R notebooks"""
 
-import copy
 import re
 
-from ..constants import MD_RESPONSE_CELL_SOURCE
-from ..utils import get_source
 
 solution_assignment_regex = re.compile(r"(\s*[\w. $()]*(=|<-))(.*) ?# ?SOLUTION")
 def solution_assignment_sub(match):

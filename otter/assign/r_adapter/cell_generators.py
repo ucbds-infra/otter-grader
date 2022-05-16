@@ -2,53 +2,61 @@
 
 import nbformat
 
+from ..cell_generators import CellFactory
 from ..utils import lock
 
 
-def gen_export_cells(nb_name, instruction_text):
+class RCellFactory(CellFactory):
     """
-    Generates export cells that instruct the student the run a code cell calling 
-    ``ottr::export`` to generate and download their submission. The Markdown cell contains:
+    """
 
-    .. code-block:: markdown
+    def create_init_cells(self):
+        return []
 
-        ## Submission
+    def create_check_all_cells(self):
+        return []
+
+    def create_export_cells(self):
+        """
+        Generates export cells that instruct the student the run a code cell calling 
+        ``ottr::export`` to generate and download their submission. The Markdown cell contains:
+
+        .. code-block:: markdown
+
+            ## Submission
+            
+            Make sure you have run all cells in your notebook in order before running the cell below, so 
+            that all images/graphs appear in the output. The cell below will generate a zipfile for you 
+            to submit. **Please save before exporting!**
+
+        Additional instructions can be appended to this cell by passing a string to ``instruction_text``.
+
+        The code cell contains:
+
+        .. code-block:: python
+
+            # Save your notebook first, then run this cell to export your submission.
+            ottr::export("path/to/notebook.ipynb")
         
-        Make sure you have run all cells in your notebook in order before running the cell below, so 
-        that all images/graphs appear in the output. The cell below will generate a zipfile for you 
-        to submit. **Please save before exporting!**
+        Returns:
+            ``list[nbformat.NotebookNode]``: generated export cells
+        """
+        export_cell_config = self._get_export_cell_config()
 
-    Additional instructions can be appended to this cell by passing a string to ``instruction_text``.
+        instructions = nbformat.v4.new_markdown_cell()
+        instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before " \
+        "running the cell below, so that all images/graphs appear in the output. The cell below will generate " \
+        "a zip file for you to submit. **Please save before exporting!**"
+        
+        if export_cell_config.get("instructions", ""):
+            instructions.source += '\n\n' + export_cell_config["instructions"]
 
-    The code cell contains:
+        export = nbformat.v4.new_code_cell()
+        source_lines = ["# Save your notebook first, then run this cell to export your submission."]
+        source_lines.append(f'ottr::export("{self.assignment.notebook_basename}")')
+        export.source = "\n".join(source_lines)
 
-    .. code-block:: python
+        lock(instructions)
+        lock(export)
 
-        # Save your notebook first, then run this cell to export your submission.
-        ottr::export("path/to/notebook.ipynb")
-    
-    Args:
-        instruction_text (``str``): extra instructions for students when exporting
-        **kwargs: a catch-all so that the API matches 
-            ``otter.assign.cell_generators.gen_export_cells``
-    
-    Returns:
-        ``list`` of ``nbformat.NotebookNode``: generated export cells
-    """
-    instructions = nbformat.v4.new_markdown_cell()
-    instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before " \
-    "running the cell below, so that all images/graphs appear in the output. The cell below will generate " \
-    "a zip file for you to submit. **Please save before exporting!**"
-    
-    if instruction_text:
-        instructions.source += '\n\n' + instruction_text
-
-    export = nbformat.v4.new_code_cell()
-    source_lines = ["# Save your notebook first, then run this cell to export your submission."]
-    source_lines.append(f'ottr::export("{nb_name}")')
-    export.source = "\n".join(source_lines)
-
-    lock(instructions)
-    lock(export)
-
-    return [instructions, export, nbformat.v4.new_markdown_cell(" ")]     # last cell is buffer
+        return [instructions, export, nbformat.v4.new_markdown_cell(" ")]     # last cell is buffer

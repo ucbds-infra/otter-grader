@@ -3,7 +3,6 @@
 __all__ = ["export_notebook", "grade_submission"]
 
 import os
-import sys
 import shutil
 import tempfile
 
@@ -42,7 +41,6 @@ def grade_submission(submission_path, ag_path="autograder.zip", quiet=False, deb
         ``otter.test_files.GradingResults``: the results object produced during the grading of the
             submission.
     """
-
     dp = tempfile.mkdtemp()
 
     if quiet:

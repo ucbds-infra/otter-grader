@@ -73,7 +73,7 @@ class RRunner(AbstractLanguageRunner):
 
     def add_seed_to_script(self, script_path):
         """
-        Add intercell seeding to an Rmd file.
+        Add a line calling ``set.seed`` to the top of the R script at the specified path.
         """
         with open(script_path) as f:
             script = f.read()
@@ -215,7 +215,6 @@ class RRunner(AbstractLanguageRunner):
                 client = None
 
             subm_path = self.resolve_submission_path()
-            ignore_errors = "FALSE" if self.options["debug"] else "TRUE"
             output = R_PACKAGES["ottr"].run_autograder(
                 subm_path, ignore_errors = not self.options["debug"])[0]
             scores = GradingResults.from_ottr_json(output)

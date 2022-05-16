@@ -346,6 +346,7 @@ class loggers:
     _instances = {}
     _log_level = logging.WARNING
 
+    @staticmethod
     def __new__(cls, *args, **kwargs):
         raise NotImplementedError("This class is not meant to be instantiated")
 
@@ -405,7 +406,7 @@ class loggers:
 
 class Loggable:
     """
-    A class for inheriting from which provides a logger via a class- and instance-accessible field.
+    A class for inheriting from that provides a logger via a class- and instance-accessible field.
     """
 
     _logger_instance = None
@@ -413,7 +414,7 @@ class Loggable:
     @classmethod
     def _load_logger(cls):
         """
-        Set-up the ``_logger`` field of the ``Notebook``.
+        Set-up the ``_logger`` field.
         """
         if cls._logger_instance is None:
             name = cls.__module__ + "." + cls.__name__
@@ -424,9 +425,7 @@ class Loggable:
         """
         ``logging.Logger``: the logger instance for this class
         """
-        self._load_logger()
-        return type(self)._logger_instance
-
+        return self._get_logger()
 
     @classmethod
     def _get_logger(cls):

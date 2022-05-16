@@ -2,20 +2,21 @@
 
 import copy
 import nbformat
-import os
-import pathlib
 
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
-from .cell_generators import (
-    add_export_tag_to_cell, gen_init_cell, gen_markdown_response_cell, gen_export_cells, 
-    gen_check_all_cell
-)
+from .cell_generators import add_export_tag_to_cell, CellFactory
 from .questions import add_point_value_info_to_cell, create_question_config
-from .r_adapter.cell_generators import gen_export_cells as gen_ottr_export_cells
+from .r_adapter.cell_generators import RCellFactory
 from .solutions import has_seed, SOLUTION_CELL_TAG
 from .tests import any_public_tests, determine_question_point_value
-from .utils import add_tag, AssignNotebookFormatException, EmptyCellException, get_source, \
-    is_cell_type, is_ignore_cell
+from .utils import add_tag, AssignNotebookFormatException, is_cell_type, is_ignore_cell
+
+
+def create_cell_factory(assignment):
+    """
+    """
+    CellFactoryClass = RCellFactory if assignment.is_r else CellFactory
+    return CellFactoryClass(assignment)
 
 
 def transform_notebook(nb, assignment):
@@ -34,11 +35,13 @@ def transform_notebook(nb, assignment):
     """
     transformed_cells, test_files = get_transformed_cells(nb['cells'], assignment)
 
-    if assignment.init_cell and assignment.is_python:
-        transformed_cells = [gen_init_cell(assignment.master.name, assignment.colab)] + transformed_cells
+    cell_factory = create_cell_factory(assignment)
 
-    if assignment.check_all_cell and assignment.is_python:
-        transformed_cells += gen_check_all_cell()
+    if assignment.init_cell:
+        transformed_cells = cell_factory.create_init_cells() + transformed_cells
+
+    if assignment.check_all_cell:
+        transformed_cells += cell_factory.create_check_all_cells()
 
     if assignment.export_cell:
         export_cell = assignment.export_cell
@@ -46,18 +49,7 @@ def transform_notebook(nb, assignment):
             export_cell = {}
 
         # TODO: convert export_cell to default dict
-        if assignment.is_python:
-            transformed_cells += gen_export_cells(
-                export_cell.get('instructions', ''), 
-                pdf = export_cell.get('pdf', True),
-                filtering = export_cell.get('filtering', True),
-                force_save = export_cell.get('force_save', False),
-                run_tests = export_cell.get('run_tests', False))
-
-        elif assignment.is_r:
-            transformed_cells += gen_ottr_export_cells(
-                assignment.notebook_basename,
-                export_cell.get('instructions', ''))
+        transformed_cells += cell_factory.create_export_cells()
 
     transformed_nb = copy.deepcopy(nb)
     transformed_nb['cells'] = transformed_cells
@@ -86,6 +78,8 @@ def get_transformed_cells(cells, assignment):
         from otter.assign.r_adapter.tests import read_test, gen_test_cell
     else:
         from otter.assign.tests import read_test, gen_test_cell
+
+    cell_factory = create_cell_factory(assignment)
 
     curr_block = []  # allow nested blocks
     transformed_cells = []
@@ -143,7 +137,8 @@ def get_transformed_cells(cells, assignment):
                     if prompt_insertion_index is None:
                         # TODO: make this error nicer?
                         raise RuntimeError("Could not find prompt insertion index")
-                    transformed_cells.insert(prompt_insertion_index, gen_markdown_response_cell())
+                    transformed_cells.insert(
+                        prompt_insertion_index, cell_factory.create_markdown_response_cell())
                     has_prompt = True
 
             continue  # if this is an end to the last nested block, we're OK
