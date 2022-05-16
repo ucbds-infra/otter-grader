@@ -171,6 +171,9 @@ def test_colab():
             grader.export()
 
 
+# TODO: test for jupyterlite
+
+
 def test_grading_mode():
     """
     Check that a call to a grading-mode-disabled method is not executed.

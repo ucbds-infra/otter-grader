@@ -130,9 +130,10 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
         "default": True,
     },
     {
-        "key": "colab",
-        "description": "whether this assignment will be run on Google Colab",
-        "default": False,
+        "key": "runs_on",
+        "description": "the interpreter this notebook will be run on if different from the " \
+            "default IPython interpreter (one of {'default', 'colab', 'jupyterlite'})",
+        "default": "default",
     },
 ]
 

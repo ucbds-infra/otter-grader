@@ -8,19 +8,21 @@ import nbformat
 from .constants import MD_RESPONSE_CELL_SOURCE
 from .utils import get_source, lock
 
-def gen_init_cell(nb_name, colab):
+def gen_init_cell(nb_name, runs_on):
     """
     Generates a cell to initialize Otter in the notebook.
 
     Args:
         nb_name (``str``): the name of the notebook being graded
-        colab (``bool``): whether the notebook will be run on Colab
+        runs_on (``str``): the interpreter that the notebook will be run on
     
     Returns:
         ``nbformat.NotebookNode``: the init cell
     """
-    if colab:
+    if runs_on.lower() == "colab":
         args = "colab=True"
+    elif runs_on.lower() == "jupyterlite":
+        args = "jupyterlite=True"
     else:
         args  = f"\"{nb_name}\""
     contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
