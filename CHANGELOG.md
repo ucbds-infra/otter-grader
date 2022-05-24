@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v3.3.0:**
 
 * Made `otter.check.utils.save_notebook` compatible with JupyterLab and RetroLab per [#448](https://github.com/ucbds-infra/otter-grader/issues/448)
 * Add `libmagick++-dev` to Gradescope R autograding image
