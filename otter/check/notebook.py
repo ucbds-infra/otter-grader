@@ -275,8 +275,9 @@ class Notebook(Loggable):
             saved = save_notebook(nb_path)
             if not saved:
                 warnings.warn(
-                    "Could not force-save notebook; the results of this call will be based on the last "
-                    "saved version of this notebook."
+                    "Couldn't automatically save the notebook; we recommend using File > Save & "
+                    "Checkpoint and then re-running this cell. The zip file returned by this call "
+                    "will use the last saved version of this notebook."
                 )
             else:
                 self._logger.debug("Force-save successful")
@@ -352,8 +353,9 @@ class Notebook(Loggable):
             saved = save_notebook(nb_path)
             if not saved:
                 warnings.warn(
-                    "Could not force-save notebook; the results of this call will be based on the last "
-                    "saved version of this notebook."
+                    "Couldn't automatically save the notebook; we recommend using File > Save & "
+                    "Checkpoint and then re-running this cell. The zip file returned by this call "
+                    "will use the last saved version of this notebook."
                 )
             else:
                 self._logger.debug("Force-save successful")
