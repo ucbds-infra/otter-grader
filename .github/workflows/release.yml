@@ -71,17 +71,6 @@ jobs:
           git commit -am 'release v${{ github.event.inputs.version }}'
           git push origin stable
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: |
-            ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
-            ucbdsinfra/otter-grader:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Create dist and push to PyPI
         env:
           TWINE_USERNAME: __token__
@@ -105,3 +94,14 @@ jobs:
         run: |
           hub pull-request -b ucbds-infra:master -h ucbds-infra:stable -l "release" -r chrispyles \
             -m "Release v${{ github.event.inputs.version }}"$'\n'$'\n'"Updates from the release of version ${{ github.event.inputs.version }}"
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
+            ucbdsinfra/otter-grader:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
