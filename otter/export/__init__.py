@@ -1,12 +1,17 @@
 """IPython notebook PDF Exporter forked from nb2pdf and gsExport"""
 
-import nbformat
-import nbconvert
 import os
-import pkg_resources
-import warnings
 
-from .exporters import get_exporter
+from .utils import WkhtmltopdfNotFoundError
+
+
+# TODO: convert to import_or_raise?
+# check for nbconvert and disable otter.export if it's not installed -- #458
+_MISSING_NBCONVERT = False
+try:
+    import nbconvert
+except ImportError:
+    _MISSING_NBCONVERT = True
 
 
 def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
@@ -23,7 +28,10 @@ def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
     Returns:
         ``str``: the path at which the PDF was written
     """
-    # notebook = load_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
+    if _MISSING_NBCONVERT:
+        raise ImportError("nbconvert is required for Otter Export but it could not be found")
+
+    from .exporters import get_exporter
 
     if dest is not None:
         pdf_name = dest

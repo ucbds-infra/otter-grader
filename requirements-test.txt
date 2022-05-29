@@ -5,3 +5,6 @@ tqdm
 codecov
 rpy2
 pytest
+jupyter_client
+ipykernel
+matplotlib

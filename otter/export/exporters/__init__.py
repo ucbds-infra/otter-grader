@@ -7,15 +7,14 @@ import shutil
 from .via_html import PDFViaHTMLExporter
 from .via_latex import PDFViaLatexExporter
 
+from ..utils import WkhtmltopdfNotFoundError
+
+
 EXPORTERS = {
     "html": PDFViaHTMLExporter,
     "latex": PDFViaLatexExporter,
 }
 
-class WkhtmltopdfNotFoundError(Exception):
-    """
-    Exception to throw when PDF via HTML is indicated but wkhtmltopdf is not found
-    """
 
 def get_exporter(exporter_type=None):
     """

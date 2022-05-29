@@ -10,8 +10,7 @@ import warnings
 from .assignment import Assignment
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
-from ...export import export_notebook
-from ...export.exporters import WkhtmltopdfNotFoundError
+from ...export import export_notebook, WkhtmltopdfNotFoundError
 from ...plugins import PluginCollection
 from ...utils import get_relpath, block_print
 

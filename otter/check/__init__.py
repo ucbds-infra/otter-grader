@@ -3,7 +3,6 @@
 import os
 
 from glob import glob
-from jinja2 import Template
 
 from .logs import LogEntry, EventType
 from .notebook import _OTTER_LOG_FILENAME
@@ -41,7 +40,7 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
     LOGGER.debug(f"LogEntry created successfully")
 
 
-def main(file,  *, tests_path="./tests", question=None, seed=None):
+def main(file, *, tests_path="./tests", question=None, seed=None):
     """
     Runs Otter Check
 
