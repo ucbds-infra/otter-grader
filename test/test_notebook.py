@@ -171,6 +171,35 @@ def test_colab():
             grader.export()
 
 
+def test_jupyterlite():
+    """
+    Checks that the ``Notebook`` class correctly disables methods on Google Colab.
+    """
+    tests_url_prefix = "https://domain.tld/"
+    grader = Notebook(tests_url_prefix=tests_url_prefix, jupyterlite=True)
+
+    # check for appropriate errors
+    with mock.patch("otter.check.notebook.LogEntry") as mocked_event:
+        grader._log_event()
+        mocked_event.assert_not_called()
+
+    with mock.patch("otter.check.utils.import_or_raise") as mocked_import, \
+            mock.patch("otter.check.utils.os") as mocked_os, \
+            mock.patch("otter.check.utils.open", mock.mock_open()) as mocked_open, \
+            mock.patch("otter.check.utils.IPythonInterpreter") as mocked_interp:
+        mocked_interp.PYOLITE.value.running.return_value = True
+        mocked_os.path.join.return_value = FILE_MANAGER.get_path("tests/q1.py")
+
+        grader.check("q1")
+
+        mocked_import.assert_called_with("pyodide")
+        mocked_pyodide = mocked_import.return_value
+        mocked_pyodide.open_url.assert_called_with(f"{tests_url_prefix}q1.py")
+        mocked_os.makedirs.assert_called_with("./tests", exist_ok=True)
+        mocked_open.assert_called_with(mocked_os.path.join.return_value, "w+")
+
+
+
 # TODO: test for jupyterlite
 
 

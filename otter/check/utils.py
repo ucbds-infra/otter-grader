@@ -96,18 +96,19 @@ class IPythonInterpreter(Enum):
         """
         """
 
-        def __init__(self, check_str):
+        def __init__(self, check_str, display_name):
             self.check_str = check_str
+            self.display_name = display_name
 
         def running(self):
             """
             """
             return self.check_str in str(get_ipython())
 
-    COLAB = Interpreter("google.colab")
+    COLAB = Interpreter("google.colab", "Google Colab")
     """the Google Colab interpreter"""
 
-    PYOLITE = Interpreter("pyolite.")
+    PYOLITE = Interpreter("pyolite.", "Jupyterlite")
     """the JupyterLite interpreter"""
 
 
@@ -123,7 +124,7 @@ def incompatible_with(interpreter, throw_error = True):
         """
         if self._interpreter is interpreter:
             if throw_error:
-                raise RuntimeError("This method is not compatible with Google Colab")
+                raise RuntimeError(f"This method is not compatible with {interpreter.value.display_name}")
             else:
                 return
         return wrapped(*args, **kwargs)
