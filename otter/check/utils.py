@@ -94,6 +94,10 @@ class IPythonInterpreter(Enum):
 
     class Interpreter:
         """
+        A class representing a flavor of IPython interpreter.
+
+        Contains attributes for an importable name substring (used to check which interpreter is
+        running) and a display name for error messages and the like.
         """
 
         def __init__(self, check_str, display_name):
@@ -102,6 +106,11 @@ class IPythonInterpreter(Enum):
 
         def running(self):
             """
+            Determine whether this interpreter is currently running by checking the string
+            representation of the return value of ``IPython.get_ipython``.
+
+            Returns:
+                ``bool``: whether this interpreter is running
             """
             return self.check_str in str(get_ipython())
 
