@@ -66,7 +66,7 @@ defaults) is ``export_cell``.
     autograder_files: []           # a list of other files only to include in the autograder
     plugins: []                    # a list of plugin names and configurations
     test_files: true               # whether to store tests in separate .py files rather than in the notebook metadata
-    colab: false                   # whether this assignment will be run on Google Colab
+    runs_on: default               # the interpreter this notebook will be run on if different from the default IPython interpreter (one of {'default', 'colab', 'jupyterlite'})
 
 .. END YAML TARGET
 

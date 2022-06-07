@@ -54,13 +54,13 @@ defaults) is ``export_cell``.
     solutions_pdf: false           # whether to generate a PDF of the solutions notebook
     template_pdf: false            # whether to generate a filtered Gradescope assignment template PDF
     init_cell: true                # whether to include an Otter initialization cell in the output notebooks
-    check_all_cell: true           # whether to include an Otter check-all cell in the output notebooks
+    check_all_cell: false          # whether to include an Otter check-all cell in the output notebooks
     export_cell:                   # whether to include an Otter export cell in the output notebooks
       instructions: ''             # additional submission instructions to include in the export cell
       pdf: true                    # whether to include a PDF of the notebook in the generated zip file
       filtering: true              # whether the generated PDF should be filtered
       force_save: false            # whether to force-save the notebook with JavaScript (only works in classic notebook)
-      run_tests: false             # whether to run student submissions against local tests during export
+      run_tests: true              # whether to run student submissions against local tests during export
     seed:                          # intercell seeding configurations
       variable: null               # a variable name to override with the autograder seed during grading
       autograder_value: null       # the value of the autograder seed
@@ -74,8 +74,9 @@ defaults) is ``export_cell``.
     plugins: []                    # a list of plugin names and configurations
     tests:                         # information about the structure and storage of tests
       files: false                 # whether to store tests in separate files, instead of the notebook metadata
-      ok_format: false             # whether the test cases are in OK-format (instead of the exception-based format)
-    colab: false                   # whether this assignment will be run on Google Colab
+      ok_format: true              # whether the test cases are in OK-format (instead of the exception-based format)
+    show_question_points: false    # whether to add the question point values to the last cell of each question
+    runs_on: default               # the interpreter this notebook will be run on if different from the default interpreter (one of {'default', 'colab', 'jupyterlite'})
 
 .. END YAML TARGET
 
@@ -594,6 +595,21 @@ Here is an example of plugin replacement in Otter Assign:
     <iframe src="../../_static/notebooks/html/assign-plugin.html"></iframe>
 
 *Note that student-facing plugins are not supported with R assignments.*
+
+
+Running on Non-standard Python Environments
+-------------------------------------------
+
+For non-standard Python notebook environments (which use their own interpreters, such as Colab or
+Jupyterlite), some Otter features are disabled and the the notebooks that are produced for running
+on those environments are slightly different. To indicate that the notebook produce by Otter Assign
+is going to be run in such an environment, use the ``runs_on`` assignment configuration. It
+currently supports these values:
+
+* ``default``, indicating a normal IPython environment (the default value)
+* ``colab``, indicating that the notebook will be used on Google Colab
+* ``jupyterlite``, indicating that the notebook will be used on Jupyterlite (or any environment
+  using the Pyolite kernel)
 
 
 Sample Notebook
