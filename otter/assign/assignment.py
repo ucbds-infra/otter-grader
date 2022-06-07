@@ -153,6 +153,11 @@ _DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS = [
                 "description": "whether the test cases are in OK-format (instead of the exception-based format)",
                 "default": True,
             },
+            {
+                "key": "url_prefix",
+                "description": "a URL prefix for where test files can be found for student use",
+                "default": None,
+            }
         ],
     },
     {
