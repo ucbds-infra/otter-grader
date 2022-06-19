@@ -27,8 +27,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     """
     assignment.notebook_basename = os.path.basename(str(output_nb_path))
 
-    with open(nb_path) as f:
-        nb = nbformat.read(f, as_version=NB_VERSION)
+    nb = nbformat.read(nb_path, as_version=NB_VERSION)
 
     if assignment.lang is None:
         try:

@@ -2,7 +2,7 @@
 
 import nbformat
 
-from ..cell_generators import CellFactory
+from ..cell_factory import CellFactory
 from ..utils import lock
 
 

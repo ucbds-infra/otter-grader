@@ -4,16 +4,24 @@ import copy
 import nbformat
 
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
-from .cell_generators import add_export_tag_to_cell, CellFactory
+from .cell_factory import CellFactory
 from .questions import add_point_value_info_to_cell, create_question_config
-from .r_adapter.cell_generators import RCellFactory
+from .r_adapter.cell_factory import RCellFactory
 from .solutions import has_seed, SOLUTION_CELL_TAG
 from .tests import any_public_tests, determine_question_point_value
-from .utils import add_tag, AssignNotebookFormatException, is_cell_type, is_ignore_cell
+from .utils import add_export_tag_to_cell, add_tag, AssignNotebookFormatException, is_cell_type, \
+    is_ignore_cell
 
 
 def create_cell_factory(assignment):
     """
+    Create a ``CellFactory`` for the provided assignment based on the language of the assignment.
+
+    Args:
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+
+    Returns:
+        ``otter.assign.cell_factory.CellFactory``: an instantiated cell factory
     """
     CellFactoryClass = RCellFactory if assignment.is_r else CellFactory
     return CellFactoryClass(assignment)
@@ -31,7 +39,6 @@ def transform_notebook(nb, assignment):
     Returns:
         ``tuple[nbformat.NotebookNode, dict]``: the transformed notebook and a dictionary mapping 
         test names to their parsed contents
-
     """
     transformed_cells, test_files = get_transformed_cells(nb['cells'], assignment)
 
@@ -78,8 +85,6 @@ def get_transformed_cells(cells, assignment):
         from otter.assign.r_adapter.tests import read_test, gen_test_cell
     else:
         from otter.assign.tests import read_test, gen_test_cell
-
-    cell_factory = create_cell_factory(assignment)
 
     curr_block = []  # allow nested blocks
     transformed_cells = []
@@ -138,7 +143,7 @@ def get_transformed_cells(cells, assignment):
                         # TODO: make this error nicer?
                         raise RuntimeError("Could not find prompt insertion index")
                     transformed_cells.insert(
-                        prompt_insertion_index, cell_factory.create_markdown_response_cell())
+                        prompt_insertion_index, CellFactory.create_markdown_response_cell())
                     has_prompt = True
 
             continue  # if this is an end to the last nested block, we're OK

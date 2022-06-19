@@ -1,14 +1,14 @@
 """Miscellaneous cell generators for Otter Assign"""
 
-import copy
 import nbformat
 
 from textwrap import dedent
 
 from .constants import MD_RESPONSE_CELL_SOURCE
-from .utils import get_source, lock
+from .utils import lock
 
 
+# TODO: update docstrings
 class CellFactory:
     """
     Attributes:
@@ -33,19 +33,6 @@ class CellFactory:
         cell = nbformat.v4.new_code_cell(contents)
         lock(cell)
         return [cell]
-
-    def create_markdown_response_cell(self):
-        """
-        Generates a Markdown response cell with the following contents:
-
-        .. code-block:: markdown
-
-            _Type your answer here, replacing this text._
-
-        Returns:
-            ``nbformat.NotebookNode``: the response cell
-        """
-        return [nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)]
 
     def create_check_all_cells(self):
         """
@@ -84,7 +71,6 @@ class CellFactory:
             export_cell_config = {}
         return export_cell_config
 
-    # TODO: get params from self.assignment
     def create_export_cells(self):
         """
         Generates export cells that instruct the student the run a code cell calling 
@@ -170,21 +156,16 @@ class CellFactory:
 
         return [instructions, export, nbformat.v4.new_markdown_cell(" ")]     # last cell is buffer
 
+    @staticmethod
+    def create_markdown_response_cell():
+        """
+        Generates a Markdown response cell with the following contents:
 
-def add_export_tag_to_cell(cell, end=False):
-    """
-    Adds an HTML comment to open or close question export for PDF filtering to the top of ``cell``.
-    ``cell`` should be a Markdown cell.
-    
-    Args:
-        cell (``nbformat.NotebookNode``): the cell to add the close export to
+        .. code-block:: markdown
 
-    Returns:
-        ``nbformat.NotebookNode``: the cell with the close export comment at the top
-    """
-    cell = copy.deepcopy(cell)
-    source = get_source(cell)
-    tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
-    source = [tag, ""] + source
-    cell['source'] = "\n".join(source)
-    return cell
+            _Type your answer here, replacing this text._
+
+        Returns:
+            ``nbformat.NotebookNode``: the response cell
+        """
+        return [nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)]

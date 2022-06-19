@@ -5,7 +5,6 @@ import datetime as dt
 import json
 import os
 import pathlib
-import pprint
 import re
 import shutil
 
@@ -355,8 +354,8 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
 @contextmanager
 def patch_copytree():
     """
-    A context manager patch for ``shutil.copytree` on WSL. Shamelessly stolen from https://bugs.python.org/issue38633
-    (see for more information)
+    A context manager patch for ``shutil.copytree` on WSL. Shamelessly stolen from
+    https://bugs.python.org/issue38633 (see for more information)
     """
     import errno, shutil
     orig_copyxattr = shutil._copyxattr
@@ -372,3 +371,22 @@ def patch_copytree():
     yield
 
     shutil._copyxattr = orig_copyxattr
+
+
+def add_export_tag_to_cell(cell, end=False):
+    """
+    Adds an HTML comment to open or close question export for PDF filtering to the top of ``cell``.
+    ``cell`` should be a Markdown cell.
+    
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to add the close export to
+
+    Returns:
+        ``nbformat.NotebookNode``: the cell with the close export comment at the top
+    """
+    cell = copy.deepcopy(cell)
+    source = get_source(cell)
+    tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
+    source = [tag, ""] + source
+    cell['source'] = "\n".join(source)
+    return cell

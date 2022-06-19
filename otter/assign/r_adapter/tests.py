@@ -3,7 +3,6 @@ ottr test adapters for Otter Assign
 """
 
 import re
-import pprint
 import yaml
 import nbformat
 
