@@ -6,12 +6,12 @@ from jinja2 import Template
 from textwrap import indent
 
 
+# TODO: cleanup
 NB_VERSION = 4
 BLOCK_QUOTE = "```"
 COMMENT_PREFIX = "#"
 TEST_HEADERS = ["TEST", "HIDDEN TEST"]
 ALLOWED_NAME = re.compile(r'[A-Za-z][A-Za-z0-9_]*')
-NB_VERSION = 4
 
 MD_RESPONSE_CELL_SOURCE = "_Type your answer here, replacing this text._"
 

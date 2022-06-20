@@ -12,6 +12,7 @@ PyYAML
 python-on-whales
 requests
 wrapt
+jupytext
 
 # plugins
 google-api-python-client
