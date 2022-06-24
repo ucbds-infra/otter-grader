@@ -3,6 +3,7 @@
 import copy
 import datetime as dt
 import json
+import nbformat as nbf
 import os
 import pathlib
 import re
@@ -390,3 +391,9 @@ def add_export_tag_to_cell(cell, end=False):
     source = [tag, ""] + source
     cell['source'] = "\n".join(source)
     return cell
+
+
+def cell_from_source(cell_type, source_lines):
+    """
+    """
+    return getattr(nbf.v4, f"new_{cell_type}_cell")("\n".join(source_lines))

@@ -10,6 +10,7 @@ import warnings
 from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
 from .plugins import replace_plugins_with_calls
+from .r_adapter.rmarkdown_converter import RMarkdownConverter
 from .solutions import overwrite_seed_vars, strip_ignored_lines, strip_solutions_and_output
 from .tests import write_tests
 from .utils import get_notebook_language, patch_copytree, remove_cell_ids
@@ -27,7 +28,10 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     """
     assignment.notebook_basename = os.path.basename(str(output_nb_path))
 
-    nb = nbformat.read(nb_path, as_version=NB_VERSION)
+    if assignment.is_rmd:
+        nb = RMarkdownConverter.read_as_notebook(nb_path) # TODO: change arg name?
+    else:
+        nb = nbformat.read(nb_path, as_version=NB_VERSION)
 
     if assignment.lang is None:
         try:
@@ -80,7 +84,10 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     remove_cell_ids(transformed_nb)
 
     # write notebook
-    nbformat.write(transformed_nb, str(output_nb_path))
+    if assignment.is_rmd:
+        RMarkdownConverter.write_as_rmd(transformed_nb, output_nb_path)
+    else:
+        nbformat.write(transformed_nb, str(output_nb_path))
 
     # copy files
     for file in assignment.files:
@@ -128,8 +135,11 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
 
     # strip solutions from student version
     student_nb_path = student_dir / nb_name
-    with open(student_nb_path) as f:
-        nb = nbformat.read(f, as_version=NB_VERSION)
+
+    if assignment.is_rmd:
+        nb = RMarkdownConverter.read_as_notebook(student_nb_path)
+    else:
+        nb = nbformat.read(student_nb_path, as_version=NB_VERSION)
 
     nb = strip_solutions_and_output(nb)
 
@@ -145,8 +155,10 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
 
     write_tests(nb, tests_dir, assignment.test_files, assignment, include_hidden=False)
 
-    with open(student_nb_path, "w") as f:
-        nbformat.write(nb, f)
+    if assignment.is_rmd:
+        RMarkdownConverter.write_as_rmd(nb, student_nb_path)
+    else:
+        nbformat.write(nb, student_nb_path)
 
 
 def write_output_directories(master_nb_path, result_dir, assignment):

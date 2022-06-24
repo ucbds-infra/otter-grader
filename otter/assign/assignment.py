@@ -180,7 +180,7 @@ class Assignment(fica.Config):
         default=False,
     )
 
-
+    lang = None
 
 
     # TODO: add in other defaults

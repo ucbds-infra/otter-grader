@@ -6,6 +6,7 @@ import pathlib
 import warnings
 
 from .assignment import Assignment
+from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
 from ..export import export_notebook
@@ -54,10 +55,9 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
     LOGGER.debug(f"Normalized master path: {master}")
     LOGGER.debug(f"Normalized result path: {result}")
 
-    if assignment.is_rmd:
-        from .rmarkdown_adapter.output import write_output_directories
-    else:
-        from .output import write_output_directories
+    # if assignment.is_rmd:
+    #     from .rmarkdown_adapter.output import write_output_directories
+    # else:
 
     with chdir(master.parent):
         LOGGER.info("Generating views")
