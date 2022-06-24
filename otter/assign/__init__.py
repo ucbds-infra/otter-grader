@@ -186,7 +186,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 seed = assignment.generate.get('seed', None)
 
             LOGGER.debug(f"Resolved seed for running tests: {seed}")
-            
+
             if assignment._otter_config is not None:
                 LOGGER.debug("Retrieving updated plugins from otter_config.json for running tests")
                 test_pc = PluginCollection(assignment._otter_config.get("plugins", []), output_nb_path, {})
