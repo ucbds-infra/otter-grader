@@ -3,12 +3,14 @@
 import jupytext
 import os
 import re
+import pprint
 
 import nbformat
 
 import sys
 sys.path.insert(0, ".")
 
+from copy import deepcopy
 from jupytext.config import JupytextConfiguration
 
 from otter.assign.utils import cell_from_source, get_source
@@ -39,22 +41,53 @@ class RMarkdownConverter:
         # from_index = 0
         in_comment = False
         # insert_at = None
+        in_solution_region, just_closed_solution_region = False, False
+        has_prompt = False
         for i, l in enumerate(lines):
+            if just_closed_solution_region:
+                just_closed_solution_region = False
+                if l == "":
+                    print("doing it")
+                    print(new_lines)
+                    continue
+
             if in_comment and l.strip() == HTML_COMMENT_END:
                     # new_lines.insert(insert_at, "<!-- #raw -->")
                     new_lines.append("<!-- #endraw -->")
                     in_comment = False
             elif l.startswith(HTML_COMMENT_START):
-                if HTML_COMMENT_END in l and CONFIG_START_REGEX.search(l): # CONFIG_START_REGEX prevents us from matching pdf export comment in ag notebooks
+                if HTML_COMMENT_END in l:
+                    if CONFIG_START_REGEX.search(l): # CONFIG_START_REGEX prevents us from matching pdf export comment in ag notebooks
                     # pre_comment_lines = lines[from_index:i]
                     # if any(pcl != "" for pcl in pre_comment_lines):
                     #     new_cells.append(cell_from_source("markdown", pre_comment_lines))
                     # raw_cell = cell_from_source("raw", [EXTRACT_COMMENT_REGEX.match(l).group(1)])
                     # new_cells.append(raw_cell)
                     # from_index = i + 1
-                    new_lines.append("<!-- #raw -->")
-                    new_lines.append(EXTRACT_COMMENT_REGEX.match(l).group(1))
-                    new_lines.append("<!-- #endraw -->")
+                        if "begin" in l.lower() and "prompt" in l.lower():
+                            has_prompt = True
+                            if new_lines[len(new_lines) - 1].strip() == "":
+                                new_lines.pop(len(new_lines) - 1)
+                        if has_prompt:
+                            if "begin" in l.lower() and "solution" in l.lower():
+                                has_prompt = False
+                                if new_lines[len(new_lines) - 1].strip() == "":
+                                    new_lines.pop(len(new_lines) - 1)
+                            elif "end" in l.lower() and "prompt" not in l.lower():
+                                has_prompt = False
+                        # if "begin" in l.lower() and ("prompt" in l.lower() or "solution" in l.lower()) and :
+                        #     has_prompt = True
+                        #     new_lines.pop(len(new_lines) - 1)
+                        new_lines.append("<!-- #raw -->")
+                        new_lines.append(EXTRACT_COMMENT_REGEX.match(l).group(1))
+                        new_lines.append("<!-- #endraw -->")
+                    else:
+                        if l == """<!-- #region tags=["otter_assign_solution_cell"] -->""":
+                            in_solution_region = True
+                        elif in_solution_region and l == "<!-- #endregion -->":
+                            print(l)
+                            in_solution_region, just_closed_solution_region = False, True
+                        new_lines.append(l)
                 elif l.strip() == HTML_COMMENT_START:
                     if i + 1 < len(lines) and CONFIG_START_REGEX.match(lines[i + 1]):
                         new_lines.append("<!-- #raw -->")
@@ -64,27 +97,39 @@ class RMarkdownConverter:
 
             else:
                 new_lines.append(l)
-        
+
         # if from_index < len(lines) - 1:
         #     new_cells.append(cell_from_source("markdown", lines[from_index:i]))
         assert not in_comment
 
+        print("\n".join(new_lines))
+
         nb = jupytext.reads("\n".join(new_lines), "Rmd", as_version=4) # TODO: use constant
         nb["metadata"]["kernelspec"] = {"language": "r"}
+        pprint.pprint(nb)
 
         nbformat.write(nb, "hw01-2-2-2.ipynb")
         return nb
 
     @staticmethod
-    def write_as_rmd(nb, rmd_path, strip_metadata=False):
+    def write_as_rmd(nb, rmd_path, has_solutions):
         """
         """
         if os.path.splitext(rmd_path)[1] != ".Rmd":
             raise ValueError("The provided path does not have the .Rmd extension")
+        pprint.pprint(nb)
 
         config = None
-        if strip_metadata:
-            config = JupytextConfiguration(cell_metadata_filter="-all")
+        # if strip_metadata:
+        # config = JupytextConfiguration(split_at_heading=True)
+
+        if not has_solutions:
+            nb = deepcopy(nb)
+            for i, cell in enumerate(nb["cells"]):
+                if i < len(nb["cells"]) - 1 and cell["cell_type"] == "markdown" and nb["cells"][i + 1]["cell_type"] == "markdown":
+                    cell["metadata"]["lines_to_next_cell"] = 0
+
+        print(jupytext.writes(nb, fmt="Rmd"))
 
         jupytext.write(nb, rmd_path, config=config)
 
