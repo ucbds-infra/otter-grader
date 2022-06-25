@@ -173,7 +173,10 @@ class CellFactory:
 
             _Type your answer here, replacing this text._
 
+        Note that, unlike the other methods, this method returns a single cell rather than a list of
+        cells.
+
         Returns:
             ``nbformat.NotebookNode``: the response cell
         """
-        return [nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)]
+        return nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)

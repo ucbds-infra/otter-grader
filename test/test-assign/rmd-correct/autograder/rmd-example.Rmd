@@ -19,7 +19,7 @@ rng_seed <- 42
 
 **Question 1.** Assign x to the smallest prime number.
 
-```{r}
+```{r tags=c("otter_assign_solution_cell")}
 x <- 2 # SOLUTION
 ```
 
@@ -29,12 +29,12 @@ x <- 2 # SOLUTION
 
 **Question 2.** Visualize the answer
 
-```{r}
+```{r tags=c("otter_assign_solution_cell")}
 set.seed(123) # SEED
 # BEGIN SOLUTION NO PROMPT
 x <- runif(100)
 y <- rnorm(100)
-data = data.frame(x, y)
+data <- data.frame(x, y)
 ggplot(data, aes(x=x, y=y)) +
     geom_point()
 # END SOLUTION
@@ -46,18 +46,18 @@ plt.plot(...);
 This cell is not part of a question.
 
 ```{r}
-y = 3
+y <- 3
 ```
 
 **Question 3.** Define `square` and assign `nine` to 3 squared.
 
-```{r}
-square = function(x) {
-    y = x * x # SOLUTION
+```{r tags=c("otter_assign_solution_cell")}
+square <- function(x) {
+    y <- x * x # SOLUTION
     return(y) # SOLUTION
 }
 
-nine = square(3) # SOLUTION
+nine <- square(3) # SOLUTION
 ```
 
 ```{r}
@@ -66,9 +66,14 @@ nine = square(3) # SOLUTION
 
 **Question 4.** What does equilateral mean?
 
-<!-- BEGIN SOLUTION -->
+
+_Type your answer here, replacing this text._
+
+<!-- #region tags=["otter_assign_solution_cell"] -->
 Having equal side lengths.
-<!-- END SOLUTION -->
+<!-- #endregion -->
+
+
 
 ```{r}
 # this isn't part of a question
@@ -78,8 +83,8 @@ Having equal side lengths.
 
 **Question 5.** Approximate the area and circumference of a circle with radius 3.
 
-```{r}
-pi = 3.14
+```{r tags=c("otter_assign_solution_cell")}
+pi <- 3.14
 if (TRUE) {
     # BEGIN SOLUTION
     radius = 3
@@ -88,7 +93,7 @@ if (TRUE) {
     print(paste0('A circle with radius', radius, 'has area', area))
 }
 
-circumference = function(r) {
+circumference <- function(r) {
     # BEGIN SOLUTION NO PROMPT
     return(2 * pi * r)
     # END SOLUTION
@@ -106,25 +111,23 @@ circumference = function(r) {
 
 _This question has a custom prompt below, so that prompt should be in the output. It also has no solution!_
 
-<!-- BEGIN PROMPT -->
 _Write your thing here._
-<!-- END PROMPT -->
 
-<!-- BEGIN SOLUTION NO PROMPT -->
-some thing
-<!-- END SOLUTION -->
 
 **Question 7:** What is the answer?
 
-<!-- BEGIN SOLUTION -->
+
+_Type your answer here, replacing this text._
+
+<!-- #region tags=["otter_assign_solution_cell"] -->
 42
-<!-- END SOLUTION -->
+<!-- #endregion -->
 
 **Question 8:** Test intercell seeding by generating 10 random $N(4,2)$ numbers.
 
-```{r}
+```{r tags=c("otter_assign_solution_cell")}
 set.seed(42) # SEED
-z = rnorm(10, 4, 2) # SOLUTION
+z <- rnorm(10, 4, 2) # SOLUTION
 z
 ```
 
@@ -133,3 +136,13 @@ z
 ```
 
 **You're done!**
+
+
+## Submission
+
+Make sure you have run all cells in your notebook in order before running the cell below, so that all images/graphs appear in the output. The cell below will generate a zip file for you to submit. **Please save before exporting!**
+
+```{r}
+# Save your notebook first, then run this cell to export your submission.
+ottr::export("rmd-example.Rmd")
+```

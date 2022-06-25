@@ -64,7 +64,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         output_nb_path = write_output_directories(master, result, assignment)
 
         # update seed variables
-        if isinstance(assignment.seed, dict):
+        if assignment.seed.variable:
             LOGGER.debug("Processing seed dict")
             if assignment.generate:
                 LOGGER.debug("Otter Generate configuration found while processing seed dict")
