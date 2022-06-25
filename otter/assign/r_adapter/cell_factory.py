@@ -46,9 +46,10 @@ class RCellFactory(CellFactory):
         export_cell_config = self._get_export_cell_config()
 
         instructions = nbformat.v4.new_markdown_cell()
-        instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before " \
-        "running the cell below, so that all images/graphs appear in the output. The cell below will generate " \
-        "a zip file for you to submit. **Please save before exporting!**"
+        instructions.source = "## Submission\n\nMake sure you have run all cells in your " \
+            "notebook in order before running the cell below, so that all images/graphs appear " \
+            "in the output. The cell below will generate a zip file for you to submit. **Please " \
+            "save before exporting!**"
         
         if export_cell_config.get("instructions", ""):
             instructions.source += '\n\n' + export_cell_config["instructions"]

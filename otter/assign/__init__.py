@@ -12,7 +12,7 @@ from .utils import run_tests, write_otter_config_file, run_generate_autograder
 from ..export import export_notebook
 from ..export.exporters import WkhtmltopdfNotFoundError
 from ..plugins import PluginCollection
-from ..utils import block_print, chdir, get_relpath, knit_rmd_file, loggers
+from ..utils import chdir, get_relpath, knit_rmd_file, loggers
 
 
 LOGGER = loggers.get_logger(__name__)

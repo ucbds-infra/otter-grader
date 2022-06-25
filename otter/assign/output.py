@@ -10,7 +10,7 @@ import warnings
 from .constants import NB_VERSION
 from .notebook_transformer import transform_notebook
 from .plugins import replace_plugins_with_calls
-from .r_adapter.rmarkdown_converter import RMarkdownConverter
+from .r_adapter import rmarkdown_converter
 from .solutions import overwrite_seed_vars, strip_ignored_lines, strip_solutions_and_output
 from .tests import write_tests
 from .utils import get_notebook_language, patch_copytree, remove_cell_ids
@@ -29,7 +29,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     assignment.notebook_basename = os.path.basename(str(output_nb_path))
 
     if assignment.is_rmd:
-        nb = RMarkdownConverter.read_as_notebook(nb_path) # TODO: change arg name?
+        nb = rmarkdown_converter.read_as_notebook(nb_path) # TODO: change arg name?
     else:
         nb = nbformat.read(nb_path, as_version=NB_VERSION)
 
@@ -85,7 +85,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
 
     # write notebook
     if assignment.is_rmd:
-        RMarkdownConverter.write_as_rmd(transformed_nb, output_nb_path, True)
+        rmarkdown_converter.write_as_rmd(transformed_nb, output_nb_path, True)
     else:
         nbformat.write(transformed_nb, str(output_nb_path))
 
@@ -137,7 +137,7 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
     student_nb_path = student_dir / nb_name
 
     if assignment.is_rmd:
-        nb = RMarkdownConverter.read_as_notebook(student_nb_path)
+        nb = rmarkdown_converter.read_as_notebook(student_nb_path)
     else:
         nb = nbformat.read(student_nb_path, as_version=NB_VERSION)
 
@@ -156,7 +156,7 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
     write_tests(nb, tests_dir, assignment.test_files, assignment, include_hidden=False)
 
     if assignment.is_rmd:
-        RMarkdownConverter.write_as_rmd(nb, student_nb_path, False)
+        rmarkdown_converter.write_as_rmd(nb, student_nb_path, False)
     else:
         nbformat.write(nb, student_nb_path)
 
