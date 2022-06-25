@@ -1,12 +1,11 @@
-"""
-Miscellaneous cell generators for Otter Assign
-"""
+"""Miscellaneous cell generators for Otter Assign"""
 
 import copy
 import nbformat
 
 from .constants import MD_RESPONSE_CELL_SOURCE
 from .utils import get_source, lock
+
 
 def gen_init_cell(nb_name, runs_on):
     """
@@ -30,6 +29,7 @@ def gen_init_cell(nb_name, runs_on):
     lock(cell)
     return cell
 
+
 def gen_markdown_response_cell():
     """
     Generates a Markdown response cell with the following contents:
@@ -42,6 +42,7 @@ def gen_markdown_response_cell():
         ``nbformat.NotebookNode``: the response cell
     """
     return nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)
+
 
 def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=False, run_tests=False):
     """
@@ -83,13 +84,22 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
     instructions = nbformat.v4.new_markdown_cell()
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before " \
     "running the cell below, so that all images/graphs appear in the output. The cell below will generate " \
-    "a zip file for you to submit. **Please save before exporting!**"
+    "a zip file for you to submit."
+
+    # only include save text if force_save is false
+    if not force_save:
+        instructions.source += " **Please save before exporting!**"
     
     if instruction_text:
         instructions.source += '\n\n' + instruction_text
 
     export = nbformat.v4.new_code_cell()
-    source_lines = ["# Save your notebook first, then run this cell to export your submission."]
+    source_lines = []
+
+    # only include save text if force_save is false
+    if not force_save:
+        source_lines.append("# Save your notebook first, then run this cell to export your submission.")
+
     args = []
     if not filtering:
         args += ["filtering=False"]
@@ -107,6 +117,7 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
     lock(export)
 
     return [instructions, export, nbformat.v4.new_markdown_cell(" ")]     # last cell is buffer
+
 
 def gen_check_all_cell():
     """
@@ -138,22 +149,8 @@ def gen_check_all_cell():
 
     return [instructions, check_all]
 
-def gen_close_export_cell():
-    """
-    Generates a Markdown cell to end question export for PDF filtering. The cell contains:
 
-    .. code-block:: markdown
-
-        <!-- END QUESTION -->
-    
-    Returns:
-        ``nbformat.NotebookNode``: new Markdown cell with ``<!-- END QUESTION -->``
-    """
-    cell = nbformat.v4.new_markdown_cell("<!-- END QUESTION -->")
-    lock(cell)
-    return cell
-
-def add_close_export_to_cell(cell):
+def add_export_tag_to_cell(cell, end=False):
     """
     Adds an HTML comment to close question export for PDF filtering to the top of ``cell``. ``cell``
     should be a Markdown cell. This adds ``<!-- END QUESTION-->`` as the first line of the cell.
@@ -166,7 +163,7 @@ def add_close_export_to_cell(cell):
     """
     cell = copy.deepcopy(cell)
     source = get_source(cell)
-    source = ["<!-- END QUESTION -->\n", "\n"] + source
+    tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
+    source = [tag, ""] + source
     cell['source'] = "\n".join(source)
     return cell
-

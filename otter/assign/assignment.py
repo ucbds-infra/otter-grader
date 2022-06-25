@@ -181,14 +181,16 @@ class Assignment(fica.Config):
         enforce_subkeys=True,
     )
 
-    colab: bool = fica.Key(
-        description="whether this assignment will be run on Google Colab",
-        default=False,
-    )
-
     show_question_points: bool = fica.Key(
         description="whether to add the question point values to the last cell of each question",
         default=False,
+    )
+
+    runs_on: str = fica.Key(
+        description= "the interpreter this notebook will be run on if different from the " \
+            "default interpreter (one of {'default', 'colab', 'jupyterlite'})",
+        default="default",
+        validator=fica.validators.choice(["default", "colab", "jupyterlite"])
     )
 
     # TODO: docstrings

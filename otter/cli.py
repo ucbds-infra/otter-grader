@@ -151,7 +151,10 @@ def grade_cli(*args, **kwargs):
     """
     Grade assignments locally using Docker containers.
     """
-    return grade(*args, **kwargs)
+    g = grade(*args, **kwargs)
+    if g is not None:
+        click.echo(g)
+    return g
 
 
 defaults = run.__kwdefaults__

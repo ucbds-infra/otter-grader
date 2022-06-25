@@ -11,6 +11,13 @@ _This section contains features that will be released into a pre-release version
 * Set `export_cell: run_tests: true` and `check_all_cell: false` as new defaults for Otter Assign per [#378](https://github.com/ucbds-infra/otter-grader/issues/378)
 * Made the v1 format of Otter Assign the default and added the `--v0` flag to the CLI
 * Converted logging in some of Otter's tooling from `print` statements to the `logging` library, and added verbosity flags to each command
+* Updated containerized grading to better handle grading single files
+* Made Otter compatible with Jupyterlite per [#458](https://github.com/ucbds-infra/otter-grader/issues/458)
+
+**v3.3.0:**
+
+* Made `otter.check.utils.save_notebook` compatible with JupyterLab and RetroLab per [#448](https://github.com/ucbds-infra/otter-grader/issues/448)
+* Add `libmagick++-dev` to Gradescope R autograding image
 
 **v3.2.1:**
 

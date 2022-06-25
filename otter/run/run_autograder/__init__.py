@@ -1,6 +1,5 @@
 """Autograding process internals for Otter-Grader"""
 
-import dill
 import os
 import json
 import pandas as pd
@@ -11,7 +10,7 @@ from glob import glob
 from .runners import create_runner
 from .utils import OtterRuntimeError
 from ...version import LOGO_WITH_VERSION
-from ...utils import chdir, loggers
+from ...utils import chdir, import_or_raise, loggers
 
 
 LOGGER = loggers.get_logger(__name__)
@@ -28,6 +27,8 @@ def main(autograder_dir, **kwargs):
             ``otter.run.run_autograder.constants.DEFAULT_OPTIONS``; these values override anything
             present in ``otter_config.json``
     """
+    dill = import_or_raise("dill")
+
     config_fp = os.path.join(autograder_dir, "source", "otter_config.json")
     if os.path.isfile(config_fp):
         with open(config_fp, encoding="utf-8") as f:

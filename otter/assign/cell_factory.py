@@ -4,6 +4,7 @@ import nbformat
 
 from textwrap import dedent
 
+from .assignment import Assignment
 from .constants import MD_RESPONSE_CELL_SOURCE
 from .feature_toggle import FeatureToggle
 from .utils import lock
@@ -15,6 +16,8 @@ class CellFactory:
     Attributes:
         assignment (``otter.assign.assignment.Assignment``): the assignment config
     """
+
+    assignment: Assignment
 
     def __init__(self, assignment):
         self.assignment = assignment
@@ -29,10 +32,13 @@ class CellFactory:
         Returns:
             ``list[nbformat.NotebookNode]``: the init cell
         """
-        if self.assignment.colab:
+        if self.assignment.runs_on == "colab":
             args = "colab=True"
+        elif self.assignment.runs_on == "jupyterlite":
+            args = "jupyterlite=True"
         else:
             args  = f"\"{self.assignment.master.name}\""
+
         contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
         cell = nbformat.v4.new_code_cell(contents)
         lock(cell)

@@ -34,7 +34,7 @@ def transform_notebook(nb, assignment):
     transformed_cells, test_files = get_transformed_cells(nb['cells'], assignment)
 
     if assignment.init_cell and assignment.is_python:
-        transformed_cells = [gen_init_cell(assignment.master.name, assignment.colab)] + transformed_cells
+        transformed_cells = [gen_init_cell(assignment.master.name, assignment.runs_on)] + transformed_cells
 
     if assignment.check_all_cell and assignment.is_python:
         transformed_cells += gen_check_all_cell()

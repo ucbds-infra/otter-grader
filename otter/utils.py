@@ -1,8 +1,8 @@
 """Various utilities for Otter-Grader"""
 
+import importlib
 import logging
 import os
-import sys
 import pathlib
 import random
 import re
@@ -12,6 +12,7 @@ import tempfile
 
 from collections.abc import Mapping
 from contextlib import contextmanager, redirect_stdout
+from functools import lru_cache
 from IPython import get_ipython
 
 
@@ -437,3 +438,15 @@ class Loggable:
         """
         cls._load_logger()
         return cls._logger_instance
+
+
+@lru_cache(None)
+def import_or_raise(module):
+    """
+    Import a module or raise an ``ImportError`` if it is unable to be imported. Return values are
+    stored in an LRU cache.
+    """
+    try:
+        return importlib.import_module(module)
+    except:
+        raise ImportError(f"Could not import required module: {module}")

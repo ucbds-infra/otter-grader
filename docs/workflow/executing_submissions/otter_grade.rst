@@ -107,6 +107,17 @@ and at the end of grading we would have
         ├── q2.py
         └── q3.py    # etc.
 
+To grade a single notebook(as opposed to all the notebooks in a directory), you can pass the path to the
+notebook file using the flag ``-p``. For example, using the directory structure above, the call looks
+like this:
+
+.. code-block:: console
+
+    otter grade -p "./nb0.ipynb"
+
+The usual information for this graded notebook is written to ``final_grades.csv`` but the percent correct is returned
+to the command-line from the call as well.
+
 To grade submissions that aren't notebook files, use the ``--ext`` flag, which accepts the file 
 extension to search for submissions with. For example, if we had the same example as above but with 
 Rmd files:

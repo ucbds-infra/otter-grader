@@ -6,6 +6,7 @@ import pytest
 import shutil
 import subprocess
 import tempfile
+import yaml
 import zipfile
 
 from contextlib import contextmanager
@@ -127,3 +128,14 @@ def unzip_to_temp(zf_path, delete_zip=False):
     shutil.rmtree(tempdir)
     if delete_zip:
         os.remove(zf_path)
+
+
+class _CorrectIndentationDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, *args, **kwargs):
+        return super().increase_indent(flow=flow, indentless=False)
+
+
+def dump_yaml(dct):
+    """
+    """
+    return yaml.dump(dct, sort_keys=False, Dumper=_CorrectIndentationDumper)

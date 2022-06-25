@@ -1,13 +1,14 @@
 """Utilities for Otter Check"""
 
-import dill
 import hashlib
 import json
 import os
+import requests
 import tempfile
 import time
 import wrapt
 
+from enum import Enum
 from glob import glob
 from IPython import get_ipython
 from IPython.display import display, Javascript
@@ -16,6 +17,7 @@ from subprocess import run, PIPE
 from .logs import EventType
 
 from ..test_files import NOTEBOOK_METADATA_KEY
+from ..utils import import_or_raise
 
 
 def save_notebook(filename, timeout=10):
@@ -29,21 +31,26 @@ def save_notebook(filename, timeout=10):
     Returns
         ``bool``: whether the notebook was saved successfully
     """
-    timeout = timeout * 10**9
     if get_ipython() is not None:
-        with open(filename, "rb") as f:
-            md5 = hashlib.md5(f.read()).hexdigest()
-        start = time.time_ns()
-        display(Javascript("Jupyter.notebook.save_checkpoint();"))
+        orig_mod_time = os.path.getmtime(filename)
+        start = time.time()
+        display(Javascript("""
+            if (typeof Jupyter !== 'undefined') {
+                Jupyter.notebook.save_checkpoint();
+            }
+            else {
+                document.querySelector('[data-command="docmanager:save"]').click();
+            }
+        """))
 
-        curr = md5
-        while curr == md5 and time.time_ns() - start <= timeout:
-            time.sleep(1)
-            with open(filename, "rb") as f:
-                curr = hashlib.md5(f.read()).hexdigest()
+        while time.time() - start < timeout:
+            curr_mod_time = os.path.getmtime(filename)
+            if orig_mod_time < curr_mod_time and os.path.getsize(filename) > 0:
+                return True
 
+            time.sleep(0.2)
 
-        return curr != md5
+        return False
 
     return True
 
@@ -52,6 +59,8 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
     """
     Grade a submission zip file in a separate process and return the ``GradingResults`` object.
     """
+    dill = import_or_raise("dill")
+
     _, results_path = tempfile.mkstemp(suffix=".pkl")
 
     try:
@@ -78,26 +87,58 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
         os.remove(results_path)
 
 
-def running_on_colab():
+class IPythonInterpreter(Enum):
     """
-    Determine whether the current environment is running on Google Colab by checking the IPython
-    interpreter.
+    An enum of different types of IPython interpreters.
+    """
 
-    Returns:
-        ``bool``: whether the current environment is on Google Colab
-    """
-    return "google.colab" in str(get_ipython())
+    class Interpreter:
+        """
+        A class representing a flavor of IPython interpreter.
+
+        Contains attributes for an importable name substring (used to check which interpreter is
+        running) and a display name for error messages and the like.
+        """
+
+        def __init__(self, check_str, display_name):
+            self.check_str = check_str
+            self.display_name = display_name
+
+        def running(self):
+            """
+            Determine whether this interpreter is currently running by checking the string
+            representation of the return value of ``IPython.get_ipython``.
+
+            Returns:
+                ``bool``: whether this interpreter is running
+            """
+            return self.check_str in str(get_ipython())
+
+    COLAB = Interpreter("google.colab", "Google Colab")
+    """the Google Colab interpreter"""
+
+    PYOLITE = Interpreter("pyolite.", "Jupyterlite")
+    """the JupyterLite interpreter"""
 
 
-@wrapt.decorator
-def colab_incompatible(wrapped, self, args, kwargs):
+def incompatible_with(interpreter, throw_error = True):
     """
-    A decator that raises an error if the wrapped function is called in an environment running on
-    Google Colab.
+    Create a decorator indicating that a method is incompatible with a specific interpreter.
     """
-    if self._colab:
-        raise RuntimeError("This method is not compatible with Google Colab")
-    return wrapped(*args, **kwargs)
+    @wrapt.decorator
+    def incompatible(wrapped, self, args, kwargs):
+        """
+        A decorator that raises an error or performs no action (depending on ``throw_error``) if the
+        wrapped function is called in an environment running on the specified interpreter.
+        """
+        if self._interpreter is interpreter:
+            if throw_error:
+                raise RuntimeError(f"This method is not compatible with {interpreter.value.display_name}")
+            else:
+                return
+        return wrapped(*args, **kwargs)
+
+    return incompatible
 
 
 @wrapt.decorator
@@ -185,19 +226,41 @@ def list_available_tests(tests_dir, nb_path):
     return sorted(tests)
 
 
-def resolve_test_info(tests_dir, nb_path, question):
+def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
     """
     Determine the test path and test name.
+
+    If ``tests_url_prefix`` is specified, the test file is downloaded from the URL
+    ``{tests_url_prefix}/{question}.py`` and saved to the file ``{tests_dir}/{question}.py``. If
+    ``tests_dir`` does not already exist, it is created.
 
     Args:
         tests_dir (``str``): the path to the directory of tests
         nb_path (``str``): the path to the notebook
+        tests_url_prefix (``str | None``): the prefix of a URL to the test file
         question (``str``): the question name
 
     Returns:
         ``tuple[str, str]``: the test path and test name
     """
-    if tests_dir and os.path.isdir(tests_dir):
+    if tests_url_prefix is not None:
+        if not IPythonInterpreter.PYOLITE.value.running():
+            raise ValueError("Downloading test files from URLs is only supported on JupyterLite")
+
+        pyodide = import_or_raise("pyodide")
+
+        test_url = f"{tests_url_prefix}{'/' if not tests_url_prefix.endswith('/') else ''}{question}.py"
+        text = pyodide.open_url(test_url).getvalue()
+
+        os.makedirs(tests_dir, exist_ok=True)
+
+        test_path = os.path.join(tests_dir, f"{question}.py")
+        test_name = None
+
+        with open(test_path, "w+") as f:
+            f.write(text)
+
+    elif tests_dir and os.path.isdir(tests_dir):
         if not os.path.isfile(os.path.join(tests_dir, question + ".py")):
             raise FileNotFoundError(f"Test {question} does not exist")
 

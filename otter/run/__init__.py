@@ -2,12 +2,13 @@
 
 import json
 import os
-import dill
 import shutil
 import tempfile
 import zipfile
 
 from .run_autograder import main as run_autograder
+
+from ..utils import import_or_raise
 
 
 def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=False, debug=False):
@@ -29,6 +30,7 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
     Returns:
         ``otter.test_files.GradingResults``: the grading results object
     """
+    dill = import_or_raise("dill")
     dp = tempfile.mkdtemp()
 
     try:

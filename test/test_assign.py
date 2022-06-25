@@ -1,21 +1,22 @@
 """Tests for ``otter.assign``"""
 
+import nbformat as nbf
 import os
 import pathlib
 import pytest
 import shutil
-import subprocess
+import tempfile
 
+from contextlib import contextmanager
 from glob import glob
 from unittest import mock
-from unittest.mock import patch
 
 from otter.assign import main as assign
 from otter.assign.tests import determine_question_point_value, Test
 from otter.generate.token import APIClient
 from otter.utils import nullcontext
 
-from .utils import assert_dirs_equal, TestFileManager
+from .utils import assert_dirs_equal, dump_yaml, TestFileManager, unzip_to_temp
 
 
 FILE_MANAGER = TestFileManager("test/test-assign")
@@ -28,7 +29,7 @@ def cleanup_output(cleanup_enabled):
     """
     yield
     if cleanup_enabled and os.path.exists(FILE_MANAGER.get_path("output")):
-            shutil.rmtree(FILE_MANAGER.get_path("output"))
+        shutil.rmtree(FILE_MANAGER.get_path("output"))
 
 
 @pytest.fixture(autouse=True)
@@ -41,30 +42,22 @@ def disable_pdf_generation(pdfs_enabled):
             open(dest, "wb+").close()
             return mock.DEFAULT
 
-        cm = patch("otter.assign.export_notebook", side_effect=create_fake_pdf)
-        cm2 = patch("otter.assign.v0.export_notebook", side_effect=create_fake_pdf)
-        cm3 = patch("otter.assign.knit_rmd_file", side_effect=create_fake_pdf)
+        cm1 = mock.patch("otter.assign.export_notebook", side_effect=create_fake_pdf)
+        cm2 = mock.patch("otter.assign.v0.export_notebook", side_effect=create_fake_pdf)
+        cm3 = mock.patch("otter.assign.knit_rmd_file", side_effect=create_fake_pdf)
 
     else:
-        cm, cm2 = nullcontext(), nullcontext()
+        cm1, cm2, cm3 = nullcontext(), nullcontext(), nullcontext()
 
-    with cm, cm2, cm3:
+    with cm1, cm2, cm3:
         yield
 
 
 def check_gradescope_zipfile(path, correct_dir_path):
-    ag_path = FILE_MANAGER.get_path("autograder")
-
-    # unzip the zipfile
-    unzip_command = ["unzip", "-o", path, "-d", ag_path]
-    unzip = subprocess.run(unzip_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    assert len(unzip.stderr) == 0, unzip.stderr.decode("utf-8")
-
-    assert_dirs_equal(ag_path, correct_dir_path)
-
-    # cleanup
-    if os.path.exists(ag_path):
-        shutil.rmtree(ag_path)
+    """
+    """
+    with unzip_to_temp(path) as unzipped_dir:
+        assert_dirs_equal(unzipped_dir, correct_dir_path)
 
 
 def assign_and_check_output(nb_path, correct_dir, assign_kwargs={}, assert_dirs_equal_kwargs={}):
@@ -73,6 +66,33 @@ def assign_and_check_output(nb_path, correct_dir, assign_kwargs={}, assert_dirs_
     output_path = FILE_MANAGER.get_path("output")
     assign(nb_path, output_path, **assign_kwargs)
     assert_dirs_equal(output_path, correct_dir, **assert_dirs_equal_kwargs)
+
+
+# TODO: refactor existing tests to use this
+@pytest.fixture
+def generate_master_notebook(cleanup_enabled):
+    """
+    Yields a function that generates a master notebook file with a specific assignment config and
+    returns the path at which the notebook was written. This fixture also deletes the notebook file
+    during cleanup.
+    """
+    nb_path = FILE_MANAGER.get_path("master.ipynb")
+
+    def generate_notebook(assignment_config):
+        if os.path.exists(nb_path):
+            raise RuntimeError(f"{nb_path} already exists")
+        nb = nbf.read(FILE_MANAGER.get_path("master-skeleton.ipynb"), as_version=nbf.NO_CONVERT)
+        config_cell = nbf.v4.new_raw_cell("# ASSIGNMENT CONFIG\n" + dump_yaml(assignment_config))
+        nb.cells.insert(0, config_cell)
+
+        nbf.write(nb, nb_path)
+
+        return nb_path
+
+    yield generate_notebook
+
+    if cleanup_enabled:
+        os.remove(nb_path)
 
 
 def test_convert_example():
@@ -110,7 +130,8 @@ def test_otter_example():
 
 def test_pdf_example():
     """
-    Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs
+    Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file
+    along with PDFs
     """
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-pdf.ipynb"),
@@ -120,11 +141,11 @@ def test_pdf_example():
     )
 
 
-@patch.object(APIClient, "get_token")
+@mock.patch.object(APIClient, "get_token")
 def test_gradescope_example(mocked_client):
     """
-    Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file along with PDFs.
-    Additionally, includes testing Gradescope integration.
+    Checks that otter assign filters and outputs correctly, as well as creates a correct .zip file
+    along with PDFs. Additionally, includes testing Gradescope integration.
     """
     # set a return value that does not match the token in the notebook, so we'll know if APIClient
     # is called
@@ -187,3 +208,13 @@ def test_point_value_rounding():
         "manual": False,
     }, [Test("", "", False, 4 / 11, "", "") for _ in range(11)])
     assert points == 4
+
+
+def test_jupyterlite(generate_master_notebook):
+    """
+    """
+    master_nb_path = generate_master_notebook({"runs_on": "jupyterlite"})
+    assign_and_check_output(
+        master_nb_path,
+        FILE_MANAGER.get_path("jupyterlite-correct")
+    )
