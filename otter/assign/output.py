@@ -156,7 +156,7 @@ def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
     write_tests(nb, tests_dir, assignment.test_files, assignment, include_hidden=False)
 
     if assignment.is_rmd:
-        RMarkdownConverter.write_as_rmd(nb, student_nb_path)
+        RMarkdownConverter.write_as_rmd(nb, student_nb_path, strip_metadata=True)
     else:
         nbformat.write(nb, student_nb_path)
 

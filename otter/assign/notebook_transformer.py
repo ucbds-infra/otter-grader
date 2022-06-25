@@ -104,7 +104,7 @@ def get_transformed_cells(cells, assignment):
 
         # check for assignment config
         if is_assignment_config_cell(cell):
-            assignment.update(get_cell_config(cell))
+            assignment.update_(get_cell_config(cell))
             continue
 
         # check for an end to the current block

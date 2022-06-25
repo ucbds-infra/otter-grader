@@ -1,6 +1,7 @@
 """Assignment configurations for Otter Assign"""
 
 import fica
+import pathlib
 import yaml
 
 from typing import Dict, List, Optional
@@ -11,6 +12,16 @@ from ..utils import convert_config_description_dict, Loggable, loggers, recursiv
 
 
 LOGGER = loggers.get_logger(__name__)
+
+# TODO: remove
+class MyConfig(fica.Config):
+
+    def get(self, attr, default):
+        return getattr(self, attr)
+
+    # TODO: add to fica
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
 
 
 class Assignment(fica.Config):
@@ -58,7 +69,7 @@ class Assignment(fica.Config):
         default=False,
     )
 
-    class ExportCellValue(fica.Config):
+    class ExportCellValue(MyConfig):
 
         instructions: str = fica.Key(
             description="additional submission instructions to include in the export cell",
@@ -91,7 +102,7 @@ class Assignment(fica.Config):
         subkey_container=ExportCellValue,
     )
 
-    class SeedValue(fica.Config):
+    class SeedValue(MyConfig):
 
         variable: Optional[str] = fica.Key(
             description="a variable name to override with the autograder seed during grading",
@@ -150,7 +161,7 @@ class Assignment(fica.Config):
         default=[],
     )
 
-    class TestsValue(fica.Config):
+    class TestsValue(MyConfig):
 
         files: bool = fica.Key(
             description="whether to store tests in separate files, instead of the notebook " \
@@ -180,8 +191,22 @@ class Assignment(fica.Config):
         default=False,
     )
 
-    lang = None
+    # TODO: docstrings
+    lang: Optional[str] = None
 
+    master: pathlib.Path = None
+
+    result: pathlib.Path = None
+
+    seed_required: bool = False
+
+    _otter_config = None # TODO: type
+
+    _temp_test_dir: Optional[str] = None
+
+    notebook_basename: Optional[str] = None
+
+    test_files: Dict = {}
 
     # TODO: add in other defaults
     defaults = {
