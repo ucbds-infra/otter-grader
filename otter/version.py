@@ -8,7 +8,7 @@ from textwrap import dedent
 __version__ = "3.2.1"
 
 
-LOGO_WITH_VERSION = f"""\
+LOGO_WITH_VERSION = fr"""
   _________        __          __               
  /  _____  \    __|  |__    __|  |__               
 |  /     \  |  |__    __|  |__    __|   _______    _  _____
@@ -18,7 +18,7 @@ LOGO_WITH_VERSION = f"""\
 |  \_____/  |     |  |_       |  |_    | |_____   |  |
  \_________/       \ __|       \ __|    \______|  |__|
                                                 v{__version__}
-"""
+"""[1:]  # remove beginning newline
 
 
 def print_version_info(logo=False):
