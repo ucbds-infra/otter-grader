@@ -4,6 +4,7 @@ import os
 import pathlib
 import pytest
 import shutil
+import subprocess
 import tempfile
 import zipfile
 
@@ -50,7 +51,8 @@ def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
                 c1, c2 = f1.read(), f2.read()
                 if ignore_trailing_whitespace:
                     c1, c2 = c1.rstrip(), c2.rstrip()
-                assert c1 == c2, f"Contents of {p1} did not equal contents of {p2}"
+                diff = subprocess.run(["diff", p1, p2], stdout=subprocess.PIPE).stdout.decode("utf-8")
+                assert c1 == c2, f"Contents of {p1} did not equal contents of {p2}:\n{diff}"
     
     except UnicodeDecodeError:
         with open(p1, "rb") as f1:

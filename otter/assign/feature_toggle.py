@@ -24,6 +24,6 @@ class FeatureToggle(Enum):
             return self.test(assignment)
 
     # TODO: allowed for R nbs? maybe enable because it should be harmless?
-    PDF_FILTERING_COMMENTS = FeatureToggleValue(lambda a: not a.is_r)
+    PDF_FILTERING_COMMENTS = FeatureToggleValue(lambda a: not a.is_rmd)
 
     EMPTY_MD_BOUNDARY_CELLS = FeatureToggleValue(lambda a: not a.is_rmd)
