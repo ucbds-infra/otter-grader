@@ -5,6 +5,7 @@ import nbformat
 from textwrap import dedent
 
 from .constants import MD_RESPONSE_CELL_SOURCE
+from .feature_toggle import FeatureToggle
 from .utils import lock
 
 
@@ -17,6 +18,9 @@ class CellFactory:
 
     def __init__(self, assignment):
         self.assignment = assignment
+
+    def check_feature_toggle(self, feature_toggle: FeatureToggle):
+        return feature_toggle.value.is_enabled(self.assignment)
 
     def create_init_cells(self):
         """
@@ -154,7 +158,11 @@ class CellFactory:
         lock(instructions)
         lock(export)
 
-        return [instructions, export, nbformat.v4.new_markdown_cell(" ")]     # last cell is buffer
+        cells = [instructions]
+        if self.check_feature_toggle(FeatureToggle.EMPTY_MD_BOUNDARY_CELLS):
+            cells.append(nbformat.v4.new_markdown_cell(" "))  # add buffer cell
+
+        return cells
 
     @staticmethod
     def create_markdown_response_cell():

@@ -5,12 +5,35 @@ import nbformat
 
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
 from .cell_factory import CellFactory
+from .feature_toggle import FeatureToggle
 from .questions import add_point_value_info_to_cell, create_question_config
 from .r_adapter.cell_factory import RCellFactory
 from .solutions import has_seed, SOLUTION_CELL_TAG
 from .tests import any_public_tests, determine_question_point_value
-from .utils import add_export_tag_to_cell, add_tag, AssignNotebookFormatException, is_cell_type, \
-    is_ignore_cell
+from .utils import add_tag, AssignNotebookFormatException, get_source, is_cell_type, is_ignore_cell
+
+
+def add_export_tag_to_cell(cell, assignment, end=False):
+    """
+    Adds an HTML comment to open or close question export for PDF filtering to the top of ``cell``.
+    ``cell`` should be a Markdown cell.
+    
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to add the close export to
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+
+    Returns:
+        ``nbformat.NotebookNode``: the cell with the close export comment at the top
+    """
+    if not FeatureToggle.PDF_FILTERING_COMMENTS.value.is_enabled(assignment):
+        return cell
+
+    cell = copy.deepcopy(cell)
+    source = get_source(cell)
+    tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
+    source = [tag, ""] + source
+    cell['source'] = "\n".join(source)
+    return cell
 
 
 def create_cell_factory(assignment):
@@ -233,18 +256,18 @@ def get_transformed_cells(cells, assignment):
         export_delim_cell = None
         if need_begin_export:
             if is_cell_type(cell, "markdown"):
-                cell = add_export_tag_to_cell(cell)
+                cell = add_export_tag_to_cell(cell, assignment)
             else:
                 export_delim_cell = nbformat.v4.new_markdown_cell()
-                export_delim_cell = add_export_tag_to_cell(export_delim_cell)
+                export_delim_cell = add_export_tag_to_cell(export_delim_cell, assignment)
             need_begin_export = False
         if need_end_export:
             if is_cell_type(cell, "markdown"):
-                cell = add_export_tag_to_cell(cell, end=True)
+                cell = add_export_tag_to_cell(cell, assignment, end=True)
             else:
                 if export_delim_cell is None:
                     export_delim_cell = nbformat.v4.new_markdown_cell()
-                export_delim_cell = add_export_tag_to_cell(export_delim_cell, end=True)
+                export_delim_cell = add_export_tag_to_cell(export_delim_cell, assignment, end=True)
             need_end_export = False
 
         if export_delim_cell is not None:
@@ -258,6 +281,6 @@ def get_transformed_cells(cells, assignment):
 
     # if the last cell was the end of a manually-graded question, add a close export tag
     if need_end_export:
-        transformed_cells.append(add_export_tag_to_cell(nbformat.v4.new_markdown_cell(), end=True))
+        transformed_cells.append(add_export_tag_to_cell(nbformat.v4.new_markdown_cell(), assignment, end=True))
 
     return transformed_cells, test_files

@@ -374,25 +374,6 @@ def patch_copytree():
     shutil._copyxattr = orig_copyxattr
 
 
-def add_export_tag_to_cell(cell, end=False):
-    """
-    Adds an HTML comment to open or close question export for PDF filtering to the top of ``cell``.
-    ``cell`` should be a Markdown cell.
-    
-    Args:
-        cell (``nbformat.NotebookNode``): the cell to add the close export to
-
-    Returns:
-        ``nbformat.NotebookNode``: the cell with the close export comment at the top
-    """
-    cell = copy.deepcopy(cell)
-    source = get_source(cell)
-    tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
-    source = [tag, ""] + source
-    cell['source'] = "\n".join(source)
-    return cell
-
-
 def cell_from_source(cell_type, source_lines):
     """
     """

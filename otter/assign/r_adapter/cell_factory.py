@@ -2,6 +2,8 @@
 
 import nbformat
 
+from otter.assign.feature_toggle import FeatureToggle
+
 from ..cell_factory import CellFactory
 from ..utils import lock
 
@@ -59,4 +61,8 @@ class RCellFactory(CellFactory):
         lock(instructions)
         lock(export)
 
-        return [instructions, export, nbformat.v4.new_markdown_cell(" ")]     # last cell is buffer
+        cells = [instructions, export]
+        if self.check_feature_toggle(FeatureToggle.EMPTY_MD_BOUNDARY_CELLS):
+            cells.append(nbformat.v4.new_markdown_cell(" "))  # add buffer cell
+
+        return cells
