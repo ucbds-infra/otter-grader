@@ -48,6 +48,10 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     # update assignment.tests["files"] for R notebooks
     assignment.tests["files"] |= assignment.is_r
 
+    # force test files if a test URL prefix is provided
+    if assignment.tests["url_prefix"]:
+        assignment.tests["files"] = True
+
     output_dir = output_nb_path.parent
     tests_dir = output_dir / 'tests'
     if assignment.tests["files"]:

@@ -213,7 +213,10 @@ def test_point_value_rounding():
 def test_jupyterlite(generate_master_notebook):
     """
     """
-    master_nb_path = generate_master_notebook({"runs_on": "jupyterlite"})
+    master_nb_path = generate_master_notebook({
+        "runs_on": "jupyterlite",
+        "tests": {"url_prefix": "https://domain.tld/tests/"}
+    })
     assign_and_check_output(
         master_nb_path,
         FILE_MANAGER.get_path("jupyterlite-correct")
