@@ -7,13 +7,15 @@ from .constants import MD_RESPONSE_CELL_SOURCE
 from .utils import get_source, lock
 
 
-def gen_init_cell(nb_name, runs_on):
+def gen_init_cell(nb_name, runs_on, url_prefix):
     """
     Generates a cell to initialize Otter in the notebook.
 
     Args:
         nb_name (``str``): the name of the notebook being graded
         runs_on (``str``): the interpreter that the notebook will be run on
+        url_prefix (``str``): a URL prefix for the ``tests_url_prefix`` argument to
+            ``otter.Notebook``
     
     Returns:
         ``nbformat.NotebookNode``: the init cell
@@ -24,6 +26,8 @@ def gen_init_cell(nb_name, runs_on):
         args = "jupyterlite=True"
     else:
         args  = f"\"{nb_name}\""
+    if url_prefix:
+        args += f", tests_url_prefix=\"{url_prefix}\""
     contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
     cell = nbformat.v4.new_code_cell(contents)
     lock(cell)
