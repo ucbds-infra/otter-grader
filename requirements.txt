@@ -8,6 +8,7 @@ requests
 wrapt
 jupytext
 click
+fica
 
 # plugins
 google-api-python-client
