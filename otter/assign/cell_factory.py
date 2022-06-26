@@ -39,6 +39,9 @@ class CellFactory:
         else:
             args  = f"\"{self.assignment.master.name}\""
 
+        if self.assignment.tests.url_prefix:
+            args += f", tests_url_prefix=\"{self.assignment.tests.url_prefix}\""
+
         contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
         cell = nbformat.v4.new_code_cell(contents)
         lock(cell)
