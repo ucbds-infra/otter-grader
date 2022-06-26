@@ -175,6 +175,11 @@ class Assignment(fica.Config):
             default=True,
         )
 
+        url_prefix: Optional[str] = fica.Key(
+            description="a URL prefix for where test files can be found for student use",
+            default=None,
+        )
+
     tests: TestsValue = fica.Key(
         description="information about the structure and storage of tests",
         subkey_container=TestsValue,
