@@ -2,10 +2,10 @@
 
 import copy
 import json
-import nbformat
+import nbformat as nbf
 import os
-import shutil
 import tempfile
+import warnings
 
 from glob import glob
 from nbconvert.exporters import ScriptExporter
@@ -32,6 +32,16 @@ class RRunner(AbstractLanguageRunner):
 
     subm_path_deletion_required = False
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
+
+    # TODO: find a workflow for Rmd files
+    def validate_uuid(self, submission_path):
+        if self.options["assignment_uuid"]:
+            if os.path.splitext(submission_path)[1].lower() != ".ipynb":
+                warnings.warn("UUID verification cannot be used with R scripts or R Markdown files")
+
+            nb = nbf.read(submission_path, as_version=nbf.NO_CONVERT)
+            uuid = self.get_notebook_uuid(nb)
+            self.abort_or_warn_if_invalid_uuid(uuid)
 
     def filter_cells_with_syntax_errors(self, nb):
         """
@@ -94,7 +104,8 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(nbs) == 1:
             nb_path = nbs[0]
-            nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
+            self.validate_uuid(nb_path)
+            nb = nbf.read(nb_path, as_version=NBFORMAT_VERSION)
             nb = self.filter_cells_with_syntax_errors(nb)
 
             # create the R script

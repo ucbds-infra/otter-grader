@@ -136,6 +136,16 @@ DEFAULT_OPTIONS_WITH_DESCRIPTIONS = [
         "description": "whether to set conda's channel_priority config to strict in the setup.sh file",
         "default": True,
     },
+    {
+        "key": "assignment_uuid",
+        "description": "a UUID for the assignment to ensure that students submit to the correct autograder",
+        "default": None,
+    },
+    {
+        "key": "allow_different_uuid",
+        "description": "if true, a different/absent UUID in the notebook does not fail the autograder",
+        "default": False,
+    },
 ]
 
 DEFAULT_OPTIONS = convert_config_description_dict(DEFAULT_OPTIONS_WITH_DESCRIPTIONS)

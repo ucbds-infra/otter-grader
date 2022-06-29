@@ -2,10 +2,15 @@
 
 import os
 import shutil
+import warnings
 
 from abc import ABC, abstractmethod
 
+from otter.run.run_autograder.utils import OtterRuntimeError
+
 from ..constants import DEFAULT_OPTIONS
+
+from ....test_files import NOTEBOOK_METADATA_KEY
 
 
 class AbstractLanguageRunner(ABC):
@@ -66,6 +71,59 @@ class AbstractLanguageRunner(ABC):
         if os.path.exists("./submission/tests"):
             shutil.rmtree("./submission/tests")
         shutil.copytree("./source/tests", "./submission/tests")
+
+    def abort_or_warn_if_invalid_uuid(self, got):
+        """
+        Raise an ``OtterRuntimeError`` or a ``UserWarning`` (depending on configuration) if the
+        UUID of the notebook is invalid.
+
+        If no assignment UUID was provided in the configurations, no action is taken.
+
+        Args:
+            got (``str | None``): the UUID of the submission or ``None`` if it didn't have one
+
+        Raises:
+            ``otter.runb.run_autograder.utils.OtterRuntimeError``: if the UUID is invalid and
+                grading should be aborted
+        """
+        if self.options["assignment_uuid"] and got != self.options["assignment_uuid"]:
+            message = f"Received submission with UUID '{got}' (expected '{self.options['assignment_uuid']}')"
+            if self.options["allow_different_uuid"]:
+                warnings.warn(message)
+            else:
+                raise OtterRuntimeError(message)
+
+    def get_notebook_uuid(self, nb):
+        """
+        Get the assignment UUID in the metadata of the provided notebook, if any.
+
+        Args:
+            nb (``nbformat.NotebookNode``): the notebook
+
+        Returns:
+            ``str | None``: the assignment UUID of the notebook, if any
+        """
+        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+            return None
+
+        return nb["metadata"][NOTEBOOK_METADATA_KEY].get("assignment_uuid", None)
+
+    @abstractmethod
+    def validate_uuid(self, submission_path):
+        """
+        Validate the UUID of the submission, raising an error/warning if appropriate.
+
+        This method should be invoked as part of the implementation of another abstract method
+        (either ``resolve_submission_path`` or ``run``).
+
+        Args:
+            submission_path (``str``): the path to the submission file
+
+        Raises:
+            ``otter.runb.run_autograder.utils.OtterRuntimeError``: if the UUID is invalid and
+                grading should be aborted
+        """
+        ...
 
     @abstractmethod
     def resolve_submission_path(self):
