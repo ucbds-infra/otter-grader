@@ -3,6 +3,7 @@
 import fica
 import pathlib
 import yaml
+import uuid
 
 from typing import Dict, List, Optional
 
@@ -216,6 +217,8 @@ class Assignment(fica.Config):
 
     test_files: Dict = {}
 
+    uuid: Optional[str] = None
+
     # TODO: add in other defaults
     defaults = {
         "master": None,
@@ -245,6 +248,10 @@ class Assignment(fica.Config):
     #             raise ValueError(f"Unexpected assignment config: '{k}'")
     #     recursive_dict_update(self.config, config)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._populate_uuid()
+
     @property
     def is_r(self):
         """
@@ -265,6 +272,13 @@ class Assignment(fica.Config):
         Whether the input file is an RMarkdown document
         """
         return self.master.suffix.lower() == ".rmd"
+
+    def _populate_uuid(self):
+        """
+        Populate the UUID field if it is not already populated.
+        """
+        if self.uuid is None:
+            self.uuid = str(uuid.uuid4())
     
     # @property
     # def allowed_configs(self):

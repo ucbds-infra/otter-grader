@@ -18,6 +18,7 @@ from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
 from ..generate.token import APIClient
+from ..test_files import NOTEBOOK_METADATA_KEY
 from ..utils import get_relpath, get_source
 
 
@@ -248,6 +249,7 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
 
 # TODO: update for new assign format
+# TODO: add uuid
 def run_generate_autograder(result, assignment, gs_username, gs_password, plugin_collection=None):
     """
     Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
@@ -379,3 +381,12 @@ def cell_from_source(cell_type, source_lines):
     """
     """
     return getattr(nbf.v4, f"new_{cell_type}_cell")("\n".join(source_lines))
+
+
+def add_uuid_to_notebook(nb, assignment):
+    """
+    """
+    if assignment.uuid is None:
+        raise ValueError("No UUID has been created for the assignment")
+
+    nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_uuid"] = assignment.uuid

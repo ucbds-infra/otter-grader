@@ -10,7 +10,8 @@ from .questions import add_point_value_info_to_cell, create_question_config
 from .r_adapter.cell_factory import RCellFactory
 from .solutions import has_seed, SOLUTION_CELL_TAG
 from .tests import any_public_tests, determine_question_point_value
-from .utils import add_tag, AssignNotebookFormatException, get_source, is_cell_type, is_ignore_cell
+from .utils import add_tag, add_uuid_to_notebook, AssignNotebookFormatException, get_source, \
+    is_cell_type, is_ignore_cell
 
 
 def add_export_tag_to_cell(cell, assignment, end=False):
@@ -83,6 +84,7 @@ def transform_notebook(nb, assignment):
 
     transformed_nb = copy.deepcopy(nb)
     transformed_nb['cells'] = transformed_cells
+    add_uuid_to_notebook(transformed_nb, assignment)
 
     return transformed_nb, test_files
 
