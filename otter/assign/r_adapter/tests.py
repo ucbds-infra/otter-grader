@@ -18,6 +18,7 @@ from ...test_files.abstract_test import TestFile
 Test = namedtuple('Test', ['name', 'hidden', 'points', 'body', 'success_message', 'failure_message'])
 
 
+# TODO: remove rmd checks
 def read_test(cell, question, assignment, rmd=False):
     """
     Returns the contents of a test as a ``(name, hidden, body)`` named tuple

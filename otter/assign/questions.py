@@ -10,6 +10,7 @@ from .utils import get_source, lock, get_spec, EmptyCellException
 from ..utils import convert_config_description_dict
 
 
+# TODO: convert to fica
 _DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS = [
     {
         "key": "name",
@@ -50,6 +51,7 @@ def create_question_config(parsed_config):
         raise ValueError(f"Question name not specified in config YAML: {parsed_config}")
     return config
 
+# TODO: remove
 def is_question_cell(cell):
     """
     Returns whether cell contains BEGIN QUESTION in a block quote
@@ -65,6 +67,7 @@ def is_question_cell(cell):
     return get_spec(get_source(cell), "question") is not None
 
 
+# TODO: remove
 def read_question_metadata(cell):
     """
     Returns parsed question metadata from a question cell

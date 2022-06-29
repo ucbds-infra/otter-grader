@@ -43,6 +43,7 @@ class AssignNotebookFormatException(Exception):
 # Getters
 #---------------------------------------------------------------------------------------------------
 
+# TODO: remove
 def get_spec(source, begin):
     """
     Returns the line number of the spec begin line or ``None``. Converts ``begin`` to an uppercase 

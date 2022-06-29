@@ -192,6 +192,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
     print(out, **kwargs)
 
 
+# TODO: remove when Otter Assign format v0 is removed
 def convert_config_description_dict(configs, for_docs=False):
     """
     Recursively converts a documented list of dictionary configurations into a dictionary with the 
@@ -318,27 +319,6 @@ def knit_rmd_file(rmd_path, pdf_path):
         pdf_path = os.path.abspath(pdf_path)
         rmarkdown = importr("rmarkdown")
         rmarkdown.render(ntf.name, "pdf_document", pdf_path)
-
-
-def recursive_dict_update(d, u):
-    """
-    Recursively update a possibly-nested ``dict`` in-place.
-
-    Args:
-        d (``dict``): the original dictionary to be updated
-        u (``dict``): the dictionary of new values to override in ``d``
-
-    Returns:
-        ``dict``: the original dictionary
-    """
-    for k, v in u.items():
-        d_v = d.get(k)
-        if isinstance(v, Mapping) and isinstance(d_v, Mapping):
-            d[k] = recursive_dict_update(d_v, v)
-        else:
-            d[k] = v
-
-    return d
 
 
 class loggers:

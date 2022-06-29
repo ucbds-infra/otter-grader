@@ -2,6 +2,7 @@
 
 from ...utils import convert_config_description_dict
 
+# TODO: convert to fica
 # a dictionary for documenting each configuration and its default value; the dictionary of actual
 # configurations that gets imported is generated from this dictionary
 DEFAULT_OPTIONS_WITH_DESCRIPTIONS = [

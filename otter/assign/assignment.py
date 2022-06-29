@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 
 from .constants import BLOCK_QUOTE
 from .utils import get_source, get_spec
-from ..utils import convert_config_description_dict, Loggable, loggers, recursive_dict_update
+from ..utils import convert_config_description_dict, Loggable, loggers
 
 
 LOGGER = loggers.get_logger(__name__)
@@ -24,6 +24,7 @@ class MyConfig(fica.Config):
         setattr(self, key, value)
 
 
+# TODO: Loggable?
 class Assignment(fica.Config):
     """
     Configurations for the assignment.
