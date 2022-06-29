@@ -67,24 +67,15 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             LOGGER.debug("Processing seed dict")
             if assignment.generate:
                 LOGGER.debug("Otter Generate configuration found while processing seed dict")
-                if assignment.generate is True:
-                    assignment.generate = {}
-                    LOGGER.debug("Re-assigning assignment.generate to an empty dict")
-
-                assignment.generate["seed"] = assignment.seed["autograder_value"]
-                assignment.generate["seed_variable"] = assignment.seed["variable"]
+                assignment.add_generate_arg("seed", assignment.seed["autograder_value"])
+                assignment.add_generate_arg("seed_variable", assignment.seed["variable"])
                 LOGGER.debug("Added seed information to assignment.generate")
 
         # check that we have a seed if needed
         if assignment.seed_required:
             LOGGER.debug("Assignment seed is required")
-
-            generate_args = assignment.generate
-            if generate_args is True:
-                LOGGER.debug("Substituting Otter Generate configuration for dict with unspecified seed")
-                generate_args = {'seed': None}
-
-            if generate_args and not isinstance(generate_args.get('seed', None), int):
+            if assignment.generate and \
+                    not isinstance(assignment.get_generate_arg('seed', None), int):
                 raise RuntimeError("Seeding cell found but no or invalid seed provided")
 
         plugins, pc = assignment.plugins, None
@@ -92,12 +83,9 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             LOGGER.debug("Processing plugins")
             pc = PluginCollection(plugins, "", {})
             pc.run("during_assign", assignment)
-            if assignment.generate is True:
-                assignment.generate = {"plugins": []}
+            assignment.add_generate_arg("plugins", [])
             if assignment.generate is not False:
                 LOGGER.debug("Adding plugin configurations to Otter Generate configuration")
-                if not assignment.generate.get("plugins"):
-                    assignment.generate["plugins"] = []
                 assignment.generate["plugins"].extend(plugins)
 
         # generate Gradescope autograder zipfile

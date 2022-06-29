@@ -279,7 +279,75 @@ class Assignment(fica.Config):
         """
         if self.uuid is None:
             self.uuid = str(uuid.uuid4())
-    
+
+    def add_generate_arg(self, key, value, overwrite=False):
+        """
+        Add a key-value pair to the ``generate`` key if ``generate`` is enabled.
+
+        If ``generate`` is ``False``, no action is taken. If it is ``True``, it is instead set to
+        an empty ``dict`` and the key is inserted. Otherwise, the key is inserted into the ``dict``
+        already pointed to by ``generate``.
+
+        Args:
+            key (``str``): the key to add
+            value (``object``): the value the key maps to
+            overwrite (``bool``): whether to overwrite the value of ``key`` if it is present
+        """
+        if self.generate is False:
+            return
+
+        if self.generate is True:
+            self.generate = {}
+
+        if overwrite or key not in self.generate:
+            self.generate[key] = value
+
+    def get_generate_arg(self, key, default):
+        """
+        Get the value of a key in ``generate`` if it exists, otherwise returning ``default``.\
+
+        Args:
+            key (``str``): the key to look for
+            default (``object``): the default value of the key
+
+        Returns:
+            ``object``: the value of the key if it is present, else ``default``
+
+        Raise:
+            ``ValueError``: if ``generate`` is ``False``
+        """
+        if self.generate is False:
+            raise ValueError("Otter Generate is not configured for this assignment")
+
+        return default if self.generate is True else self.generate.get(key, default)
+
+    def get_otter_config(self):
+        """
+        Get the contents of ``otter_config.json`` for this assignment.
+
+        Returns:
+            ``dict[str, object]``: the ``otter_config.json`` file as a ``dict``
+        """
+        if self.generate is False:
+            raise ValueError("Otter Generate is not configured for this assignment")
+
+        otter_config = {} if self.generate is True else self.generate
+
+        if self.is_r:
+            otter_config["lang"] = "r"
+
+        # TODO: move this config out of the assignment metadata and into the generate key
+        if self.variables:
+            otter_config["serialized_variables"] = str(self.variables)
+
+        otter_config["assignment_uuid"] = self.uuid
+
+        return otter_config
+
+
+
+
+
     # @property
     # def allowed_configs(self):
     #     """

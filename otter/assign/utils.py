@@ -249,7 +249,6 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
 
 # TODO: update for new assign format
-# TODO: add uuid
 def run_generate_autograder(result, assignment, gs_username, gs_password, plugin_collection=None):
     """
     Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
@@ -263,17 +262,6 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         plugin_collection (``otter.plugins.PluginCollection``, optional): a plugin collection to pass
             to Otter Generate
     """
-    generate_args = assignment.generate
-    if generate_args is True:
-        generate_args = {}
-
-    if "pdfs" in generate_args:
-        raise ValueError("The 'pdfs' key of 'generate' is no longer supported. Put any " + \
-                         "'pdfs' configurations inside the 'generate' key itself.")
-
-    if assignment.is_r:
-        generate_args["lang"] = "r"
-
     curr_dir = os.getcwd()
     os.chdir(str(result / 'autograder'))
 
@@ -321,13 +309,12 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
 
         files += assignment.autograder_files
 
-    # TODO: move this config out of the assignment metadata and into the generate key
-    if assignment.variables:
-        generate_args['serialized_variables'] = str(assignment.variables)
-
-    if generate_args:
+    otter_config = assignment.get_otter_config()
+    if otter_config:
+        # TODO: move this filename into a global variable somewhere and remove all of the places
+        # it's hardcoded
         with open("otter_config.json", "w+") as f:
-            json.dump(generate_args, f, indent=2)
+            json.dump(otter_config, f, indent=2)
 
     # TODO: change generate_autograder so that only necessary kwargs are needed
     timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
@@ -336,7 +323,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     generate_autograder(
         tests_dir=test_dir,
         output_path=output_path,
-        config="otter_config.json" if generate_args else None,
+        config="otter_config.json" if otter_config else None,
         lang="python" if assignment.is_python else "r",
         requirements=requirements,
         overwrite_requirements=assignment.overwrite_requirements,
