@@ -13,6 +13,7 @@ from .tests import any_public_tests, determine_question_point_value
 from .utils import add_tag, AssignNotebookFormatException, get_source, is_cell_type, is_ignore_cell
 
 
+# TODO: convert this to a class like cell factory
 def add_export_tag_to_cell(cell, assignment, end=False):
     """
     Adds an HTML comment to open or close question export for PDF filtering to the top of ``cell``.
