@@ -60,7 +60,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
     with chdir(master.parent):
         LOGGER.info("Generating views")
-        output_nb_path = write_output_directories(master, result, assignment)
+        write_output_directories(master, result, assignment)
 
         # update seed variables
         if assignment.seed.variable:
@@ -189,7 +189,8 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
             if assignment._otter_config is not None:
                 LOGGER.debug("Retrieving updated plugins from otter_config.json for running tests")
-                test_pc = PluginCollection(assignment._otter_config.get("plugins", []), output_nb_path, {})
+                test_pc = PluginCollection(
+                    assignment._otter_config.get("plugins", []), assignment.ag_notebook_path, {})
 
             else:
                 LOGGER.debug("Using pre-configured plugins for running tests")

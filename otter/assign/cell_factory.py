@@ -47,6 +47,30 @@ class CellFactory:
         lock(cell)
         return [cell]
 
+    # TODO: update docstring
+    def create_check_cells(self, question):
+        """
+        Parses a list of test named tuples and creates a single test file. Adds this test file as a value
+        to ``tests_dict`` with a key corresponding to the test's name, taken from ``question``. Returns
+        a code cell that runs the check on this test.
+        
+        Args:
+            question (``dict``): question metadata
+            tests (``list`` of ``Test``): tests to be written
+            tests_dict (``dict``): the tests for this assignment
+            assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+
+        Returns:
+            ``nbformat.NotebookNode``: code cell calling ``otter.Notebook.check`` on this test
+        """
+        if question.name not in self._tests_by_question:
+            return []
+
+        cell = nbformat.v4.new_code_cell()
+        cell.source = ['grader.check("{}")'.format(question.name)]
+        lock(cell)
+        return [cell]
+
     def create_check_all_cells(self):
         """
         Generates a check-all cell and a Markdown cell with instructions to run all tests in the

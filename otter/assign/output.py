@@ -7,91 +7,51 @@ import shutil
 import tempfile
 import warnings
 
+from .assignment import Assignment
 from .constants import NB_VERSION
-from .notebook_transformer import transform_notebook
-from .plugins import replace_plugins_with_calls
+from .notebook_transformer import NotebookTransformer
 from .r_adapter import rmarkdown_converter
-from .solutions import overwrite_seed_vars, strip_ignored_lines, strip_solutions_and_output
-from .tests import write_tests
-from .utils import get_notebook_language, patch_copytree, remove_cell_ids
+from .r_adapter.tests_manager import RAssignmentTestsManager
+from .tests_manager import AssignmentTestsManager
+from .utils import get_notebook_language
 
 
-def write_autograder_dir(nb_path, output_nb_path, assignment):
+def write_output_dir(
+    nb_transformer: NotebookTransformer,
+    output_dir: pathlib.Path,
+    assignment: Assignment,
+    sanitize: bool,
+):
     """
-    Converts a master notebook to a solutions notebook and writes this notebook to the output directory,
-    copying support files and writing tests as needed.
-
-    Args:
-        nb_path (``pathlib.Path``): path to master notebook
-        output_nb_path (``pathlib.Path``): path to output file
-        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
     """
-    assignment.notebook_basename = os.path.basename(str(output_nb_path))
-
-    if assignment.is_rmd:
-        nb = rmarkdown_converter.read_as_notebook(nb_path) # TODO: change arg name?
-    else:
-        nb = nbformat.read(nb_path, as_version=NB_VERSION)
-
-    if assignment.lang is None:
-        try:
-            assignment.lang = get_notebook_language(nb)
-        except KeyError:
-            warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
-            assignment.lang = "python"
-
-    transformed_nb, assignment.test_files = transform_notebook(nb, assignment)
-
-    # replace plugins
-    transformed_nb = replace_plugins_with_calls(transformed_nb)
-
-    # update assignment.tests["files"] for R notebooks
-    assignment.tests["files"] |= assignment.is_r
-
-    # force test files if a test URL prefix is provided
-    if assignment.tests["url_prefix"]:
-        assignment.tests["files"] = True
-
-    output_dir = output_nb_path.parent
-    tests_dir = output_dir / 'tests'
-    if assignment.tests["files"]:
+    output_path = output_dir / assignment.notebook_basename
+    tests_dir = output_dir / "tests"
+    if assignment.tests.files:
         os.makedirs(tests_dir, exist_ok=True)
 
-    if assignment.requirements:
-        output_fn = ("requirements.txt", "requirements.R")[assignment.is_r]
-        if isinstance(assignment.requirements, list):
-            with open(str(output_dir / output_fn), "w+") as f:
-                f.write("\n".join(assignment.requirements))
-            assignment.requirements = str(output_dir / output_fn)
-        else:
-            shutil.copy(assignment.requirements, str(output_dir / output_fn))
+    if not sanitize:
+        if assignment.requirements:
+            output_fn = ("requirements.txt", "requirements.R")[assignment.is_r]
+            if isinstance(assignment.requirements, list):
+                with open(str(output_dir / output_fn), "w+") as f:
+                    f.write("\n".join(assignment.requirements))
+                assignment.requirements = str(output_dir / output_fn)
+            else:
+                shutil.copy(assignment.requirements, str(output_dir / output_fn))
 
-    if assignment.environment:
-        output_fn = "environment.yml"
-        shutil.copy(assignment.environment, str(output_dir / output_fn))
-    
-    # strip out ignored lines
-    transformed_nb = strip_ignored_lines(transformed_nb)
+        if assignment.environment:
+            output_fn = "environment.yml"
+            shutil.copy(assignment.environment, str(output_dir / output_fn))
 
     # write tests
-    write_tests(transformed_nb, str(tests_dir), assignment.test_files, assignment, include_hidden=True)
+    nb_transformer.write_tests(str(tests_dir), not sanitize, assignment.tests.files)
 
     # write a temp dir for otter generate tests
-    if assignment.generate:
+    if not sanitize and assignment.generate:
         assignment._temp_test_dir = pathlib.Path(tempfile.mkdtemp())
-        write_tests(
-            None, str(assignment._temp_test_dir), assignment.test_files, assignment, 
-            include_hidden=True, force_files=True)
+        nb_transformer.write_tests(str(assignment._temp_test_dir), True, True)
 
-    # TODO: this is a bad practice and only a monkey-patch for #340. we shold do some better parsing
-    # of the nbformat version info to determine if this is necessary.
-    remove_cell_ids(transformed_nb)
-
-    # write notebook
-    if assignment.is_rmd:
-        rmarkdown_converter.write_as_rmd(transformed_nb, output_nb_path, True)
-    else:
-        nbformat.write(transformed_nb, str(output_nb_path))
+    nb_transformer.write_transformed_nb(output_path, sanitize)
 
     # copy files
     for file in assignment.files:
@@ -102,94 +62,49 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
             
         else:
             # check that file is in subdir
-            assert os.path.abspath(nb_path.parent) in os.path.abspath(file), \
+            # TODO: convert to something other than assertion error
+            assert str(assignment.master.parent) in os.path.abspath(file), \
                 f"{file} is not in a subdirectory of the master notebook directory"
             file_path = pathlib.Path(file).resolve()
-            rel_path = file_path.parent.relative_to(nb_path.parent)
+            rel_path = file_path.parent.relative_to(assignment.master.parent)
             os.makedirs(output_dir / rel_path, exist_ok=True)
             shutil.copy(file, str(output_dir / rel_path))
 
 
-def write_student_dir(nb_name, autograder_dir, student_dir, assignment):
-    """
-    Copies the autograder (solutions) directory and removes extraneous files, strips solutions from
-    the notebook, and removes hidden tests from the tests directory.
-
-    Args:
-        nb_name (``str``): the master notebook name
-        autograder_dir (``pathlib.Path``): the path to the autograder directory
-        student_dir (``pathlib.Path``): the path to the student directory
-        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-    """
-    # copy autograder dir
-    with patch_copytree():
-        shutil.copytree(autograder_dir, student_dir, copy_function=shutil.copy)
-
-    # remove requirements from student dir if present
-    output_fn = ("requirements.txt", "requirements.R")[assignment.is_r]
-    requirements = str(student_dir / output_fn)
-    if os.path.isfile(requirements):
-        os.remove(requirements)
-
-    # remove environment from student dir if present
-    output_fn = "environment.yml"
-    environment = str(student_dir / output_fn)
-    if os.path.isfile(environment):
-        os.remove(environment)
-
-    # strip solutions from student version
-    student_nb_path = student_dir / nb_name
-
-    if assignment.is_rmd:
-        nb = rmarkdown_converter.read_as_notebook(student_nb_path)
-    else:
-        nb = nbformat.read(student_nb_path, as_version=NB_VERSION)
-
-    nb = strip_solutions_and_output(nb)
-
-    # overwrite seed variable
-    if isinstance(assignment.seed, dict):
-        nb = overwrite_seed_vars(nb, assignment.seed["variable"], assignment.seed["student_value"])
-
-    # remove hidden tests from student directory
-    tests_dir = str(student_dir / "tests")
-    if assignment.tests["files"]:
-        shutil.rmtree(tests_dir)
-        os.makedirs(tests_dir)
-
-    write_tests(nb, tests_dir, assignment.test_files, assignment, include_hidden=False)
-
-    if assignment.is_rmd:
-        rmarkdown_converter.write_as_rmd(nb, student_nb_path, False)
-    else:
-        nbformat.write(nb, student_nb_path)
-
-
 def write_output_directories(master_nb_path, result_dir, assignment):
     """
-    Converts a master notebook to an autograder and student directory based on configurations in 
-    ``assignment``.
-
-    Args:
-        master_nb_path (``nbformat.NotebookNode``): the master notebook path
-        result_dir (``pathlib.Path``): path to the result directory
-        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-
-    Returns:
-        ``pathlib.Path``: the absolute path to the written autograder notebook
     """
+    if assignment.is_rmd:
+        nb = rmarkdown_converter.read_as_notebook(master_nb_path) # TODO: change arg name?
+    else:
+        nb = nbformat.read(master_nb_path, as_version=NB_VERSION)
+
+    if assignment.lang is None:
+        try:
+            assignment.lang = get_notebook_language(nb)
+        except KeyError:
+            warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
+            assignment.lang = "python"
+
+    tests_mgr = (RAssignmentTestsManager if assignment.is_r else AssignmentTestsManager)(assignment)
+    nb_transformer = NotebookTransformer(assignment, tests_mgr)
+    nb_transformer.transform_notebook(nb)
+
+    # update assignment.tests["files"] for R notebooks
+    assignment.tests["files"] |= assignment.is_r
+
+    # force test files if a test URL prefix is provided
+    if assignment.tests["url_prefix"]:
+        assignment.tests["files"] = True
+
     # create directories
     autograder_dir = result_dir / 'autograder'
     student_dir = result_dir / 'student'
     shutil.rmtree(autograder_dir, ignore_errors=True)
     shutil.rmtree(student_dir, ignore_errors=True)
     os.makedirs(autograder_dir, exist_ok=True)
+    os.makedirs(student_dir, exist_ok=True)
 
-    # write autograder directory
-    output_nb_path = autograder_dir / master_nb_path.name
-    write_autograder_dir(master_nb_path, output_nb_path, assignment)
-
-    # write student dir
-    write_student_dir(master_nb_path.name, autograder_dir, student_dir, assignment)
-
-    return os.path.abspath(output_nb_path)
+    # populate directories
+    write_output_dir(nb_transformer, autograder_dir, assignment, False)
+    write_output_dir(nb_transformer, student_dir, assignment, True)

@@ -1,8 +1,7 @@
 """Plugin replacement for Otter Assign"""
 
-import re
+import copy
 import yaml
-import nbformat
 
 from .utils import get_source
 
@@ -87,6 +86,8 @@ def replace_plugins_with_calls(nb):
     Args:
         nb (``nbformat.NotebookNode``): the notebook
     """
+    nb = copy.deepcopy(nb)
+
     for cell in nb['cells']:
         cell['source'] = '\n'.join(replace_plugins(get_source(cell)))
     

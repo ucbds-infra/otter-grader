@@ -1,7 +1,6 @@
 """Solution removal for Otter Assign"""
 
 import copy
-import nbformat
 import re
 
 from .r_adapter import solutions as r_solutions
@@ -182,18 +181,24 @@ def strip_ignored_lines(nb):
     Args:
         nb (``nbformat.NotebookNode``): the notebook to have ignored lines stripped
     """
-    for i, cell in enumerate(nb['cells']):
+    nb = copy.deepcopy(nb)
+    for cell in nb['cells']:
         cell['source'] = '\n'.join(remove_ignored_lines(get_source(cell)))
     return nb
 
 
 def strip_solutions_and_output(nb):
     """
-    Write a notebook with solutions stripped and outputs cleared.
+    Strip solutions and outputs from a notebook.
     
     Args:
         nb (``nbformat.NotebookNode``): the notebook to have solutions stripped
+
+    Returns:
+        ``nbformat.NotebookNode``: a copy of the notebook with its solutions stripped
     """
+    nb = copy.deepcopy(nb)
+
     md_solutions = []
     lang = get_notebook_language(nb)
     for i, cell in enumerate(nb['cells']):

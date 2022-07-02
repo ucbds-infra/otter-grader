@@ -3,22 +3,19 @@
 import copy
 import datetime as dt
 import json
-import nbformat as nbf
 import os
 import pathlib
 import re
 import shutil
 
-from contextlib import contextmanager
 from glob import glob
 from textwrap import indent
 
-from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
+from .constants import IGNORE_REGEX
 
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
-from ..generate.token import APIClient
-from ..utils import get_relpath, get_source
+from ..utils import get_source
 
 
 class EmptyCellException(Exception):
@@ -30,46 +27,17 @@ class EmptyCellException(Exception):
 class AssignNotebookFormatException(Exception):
     """
     """
-    def __init__(self, message, question_metadata, cell_index, *args, **kwargs):
-        question_name = question_metadata.get("name")
+    def __init__(self, message, question, cell_index, *args, **kwargs):
         message += " ("
-        if question_name is not None:
-            message += f"question { question_name }, "
-        message = message + f"cell number { cell_index + 1 })"
+        if question is not None:
+            message += f"question { question.name }, "
+        message += f"cell number { cell_index + 1 })"
         super().__init__(message, *args, **kwargs)
 
 
 #---------------------------------------------------------------------------------------------------
 # Getters
 #---------------------------------------------------------------------------------------------------
-
-# TODO: remove
-def get_spec(source, begin):
-    """
-    Returns the line number of the spec begin line or ``None``. Converts ``begin`` to an uppercase 
-    string and looks for a line matching ``f"BEGIN {begin.upper()}"``. Used for finding question and
-    assignment metadata, which match ``BEGIN QUESTION`` and ``BEGIN ASSIGNMENT``, resp.
-    
-    Args:
-        source (``list`` of ``str``): cell source as a list of lines of text
-        begin (``str``): the spec to look for
-    
-    Returns:
-        ``int``: line number of BEGIN ASSIGNMENT, if present
-        ``None``: if BEGIN ASSIGNMENT not present in the cell
-    """
-    block_quotes = [
-        i for i, line in enumerate(source) if line[:3] == BLOCK_QUOTE
-    ]
-    assert len(block_quotes) % 2 == 0, f"wrong number of block quote delimieters in {source}"
-
-    begins = [
-        block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) 
-        if source[block_quotes[i]+1].strip(' ') == f"BEGIN {begin.upper()}"
-    ]
-    assert len(begins) <= 1, f'multiple BEGIN {begin.upper()} blocks defined in {source}'
-    
-    return begins[0] if begins else None
 
 def get_notebook_language(nb):
     """
@@ -101,6 +69,7 @@ def is_ignore_cell(cell):
     source = get_source(cell)
     return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
 
+# TODO: refactor to use this method instead of direct checks
 def is_cell_type(cell, cell_type):
     return cell["cell_type"] == cell_type
 
@@ -122,6 +91,7 @@ def remove_output(nb):
         if 'execution_count' in cell:
             cell['execution_count'] = None
 
+
 def remove_cell_ids(nb):
     """
     Removes all cell IDs from a notebook in-place
@@ -132,6 +102,7 @@ def remove_cell_ids(nb):
     for cell in nb['cells']:
         if 'id' in cell:
             cell.pop('id')
+
 
 def lock(cell):
     """
@@ -144,6 +115,7 @@ def lock(cell):
     m["editable"] = False
     m["deletable"] = False
 
+
 def add_tag(cell, tag):
     """
     """
@@ -153,10 +125,12 @@ def add_tag(cell, tag):
     cell["metadata"]["tags"].append(tag)
     return cell
 
+
 def has_tag(cell, tag):
     """
     """
     return tag in cell["metadata"].get("tags", [])
+
 
 def remove_tag(cell, tag):
     """
@@ -196,6 +170,7 @@ def str_to_doctest(code_lines, lines):
     else:
         return str_to_doctest(code_lines, lines + [">>> " + line])
 
+
 def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
     Runs tests in the autograder version of the notebook
@@ -220,6 +195,7 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
             indent(results.summary(), '    '))
 
     os.chdir(curr_dir)
+
 
 def write_otter_config_file(master, result, assignment):
     """
@@ -246,6 +222,7 @@ def write_otter_config_file(master, result, assignment):
         json.dump(config, f, indent=4)
     with open(result / 'student' / config_name, "w+") as f:
         json.dump(config, f, indent=4)
+
 
 # TODO: update for new assign format
 def run_generate_autograder(result, assignment, gs_username, gs_password, plugin_collection=None):
@@ -352,30 +329,3 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         shutil.rmtree(str(assignment._temp_test_dir))
 
     os.chdir(curr_dir)
-
-@contextmanager
-def patch_copytree():
-    """
-    A context manager patch for ``shutil.copytree` on WSL. Shamelessly stolen from
-    https://bugs.python.org/issue38633 (see for more information)
-    """
-    import errno, shutil
-    orig_copyxattr = shutil._copyxattr
-    
-    def patched_copyxattr(src, dst, *, follow_symlinks=True):
-        try:
-            orig_copyxattr(src, dst, follow_symlinks=follow_symlinks)
-        except OSError as ex:
-            if ex.errno != errno.EACCES: raise
-    
-    shutil._copyxattr = patched_copyxattr
-
-    yield
-
-    shutil._copyxattr = orig_copyxattr
-
-
-def cell_from_source(cell_type, source_lines):
-    """
-    """
-    return getattr(nbf.v4, f"new_{cell_type}_cell")("\n".join(source_lines))

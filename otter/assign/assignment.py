@@ -1,14 +1,12 @@
 """Assignment configurations for Otter Assign"""
 
 import fica
+import os
 import pathlib
-import yaml
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
-from .constants import BLOCK_QUOTE
-from .utils import get_source, get_spec
-from ..utils import convert_config_description_dict, Loggable, loggers
+from ..utils import Loggable, loggers
 
 
 LOGGER = loggers.get_logger(__name__)
@@ -25,6 +23,7 @@ class MyConfig(fica.Config):
 
 
 # TODO: Loggable?
+# TODO: add detection/warnings/errors for when a user provides an invalid key?
 class Assignment(fica.Config):
     """
     Configurations for the assignment.
@@ -139,7 +138,7 @@ class Assignment(fica.Config):
 
     variables: Optional[Dict[str, str]] = fica.Key(
         description="a mapping of variable names to type strings for serializing environments",
-        default=None, # TODO: this was {}, is this an issue?
+        default=None,
     )
 
     ignore_modules: List[str] = fica.Key(
@@ -199,51 +198,26 @@ class Assignment(fica.Config):
         validator=fica.validators.choice(["default", "colab", "jupyterlite"])
     )
 
-    # TODO: docstrings
     lang: Optional[str] = None
+    """the language of the assignment"""
 
     master: pathlib.Path = None
+    """the path to the master notebook"""
 
     result: pathlib.Path = None
+    """the path to the output directory"""
 
     seed_required: bool = False
+    """whether a seeding configuration is required for Otter Generate"""
 
-    _otter_config = None # TODO: type
+    _otter_config: Optional[Dict[str, Any]] = None
+    """the (parsed) contents of an ``otter_config.json`` file to be used for Otter Generate"""
 
     _temp_test_dir: Optional[str] = None
+    """the path to a directory of test files for Otter Generate"""
 
     notebook_basename: Optional[str] = None
-
-    test_files: Dict = {}
-
-    # TODO: add in other defaults
-    defaults = {
-        "master": None,
-        "result": None,
-        "seed_required": False,
-        "_otter_config": None,
-        "lang": None,
-        "_temp_test_dir": None, # path to a temp dir for tests for otter generate
-        "notebook_basename": None,
-        "test_files": {},  # test file name -> test file info
-        # **convert_config_description_dict(_DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS),
-    }
-
-
-    # TODO: how to recursively update values? is this necessary?
-    # def update(self, config):
-    #     """
-    #     Updates the configuration stored in this assignment using keys and values in the dictionary
-    #     ``config``
-
-    #     Args:
-    #         config (``dict``): new configurations
-    #     """
-    #     self._logger.debug(f"Updating configurations: {config}")
-    #     for k in config.keys():
-    #         if k not in self.allowed_configs:
-    #             raise ValueError(f"Unexpected assignment config: '{k}'")
-    #     recursive_dict_update(self.config, config)
+    """the basename of the master notebook file"""
 
     @property
     def is_r(self):
@@ -265,50 +239,11 @@ class Assignment(fica.Config):
         Whether the input file is an RMarkdown document
         """
         return self.master.suffix.lower() == ".rmd"
-    
-    # @property
-    # def allowed_configs(self):
-    #     """
-    #     The list of allowed configuration keys
-    #     """
-    #     return type(self).defaults.keys()
 
+    @property
+    def notebook_basename(self):
+        return os.path.basename(str(self.master))
 
-# TODO: remove after finishing Rmd v1 format
-def read_assignment_metadata(cell):
-    """
-    Return assignment metadata from an assignment cell
-    
-    Args:
-        cell (``nbformat.NotebookNode``): the assignment cell
-    
-    Returns:
-        ``dict``: assignment metadata
-    """
-    LOGGER.debug(f"Parsing assignment metadata from cell: {cell}")
-    source = get_source(cell)
-    begin_assignment_line = get_spec(source, "assignment")
-    i, lines = begin_assignment_line + 1, []
-    while source[i].strip() != BLOCK_QUOTE:
-        lines.append(source[i])
-        i = i + 1
-    metadata = yaml.full_load('\n'.join(lines))
-    LOGGER.debug(f"Parsed assignment metadata: {metadata}")
-    return metadata
-
-
-# TODO: remove after finishing Rmd v1 format
-# TODO: also remove get_spec
-def is_assignment_cell(cell):
-    """
-    Returns whether cell contains BEGIN ASSIGNMENT in a block quote
-    
-    Args:
-        cell (``nbformat.NotebookNode``): notebook cell
-    
-    Returns:
-        ``bool``: whether the current cell is an assignment definition cell
-    """
-    if cell.cell_type != 'markdown':
-        return False
-    return get_spec(get_source(cell), "assignment") is not None
+    @property
+    def ag_notebook_path(self):
+        return self.result / "autograder" / self.notebook_basename  # TODO: move dir name into constant
