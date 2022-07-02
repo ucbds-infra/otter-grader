@@ -3,9 +3,7 @@
 import json
 import nbformat as nbf
 import os
-import shutil
 import warnings
-import zipfile
 
 from glob import glob
 

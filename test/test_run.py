@@ -1,5 +1,6 @@
 """Tests for ``otter.run``"""
 
+import copy
 import json
 import nbformat
 import nbconvert
@@ -137,5 +138,45 @@ def test_script(load_config, expected_results):
 
     finally:
         delete_paths([FILE_MANAGER.get_path("autograder/submission/fails2and6H.py")])
+        with open(nb_path, "w+") as f:
+            nbformat.write(nb, f)
+
+
+def test_uuid(load_config, expected_results):
+    uuid = "abc123"
+    config = load_config()
+    nb_path = FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb")
+    orig_nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
+    nb = copy.deepcopy(orig_nb)
+
+    def perform_test(nb, expected_results, **kwargs):
+        nbformat.write(nb, nb_path)
+
+        run_autograder(config["autograder_dir"], assignment_uuid = uuid, **kwargs)
+
+        with FILE_MANAGER.open("autograder/results/results.json") as f:
+            actual_results = json.load(f)
+
+        assert actual_results == expected_results, \
+            f"Actual results did not matched expected:\n{actual_results}"
+
+    try:
+        # test with correct UUID
+        nb["metadata"]["otter"] = {"assignment_uuid": uuid}
+        perform_test(nb, expected_results)
+
+        # test with wrong UUID
+        nb["metadata"]["otter"]["assignment_uuid"] = "def456"
+        perform_test(nb, expected_results) # TODO: update these results
+
+        # test with correct UUID and allow different UUIDs
+
+        # test with wrong UUID and allow different UUIDs
+
+        # test with no UUID in nb
+
+
+    finally:
+        delete_paths([nb_path])
         with open(nb_path, "w+") as f:
             nbformat.write(nb, f)
