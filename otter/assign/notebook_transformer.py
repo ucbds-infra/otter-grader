@@ -80,7 +80,7 @@ class NotebookTransformer:
             ``tuple[nbformat.NotebookNode, dict]``: the transformed notebook and a dictionary
             mapping test names to their parsed contents
         """
-        transformed_cells, test_files = self._get_transformed_cells(nb['cells'])
+        transformed_cells = self._get_transformed_cells(nb['cells'])
 
         if self.assignment.init_cell:
             transformed_cells = self.cell_factory.create_init_cells() + transformed_cells
@@ -109,8 +109,6 @@ class NotebookTransformer:
         remove_cell_ids(transformed_nb)
 
         self.transformed_nb = transformed_nb
-
-        return transformed_nb, test_files
 
     def _get_sanitized_nb(self):
         """
@@ -183,14 +181,15 @@ class NotebookTransformer:
                     if question.manual or question.export:
                         need_end_export = True
 
-                    # generate a check cell
-                    check_cells = self.cell_factory.create_check_cells(question)
+                    # generate a check cell if necessary
+                    if self.tests_mgr.has_tests(question):
+                        check_cells = self.cell_factory.create_check_cells(question)
 
-                    # only add to notebook if there's a response cell or if there are public tests;
-                    # don't add cell if the 'check_cell' key of question is false
-                    if (not no_solution or self.tests_mgr.any_public_tests(question)) and \
-                            question.check_cell:
-                        transformed_cells.extend(check_cells)
+                        # only add to notebook if there's a response cell or if there are public tests;
+                        # don't add cell if the 'check_cell' key of question is false
+                        if (not no_solution or self.tests_mgr.any_public_tests(question)) and \
+                                question.check_cell:
+                            transformed_cells.extend(check_cells)
 
                     # add points to question cell if specified
                     if self.assignment.show_question_points and last_question_md_cell is not None:
@@ -283,7 +282,7 @@ class NotebookTransformer:
                     if not is_cell_type(cell, "code"):
                         raise AssignNotebookFormatException(
                             "Found a non-code cell in tests block", question, i)
-                    self.tests_mgr.read_test(cell, question, self.assignment)
+                    self.tests_mgr.read_test(cell, question)
                     continue
 
                 elif curr_block[-1] == BlockType.SOLUTION:
@@ -300,14 +299,14 @@ class NotebookTransformer:
             if need_begin_export:
                 if is_cell_type(cell, "markdown"):
                     cell = self.add_export_tag_to_cell(cell)
-                else:
+                elif FeatureToggle.PDF_FILTERING_COMMENTS.value.is_enabled(self.assignment):
                     export_delim_cell = nbformat.v4.new_markdown_cell()
                     export_delim_cell = self.add_export_tag_to_cell(export_delim_cell)
                 need_begin_export = False
             if need_end_export:
                 if is_cell_type(cell, "markdown"):
                     cell = self.add_export_tag_to_cell(cell, end=True)
-                else:
+                elif FeatureToggle.PDF_FILTERING_COMMENTS.value.is_enabled(self.assignment):
                     if export_delim_cell is None:
                         export_delim_cell = nbformat.v4.new_markdown_cell()
                     export_delim_cell = self.add_export_tag_to_cell(export_delim_cell, end=True)

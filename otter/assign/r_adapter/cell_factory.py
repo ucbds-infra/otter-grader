@@ -19,7 +19,7 @@ class RCellFactory(CellFactory):
         cell = nbformat.v4.new_code_cell()
         cell.source = ['. = ottr::check("tests/{}.R")'.format(question.name)]
         lock(cell)
-        return cell
+        return [cell]
 
     def create_check_all_cells(self):
         return []

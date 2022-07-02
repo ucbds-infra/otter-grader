@@ -8,12 +8,30 @@ import yaml
 import nbformat
 
 from collections import namedtuple
+from dataclasses import dataclass, replace
+from typing import Optional, Union
 
 from ..constants import TEST_REGEX, OTTR_TEST_NAME_REGEX, OTTR_TEST_FILE_TEMPLATE
 from ..tests import write_test
 from ..utils import get_source, lock
 
 Test = namedtuple('Test', ['name', 'hidden', 'points', 'body', 'success_message', 'failure_message'])
+
+@dataclass
+class Test:
+
+    name: str
+
+    hidden: bool
+
+    points: Union[int, float]
+
+    body: str
+
+    success_message: Optional[str]
+
+    failure_message: Optional[str]
+
 
 def read_test(cell, question, assignment, rmd=False):
     """
@@ -74,7 +92,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         f"Points for question {question['name']} could not be parsed:\n{points}"
 
     # update point values
-    tests = [tc._replace(points=p) for tc, p in zip(tests, points)]
+    tests = [replace(tc, points=p) for tc, p in zip(tests, points)]
     test = gen_suite(question['name'], tests, points)
 
     tests_dict[question['name']] = test

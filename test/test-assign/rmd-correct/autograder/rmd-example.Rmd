@@ -73,8 +73,6 @@ _Type your answer here, replacing this text._
 Having equal side lengths.
 <!-- #endregion -->
 
-
-
 ```{r}
 # this isn't part of a question
 # it's here to make sure that we get a MD cell above to close the export

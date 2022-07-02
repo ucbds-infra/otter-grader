@@ -7,7 +7,8 @@ import pprint
 import yaml
 import nbformat
 
-from collections import namedtuple
+from dataclasses import dataclass
+from typing import Union, Optional
 
 from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGEX, OTTR_TEST_NAME_REGEX, \
     OTTR_TEST_FILE_TEMPLATE
@@ -16,7 +17,20 @@ from ...test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
 from ...test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
-Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
+@dataclass
+class Test:
+
+    input: str
+
+    output: str
+
+    hidden: bool
+
+    points: Union[int, float]
+
+    success_message: Optional[str]
+
+    failure_message: Optional[str]
 
 
 def is_test_cell(cell):

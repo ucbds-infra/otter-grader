@@ -3,18 +3,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, replace
 from textwrap import indent
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 
 OK_FORMAT_VARNAME = "OK_FORMAT"
-
-
-class Pointed(ABC):
-
-    @property
-    @abstractmethod
-    def points(self) -> Union[int, float]:
-        ...
 
 
 # # class for storing the test cases themselves
@@ -24,7 +16,7 @@ class Pointed(ABC):
 # TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points", "success_message", "failure_message"])
 
 @dataclass
-class TestCase(Pointed):
+class TestCase:
 
     name: str
 
@@ -112,7 +104,7 @@ class TestFile(ABC):
         self._score = None
 
     @staticmethod
-    def resolve_test_file_points(total_points: Optional[Union[int, float, List[Union[int, float]]]], test_cases: List[Pointed]):
+    def resolve_test_file_points(total_points, test_cases):
         if isinstance(total_points, list):
             if len(total_points) != len(test_cases):
                 raise ValueError("Points specified in test has different length than number of test cases")

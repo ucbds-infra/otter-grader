@@ -13,13 +13,13 @@ from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, EXCEPTION
 from .solutions import remove_ignored_lines
 from .utils import get_source, str_to_doctest
 
-from ..test_files.abstract_test import OK_FORMAT_VARNAME, Pointed, TestFile
+from ..test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
 from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 # TODO: docstrings for this whole file
 
 @dataclass
-class TestCase(Pointed):
+class TestCase:
 
     input: str
 
@@ -44,6 +44,8 @@ class AssignmentTestsManager:
 
     def __init__(self, assignment):
         self.assignment = assignment
+        self._tests_by_question = {}
+        self._questions = {}
 
     def any_public_tests(self, question):
         """
@@ -124,6 +126,9 @@ class AssignmentTestsManager:
             TestCase(test_source, output, hidden, points, success_message, failure_message),
         )
 
+    def has_tests(self, question):
+        return question.name in self._tests_by_question
+
     @staticmethod
     def _resolve_test_file_points(total_points, test_cases):
         TestFile.resolve_test_file_points(total_points, test_cases)
@@ -133,20 +138,20 @@ class AssignmentTestsManager:
         question = self._questions[question_name]
         test_cases = self._tests_by_question[question_name]
 
-        points = question.get('points', None)
+        points = question.points
         if isinstance(points, dict):
             points = points.get('each', 1) * len(test_cases)
         elif isinstance(points, list):
             if len(points) != len(test_cases):
                 raise ValueError(
-                    f"Error in question {question['name']}: length of 'points' is {len(points)} "
+                    f"Error in question {question.name}: length of 'points' is {len(points)} "
                     f"but there are {len(test_cases)} tests")
 
         # check for errors in resolving points
         test_cases = self._resolve_test_file_points(points, test_cases)
 
         return {
-            "name": question["name"],
+            "name": question.name,
             "points": points,
             "test_cases": test_cases,
         }
@@ -267,7 +272,7 @@ class AssignmentTestsManager:
         Returns:
             number: the point value of the question
         """
-        test_cases = self._tests_by_question[question.name]
+        test_cases = self._tests_by_question.get(question.name, [])
         if len(test_cases) == 0:
             if question.points is None and question.manual:
                 raise ValueError(

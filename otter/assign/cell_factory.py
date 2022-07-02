@@ -63,9 +63,6 @@ class CellFactory:
         Returns:
             ``nbformat.NotebookNode``: code cell calling ``otter.Notebook.check`` on this test
         """
-        if question.name not in self._tests_by_question:
-            return []
-
         cell = nbformat.v4.new_code_cell()
         cell.source = ['grader.check("{}")'.format(question.name)]
         lock(cell)
