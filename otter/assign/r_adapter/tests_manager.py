@@ -1,49 +1,36 @@
-"""
-ottr test adapters for Otter Assign
-"""
+"""R tests adapter for Otter Assign"""
 
 import re
 
 from dataclasses import dataclass
 from typing import ClassVar
 
-from ..constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, OTTR_TEST_FILE_TEMPLATE
+from ..constants import OTTR_TEST_FILE_TEMPLATE
 from ..tests_manager import AssignmentTestsManager, TestCase
-from ..utils import get_source, lock
+from ..utils import get_source
 
 from ...test_files.abstract_test import TestFile
 
 
-# TODO: docstrings
-
 @dataclass
 class RTestCase(TestCase):
+    """
+    A dataclass representing a test case for a question in an R assignment.
+    """
 
     name: str
+    """the name of the test case"""
 
+    # set the type of output to ClassVar since it's not used for R test cases
     output: ClassVar[None] = None
 
 
 class RAssignmentTestsManager(AssignmentTestsManager):
+    """
+    A class for creating and managing test cases for an R assignment.
+    """
 
     def read_test(self, cell, question):
-        """
-        Returns the contents of a test as a ``(name, hidden, body)`` named tuple
-        
-        Args:
-            cell (``nbformat.NotebookNode``): a test cell
-            question (``dict``): question metadata
-            assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-            rmd (``bool``, optional): whether the cell is from an Rmd file; if true, the first and last
-                lines of ``cell``'s source are trimmed, since they should be backtick delimeters
-
-        Returns:
-            ``Test``: test named tuple
-        """
-        # TODO: i don't think this is needed...?
-        # if self.assignment.is_rmd:
-        #     source = get_source(cell)[1:-1]
-        # else:
         source = get_source(cell)
 
         if source[0].lstrip().startswith("#"):
@@ -78,18 +65,6 @@ class RAssignmentTestsManager(AssignmentTestsManager):
     def _resolve_test_file_points(total_points, test_cases):
         return TestFile.resolve_test_file_points(total_points, test_cases)
 
-    # TODO: why is points ignored here?
     def _format_test(self, name, points, test_cases):
-        """
-        Generates an R-formatted test file for ottr
-
-        Args:
-            name (``str``): the test name
-            tests (``list`` of ``Test``): the test case named tuples that define this test file
-            points (``float`` or ``int`` or ``list`` of ``float`` or ``int``): th points per question
-
-        Returns:
-            ``str``: the rendered R test file
-        """
         template_data = {'name': name, 'test_cases': test_cases}
         return OTTR_TEST_FILE_TEMPLATE.render(**template_data)

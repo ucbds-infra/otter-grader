@@ -47,7 +47,6 @@ class CellFactory:
         lock(cell)
         return [cell]
 
-    # TODO: update docstring
     def create_check_cells(self, question):
         """
         Parses a list of test named tuples and creates a single test file. Adds this test file as a value

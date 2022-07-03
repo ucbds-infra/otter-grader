@@ -10,37 +10,55 @@ from typing import Any, Dict, List, Optional, Union
 
 from .assignment import Assignment
 from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, EXCEPTION_BASED_TEST_FILE_TEMPLATE
+from .question_config import QuestionConfig
 from .solutions import remove_ignored_lines
 from .utils import get_source, str_to_doctest
 
 from ..test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
 from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
-# TODO: docstrings for this whole file
 
 @dataclass
 class TestCase:
+    """
+    A dataclass representing a test case for a question.
+    """
 
     input: str
+    """the input of the test case"""
 
     output: str
+    """the expected output of the test case"""
 
     hidden: bool
+    """whether the test case is hidden"""
 
-    points: Union[int, float]
+    points: Optional[Union[int, float]]
+    """the point value of the test case"""
 
     success_message: Optional[str]
+    """a message to show to the student if the test passes"""
 
     failure_message: Optional[str]
+    """a message to show to the student if the test fails"""
 
 
 class AssignmentTestsManager:
+    """
+    A class for creating and managing test cases for an assignment.
+
+    Args:
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+    """
 
     assignment: Assignment
+    """the assignment config"""
 
     _tests_by_question: Dict[str, List[TestCase]]
+    """a dictionary mapping question names to lists of test cases"""
 
-    _questions: Dict[str, Dict]
+    _questions: Dict[str, QuestionConfig]
+    """a dictionary mapping question names to ``QuestionConfig`` objects"""
 
     def __init__(self, assignment):
         self.assignment = assignment
@@ -49,17 +67,24 @@ class AssignmentTestsManager:
 
     def any_public_tests(self, question):
         """
-        Returns whether any of the ``Test`` named tuples in ``test_cases`` are public tests.
+        Determine whether any of the test cases in the specified question are public.
 
         Args:
-            test_cases (``list`` of ``Test``): list of test cases
+            question (``otter.assign.question_config.QuestionConfig``): the question config
         
         Returns:
-            ``bool``: whether any of the tests are public
+            ``bool``: whether any of the test cases for the question are public
         """
         return any(not tc.hidden for tc in self._tests_by_question[question["name"]])
 
     def _add_test_case(self, question, test_case):
+        """
+        Track a test case for the specified question.
+
+        Args:
+            question (``otter.assign.question_config.QuestionConfig``): the question config
+            test_case (``TestCase``): the test case to track
+        """
         question_name = question["name"]
         self._questions[question_name] = question
 
@@ -70,6 +95,14 @@ class AssignmentTestsManager:
 
     def _parse_test_config(self, source: List[str]):
         """
+        Parse test configurations from the test cell source.
+
+        Args:
+            source (``list[str]``): the source lines of the test cell
+
+        Returns:
+            ``tuple[dict, int | None]``: the parsed config and the index in ``source`` of the line
+                at which the config ended, if any
         """
         config, i = {}, None
         if re.match(BEGIN_TEST_CONFIG_REGEX, source[0], flags=re.IGNORECASE):
@@ -83,15 +116,11 @@ class AssignmentTestsManager:
 
     def read_test(self, cell, question):
         """
-        Returns the contents of a test as an ``(input, output, hidden, points, success_message, 
-        failure_message)`` named tuple
-        
+        Parse and track a test case from the provided cell for the specified question.
+
         Args:
             cell (``nbformat.NotebookNode``): a test cell
-            question (``dict``): question metadata
-
-        Returns:
-            ``Test``: test named tuple
+            question (``otter.assign.question_config.QuestionConfig``): the question config
         """
         source = get_source(cell)
 
@@ -127,14 +156,49 @@ class AssignmentTestsManager:
         )
 
     def has_tests(self, question):
+        """
+        Determine whether the specified question has any test cases.
+
+        Args:
+            question (``otter.assign.question_config.QuestionConfig``): the question config
+
+        Returns:
+            ``bool``: whether the question has any test cases
+        """
         return question.name in self._tests_by_question
 
     @staticmethod
     def _resolve_test_file_points(total_points, test_cases):
+        """
+        Validate and reformat the point values of the provided test cases taking into account the
+        total points for the question.
+
+        For Python, this is validation doesn't change the underlying test cases and only raises an
+        error if the specified point values are invalid. This may not be the case for other
+        languages, however.
+
+        Args:
+            total_points (``int | float | list[int | float | None] | None``): the value of the
+                ``points`` configuration for the question
+            test_cases (``list[TestCase]``): the test cases for the question
+
+        Returns:
+            ``list[TestCase]``: updated test cases
+        """
         TestFile.resolve_test_file_points(total_points, test_cases)
         return test_cases
 
     def _create_test_file_info(self, question_name):
+        """
+        Create a ``dict`` containing the test file information for the question with the specified
+        name.
+
+        Args:
+            question_name (``str``): the question name
+
+        Returns:
+            ``dict``: the test file info
+        """
         question = self._questions[question_name]
         test_cases = self._tests_by_question[question_name]
 
@@ -159,13 +223,13 @@ class AssignmentTestsManager:
     @staticmethod
     def _create_ok_test_case(test_case: TestCase):
         """
-        Generates an OK test case for a test named tuple
-        
+        Create an OK-formatted test case for a test case object.
+
         Args:
-            test (``otter.assign.Test``): OK test for this test case
+            test (``TestCase``): the test case to convert to OK format
 
         Returns:
-            ``dict``: the OK test case
+            ``dict``: the OK-formatted test case
         """
         code_lines = str_to_doctest(test_case.input.split('\n'), [])
         code_lines.append(test_case.output)
@@ -188,13 +252,13 @@ class AssignmentTestsManager:
     @classmethod
     def _create_ok_test_suite(cls, test_cases: List[TestCase]):
         """
-        Generates an OK test suite for a list of tests as named tuples
+        Create an OK-formatted test suite for a list of test cases.
         
         Args:
-            tests (``list`` of ``otter.assign.Test``): test cases
+            test_cases (``list[TestCase]``): the test cases
 
         Returns:
-            ``dict``: OK test suite
+            ``dict``: the OK-formatted test suite
         """
         return  {
             'cases': [cls._create_ok_test_case(tc) for tc in test_cases],
@@ -206,6 +270,16 @@ class AssignmentTestsManager:
 
     def _format_test(self, name, points, test_cases) -> Union[str, Dict[str, Any]]:
         """
+        Format the test cases for a question based on the assignment config.
+
+        Args:
+            name (``str``): the name of the question
+            points (``int | float | list[int | float | None] | None``): the ``points`` configuration
+                from the question config
+            test_cases (``list[TestCase]``): the test cases for the question
+
+        Returns:
+            ``dict | str``: the formatted test file
         """
         if self.assignment.tests.ok_format:
             test = {
@@ -227,9 +301,17 @@ class AssignmentTestsManager:
 
     def write_tests(self, nb, test_dir, include_hidden=True, force_files=False):
         """
+        Write all test files to a notebook's metadata or a tests directory.
+
+        Args:
+            nb (``nbformat.NotebookNode``): the notebook
+            test_dir (``pathlib.Path | str``): the tests directory
+            include_hidden (``bool``): whether to include hidden test cases
+            force_files (``bool``): whether to force writing to test files (overriding the
+                assignment config)
         """
         # TODO: move this notebook to the notebook metadata test classes
-        if isinstance(nb, dict) and not self.assignment.tests.files:
+        if isinstance(nb, dict) and not self.assignment.tests.files and not force_files:
             if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
                 nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
             nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"] = {}
@@ -262,15 +344,13 @@ class AssignmentTestsManager:
 
     def determine_question_point_value(self, question):
         """
-        Determine the point value of a question using the question metadata and list of test cases.
+        Determine the point value of a question using the question config and its test cases.
 
         Args:
-            question_metadata (``dict[str, object]``): the question metadata
-            test_cases (``list[Test]``): the test cases for the question; if a manual question, this
-                list should be empty
+            question (``otter.assign.question_config.QuestionConfig``): the question config
 
         Returns:
-            number: the point value of the question
+            ``int | float``: the point value of the question
         """
         test_cases = self._tests_by_question.get(question.name, [])
         if len(test_cases) == 0:

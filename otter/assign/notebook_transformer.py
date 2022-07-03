@@ -3,8 +3,6 @@
 import copy
 import nbformat
 
-from typing import Optional
-
 from .assignment import Assignment
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
 from .cell_factory import CellFactory
@@ -20,16 +18,32 @@ from .utils import add_tag, AssignNotebookFormatException, get_source, is_cell_t
     is_ignore_cell, remove_cell_ids
 
 
-# TODO: docstrings
 class NotebookTransformer:
+    """
+    A transformer for master notebooks that converts them to autograder- and
+    student-formatted notebooks.
+
+    A note on terminology: An *autograder-formatted* notebook is the same as the master notebook but
+    with all metadata and structural cells removed, and cells that set up and use Otter's client
+    package (e.g. init cells, check cells, etc.) added. A *student-formatted* notebook is the same
+    as an autograder-formatted notebook but has had its solutions and hidden tests stripped. (The
+    conversion from an autograder-fromatted notebook to a student-formatted notebook is not actually
+    handled in this class but in the TransformedNotebookContainer class.)
+
+    Args:
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+        tests_mgr (``otter.assign.tests_manager.AssignmentTestsManager``): the tests manager to
+            populate
+    """
 
     assignment: Assignment
+    """the assignment config"""
 
     cell_factory: CellFactory
+    """a factory for various kinds of cells for using Otter's client package"""
 
     tests_mgr: AssignmentTestsManager
-
-    transformed_nb: Optional[nbformat.NotebookNode]
+    """the tests manager to populate"""
 
     def __init__(self, assignment, tests_mgr):
         self.assignment = assignment
@@ -38,14 +52,14 @@ class NotebookTransformer:
 
     def add_export_tag_to_cell(self, cell, end=False):
         """
-        Adds an HTML comment to open or close question export for PDF filtering to the top of
+        Add an HTML comment to open or close question export for PDF filtering to the top of
         ``cell``. ``cell`` should be a Markdown cell.
 
         Args:
             cell (``nbformat.NotebookNode``): the cell to add the close export to
 
         Returns:
-            ``nbformat.NotebookNode``: the cell with the close export comment at the top
+            ``nbformat.NotebookNode``: a copy of ``cell`` with the close export comment at the top
         """
         if not FeatureToggle.PDF_FILTERING_COMMENTS.value.is_enabled(self.assignment):
             return cell
@@ -60,7 +74,14 @@ class NotebookTransformer:
     @staticmethod
     def add_point_value_info_to_cell(cell, points):
         """
-        Adds the point value information to the provided cell, returning a copy.
+        Add the point value information to the provided cell, returning a copy.
+
+        Args:
+            cell (``nbformat.NotebookNode``): the cell to add to
+            points (``int | float``): the point value of the question
+
+        Returns:
+            ``nbformat.NotebookNode``: a copy of ``cell`` with the point value
         """
         cell = copy.deepcopy(cell)
         source = get_source(cell)
@@ -68,17 +89,15 @@ class NotebookTransformer:
         cell["source"] = "\n".join(source)
         return cell
 
-    def transform_notebook(self, nb):
+    def transform_notebook(self, nb) -> "TransformedNotebookContainer":
         """
-        Converts a master notebook to an Otter-formatted solutions notebook, parsing test cells into
-        dictionaries ready to be written as OK test files.
+        Transform a master notebook into an autograder-formatted notebook.
 
         Args:
             nb (``nbformat.NotebookNode``): the master notebook
 
         Returns:
-            ``tuple[nbformat.NotebookNode, dict]``: the transformed notebook and a dictionary
-            mapping test names to their parsed contents
+            ``TransformedNotebookContainer``: the autograder-formatted notebook
         """
         transformed_cells = self._get_transformed_cells(nb['cells'])
 
@@ -104,56 +123,23 @@ class NotebookTransformer:
         # strip out ignored lines
         transformed_nb = strip_ignored_lines(transformed_nb)
 
-        # TODO: this is a bad practice and only a monkey-patch for #340. we should do some better parsing
-        # of the nbformat version info to determine if this is necessary.
+        # TODO: this is a bad practice and only a monkey-patch for #340. we should do some better
+        # parsing of the nbformat version info to determine if this is necessary.
         remove_cell_ids(transformed_nb)
 
-        self.transformed_nb = transformed_nb
-
-    def _get_sanitized_nb(self):
-        """
-        """
-        nb = strip_solutions_and_output(self.transformed_nb)
-        if self.assignment.seed.variable:
-            nb = overwrite_seed_vars(nb, self.assignment.seed.variable, self.assignment.seed.student_value)
-        return nb
-
-    def write_transformed_nb(self, output_path, sanitize):
-        """
-        """
-        nb = self._get_sanitized_nb() if sanitize else self.transformed_nb
-        if self.assignment.is_rmd:
-            rmarkdown_converter.write_as_rmd(nb, str(output_path), not sanitize)
-        else:
-            nbformat.write(nb, str(output_path))
-
-    def write_tests(self, tests_dir, include_hidden, force_files):
-        """
-        """
-        self.tests_mgr.write_tests(self.transformed_nb, tests_dir, include_hidden=include_hidden, force_files=force_files)
+        return TransformedNotebookContainer(transformed_nb, self)
 
     def _get_transformed_cells(self, cells):
         """
-        Takes in a list of cells from the master notebook and returns a list of cells for the '
-        solutions notebook. 
-
-        Replaces test cells with a cell calling ``otter.Notebook.check``, inserts Markdown
-        response cells for manual questions with Markdown solutions, and comments out question
-        metadata in question cells, among other things.
+        Takes in a list of cells from the master notebook and returns a list of cells for the
+        autograder notebook.
 
         Args:
-            cells (``list[nbformat.NotebookNode]``): original code cells
-            assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+            cells (``list[nbformat.NotebookNode]``): the cells of the master notebook
 
         Returns:
-            ``tuple[list, dict]``: list of cleaned notebook cells and a dictionary mapping test
-            names to their parsed contents
+            ``list[nbformat.NotebookNode]``: the cells of the autograder notebook
         """
-        # if self.assignment.is_r:
-        #     from otter.assign.r_adapter.tests import read_test, gen_test_cell
-        # else:
-        #     from otter.assign.tests import read_test, gen_test_cell
-
         curr_block = []  # allow nested blocks
         transformed_cells = []
 
@@ -327,3 +313,76 @@ class NotebookTransformer:
                 self.add_export_tag_to_cell(nbformat.v4.new_markdown_cell(), end=True))
 
         return transformed_cells
+
+
+class TransformedNotebookContainer:
+    """
+    A container for the autograder notebook returned by ``NotebookTransformer.transform_notebook``
+    that contains logic for writing the notebook file (both autograder and student versions) and
+    the test files.
+
+    Args:
+        transformed_nb (``nbformat.NotebookNode``): the autograder notebook
+        nb_transformer (``NotebookTransformer``): the notebook transformer used to create
+            ``transformed_nb``
+    """
+
+    transformed_nb: nbformat.NotebookNode
+    """the autograder notebook"""
+
+    nb_transformer: NotebookTransformer
+    """the notebook transformer used to create ``transformed_nb``"""
+
+    def __init__(self, transformed_nb, nb_transformer):
+        self.transformed_nb = transformed_nb
+        self.nb_transformer = nb_transformer
+
+    def _get_sanitized_nb(self):
+        """
+        Return a copy of ``self.transformed_nb`` with solutions and outputs stripped and seed
+        variables replaced.
+
+        Returns:
+            ``nbformat.NotebookNode``: the student notebook
+        """
+        nb = strip_solutions_and_output(self.transformed_nb)
+        if self.nb_transformer.assignment.seed.variable:
+            nb = overwrite_seed_vars(
+                nb,
+                self.nb_transformer.assignment.seed.variable,
+                self.nb_transformer.assignment.seed.student_value,
+            )
+        return nb
+
+    def write_transformed_nb(self, output_path, sanitize):
+        """
+        Write the transformed notebook (either as an autograder or student notebook) to the
+        specified file, converting to R Markdown if necessary.
+
+        Args:
+            output_path (``pathlib.Path | str``): the path at which to write the notebook
+            sanitize (``bool``): whether to sanitize the notebook (i.e. write the student version)
+        """
+        nb = self._get_sanitized_nb() if sanitize else self.transformed_nb
+        if self.nb_transformer.assignment.is_rmd:
+            rmarkdown_converter.write_as_rmd(nb, str(output_path), not sanitize)
+        else:
+            nbformat.write(nb, str(output_path))
+
+    def write_tests(self, tests_dir, include_hidden, force_files):
+        """
+        Write the tests, either to the notebook metadata or files in ``tests_dir`` as indicated by
+        the assignment config.
+
+        Args:
+            tests_dir (``pathlib.Path | str | None``): the path to the directory of tests, if any
+            include_hidden (``bool``): whether to include hidden test cases
+            force_files (``bool``): whether to force writing the tests as files (overriding the
+                assignment config)
+        """
+        self.nb_transformer.tests_mgr.write_tests(
+            self.transformed_nb,
+            tests_dir,
+            include_hidden=include_hidden,
+            force_files=force_files,
+        )

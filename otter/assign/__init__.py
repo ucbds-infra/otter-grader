@@ -197,4 +197,4 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 test_pc = pc
 
             run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
-            LOGGER.info("All autograder tests passed.")  # TODO: should this be a direct print?
+            LOGGER.info("All autograder tests passed.")

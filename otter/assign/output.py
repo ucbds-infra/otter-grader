@@ -9,7 +9,7 @@ import warnings
 
 from .assignment import Assignment
 from .constants import NB_VERSION
-from .notebook_transformer import NotebookTransformer
+from .notebook_transformer import NotebookTransformer, TransformedNotebookContainer
 from .r_adapter import rmarkdown_converter
 from .r_adapter.tests_manager import RAssignmentTestsManager
 from .tests_manager import AssignmentTestsManager
@@ -17,7 +17,7 @@ from .utils import get_notebook_language
 
 
 def write_output_dir(
-    nb_transformer: NotebookTransformer,
+    transformed_nb: TransformedNotebookContainer,
     output_dir: pathlib.Path,
     assignment: Assignment,
     sanitize: bool,
@@ -44,14 +44,14 @@ def write_output_dir(
             shutil.copy(assignment.environment, str(output_dir / output_fn))
 
     # write tests
-    nb_transformer.write_tests(str(tests_dir), not sanitize, assignment.tests.files)
+    transformed_nb.write_tests(str(tests_dir), not sanitize, assignment.tests.files)
 
     # write a temp dir for otter generate tests
     if not sanitize and assignment.generate:
         assignment._temp_test_dir = pathlib.Path(tempfile.mkdtemp())
-        nb_transformer.write_tests(str(assignment._temp_test_dir), True, True)
+        transformed_nb.write_tests(str(assignment._temp_test_dir), True, True)
 
-    nb_transformer.write_transformed_nb(output_path, sanitize)
+    transformed_nb.write_transformed_nb(output_path, sanitize)
 
     # copy files
     for file in assignment.files:
@@ -62,9 +62,9 @@ def write_output_dir(
             
         else:
             # check that file is in subdir
-            # TODO: convert to something other than assertion error
-            assert str(assignment.master.parent) in os.path.abspath(file), \
-                f"{file} is not in a subdirectory of the master notebook directory"
+            if str(assignment.master.parent) not in os.path.abspath(file):
+                raise ValueError(
+                    f"{file} is not in a subdirectory of the master notebook directory")
             file_path = pathlib.Path(file).resolve()
             rel_path = file_path.parent.relative_to(assignment.master.parent)
             os.makedirs(output_dir / rel_path, exist_ok=True)
@@ -88,7 +88,7 @@ def write_output_directories(master_nb_path, result_dir, assignment):
 
     tests_mgr = (RAssignmentTestsManager if assignment.is_r else AssignmentTestsManager)(assignment)
     nb_transformer = NotebookTransformer(assignment, tests_mgr)
-    nb_transformer.transform_notebook(nb)
+    transformed_nb = nb_transformer.transform_notebook(nb)
 
     # update assignment.tests["files"] for R notebooks
     assignment.tests["files"] |= assignment.is_r
@@ -106,5 +106,5 @@ def write_output_directories(master_nb_path, result_dir, assignment):
     os.makedirs(student_dir, exist_ok=True)
 
     # populate directories
-    write_output_dir(nb_transformer, autograder_dir, assignment, False)
-    write_output_dir(nb_transformer, student_dir, assignment, True)
+    write_output_dir(transformed_nb, autograder_dir, assignment, False)
+    write_output_dir(transformed_nb, student_dir, assignment, True)
