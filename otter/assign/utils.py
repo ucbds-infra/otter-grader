@@ -240,9 +240,9 @@ def write_otter_config_file(assignment):
         config["variables"] = assignment.variables
 
     config_name = assignment.master.stem + '.otter'
-    with open(assignment.result / 'autograder' / config_name, "w+") as f:
+    with open(assignment.get_ag_path(config_name), "w+") as f:
         json.dump(config, f, indent=4)
-    with open(assignment.result / 'student' / config_name, "w+") as f:
+    with open(assignment.get_stu_path(config_name), "w+") as f:
         json.dump(config, f, indent=4)
 
 
@@ -271,7 +271,7 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
         generate_args["lang"] = "r"
 
     curr_dir = os.getcwd()
-    os.chdir(str(assignment.result / 'autograder'))
+    os.chdir(str(assignment.get_ag_path()))
 
     # use temp tests dir
     test_dir = "tests"
@@ -295,7 +295,7 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
     if assignment.autograder_files:
         ag_dir = os.getcwd()
         os.chdir(curr_dir)
-        output_dir  = assignment.result / 'autograder'
+        output_dir = assignment.get_ag_path()
 
         # copy files
         for file in assignment.autograder_files:

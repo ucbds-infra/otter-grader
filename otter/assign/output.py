@@ -111,8 +111,8 @@ def write_output_directories(assignment):
         assignment.tests["files"] = True
 
     # create directories
-    autograder_dir = assignment.result / 'autograder'
-    student_dir = assignment.result / 'student'
+    autograder_dir = assignment.get_ag_path()
+    student_dir = assignment.get_stu_path()
     shutil.rmtree(autograder_dir, ignore_errors=True)
     shutil.rmtree(student_dir, ignore_errors=True)
     os.makedirs(autograder_dir, exist_ok=True)

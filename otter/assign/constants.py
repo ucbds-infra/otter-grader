@@ -7,6 +7,10 @@ from textwrap import indent
 
 
 # TODO: cleanup
+AG_DIR_NAME = "autograder"
+STU_DIR_NAME = "student"
+
+
 NB_VERSION = 4
 BLOCK_QUOTE = "```"
 COMMENT_PREFIX = "#"

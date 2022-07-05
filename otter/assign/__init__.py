@@ -6,6 +6,7 @@ import pathlib
 import warnings
 
 from .assignment import Assignment
+from .constants import AG_DIR_NAME
 from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
@@ -106,8 +107,8 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             LOGGER.info("Generating solutions PDF")
             filtering = assignment.solutions_pdf == 'filtered'
 
-            src = os.path.abspath(str(result / 'autograder' / master.name))
-            dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-sol.pdf')))
+            src = os.path.abspath(str(assignment.get_ag_path(master.name)))
+            dst = os.path.abspath(str(assignment.get_ag_path(master.stem + '-sol.pdf')))
         
             if not assignment.is_rmd:
                 LOGGER.debug(f"Exporting {src} as notebook to {dst}")
@@ -143,8 +144,8 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         if assignment.template_pdf and not no_pdfs:
             LOGGER.info("Generating template PDF")
             
-            src = os.path.abspath(str(result / 'autograder' / master.name))
-            dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-template.pdf')))
+            src = os.path.abspath(str(assignment.get_ag_path( master.name)))
+            dst = os.path.abspath(str(assignment.get_ag_path(master.stem + '-template.pdf')))
 
             if not assignment.is_rmd:
                 LOGGER.debug("Attempting PDF via LaTeX export")
@@ -192,5 +193,10 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 LOGGER.debug("Using pre-configured plugins for running tests")
                 test_pc = pc
 
-            run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
+            run_tests(
+                assignment.get_ag_path(master.name),
+                debug=debug,
+                seed=seed,
+                plugin_collection=test_pc,
+            )
             LOGGER.info("All autograder tests passed.")

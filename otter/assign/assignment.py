@@ -6,10 +6,10 @@ import pathlib
 
 from typing import Any, Dict, List, Optional
 
-from ..utils import Loggable, loggers
+from .constants import AG_DIR_NAME, STU_DIR_NAME
 
+from ..utils import Loggable
 
-LOGGER = loggers.get_logger(__name__)
 
 # TODO: remove
 class MyConfig(fica.Config):
@@ -17,14 +17,12 @@ class MyConfig(fica.Config):
     def get(self, attr, default):
         return getattr(self, attr)
 
-    # TODO: add to fica
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
 
-# TODO: Loggable?
-# TODO: add detection/warnings/errors for when a user provides an invalid key?
-class Assignment(fica.Config):
+# TODO: add detection/warnings/errors for when a user provides an invalid key? (to be added to fica)
+class Assignment(fica.Config, Loggable):
     """
     Configurations for the assignment.
     """
@@ -219,6 +217,15 @@ class Assignment(fica.Config):
     notebook_basename: Optional[str] = None
     """the basename of the master notebook file"""
 
+    def __init__(self, user_config: Dict[str, Any] = {}) -> None:
+        self._logger.debug(f"Initializing with config: {user_config}")
+
+        super().__init__(user_config)
+
+    def update_(self, user_config: Dict[str, Any]):
+        self._logger.debug(f"Updating config: {user_config}")
+        return super().update_(user_config)
+
     @property
     def is_r(self):
         """
@@ -246,4 +253,14 @@ class Assignment(fica.Config):
 
     @property
     def ag_notebook_path(self):
-        return self.result / "autograder" / self.notebook_basename  # TODO: move dir name into constant
+        return self.result / AG_DIR_NAME / self.notebook_basename
+
+    def get_ag_path(self, path=""):
+        """
+        """
+        return self.result / AG_DIR_NAME / path
+
+    def get_stu_path(self, path=""):
+        """
+        """
+        return self.result / STU_DIR_NAME / path
