@@ -120,10 +120,10 @@ def test_script(load_config, expected_results):
 
     try:
         py, _ = nbconvert.export(nbconvert.PythonExporter, nb)
-        
+
         # remove magic commands
         py = "\n".join(l for l in py.split("\n") if not l.startswith("get_ipython"))
-        
+
         with FILE_MANAGER.open("autograder/submission/fails2and6H.py", "w+") as f:
             f.write(py)
 

@@ -161,10 +161,10 @@ class Notebook(Loggable):
             nb_path (``Optional[str]``): path to the notebook
             fail_silently (``bool``): if true, the method does not fail the notebook path can't be
                 resolved
-        
+
         Returns:
             ``str``: resolved notebook path
-        
+
         Raises:
             ``ValueError``: if no notebooks or too many notebooks are found.
         """
@@ -403,7 +403,7 @@ class Notebook(Loggable):
         for file in files:
             zf.write(file)
             self._logger.debug(f"Added file to zip file: {file}")
-        
+
         for file in self._addl_files:
             zf.write(file)
             self._logger.debug(f"Added plugin file to zip file: {file}")

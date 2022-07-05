@@ -145,17 +145,17 @@ class Assignment:
 
     To access a configuration value, use the dot syntax. For example, to access the ``generate`` key
     of an ``Assignment`` instance ``assignment``:
-    
+
     .. code-block::python
-        
+
         assignment.generate
-    
+
     If ``generate`` is present in ``assignment.config``, then the value in that dictionary will be 
     returned. If it is not, the value in ``Assignment.defaults`` will be returned instead. Configurations
     can also be updated using dot syntax:
-    
+
     .. code-block:: python
-        
+
         assignment.generate = True
 
     If a key not present in ``Assignment.defaults`` is attempted to be accessed or set, an 
@@ -210,7 +210,7 @@ class Assignment:
         Whether the language of the assignment is R
         """
         return self.lang == "r"
-    
+
     @property
     def is_python(self):
         """
@@ -224,7 +224,7 @@ class Assignment:
         Whether the input file is an RMarkdown document
         """
         return self.master.suffix.lower() == ".rmd"
-    
+
     @property
     def allowed_configs(self):
         """
@@ -235,10 +235,10 @@ class Assignment:
 def read_assignment_metadata(cell):
     """
     Return assignment metadata from an assignment cell
-    
+
     Args:
         cell (``nbformat.NotebookNode``): the assignment cell
-    
+
     Returns:
         ``dict``: assignment metadata
     """
@@ -254,10 +254,10 @@ def read_assignment_metadata(cell):
 def is_assignment_cell(cell):
     """
     Returns whether cell contains BEGIN ASSIGNMENT in a block quote
-    
+
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
-    
+
     Returns:
         ``bool``: whether the current cell is an assignment definition cell
     """

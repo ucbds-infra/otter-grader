@@ -19,7 +19,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
          debug=False):
     """
     Runs Otter Assign on a master notebook
-    
+
     Args:
         master (``str``): path to master notebook
         result (``str``): path to result directory
@@ -41,14 +41,14 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
     #     lang = lang.lower()
     #     assert lang in ["r", "python"], f"Language {lang} is not valid"
     #     assignment.lang = lang
-    
+
     # TODO: update this condition
     if True:
         result = get_relpath(master.parent, result)
         orig_dir = os.getcwd()
         os.chdir(master.parent)
         # master = pathlib.Path(master.name)
-    
+
     assignment.master, assignment.result = master, result
     # assignment.files = files
 
@@ -80,7 +80,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 assignment.generate["plugins"].extend(plugins)
         else:
             pc = None
-        
+
         # generate PDF of solutions
         if assignment.solutions_pdf and not assignment.is_rmd and not no_pdfs:
             print("Generating solutions PDF...")
@@ -137,7 +137,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 seed = None
             else:
                 seed = assignment.generate.get('seed', None)
-            
+
             if assignment._otter_config is not None:
                 test_pc = PluginCollection(assignment._otter_config.get("plugins", []), output_nb_path, {})
 
@@ -146,7 +146,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
             run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
             print("All tests passed!")
-    
+
     # for tests
     except:
         # TODO: change this condition

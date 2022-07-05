@@ -90,7 +90,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     # ensure that a token is present if necessary
     if "token" not in otter_config and token is not None:
         otter_config["token"] = token
-    
+
     elif "token" not in otter_config and "course_id" in otter_config and "assignment_id" in otter_config:
         client = APIClient()
         if username is not None and password is not None:
@@ -99,7 +99,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         else:
             token = client.get_token()
         otter_config["token"] = token
-    
+
     elif ("course_id" in otter_config) ^ ("assignment_id" in otter_config):
         raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")
 
@@ -135,7 +135,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
     else:
         plugin_collection.add_new_plugins(otter_config.get("plugins", []))
-    
+
     plugin_collection.run("during_generate", otter_config, assignment)
 
     # open requirements if it exists
@@ -157,7 +157,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     rendered = {}
     for fn, template in templates.items():
         rendered[fn] = template.render(**template_context)
-    
+
     if os.path.exists(output_path):
         os.remove(output_path)
 

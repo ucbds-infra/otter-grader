@@ -49,11 +49,11 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     Used to generate a dynamic variable name for grading functions
 
     This function generates a random name using the given length and character set.
-    
+
     Args:
         size (``int``): length of output name
         chars (``str``, optional): set of characters used to create function name
-    
+
     Returns:
         ``str``: randomized string name for grading function
     """
@@ -117,10 +117,10 @@ def chdir(new_dir):
 def get_source(cell):
     """
     Returns the source code of a cell in a way that works for both nbformat and JSON
-    
+
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
-    
+
     Returns:
         ``list`` of ``str``: each line of the cell source stripped of ending line breaks
     """
@@ -151,7 +151,7 @@ def load_default_file(provided_fn, default_fn, default_disabled=False):
     """
     if provided_fn is None and os.path.isfile(default_fn) and not default_disabled:
         provided_fn = default_fn
-    
+
     if provided_fn is not None:
         if not os.path.isfile(provided_fn):
             raise FileNotFoundError(f"Could not find specified file: {provided_fn}")
@@ -180,7 +180,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
         l, r = left // 2, left // 2
         if left % 2 == 1:
             r += 1
-        
+
         out = char * l + whitespace + mid_text + whitespace + char * r
 
     else:
@@ -277,7 +277,7 @@ def convert_config_description_dict(configs, for_docs=False):
 def assert_path_exists(path_tuples):
     """
     Ensure that a series of file paths exist and are of a specific type, or raise a ``ValueError``.
-    
+
     Elements of ``path_tuples`` should be 2-tuples where the first element is a string representing 
     the file path and the second element is ``True`` if the path should be a directory, ``False`` if 
     it should be a file, and ``None`` if it doesn't matter.

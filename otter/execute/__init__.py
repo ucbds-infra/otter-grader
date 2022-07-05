@@ -102,5 +102,5 @@ def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors
 
     if plugin_collection is not None:
         plugin_collection.run("after_grading", results)
-    
+
     return results

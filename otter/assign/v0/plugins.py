@@ -16,7 +16,7 @@ BEGIN_EXPORT = "# BEGIN PLUGIN EXPORT"
 def replace_plugins(lines):
     """
     Replaces plugins with calls in ``lines``
-    
+
     Args:
         lines (``list`` of ``str``): cell contents as a list of strings
 
@@ -33,13 +33,13 @@ def replace_plugins(lines):
             plugin = False
             ends.append(i)
             stripped.append([])
-        
+
         elif line.rstrip().endswith(BEGIN):
             assert not plugin, f"Nested plugins found in {lines}"
             starts.append(i)
             exports.append(False)
             plugin = True
-        
+
         elif line.rstrip().endswith(BEGIN_EXPORT):
             assert not plugin, f"Nested plugins found in {lines}"
             starts.append(i)
@@ -83,11 +83,11 @@ def replace_plugins(lines):
 def replace_plugins_with_calls(nb):
     """
     Write a notebook with plugins replaced with calls
-    
+
     Args:
         nb (``nbformat.NotebookNode``): the notebook
     """
     for cell in nb['cells']:
         cell['source'] = '\n'.join(replace_plugins(get_source(cell)))
-    
+
     return nb

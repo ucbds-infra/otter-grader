@@ -71,7 +71,7 @@ GradingTestCaseResult = namedtuple(
 class GradingResults:
     """
     Stores and wrangles test result objects
-    
+
     Initialize with a list of ``otter.test_files.abstract_test.TestFile`` subclass objects and 
     this class will store the results as named tuples so that they can be accessed/manipulated easily. 
     Also contains methods to put the results into a nice ``dict`` format or into the correct format 
@@ -79,7 +79,7 @@ class GradingResults:
 
     Args:
         results (``list`` of ``TestFile``): the list of test file objects summarized in this grade
-    
+
     Attributes:
         results (``dict``): maps test names to ``GradingTestCaseResult`` named tuples containing the 
             test result information
@@ -104,7 +104,7 @@ class GradingResults:
 
         Args:
             ottr_output (``str``): the JSON output of Ottr as a string
-        
+
         Returns:
             ``GradingResults``: the Ottr grading results
         """
@@ -128,16 +128,16 @@ class GradingResults:
                     message = tcr["error"],
                     passed = tcr["passed"],
                 ))
-            
+
             test_file = OttrTestFile(
                 name = os.path.splitext(os.path.basename(tfr["filename"]))[0],
                 path = tfr["filename"],
                 test_cases = test_cases,
             )
             test_file.test_case_results = test_case_results
-            
+
             test_files.append(test_file)
-        
+
         return cls(test_files)
 
     @property
@@ -160,14 +160,14 @@ class GradingResults:
         ``int`` or ``float``: the total points possible
         """
         return sum(tr.possible for tr in self.results.values())
-    
+
     def get_result(self, test_name):
         """
         Returns the ``TestFile`` corresponding to the test with name ``test_name``
 
         Args:
             test_name (``str``): the name of the desired test
-        
+
         Returns:
             ``TestFile``: the graded test file object
         """
@@ -179,7 +179,7 @@ class GradingResults:
 
         Args:
             test_name (``str``): the name of the test
-        
+
         Returns:
             ``int`` or ``float``: the score
         """
@@ -218,7 +218,7 @@ class GradingResults:
         Indicates that all results should be hidden from students on Gradescope
         """
         self.all_hidden = True
-    
+
     def set_plugin_data(self, plugin_name, data):
         """
         Stores plugin data for plugin ``plugin_name`` in the results. ``data`` must be picklable.
@@ -232,7 +232,7 @@ class GradingResults:
         except:
             raise ValueError(f"Data was not pickleable: {data}")
         self._plugin_data[plugin_name] = data
-    
+
     def get_plugin_data(self, plugin_name, default=None):
         """
         Retrieves data for plugin ``plugin_name`` in the results
@@ -388,5 +388,5 @@ class GradingResults:
             for test in output["tests"]:
                 test["visibility"]  = "hidden"
             output["stdout_visibility"] = "hidden"
-        
+
         return output

@@ -23,7 +23,7 @@ def run_doctest(name, doctest_string, global_environment):
         doctest_string (``str``): doctest in string form
         global_environment (``dict``): global environment resulting from the execution of a python 
             script/notebook
-    
+
     Returns:
         ``tuple`` of (``bool``, ``str``): results from running the test
     """

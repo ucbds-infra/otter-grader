@@ -21,7 +21,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     Implements the ``during_generate``, ``before_grading``, and ``after_grading`` events. Make sure 
     to list this plugin as ``otter.plugins.builtin.GoogleSheetsGradeOverride``, otherwise the 
     ``during_generate`` event of this plugin will not work.
-    
+
     The google sheet should have the following format:
 
     =============== ================== =========== ======== ==============
@@ -109,13 +109,13 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         if assignment is not None:
             curr_dir = os.getcwd()
             os.chdir(assignment.master.parent)
-        
+
         cfg_idx = [self.IMPORTABLE_NAME in c.keys() for c in otter_config["plugins"] if isinstance(c, dict)].index(True)
         creds_path = otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["credentials_json_path"]
         with open(creds_path, encoding="utf-8") as f:
             creds = json.load(f)
         otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["service_account_credentials"] = creds
-        
+
         if assignment is not None:
             os.chdir(curr_dir)
 

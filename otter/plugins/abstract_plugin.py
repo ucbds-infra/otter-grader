@@ -118,7 +118,7 @@ class AbstractOtterPlugin(ABC):
             ``PluginEventNotSupportedException``: if the event is not supported by this plugin
         """
         raise PluginEventNotSupportedException()
-    
+
     def notebook_export(self, *args, **kwargs):
         """
         Plugin event run when a student calls ``Notebook.export``. Accepts arbitrary arguments and 

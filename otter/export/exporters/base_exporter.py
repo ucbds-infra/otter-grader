@@ -17,12 +17,12 @@ TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 class BaseExporter(ABC):
     """
     Abstract base class for Otter Export exporters
-    
+
     Defines methods that read in notebooks from file paths and filter cells with pagebreak annotations 
     if necessary. Sublcasses are not meant to be instatiated but have class methods called. The abstract
     class method ``BaseExporter.convert_notebook`` does the heavy lifting of converting a notebook 
     file path into a PDF file.
-    
+
     Attributes:
         default_options (``dict``): the default options for all exporters
     """
@@ -41,7 +41,7 @@ class BaseExporter(ABC):
     def convert_notebook(cls, nb_path, dest, debug=False, **kwargs):
         """
         Writes a notebook at ``nb_path`` to a PDF file
-        
+
         Args:
             nb_path (``str``): path to notebook
             dest (``str``): path to write PDF
@@ -104,13 +104,13 @@ class BaseExporter(ABC):
                     if has_begin(line) and lines_before_begin == -1:
                         lines_before_begin = line_idx
                         in_question = True
-                
+
                 # check for end question regex in source
                 else:
                     if has_end(line):
                         lines_after_end = line_idx
                         in_question = False
-                        
+
                         # if we are creating pagebreaks, sub the end regex for a newpage directive
                         if pagebreaks:
                             source[line_idx] = sub_end_for_new_page(line)
@@ -122,7 +122,7 @@ class BaseExporter(ABC):
             # if both are in cell and before is after end, delete intervening lines
             elif lines_before_begin != -1 and lines_after_end != -1 and lines_after_end < lines_before_begin:
                 del source[lines_after_end+1:lines_before_begin]
-            
+
             else:
                 # if there is an end comment, delete lines after that
                 if lines_after_end != -1:
@@ -134,7 +134,7 @@ class BaseExporter(ABC):
 
             # update source
             cell["source"] = "\n".join(source)
-        
+
         # reverse indices list so that we do not need to decrement while deleting
         idx_to_delete.reverse()
 

@@ -38,7 +38,7 @@ def transform_notebook(nb, assignment):
 
     if assignment.check_all_cell and assignment.is_python:
         transformed_cells += gen_check_all_cell()
-    
+
     if assignment.export_cell and assignment.is_python:
         export_cell = assignment.export_cell
         if export_cell is True:
@@ -67,7 +67,7 @@ def get_transformed_cells(cells, assignment):
     Args:
         cells (``list`` of ``nbformat.NotebookNode``): original code cells
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-    
+
     Returns:
         ``tuple(list, dict)``: list of cleaned notebook cells and a dictionary mapping test names to 
             their parsed contents
@@ -76,7 +76,7 @@ def get_transformed_cells(cells, assignment):
         from .r_adapter.tests import read_test, gen_test_cell
     else:
         from .tests import read_test, gen_test_cell
-    
+
     # global SEED_REQUIRED, ASSIGNMENT_METADATA
     transformed_cells, test_files = [], {}
     question_metadata, test_cases, processed_solution, md_has_prompt = {}, [], False, False
@@ -90,7 +90,7 @@ def get_transformed_cells(cells, assignment):
 
         if is_ignore_cell(cell):
             continue
-        
+
         # this is the prompt cell or if a manual question then the solution cell
         if question_metadata and not processed_solution:
             assert not is_question_cell(cell), f"Found question cell before end of previous question cell: {cell}"
@@ -100,11 +100,11 @@ def get_transformed_cells(cells, assignment):
                 md_has_prompt = True
                 transformed_cells.append(cell)
                 continue
-            
+
             # if this a manual question but not MD solution, it has a code solution cell
             elif question_metadata.get('manual', False) and not is_markdown_solution_cell(cell):
                 md_has_prompt = True
-            
+
             # if there is no prompt, add a prompt cell
             elif is_markdown_solution_cell(cell) and not md_has_prompt:
                 transformed_cells.append(gen_markdown_response_cell())
@@ -118,7 +118,7 @@ def get_transformed_cells(cells, assignment):
 
             if not no_solution:
                 transformed_cells.append(cell)
-            
+
             processed_solution = True
 
         # if this is a test cell, parse and add to test_cases
@@ -145,7 +145,7 @@ def get_transformed_cells(cells, assignment):
                 manual = question_metadata.get('manual', False)
                 if manual:
                     need_close_export = True
-                
+
                 # reset vars
                 question_metadata, processed_solution, test_cases, md_has_prompt, no_solution = {}, False, [], False, False
 

@@ -193,7 +193,7 @@ def test_rmd_example():
             variable_path_exts=[".zip"],
         ),
     )
-    
+
     # check gradescope zip file
     check_gradescope_zipfile(
         glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 

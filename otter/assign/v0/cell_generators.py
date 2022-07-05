@@ -15,7 +15,7 @@ def gen_init_cell(nb_name, runs_on):
     Args:
         nb_name (``str``): the name of the notebook being graded
         runs_on (``str``): the interpreter that the notebook will be run on
-    
+
     Returns:
         ``nbformat.NotebookNode``: the init cell
     """
@@ -51,7 +51,7 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
     .. code-block:: markdown
 
         ## Submission
-        
+
         Make sure you have run all cells in your notebook in order before running the cell below, so 
         that all images/graphs appear in the output. The cell below will generate a zipfile for you 
         to submit. **Please save before exporting!**
@@ -64,10 +64,10 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
 
         # Save your notebook first, then run this cell to export your submission.
         grader.export()
-    
+
     The call to ``grader.export()`` contains different arguments based on the values passed to ``pdf``
     and ``filtering``. 
-    
+
     Args:
         instruction_text (``str``): extra instructions for students when exporting
         pdf (``bool``, optional): whether a PDF is needed
@@ -76,7 +76,7 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
             ``otter.Notebook.export`` to ``True``
         run_tests (``bool``, optional): whether to set the ``run_tests`` argument of 
             ``otter.Notebook.export`` to ``True``
-    
+
     Returns:
         ``list`` of ``nbformat.NotebookNode``: generated export cells
     """
@@ -84,7 +84,7 @@ def gen_export_cells(instruction_text, pdf=True, filtering=True, force_save=Fals
     instructions.source = "## Submission\n\nMake sure you have run all cells in your notebook in order before " \
     "running the cell below, so that all images/graphs appear in the output. The cell below will generate " \
     "a zip file for you to submit. **Please save before exporting!**"
-    
+
     if instruction_text:
         instructions.source += '\n\n' + instruction_text
 
@@ -116,7 +116,7 @@ def gen_check_all_cell():
     .. code-block:: markdown
 
         ---
-        
+
         To double-check your work, the cell below will rerun all of the autograder tests.
 
     The code cell has the following contents:
@@ -124,7 +124,7 @@ def gen_check_all_cell():
     .. code-block:: python
 
         grader.check_all()
-    
+
     Returns:
         ``list`` of ``nbformat.NotebookNode``: generated check-all cells
     """
@@ -145,7 +145,7 @@ def gen_close_export_cell():
     .. code-block:: markdown
 
         <!-- END QUESTION -->
-    
+
     Returns:
         ``nbformat.NotebookNode``: new Markdown cell with ``<!-- END QUESTION -->``
     """
@@ -157,7 +157,7 @@ def add_close_export_to_cell(cell):
     """
     Adds an HTML comment to close question export for PDF filtering to the top of ``cell``. ``cell``
     should be a Markdown cell. This adds ``<!-- END QUESTION-->`` as the first line of the cell.
-    
+
     Args:
         cell (``nbformat.NotebookNode``): the cell to add the close export to
 
