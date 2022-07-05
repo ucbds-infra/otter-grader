@@ -6,8 +6,6 @@ import pathlib
 
 from typing import Any, Dict, List, Optional
 
-from .constants import AG_DIR_NAME, STU_DIR_NAME
-
 from ..utils import Loggable
 
 

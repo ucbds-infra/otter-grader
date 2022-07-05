@@ -6,7 +6,6 @@ import pathlib
 import warnings
 
 from .assignment import Assignment
-from .constants import AG_DIR_NAME
 from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
