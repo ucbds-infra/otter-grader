@@ -10,7 +10,9 @@ from abc import ABC, abstractmethod
 
 from .utils import has_begin, has_end, sub_end_for_new_page
 
-NBFORMAT_VERSION = 4
+from ...utils import NBFORMAT_VERSION
+
+
 NBCONVERT_6 = int(nbconvert.__version__.split(".")[0]) >= 6    # for determining template inheritance
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 

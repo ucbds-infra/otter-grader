@@ -16,6 +16,11 @@ from functools import lru_cache
 from IPython import get_ipython
 
 
+# TODO: migrate other uses to this constant
+NBFORMAT_VERSION = 4
+"""the version of the Jupyter notebook format to use"""
+
+
 @contextmanager
 def block_print():
     """

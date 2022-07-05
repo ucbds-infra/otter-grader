@@ -8,12 +8,13 @@ import tempfile
 import warnings
 
 from .assignment import Assignment
-from .constants import NB_VERSION
 from .notebook_transformer import NotebookTransformer, TransformedNotebookContainer
 from .r_adapter import rmarkdown_converter
 from .r_adapter.tests_manager import RAssignmentTestsManager
 from .tests_manager import AssignmentTestsManager
 from .utils import get_notebook_language
+
+from ..utils import NBFORMAT_VERSION
 
 
 def write_output_dir(
@@ -90,7 +91,7 @@ def write_output_directories(assignment):
     if assignment.is_rmd:
         nb = rmarkdown_converter.read_as_notebook(assignment.master)
     else:
-        nb = nbformat.read(assignment.master, as_version=NB_VERSION)
+        nb = nbformat.read(assignment.master, as_version=NBFORMAT_VERSION)
 
     if assignment.lang is None:
         try:

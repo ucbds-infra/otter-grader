@@ -18,10 +18,9 @@ from ..utils import OtterRuntimeError
 from ....export import export_notebook
 from ....generate.token import APIClient
 from ....test_files import GradingResults
-from ....utils import chdir, get_source, knit_rmd_file
+from ....utils import chdir, get_source, knit_rmd_file, NBFORMAT_VERSION
 
 
-NBFORMAT_VERSION = 4
 R_PACKAGES = {
     "knitr": importr("knitr"),
     "ottr": importr("ottr"),

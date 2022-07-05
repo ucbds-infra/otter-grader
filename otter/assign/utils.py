@@ -11,8 +11,6 @@ import shutil
 from glob import glob
 from textwrap import indent
 
-from .constants import IGNORE_REGEX
-
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
 from ..utils import get_source
@@ -59,7 +57,8 @@ def is_ignore_cell(cell):
         ``bool``: whether the cell is a ignored
     """
     source = get_source(cell)
-    return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
+    return bool(source and
+        re.match(r"(##\s*ignore\s*##\s*|#\s*ignore\s*)", source[0], flags=re.IGNORECASE))
 
 
 def is_cell_type(cell, cell_type):

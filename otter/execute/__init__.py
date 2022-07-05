@@ -8,10 +8,7 @@ from .execute_notebook import execute_notebook
 from .transforms import filter_ignored_cells, script_to_notebook
 
 from ..test_files import create_test_file, GradingResults
-from ..utils import id_generator
-
-
-NBFORMAT_VERSION = 4
+from ..utils import id_generator, NBFORMAT_VERSION
 
 
 def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors=True, script=False, 

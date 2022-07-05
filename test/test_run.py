@@ -7,11 +7,11 @@ import pytest
 import os
 
 from otter.run.run_autograder import main as run_autograder
+from otter.utils import NBFORMAT_VERSION
 
 from .utils import delete_paths, TestFileManager
 
 
-NBFORMAT_VERSION = 4
 FILE_MANAGER = TestFileManager("test/test-run")
 
 

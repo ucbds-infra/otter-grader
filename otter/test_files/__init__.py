@@ -17,9 +17,7 @@ from .ottr_test import OttrTestFile
 
 from ..check.logs import QuestionNotInLogException
 from ..run.run_autograder.constants import DEFAULT_OPTIONS
-
-
-NBFORMAT_VERSION = 4
+from ..utils import NBFORMAT_VERSION
 
 
 def create_test_file(path, test_name=None):

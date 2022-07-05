@@ -3,13 +3,34 @@
 import re
 
 from dataclasses import dataclass
+from jinja2 import Template
+from textwrap import indent
 from typing import ClassVar
 
-from ..constants import OTTR_TEST_FILE_TEMPLATE
 from ..tests_manager import AssignmentTestsManager, TestCase
 from ..utils import get_source
 
 from ...test_files.abstract_test import TestFile
+
+
+# DON'T change this template or the regex that removes hidden tests will break in the R adapter!
+OTTR_TEST_FILE_TEMPLATE = Template("""\
+test = list(
+  name = "{{ name }}",
+  cases = list({% for tc in test_cases %}
+    ottr::TestCase$new(
+      hidden = {% if tc.hidden %}TRUE{% else %}FALSE{% endif %},
+      name = {% if tc.name %}"{{ tc.name }}"{% else %}NA{% endif %},
+      points = {% if tc.points is none %}NA{% else %}{{ tc.points }}{% endif %},{% if tc.success_message %}
+      success_message = "{{ tc.success_message }}",{% endif %}{% if tc.failure_message %}
+      failure_message = "{{ tc.failure_message }}",{% endif %}
+      code = {
+        {{ indent(tc.input, "        ").lstrip() }}{# lstrip so that the first line indent is correct #}
+      }
+    ){% if not loop.last %},{% endif %}{% endfor %}
+  )
+)""")
+OTTR_TEST_FILE_TEMPLATE.globals['indent'] = indent
 
 
 @dataclass

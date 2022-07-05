@@ -249,11 +249,13 @@ class Assignment(fica.Config, Loggable):
 
     @property
     def notebook_basename(self):
+        """the basename of the notebook"""
         return os.path.basename(str(self.master))
 
     @property
     def ag_notebook_path(self):
-        return self.result / AG_DIR_NAME / self.notebook_basename
+        """the path to the autograder notebook"""
+        return self.get_ag_path(self.notebook_basename)
 
     def get_ag_path(self, path=""):
         """
@@ -265,7 +267,7 @@ class Assignment(fica.Config, Loggable):
         Returns:
             ``pathlib.Path``: the path to the autograder directory or the specified file within it
         """
-        return self.result / AG_DIR_NAME / path
+        return self.result / "autograder" / path
 
     def get_stu_path(self, path=""):
         """
@@ -277,4 +279,4 @@ class Assignment(fica.Config, Loggable):
         Returns:
             ``pathlib.Path``: the path to the student directory or the specified file within it
         """
-        return self.result / STU_DIR_NAME / path
+        return self.result / "student" / path

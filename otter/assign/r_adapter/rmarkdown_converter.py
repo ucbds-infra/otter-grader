@@ -6,7 +6,7 @@ import re
 
 from copy import deepcopy
 
-from ..constants import NB_VERSION
+from ...utils import NBFORMAT_VERSION
 
 
 HTML_COMMENT_START = "<!--"
@@ -88,7 +88,7 @@ def read_as_notebook(rmd_path):
     if in_comment:
         raise ValueError("R Markdown file ends with an unclosed HTML comment")
 
-    nb = jupytext.reads("\n".join(new_lines), "Rmd", as_version=NB_VERSION)
+    nb = jupytext.reads("\n".join(new_lines), "Rmd", as_version=NBFORMAT_VERSION)
     nb["metadata"]["kernelspec"] = {"language": "r"}
 
     return nb

@@ -3,7 +3,6 @@
 import nbformat
 
 from .assignment import Assignment
-from .constants import MD_RESPONSE_CELL_SOURCE
 from .feature_toggle import FeatureToggle
 from .utils import lock
 
@@ -176,4 +175,4 @@ class CellFactory:
         Returns:
             ``nbformat.NotebookNode``: the response cell
         """
-        return nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)
+        return nbformat.v4.new_markdown_cell("_Type your answer here, replacing this text._")
