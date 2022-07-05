@@ -6,6 +6,8 @@ import re
 
 from copy import deepcopy
 
+from ..constants import NB_VERSION
+
 
 HTML_COMMENT_START = "<!--"
 HTML_COMMENT_END = "-->"
@@ -16,6 +18,13 @@ YAML_COMMENT_CHAR = "#"
 
 def read_as_notebook(rmd_path):
     """
+    Read an R Markdown file and convert it to a master notebook to be used with Otter Assign.
+
+    Args:
+        rmd_path (``pathlib.Path | str)``: the path to the master R Markdown file
+
+    Returns:
+        ``nbformat.NotebookNode``: the R Markdown file as a master notebook
     """
     with open(rmd_path) as f:
         lines = [l.strip("\n") for l in f.readlines()]
@@ -76,9 +85,10 @@ def read_as_notebook(rmd_path):
         else:
             new_lines.append(l)
 
-    assert not in_comment # TODO: raise different kind of error
+    if in_comment:
+        raise ValueError("R Markdown file ends with an unclosed HTML comment")
 
-    nb = jupytext.reads("\n".join(new_lines), "Rmd", as_version=4) # TODO: use constant
+    nb = jupytext.reads("\n".join(new_lines), "Rmd", as_version=NB_VERSION)
     nb["metadata"]["kernelspec"] = {"language": "r"}
 
     return nb
@@ -86,6 +96,12 @@ def read_as_notebook(rmd_path):
 
 def write_as_rmd(nb, rmd_path, has_solutions):
     """
+    Write an autograder- or student-formatted R notebook as an R Markdown file.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to write
+        rmd_path (``pathlib.Path | str``): the path at which to write the R Markdown file
+        has_solutions (``bool``): whether the provided notebook is an autograder notebook
     """
     if os.path.splitext(rmd_path)[1] != ".Rmd":
         raise ValueError("The provided path does not have the .Rmd extension")

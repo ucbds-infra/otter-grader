@@ -50,7 +50,7 @@ test = list(
       success_message = "{{ tc.success_message }}",{% endif %}{% if tc.failure_message %}
       failure_message = "{{ tc.failure_message }}",{% endif %}
       code = {
-        {{ indent(tc.body, "        ").lstrip() }}{# lstrip so that the first line indent is correct #}
+        {{ indent(tc.input, "        ").lstrip() }}{# lstrip so that the first line indent is correct #}
       }
     ){% if not loop.last %},{% endif %}{% endfor %}
   )

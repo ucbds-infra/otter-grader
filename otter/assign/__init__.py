@@ -54,13 +54,9 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
     LOGGER.debug(f"Normalized master path: {master}")
     LOGGER.debug(f"Normalized result path: {result}")
 
-    # if assignment.is_rmd:
-    #     from .rmarkdown_adapter.output import write_output_directories
-    # else:
-
     with chdir(master.parent):
         LOGGER.info("Generating views")
-        output_nb_path = write_output_directories(master, result, assignment)
+        write_output_directories(assignment)
 
         # update seed variables
         if assignment.seed.variable:
@@ -91,7 +87,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         # generate Gradescope autograder zipfile
         if assignment.generate:
             LOGGER.info("Generating autograder zipfile")
-            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
+            run_generate_autograder(assignment, username, password, plugin_collection=pc)
         
         # generate PDF of solutions
         if assignment.solutions_pdf and not no_pdfs:
@@ -161,7 +157,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                     "Otter Service and serialized environments are unsupported with R, "
                     "configurations ignored")
             else:
-                write_otter_config_file(master, result, assignment)
+                write_otter_config_file(assignment)
 
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:
@@ -177,11 +173,12 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
             if assignment._otter_config is not None:
                 LOGGER.debug("Retrieving updated plugins from otter_config.json for running tests")
-                test_pc = PluginCollection(assignment._otter_config.get("plugins", []), output_nb_path, {})
+                test_pc = PluginCollection(
+                    assignment._otter_config.get("plugins", []), assignment.ag_notebook_path, {})
 
             else:
                 LOGGER.debug("Using pre-configured plugins for running tests")
                 test_pc = pc
 
             run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
-            LOGGER.info("All autograder tests passed.")  # TODO: should this be a direct print?
+            LOGGER.info("All autograder tests passed.")

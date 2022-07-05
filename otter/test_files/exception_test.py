@@ -3,6 +3,7 @@
 import inspect
 import pathlib
 
+from dataclasses import replace
 from functools import lru_cache
 from textwrap import indent
 
@@ -47,7 +48,7 @@ class test_case:
         self.test_func = test_func
         return self
 
-    def to_namedtuple(self):
+    def to_dataclass(self):
         """
         Convert this test case to a ``TestCase`` named tuple for use in Otter's test file internals.
 
@@ -210,9 +211,9 @@ class ExceptionTestFile(TestFile):
         test_cases = []
         for _, v in env.items():
             if isinstance(v, test_case):
-                tc = v.to_namedtuple()
+                tc = v.to_dataclass()
                 if tc.name is None:
-                    tc =  tc._replace(name=f"{name} - {len(test_cases) + 1}")
+                    tc = replace(tc, name=f"{name} - {len(test_cases) + 1}")
                 test_cases.append(tc)
 
         test_cases = cls.resolve_test_file_points(points, test_cases)

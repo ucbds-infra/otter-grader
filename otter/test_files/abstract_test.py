@@ -1,25 +1,50 @@
 """Abstract test objects for providing a schema to write and parse test cases"""
 
 from abc import ABC, abstractmethod
-from collections import namedtuple
+from dataclasses import asdict, dataclass, replace
 from textwrap import indent
+from typing import Optional, Union
 
 
 OK_FORMAT_VARNAME = "OK_FORMAT"
 
 
-# class for storing the test cases themselves
-#   - body is the string that gets run for the test
-#   - hidden is the visibility of the test case
-#   - points is the number of points this test case is worth
-TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points", "success_message", "failure_message"])
+# # class for storing the test cases themselves
+# #   - body is the string that gets run for the test
+# #   - hidden is the visibility of the test case
+# #   - points is the number of points this test case is worth
+# TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points", "success_message", "failure_message"])
+
+@dataclass
+class TestCase:
+
+    name: str
+
+    body: str
+
+    hidden: bool
+
+    points: Union[int, float]
+
+    success_message: Optional[str]
+
+    failure_message: Optional[str]
 
 
-# class for storing the results of a single test _case_ (within a test file)
-#   - message should be a string to print out to the student (ignored if passed is True)
-#   - passed is whether the test case passed
-#   - hidden is the visibility of the test case
-TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed"])
+@dataclass
+class TestCaseResult:
+
+    test_case: TestCase
+
+    message: Optional[str]
+
+    passed: bool
+
+# # class for storing the results of a single test _case_ (within a test file)
+# #   - message should be a string to print out to the student (ignored if passed is True)
+# #   - passed is whether the test case passed
+# #   - hidden is the visibility of the test case
+# TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed"])
 
 
 class TestFile(ABC):
@@ -83,7 +108,7 @@ class TestFile(ABC):
         if isinstance(total_points, list):
             if len(total_points) != len(test_cases):
                 raise ValueError("Points specified in test has different length than number of test cases")
-            test_cases = [tc._replace(points=pt) for tc, pt in zip(test_cases, total_points)]
+            test_cases = [replace(tc, points=pt) for tc, pt in zip(test_cases, total_points)]
             total_points = None
 
         elif total_points is not None and not isinstance(total_points, (int, float)):
@@ -125,7 +150,7 @@ class TestFile(ABC):
                 per_remaining = 0.0
 
         point_values = [p if p is not None else per_remaining for p in point_values]
-        return [tc._replace(points=p) for tc, p in zip(test_cases, point_values)]
+        return [replace(tc, points=p) for tc, p in zip(test_cases, point_values)]
 
     @property
     def passed_all(self):
@@ -168,9 +193,9 @@ class TestFile(ABC):
             "possible": self.possible,
             "name": self.name,
             "path": self.path,
-            "test_cases": [tc._asdict() for tc in self.test_cases],
+            "test_cases": [asdict(tc) for tc in self.test_cases],
             "all_or_nothing": self.all_or_nothing,
-            "test_case_results": [tcr._asdict() for tcr in self.test_case_results],
+            "test_case_results": [asdict(tcr) for tcr in self.test_case_results],
         }
 
     def summary(self, public_only=False):

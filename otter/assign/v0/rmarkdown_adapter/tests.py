@@ -1,5 +1,7 @@
 import re
 
+from dataclasses import replace
+
 from .utils import Cell
 
 from ..constants import TEST_REGEX
@@ -49,7 +51,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
         f"Points for question {question['name']} could not be parsed:\n{points}"
 
     # update point values
-    tests = [tc._replace(points=p) for tc, p in zip(tests, points)]
+    tests = [replace(tc, points=p) for tc, p in zip(tests, points)]
     test = gen_suite(question['name'], tests, points)
 
     tests_dict[question['name']] = test
