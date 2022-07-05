@@ -12,7 +12,7 @@ from ..utils import Loggable, loggers
 
 LOGGER = loggers.get_logger(__name__)
 
-# TODO: remove
+# TODO: remove (#442)
 class MyConfig(fica.Config):
 
     def get(self, attr, default):
