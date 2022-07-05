@@ -23,6 +23,15 @@ def write_output_dir(
     sanitize: bool,
 ):
     """
+    Write an output directory (either for the autograder or student, as indicated by ``sanitize``).
+
+    Args:
+        transformed_nb (``otter.assign.notebook_transformed.TransformedNotebookContainer``): the
+            transformed notebook
+        output_dir (``pathlib.Path``): the path to the output directory being written (assumed to
+            already exist)
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+        sanitize (``bool``): whether to sanitize the output (by removing solutions and hidden tests)
     """
     output_path = output_dir / assignment.notebook_basename
     tests_dir = output_dir / "tests"
@@ -71,13 +80,17 @@ def write_output_dir(
             shutil.copy(file, str(output_dir / rel_path))
 
 
-def write_output_directories(master_nb_path, result_dir, assignment):
+def write_output_directories(assignment):
     """
+    Process a master notebook and write the results to the output directories.
+
+    Args:
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
     """
     if assignment.is_rmd:
-        nb = rmarkdown_converter.read_as_notebook(master_nb_path) # TODO: change arg name?
+        nb = rmarkdown_converter.read_as_notebook(assignment.master)
     else:
-        nb = nbformat.read(master_nb_path, as_version=NB_VERSION)
+        nb = nbformat.read(assignment.master, as_version=NB_VERSION)
 
     if assignment.lang is None:
         try:
@@ -98,8 +111,8 @@ def write_output_directories(master_nb_path, result_dir, assignment):
         assignment.tests["files"] = True
 
     # create directories
-    autograder_dir = result_dir / 'autograder'
-    student_dir = result_dir / 'student'
+    autograder_dir = assignment.result / 'autograder'
+    student_dir = assignment.result / 'student'
     shutil.rmtree(autograder_dir, ignore_errors=True)
     shutil.rmtree(student_dir, ignore_errors=True)
     os.makedirs(autograder_dir, exist_ok=True)

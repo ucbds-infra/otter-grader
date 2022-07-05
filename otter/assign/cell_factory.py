@@ -1,8 +1,6 @@
-"""Miscellaneous cell generators for Otter Assign"""
+"""Cell factory for Otter Assign"""
 
 import nbformat
-
-from textwrap import dedent
 
 from .assignment import Assignment
 from .constants import MD_RESPONSE_CELL_SOURCE
@@ -10,24 +8,38 @@ from .feature_toggle import FeatureToggle
 from .utils import lock
 
 
-# TODO: update docstrings
 class CellFactory:
     """
-    Attributes:
+    A factory for cells that make use of Otter's client package (e.g. init cell, check cell).
+
+    All (non-static cell-generating) methods in this factory should return a
+    ``list[nbformat.NotebookNode]``.
+
+    Args:
         assignment (``otter.assign.assignment.Assignment``): the assignment config
     """
 
     assignment: Assignment
+    """the assignment config"""
 
     def __init__(self, assignment):
         self.assignment = assignment
 
     def check_feature_toggle(self, feature_toggle: FeatureToggle):
+        """
+        Check whether the specified feature is enabled for this assignment.
+
+        Args:
+            feature_toggle (``otter.assign.feature_toggle.FeatureToggle``): the feature
+
+        Returns:
+            ``bool``: whether the feature is enabled
+        """
         return feature_toggle.value.is_enabled(self.assignment)
 
     def create_init_cells(self):
         """
-        Generates a cell to initialize Otter in the notebook.
+        Generate a cell to initialize Otter in the notebook.
 
         Returns:
             ``list[nbformat.NotebookNode]``: the init cell
@@ -49,18 +61,13 @@ class CellFactory:
 
     def create_check_cells(self, question):
         """
-        Parses a list of test named tuples and creates a single test file. Adds this test file as a value
-        to ``tests_dict`` with a key corresponding to the test's name, taken from ``question``. Returns
-        a code cell that runs the check on this test.
+        Create a cell calling ``otter.Notebook.check`` for the specified question.
         
         Args:
-            question (``dict``): question metadata
-            tests (``list`` of ``Test``): tests to be written
-            tests_dict (``dict``): the tests for this assignment
-            assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+            question (``otter.assign.question_config.QuestionConfig``): the question config
 
         Returns:
-            ``nbformat.NotebookNode``: code cell calling ``otter.Notebook.check`` on this test
+            ``list[nbformat.NotebookNode]``: the check cell
         """
         cell = nbformat.v4.new_code_cell()
         cell.source = ['grader.check("{}")'.format(question.name)]
@@ -69,23 +76,11 @@ class CellFactory:
 
     def create_check_all_cells(self):
         """
-        Generates a check-all cell and a Markdown cell with instructions to run all tests in the
-        notebook. The Markdown cell has the following contents:
-
-        .. code-block:: markdown
-
-            ---
-            
-            To double-check your work, the cell below will rerun all of the autograder tests.
-
-        The code cell has the following contents:
-
-        .. code-block:: python
-
-            grader.check_all()
+        Generate a check-all cell and a Markdown cell with instructions to run all tests in the
+        notebook.
         
         Returns:
-            ``list`` of ``nbformat.NotebookNode``: generated check-all cells
+            ``list[nbformat.NotebookNode]``: the check-all cells
         """
         instructions = nbformat.v4.new_markdown_cell()
         instructions.source = "---\n\nTo double-check your work, the cell below will rerun all " \
@@ -99,6 +94,14 @@ class CellFactory:
         return [instructions, check_all]
 
     def _get_export_cell_config(self):
+        """
+        Get the configurations from ``self.assignment`` for the export cell, coercing ``True`` to
+        an empty ``dict`` if necessary.
+
+        Returns:
+            ``bool | dict``: the configurations dict or ``False`` if the configuration is specified
+                as ``False``
+        """
         export_cell_config = self.assignment.export_cell
         if export_cell_config is True:
             export_cell_config = {}
@@ -106,42 +109,11 @@ class CellFactory:
 
     def create_export_cells(self):
         """
-        Generates export cells that instruct the student the run a code cell calling 
-        ``otter.Notebook.export`` to generate and download their submission. The Markdown cell
-        contains:
+        Generate export cells that instruct the student the run a code cell calling 
+        ``otter.Notebook.export`` to generate and download their submission.
 
-        .. code-block:: markdown
-
-            ## Submission
-            
-            Make sure you have run all cells in your notebook in order before running the cell
-            below, so that all images/graphs appear in the output. The cell below will generate a 
-            zip file for you to submit. **Please save before exporting!**
-
-        Additional instructions can be appended to this cell by passing a string to
-        ``instruction_text``.
-
-        The code cell contains:
-
-        .. code-block:: python
-
-            # Save your notebook first, then run this cell to export your submission.
-            grader.export()
-        
-        The call to ``grader.export()`` contains different arguments based on the values passed to
-        ``pdf`` and ``filtering``. 
-        
-        Args:
-            instruction_text (``str``): extra instructions for students when exporting
-            pdf (``bool``, optional): whether a PDF is needed
-            filtering (``bool``, optional): whether PDF filtering is needed
-            force_save (``bool``, optional): whether or not to set the ``force_save`` argument of 
-                ``otter.Notebook.export`` to ``True``
-            run_tests (``bool``, optional): whether to set the ``run_tests`` argument of 
-                ``otter.Notebook.export`` to ``True``
-        
         Returns:
-            ``list`` of ``nbformat.NotebookNode``: generated export cells
+            ``list[nbformat.NotebookNode]``: the export cells
         """
         export_cell_config = self._get_export_cell_config()
 
@@ -192,14 +164,14 @@ class CellFactory:
     @staticmethod
     def create_markdown_response_cell():
         """
-        Generates a Markdown response cell with the following contents:
+        Generate a Markdown response cell with the following contents:
 
         .. code-block:: markdown
 
             _Type your answer here, replacing this text._
 
         Note that, unlike the other methods, this method returns a single cell rather than a list of
-        cells.
+        cells (since it is not used in the same context).
 
         Returns:
             ``nbformat.NotebookNode``: the response cell

@@ -54,13 +54,9 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
     LOGGER.debug(f"Normalized master path: {master}")
     LOGGER.debug(f"Normalized result path: {result}")
 
-    # if assignment.is_rmd:
-    #     from .rmarkdown_adapter.output import write_output_directories
-    # else:
-
     with chdir(master.parent):
         LOGGER.info("Generating views")
-        write_output_directories(master, result, assignment)
+        write_output_directories(assignment)
 
         # update seed variables
         if assignment.seed.variable:
@@ -173,7 +169,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                     "Otter Service and serialized environments are unsupported with R, "
                     "configurations ignored")
             else:
-                write_otter_config_file(master, result, assignment)
+                write_otter_config_file(assignment)
 
         # run tests on autograder notebook
         if assignment.run_tests and not no_run_tests and assignment.is_python:

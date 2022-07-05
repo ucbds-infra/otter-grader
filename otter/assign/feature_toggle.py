@@ -1,4 +1,4 @@
-""""""
+"""Feature toggling for Otter Assign"""
 
 from enum import Enum
 

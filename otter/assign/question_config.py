@@ -7,6 +7,7 @@ from typing import Any, Dict
 
 class QuestionConfig(fica.Config):
     """
+    Configurations for a question.
     """
 
     name = fica.Key(
@@ -24,7 +25,8 @@ class QuestionConfig(fica.Config):
     )
 
     check_cell = fica.Key(
-        description="whether to include a check cell after this question (for autograded questions only)",
+        description="whether to include a check cell after this question (for autograded " \
+            "questions only)",
         default=True,
     )
 

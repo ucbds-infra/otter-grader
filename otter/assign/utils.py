@@ -35,10 +35,6 @@ class AssignNotebookFormatException(Exception):
         super().__init__(message, *args, **kwargs)
 
 
-#---------------------------------------------------------------------------------------------------
-# Getters
-#---------------------------------------------------------------------------------------------------
-
 def get_notebook_language(nb):
     """
     Parse the notebook kernel language and return it as a string.
@@ -51,10 +47,6 @@ def get_notebook_language(nb):
     """
     return nb["metadata"]["kernelspec"]["language"].lower()
 
-
-#---------------------------------------------------------------------------------------------------
-# Cell Type Checkers
-#---------------------------------------------------------------------------------------------------
 
 def is_ignore_cell(cell):
     """
@@ -69,18 +61,24 @@ def is_ignore_cell(cell):
     source = get_source(cell)
     return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
 
-# TODO: refactor to use this method instead of direct checks
+
 def is_cell_type(cell, cell_type):
+    """
+    Determine whether a cell is of a specific type.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to check
+        cell_type (``str``): the cell type to check for
+
+    Returns:
+        ``bool``: whether ``cell`` is of type ``cell_type``        
+    """
     return cell["cell_type"] == cell_type
 
 
-#---------------------------------------------------------------------------------------------------
-# Cell Reformatters
-#---------------------------------------------------------------------------------------------------
-
 def remove_output(nb):
     """
-    Removes all outputs from a notebook in-place
+    Remove all outputs from a notebook in-place.
     
     Args:
         nb (``nbformat.NotebookNode``): a notebook
@@ -94,7 +92,7 @@ def remove_output(nb):
 
 def remove_cell_ids(nb):
     """
-    Removes all cell IDs from a notebook in-place
+    Remove all cell IDs from a notebook in-place.
     
     Args:
         nb (``nbformat.NotebookNode``): a notebook
@@ -106,7 +104,7 @@ def remove_cell_ids(nb):
 
 def lock(cell):
     """
-    Makes a cell non-editable and non-deletable in-place
+    Make a cell non-editable and non-deletable in-place.
 
     Args:
         cell (``nbformat.NotebookNode``): cell to be locked
@@ -118,6 +116,14 @@ def lock(cell):
 
 def add_tag(cell, tag):
     """
+    Add a tag to a cell, returning a copy.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to add a tag to
+        tag (``str``): the tag to add
+
+    Returns:
+        ``nbformat.NotebookNode``: a copy of ``cell`` with the tag added
     """
     cell = copy.deepcopy(cell)
     if "tags" not in cell["metadata"]:
@@ -128,12 +134,28 @@ def add_tag(cell, tag):
 
 def has_tag(cell, tag):
     """
+    Determine whether a cell has a tag.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to check
+        tag (``str``): the tag to check for
+
+    Returns:
+        ``nbformat.NotebookNode``: whether ``cell`` is tagged with ``tag``
     """
     return tag in cell["metadata"].get("tags", [])
 
 
 def remove_tag(cell, tag):
     """
+    Remove a tag from a cell, returning a copy.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to remove a tag from
+        tag (``str``): the tag to remove
+
+    Returns:
+        ``nbformat.NotebookNode``: a copy of ``cell`` with the tag removed
     """
     cell = copy.deepcopy(cell)
     if "tags" not in cell["metadata"] or tag not in cell["metadata"]["tags"]:
@@ -142,20 +164,17 @@ def remove_tag(cell, tag):
     return cell
 
 
-#---------------------------------------------------------------------------------------------------
-# Miscellaneous
-#---------------------------------------------------------------------------------------------------
-
 def str_to_doctest(code_lines, lines):
     """
-    Converts a list of lines of Python code ``code_lines`` to a list of doctest-formatted lines ``lines``
+    Convert a list of lines of Python code ``code_lines`` to the doctest format and appending the
+    results to ``lines``.
 
     Args:
-        code_lines (``list``): list of lines of python code
-        lines (``list``): set of characters used to create function name
+        code_lines (``list[str]``): the code to convert
+        lines (``list[str]``): the list to append the converted lines to
     
     Returns:
-        ``list`` of ``str``: doctest formatted list of lines
+        ``list[str]``: a pointer to ``lines``
     """
     if len(code_lines) == 0:
         return lines
@@ -173,13 +192,17 @@ def str_to_doctest(code_lines, lines):
 
 def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
-    Runs tests in the autograder version of the notebook
+    Grade a notebook and throw an error if it does not receive a perfect score.
     
     Args:
-        nb_path (``pathlib.Path``): path to iPython notebooks
-        debug (``bool``, optional): ``True`` if errors should not be ignored
-        seed (``int``, optional): random seed for notebook execution
-        plugin_collection(``otter.plugins.PluginCollection``, optional): plugins to run with tests
+        nb_path (``pathlib.Path``): the path to the notebook to grade
+        debug (``bool``, optional): whether to raise errors instead of ignoring them
+        seed (``int``, optional): an RNG seed for notebook execution
+        plugin_collection (``otter.plugins.PluginCollection``, optional): plugins to run while
+            grading
+
+    Raises:
+        ``RuntimeError``: if the grade received by the notebook is not 100%
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
@@ -197,41 +220,39 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     os.chdir(curr_dir)
 
 
-def write_otter_config_file(master, result, assignment):
+def write_otter_config_file(assignment):
     """
-    Creates an Otter configuration file (a ``.otter`` file) for students to use Otter tools, including
-    saving environments and submitting to an Otter Service deployment, using assignment configurations.
-    Writes the resulting file to the ``autograder`` and ``student`` subdirectories of ``result``.
+    Create an Otter configuration file (a ``.otter`` file) for students to use Otter tools,
+    including saving environments and submitting to an Otter Service deployment, using assignment
+    configurations. Writes the resulting file to the ``autograder`` and ``student`` subdirectories
+    of ``assignment.result``.
 
     Args:
-        master (``pathlib.Path``): path to master notebook
-        result (``pathlib.Path``): path to result directory
-        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
     """
     config = {}
 
-    config["notebook"] = master.name
+    config["notebook"] = assignment.master.name
     config["save_environment"] = assignment.save_environment
     config["ignore_modules"] = assignment.ignore_modules
 
     if assignment.variables:
         config["variables"] = assignment.variables
 
-    config_name = master.stem + '.otter'
-    with open(result / 'autograder' / config_name, "w+") as f:
+    config_name = assignment.master.stem + '.otter'
+    with open(assignment.result / 'autograder' / config_name, "w+") as f:
         json.dump(config, f, indent=4)
-    with open(result / 'student' / config_name, "w+") as f:
+    with open(assignment.result / 'student' / config_name, "w+") as f:
         json.dump(config, f, indent=4)
 
 
 # TODO: update for new assign format
-def run_generate_autograder(result, assignment, gs_username, gs_password, plugin_collection=None):
+def run_generate_autograder(assignment, gs_username, gs_password, plugin_collection=None):
     """
-    Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
+    Run Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
     configurations in ``assignment.generate``.
 
     Args:
-        result (``pathlib.Path``): the path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         gs_username (``str``): Gradescope username for token generation
         gs_password (``str``): Gradescope password for token generation
@@ -250,7 +271,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         generate_args["lang"] = "r"
 
     curr_dir = os.getcwd()
-    os.chdir(str(result / 'autograder'))
+    os.chdir(str(assignment.result / 'autograder'))
 
     # use temp tests dir
     test_dir = "tests"
@@ -274,7 +295,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if assignment.autograder_files:
         ag_dir = os.getcwd()
         os.chdir(curr_dir)
-        output_dir  = result / 'autograder'
+        output_dir  = assignment.result / 'autograder'
 
         # copy files
         for file in assignment.autograder_files:

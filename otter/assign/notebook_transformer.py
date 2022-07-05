@@ -27,7 +27,7 @@ class NotebookTransformer:
     with all metadata and structural cells removed, and cells that set up and use Otter's client
     package (e.g. init cells, check cells, etc.) added. A *student-formatted* notebook is the same
     as an autograder-formatted notebook but has had its solutions and hidden tests stripped. (The
-    conversion from an autograder-fromatted notebook to a student-formatted notebook is not actually
+    conversion from an autograder-formatted notebook to a student-formatted notebook is not actually
     handled in this class but in the TransformedNotebookContainer class.)
 
     Args:

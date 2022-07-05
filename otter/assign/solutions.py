@@ -54,7 +54,7 @@ def overwrite_seed_vars(nb, seed_variable, seed):
 solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*=).* ?# ?SOLUTION")
 def solution_assignment_sub(match):
     """
-    Substitutes the first matching group  with ` ...`
+    Substitutes the first matching group  with `` ...``
     """
     prefix = match.group(1)
     return prefix + ' ...'
@@ -63,7 +63,7 @@ def solution_assignment_sub(match):
 solution_line_regex = re.compile(r"(\s*).* ?# ?SOLUTION")
 def solution_line_sub(match):
     """
-    Substitutes the first matching group  with `...`
+    Substitutes the first matching group  with ``...``
     """
     prefix = match.group(1)
     return prefix + '...'
@@ -137,10 +137,10 @@ def remove_ignored_lines(lines):
     Remove ignored lines in ``lines``.
     
     Args:
-        lines (``list`` of ``str``): cell source as a list of strings
+        lines (``list[str]``): cell source as a list of strings
 
     Returns:
-        ``list`` of ``str``: stripped version of lines without ignored lines
+        ``list[str]``: stripped version of lines without ignored lines
     """
     ignore_suffix = "# IGNORE"
     stripped = []
