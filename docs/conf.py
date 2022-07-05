@@ -61,6 +61,7 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
     'sphinx_click',
+    'fica.sphinx',
 ]
 
 napoleon_google_docstring = True
@@ -208,7 +209,7 @@ texinfo_documents = [
 files_to_replace = [
     "workflow/otter_generate/index.rst",
     "otter_assign/v0/python_notebook_format.rst",
-    "otter_assign/v1/notebook_format.rst",
+    # "otter_assign/v1/notebook_format.rst",
 ]
 
 def extract_descriptions_as_comments(config):

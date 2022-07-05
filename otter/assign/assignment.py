@@ -215,10 +215,10 @@ class Assignment(fica.Config, Loggable):
     notebook_basename: Optional[str] = None
     """the basename of the master notebook file"""
 
-    def __init__(self, user_config: Dict[str, Any] = {}) -> None:
+    def __init__(self, user_config: Dict[str, Any] = {}, *args, **kwargs) -> None:
         self._logger.debug(f"Initializing with config: {user_config}")
 
-        super().__init__(user_config)
+        super().__init__(user_config, *args, **kwargs)
 
     def update_(self, user_config: Dict[str, Any]):
         self._logger.debug(f"Updating config: {user_config}")

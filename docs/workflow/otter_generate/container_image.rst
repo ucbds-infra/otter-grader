@@ -13,14 +13,14 @@ contents:
     ├── environment.yml
     ├── files/
     ├── otter_config.json
-    ├── requirements.R
+    ├── requirements.r
     ├── requirements.txt
     ├── run_autograder
     ├── run_otter.py
     ├── setup.sh
     └── tests/
 
-Note that for pure-Python assignments, ``requirements.R`` is not included and all of the 
+Note that for pure-Python assignments, ``requirements.r`` is not included and all of the 
 R-pertinent portions of ``setup.sh`` are removed. Below are descriptions of each of the items 
 listed above and the Jinja2 templates used to create them (if applicable).
 
@@ -44,7 +44,7 @@ This script does the following:
 #. Install Miniconda
 #. Install R, ``r-essentials``, and ``r-devtools`` from conda
 #. Install Python requirements from ``requirements.txt`` (this step installs Otter itself)
-#. Install R requires from ``requirements.R``
+#. Install R requires from ``requirements.r``
 #. Install Otter's R autograding package ottr
 
 Currently this script is not customizable, but you can unzip the provided zip file to edit it 
@@ -76,7 +76,7 @@ by the version on the Gradescope container. If you choose to overwrite the requi
 to do the same.* 
 
 
-``requirements.R``
+``requirements.r``
 ------------------
 
 This file uses R functions like ``install.packages`` and ``devtools::install_github`` to install R 
@@ -84,7 +84,7 @@ packages. If you are creating an R assignment, it is this file (rather than ``re
 that your requirements and overwrite-requirements options are applied to. The template file 
 contains:
 
-.. literalinclude:: ../../../otter/generate/templates/r/requirements.R
+.. literalinclude:: ../../../otter/generate/templates/r/requirements.r
     :language: r
 
 
