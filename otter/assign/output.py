@@ -68,7 +68,7 @@ def write_output_dir(
         # if a directory, copy the entire dir
         if os.path.isdir(file):
             shutil.copytree(file, str(output_dir / os.path.basename(file)))
-            
+
         else:
             # check that file is in subdir
             if str(assignment.master.parent) not in os.path.abspath(file):

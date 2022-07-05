@@ -51,7 +51,7 @@ def get_notebook_language(nb):
 def is_ignore_cell(cell):
     """
     Returns whether the current cell should be ignored
-    
+
     Args:
         cell (``nbformat.NotebookNode``): a notebook cell
 
@@ -79,7 +79,7 @@ def is_cell_type(cell, cell_type):
 def remove_output(nb):
     """
     Remove all outputs from a notebook in-place.
-    
+
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
@@ -93,7 +93,7 @@ def remove_output(nb):
 def remove_cell_ids(nb):
     """
     Remove all cell IDs from a notebook in-place.
-    
+
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
@@ -172,7 +172,7 @@ def str_to_doctest(code_lines, lines):
     Args:
         code_lines (``list[str]``): the code to convert
         lines (``list[str]``): the list to append the converted lines to
-    
+
     Returns:
         ``list[str]``: a pointer to ``lines``
     """
@@ -193,7 +193,7 @@ def str_to_doctest(code_lines, lines):
 def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
     Grade a notebook and throw an error if it does not receive a perfect score.
-    
+
     Args:
         nb_path (``pathlib.Path``): the path to the notebook to grade
         debug (``bool``, optional): whether to raise errors instead of ignoring them

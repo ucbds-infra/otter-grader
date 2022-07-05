@@ -232,7 +232,7 @@ class Assignment(fica.Config, Loggable):
         Whether the language of the assignment is R
         """
         return self.lang == "r"
-    
+
     @property
     def is_python(self):
         """

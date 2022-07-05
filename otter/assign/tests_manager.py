@@ -71,7 +71,7 @@ class AssignmentTestsManager:
 
         Args:
             question (``otter.assign.question_config.QuestionConfig``): the question config
-        
+
         Returns:
             ``bool``: whether any of the test cases for the question are public
         """
@@ -253,7 +253,7 @@ class AssignmentTestsManager:
     def _create_ok_test_suite(cls, test_cases: List[TestCase]):
         """
         Create an OK-formatted test suite for a list of test cases.
-        
+
         Args:
             test_cases (``list[TestCase]``): the test cases
 
