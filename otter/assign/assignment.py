@@ -257,10 +257,24 @@ class Assignment(fica.Config, Loggable):
 
     def get_ag_path(self, path=""):
         """
+        Get the path to the autograder output directory or a file in that directory.
+
+        Args:
+            path (``str | pathlib.Path``): a path to append to the autograder output directory path
+
+        Returns:
+            ``pathlib.Path``: the path to the autograder directory or the specified file within it
         """
         return self.result / AG_DIR_NAME / path
 
     def get_stu_path(self, path=""):
         """
+        Get the path to the student output directory or a file in that directory.
+
+        Args:
+            path (``str | pathlib.Path``): a path to append to the student output directory path
+
+        Returns:
+            ``pathlib.Path``: the path to the student directory or the specified file within it
         """
         return self.result / STU_DIR_NAME / path
