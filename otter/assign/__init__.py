@@ -99,7 +99,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         # generate Gradescope autograder zipfile
         if assignment.generate:
             LOGGER.info("Generating autograder zipfile")
-            run_generate_autograder(result, assignment, username, password, plugin_collection=pc)
+            run_generate_autograder(assignment, username, password, plugin_collection=pc)
         
         # generate PDF of solutions
         if assignment.solutions_pdf and not no_pdfs:

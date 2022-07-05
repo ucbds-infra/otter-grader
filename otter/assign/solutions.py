@@ -8,6 +8,7 @@ from .utils import get_notebook_language, get_source, has_tag, is_cell_type, rem
     remove_tag
 
 
+BLOCK_PROMPT = "..."
 SOLUTION_CELL_TAG = "otter_assign_solution_cell"
 
 
@@ -92,6 +93,11 @@ def replace_solutions(lines, lang):
     Returns:
         ``list[str]``: stripped version of lines without solutions
     """
+    if lang == "r":
+        from .r_adapter.solutions import BLOCK_PROMPT
+    else:
+        BLOCK_PROMPT = globals()["BLOCK_PROMPT"]
+
     stripped = []
     solution = False
     for line in lines:
@@ -116,7 +122,7 @@ def replace_solutions(lines, lang):
             assert not solution, f"Nested BEGIN SOLUTION in {lines}"
             solution = True
             if not begin_solution.group(2):
-                line = begin_solution.group(1) + '...'
+                line = begin_solution.group(1) + BLOCK_PROMPT
             else:
                 continue
         for exp, sub in SUBSTITUTIONS[lang]:

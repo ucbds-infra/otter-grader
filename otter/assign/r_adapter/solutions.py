@@ -3,6 +3,9 @@
 import re
 
 
+BLOCK_PROMPT = "# YOUR CODE HERE"
+
+
 solution_assignment_regex = re.compile(r"(\s*[\w. $()]*(=|<-))(.*) ?# ?SOLUTION")
 def solution_assignment_sub(match):
     """
