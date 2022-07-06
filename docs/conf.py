@@ -204,11 +204,10 @@ texinfo_documents = [
 
 
 # -- YAML Dictionary Replacement ---------------------------------------------
+# TODO: remove w/ Otter v5
 
 files_to_replace = [
-    "workflow/otter_generate/index.rst",
     "otter_assign/v0/python_notebook_format.rst",
-    # "otter_assign/v1/notebook_format.rst",
 ]
 
 def extract_descriptions_as_comments(config):

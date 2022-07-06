@@ -38,12 +38,11 @@ class QuestionConfig(fica.Config):
 
     def __init__(
         self,
-        user_config: Dict[str, Any],
-        *args,
+        user_config: Dict[str, Any] = {},
         documentation_mode: bool = False,
         **kwargs,
     ):
         if "name" not in user_config and not documentation_mode:
             raise ValueError(f"Question name not specified: {user_config}")
 
-        super().__init__(user_config, *args, documentation_mode=documentation_mode, **kwargs)
+        super().__init__(user_config=user_config, documentation_mode=documentation_mode, **kwargs)

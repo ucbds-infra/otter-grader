@@ -83,9 +83,10 @@ plugin event must be gathered from the arguments passed to it.
 
 The ``before_grading`` method will be called before grading occurs, just after the plugins are 
 instantiated, and will be passed an instance of the
-``otter.run.run_autograder.autograder_config.AutograderConfig`` class, a
-`fica<https://fica.readthedocs.io/en/latest/>`_ configurations class. Any 
-changes made to the options will be used during grading.
+``otter.run.run_autograder.autograder_config.AutograderConfig`` class, a fica_ configurations class.
+Any changes made to the options will be used during grading.
+
+.. _fica: https://fica.readthedocs.io/
 
 
 ``before_execution``

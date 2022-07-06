@@ -111,9 +111,11 @@ values, but these can be configured by creating an Otter config JSON file and pa
 this file to the ``-c`` flag (``./otter_config.json`` is automatically added if found and ``-c`` is 
 unspecified).
 
-The supported keys and their default values are provided in 
-``otter.run.run_autograder.autograder_config.AutograderConfig``, the keys of which are described
-below.
+The supported keys and their default values are configured in a fica_ configuration class
+(``otter.run.run_autograder.autograder_config.AutograderConfig``). The available configurations are
+documented below.
+
+.. _fica: https://fica.readthedocs.io/
 
 .. fica:: otter.run.run_autograder.autograder_config.AutograderConfig
     :format: json
