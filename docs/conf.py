@@ -77,7 +77,6 @@ autosummary_generate = False
 ipython_execlines = [
     "import json",
     "import yaml",
-    "from otter.run.run_autograder.constants import DEFAULT_OPTIONS_WITH_DESCRIPTIONS",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

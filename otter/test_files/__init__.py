@@ -16,7 +16,7 @@ from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
 from ..check.logs import QuestionNotInLogException
-from ..run.run_autograder.constants import DEFAULT_OPTIONS
+from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import NBFORMAT_VERSION
 
 
@@ -315,20 +315,18 @@ class GradingResults:
         """
         return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
 
-    def to_gradescope_dict(self, config):
+    def to_gradescope_dict(self, ag_config):
         """
         Converts these results into a dictionary formatted for Gradescope's autograder. Requires a 
         dictionary of configurations for the Gradescope assignment generated using Otter Generate.
 
         Args:
-            config (``dict``): the grading configurations
+            ag_config (``otter.run.run_autograder.autograder_config.AutograderConfig``): the
+                autograder config
 
         Returns:
             ``dict``: the results formatted for Gradescope
         """
-        options = DEFAULT_OPTIONS.copy()
-        options.update(config)
-
         output = {"tests": []}
 
         if self.output is not None:
@@ -336,10 +334,10 @@ class GradingResults:
             # TODO: use output to display public test case results?
 
         # hidden visibility determined by show_hidden
-        hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
+        hidden_test_visibility = ("hidden", "after_published")[ag_config.show_hidden]
 
         # if show_all_public is true and all tests are public tests, display all tests in results
-        if options["show_all_public"] and all(tf.all_public for tf in self.results.values()):
+        if ag_config.show_all_public and all(tf.all_public for tf in self.results.values()):
             hidden_test_visibility = "visible"
 
         # start w/ summary of public tests
@@ -361,24 +359,24 @@ class GradingResults:
                 "output": test_file.summary(),
             })
 
-        if options["show_stdout"]:
+        if ag_config.show_stdout:
             output["stdout_visibility"] = "after_published"
 
-        if options["points_possible"] is not None:
+        if ag_config.points_possible is not None:
             try:
-                output["score"] = self.total / self.possible * options["points_possible"]
+                output["score"] = self.total / self.possible * ag_config.points_possible
             except ZeroDivisionError:
                 output["score"] = 0
 
-        if options["score_threshold"] is not None:
+        if ag_config.score_threshold is not None:
             try:
                 if self.total / self.possible >= config["score_threshold"]:
-                    output["score"] = options["points_possible"] or self.possible
+                    output["score"] = ag_config.points_possible or self.possible
                 else:
                     output["score"] = 0
             except ZeroDivisionError:
                 if 0 >= config["score_threshold"]:
-                    output["score"] = options["points_possible"] or self.possible
+                    output["score"] = ag_config.points_possible or self.possible
                 else:
                     output["score"] = 0
 

@@ -14,7 +14,7 @@ from .token import APIClient
 from .utils import zip_folder
 
 from ..plugins import PluginCollection
-from ..run.run_autograder.constants import DEFAULT_OPTIONS
+from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import load_default_file
 
 
@@ -39,7 +39,7 @@ LANGUAGE_BASED_CONFIGURATIONS = {
 
 
 def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_config=False, 
-         lang="python", requirements=None, no_requirements=False, overwrite_requirements=False, 
+         lang=None, requirements=None, no_requirements=False, overwrite_requirements=False, 
          environment=None, no_environment=False, username=None, password=None, token=None, files=[], 
          assignment=None, plugin_collection=None):
     """
@@ -103,15 +103,17 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     elif ("course_id" in otter_config) ^ ("assignment_id" in otter_config):
         raise ValueError(f"Otter config contains 'course_id' or 'assignment_id' but not both")
 
-    options = DEFAULT_OPTIONS.copy()
-    options.update(otter_config)
+    ag_config = AutograderConfig(otter_config)
 
     # update language
-    options["lang"] = options.get("lang", lang.lower())
-    if options["lang"] not in LANGUAGE_BASED_CONFIGURATIONS.keys():
-        raise ValueError(f"Invalid language specified: {options['lang']}")
+    if lang is not None:
+        ag_config.lang = lang
+        otter_config["lang"] = lang
 
-    lang_config = LANGUAGE_BASED_CONFIGURATIONS[options["lang"]]
+    if ag_config.lang not in LANGUAGE_BASED_CONFIGURATIONS.keys():
+        raise ValueError(f"Invalid language specified: {ag_config.lang}")
+
+    lang_config = LANGUAGE_BASED_CONFIGURATIONS[ag_config.lang]
 
     template_dir = lang_config["template_dir"]
 
@@ -123,11 +125,11 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
                 templates[fn] = Template(f.read())
 
     template_context = {
-        "autograder_dir": options['autograder_dir'],
+        "autograder_dir": ag_config.autograder_dir,
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_branch": OTTR_BRANCH,
-        "channel_priority_strict": options["channel_priority_strict"],
+        "channel_priority_strict": ag_config.channel_priority_strict,
     }
 
     if plugin_collection is None:

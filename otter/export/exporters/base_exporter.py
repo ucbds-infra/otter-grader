@@ -1,6 +1,4 @@
-"""
-ABC for Otter Export exporters
-"""
+"""ABC for Otter Export exporters"""
 
 import nbformat
 import nbconvert

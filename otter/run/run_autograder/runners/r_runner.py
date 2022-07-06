@@ -60,9 +60,9 @@ class RRunner(AbstractLanguageRunner):
             if line.startswith("```{r"):
                 insertions.append(i)
 
-        seed = f"set.seed({self.options['seed']})"
-        if self.options["seed_variable"]:
-            seed = f"{self.options['seed_variable']} = {self.options['seed']}"
+        seed = f"set.seed({self.ag_config.seed})"
+        if self.ag_config.seed_variable:
+            seed = f"{self.ag_config.seed_variable} = {self.ag_config.seed}"
 
         for i in insertions[::-1]:
             lines.insert(i + 1, seed)
@@ -77,7 +77,7 @@ class RRunner(AbstractLanguageRunner):
         with open(script_path) as f:
             script = f.read()
 
-        script = f"set.seed({self.options['seed']})\n" + script
+        script = f"set.seed({self.ag_config.seed})\n" + script
 
         with open(script_path, "w") as f:
             f.write(script)
@@ -113,7 +113,7 @@ class RRunner(AbstractLanguageRunner):
             rmd_path = rmds[0]
 
             # add seeds
-            if self.options["seed"] is not None:
+            if self.ag_config.seed is not None:
                 self.add_seeds_to_rmd_file(rmd_path)
 
             # create the R script
@@ -133,15 +133,15 @@ class RRunner(AbstractLanguageRunner):
         elif len(scripts) == 0:
             raise OtterRuntimeError("No gradable files found in submission")
 
-        if self.options["seed"] is not None:
+        if self.ag_config.seed is not None:
             self.add_seed_to_script(scripts[0]) 
 
         return scripts[0]
 
     def write_pdf(self):
         """
-        Generate a PDF of a submission using the options in ``self.options`` and return the that to 
-        the PDF.
+        Generate a PDF of a submission using the configurations in ``self.ag_config`` and return the
+        path to the PDF.
         """
         try:
             nbs = glob("*.ipynb")
@@ -161,8 +161,8 @@ class RRunner(AbstractLanguageRunner):
             pdf_path = os.path.splitext(subm_path)[0] + ".pdf"
             if ipynb:
                 export_notebook(
-                    subm_path, dest=pdf_path, filtering=self.options["filtering"], 
-                    pagebreaks=self.options["pagebreaks"], exporter_type="latex")
+                    subm_path, dest=pdf_path, filtering=self.ag_config.filtering, 
+                    pagebreaks=self.ag_config.pagebreaks, exporter_type="latex")
 
             else:
                 knit_rmd_file(subm_path, pdf_path)
@@ -192,7 +192,7 @@ class RRunner(AbstractLanguageRunner):
 
             for student_email in student_emails:
                 client.upload_pdf_submission(
-                    self.options["course_id"], self.options["assignment_id"], student_email, pdf_path)
+                    self.ag_config.course_id, self.ag_config.assignment_id, student_email, pdf_path)
 
             print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
 
@@ -200,22 +200,22 @@ class RRunner(AbstractLanguageRunner):
             print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
 
     def run(self):
-        os.environ["PATH"] = f"{self.options['miniconda_path']}/bin:" + os.environ.get("PATH")
+        os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH")
 
         with chdir("./submission"):
-            if self.options["token"] is not None:
-                client = APIClient(token=self.options["token"])
+            if self.ag_config.token is not None:
+                client = APIClient(token=self.ag_config.token)
                 generate_pdf = True
                 has_token = True
 
             else:
-                generate_pdf = self.options["pdf"]
+                generate_pdf = self.ag_config.pdf
                 has_token = False
                 client = None
 
             subm_path = self.resolve_submission_path()
             output = R_PACKAGES["ottr"].run_autograder(
-                subm_path, ignore_errors = not self.options["debug"])[0]
+                subm_path, ignore_errors = not self.ag_config.debug)[0]
             scores = GradingResults.from_ottr_json(output)
 
             if generate_pdf:

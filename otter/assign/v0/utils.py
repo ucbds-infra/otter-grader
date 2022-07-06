@@ -277,7 +277,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
         tests_dir=test_dir,
         output_path="autograder.zip",
         config="otter_config.json" if generate_args else None,
-        lang="python" if assignment.is_python else "r",
+        lang=None if assignment.is_python else "r",
         requirements=requirements,
         overwrite_requirements=assignment.overwrite_requirements,
         environment="environment.yml" if assignment.environment else None,

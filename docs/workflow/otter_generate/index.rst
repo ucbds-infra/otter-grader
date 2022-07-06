@@ -112,41 +112,11 @@ this file to the ``-c`` flag (``./otter_config.json`` is automatically added if 
 unspecified).
 
 The supported keys and their default values are provided in 
-``otter.run.run_autograder.constants.DEFAULT_OPTIONS``, which is generated from the dictionary 
-printed below for documenting each option.
+``otter.run.run_autograder.autograder_config.AutograderConfig``, the keys of which are described
+below.
 
-.. BEGIN YAML TARGET: otter.run.run_autograder.constants.DEFAULT_OPTIONS_WITH_DESCRIPTIONS
-
-.. code-block:: yaml
-
-    score_threshold: null             # a score threshold for pass-fail assignments
-    points_possible: null             # a custom total score for the assignment; if unspecified the sum of question point values is used.
-    show_stdout: false                # whether to display the autograding process stdout to students on Gradescope
-    show_hidden: false                # whether to display the results of hidden tests to students on Gradescope
-    show_all_public: false            # whether to display all test results if all tests are public tests
-    seed: null                        # a random seed for intercell seeding
-    seed_variable: null               # a variable name to override with the seed
-    grade_from_log: false             # whether to re-assemble the student's environment from the log rather than by re-executing their submission
-    serialized_variables: {}          # a mapping of variable names to type strings for validating a deserialized student environment
-    pdf: false                        # whether to generate a PDF of the notebook when not using Gradescope auto-upload
-    token: null                       # a Gradescope token for uploading a PDF of the notebook
-    course_id: None                   # a Gradescope course ID for uploading a PDF of the notebook
-    assignment_id: None               # a Gradescope assignment ID for uploading a PDF of the notebook
-    filtering: false                  # whether the generated PDF should have cells filtered out
-    pagebreaks: false                 # whether the generated PDF should have pagebreaks between filtered sectios
-    debug: false                      # whether to run the autograder in debug mode (without ignoring errors)
-    autograder_dir: /autograder       # the directory in which autograding is taking place
-    lang: python                      # the language of the assignment; one of {'python', 'r'}
-    miniconda_path: /root/miniconda3  # the path to the miniconda install directory
-    plugins: []                       # a list of plugin names and configuration details for grading
-    logo: true                        # whether to print the Otter logo to stdout
-    print_summary: true               # whether to print the grading summary
-    print_score: true                 # whether to print out the submission score in the grading summary
-    zips: false                       # whether zip files are being graded
-    log_level: null                   # a log level for logging messages; any value suitable for ``logging.Logger.setLevel``
-    channel_priority_strict: true     # whether to set conda's channel_priority config to strict in the setup.sh file
-
-.. END YAML TARGET
+.. fica:: otter.run.run_autograder.autograder_config.AutograderConfig
+    :format: json
 
 
 Grading with Environments
