@@ -370,12 +370,12 @@ class GradingResults:
 
         if ag_config.score_threshold is not None:
             try:
-                if self.total / self.possible >= config["score_threshold"]:
+                if self.total / self.possible >= ag_config.score_threshold:
                     output["score"] = ag_config.points_possible or self.possible
                 else:
                     output["score"] = 0
             except ZeroDivisionError:
-                if 0 >= config["score_threshold"]:
+                if 0 >= ag_config.score_threshold:
                     output["score"] = ag_config.points_possible or self.possible
                 else:
                     output["score"] = 0
