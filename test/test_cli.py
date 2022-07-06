@@ -404,10 +404,6 @@ def test_generate(run_cli):
         assert result.exit_code != 0
         mocked_generate.assert_not_called()
 
-        result = run_cli(["generate", "-l", "bar"])
-        assert result.exit_code != 0
-        mocked_generate.assert_not_called()
-
 
 def test_grade(run_cli):
     """
