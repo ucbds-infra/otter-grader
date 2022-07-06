@@ -72,7 +72,7 @@ def test_shelve():
         "module": sys,
         "ignored_func": calendar.setfirstweekday
     }
-    
+
     entry = LogEntry(
         event_type=EventType.CHECK,
         results=[],

@@ -6,7 +6,9 @@ PyYAML
 python-on-whales
 requests
 wrapt
+jupytext
 click
+fica>=0.1.1
 
 # plugins
 google-api-python-client

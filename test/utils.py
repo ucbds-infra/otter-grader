@@ -4,6 +4,7 @@ import os
 import pathlib
 import pytest
 import shutil
+import subprocess
 import tempfile
 import yaml
 import zipfile
@@ -51,8 +52,9 @@ def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
                 c1, c2 = f1.read(), f2.read()
                 if ignore_trailing_whitespace:
                     c1, c2 = c1.rstrip(), c2.rstrip()
-                assert c1 == c2, f"Contents of {p1} did not equal contents of {p2}"
-    
+                diff = subprocess.run(["diff", p1, p2], stdout=subprocess.PIPE).stdout.decode("utf-8")
+                assert c1 == c2, f"Contents of {p1} did not equal contents of {p2}:\n{diff}"
+
     except UnicodeDecodeError:
         with open(p1, "rb") as f1:
             with open(p2, "rb") as f2:
@@ -77,7 +79,7 @@ def assert_dirs_equal(dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_e
     assert os.path.exists(dir1), f"{dir1} does not exist"
     assert os.path.exists(dir2), f"{dir2} does not exist"
     assert os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type"
-    
+
     if os.path.isfile(dir1):
         if os.path.splitext(dir1)[1] not in ignore_ext:
             assert_files_equal(dir1, dir2)

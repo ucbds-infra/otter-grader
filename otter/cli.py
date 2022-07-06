@@ -110,7 +110,7 @@ defaults = generate.__kwdefaults__
 @click.option("--overwrite-requirements", is_flag=True, help="Overwrite (rather than append to) default requirements for Gradescope; ignored if no REQUIREMENTS argument")
 @click.option("-e", "--environment", type=click.Path(exists=True, dir_okay=False), help="Path to environment.yml file; ./environment.yml automatically checked (overwrite)")
 @click.option("--no-environment", is_flag=True, help="Disable auto-inclusion of unespecified environment file at ./environment.yml")
-@click.option("-l", "--lang", default=defaults["lang"], type=click.Choice(["python", "r"], case_sensitive=False), help="Assignment programming language; defaults to Python")
+@click.option("-l", "--lang", help="Assignment programming language; defaults to Python")
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--token", help="Gradescope token for uploading PDFs")

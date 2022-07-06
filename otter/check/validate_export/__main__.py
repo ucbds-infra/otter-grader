@@ -36,7 +36,7 @@ def main():
 
         with open(args.results_path, "wb") as f:
             dill.dump(results, f)
-    
+
     finally:
         shutil.rmtree(nb_dir)
 

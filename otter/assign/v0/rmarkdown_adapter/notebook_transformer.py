@@ -50,7 +50,7 @@ def get_transformed_cells(cells, assignment):
     Args:
         cells (``list`` of ``otter.assign.rmarkdown_adapter.utils.Cell``): original code cells
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-    
+
     Returns:
         ``tuple[list, dict]``: list of cleaned notebook cells and a dictionary mapping test names to 
             their parsed contents
@@ -82,7 +82,7 @@ def get_transformed_cells(cells, assignment):
 
             if not no_solution:
                 transformed_cells.append(cell)
-            
+
             processed_solution = True
 
         # if this is a test cell, parse and add to test_cases
@@ -102,7 +102,7 @@ def get_transformed_cells(cells, assignment):
                     # only add to notebook if there's a response cell or if there are public tests
                     if not no_solution or any_public_tests(test_cases):
                         transformed_cells.append(check_cell)
-                
+
                 # reset vars
                 question_metadata, processed_solution, test_cases, md_has_prompt, no_solution = {}, False, [], False, False
 

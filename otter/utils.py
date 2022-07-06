@@ -16,6 +16,11 @@ from functools import lru_cache
 from IPython import get_ipython
 
 
+# TODO: migrate other uses to this constant
+NBFORMAT_VERSION = 4
+"""the version of the Jupyter notebook format to use"""
+
+
 @contextmanager
 def block_print():
     """
@@ -49,11 +54,11 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     Used to generate a dynamic variable name for grading functions
 
     This function generates a random name using the given length and character set.
-    
+
     Args:
         size (``int``): length of output name
         chars (``str``, optional): set of characters used to create function name
-    
+
     Returns:
         ``str``: randomized string name for grading function
     """
@@ -117,10 +122,10 @@ def chdir(new_dir):
 def get_source(cell):
     """
     Returns the source code of a cell in a way that works for both nbformat and JSON
-    
+
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
-    
+
     Returns:
         ``list`` of ``str``: each line of the cell source stripped of ending line breaks
     """
@@ -151,7 +156,7 @@ def load_default_file(provided_fn, default_fn, default_disabled=False):
     """
     if provided_fn is None and os.path.isfile(default_fn) and not default_disabled:
         provided_fn = default_fn
-    
+
     if provided_fn is not None:
         if not os.path.isfile(provided_fn):
             raise FileNotFoundError(f"Could not find specified file: {provided_fn}")
@@ -180,7 +185,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
         l, r = left // 2, left // 2
         if left % 2 == 1:
             r += 1
-        
+
         out = char * l + whitespace + mid_text + whitespace + char * r
 
     else:
@@ -192,6 +197,7 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
     print(out, **kwargs)
 
 
+# TODO: remove when Otter Assign format v0 is removed
 def convert_config_description_dict(configs, for_docs=False):
     """
     Recursively converts a documented list of dictionary configurations into a dictionary with the 
@@ -276,7 +282,7 @@ def convert_config_description_dict(configs, for_docs=False):
 def assert_path_exists(path_tuples):
     """
     Ensure that a series of file paths exist and are of a specific type, or raise a ``ValueError``.
-    
+
     Elements of ``path_tuples`` should be 2-tuples where the first element is a string representing 
     the file path and the second element is ``True`` if the path should be a directory, ``False`` if 
     it should be a file, and ``None`` if it doesn't matter.
@@ -320,33 +326,13 @@ def knit_rmd_file(rmd_path, pdf_path):
         rmarkdown.render(ntf.name, "pdf_document", pdf_path)
 
 
-def recursive_dict_update(d, u):
-    """
-    Recursively update a possibly-nested ``dict`` in-place.
-
-    Args:
-        d (``dict``): the original dictionary to be updated
-        u (``dict``): the dictionary of new values to override in ``d``
-
-    Returns:
-        ``dict``: the original dictionary
-    """
-    for k, v in u.items():
-        d_v = d.get(k)
-        if isinstance(v, Mapping) and isinstance(d_v, Mapping):
-            d[k] = recursive_dict_update(d_v, v)
-        else:
-            d[k] = v
-
-    return d
-
-
 class loggers:
 
     _format = "[%(levelname)s %(name)s.%(funcName)s] %(message)s"
     _instances = {}
     _log_level = logging.WARNING
 
+    @staticmethod
     def __new__(cls, *args, **kwargs):
         raise NotImplementedError("This class is not meant to be instantiated")
 
@@ -406,7 +392,7 @@ class loggers:
 
 class Loggable:
     """
-    A class for inheriting from which provides a logger via a class- and instance-accessible field.
+    A class for inheriting from that provides a logger via a class- and instance-accessible field.
     """
 
     _logger_instance = None
@@ -414,7 +400,7 @@ class Loggable:
     @classmethod
     def _load_logger(cls):
         """
-        Set-up the ``_logger`` field of the ``Notebook``.
+        Set-up the ``_logger`` field.
         """
         if cls._logger_instance is None:
             name = cls.__module__ + "." + cls.__name__
@@ -425,9 +411,7 @@ class Loggable:
         """
         ``logging.Logger``: the logger instance for this class
         """
-        self._load_logger()
-        return type(self)._logger_instance
-
+        return self._get_logger()
 
     @classmethod
     def _get_logger(cls):

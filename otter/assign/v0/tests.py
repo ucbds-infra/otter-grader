@@ -7,7 +7,8 @@ import pprint
 import yaml
 import nbformat
 
-from collections import namedtuple
+from dataclasses import dataclass
+from typing import Union, Optional
 
 from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGEX, OTTR_TEST_NAME_REGEX, \
     OTTR_TEST_FILE_TEMPLATE
@@ -16,13 +17,26 @@ from ...test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
 from ...test_files.metadata_test import NOTEBOOK_METADATA_KEY
 
 
-Test = namedtuple('Test', ['input', 'output', 'hidden', 'points', 'success_message', 'failure_message'])
+@dataclass
+class Test:
+
+    input: str
+
+    output: str
+
+    hidden: bool
+
+    points: Union[int, float]
+
+    success_message: Optional[str]
+
+    failure_message: Optional[str]
 
 
 def is_test_cell(cell):
     """
     Returns whether the current cell is a test cell
-    
+
     Args:
         cell (``nbformat.NotebookNode``): a notebook cell
 
@@ -41,7 +55,7 @@ def any_public_tests(test_cases):
 
     Args:
         test_cases (``list`` of ``Test``): list of test cases
-    
+
     Returns:
         ``bool``: whether any of the tests are public
     """
@@ -52,7 +66,7 @@ def read_test(cell, question, assignment):
     """
     Returns the contents of a test as an ``(input, output, hidden, points, success_message, 
     failure_message)`` named tuple
-    
+
     Args:
         cell (``nbformat.NotebookNode``): a test cell
         question (``dict``): question metadata
@@ -82,7 +96,7 @@ def read_test(cell, question, assignment):
     else:
         config = {}
         i = 0
-    
+
     hidden = config.get("hidden", hidden)
     points = config.get("points", None)
     success_message = config.get("success_message", None)
@@ -96,7 +110,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
     Parses a list of test named tuples and creates a single test file. Adds this test file as a value
     to ``tests_dict`` with a key corresponding to the test's name, taken from ``question``. Returns
     a code cell that runs the check on this test.
-    
+
     Args:
         question (``dict``): question metadata
         tests (``list`` of ``Test``): tests to be written
@@ -138,7 +152,7 @@ def gen_test_cell(question, tests, tests_dict, assignment):
 def gen_suite(tests):
     """
     Generates an OK test suite for a list of tests as named tuples
-    
+
     Args:
         tests (``list`` of ``otter.assign.Test``): test cases
 
@@ -158,7 +172,7 @@ def gen_suite(tests):
 def gen_case(test):
     """
     Generates an OK test case for a test named tuple
-    
+
     Args:
         test (``otter.assign.Test``): OK test for this test case
 
@@ -184,7 +198,7 @@ def gen_case(test):
 def write_test(nb, path, test, use_file=False):
     """
     Writes an OK test file
-    
+
     Args:
         nb (``dict``): the notebook being written
         path (``str``): path of file to be written or the name of the test
@@ -210,7 +224,7 @@ def write_test(nb, path, test, use_file=False):
 def remove_hidden_tests_from_dir(nb, test_dir, assignment, use_files=False):
     """
     Rewrites test files in a directory to remove hidden tests
-    
+
     Args:
         nb (``dict``): the notebook being written
         test_dir (``pathlib.Path``): path to test files directory

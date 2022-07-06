@@ -6,9 +6,7 @@ test = list(
       name = NA,
       points = 1,
       code = {
-        test_that("q1a", {
-            expect_true(is.numeric(x))
-        })
+        testthat::expect_true(is.numeric(x))
       }
     ),
     ottr::TestCase$new(
@@ -16,10 +14,8 @@ test = list(
       name = NA,
       points = 1,
       code = {
-        test_that("q1b", {
-            expect_true(0 < x)
-            expect_true(x < 100)
-        })
+        testthat::expect_true(0 < x)
+        testthat::expect_true(x < 100)
       }
     ),
     ottr::TestCase$new(
@@ -27,9 +23,7 @@ test = list(
       name = NA,
       points = 1,
       code = {
-        test_that("q1c", {
-            expect_equal(x, 2)
-        })
+        testthat::expect_equal(x, 2)
       }
     ),
     ottr::TestCase$new(
@@ -38,9 +32,7 @@ test = list(
       points = 2,
       success_message = "congrats",
       code = {
-        test_that("q1d", {
-            expect_equal(as.character(x), "2")
-        })
+        testthat::expect_equal(as.character(x), "2")
       }
     )
   )

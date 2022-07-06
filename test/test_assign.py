@@ -5,18 +5,22 @@ import os
 import pathlib
 import pytest
 import shutil
-import tempfile
 
-from contextlib import contextmanager
 from glob import glob
 from unittest import mock
 
 from otter.assign import main as assign
-from otter.assign.tests import determine_question_point_value, Test
+from otter.assign.assignment import Assignment
+from otter.assign.question_config import QuestionConfig
+from otter.assign.tests_manager import AssignmentTestsManager, TestCase
 from otter.generate.token import APIClient
 from otter.utils import nullcontext
 
 from .utils import assert_dirs_equal, dump_yaml, TestFileManager, unzip_to_temp
+
+
+# prevent pytest from thinking TestCase is a testing class
+TestCase.__test__ = False
 
 
 FILE_MANAGER = TestFileManager("test/test-assign")
@@ -189,7 +193,7 @@ def test_rmd_example():
             variable_path_exts=[".zip"],
         ),
     )
-    
+
     # check gradescope zip file
     check_gradescope_zipfile(
         glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 
@@ -201,12 +205,14 @@ def test_point_value_rounding():
     """
     Tests that point values are rounded appropriately.
     """
+    question = QuestionConfig({"name": "q1", "points": None, "manual": False})
+    tests_mgr = AssignmentTestsManager(Assignment())
+    for _ in range(11):
+        tests_mgr._add_test_case(question, TestCase("", "", False, 4 / 11, "", ""))
+
     # sum(4 / 11 for _ in range(11)) evaluates to 4.000000000000001 in Python, so this will
     # check that the per-test-case point values are correctly rounded.
-    points = determine_question_point_value({
-        "points": None,
-        "manual": False,
-    }, [Test("", "", False, 4 / 11, "", "") for _ in range(11)])
+    points = tests_mgr.determine_question_point_value(question)
     assert points == 4
 
 

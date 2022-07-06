@@ -19,8 +19,8 @@ rng_seed <- 90
 
 **Question 1.** Assign x to the smallest prime number.
 
-```{r}
-x <- ...
+```{r tags=c()}
+x <- NULL # YOUR CODE HERE
 ```
 
 ```{r}
@@ -29,25 +29,25 @@ x <- ...
 
 **Question 2.** Visualize the answer
 
-```{r}
+```{r tags=c()}
 plt.plot(...);
 ```
 
 This cell is not part of a question.
 
 ```{r}
-y = 3
+y <- 3
 ```
 
 **Question 3.** Define `square` and assign `nine` to 3 squared.
 
-```{r}
-square = function(x) {
-    y = ...
+```{r tags=c()}
+square <- function(x) {
+    y <- NULL # YOUR CODE HERE
     # YOUR CODE HERE
 }
 
-nine = ...
+nine <- NULL # YOUR CODE HERE
 ```
 
 ```{r}
@@ -66,14 +66,14 @@ _Type your answer here, replacing this text._
 
 **Question 5.** Approximate the area and circumference of a circle with radius 3.
 
-```{r}
-pi = 3.14
+```{r tags=c()}
+pi <- 3.14
 if (TRUE) {
     # YOUR CODE HERE
     print(paste0('A circle with radius', radius, 'has area', area))
 }
 
-circumference = function(r) {
+circumference <- function(r) {
     # Next, define a circumference function.
 }
 ```
@@ -94,8 +94,8 @@ _Type your answer here, replacing this text._
 
 **Question 8:** Test intercell seeding by generating 10 random $N(4,2)$ numbers.
 
-```{r}
-z = ...
+```{r tags=c()}
+z <- NULL # YOUR CODE HERE
 z
 ```
 
@@ -104,3 +104,12 @@ z
 ```
 
 **You're done!**
+
+## Submission
+
+Make sure you have run all cells in your notebook in order before running the cell below, so that all images/graphs appear in the output. The cell below will generate a zip file for you to submit. **Please save before exporting!**
+
+```{r}
+# Save your notebook first, then run this cell to export your submission.
+ottr::export("rmd-example.Rmd")
+```

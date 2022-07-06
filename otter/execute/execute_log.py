@@ -26,7 +26,7 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
         test_dir (``str``, optional): path to directory of tests in grading environment
         variables (``dict``, optional): map of variable names -> type string to check type of deserialized
             object to prevent arbitrary code from being put into the environment
-    
+
     Results:
         ``dict``: global environment resulting from executing all code of the input notebook
     """
@@ -39,7 +39,7 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
         source = f"import otter\ngrader = otter.Notebook(\"{test_dir}\")\n"
     else:
         source = f"import otter\ngrader = otter.Notebook()\n"
-    
+
     if cwd:
         source +=  f"import sys\nsys.path.append(\"{cwd}\")\n"
 
@@ -53,7 +53,7 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
                 # transform the input to executable Python
                 # FIXME: use appropriate IPython functions here
                 isp = IPythonInputSplitter(line_input_checker=False)
-                
+
                 code_lines = []
                 cell_source_lines = cell['source']
                 source_is_str_bool = False
@@ -63,7 +63,7 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
 
                 # only execute import statements
                 cell_source_lines = [re.sub(r"^\s+", "", l) for l in cell_source_lines if "import" in l]                                
-                
+
                 for line in cell_source_lines:
                     try:
                         exec(line, global_env)
@@ -88,5 +88,5 @@ def execute_log(nb, log, check_results_list_name="check_results_secret", initial
             logged_questions.append(entry.question)
 
     print("Questions executed from log: {}".format(", ".join(logged_questions)))
-    
+
     return global_env

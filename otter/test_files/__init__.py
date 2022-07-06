@@ -16,10 +16,8 @@ from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
 from ..check.logs import QuestionNotInLogException
-from ..run.run_autograder.constants import DEFAULT_OPTIONS
-
-
-NBFORMAT_VERSION = 4
+from ..run.run_autograder.autograder_config import AutograderConfig
+from ..utils import NBFORMAT_VERSION
 
 
 def create_test_file(path, test_name=None):
@@ -71,7 +69,7 @@ GradingTestCaseResult = namedtuple(
 class GradingResults:
     """
     Stores and wrangles test result objects
-    
+
     Initialize with a list of ``otter.test_files.abstract_test.TestFile`` subclass objects and 
     this class will store the results as named tuples so that they can be accessed/manipulated easily. 
     Also contains methods to put the results into a nice ``dict`` format or into the correct format 
@@ -79,7 +77,7 @@ class GradingResults:
 
     Args:
         results (``list`` of ``TestFile``): the list of test file objects summarized in this grade
-    
+
     Attributes:
         results (``dict``): maps test names to ``GradingTestCaseResult`` named tuples containing the 
             test result information
@@ -104,7 +102,7 @@ class GradingResults:
 
         Args:
             ottr_output (``str``): the JSON output of Ottr as a string
-        
+
         Returns:
             ``GradingResults``: the Ottr grading results
         """
@@ -128,16 +126,16 @@ class GradingResults:
                     message = tcr["error"],
                     passed = tcr["passed"],
                 ))
-            
+
             test_file = OttrTestFile(
                 name = os.path.splitext(os.path.basename(tfr["filename"]))[0],
                 path = tfr["filename"],
                 test_cases = test_cases,
             )
             test_file.test_case_results = test_case_results
-            
+
             test_files.append(test_file)
-        
+
         return cls(test_files)
 
     @property
@@ -160,14 +158,14 @@ class GradingResults:
         ``int`` or ``float``: the total points possible
         """
         return sum(tr.possible for tr in self.results.values())
-    
+
     def get_result(self, test_name):
         """
         Returns the ``TestFile`` corresponding to the test with name ``test_name``
 
         Args:
             test_name (``str``): the name of the desired test
-        
+
         Returns:
             ``TestFile``: the graded test file object
         """
@@ -179,7 +177,7 @@ class GradingResults:
 
         Args:
             test_name (``str``): the name of the test
-        
+
         Returns:
             ``int`` or ``float``: the score
         """
@@ -218,7 +216,7 @@ class GradingResults:
         Indicates that all results should be hidden from students on Gradescope
         """
         self.all_hidden = True
-    
+
     def set_plugin_data(self, plugin_name, data):
         """
         Stores plugin data for plugin ``plugin_name`` in the results. ``data`` must be picklable.
@@ -232,7 +230,7 @@ class GradingResults:
         except:
             raise ValueError(f"Data was not pickleable: {data}")
         self._plugin_data[plugin_name] = data
-    
+
     def get_plugin_data(self, plugin_name, default=None):
         """
         Retrieves data for plugin ``plugin_name`` in the results
@@ -317,20 +315,18 @@ class GradingResults:
         """
         return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
 
-    def to_gradescope_dict(self, config):
+    def to_gradescope_dict(self, ag_config):
         """
         Converts these results into a dictionary formatted for Gradescope's autograder. Requires a 
         dictionary of configurations for the Gradescope assignment generated using Otter Generate.
 
         Args:
-            config (``dict``): the grading configurations
+            ag_config (``otter.run.run_autograder.autograder_config.AutograderConfig``): the
+                autograder config
 
         Returns:
             ``dict``: the results formatted for Gradescope
         """
-        options = DEFAULT_OPTIONS.copy()
-        options.update(config)
-
         output = {"tests": []}
 
         if self.output is not None:
@@ -338,10 +334,10 @@ class GradingResults:
             # TODO: use output to display public test case results?
 
         # hidden visibility determined by show_hidden
-        hidden_test_visibility = ("hidden", "after_published")[options["show_hidden"]]
+        hidden_test_visibility = ("hidden", "after_published")[ag_config.show_hidden]
 
         # if show_all_public is true and all tests are public tests, display all tests in results
-        if options["show_all_public"] and all(tf.all_public for tf in self.results.values()):
+        if ag_config.show_all_public and all(tf.all_public for tf in self.results.values()):
             hidden_test_visibility = "visible"
 
         # start w/ summary of public tests
@@ -363,24 +359,24 @@ class GradingResults:
                 "output": test_file.summary(),
             })
 
-        if options["show_stdout"]:
+        if ag_config.show_stdout:
             output["stdout_visibility"] = "after_published"
 
-        if options["points_possible"] is not None:
+        if ag_config.points_possible is not None:
             try:
-                output["score"] = self.total / self.possible * options["points_possible"]
+                output["score"] = self.total / self.possible * ag_config.points_possible
             except ZeroDivisionError:
                 output["score"] = 0
 
-        if options["score_threshold"] is not None:
+        if ag_config.score_threshold is not None:
             try:
-                if self.total / self.possible >= config["score_threshold"]:
-                    output["score"] = options["points_possible"] or self.possible
+                if self.total / self.possible >= ag_config.score_threshold:
+                    output["score"] = ag_config.points_possible or self.possible
                 else:
                     output["score"] = 0
             except ZeroDivisionError:
-                if 0 >= config["score_threshold"]:
-                    output["score"] = options["points_possible"] or self.possible
+                if 0 >= ag_config.score_threshold:
+                    output["score"] = ag_config.points_possible or self.possible
                 else:
                     output["score"] = 0
 
@@ -388,5 +384,5 @@ class GradingResults:
             for test in output["tests"]:
                 test["visibility"]  = "hidden"
             output["stdout_visibility"] = "hidden"
-        
+
         return output

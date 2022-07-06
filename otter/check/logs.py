@@ -19,7 +19,7 @@ class QuestionNotInLogException(Exception):
 class EventType(Enum):
     """
     Enum of event types for log entries
-    
+
     Attributes:
         AUTH: an auth event
         BEGIN_CHECK_ALL: beginning of a check-all call
@@ -93,7 +93,7 @@ class LogEntry:
     def get_results(self):
         """
         Get the results stored in this log entry
-        
+
         Returns:
             ``list`` of ``otter.test_files.abstract_test.TestCollectionResults``: the results at this 
                 entry if this is an ``EventType.CHECK`` record
@@ -125,7 +125,7 @@ class LogEntry:
     def flush_to_file(self, filename):
         """
         Appends this log entry (pickled) to a file
-        
+
         Args:
             filename (``str``): the path to the file to append this entry
         """
@@ -190,7 +190,7 @@ class LogEntry:
                                     variables_stored = None
                                 else:
                                     variables_stored = list(entry.unshelve().keys())
-                                
+
                                 entry.shelf = None
 
                             entry.flush_to_file(filename)
@@ -213,7 +213,7 @@ class LogEntry:
         self.shelf = shelf_contents
         self.unshelved = unshelved
         return self
-        
+
     def unshelve(self, global_env={}):
         """
         Parses a ``bytes`` object stored in the ``shelf`` attribute and unpickles the object stored
@@ -235,7 +235,7 @@ class LogEntry:
             tf.write(self.shelf)
             tf.seek(0)
             shelf = dill.load(tf)
-            
+
         # add the unpickeld env and global_env to all function __globals__
         for k, v in shelf.items():
             if type(v) == types.FunctionType:
@@ -248,7 +248,7 @@ class LogEntry:
     def sort_log(log, ascending=True):
         """
         Sorts a list of log entries by timestamp
-        
+
         Args:
             log (``list`` of ``LogEntry``): the log to sort
             ascending (``bool``, optional): whether the log should be sorted in ascending (chronological) 
@@ -265,7 +265,7 @@ class LogEntry:
     def log_from_file(filename, ascending=True):
         """
         Reads a log file and returns a sorted list of the log entries pickled in that file
-        
+
         Args:
             filename (``str``): the path to the log
             ascending (``bool``, optional): whether the log should be sorted in ascending (chronological) 
@@ -287,9 +287,9 @@ class LogEntry:
                     break
 
             log = list(sorted(log, key = lambda l: l.timestamp, reverse = not ascending))
-            
+
             return log
-            
+
         finally:
             file.close()
 
@@ -321,11 +321,11 @@ class LogEntry:
             # don't store modules or otter.Notebook instances
             if type(v) == types.ModuleType or type(v) == Notebook:
                 unshelved.append(k)
-            
+
             # ignore any functions whose __module__ is in ignore_modules
             elif type(v) == types.FunctionType and v.__module__ in ignore_modules:
                 unshelved.append(k)
-            
+
             # ensure object is pickleable by attempting dump and if so add to filtered_env
             else:
                 try:
@@ -344,7 +344,7 @@ class LogEntry:
 
                     else:
                         unshelved.append(k)
-                        
+
                 except:
                     unshelved.append(k)
 
@@ -353,7 +353,7 @@ class LogEntry:
             dill.dump(filtered_env, tf)
             tf.seek(0)
             shelf_contents = tf.read()
-            
+
         return shelf_contents, unshelved
 
 
@@ -440,7 +440,7 @@ class Log:
 
         Returns:
             ``LogEntry``: the most recent log entry for ``question``
-        
+
         Raises:
             ``QuestionNotInLogException``: if the question is not in the log
         """
@@ -486,10 +486,10 @@ class QuestionLogIterator:
         self.log = log
         self.questions = self.log.get_questions()
         self.curr_idx = 0
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.curr_idx >= len(self.questions):
             raise StopIteration
