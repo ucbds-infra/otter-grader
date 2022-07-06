@@ -15,6 +15,7 @@ _This section contains features that will be released into a pre-release version
 * Made Otter compatible with Jupyterlite per [#458](https://github.com/ucbds-infra/otter-grader/issues/458)
 * Added Otter Assign R Markdown format v1 per [#491](https://github.com/ucbds-infra/otter-grader/issues/491)
 * Refactored Otter Assign internals per [#491](https://github.com/ucbds-infra/otter-grader/issues/491)
+* Converted user-supplied configuration management and documentation to `fica` per [#485](https://github.com/ucbds-infra/otter-grader/issues/485)
 
 **v3.3.0:**
 
