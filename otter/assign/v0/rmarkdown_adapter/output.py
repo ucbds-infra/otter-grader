@@ -72,7 +72,7 @@ def write_autograder_dir(rmd_path, output_rmd_path, assignment):
         # if a directory, copy the entire dir
         if os.path.isdir(file):
             shutil.copytree(file, str(output_dir / os.path.basename(file)))
-            
+
         else:
             # check that file is in subdir
             assert os.path.abspath(rmd_path.parent) in os.path.abspath(file), \

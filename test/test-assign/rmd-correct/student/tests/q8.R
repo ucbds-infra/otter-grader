@@ -6,11 +6,8 @@ test = list(
       name = NA,
       points = 0.5,
       code = {
-        test_that("q8a", {
-            expect_equal(length(z), 10)
-        })
+        testthat::expect_equal(length(z), 10)
       }
     )
-
   )
 )

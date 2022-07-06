@@ -6,3 +6,5 @@ coverage:
     project:
       default:
         threshold: 100%
+comment:
+  behavior: new

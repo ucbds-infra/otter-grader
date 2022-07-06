@@ -46,7 +46,7 @@ def rmd_to_cells(rmd_string):
                 cells.append(Cell(cell_type, "\n".join(cell_lines)))
             cell_type = ("markdown", "code")[line.startswith("```{r") and "}" in line]
             cell_lines = [line]
-       
+
         elif re.match(BEGIN_REGEX, line):
             in_block = True
 
@@ -88,7 +88,7 @@ def collapse_empty_cells(cells):
         elif not in_run and not cell.source.strip():
             in_run = True
             run_start = i
-    
+
     replacements.reverse()
     for rs, re, rep in replacements:
         cells[rs:re] = rep

@@ -63,7 +63,7 @@ def execute_notebook(nb, check_results_list_name="check_results_secret", initial
         if cwd:
             source = f"import sys\nsys.path.append(r\"{cwd}\")\n"
             exec(source, global_env)
-        
+
         if seed is not None and seed_variable is None:
             import numpy as np
             import random

@@ -59,7 +59,7 @@ class Checker:
 
             check('tests/q1.py')
             check('tests/q1.py', global_env=globals())
-        
+
         Args:
             nb_or_test_path (``str``): path to test file or notebook
             test_name (``str``, optional): the name of the test if a notebook metadata test

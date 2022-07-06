@@ -3,11 +3,11 @@ Notebook Format
 
 Otter's notebook format groups prompts, solutions, and tests together into questions. Autograder tests 
 are specified as cells in the notebook and their output is used as the expected output of the 
-autograder when genreating tests. Each question has metadata, expressed in raw YAML metadata cell
+autograder when generating tests. Each question has metadata, expressed in raw YAML config cell
 when the question is declared.
 
 Note that the major difference between v0 format and v1 format is the use of raw notebook cells as
-delimeters. Each boundary cell denotes the start or end of a block and contains *valid YAML syntax*.
+delimiters. Each boundary cell denotes the start or end of a block and contains *valid YAML syntax*.
 First-line comments are used in these YAML raw cells to denote what type of block is being entered
 or ended.
 
@@ -18,12 +18,12 @@ are the same.
 
 .. _otter_assign_v1_assignment_metadata:
 
-Assignment Metadata
--------------------
+Assignment Config
+-----------------
 
-In addition to various command line arugments discussed below, Otter Assign also allows you to 
-specify various assignment generation arguments in an assignment metadata cell. These are very 
-similar to the question metadata cells described in the next section. Assignment metadata, included 
+In addition to various command line arguments discussed below, Otter Assign also allows you to 
+specify various assignment generation arguments in an assignment config cell. These are very 
+similar to the question config cells described in the next section. Assignment config, included 
 by convention as the first cell of the notebook, places YAML-formatted configurations in a raw cell
 that begins with the comment ``# ASSIGNMENT CONFIG``.
 
@@ -43,41 +43,7 @@ sub-dictionaries (e.g. ``export_cell``, ``generate``) can have their behaviors t
 changing their value to ``false``. The only one that defaults to true (with the specified sub-key 
 defaults) is ``export_cell``.
 
-.. BEGIN YAML TARGET: otter.assign.assignment._DEFAULT_ASSIGNMENT_CONFIGURATIONS_WITH_DESCRIPTIONS
-
-.. code-block:: yaml
-
-    requirements: null             # the path to a requirements.txt file or a list of packages
-    overwrite_requirements: false  # whether to overwrite Otter's default requirement.txt in Otter Generate
-    environment: null              # the path to a conda environment.yml file
-    run_tests: true                # whether to run the assignment tests against the autograder notebook
-    solutions_pdf: false           # whether to generate a PDF of the solutions notebook
-    template_pdf: false            # whether to generate a filtered Gradescope assignment template PDF
-    init_cell: true                # whether to include an Otter initialization cell in the output notebooks
-    check_all_cell: true           # whether to include an Otter check-all cell in the output notebooks
-    export_cell:                   # whether to include an Otter export cell in the output notebooks
-      instructions: ''             # additional submission instructions to include in the export cell
-      pdf: true                    # whether to include a PDF of the notebook in the generated zip file
-      filtering: true              # whether the generated PDF should be filtered
-      force_save: false            # whether to force-save the notebook with JavaScript (only works in classic notebook)
-      run_tests: false             # whether to run student submissions against local tests during export
-    seed:                          # intercell seeding configurations
-      variable: null               # a variable name to override with the autograder seed during grading
-      autograder_value: null       # the value of the autograder seed
-      student_value: null          # the value of the student seed
-    generate: false                # grading configurations to be passed to Otter Generate as an otter_config.json; if false, Otter Generate is disabled
-    save_environment: false        # whether to save the student's environment in the log
-    variables: {}                  # a mapping of variable names to type strings for serlizing environments
-    ignore_modules: []             # a list of modules to ignore variables from during environment serialization
-    files: []                      # a list of other files to include in the output directories and autograder
-    autograder_files: []           # a list of other files only to include in the autograder
-    plugins: []                    # a list of plugin names and configurations
-    tests:                         # information about the structure and storage of tests
-      files: false                 # whether to store tests in separate files, instead of the notebook metadata
-      ok_format: false             # whether the test cases are in OK-format (instead of the exception-based format)
-    colab: false                   # whether this assignment will be run on Google Colab
-
-.. END YAML TARGET
+.. fica:: otter.assign.assignment.Assignment
 
 All paths specified in the configuration should be **relative to the directory containing the master 
 notebook**. If, for example, you were running Otter Assign on the ``lab00.ipynb`` notebook in the 
@@ -116,7 +82,7 @@ lieu of a path to a `requirements.txt` file; for exmaple:
 
 This structure is also compatible with the `overwrite_requirements` key.
 
-A note about Otter Generate: the ``generate`` key of the assignment metadata has two forms. If you 
+A note about Otter Generate: the ``generate`` key of the assignment config has two forms. If you 
 just want to generate and require no additional arguments, set ``generate: true`` in the YAML and 
 Otter Assign will simply run ``otter generate`` from the autograder directory (this will also 
 include any files passed to ``files``, whose paths should be **relative to the directory containing 
@@ -169,7 +135,7 @@ environments, storing only variables of the name ``df`` that are pandas datafram
     variables:
         df: pandas.core.frame.DataFrame
 
-As an example, the following assignment metadata includes an export cell but no filtering, no init 
+As an example, the following assignment config includes an export cell but no filtering, no init 
 cell, and passes the configurations ``points`` and ``seed`` to Otter Generate via the 
 ``otter_config.json``.
 
@@ -190,13 +156,13 @@ Intercell Seeding
 +++++++++++++++++
 
 Python assignments support :ref:`intercell seeding <seeding>`, and there are two flavors of this. 
-The first involves the use of a seed variable, and is configured in the assignment metadata; this 
+The first involves the use of a seed variable, and is configured in the assignment config; this 
 allows you to use tools like ``np.random.default_rng`` instead of just ``np.random.seed``. The 
 second flavor involves comments in code cells, and is described 
 :ref:`below <otter_assign_v1_python_seeding>`.
 
 To use a seed variable, specify the name of the variable, the autograder seed value, and the student
-seed value in your assignment metadata.
+seed value in your assignment config.
 
 .. code-block:: yaml
 
@@ -263,22 +229,12 @@ Here is an example question in an Otter Assign-formatted question:
     <iframe src="../../_static/notebooks/html/assign-code-question-v1.html"></iframe>
 
 
-Note the use of the delimiting raw cells and the placement of question metadata in the ``# BEGIN
-QUESTION`` cell. The question metadata can contain the following fields (in any order):
+Note the use of the delimiting raw cells and the placement of question config in the ``# BEGIN
+QUESTION`` cell. The question config can contain the following fields (in any order):
 
-.. BEGIN YAML TARGET: otter.assign.questions._DEFAULT_QUESTION_CONFIGURATIONS_WITH_DESCRIPTIONS
+.. fica:: otter.assign.question_config.QuestionConfig
 
-.. code-block:: yaml
-
-    name: null        # (required) the path to a requirements.txt file
-    manual: false     # whether this is a manually-graded question
-    points: null      # how many points this question is worth; defaults to 1 internally
-    check_cell: true  # whether to include a check cell after this question (for autograded questions only)
-    export: false     # whether to force-include this question in the exported PDF
-
-.. END YAML TARGET
-
-As an example, the question metadata below indicates an autograded question ``q1`` that should be
+As an example, the question config below indicates an autograded question ``q1`` that should be
 included in the filtered PDF.
 
 .. code-block:: yaml
@@ -384,14 +340,14 @@ would be presented to students  as
 Test Cells
 ++++++++++
 
-Any cells within the ``# BEGIN TESTS`` and ``# END TESTS`` boundary cells are considered tests cells.
+Any cells within the ``# BEGIN TESTS`` and ``# END TESTS`` boundary cells are considered test cells.
 Each test cell corresponds to a single test case. There are two types of tests: public and hidden tests.
 Tests are public by default but can be hidden by adding the ``# HIDDEN`` comment as the first line
 of the cell. A hidden test is not distributed to students, but is used for scoring their work.
 
 Test cells also support test case-level metadata. If your test requires metadata beyond whether the 
 test is hidden or not, specify the test by including a mutliline string at the top of the cell that 
-includes YAML-formatted test metadata. For example,
+includes YAML-formatted test config. For example,
 
 .. code-block:: python
 
@@ -401,7 +357,7 @@ includes YAML-formatted test metadata. For example,
     """ # END TEST CONFIG
     ...  # your test goes here
 
-The test metadata supports the following keys with the defaults specified below:
+The test config supports the following keys with the defaults specified below:
 
 .. code-block:: yaml
 
@@ -475,6 +431,8 @@ For example,
         assert env["np"].allclose(env["arr"], [1.2, 3.4, 5.6])  # this also works
 
 
+.. _otter_assign_v1_r_test_cells:
+
 R Test Cells
 ????????????
 
@@ -522,12 +480,12 @@ Here is an example autograded question for R:
 
 .. _otter_assign_v1_python_manual_questions:
 
-Manually Graded Questions
+Manually-Graded Questions
 -------------------------
 
 Otter Assign also supports manually-graded questions using a similar specification to the one 
 described above. To indicate a manually-graded question, set ``manual: true`` in the question 
-metadata. 
+config. 
 
 .. raw:: html
 
@@ -594,6 +552,21 @@ Here is an example of plugin replacement in Otter Assign:
     <iframe src="../../_static/notebooks/html/assign-plugin.html"></iframe>
 
 *Note that student-facing plugins are not supported with R assignments.*
+
+
+Running on Non-standard Python Environments
+-------------------------------------------
+
+For non-standard Python notebook environments (which use their own interpreters, such as Colab or
+Jupyterlite), some Otter features are disabled and the the notebooks that are produced for running
+on those environments are slightly different. To indicate that the notebook produce by Otter Assign
+is going to be run in such an environment, use the ``runs_on`` assignment configuration. It
+currently supports these values:
+
+* ``default``, indicating a normal IPython environment (the default value)
+* ``colab``, indicating that the notebook will be used on Google Colab
+* ``jupyterlite``, indicating that the notebook will be used on Jupyterlite (or any environment
+  using the Pyolite kernel)
 
 
 Sample Notebook

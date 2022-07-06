@@ -73,11 +73,11 @@ class NotebookMetadataExceptionTestFile(ExceptionTestFile):
         """
         with open(path) as f:
             nb = json.load(f)
-        
+
         test_spec = nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"]
         if test_name not in test_spec:
             raise ValueError(f"Test {test_name} not found")
-        
+
         test_spec = test_spec[test_name]
         return cls.from_string(test_spec, path=path)
 
@@ -136,11 +136,11 @@ class NotebookMetadataOKTestFile(OKTestFile):
         """
         with open(path, encoding="utf-8") as f:
             nb = json.load(f)
-        
+
         test_spec = nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"]
         if test_name not in test_spec:
             raise ValueError(f"Test {test_name} not found")
-        
+
         test_spec = test_spec[test_name]
 
         return cls.from_spec(test_spec, path=path)
