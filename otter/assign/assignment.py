@@ -7,10 +7,8 @@ import uuid
 
 from typing import Any, Dict, List, Optional
 
-from ..utils import Loggable, loggers
+from ..utils import Loggable
 
-
-LOGGER = loggers.get_logger(__name__)
 
 # TODO: remove (#442)
 class MyConfig(fica.Config):
@@ -18,14 +16,12 @@ class MyConfig(fica.Config):
     def get(self, attr, default):
         return getattr(self, attr)
 
-    # TODO: add to fica
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
 
-# TODO: Loggable?
-# TODO: add detection/warnings/errors for when a user provides an invalid key?
-class Assignment(fica.Config):
+# TODO: add detection/warnings/errors for when a user provides an invalid key? (to be added to fica)
+class Assignment(fica.Config, Loggable):
     """
     Configurations for the assignment.
     """
@@ -223,9 +219,14 @@ class Assignment(fica.Config):
     uuid: Optional[str] = None
     """the UUID of the assignment"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, user_config: Dict[str, Any] = {}, **kwargs) -> None:
+        self._logger.debug(f"Initializing with config: {user_config}")
+        super().__init__(user_config, **kwargs)
         self._populate_uuid()
+
+    def update_(self, user_config: Dict[str, Any]):
+        self._logger.debug(f"Updating config: {user_config}")
+        return super().update_(user_config)
 
     @property
     def is_r(self):
@@ -233,7 +234,7 @@ class Assignment(fica.Config):
         Whether the language of the assignment is R
         """
         return self.lang == "r"
-    
+
     @property
     def is_python(self):
         """
@@ -321,8 +322,34 @@ class Assignment(fica.Config):
 
     @property
     def notebook_basename(self):
+        """the basename of the notebook"""
         return os.path.basename(str(self.master))
 
     @property
     def ag_notebook_path(self):
-        return self.result / "autograder" / self.notebook_basename  # TODO: move dir name into constant
+        """the path to the autograder notebook"""
+        return self.get_ag_path(self.notebook_basename)
+
+    def get_ag_path(self, path=""):
+        """
+        Get the path to the autograder output directory or a file in that directory.
+
+        Args:
+            path (``str | pathlib.Path``): a path to append to the autograder output directory path
+
+        Returns:
+            ``pathlib.Path``: the path to the autograder directory or the specified file within it
+        """
+        return self.result / "autograder" / path
+
+    def get_stu_path(self, path=""):
+        """
+        Get the path to the student output directory or a file in that directory.
+
+        Args:
+            path (``str | pathlib.Path``): a path to append to the student output directory path
+
+        Returns:
+            ``pathlib.Path``: the path to the student directory or the specified file within it
+        """
+        return self.result / "student" / path

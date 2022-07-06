@@ -21,7 +21,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
          debug=False, v0=False):
     """
     Runs Otter Assign on a master notebook.
-    
+
     Args:
         master (``str``): path to master notebook
         result (``str``): path to result directory
@@ -37,7 +37,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         warnings.warn(
             "The Otter Assign v0 format is now deprecated and will be removed in Otter v5.",
             FutureWarning)
-            
+
         from .v0 import main as v0_main
         return v0_main(master, result, no_pdfs=no_pdfs, no_run_tests=no_run_tests, username=username, 
             password=password, debug=debug)
@@ -49,7 +49,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
     assignment = Assignment()
 
     result = get_relpath(master.parent, result)
-    
+
     assignment.master, assignment.result = master, result
     LOGGER.debug(f"Normalized master path: {master}")
     LOGGER.debug(f"Normalized result path: {result}")
@@ -88,15 +88,15 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         if assignment.generate:
             LOGGER.info("Generating autograder zipfile")
             run_generate_autograder(assignment, username, password, plugin_collection=pc)
-        
+
         # generate PDF of solutions
         if assignment.solutions_pdf and not no_pdfs:
             LOGGER.info("Generating solutions PDF")
             filtering = assignment.solutions_pdf == 'filtered'
 
-            src = os.path.abspath(str(result / 'autograder' / master.name))
-            dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-sol.pdf')))
-        
+            src = os.path.abspath(str(assignment.get_ag_path(master.name)))
+            dst = os.path.abspath(str(assignment.get_ag_path(master.stem + '-sol.pdf')))
+
             if not assignment.is_rmd:
                 LOGGER.debug(f"Exporting {src} as notebook to {dst}")
                 try:
@@ -130,9 +130,9 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         # generate a tempalte PDF for Gradescope
         if assignment.template_pdf and not no_pdfs:
             LOGGER.info("Generating template PDF")
-            
-            src = os.path.abspath(str(result / 'autograder' / master.name))
-            dst = os.path.abspath(str(result / 'autograder' / (master.stem + '-template.pdf')))
+
+            src = os.path.abspath(str(assignment.get_ag_path( master.name)))
+            dst = os.path.abspath(str(assignment.get_ag_path(master.stem + '-template.pdf')))
 
             if not assignment.is_rmd:
                 LOGGER.debug("Attempting PDF via LaTeX export")
@@ -180,5 +180,11 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 LOGGER.debug("Using pre-configured plugins for running tests")
                 test_pc = pc
 
-            run_tests(result / 'autograder' / master.name, debug=debug, seed=seed, plugin_collection=test_pc)
+            run_tests(
+                assignment.get_ag_path(master.name),
+                debug=debug,
+                seed=seed,
+                plugin_collection=test_pc,
+            )
+
             LOGGER.info("All autograder tests passed.")

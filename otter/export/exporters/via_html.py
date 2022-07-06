@@ -53,7 +53,7 @@ class PDFViaHTMLExporter(BaseExporter):
             html_path = os.path.splitext(dest)[0] + ".html"
             with open(html_path, "wb+") as f:
                 f.write(html.encode("utf-8"))
-        
+
         merger = PdfFileMerger()
         for subnb in notebook_pdf_generator(nb):
             html, _ = nbconvert.export(exporter, subnb)

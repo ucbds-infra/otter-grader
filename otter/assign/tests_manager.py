@@ -6,16 +6,35 @@ import re
 import yaml
 
 from dataclasses import dataclass
+from jinja2 import Template
 from typing import Any, Dict, List, Optional, Union
 
 from .assignment import Assignment
-from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, EXCEPTION_BASED_TEST_FILE_TEMPLATE
 from .question_config import QuestionConfig
 from .solutions import remove_ignored_lines
 from .utils import get_source, str_to_doctest
 
 from ..test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
 from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
+
+
+BEGIN_TEST_CONFIG_REGEX = r'(?:.\s*=\s*)?""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
+END_TEST_CONFIG_REGEX = r'""?"?\s*#\s*END\s*TEST\s*CONFIG'
+
+EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template("""\
+from otter.test_files import test_case
+
+{{ OK_FORMAT_VARNAME }} = False
+
+name = "{{ name }}"
+points = {{ points }}
+
+{% for tc in test_cases %}@test_case(points={{ tc.points }}, hidden={{ tc.hidden }}{% if tc.success_message is not none %}, 
+    success_message="{{ tc.success_message }}"{% endif %}{% if tc.failure_message is not none %}, 
+    failure_message="{{ tc.failure_message }}"{% endif %})
+{{ tc.input }}
+{% endfor %}
+""")
 
 
 @dataclass
@@ -71,7 +90,7 @@ class AssignmentTestsManager:
 
         Args:
             question (``otter.assign.question_config.QuestionConfig``): the question config
-        
+
         Returns:
             ``bool``: whether any of the test cases for the question are public
         """
@@ -253,7 +272,7 @@ class AssignmentTestsManager:
     def _create_ok_test_suite(cls, test_cases: List[TestCase]):
         """
         Create an OK-formatted test suite for a list of test cases.
-        
+
         Args:
             test_cases (``list[TestCase]``): the test cases
 

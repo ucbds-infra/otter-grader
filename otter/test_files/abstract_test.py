@@ -211,7 +211,7 @@ class TestFile(ABC):
         tcrs = self.test_case_results
         if public_only:
             tcrs = [tcr for tcr in tcrs if not tcr.test_case.hidden]
-        
+
         tcr_summaries = []
         for tcr in tcrs:
             smry = ""

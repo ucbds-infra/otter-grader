@@ -61,6 +61,7 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
     'sphinx_click',
+    'fica.sphinx',
 ]
 
 napoleon_google_docstring = True
@@ -76,7 +77,6 @@ autosummary_generate = False
 ipython_execlines = [
     "import json",
     "import yaml",
-    "from otter.run.run_autograder.constants import DEFAULT_OPTIONS_WITH_DESCRIPTIONS",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -204,11 +204,10 @@ texinfo_documents = [
 
 
 # -- YAML Dictionary Replacement ---------------------------------------------
+# TODO: remove w/ Otter v5
 
 files_to_replace = [
-    "workflow/otter_generate/index.rst",
     "otter_assign/v0/python_notebook_format.rst",
-    "otter_assign/v1/notebook_format.rst",
 ]
 
 def extract_descriptions_as_comments(config):

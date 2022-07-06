@@ -13,6 +13,9 @@ _This section contains features that will be released into a pre-release version
 * Converted logging in some of Otter's tooling from `print` statements to the `logging` library, and added verbosity flags to each command
 * Updated containerized grading to better handle grading single files
 * Made Otter compatible with Jupyterlite per [#458](https://github.com/ucbds-infra/otter-grader/issues/458)
+* Added Otter Assign R Markdown format v1 per [#491](https://github.com/ucbds-infra/otter-grader/issues/491)
+* Refactored Otter Assign internals per [#491](https://github.com/ucbds-infra/otter-grader/issues/491)
+* Converted user-supplied configuration management and documentation to `fica` per [#485](https://github.com/ucbds-infra/otter-grader/issues/485)
 
 **v3.3.0:**
 

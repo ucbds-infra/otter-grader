@@ -11,8 +11,6 @@ import shutil
 from glob import glob
 from textwrap import indent
 
-from .constants import IGNORE_REGEX
-
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
 from ..test_files import NOTEBOOK_METADATA_KEY
@@ -52,7 +50,7 @@ def get_notebook_language(nb):
 def is_ignore_cell(cell):
     """
     Returns whether the current cell should be ignored
-    
+
     Args:
         cell (``nbformat.NotebookNode``): a notebook cell
 
@@ -60,7 +58,8 @@ def is_ignore_cell(cell):
         ``bool``: whether the cell is a ignored
     """
     source = get_source(cell)
-    return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
+    return bool(source and
+        re.match(r"(##\s*ignore\s*##\s*|#\s*ignore\s*)", source[0], flags=re.IGNORECASE))
 
 
 def is_cell_type(cell, cell_type):
@@ -80,7 +79,7 @@ def is_cell_type(cell, cell_type):
 def remove_output(nb):
     """
     Remove all outputs from a notebook in-place.
-    
+
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
@@ -94,7 +93,7 @@ def remove_output(nb):
 def remove_cell_ids(nb):
     """
     Remove all cell IDs from a notebook in-place.
-    
+
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
@@ -173,7 +172,7 @@ def str_to_doctest(code_lines, lines):
     Args:
         code_lines (``list[str]``): the code to convert
         lines (``list[str]``): the list to append the converted lines to
-    
+
     Returns:
         ``list[str]``: a pointer to ``lines``
     """
@@ -194,7 +193,7 @@ def str_to_doctest(code_lines, lines):
 def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
     Grade a notebook and throw an error if it does not receive a perfect score.
-    
+
     Args:
         nb_path (``pathlib.Path``): the path to the notebook to grade
         debug (``bool``, optional): whether to raise errors instead of ignoring them
@@ -241,9 +240,9 @@ def write_otter_config_file(assignment):
         config["variables"] = assignment.variables
 
     config_name = assignment.master.stem + '.otter'
-    with open(assignment.result / 'autograder' / config_name, "w+") as f:
+    with open(assignment.get_ag_path(config_name), "w+") as f:
         json.dump(config, f, indent=4)
-    with open(assignment.result / 'student' / config_name, "w+") as f:
+    with open(assignment.get_stu_path(config_name), "w+") as f:
         json.dump(config, f, indent=4)
 
 
@@ -261,7 +260,7 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
             to Otter Generate
     """
     curr_dir = os.getcwd()
-    os.chdir(str(assignment.result / 'autograder'))
+    os.chdir(str(assignment.get_ag_path()))
 
     # use temp tests dir
     test_dir = "tests"
@@ -285,7 +284,7 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
     if assignment.autograder_files:
         ag_dir = os.getcwd()
         os.chdir(curr_dir)
-        output_dir  = assignment.result / 'autograder'
+        output_dir = assignment.get_ag_path()
 
         # copy files
         for file in assignment.autograder_files:

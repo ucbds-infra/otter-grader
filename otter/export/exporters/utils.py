@@ -25,10 +25,10 @@ def has_begin(line):
     .. code-block:: html
 
         <!-- BEGIN QUESTION -->
-    
+
     Args:
         line (``str``): the line to search
-    
+
     Returns:
         ``bool``: whether the line contains a substring matching the begin question regex
     """
@@ -45,10 +45,10 @@ def has_end(line):
     .. code-block:: html
 
         <!-- END QUESTION -->
-    
+
     Args:
         line (``str``): the line to search
-    
+
     Returns:
         ``bool``: whether the line contains a substring matching the end question regex
     """
@@ -106,12 +106,12 @@ def notebook_pdf_generator(nb):
             all_cells.append(subnb_cells)
             subnb_cells = []
             subnb_cells.append(c2)
-            
+
         else:
             subnb_cells.append(cell)
-    
+
     all_cells.append(subnb_cells)
-    
+
     for subnb_cells in all_cells:
         dummy_nb.cells = subnb_cells
         yield dummy_nb

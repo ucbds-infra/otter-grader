@@ -11,10 +11,10 @@ from .utils import get_source, remove_output
 def is_markdown_solution_cell(cell):
     """
     Returns whether any line of the cell matches MD_SOLUTION_REGEX
-    
+
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
-    
+
     Returns:
         ``bool``: whether the current cell is a Markdown solution cell
     """
@@ -57,7 +57,7 @@ SUBSTITUTIONS = [
 def replace_solutions(lines):
     """
     Replaces solutions in ``lines``
-    
+
     Args:
         lines (``list`` of ``str``): solutions as a list of strings
 
@@ -95,17 +95,17 @@ def replace_solutions(lines):
             m = exp.match(line)
             if m:
                 line = sub(m)
-        
+
         stripped.append(line)
-    
+
     assert not solution, f"BEGIN SOLUTION without END SOLUTION in {lines}"
-    
+
     return stripped
 
 def remove_ignored_lines(lines):
     """
     Removes ignored lines in ``lines``
-    
+
     Args:
         lines (``list`` of ``str``): cell source as a list of strings
 
@@ -138,15 +138,15 @@ def remove_ignored_lines(lines):
             continue
 
         stripped.append(line)
-    
+
     assert not in_block, f"BEGIN IGNORE without END IGNORE in {lines}"
-    
+
     return stripped
 
 def strip_ignored_lines(nb):
     """
     Write a notebook with ignored lines stripped
-    
+
     Args:
         nb (``nbformat.NotebookNode``): the notebook to have ignored lines stripped
     """
@@ -158,7 +158,7 @@ def strip_ignored_lines(nb):
 def strip_solutions_and_output(nb):
     """
     Write a notebook with solutions stripped and outputs cleared
-    
+
     Args:
         nb (``nbformat.NotebookNode``): the notebook to have solutions stripped
     """
@@ -170,8 +170,8 @@ def strip_solutions_and_output(nb):
     md_solutions.reverse()
     for i in md_solutions:
         del nb['cells'][i]
-    
+
     # remove output from student version
     remove_output(nb)
-    
+
     return nb

@@ -7,7 +7,7 @@ class OttrTestFile(TestFile):
 
     def run(self, global_environment):
         raise NotImplementedError("Ottr test files cannot be run from Python")
-    
+
     @classmethod
     def from_file(cls, path):
         raise NotImplementedError("Cannot create Ottr test files from a file in Python")

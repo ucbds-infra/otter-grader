@@ -3,7 +3,6 @@
 import nbformat
 
 from .assignment import Assignment
-from .constants import MD_RESPONSE_CELL_SOURCE
 from .feature_toggle import FeatureToggle
 from .utils import lock
 
@@ -62,7 +61,7 @@ class CellFactory:
     def create_check_cells(self, question):
         """
         Create a cell calling ``otter.Notebook.check`` for the specified question.
-        
+
         Args:
             question (``otter.assign.question_config.QuestionConfig``): the question config
 
@@ -78,7 +77,7 @@ class CellFactory:
         """
         Generate a check-all cell and a Markdown cell with instructions to run all tests in the
         notebook.
-        
+
         Returns:
             ``list[nbformat.NotebookNode]``: the check-all cells
         """
@@ -127,7 +126,7 @@ class CellFactory:
         # only include save text if force_save is false
         if not force_save:
             instructions.source += " **Please save before exporting!**"
-        
+
         if export_cell_config.get("instructions", ""):
             instructions.source += '\n\n' + export_cell_config["instructions"]
 
@@ -176,4 +175,4 @@ class CellFactory:
         Returns:
             ``nbformat.NotebookNode``: the response cell
         """
-        return nbformat.v4.new_markdown_cell(MD_RESPONSE_CELL_SOURCE)
+        return nbformat.v4.new_markdown_cell("_Type your answer here, replacing this text._")

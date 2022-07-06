@@ -8,12 +8,13 @@ import tempfile
 import warnings
 
 from .assignment import Assignment
-from .constants import NB_VERSION
 from .notebook_transformer import NotebookTransformer, TransformedNotebookContainer
 from .r_adapter import rmarkdown_converter
 from .r_adapter.tests_manager import RAssignmentTestsManager
 from .tests_manager import AssignmentTestsManager
 from .utils import get_notebook_language
+
+from ..utils import NBFORMAT_VERSION
 
 
 def write_output_dir(
@@ -68,7 +69,7 @@ def write_output_dir(
         # if a directory, copy the entire dir
         if os.path.isdir(file):
             shutil.copytree(file, str(output_dir / os.path.basename(file)))
-            
+
         else:
             # check that file is in subdir
             if str(assignment.master.parent) not in os.path.abspath(file):
@@ -90,7 +91,7 @@ def write_output_directories(assignment):
     if assignment.is_rmd:
         nb = rmarkdown_converter.read_as_notebook(assignment.master)
     else:
-        nb = nbformat.read(assignment.master, as_version=NB_VERSION)
+        nb = nbformat.read(assignment.master, as_version=NBFORMAT_VERSION)
 
     if assignment.lang is None:
         try:
@@ -111,8 +112,8 @@ def write_output_directories(assignment):
         assignment.tests["files"] = True
 
     # create directories
-    autograder_dir = assignment.result / 'autograder'
-    student_dir = assignment.result / 'student'
+    autograder_dir = assignment.get_ag_path()
+    student_dir = assignment.get_stu_path()
     shutil.rmtree(autograder_dir, ignore_errors=True)
     shutil.rmtree(student_dir, ignore_errors=True)
     os.makedirs(autograder_dir, exist_ok=True)

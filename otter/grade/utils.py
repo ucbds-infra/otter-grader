@@ -14,10 +14,10 @@ OTTER_DOCKER_IMAGE_TAG = "otter-grade"
 def list_files(path):
     """
     Returns a list of all non-hidden files in a directory
-    
+
     Args:
         path (``str``): path to a directory
-    
+
     Returns:
         ``list`` of ``str``: list of filenames in the given directory
 
@@ -27,10 +27,10 @@ def list_files(path):
 def merge_csv(dataframes):
     """
     Merges dataframes along the vertical axis
-    
+
     Args:
         dataframes (``list`` of ``pandas.core.frame.DataFrame``): list of dataframes with same columns
-    
+
     Returns:
         ``pandas.core.frame.DataFrame``: A merged dataframe resulting from 'stacking' all input dataframes
 
@@ -47,7 +47,7 @@ def prune_images(force=False):
         sure = bool(re.match(r"ye?s?", sure, flags=re.IGNORECASE))
     else:
         sure = True
-    
+
     if sure:        
         images = docker.images()
 

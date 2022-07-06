@@ -85,7 +85,7 @@ SUBSTITUTIONS = {
 def replace_solutions(lines, lang):
     """
     Replace solutions in ``lines``.
-    
+
     Args:
         lines (``list[str]``): solutions as a list of strings
         lang (``str``): the language of the code in ``lines``
@@ -130,18 +130,18 @@ def replace_solutions(lines, lang):
             if m:
                 line = sub(m)
                 break
-        
+
         stripped.append(line)
-    
+
     assert not solution, f"BEGIN SOLUTION without END SOLUTION in {lines}"
-    
+
     return stripped
 
 
 def remove_ignored_lines(lines):
     """
     Remove ignored lines in ``lines``.
-    
+
     Args:
         lines (``list[str]``): cell source as a list of strings
 
@@ -174,16 +174,16 @@ def remove_ignored_lines(lines):
             continue
 
         stripped.append(line)
-    
+
     assert not in_block, f"BEGIN IGNORE without END IGNORE in {lines}"
-    
+
     return stripped
 
 
 def strip_ignored_lines(nb):
     """
     Create a copy of a notebook with ignored lines stripped.
-    
+
     Args:
         nb (``nbformat.NotebookNode``): the notebook to strip
 
@@ -199,7 +199,7 @@ def strip_ignored_lines(nb):
 def strip_solutions_and_output(nb):
     """
     Create a copy of a notebook with solutions and outputs stripped.
-    
+
     Args:
         nb (``nbformat.NotebookNode``): the notebook to strip
 
@@ -221,8 +221,8 @@ def strip_solutions_and_output(nb):
     md_solutions.reverse()
     for i in md_solutions:
         del nb['cells'][i]
-    
+
     # remove output from student version
     remove_output(nb)
-    
+
     return nb

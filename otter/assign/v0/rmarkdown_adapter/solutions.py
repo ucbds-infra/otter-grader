@@ -12,10 +12,10 @@ from ..utils import get_source
 def is_markdown_solution_cell(cell):
     """
     Returns whether any line of the cell matches `<!-- BEGIN SOLUTION -->`
-    
+
     Args:
         cell (``otter.assign.rmarkdown_adapter.utils.Cell``): notebook cell
-    
+
     Returns:
         ``bool``: whether the current cell is a Markdown solution cell
     """
@@ -57,7 +57,7 @@ SUBSTITUTIONS = [
 def replace_solutions(lines):
     """
     Replaces solutions in ``lines``
-    
+
     Args:
         lines (``list`` of ``str``): solutions as a list of strings
 
@@ -91,7 +91,7 @@ def replace_solutions(lines):
                 line = begin_solution.group(1) + '# YOUR CODE HERE'
             else:
                 continue
-        
+
         begin_solution = begin_md_solution_regex.match(line)
         if begin_solution:
             assert not solution, f"Nested BEGIN SOLUTION in {lines}"
@@ -100,22 +100,22 @@ def replace_solutions(lines):
                 line = begin_solution.group(1) + MD_RESPONSE_CELL_SOURCE
             else:
                 continue
-        
+
         for exp, sub in SUBSTITUTIONS:
             m = exp.match(line)
             if m:
                 line = sub(m)
-        
+
         stripped.append(line)
-    
+
     assert not solution, f"BEGIN SOLUTION without END SOLUTION in {lines}"
-    
+
     return stripped
 
 def strip_solutions_and_output(rmd_string):
     """
     Writes a Rmd file with solutions stripped
-    
+
     Args:
         rmd_string (``str``): the Rmd document as a string
     """

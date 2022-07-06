@@ -21,12 +21,12 @@ def grade_submission(submission_path, ag_path="autograder.zip", quiet=False, deb
     """
     Runs non-containerized grading on a single submission at ``submission_path`` using the autograder 
     configuration file at ``ag_path``. 
-    
+
     Creates a temporary grading directory using the ``tempfile`` library and grades the submission 
     by replicating the autograder tree structure in that folder and running the autograder there. Does
     not run environment setup files (e.g. ``setup.sh``) or install requirements, so any requirements 
     should be available in the environment being used for grading. 
-    
+
     Print statements executed during grading can be suppressed with ``quiet``.
 
     Args:

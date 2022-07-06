@@ -23,9 +23,8 @@ def main(autograder_dir, **kwargs):
     Args:
         autograder_dir (``str``): the absolute path of the directory in which autograding is occurring
             (e.g. on Gradescope, this is ``/autograder``)
-        **kwargs: keyword arguments for updating configurations in the default configurations 
-            ``otter.run.run_autograder.constants.DEFAULT_OPTIONS``; these values override anything
-            present in ``otter_config.json``
+        **kwargs: keyword arguments for updating autograder configurations=; these values override
+            anything present in ``otter_config.json``
     """
     dill = import_or_raise("dill")
 
@@ -67,7 +66,7 @@ def main(autograder_dir, **kwargs):
             with open("results/results.pkl", "wb+") as f:
                     dill.dump(scores, f)
 
-            output = scores.to_gradescope_dict(runner.get_options())
+            output = scores.to_gradescope_dict(runner.get_config())
 
         except OtterRuntimeError as e:
             output = {

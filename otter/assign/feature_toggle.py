@@ -11,10 +11,10 @@ _NOT_RMD: Callable[[Assignment], bool] = lambda a: not a.is_rmd
 """a function that returns ``True`` if the assignment is not an R Markdown assignment"""
 
 
-# TODO: refactor?
-# TODO: move things in like check all cell
+# TODO: move other things in
 class FeatureToggle(Enum):
     """
+    An enum for managing features that are enabled or disabled depending on the assignment config.
     """
 
     class FeatureToggleValue:
