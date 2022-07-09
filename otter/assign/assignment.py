@@ -26,7 +26,7 @@ class Assignment(fica.Config, Loggable):
     """
 
     name: Optional[str] = fica.Key(
-        description="a name for the assignment (to determine that students submit to the correct" \
+        description="a name for the assignment (to validate that students submit to the correct " \
             "autograder",
         default=None,
     )
