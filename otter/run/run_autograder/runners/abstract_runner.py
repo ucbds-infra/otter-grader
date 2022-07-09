@@ -9,7 +9,7 @@ from abc import ABC, abstractmethod
 from ..autograder_config import AutograderConfig
 from ..utils import OtterRuntimeError
 
-from ....test_files import NOTEBOOK_METADATA_KEY
+from ....utils import NOTEBOOK_METADATA_KEY
 
 
 class AbstractLanguageRunner(ABC):

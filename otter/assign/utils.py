@@ -13,8 +13,7 @@ from textwrap import indent
 
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
-from ..test_files import NOTEBOOK_METADATA_KEY
-from ..utils import get_source
+from ..utils import get_source, NOTEBOOK_METADATA_KEY
 
 
 class EmptyCellException(Exception):
