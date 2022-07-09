@@ -3,7 +3,6 @@
 import fica
 import os
 import pathlib
-import uuid
 
 from typing import Any, Dict, List, Optional
 
@@ -25,6 +24,12 @@ class Assignment(fica.Config, Loggable):
     """
     Configurations for the assignment.
     """
+
+    name: Optional[str] = fica.Key(
+        description="a name for the assignment (to determine that students submit to the correct" \
+            "autograder",
+        default=None,
+    )
 
     requirements: Optional[str] = fica.Key(
         description="the path to a requirements.txt file or a list of packages",
@@ -216,13 +221,9 @@ class Assignment(fica.Config, Loggable):
     notebook_basename: Optional[str] = None
     """the basename of the master notebook file"""
 
-    uuid: Optional[str] = None
-    """the UUID of the assignment"""
-
     def __init__(self, user_config: Dict[str, Any] = {}, **kwargs) -> None:
         self._logger.debug(f"Initializing with config: {user_config}")
         super().__init__(user_config, **kwargs)
-        self._populate_uuid()
 
     def update_(self, user_config: Dict[str, Any]):
         self._logger.debug(f"Updating config: {user_config}")
@@ -248,13 +249,6 @@ class Assignment(fica.Config, Loggable):
         Whether the input file is an RMarkdown document
         """
         return self.master.suffix.lower() == ".rmd"
-
-    def _populate_uuid(self):
-        """
-        Populate the UUID field if it is not already populated.
-        """
-        if self.uuid is None:
-            self.uuid = str(uuid.uuid4())
 
     def add_generate_arg(self, key, value, overwrite=False):
         """
@@ -316,7 +310,8 @@ class Assignment(fica.Config, Loggable):
         if self.variables:
             otter_config["serialized_variables"] = str(self.variables)
 
-        otter_config["assignment_uuid"] = self.uuid
+        if self.name:
+            otter_config["assignment_name"] = self.name
 
         return otter_config
 

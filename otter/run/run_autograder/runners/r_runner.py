@@ -33,14 +33,11 @@ class RRunner(AbstractLanguageRunner):
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
 
     # TODO: find a workflow for Rmd files
-    def validate_uuid(self, submission_path):
-        if self.ag_config.assignment_uuid:
-            if os.path.splitext(submission_path)[1].lower() != ".ipynb":
-                warnings.warn("UUID verification cannot be used with R scripts or R Markdown files")
-
+    def validate_submission(self, submission_path):
+        if os.path.splitext(submission_path)[1].lower() == ".ipynb":
             nb = nbf.read(submission_path, as_version=nbf.NO_CONVERT)
-            uuid = self.get_notebook_uuid(nb)
-            self.abort_or_warn_if_invalid_uuid(uuid)
+            assignment_name = self.get_notebook_assignment_name(nb)
+            self.validate_assignment_name(assignment_name)
 
     def filter_cells_with_syntax_errors(self, nb):
         """
@@ -103,7 +100,7 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(nbs) == 1:
             nb_path = nbs[0]
-            self.validate_uuid(nb_path)
+            self.validate_submission(nb_path)
             nb = nbf.read(nb_path, as_version=NBFORMAT_VERSION)
             nb = self.filter_cells_with_syntax_errors(nb)
 

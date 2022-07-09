@@ -339,10 +339,8 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
     os.chdir(curr_dir)
 
 
-def add_uuid_to_notebook(nb, assignment):
+def add_assignment_name_to_notebook(nb, assignment):
     """
     """
-    if assignment.uuid is None:
-        raise ValueError("No UUID has been created for the assignment")
-
-    nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_uuid"] = assignment.uuid
+    if assignment.name is not None:
+        nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_name"] = assignment.name

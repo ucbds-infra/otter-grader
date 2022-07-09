@@ -34,14 +34,11 @@ class PythonRunner(AbstractLanguageRunner):
         open("__init__.py", "a").close()
         open("submission/__init__.py", "a").close()
 
-    def validate_uuid(self, submission_path):
-        if self.ag_config.assignment_uuid:
-            if os.path.splitext(submission_path)[1] == ".py":
-                warnings.warn("UUID verification cannot be used with Python scripts")
-
+    def validate_submission(self, submission_path):
+        if os.path.splitext(submission_path)[1] == ".ipynb":
             nb = nbf.read(submission_path, as_version=nbf.NO_CONVERT)
-            uuid = self.get_notebook_uuid(nb)
-            self.abort_or_warn_if_invalid_uuid(uuid)
+            assignment_name = self.get_notebook_assignment_name(nb)
+            self.validate_assignment_name(assignment_name)
 
     def resolve_submission_path(self):
         nbs = glob("*.ipynb")
@@ -114,7 +111,7 @@ class PythonRunner(AbstractLanguageRunner):
         with chdir("./submission"):
 
             subm_path = self.resolve_submission_path()
-            self.validate_uuid(subm_path)
+            self.validate_submission(subm_path)
 
             # load plugins
             plugins = self.ag_config.plugins

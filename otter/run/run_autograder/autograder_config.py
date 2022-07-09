@@ -144,12 +144,8 @@ class AutograderConfig(fica.Config):
         default=True,
     )
 
-    assignment_uuid = fica.Key(
-        description="a UUID for the assignment to ensure that students submit to the correct autograder",
+    assignment_name = fica.Key(
+        description="a name for the assignment to ensure that students submit to the correct " \
+            "autograder",
         default=None,
-    )
-
-    allow_different_uuid = fica.Key(
-        description="if true, a different/absent UUID in the notebook does not fail the autograder",
-        default=False,
     )
