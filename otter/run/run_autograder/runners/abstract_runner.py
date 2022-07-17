@@ -86,7 +86,7 @@ class AbstractLanguageRunner(ABC):
         """
         if self.ag_config.assignment_name and got != self.ag_config.assignment_name:
             message = f"Received submission for assignment '{got}' (this is assignment " \
-                "'{self.ag_config.assignment_name}')"
+                f"'{self.ag_config.assignment_name}')"
             raise OtterRuntimeError(message)
 
     def get_notebook_assignment_name(self, nb):

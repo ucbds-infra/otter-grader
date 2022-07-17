@@ -4,10 +4,14 @@ import copy
 import json
 import nbformat
 import nbconvert
-import pytest
 import os
+import pytest
+import re
+
+from contextlib import nullcontext
 
 from otter.run.run_autograder import main as run_autograder
+from otter.run.run_autograder.utils import OtterRuntimeError
 from otter.utils import NBFORMAT_VERSION
 
 from .utils import delete_paths, TestFileManager
@@ -142,17 +146,20 @@ def test_script(load_config, expected_results):
             nbformat.write(nb, f)
 
 
-def test_uuid(load_config, expected_results):
-    uuid = "abc123"
+def test_assignment_name(load_config, expected_results):
+    name = "hw01"
     config = load_config()
     nb_path = FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb")
     orig_nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
     nb = copy.deepcopy(orig_nb)
 
-    def perform_test(nb, expected_results, **kwargs):
+    def perform_test(nb, expected_results, error=None, **kwargs):
         nbformat.write(nb, nb_path)
 
-        run_autograder(config["autograder_dir"], assignment_uuid = uuid, **kwargs)
+        cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
+            else nullcontext()
+        with cm:
+            run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
 
         with FILE_MANAGER.open("autograder/results/results.json") as f:
             actual_results = json.load(f)
@@ -160,20 +167,38 @@ def test_uuid(load_config, expected_results):
         assert actual_results == expected_results, \
             f"Actual results did not matched expected:\n{actual_results}"
 
+    formatted_output_template = "Otter encountered an error when grading this submission:\n\n{e}"
+    expected_error_results = {
+        "score": 0,
+        "stdout_visibility": "hidden",
+        "tests": [
+            {
+                "name": "Autograder Error",
+            },
+        ],
+    }
+
     try:
-        # test with correct UUID
-        nb["metadata"]["otter"] = {"assignment_uuid": uuid}
+        # test with correct name
+        nb["metadata"]["otter"] = {"assignment_name": name}
         perform_test(nb, expected_results)
 
-        # test with wrong UUID
-        nb["metadata"]["otter"]["assignment_uuid"] = "def456"
-        perform_test(nb, expected_results) # TODO: update these results
-
-        # test with correct UUID and allow different UUIDs
-
-        # test with wrong UUID and allow different UUIDs
+        # test with wrong name
+        bad_name = "lab01"
+        error_message = f"Received submission for assignment '{bad_name}' (this is assignment " \
+            f"'{name}')"
+        expected_error_results["tests"][0]["output"] = \
+            formatted_output_template.format(e=OtterRuntimeError(error_message))
+        nb["metadata"]["otter"]["assignment_name"] = bad_name
+        perform_test(nb, expected_error_results, error=error_message)
 
         # test with no UUID in nb
+        error_message = f"Received submission for assignment 'None' (this is assignment " \
+            f"'{name}')"
+        expected_error_results["tests"][0]["output"] = \
+            formatted_output_template.format(e=OtterRuntimeError(error_message))
+        nb["metadata"]["otter"].pop("assignment_name")
+        perform_test(nb, expected_error_results, error=error_message)
 
 
     finally:
