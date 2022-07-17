@@ -24,10 +24,12 @@ RUN apt-get clean && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN echo 'hi'
+
 # R
 RUN apt-get clean && \
     apt-get update && \
-    conda install -y r-base r-essentials -c conda-forge && \
+    conda install -y r-base r-essential && \
     conda install -c r r-irkernel r-essentials r-devtools -c conda-forge && \
     rm -rf /var/lib/apt/lists/*
 
