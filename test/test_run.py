@@ -192,7 +192,7 @@ def test_assignment_name(load_config, expected_results):
         nb["metadata"]["otter"]["assignment_name"] = bad_name
         perform_test(nb, expected_error_results, error=error_message)
 
-        # test with no UUID in nb
+        # test with no name in nb
         error_message = f"Received submission for assignment 'None' (this is assignment " \
             f"'{name}')"
         expected_error_results["tests"][0]["output"] = \
