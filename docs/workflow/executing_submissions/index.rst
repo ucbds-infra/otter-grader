@@ -59,7 +59,8 @@ Assignment Name Verification
 To ensure that students have uploaded submissions to the correct assignment on your LMS, you can
 configure Otter to check for an assignment name in the notebook metadata of the submission. If you
 set the ``assignment_name`` key of your ``otter_config.json`` to a string, Otter will check that the
-submission has this name as ``nb["metadata"]["otter"]["assignment_name"]`` before grading it. (This
+submission has this name as ``nb["metadata"]["otter"]["assignment_name"]`` (or, in the case of R
+Markdown submissions, the ``assignment_name`` key of the YAML header) before grading it. (This
 metadata can be set automatically with Otter Assign.) If the name doesn't match or there is no name,
 an error will be raised and the assignment will not be graded. If the ``assignment_name`` key is not
 present in your ``otter_config.json``, this validation is turned off.
