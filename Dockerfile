@@ -27,7 +27,7 @@ RUN apt-get clean && \
 # R
 RUN apt-get clean && \
     apt-get update && \
-    conda install -y r-base r-essentials && \
+    conda install -y r-base r-essentials -c conda-forge && \
     conda install -c r r-irkernel r-essentials r-devtools -c conda-forge && \
     rm -rf /var/lib/apt/lists/*
 
