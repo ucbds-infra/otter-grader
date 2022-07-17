@@ -341,6 +341,14 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
 
 def add_assignment_name_to_notebook(nb, assignment):
     """
+    Add the assignment name from the assignment config to the provided notebook's metadata in-place.
+
+    If ``assignment`` has a name, the name is added to the notebook metadata, as
+    ``nb["metadata"]["otter"]["assignment_name"]``.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to add the name to
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
     """
     if assignment.name is not None:
         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
