@@ -7,6 +7,7 @@ output: pdf_document
 
 <!--
 # ASSIGNMENT CONFIG
+name: hw01
 generate: true
 solutions_pdf: true
 files:

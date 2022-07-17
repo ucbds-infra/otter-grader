@@ -3,6 +3,7 @@ title: "Otter Assign for Rmd Test"
 author: "Chris Pyles"
 date: "8/3/2020"
 output: pdf_document
+assignment_name: "hw01"
 ---
 
 ```{r setup, include=FALSE}

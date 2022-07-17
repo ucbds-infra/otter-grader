@@ -52,7 +52,7 @@ def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
                 c1, c2 = f1.read(), f2.read()
                 if ignore_trailing_whitespace:
                     c1, c2 = c1.rstrip(), c2.rstrip()
-                diff = subprocess.run(["diff", p1, p2], stdout=subprocess.PIPE).stdout.decode("utf-8")
+                diff = subprocess.run(["diff", "--context=5", p1, p2], stdout=subprocess.PIPE).stdout.decode("utf-8")
                 assert c1 == c2, f"Contents of {p1} did not equal contents of {p2}:\n{diff}"
 
     except UnicodeDecodeError:
