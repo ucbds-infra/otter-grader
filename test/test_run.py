@@ -270,7 +270,7 @@ def test_rmd(load_config, expected_rmd_results):
         perform_test(
             sub_name(bad_name), get_expected_error_results(error_message), error=error_message)
 
-        # test with no name in nb
+        # test with no name in Rmd
         error_message = error_message_template.format(got=None, want=name)
         perform_test(
             "\n".join([l for l in orig_rmd.split("\n") if not l.startswith("assignment_name: ")]),

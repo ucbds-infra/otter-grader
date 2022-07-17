@@ -43,6 +43,7 @@ class RRunner(AbstractLanguageRunner):
             assignment_name = self.get_notebook_assignment_name(nb)
 
         elif ext == ".rmd":
+            assignment_name = None
             with open(submission_path) as f:
                 rmd = f.read()
             config = re.match(RMD_YAML_REGEX, rmd)
