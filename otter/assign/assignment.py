@@ -4,19 +4,10 @@ import fica
 import os
 import pathlib
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
+from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import Loggable
-
-
-# TODO: remove (#442)
-class MyConfig(fica.Config):
-
-    def get(self, attr, default):
-        return getattr(self, attr)
-
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
 
 
 # TODO: add detection/warnings/errors for when a user provides an invalid key? (to be added to fica)
@@ -71,7 +62,7 @@ class Assignment(fica.Config, Loggable):
         default=False,
     )
 
-    class ExportCellValue(MyConfig):
+    class ExportCellValue(fica.Config):
 
         instructions: str = fica.Key(
             description="additional submission instructions to include in the export cell",
@@ -104,7 +95,7 @@ class Assignment(fica.Config, Loggable):
         subkey_container=ExportCellValue,
     )
 
-    class SeedValue(MyConfig):
+    class SeedValue(fica.Config):
 
         variable: Optional[str] = fica.Key(
             description="a variable name to override with the autograder seed during grading",
@@ -127,10 +118,11 @@ class Assignment(fica.Config, Loggable):
         subkey_container=SeedValue,
     )
 
-    generate: bool = fica.Key(
+    generate: Union[bool, AutograderConfig] = fica.Key(
         description="grading configurations to be passed to Otter Generate as an " \
             "otter_config.json; if false, Otter Generate is disabled",
         default=False,
+        subkey_container=AutograderConfig,
     )
 
     save_environment: bool = fica.Key(
@@ -163,7 +155,7 @@ class Assignment(fica.Config, Loggable):
         default=[],
     )
 
-    class TestsValue(MyConfig):
+    class TestsValue(fica.Config):
 
         files: bool = fica.Key(
             description="whether to store tests in separate files, instead of the notebook " \
@@ -212,9 +204,7 @@ class Assignment(fica.Config, Loggable):
     seed_required: bool = False
     """whether a seeding configuration is required for Otter Generate"""
 
-    _otter_config: Optional[Dict[str, Any]] = None
-    """the (parsed) contents of an ``otter_config.json`` file to be used for Otter Generate"""
-
+    # TODO: rename this
     _temp_test_dir: Optional[str] = None
     """the path to a directory of test files for Otter Generate"""
 
@@ -225,9 +215,16 @@ class Assignment(fica.Config, Loggable):
         self._logger.debug(f"Initializing with config: {user_config}")
         super().__init__(user_config, **kwargs)
 
-    def update_(self, user_config: Dict[str, Any]):
+        # convert a boolean to a config object for self.generate if indicated
+        if self.generate is True:
+            self.generate = AutograderConfig()
+
+    def update(self, user_config: Dict[str, Any]):
         self._logger.debug(f"Updating config: {user_config}")
-        return super().update_(user_config)
+        ret = super().update(user_config)
+        if self.generate is True:
+            self.generate = AutograderConfig()
+        return ret
 
     @property
     def is_r(self):
@@ -250,46 +247,12 @@ class Assignment(fica.Config, Loggable):
         """
         return self.master.suffix.lower() == ".rmd"
 
-    def add_generate_arg(self, key, value, overwrite=False):
+    @property
+    def generate_enabled(self):
         """
-        Add a key-value pair to the ``generate`` key if ``generate`` is enabled.
-
-        If ``generate`` is ``False``, no action is taken. If it is ``True``, it is instead set to
-        an empty ``dict`` and the key is inserted. Otherwise, the key is inserted into the ``dict``
-        already pointed to by ``generate``.
-
-        Args:
-            key (``str``): the key to add
-            value (``object``): the value the key maps to
-            overwrite (``bool``): whether to overwrite the value of ``key`` if it is present
+        Whether Otter Generate is enabled for this assignment
         """
-        if self.generate is False:
-            return
-
-        if self.generate is True:
-            self.generate = {}
-
-        if overwrite or key not in self.generate:
-            self.generate[key] = value
-
-    def get_generate_arg(self, key, default):
-        """
-        Get the value of a key in ``generate`` if it exists, otherwise returning ``default``.\
-
-        Args:
-            key (``str``): the key to look for
-            default (``object``): the default value of the key
-
-        Returns:
-            ``object``: the value of the key if it is present, else ``default``
-
-        Raise:
-            ``ValueError``: if ``generate`` is ``False``
-        """
-        if self.generate is False:
-            raise ValueError("Otter Generate is not configured for this assignment")
-
-        return default if self.generate is True else self.generate.get(key, default)
+        return self.generate is not False
 
     def get_otter_config(self):
         """
@@ -298,22 +261,22 @@ class Assignment(fica.Config, Loggable):
         Returns:
             ``dict[str, object]``: the ``otter_config.json`` file as a ``dict``
         """
-        if self.generate is False:
+        if not self.generate_enabled:
             raise ValueError("Otter Generate is not configured for this assignment")
 
-        otter_config = {} if self.generate is True else self.generate
+        otter_config = self.generate
 
         if self.is_r:
-            otter_config["lang"] = "r"
+            otter_config.lang = "r"
 
         # TODO: move this config out of the assignment metadata and into the generate key
         if self.variables:
-            otter_config["serialized_variables"] = str(self.variables)
+            otter_config.serialized_variables = str(self.variables)
 
         if self.name:
-            otter_config["assignment_name"] = self.name
+            otter_config.assignment_name = self.name
 
-        return otter_config
+        return otter_config.get_user_config()
 
     @property
     def notebook_basename(self):

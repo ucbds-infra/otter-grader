@@ -157,7 +157,7 @@ class NotebookTransformer:
 
             # check for assignment config
             if is_assignment_config_cell(cell):
-                self.assignment.update_(get_cell_config(cell))
+                self.assignment.update(get_cell_config(cell))
                 continue
 
             # check for an end to the current block
