@@ -24,8 +24,6 @@ RUN apt-get clean && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN echo 'hi'
-
 # R
 RUN apt-get clean && \
     apt-get update && \
