@@ -343,4 +343,6 @@ def add_assignment_name_to_notebook(nb, assignment):
     """
     """
     if assignment.name is not None:
+        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+            nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
         nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_name"] = assignment.name
