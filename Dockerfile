@@ -29,7 +29,7 @@ RUN echo 'hi'
 # R
 RUN apt-get clean && \
     apt-get update && \
-    conda install -y r-base r-essentials && \
+    conda install -y "r-base>=4.0.0" r-essentials && \
     conda install -c r r-irkernel r-essentials r-devtools -c conda-forge && \
     rm -rf /var/lib/apt/lists/*
 
