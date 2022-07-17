@@ -105,6 +105,39 @@ def expected_results():
     }
 
 
+@pytest.fixture(scope="module")
+def expected_rmd_results():
+    return {
+        "tests": [
+            {
+                "name": "Public Tests",
+                "output": "q1 results: All test cases passed!",
+                "visibility": "visible",
+            },
+            {
+                "max_score": 5,
+                "name": "q1",
+                "output": "q1 results: All test cases passed!\nq1d message: congrats",
+                "score": 5,
+                "visibility": "hidden",
+            },
+        ],
+    }
+
+
+def get_expected_error_results(error):
+    return {
+        "score": 0,
+        "stdout_visibility": "hidden",
+        "tests": [
+            {
+                "name": "Autograder Error",
+                "output": f"Otter encountered an error when grading this submission:\n\n{error}",
+            },
+        ],
+    }
+
+
 @pytest.fixture
 def load_config():
     def load_config_file(rmd=False):
@@ -175,16 +208,8 @@ def test_assignment_name(load_config, expected_results):
         assert actual_results == expected_results, \
             f"Actual results did not matched expected:\n{actual_results}"
 
-    formatted_output_template = "Otter encountered an error when grading this submission:\n\n{e}"
-    expected_error_results = {
-        "score": 0,
-        "stdout_visibility": "hidden",
-        "tests": [
-            {
-                "name": "Autograder Error",
-            },
-        ],
-    }
+    error_message_template = "Received submission for assignment '{got}' (this is assignment " \
+            "'{want}')"
 
     try:
         # test with correct name
@@ -193,21 +218,14 @@ def test_assignment_name(load_config, expected_results):
 
         # test with wrong name
         bad_name = "lab01"
-        error_message = f"Received submission for assignment '{bad_name}' (this is assignment " \
-            f"'{name}')"
-        expected_error_results["tests"][0]["output"] = \
-            formatted_output_template.format(e=OtterRuntimeError(error_message))
+        error_message = error_message_template.format(got=bad_name, want=name)
         nb["metadata"]["otter"]["assignment_name"] = bad_name
-        perform_test(nb, expected_error_results, error=error_message)
+        perform_test(nb, get_expected_error_results(error_message), error=error_message)
 
         # test with no name in nb
-        error_message = f"Received submission for assignment 'None' (this is assignment " \
-            f"'{name}')"
-        expected_error_results["tests"][0]["output"] = \
-            formatted_output_template.format(e=OtterRuntimeError(error_message))
+        error_message = error_message_template.format(got=None, want=name)
         nb["metadata"]["otter"].pop("assignment_name")
-        perform_test(nb, expected_error_results, error=error_message)
-
+        perform_test(nb, get_expected_error_results(error_message), error=error_message)
 
     finally:
         delete_paths([nb_path])
@@ -215,7 +233,7 @@ def test_assignment_name(load_config, expected_results):
             nbformat.write(nb, f)
 
 
-def test_rmd(load_config):
+def test_rmd(load_config, expected_rmd_results):
     name = "hw01"
     config = load_config(True)
     rmd_path = FILE_MANAGER.get_path("rmd-autograder/submission/hw01.Rmd")
@@ -239,39 +257,26 @@ def test_rmd(load_config):
         assert actual_results == expected_results, \
             f"Actual results did not matched expected:\n{actual_results}"
 
-    formatted_output_template = "Otter encountered an error when grading this submission:\n\n{e}"
-    expected_error_results = {
-        "score": 0,
-        "stdout_visibility": "hidden",
-        "tests": [
-            {
-                "name": "Autograder Error",
-            },
-        ],
-    }
+    error_message_template = "Received submission for assignment '{got}' (this is assignment " \
+            "'{want}')"
 
     try:
         # test with correct name
-        perform_test(orig_rmd, {
-            "tests": [{"name": "Public Tests", "visibility": "visible", "output": ""}],
-        })
+        perform_test(orig_rmd, expected_rmd_results)
 
         # test with wrong name
         bad_name = "lab01"
-        error_message = f"Received submission for assignment '{bad_name}' (this is assignment " \
-            f"'{name}')"
-        expected_error_results["tests"][0]["output"] = \
-            formatted_output_template.format(e=OtterRuntimeError(error_message))
-        perform_test(sub_name(bad_name), expected_error_results, error=error_message)
+        error_message = error_message_template.format(got=bad_name, want=name)
+        perform_test(
+            sub_name(bad_name), get_expected_error_results(error_message), error=error_message)
 
         # test with no name in nb
-        error_message = f"Received submission for assignment 'None' (this is assignment " \
-            f"'{name}')"
-        expected_error_results["tests"][0]["output"] = \
-            formatted_output_template.format(e=OtterRuntimeError(error_message))
-        perform_test("\n".join([l for l in orig_rmd.split("\n") if \
-            not l.startswith("assignment_name: ")]), expected_error_results, error=error_message)
-
+        error_message = error_message_template.format(got=None, want=name)
+        perform_test(
+            "\n".join([l for l in orig_rmd.split("\n") if not l.startswith("assignment_name: ")]),
+            get_expected_error_results(error_message),
+            error=error_message,
+        )
 
     finally:
         delete_paths([rmd_path])

@@ -4,8 +4,9 @@ import copy
 import json
 import nbformat as nbf
 import os
+import re
 import tempfile
-import warnings
+import yaml
 
 from glob import glob
 from nbconvert.exporters import ScriptExporter
@@ -26,17 +27,30 @@ R_PACKAGES = {
     "ottr": importr("ottr"),
 }
 
+RMD_YAML_REGEX = r"^\n*---\n([\s\S]+?)\n---"
+
 
 class RRunner(AbstractLanguageRunner):
 
     subm_path_deletion_required = False
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
 
-    # TODO: find a workflow for Rmd files
     def validate_submission(self, submission_path):
-        if os.path.splitext(submission_path)[1].lower() == ".ipynb":
+        assignment_name = False
+        ext = os.path.splitext(submission_path)[1].lower()
+        if ext == ".ipynb":
             nb = nbf.read(submission_path, as_version=nbf.NO_CONVERT)
             assignment_name = self.get_notebook_assignment_name(nb)
+
+        elif ext == ".rmd":
+            with open(submission_path) as f:
+                rmd = f.read()
+            config = re.match(RMD_YAML_REGEX, rmd)
+            if config:
+                config = config.group(1)
+                assignment_name = yaml.full_load(config).get("assignment_name", None)
+
+        if assignment_name is not False:
             self.validate_assignment_name(assignment_name)
 
     def filter_cells_with_syntax_errors(self, nb):
@@ -119,6 +133,8 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(rmds) == 1:
             rmd_path = rmds[0]
+
+            self.validate_submission(rmd_path)
 
             # add seeds
             if self.ag_config.seed is not None:

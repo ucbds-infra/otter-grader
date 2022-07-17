@@ -12,5 +12,5 @@ x <- 2
 ```
 
 ```{r}
-. = otter::check("tests/q1.R")
+. = ottr::check("tests/q1.R")
 ```
