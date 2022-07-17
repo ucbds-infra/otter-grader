@@ -32,6 +32,13 @@ def cleanup_output(cleanup_enabled):
             FILE_MANAGER.get_path("autograder/submission/tests"),
             FILE_MANAGER.get_path("autograder/submission/__init__.py"),
             FILE_MANAGER.get_path("autograder/submission/.OTTER_LOG"),
+            FILE_MANAGER.get_path("rmd-autograder/results/results.json"),
+            FILE_MANAGER.get_path("rmd-autograder/results/results.pkl"),
+            FILE_MANAGER.get_path("rmd-autograder/__init__.py"),
+            FILE_MANAGER.get_path("rmd-autograder/submission/test"),
+            FILE_MANAGER.get_path("rmd-autograder/submission/tests"),
+            FILE_MANAGER.get_path("rmd-autograder/submission/__init__.py"),
+            FILE_MANAGER.get_path("rmd-autograder/submission/.OTTER_LOG"),
         ])
 
 
@@ -100,8 +107,9 @@ def expected_results():
 
 @pytest.fixture
 def load_config():
-    def load_config_file():
-        with FILE_MANAGER.open("autograder/source/otter_config.json") as f:
+    def load_config_file(rmd=False):
+        dirname = "autograder" if not rmd else "rmd-autograder"
+        with FILE_MANAGER.open(f"{dirname}/source/otter_config.json") as f:
             return json.load(f)
     return load_config_file
 
@@ -205,3 +213,67 @@ def test_assignment_name(load_config, expected_results):
         delete_paths([nb_path])
         with open(nb_path, "w+") as f:
             nbformat.write(nb, f)
+
+
+def test_rmd(load_config):
+    name = "hw01"
+    config = load_config(True)
+    rmd_path = FILE_MANAGER.get_path("rmd-autograder/submission/hw01.Rmd")
+    with open(rmd_path) as f:
+        orig_rmd = f.read()
+
+    sub_name = lambda n: re.sub(r"assignment_name: \"\w+\"", f"assignment_name: \"{n}\"", orig_rmd)
+
+    def perform_test(rmd, expected_results, error=None, **kwargs):
+        with open(rmd_path, "w") as f:
+            f.write(rmd)
+
+        cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
+            else nullcontext()
+        with cm:
+            run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
+
+        with FILE_MANAGER.open("rmd-autograder/results/results.json") as f:
+            actual_results = json.load(f)
+
+        assert actual_results == expected_results, \
+            f"Actual results did not matched expected:\n{actual_results}"
+
+    formatted_output_template = "Otter encountered an error when grading this submission:\n\n{e}"
+    expected_error_results = {
+        "score": 0,
+        "stdout_visibility": "hidden",
+        "tests": [
+            {
+                "name": "Autograder Error",
+            },
+        ],
+    }
+
+    try:
+        # test with correct name
+        perform_test(orig_rmd, {
+            "tests": [{"name": "Public Tests", "visibility": "visible", "output": ""}],
+        })
+
+        # test with wrong name
+        bad_name = "lab01"
+        error_message = f"Received submission for assignment '{bad_name}' (this is assignment " \
+            f"'{name}')"
+        expected_error_results["tests"][0]["output"] = \
+            formatted_output_template.format(e=OtterRuntimeError(error_message))
+        perform_test(sub_name(bad_name), expected_error_results, error=error_message)
+
+        # test with no name in nb
+        error_message = f"Received submission for assignment 'None' (this is assignment " \
+            f"'{name}')"
+        expected_error_results["tests"][0]["output"] = \
+            formatted_output_template.format(e=OtterRuntimeError(error_message))
+        perform_test("\n".join([l for l in orig_rmd.split("\n") if \
+            not l.startswith("assignment_name: ")]), expected_error_results, error=error_message)
+
+
+    finally:
+        delete_paths([rmd_path])
+        with open(rmd_path, "w+") as f:
+            f.write(orig_rmd)
