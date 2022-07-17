@@ -149,6 +149,20 @@ cell, and passes the configurations ``points`` and ``seed`` to Otter Generate vi
         points: 3
         seed: 0
 
+You can also configure assignments created with Otter Assign to ensure that students submit to the
+correct assignment by setting the ``name`` key in the assignment config. When this is set, Otter
+Assign adds the provided name to the notebook metadata and the autograder configuration zip file;
+this configures the autograder to fail if the student uploads a notebook with a different assignment
+name in the metadata.
+
+.. code-block:: yaml
+
+    # ASSIGNMENT CONFIG
+    name: hw01
+
+You can find more information about how Otter performs assignment name verification
+:ref:`here<workflow_execution_submissions_assignment_name_verification>`.
+
 
 .. _otter_assign_v1_seed_variables:
 
