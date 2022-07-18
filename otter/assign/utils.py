@@ -13,7 +13,7 @@ from textwrap import indent
 
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
-from ..utils import get_source
+from ..utils import get_source, NOTEBOOK_METADATA_KEY
 
 
 class EmptyCellException(Exception):
@@ -258,26 +258,15 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
         plugin_collection (``otter.plugins.PluginCollection``, optional): a plugin collection to pass
             to Otter Generate
     """
-    generate_args = assignment.generate
-    if generate_args is True:
-        generate_args = {}
-
-    if "pdfs" in generate_args:
-        raise ValueError("The 'pdfs' key of 'generate' is no longer supported. Put any " + \
-                         "'pdfs' configurations inside the 'generate' key itself.")
-
-    if assignment.is_r:
-        generate_args["lang"] = "r"
-
     curr_dir = os.getcwd()
     os.chdir(str(assignment.get_ag_path()))
 
     # use temp tests dir
     test_dir = "tests"
-    if assignment.is_python and not assignment.tests["files"] and assignment._temp_test_dir is None:
+    if assignment.is_python and not assignment.tests.files and assignment._temp_test_dir is None:
         raise RuntimeError("Failed to create temp tests directory for Otter Generate")
 
-    elif assignment.is_python and not assignment.tests["files"]:
+    elif assignment.is_python and not assignment.tests.files:
         test_dir = str(assignment._temp_test_dir)
 
     requirements = None
@@ -316,13 +305,12 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
 
         files += assignment.autograder_files
 
-    # TODO: move this config out of the assignment metadata and into the generate key
-    if assignment.variables:
-        generate_args['serialized_variables'] = str(assignment.variables)
-
-    if generate_args:
+    otter_config = assignment.get_otter_config()
+    if otter_config:
+        # TODO: move this filename into a global variable somewhere and remove all of the places
+        # it's hardcoded
         with open("otter_config.json", "w+") as f:
-            json.dump(generate_args, f, indent=2)
+            json.dump(otter_config, f, indent=2)
 
     # TODO: change generate_autograder so that only necessary kwargs are needed
     timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
@@ -331,7 +319,7 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
     generate_autograder(
         tests_dir=test_dir,
         output_path=output_path,
-        config="otter_config.json" if generate_args else None,
+        config="otter_config.json" if otter_config else None,
         lang="python" if assignment.is_python else "r",
         requirements=requirements,
         overwrite_requirements=assignment.overwrite_requirements,
@@ -349,3 +337,20 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
         shutil.rmtree(str(assignment._temp_test_dir))
 
     os.chdir(curr_dir)
+
+
+def add_assignment_name_to_notebook(nb, assignment):
+    """
+    Add the assignment name from the assignment config to the provided notebook's metadata in-place.
+
+    If ``assignment`` has a name, the name is added to the notebook metadata, as
+    ``nb["metadata"]["otter"]["assignment_name"]``.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to add the name to
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+    """
+    if assignment.name is not None:
+        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+            nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
+        nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_name"] = assignment.name

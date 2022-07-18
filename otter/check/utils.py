@@ -16,8 +16,7 @@ from subprocess import run, PIPE
 
 from .logs import EventType
 
-from ..test_files import NOTEBOOK_METADATA_KEY
-from ..utils import import_or_raise
+from ..utils import import_or_raise, NOTEBOOK_METADATA_KEY
 
 
 def save_notebook(filename, timeout=10):

@@ -14,7 +14,7 @@ from .constants import BEGIN_TEST_CONFIG_REGEX, END_TEST_CONFIG_REGEX, TEST_REGE
     OTTR_TEST_FILE_TEMPLATE
 from .utils import get_source, lock, str_to_doctest
 from ...test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
-from ...test_files.metadata_test import NOTEBOOK_METADATA_KEY
+from ...utils import NOTEBOOK_METADATA_KEY
 
 
 @dataclass

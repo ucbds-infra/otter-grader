@@ -4,19 +4,10 @@ import fica
 import os
 import pathlib
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
+from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import Loggable
-
-
-# TODO: remove
-class MyConfig(fica.Config):
-
-    def get(self, attr, default):
-        return getattr(self, attr)
-
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
 
 
 # TODO: add detection/warnings/errors for when a user provides an invalid key? (to be added to fica)
@@ -24,6 +15,12 @@ class Assignment(fica.Config, Loggable):
     """
     Configurations for the assignment.
     """
+
+    name: Optional[str] = fica.Key(
+        description="a name for the assignment (to validate that students submit to the correct " \
+            "autograder)",
+        default=None,
+    )
 
     requirements: Optional[str] = fica.Key(
         description="the path to a requirements.txt file or a list of packages",
@@ -65,7 +62,7 @@ class Assignment(fica.Config, Loggable):
         default=False,
     )
 
-    class ExportCellValue(MyConfig):
+    class ExportCellValue(fica.Config):
 
         instructions: str = fica.Key(
             description="additional submission instructions to include in the export cell",
@@ -98,7 +95,7 @@ class Assignment(fica.Config, Loggable):
         subkey_container=ExportCellValue,
     )
 
-    class SeedValue(MyConfig):
+    class SeedValue(fica.Config):
 
         variable: Optional[str] = fica.Key(
             description="a variable name to override with the autograder seed during grading",
@@ -121,10 +118,11 @@ class Assignment(fica.Config, Loggable):
         subkey_container=SeedValue,
     )
 
-    generate: bool = fica.Key(
+    generate: Union[bool, AutograderConfig] = fica.Key(
         description="grading configurations to be passed to Otter Generate as an " \
             "otter_config.json; if false, Otter Generate is disabled",
         default=False,
+        subkey_container=AutograderConfig,
     )
 
     save_environment: bool = fica.Key(
@@ -157,7 +155,7 @@ class Assignment(fica.Config, Loggable):
         default=[],
     )
 
-    class TestsValue(MyConfig):
+    class TestsValue(fica.Config):
 
         files: bool = fica.Key(
             description="whether to store tests in separate files, instead of the notebook " \
@@ -206,9 +204,7 @@ class Assignment(fica.Config, Loggable):
     seed_required: bool = False
     """whether a seeding configuration is required for Otter Generate"""
 
-    _otter_config: Optional[Dict[str, Any]] = None
-    """the (parsed) contents of an ``otter_config.json`` file to be used for Otter Generate"""
-
+    # TODO: rename this
     _temp_test_dir: Optional[str] = None
     """the path to a directory of test files for Otter Generate"""
 
@@ -217,12 +213,18 @@ class Assignment(fica.Config, Loggable):
 
     def __init__(self, user_config: Dict[str, Any] = {}, **kwargs) -> None:
         self._logger.debug(f"Initializing with config: {user_config}")
-
         super().__init__(user_config, **kwargs)
 
-    def update_(self, user_config: Dict[str, Any]):
+        # convert a boolean to a config object for self.generate if indicated
+        if self.generate is True:
+            self.generate = AutograderConfig()
+
+    def update(self, user_config: Dict[str, Any]):
         self._logger.debug(f"Updating config: {user_config}")
-        return super().update_(user_config)
+        ret = super().update(user_config)
+        if self.generate is True:
+            self.generate = AutograderConfig()
+        return ret
 
     @property
     def is_r(self):
@@ -244,6 +246,37 @@ class Assignment(fica.Config, Loggable):
         Whether the input file is an RMarkdown document
         """
         return self.master.suffix.lower() == ".rmd"
+
+    @property
+    def generate_enabled(self):
+        """
+        Whether Otter Generate is enabled for this assignment
+        """
+        return self.generate is not False
+
+    def get_otter_config(self):
+        """
+        Get the contents of ``otter_config.json`` for this assignment.
+
+        Returns:
+            ``dict[str, object]``: the ``otter_config.json`` file as a ``dict``
+        """
+        if not self.generate_enabled:
+            raise ValueError("Otter Generate is not configured for this assignment")
+
+        otter_config = self.generate
+
+        if self.is_r:
+            otter_config.lang = "r"
+
+        # TODO: move this config out of the assignment metadata and into the generate key
+        if self.variables:
+            otter_config.serialized_variables = str(self.variables)
+
+        if self.name:
+            otter_config.assignment_name = self.name
+
+        return otter_config.get_user_config()
 
     @property
     def notebook_basename(self):

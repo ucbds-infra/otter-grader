@@ -20,6 +20,9 @@ from IPython import get_ipython
 NBFORMAT_VERSION = 4
 """the version of the Jupyter notebook format to use"""
 
+NOTEBOOK_METADATA_KEY = "otter"
+"""the key used for all Otter metadata added to a notebook"""
+
 
 @contextmanager
 def block_print():

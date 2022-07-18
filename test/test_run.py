@@ -1,12 +1,17 @@
 """Tests for ``otter.run``"""
 
+import copy
 import json
 import nbformat
 import nbconvert
-import pytest
 import os
+import pytest
+import re
+
+from contextlib import nullcontext
 
 from otter.run.run_autograder import main as run_autograder
+from otter.run.run_autograder.utils import OtterRuntimeError
 from otter.utils import NBFORMAT_VERSION
 
 from .utils import delete_paths, TestFileManager
@@ -27,6 +32,13 @@ def cleanup_output(cleanup_enabled):
             FILE_MANAGER.get_path("autograder/submission/tests"),
             FILE_MANAGER.get_path("autograder/submission/__init__.py"),
             FILE_MANAGER.get_path("autograder/submission/.OTTER_LOG"),
+            FILE_MANAGER.get_path("rmd-autograder/results/results.json"),
+            FILE_MANAGER.get_path("rmd-autograder/results/results.pkl"),
+            FILE_MANAGER.get_path("rmd-autograder/__init__.py"),
+            FILE_MANAGER.get_path("rmd-autograder/submission/test"),
+            FILE_MANAGER.get_path("rmd-autograder/submission/tests"),
+            FILE_MANAGER.get_path("rmd-autograder/submission/__init__.py"),
+            FILE_MANAGER.get_path("rmd-autograder/submission/.OTTER_LOG"),
         ])
 
 
@@ -93,10 +105,44 @@ def expected_results():
     }
 
 
+@pytest.fixture(scope="module")
+def expected_rmd_results():
+    return {
+        "tests": [
+            {
+                "name": "Public Tests",
+                "output": "q1 results: All test cases passed!",
+                "visibility": "visible",
+            },
+            {
+                "max_score": 5,
+                "name": "q1",
+                "output": "q1 results: All test cases passed!\nq1d message: congrats",
+                "score": 5,
+                "visibility": "hidden",
+            },
+        ],
+    }
+
+
+def get_expected_error_results(error):
+    return {
+        "score": 0,
+        "stdout_visibility": "hidden",
+        "tests": [
+            {
+                "name": "Autograder Error",
+                "output": f"Otter encountered an error when grading this submission:\n\n{error}",
+            },
+        ],
+    }
+
+
 @pytest.fixture
 def load_config():
-    def load_config_file():
-        with FILE_MANAGER.open("autograder/source/otter_config.json") as f:
+    def load_config_file(rmd=False):
+        dirname = "autograder" if not rmd else "rmd-autograder"
+        with FILE_MANAGER.open(f"{dirname}/source/otter_config.json") as f:
             return json.load(f)
     return load_config_file
 
@@ -139,3 +185,100 @@ def test_script(load_config, expected_results):
         delete_paths([FILE_MANAGER.get_path("autograder/submission/fails2and6H.py")])
         with open(nb_path, "w+") as f:
             nbformat.write(nb, f)
+
+
+def test_assignment_name(load_config, expected_results):
+    name = "hw01"
+    config = load_config()
+    nb_path = FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb")
+    orig_nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
+    nb = copy.deepcopy(orig_nb)
+
+    def perform_test(nb, expected_results, error=None, **kwargs):
+        nbformat.write(nb, nb_path)
+
+        cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
+            else nullcontext()
+        with cm:
+            run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
+
+        with FILE_MANAGER.open("autograder/results/results.json") as f:
+            actual_results = json.load(f)
+
+        assert actual_results == expected_results, \
+            f"Actual results did not matched expected:\n{actual_results}"
+
+    error_message_template = "Received submission for assignment '{got}' (this is assignment " \
+            "'{want}')"
+
+    try:
+        # test with correct name
+        nb["metadata"]["otter"] = {"assignment_name": name}
+        perform_test(nb, expected_results)
+
+        # test with wrong name
+        bad_name = "lab01"
+        error_message = error_message_template.format(got=bad_name, want=name)
+        nb["metadata"]["otter"]["assignment_name"] = bad_name
+        perform_test(nb, get_expected_error_results(error_message), error=error_message)
+
+        # test with no name in nb
+        error_message = error_message_template.format(got=None, want=name)
+        nb["metadata"]["otter"].pop("assignment_name")
+        perform_test(nb, get_expected_error_results(error_message), error=error_message)
+
+    finally:
+        delete_paths([nb_path])
+        with open(nb_path, "w+") as f:
+            nbformat.write(nb, f)
+
+
+def test_rmd(load_config, expected_rmd_results):
+    name = "hw01"
+    config = load_config(True)
+    rmd_path = FILE_MANAGER.get_path("rmd-autograder/submission/hw01.Rmd")
+    with open(rmd_path) as f:
+        orig_rmd = f.read()
+
+    sub_name = lambda n: re.sub(r"assignment_name: \"\w+\"", f"assignment_name: \"{n}\"", orig_rmd)
+
+    def perform_test(rmd, expected_results, error=None, **kwargs):
+        with open(rmd_path, "w") as f:
+            f.write(rmd)
+
+        cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
+            else nullcontext()
+        with cm:
+            run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
+
+        with FILE_MANAGER.open("rmd-autograder/results/results.json") as f:
+            actual_results = json.load(f)
+
+        assert actual_results == expected_results, \
+            f"Actual results did not matched expected:\n{actual_results}"
+
+    error_message_template = "Received submission for assignment '{got}' (this is assignment " \
+            "'{want}')"
+
+    try:
+        # test with correct name
+        perform_test(orig_rmd, expected_rmd_results)
+
+        # test with wrong name
+        bad_name = "lab01"
+        error_message = error_message_template.format(got=bad_name, want=name)
+        perform_test(
+            sub_name(bad_name), get_expected_error_results(error_message), error=error_message)
+
+        # test with no name in Rmd
+        error_message = error_message_template.format(got=None, want=name)
+        perform_test(
+            "\n".join([l for l in orig_rmd.split("\n") if not l.startswith("assignment_name: ")]),
+            get_expected_error_results(error_message),
+            error=error_message,
+        )
+
+    finally:
+        delete_paths([rmd_path])
+        with open(rmd_path, "w+") as f:
+            f.write(orig_rmd)

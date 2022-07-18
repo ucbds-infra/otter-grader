@@ -14,8 +14,8 @@ from .r_adapter.cell_factory import RCellFactory
 from .solutions import has_seed, SOLUTION_CELL_TAG, overwrite_seed_vars, strip_ignored_lines, \
     strip_solutions_and_output
 from .tests_manager import AssignmentTestsManager
-from .utils import add_tag, AssignNotebookFormatException, get_source, is_cell_type, \
-    is_ignore_cell, remove_cell_ids
+from .utils import add_tag, add_assignment_name_to_notebook, AssignNotebookFormatException, \
+    get_source, is_cell_type, is_ignore_cell, remove_cell_ids
 
 
 class NotebookTransformer:
@@ -127,6 +127,8 @@ class NotebookTransformer:
         # parsing of the nbformat version info to determine if this is necessary.
         remove_cell_ids(transformed_nb)
 
+        add_assignment_name_to_notebook(transformed_nb, self.assignment)
+
         return TransformedNotebookContainer(transformed_nb, self)
 
     def _get_transformed_cells(self, cells):
@@ -155,7 +157,7 @@ class NotebookTransformer:
 
             # check for assignment config
             if is_assignment_config_cell(cell):
-                self.assignment.update_(get_cell_config(cell))
+                self.assignment.update(get_cell_config(cell))
                 continue
 
             # check for an end to the current block

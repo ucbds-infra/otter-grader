@@ -107,6 +107,13 @@ def test_convert_example():
         FILE_MANAGER.get_path("example.ipynb"), 
         FILE_MANAGER.get_path("example-correct"), 
         assign_kwargs=dict(no_run_tests=True),
+        assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
+    )
+
+    # check gradescope zip file
+    check_gradescope_zipfile(
+        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 
+        FILE_MANAGER.get_path("example-autograder-correct"),
     )
 
 

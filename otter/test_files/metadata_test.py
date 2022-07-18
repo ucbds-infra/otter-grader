@@ -1,21 +1,11 @@
 """Support for notebook metadata test files"""
 
-import doctest
-import io
 import json
-import os
-import pathlib
-import warnings
 
-from contextlib import redirect_stderr, redirect_stdout
-from textwrap import dedent
-
-from .abstract_test import TestCase
 from .exception_test import ExceptionTestFile
 from .ok_test import OKTestFile
 
-
-NOTEBOOK_METADATA_KEY = "otter"
+from ..utils import NOTEBOOK_METADATA_KEY
 
 
 class NotebookMetadataExceptionTestFile(ExceptionTestFile):

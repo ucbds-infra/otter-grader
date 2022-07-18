@@ -2,10 +2,11 @@
 
 import copy
 import json
-import nbformat
+import nbformat as nbf
 import os
-import shutil
+import re
 import tempfile
+import yaml
 
 from glob import glob
 from nbconvert.exporters import ScriptExporter
@@ -26,11 +27,32 @@ R_PACKAGES = {
     "ottr": importr("ottr"),
 }
 
+RMD_YAML_REGEX = r"^\n*---\n([\s\S]+?)\n---"
+
 
 class RRunner(AbstractLanguageRunner):
 
     subm_path_deletion_required = False
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
+
+    def validate_submission(self, submission_path):
+        assignment_name = False
+        ext = os.path.splitext(submission_path)[1].lower()
+        if ext == ".ipynb":
+            nb = nbf.read(submission_path, as_version=nbf.NO_CONVERT)
+            assignment_name = self.get_notebook_assignment_name(nb)
+
+        elif ext == ".rmd":
+            assignment_name = None
+            with open(submission_path) as f:
+                rmd = f.read()
+            config = re.match(RMD_YAML_REGEX, rmd)
+            if config:
+                config = config.group(1)
+                assignment_name = yaml.full_load(config).get("assignment_name", None)
+
+        if assignment_name is not False:
+            self.validate_assignment_name(assignment_name)
 
     def filter_cells_with_syntax_errors(self, nb):
         """
@@ -93,7 +115,8 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(nbs) == 1:
             nb_path = nbs[0]
-            nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
+            self.validate_submission(nb_path)
+            nb = nbf.read(nb_path, as_version=NBFORMAT_VERSION)
             nb = self.filter_cells_with_syntax_errors(nb)
 
             # create the R script
@@ -111,6 +134,8 @@ class RRunner(AbstractLanguageRunner):
 
         elif len(rmds) == 1:
             rmd_path = rmds[0]
+
+            self.validate_submission(rmd_path)
 
             # add seeds
             if self.ag_config.seed is not None:

@@ -27,7 +27,7 @@ RUN apt-get clean && \
 # R
 RUN apt-get clean && \
     apt-get update && \
-    conda install -y r-base r-essentials && \
+    conda install -y "r-base>=4.0.0" r-essentials && \
     conda install -c r r-irkernel r-essentials r-devtools -c conda-forge && \
     rm -rf /var/lib/apt/lists/*
 
@@ -53,3 +53,4 @@ ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 RUN pip install git+https://github.com/ucbds-infra/otter-grader.git@6bc9682296fce1667430b5286ebcb285cc2668de
+RUN Rscript -e "install.packages('ottr', dependencies=TRUE, repos='http://cran.us.r-project.org')"

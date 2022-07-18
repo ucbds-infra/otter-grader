@@ -6,7 +6,7 @@ import re
 
 from copy import deepcopy
 
-from ...utils import NBFORMAT_VERSION
+from ...utils import get_source, NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
 
 
 HTML_COMMENT_START = "<!--"
@@ -106,13 +106,22 @@ def write_as_rmd(nb, rmd_path, has_solutions):
     if os.path.splitext(rmd_path)[1] != ".Rmd":
         raise ValueError("The provided path does not have the .Rmd extension")
 
+    nb = deepcopy(nb)
+
     # prevent neighboring markdown cells from having two lines inserted between them in the student
     # notebook (resolves whitespace issues caused by the use of prompts for written questions)
     if not has_solutions:
-        nb = deepcopy(nb)
         for i, cell in enumerate(nb["cells"]):
             if i < len(nb["cells"]) - 1 and cell["cell_type"] == "markdown" and \
                     nb["cells"][i + 1]["cell_type"] == "markdown":
                 cell["metadata"]["lines_to_next_cell"] = 0
+
+    # add assignment name to Rmd metadata if necessary
+    assignment_name = nb["metadata"].get(NOTEBOOK_METADATA_KEY, {}).get("assignment_name", None)
+    if assignment_name:
+        config_cell = nb["cells"][0]
+        source = get_source(config_cell)
+        source.insert(-1, f"assignment_name: \"{assignment_name}\"")
+        config_cell["source"] = "\n".join(source)
 
     jupytext.write(nb, rmd_path)

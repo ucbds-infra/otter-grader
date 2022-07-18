@@ -1,10 +1,9 @@
 """Autograder runner for Python assignments"""
 
 import json
+import nbformat as nbf
 import os
-import shutil
 import warnings
-import zipfile
 
 from glob import glob
 
@@ -34,6 +33,12 @@ class PythonRunner(AbstractLanguageRunner):
         # create __init__.py files
         open("__init__.py", "a").close()
         open("submission/__init__.py", "a").close()
+
+    def validate_submission(self, submission_path):
+        if os.path.splitext(submission_path)[1] == ".ipynb":
+            nb = nbf.read(submission_path, as_version=nbf.NO_CONVERT)
+            assignment_name = self.get_notebook_assignment_name(nb)
+            self.validate_assignment_name(assignment_name)
 
     def resolve_submission_path(self):
         nbs = glob("*.ipynb")
@@ -106,6 +111,7 @@ class PythonRunner(AbstractLanguageRunner):
         with chdir("./submission"):
 
             subm_path = self.resolve_submission_path()
+            self.validate_submission(subm_path)
 
             # load plugins
             plugins = self.ag_config.plugins

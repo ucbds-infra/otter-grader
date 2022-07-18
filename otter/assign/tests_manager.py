@@ -15,7 +15,7 @@ from .solutions import remove_ignored_lines
 from .utils import get_source, str_to_doctest
 
 from ..test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
+from ..utils import NOTEBOOK_METADATA_KEY
 
 
 BEGIN_TEST_CONFIG_REGEX = r'(?:.\s*=\s*)?""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'

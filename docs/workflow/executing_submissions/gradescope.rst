@@ -7,21 +7,7 @@
 Grading on Gradescope
 =====================
 
-This section details how the autograder runs and how results are displayed to students and 
-instructors on Gradescope. When a student submits to Gradescpe, the autograder does the following:
-
-#. Copies the tests and support files from the autograder source
-#. Globs the first IPYNB file and assumes this to be the submission to be graded
-#. Reads in the log from the submission if it exists
-#. Grades the notebook, globbing all tests and grading from the log if specified
-#. Looks for discrepancies between the logged scores and the autograder scores and warngs about 
-   these if present
-#. If indicated, exports the notebook as a PDF and POSTs this notebook to the other Gradescope 
-   assignment
-#. Generates the JSON object for Gradescope's results
-#. Makes adjustments to the scores and visibility based on the configurations
-#. Writes the JSON to the results file
-#. Prints the results as a dataframe to stdout
+This section describes how results are displayed to students and instructors on Gradescope.
 
 
 Writing Tests for Gradescope
