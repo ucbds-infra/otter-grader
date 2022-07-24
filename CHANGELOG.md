@@ -17,6 +17,7 @@ _This section contains features that will be released into a pre-release version
 * Refactored Otter Assign internals per [#491](https://github.com/ucbds-infra/otter-grader/issues/491)
 * Converted user-supplied configuration management and documentation to `fica` per [#485](https://github.com/ucbds-infra/otter-grader/issues/485)
 * Added assignment names to Otter Assign and Otter Generate that can be verified by Otter Run to prevent students from submitting to the wrong autograder per [#497](https://github.com/ucbds-infra/otter-grader/issues/497)
+* Set the default version of `ottr` to v1.2.0
 
 **v3.3.0:**
 
