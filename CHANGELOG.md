@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased (beta):**
+**v4.0.0.b0:**
 
 _This section contains features that will be released into a pre-release version of Otter, not the next stable release._
 
