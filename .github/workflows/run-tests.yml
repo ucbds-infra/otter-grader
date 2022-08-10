@@ -46,7 +46,7 @@ jobs:
           load: true
           push: false
           tags: otter-test
-          cache-from: type=gha
+          # cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Clean up Docker image build
