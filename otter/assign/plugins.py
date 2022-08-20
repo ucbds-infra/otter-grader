@@ -1,8 +1,7 @@
 """Plugin replacement for Otter Assign"""
 
-import re
+import copy
 import yaml
-import nbformat
 
 from .utils import get_source
 
@@ -14,13 +13,13 @@ BEGIN_EXPORT = "# BEGIN PLUGIN EXPORT"
 
 def replace_plugins(lines):
     """
-    Replaces plugins with calls in ``lines``
-    
+    Replace plugin blocks with plugin calls in a cell's source (a list of strings).
+
     Args:
-        lines (``list`` of ``str``): cell contents as a list of strings
+        lines (``list[str]``): the cell source
 
     Returns:
-        ``list`` of ``str``: stripped version of lines with plugin calls
+        ``list[str]``: a copy of ``lines`` with plugin calls
     """
     starts, ends = [], []
     stripped = [[]]
@@ -32,13 +31,13 @@ def replace_plugins(lines):
             plugin = False
             ends.append(i)
             stripped.append([])
-        
+
         elif line.rstrip().endswith(BEGIN):
             assert not plugin, f"Nested plugins found in {lines}"
             starts.append(i)
             exports.append(False)
             plugin = True
-        
+
         elif line.rstrip().endswith(BEGIN_EXPORT):
             assert not plugin, f"Nested plugins found in {lines}"
             starts.append(i)
@@ -82,12 +81,17 @@ def replace_plugins(lines):
 
 def replace_plugins_with_calls(nb):
     """
-    Write a notebook with plugins replaced with calls
-    
+    Replace all plugin blocks in a notebook with plugin calls.
+
     Args:
         nb (``nbformat.NotebookNode``): the notebook
+
+    Returns:
+        ``nbformat.NotebookNode``: a copy of ``nb`` with plugin blocks replaced
     """
+    nb = copy.deepcopy(nb)
+
     for cell in nb['cells']:
         cell['source'] = '\n'.join(replace_plugins(get_source(cell)))
-    
+
     return nb

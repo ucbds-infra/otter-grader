@@ -2,10 +2,14 @@
 
 import os
 import shutil
+import warnings
 
 from abc import ABC, abstractmethod
 
-from ..constants import DEFAULT_OPTIONS
+from ..autograder_config import AutograderConfig
+from ..utils import OtterRuntimeError
+
+from ....utils import NOTEBOOK_METADATA_KEY
 
 
 class AbstractLanguageRunner(ABC):
@@ -13,44 +17,43 @@ class AbstractLanguageRunner(ABC):
     A class defining the logic of running the autograder and generating grading results.
 
     Args:
-        otter_config (``dict[str:object]``): user-specified configurations to override the defaults
-        **kwargs: other user-specified confirations to override the defaults
-
-    Attributes:
-        options (``dict[str:object]``): the grading options, including default values from 
-            ``otter.run.run_autograder.constants.DEFAULT_OPTIONS``
+        otter_config (``dict[str, object]``): user-specified configurations to override the defaults
+        **kwargs: other user-specified configurations to override the defaults and values specified
+            in ``otter_config``
     """
 
+    ag_config: AutograderConfig
+    """the autograder config"""
+
     def __init__(self, otter_config, **kwargs):
-        self.options = DEFAULT_OPTIONS.copy()
-        self.options.update(otter_config)
-        self.options.update(kwargs)
+        self.ag_config = AutograderConfig({**otter_config, **kwargs})
 
     @staticmethod
     def determine_language(otter_config, **kwargs):
         """
         Determine the language of the assignment based on user-specified configurations.
         """
-        return kwargs.get("lang", otter_config.get("lang", DEFAULT_OPTIONS["lang"]))
+        # TODO: use fica.Key.get_default when available
+        return kwargs.get("lang", otter_config.get("lang", AutograderConfig.lang.get_value()))
 
     def get_option(self, option):
         """
         Return the value of a configuration, including defaults.
         """
-        return self.options[option]
+        return self.ag_config[option]
 
-    def get_options(self):
+    def get_config(self):
         """
-        Return the options dictionary, including defaults.
+        Return the autograder config.
         """
-        return self.options
+        return self.ag_config
 
     def prepare_files(self):
         """
         Copies tests and support files needed for running the autograder.
 
         When this method is invoked, the working directory is assumed to already be 
-        ``self.options["autograder_dir"]``.
+        ``self.ag_config.autograder_dir``.
         """
         # put files into submission directory
         if os.path.exists("./source/files"):
@@ -67,6 +70,53 @@ class AbstractLanguageRunner(ABC):
             shutil.rmtree("./submission/tests")
         shutil.copytree("./source/tests", "./submission/tests")
 
+    def validate_assignment_name(self, got):
+        """
+        Raise an ``OtterRuntimeError`` if the assignment name of the notebook is invalid.
+
+        If no assignment name was provided in the configurations, no action is taken.
+
+        Args:
+            got (``str | None``): the assignment name of the submission or ``None`` if it didn't
+                have one
+
+        Raises:
+            ``otter.runb.run_autograder.utils.OtterRuntimeError``: if the name is invalid and
+                grading should be aborted
+        """
+        if self.ag_config.assignment_name and got != self.ag_config.assignment_name:
+            message = f"Received submission for assignment '{got}' (this is assignment " \
+                f"'{self.ag_config.assignment_name}')"
+            raise OtterRuntimeError(message)
+
+    def get_notebook_assignment_name(self, nb):
+        """
+        Get the assignment name in the metadata of the provided notebook, if any.
+
+        Args:
+            nb (``nbformat.NotebookNode``): the notebook
+
+        Returns:
+            ``str | None``: the assignment name of the notebook, if any
+        """
+        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+            return None
+
+        return nb["metadata"][NOTEBOOK_METADATA_KEY].get("assignment_name", None)
+
+    @abstractmethod
+    def validate_submission(self, submission_path):
+        """
+        Validate the submission, raising an error/warning if appropriate.
+
+        This method should be invoked as part of the implementation of another abstract method
+        (either ``resolve_submission_path`` or ``run``).
+
+        Args:
+            submission_path (``str``): the path to the submission file
+        """
+        ...
+
     @abstractmethod
     def resolve_submission_path(self):
         """
@@ -74,19 +124,19 @@ class AbstractLanguageRunner(ABC):
         file.
 
         When this method is invoked, the working directory is assumed to already be 
-        ``{self.options["autograder_dir"]}/submission``.
+        ``{self.ag_config.autograder_dir}/submission``.
         """
         ...
 
     @abstractmethod
     def run(self):
         """
-        Run the autograder according to the configurations in ``self.options``.
+        Run the autograder according to the configurations in ``self.ag_config``.
 
         When this method is invoked, the working directory is assumed to already be 
-        ``self.options["autograder_dir"]``.
+        ``self.ag_config.autograder_dir``.
 
-        Retuns:
+        Returns:
             ``otter.test_files.GradingResults``: the results from grading the submission
         """
         ...

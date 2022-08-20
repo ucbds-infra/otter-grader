@@ -3,7 +3,6 @@
 import os
 import json
 import pandas as pd
-import pickle
 import zipfile
 
 from glob import glob
@@ -11,7 +10,10 @@ from glob import glob
 from .runners import create_runner
 from .utils import OtterRuntimeError
 from ...version import LOGO_WITH_VERSION
-from ...utils import chdir
+from ...utils import chdir, import_or_raise, loggers
+
+
+LOGGER = loggers.get_logger(__name__)
 
 
 def main(autograder_dir, **kwargs):
@@ -21,10 +23,11 @@ def main(autograder_dir, **kwargs):
     Args:
         autograder_dir (``str``): the absolute path of the directory in which autograding is occurring
             (e.g. on Gradescope, this is ``/autograder``)
-        **kwargs: keyword arguments for updating configurations in the default configurations 
-            ``otter.run.run_autograder.constants.DEFAULT_OPTIONS``; these values override anything
-            present in ``otter_config.json``
+        **kwargs: keyword arguments for updating autograder configurations=; these values override
+            anything present in ``otter_config.json``
     """
+    dill = import_or_raise("dill")
+
     config_fp = os.path.join(autograder_dir, "source", "otter_config.json")
     if os.path.isfile(config_fp):
         with open(config_fp, encoding="utf-8") as f:
@@ -35,6 +38,11 @@ def main(autograder_dir, **kwargs):
     config["autograder_dir"] = autograder_dir
 
     runner = create_runner(config, **kwargs)
+
+    if runner.get_option("log_level") is not None:
+        loggers.set_level(runner.get_option("log_level"))
+        # TODO: log above calls
+        # TODO: use loggers.level_context
 
     if runner.get_option("logo"):
         # ASCII 8207 is an invisible non-whitespace character; this should prevent gradescope from
@@ -56,9 +64,9 @@ def main(autograder_dir, **kwargs):
             runner.prepare_files()
             scores = runner.run()
             with open("results/results.pkl", "wb+") as f:
-                    pickle.dump(scores, f)
+                    dill.dump(scores, f)
 
-            output = scores.to_gradescope_dict(runner.get_options())
+            output = scores.to_gradescope_dict(runner.get_config())
 
         except OtterRuntimeError as e:
             output = {

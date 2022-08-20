@@ -1,17 +1,17 @@
-"""
-Gradescope token generator; original script provided by Gradescope
-"""
+"""Gradescope token generator; original script provided by Gradescope"""
 
-import requests
 import getpass
+import requests
+
 
 BASE_URL = 'https://www.gradescope.com'
+
 
 class APIClient:
     """
     Client for Gradescope's API. Logs in users and retrieves token, uploads PDF and code assignment
     submissions. 
-    
+
     Client code originally provided by Gradescope.
 
     Args:

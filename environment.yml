@@ -10,5 +10,6 @@ dependencies:
     - pip
     - pip:
         - -r requirements.txt
+        - -r requirements-export.txt
         - -r requirements-test.txt
         - -r docs/requirements.txt

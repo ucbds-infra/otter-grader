@@ -21,7 +21,7 @@ class RateLimiting(AbstractOtterPlugin):
     ``allowed_submissions``. For example, to allow only 2 submissions every hour-and-a-half:
 
     .. code-block:: json
-    
+
         {
             "plugins": [
                 {
@@ -39,7 +39,7 @@ class RateLimiting(AbstractOtterPlugin):
     student is only shown a message; from the example above:
 
     .. code-block::
-        
+
         You have exceeded the rate limit for the autograder. Students are allowed 2 submissions every 1 hours 30 minutes.
 
     The results of submission execution are still visible to instructors.

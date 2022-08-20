@@ -111,13 +111,13 @@ directory), you would run
 
 .. code-block::
 
-    otter assign hw00.ipynb dist --v1
+    otter assign hw00.ipynb dist
 
 If it was an Rmd file instead, you would run
 
 .. code-block::
 
-    otter assign hw00.Rmd dist --v1
+    otter assign hw00.Rmd dist
 
 This will create a new folder called ``dist`` with ``autograder`` and ``student`` as subdirectories, 
 as described above.
@@ -144,7 +144,7 @@ the ``--no-run-tests`` flag:
 
 .. code-block::
 
-    otter assign --no-run-tests hw00.ipynb dist --v1
+    otter assign --no-run-tests hw00.ipynb dist
 
 Because tests are not run on R notebooks, the above flag would be ignored if ``hw00.ipynb`` 
 had an R kernel.

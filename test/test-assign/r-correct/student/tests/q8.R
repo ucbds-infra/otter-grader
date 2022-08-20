@@ -9,6 +9,5 @@ test = list(
         testthat::expect_equal(length(z), 10)
       }
     )
-
   )
 )

@@ -2,21 +2,23 @@
 
 import json
 import os
-import pickle
 import shutil
 import tempfile
 import zipfile
 
 from .run_autograder import main as run_autograder
 
+from ..utils import import_or_raise
+
 
 def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=False, debug=False):
     """
-    Grades a single submission using the autograder configuration ``autograder`` without containrization
+    Grades a single submission using the autograder configuration ``autograder`` without
+    containerization.
 
-    Creates a temporary directory in the user's system and replicates grading container structure. Calls
-    the autograder and loads the pickled results object. **Note:** This does not run any setup or 
-    installation files, so the user's environment will need to have everything pre-installed.
+    Creates a temporary directory in the user's system and replicates grading container structure.
+    Calls the autograder and loads the pickled results object. **Note:** This does not run any setup
+    or installation files, so the user's environment will need to have everything pre-installed.
 
     Args:
         submission (``str``): path to a submission to grade
@@ -24,11 +26,11 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
         output_dir (``str``): directory at which to copy the results JSON file
         no_logo (``bool``): whether to suppress the Otter logo from being printed to stdout
         debug (``bool``); whether to run in debug mode (without ignoring errors)
-        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
 
     Returns:
         ``otter.test_files.GradingResults``: the grading results object
     """
+    dill = import_or_raise("dill")
     dp = tempfile.mkdtemp()
 
     try:
@@ -61,7 +63,7 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
 
         results_pkl_path = os.path.join(ag_dir, "results", "results.pkl")
         with open(results_pkl_path, "rb") as f:
-            results = pickle.load(f)
+            results = dill.load(f)
 
     finally:
         shutil.rmtree(dp)

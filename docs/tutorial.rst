@@ -44,15 +44,12 @@ Otter Assign on this notebook, run
 
 .. code-block:: console
 
-    $ otter assign demo.ipynb dist --v1
+    $ otter assign demo.ipynb dist
     Generating views...
     Generating solutions PDF...
     Generating autograder zipfile...
     Running tests...
     All tests passed!
-
-The use of the ``--v1`` flag indicates that this is an :ref:`Otter Assign format v1 formatted 
-notebook <otter_assign>`.
 
 Otter Assign should create a ``dist`` directory which contains two further subdirectories: 
 ``autograder`` and ``student``. The ``autograder`` directory contains the Gradescope autograder, 
@@ -169,7 +166,7 @@ The latter, the ``submission_pdfs`` directory, should contain the filtered PDFs 
 (which should be relatively similar).
 
 Otter Grade can also grade the zip file exports provided by the ``Notebook.export`` method. Before 
-grading the zip files, you must edit your ``autograder.zip`` to incdicate that you're doing so. To 
+grading the zip files, you must edit your ``autograder.zip`` to indicate that you're doing so. To 
 do this, open ``demo.ipynb`` (the file we used with Otter Assign) and edit the first cell of the 
 notebook (beginning with ``BEGIN ASSIGNMENT``) so that the ``zips`` key under ``generate`` is 
 ``true`` in the YAML and rerun Otter Assign.

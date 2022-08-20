@@ -131,7 +131,7 @@ def get_transformed_cells(cells):
                 transformed_cells.append(generate_delim_cell(BlockType.SOLUTION))
                 transformed_cells.append(cell)
                 transformed_cells.append(generate_delim_cell(BlockType.SOLUTION, end=True))
-            
+
             processed_solution = True
 
         # if this is a test cell, parse and add to test_cases
