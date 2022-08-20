@@ -60,7 +60,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
     if assignment.environment:
         output_fn = "environment.yml"
         shutil.copy(assignment.environment, str(output_dir / output_fn))
-    
+
     # strip out ignored lines
     transformed_nb = strip_ignored_lines(transformed_nb)
 
@@ -90,7 +90,7 @@ def write_autograder_dir(nb_path, output_nb_path, assignment):
         # if a directory, copy the entire dir
         if os.path.isdir(file):
             shutil.copytree(file, str(output_dir / os.path.basename(file)))
-            
+
         else:
             # check that file is in subdir
             assert os.path.abspath(nb_path.parent) in os.path.abspath(file), \

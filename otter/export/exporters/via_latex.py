@@ -2,7 +2,6 @@
 
 import nbconvert
 import os
-import pkg_resources
 import warnings
 
 from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
@@ -61,14 +60,14 @@ class PDFViaLatexExporter(BaseExporter):
             pdf_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         try:
-            pdf_output = pdf_exporter.from_notebook_node(nb)
+            pdf_output = nbconvert.export(pdf_exporter, nb)
             with open(dest, "wb") as output_file:
                 output_file.write(pdf_output[0])
 
             success = True
 
             if options["save_tex"]:
-                latex_output = latex_exporter.from_notebook_node(nb)
+                latex_output = nbconvert.export(latex_exporter, nb)
                 with open(os.path.splitext(dest)[0] + ".tex", "w+") as output_file:
                     output_file.write(latex_output[0])
 

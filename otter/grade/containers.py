@@ -1,4 +1,5 @@
 """Docker container management for Otter Grade"""
+
 import glob
 import os
 import pandas as pd
@@ -10,9 +11,15 @@ import zipfile
 
 from concurrent.futures import ThreadPoolExecutor, wait
 from python_on_whales import docker
+from textwrap import indent
 from typing import Optional
 
 from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
+
+from ..utils import loggers
+
+
+LOGGER = loggers.get_logger(__name__)
 
 
 def build_image(zip_path, base_image, tag):
@@ -31,7 +38,7 @@ def build_image(zip_path, base_image, tag):
     dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
 
     if not docker.image.exists(image):
-        print(f"Building new image using {base_image} as base image")
+        LOGGER.info(f"Building new image using {base_image} as base image")
 
         tmp_dir = tempfile.mkdtemp()
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
@@ -44,9 +51,9 @@ def build_image(zip_path, base_image, tag):
     return image
 
 
-def launch_grade(zip_path, submissions_dir, verbose=False, num_containers=None, ext="ipynb", 
-                 no_kill=False, output_path="./", debug=False, zips=False,
-                 image="ucbdsinfra/otter-grader", pdfs=False, timeout=None, network=True):
+def launch_grade(zip_path, submissions_dir, num_containers=None, ext="ipynb", no_kill=False, 
+                 output_path="./", zips=False, image="ucbdsinfra/otter-grader", pdfs=False, 
+                 timeout=None, network=True):
     """
     Grades notebooks in parallel Docker containers
 
@@ -57,14 +64,11 @@ def launch_grade(zip_path, submissions_dir, verbose=False, num_containers=None, 
     Args:
         zip_path(``str``): path to zip file used to set up container
         submissions_dir (``str``): path to directory of student submissions to be graded
-        verbose (``bool``, optional): whether status messages should be printed to the command line
         num_containers (``int``, optional): The number of parallel containers that will be run
         ext (``str``, optional): the submission file extension for globbing
         no_kill (``bool``, optional): whether the grading containers should be kept running after
             grading finishes
         output_path (``str``, optional): path at which to write grades CSVs copied from the container
-        debug (``bool``, optional): whether to run grading in debug mode (prints grading STDOUT and STDERR
-            from each container to the command line)
         zips (``bool``, optional): whether the submissions are zip files formatted from ``Notebook.export``
         image (``str``, optional): a base image to use for building Docker images
         pdfs (``bool``, optional): whether to copy PDFs out of the containers
@@ -95,11 +99,9 @@ def launch_grade(zip_path, submissions_dir, verbose=False, num_containers=None, 
             pool.submit(
                 grade_assignments,
                 submission_path=subm_path,
-                verbose=verbose,
                 image=img,
                 no_kill=no_kill,
                 pdf_dir=pdf_dir,
-                debug=debug,
                 pdfs=pdfs,
                 timeout=timeout,
                 network=network,
@@ -113,8 +115,8 @@ def launch_grade(zip_path, submissions_dir, verbose=False, num_containers=None, 
     return [df.result() for df in finished_futures[0]]
 
 
-def grade_assignments(submission_path, image, verbose=False, no_kill=False, pdf_dir=None, 
-                      debug=False, pdfs=False, timeout: Optional[int] = None, network=True):
+def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=False, 
+                      timeout: Optional[int] = None, network=True):
     """
     Grades multiple submissions in a directory using a single docker container. If no PDF assignment is
     wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
@@ -122,12 +124,9 @@ def grade_assignments(submission_path, image, verbose=False, no_kill=False, pdf_
     Args:
         submission_path (``str``): path to the submission to be graded
         image (``str``): a Docker image tag to be used for grading environment
-        verbose (``bool``, optional): whether status messages should be printed to the command line
         no_kill (``bool``, optional): whether the grading containers should be kept running after
             grading finishes
         pdf_dir (``str``, optional): directory in which to put notebook PDFs, if applicable
-        debug (``bool``, False): whether to run grading in debug mode (prints grading STDOUT and STDERR
-            from each container to the command line)
         pdfs (``bool``, optional): whether to copy PDFs out of the containers
         timeout (``int``): timeout in seconds for each container
         network (``bool``): whether to enable networking in the containers
@@ -171,16 +170,15 @@ def grade_assignments(submission_path, image, verbose=False, no_kill=False, pdf_
             timer.start()
 
         container_id = container.id[:12]
-        if verbose:
-            print(f"Grading {submission_path} in container {container_id}...")
+        LOGGER.info(f"Grading {submission_path} in container {container_id}...")
 
         exit = docker.container.wait(container)
 
         if timeout:
             timer.cancel()
 
-        if debug:
-            print(docker.container.logs(container))
+        logs = docker.container.logs(container)
+        LOGGER.debug(f"Container {container_id} logs:\n{indent(logs, '    ')}")
 
         if not no_kill:
             container.remove()
@@ -191,10 +189,12 @@ def grade_assignments(submission_path, image, verbose=False, no_kill=False, pdf_
         with open(results_path, "rb") as f:
             scores = pickle.load(f)
 
-        scores = scores.to_dict()
-        scores = {t: [scores[t]["score"]] if type(scores[t]) == dict else scores[t] for t in scores}
-        scores["file"] = os.path.split(submission_path)[1]
-        df = pd.DataFrame(scores)
+        scores_dict = scores.to_dict()
+        scores_dict["percent_correct"] = scores.total / scores.possible
+
+        scores_dict = {t: [scores_dict[t]["score"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
+        scores_dict["file"] = os.path.split(submission_path)[1]
+        df = pd.DataFrame(scores_dict)
 
         if pdfs:
             os.makedirs(pdf_dir, exist_ok=True)

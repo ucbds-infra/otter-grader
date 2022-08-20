@@ -11,10 +11,10 @@ from .utils import get_source, lock, get_spec, EmptyCellException
 def is_question_cell(cell):
     """
     Returns whether cell contains BEGIN QUESTION in a block quote
-    
+
     Args:
         cell (``nbformat.NotebookNode``): a notebook cell
-    
+
     Returns:
         ``bool``: whether the current cell is a question definition cell
     """
@@ -25,10 +25,10 @@ def is_question_cell(cell):
 def gen_question_cell(cell, manual, need_close_export):
     """
     Returns a locked question cell with metadata hidden in an HTML comment
-    
+
     Args:
         cell (``nbformat.NotebookNode``): the original question cell
-    
+
     Returns:
         ``nbformat.NotebookNode``: the updated question cell
     """
@@ -63,10 +63,10 @@ def gen_question_cell(cell, manual, need_close_export):
 def read_question_metadata(cell):
     """
     Returns parsed question metadata from a question cell
-    
+
     Args:
         cell (``nbformat.NotebookNode``): the question cell
-    
+
     Returns:
         ``dict``: question metadata
     """

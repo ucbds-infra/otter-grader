@@ -1,321 +1,220 @@
-##################################
-##### Tests for otter notebook #####
-##################################
+"""Tests for ``otter.Notebook``"""
 
-import unittest
-import sys
+import datetime as dt
 import os
-import shutil
-import subprocess
-import json
-import requests
-import nbformat
+import pytest
 
 from glob import glob
-from subprocess import PIPE
-from unittest.mock import patch
+from textwrap import dedent
 from unittest import mock
 
 from otter import Notebook
-from otter.check.logs import LogEntry, EventType, Log
-from otter.check.notebook import _OTTER_LOG_FILENAME
-from otter.check import notebook
+from otter.check.notebook import _OTTER_LOG_FILENAME, _ZIP_NAME_FILENAME
 
-from . import TestCase
-
-TEST_FILES_PATH = "test/test-notebook/"
+from .utils import TestFileManager
 
 
-# functions used in one of the tests below
+FILE_MANAGER = TestFileManager("test/test-notebook")
+TESTS_DIR = FILE_MANAGER.get_path("tests")
+TESTS_GLOB = glob(FILE_MANAGER.get_path("tests/*.py"))
+
+
 def square(x):
     return x ** 2
+
 
 def negate(x):
     return not x
 
-def mocked_requests_get(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, json_data, status_code):
-            self.text = json_data
-            self.status_code = status_code
 
-        def json(self):
-            return self.json_data
-
-    if args[0] == "http://some.url/auth/google":
-        return MockResponse({"text": "value1"}, 200)
-    elif args[0] == "http://some.url/submit":
-        return MockResponse({"text": "this is the fake post response"}, 200)
-
-    return MockResponse(None, 404)
-
-def mock_auth_get():
-    class AuthResponse:
-        def __init__(self, json_data, status_code):
-            self.content = json_data
-            self.status_code = status_code
-
-        def content(self):
-            return self
-
-        def decode(self, type):
-            return "fakekey"
-
-    str = "fakekey"
-    content = str.encode("utf-8", "strict")
-    response = AuthResponse(content, 2)
-
-    return response
+@pytest.fixture(autouse=True)
+def cleanup_output(cleanup_enabled):  # TODO: refactor this and similar to use delete_paths
+    yield
+    if cleanup_enabled and os.path.isfile(_OTTER_LOG_FILENAME):
+        os.remove(_OTTER_LOG_FILENAME)
 
 
-class TestNotebook(TestCase):
+def test_check():
     """
-    Test cases for the ``Notebook`` class
+    Checks that the cor checking behavior of ``otter.Notebook.check`` works correctly.
     """
-    @mock.patch('builtins.input', return_value='fakekey')
-    def test_check(self, mock_input):
-        """
-        Checks that the otter.Notebook class works correctly
-        """
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
+    grader = Notebook(tests_dir=TESTS_DIR)  # TODO: move to fixture?
 
-        def square(x):
-            return x ** 2
+    def square(x):
+        return x ** 2
 
-        def negate(x):
-            return not x
+    def negate(x):
+        return not x
 
-        global_env = {
-            "square": square,
-            "negate": negate
-        }
+    global_env = {
+        "square": square,
+        "negate": negate,
+    }
 
-        for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
-            q = os.path.split(q_path)[1][:-3]
-            result = grader.check(q, global_env=global_env)
-            if q != "q2":
-                self.assertEqual(result.grade, 1, "Test {} failed".format(q))
-            else:
-                self.assertEqual(result.grade, 0, "Test {} passed".format(q))
+    expected_reprs = {
+        "q1": 'q1 results: All test cases passed!',
+        "q2": dedent("""\
+            q2 results:
+                q2 - 1 result:
+                    Trying:
+                        1 == 1
+                    Expecting:
+                        False
+                    **********************************************************************
+                    Line 2, in q2 0
+                    Failed example:
+                        1 == 1
+                    Expected:
+                        False
+                    Got:
+                        True
 
-    def test_check_no_env(self):
-        """
-        Checks that the ``Notebook`` class works correctly, with no global env input
-        """
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
+                q2 - 2 result:
+                    Test case passed!
+        """).strip(),
+        "q3": 'q3 results: All test cases passed!',
+        "q4": 'q4 results: All test cases passed!',
+        "q5": 'q5 results: All test cases passed!',
+    }
 
-        for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
-            q = os.path.split(q_path)[1][:-3]
-            result = grader.check(q)  # global_env=global_env)
-            if q != "q2":
-                self.assertEqual(result.grade, 1, f"Test {q} expected to pass but failed:\n{result}")
-            else:
-                self.assertEqual(result.grade, 0, f"Test {q} expected to fail but passed:\n{result}")
+    for q_path in TESTS_GLOB:
+        q = os.path.split(q_path)[1][:-3]
+        result = grader.check(q, global_env=global_env)
+        if q != "q2":
+            assert result.grade == 1, "Test {} failed".format(q)
+        else:
+            assert result.grade == 0, "Test {} passed".format(q)
 
-    def test_check_raise_exception(self):
-        """
-        Checks that the otter.Notebook class check method correctly raises Exceptions
-        when things go wrong
-        """
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        global_env = 0
-        for q_path in glob(TEST_FILES_PATH + "tests/*.py"):
-            q = os.path.split(q_path)[1][:-3]
-            self.assertRaises(AttributeError,
-                              lambda: grader.check(q, global_env=global_env))
+        assert repr(result) == expected_reprs[q]
 
-    def test_check_all_repr(self):
-        """
-        Checks that the representation of results as strings is correct
-        """
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
+        # check with no global_env
+        result = grader.check(q)
+        if q != "q2":
+            assert result.grade == 1, "Test {} failed".format(q)
+        else:
+            assert result.grade == 0, "Test {} passed".format(q)
 
-        output = str(grader.check_all())
-        output2 = grader.check_all()
 
-        # checks each question substring
-        output_lst = [
-            'q1 results: All test cases passed!\n',
-            'q2 results:\n    q2 - 1 result:\n        Trying:',
-            'q3 results: All test cases passed!\n',
-            'q4 results: All test cases passed!\n',
-            'q5 results: All test cases passed!'
-        ]
+def test_to_pdf_with_nb_path():
+    """
+    Checks for existence of notebook PDF
+    This test is the general use case WITH a specified notebook path
+    """
+    nb_path = "foo.ipynb"
+    grader = Notebook(tests_dir=TESTS_DIR)
+    with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve, \
+            mock.patch("otter.check.notebook.export_notebook") as mocked_export:
+        mocked_resolve.return_value = nb_path
 
-        for result in output_lst:
-            self.assertTrue(output.count(result) == 1, f"Expected output to contain '{result}':\n{output}")
+        grader.to_pdf(filtering=False)
+        mocked_export.assert_called_once_with(nb_path, filtering=False, pagebreaks=True)
 
-    def test_to_pdf_with_nb_path(self):
-        """
-        Checks for existence of notebook PDF
-        This test is the general use case WITH a specified notebook path
-        """
-        nb = nbformat.v4.new_notebook()
-        text = """\
-        This is an auto-generated notebook."""
-        nb['cells'] = [nbformat.v4.new_markdown_cell(text)]
-        with open(TEST_FILES_PATH + 'test-nb.ipynb', "w") as f:
-            nbformat.write(nb, f)
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        grader.to_pdf(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
+        # TODO: test display_link
 
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
-        # cleanup
-        os.remove(TEST_FILES_PATH + 'test-nb.ipynb')
-        os.remove(TEST_FILES_PATH + "test-nb.pdf")
 
-    def test_to_pdf_without_nb_path_case2_fail(self):
-        """
-        Checks for correct error scenario for to_pdf method
-        This test is for when np_path is set to None and multiple
-        IPYNB notebooks exist in the working directory.
-        """
-        nb1 = nbformat.v4.new_notebook()
-        nb2 = nbformat.v4.new_notebook()
-        text = """\
-                This is an auto-generated notebook."""
-        nb1['cells'] = [nbformat.v4.new_markdown_cell(text)]
-        nb2['cells'] = [nbformat.v4.new_markdown_cell(text)]
-        with open('test-nb1.ipynb', "w") as f:
-            nbformat.write(nb1, f)
-        with open('test-nb2.ipynb', "w") as f:
-            nbformat.write(nb2, f)
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        self.assertRaises(AssertionError,
-                          lambda: grader.to_pdf(nb_path=None, filtering=False))
-        os.remove('test-nb1.ipynb')
-        os.remove('test-nb2.ipynb')
+def test_export():
+    """
+    Checks export contents for existence of PDF and equality of zip
+    """
+    timestmap = dt.datetime(2022, 1, 3, 12, 12, 12, 1212)
+    grader = Notebook(tests_dir=TESTS_DIR)
 
-    def test_export_pass(self):
-        """
-        Checks export contents for existence of PDF and equality of zip
-        """
-        nb = nbformat.v4.new_notebook()
-        text = """\
-                        This is an auto-generated notebook."""
-        nb['cells'] = [nbformat.v4.new_markdown_cell(text)]
-        with open(TEST_FILES_PATH + 'test-nb.ipynb', "w") as f:
-            nbformat.write(nb, f)
-        correct_directory = TEST_FILES_PATH + 'export-correct/'
-        os.mkdir(correct_directory)
-        with open(correct_directory + 'test-nb.ipynb', "w") as f:
-            nbformat.write(nb, f)
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        grader.export(TEST_FILES_PATH + "test-nb.ipynb", filtering=False)
+    with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve, \
+            mock.patch("builtins.open", mock.mock_open(read_data="{}")) as mocked_open, \
+            mock.patch("otter.check.notebook.dt") as mocked_dt, \
+            mock.patch("otter.check.notebook.zipfile.ZipFile") as mocked_zf, \
+            mock.patch("otter.check.notebook.export_notebook") as mocked_export, \
+            open(_OTTER_LOG_FILENAME, mode="wb+"):
+        mocked_resolve.return_value = "foo.ipynb"
+        mocked_dt.datetime.now.return_value = timestmap
 
-        self.assertTrue(os.path.isfile(TEST_FILES_PATH + "test-nb.pdf"))
-        zips = glob(TEST_FILES_PATH + "test-nb*.zip")
-        assert len(zips) == 1
-        with self.unzip_to_temp(zips[0]) as unzipped_dir:
-            # breakpoint()
-            os.remove(unzipped_dir + '/test/test-notebook/test-nb.pdf')
-            self.assertDirsEqual(
-                unzipped_dir + '/test/test-notebook/',
-                TEST_FILES_PATH + "export-correct",
-                ignore_ext=[".pdf"]
-            )
+        grader.export(pdf=False)
 
-        # cleanup
-        os.remove(correct_directory + "test-nb.ipynb")
-        os.rmdir(correct_directory)
-        os.remove(TEST_FILES_PATH + "test-nb.ipynb")
-        os.remove(TEST_FILES_PATH + "test-nb.pdf")
-        os.remove(zips[0])
+        zip_name = f"foo_{timestmap.strftime('%Y_%m_%dT%H_%M_%S_%f')}.zip"
+        mocked_zf.assert_called_once_with(zip_name, mode="w")
+        mocked_zf.return_value.write.assert_any_call(mocked_resolve.return_value)
+        mocked_zf.return_value.write.assert_any_call(_OTTER_LOG_FILENAME)
+        mocked_export.assert_not_called()
+        mocked_zf.return_value.writestr.assert_called_with(_ZIP_NAME_FILENAME, zip_name)
 
-    def test_export_without_nb_path_case2_fail(self):
-        """
-        Checks for correct error scenario for export method
-        This test is for when nb_path is set to None and
-        there are multiple IPYNB notebooks in working directory
-        """
-        nb1 = nbformat.v4.new_notebook()
-        nb2 = nbformat.v4.new_notebook()
-        text = """\
-                        This is an auto-generated notebook."""
-        nb1['cells'] = [nbformat.v4.new_markdown_cell(text)]
-        nb2['cells'] = [nbformat.v4.new_markdown_cell(text)]
-        with open('test-nb1.ipynb', "w") as f:
-            nbformat.write(nb1, f)
-        with open('test-nb2.ipynb', "w") as f:
-            nbformat.write(nb2, f)
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        self.assertRaises(AssertionError,
-                          lambda: grader.export(nb_path=None, filtering=False))
-        os.remove('test-nb1.ipynb')
-        os.remove('test-nb2.ipynb')
+    # TODO: test with pdf
+    # TODO: test force_save
+    # TODO: test run_tests
+    # TODO: test display_link
 
-    def test_export_without_nb_path_case3(self):
-        """
-        Checks for correct error scenario for export method
-        This test is for when nb_path is set to None and
-        there are no IPYNB notebooks in the working directory
-        """
-        files_in_directory = os.listdir('./')
-        notebooks = [file for file in files_in_directory if file.endswith(".ipynb")]
-        for file in notebooks:
-            os.remove('./' + file)
-        grader = Notebook()
-        self.assertRaises(ValueError,
-                          lambda: grader.export(nb_path=None, filtering=False))
 
-    def test_export_multiple_otter_error(self):
-        """
-        Checks export for error scenario for export method
-        This test should pass when export successfully raises an
-        AssertionError for the case when the directory contains
-        multiple .otter files.
-        """
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        self.assertRaises(ValueError, lambda: grader.export(nb_path=None, filtering=False))
+def test_colab():
+    """
+    Checks that the ``Notebook`` class correctly disables methods on Google Colab.
+    """
+    with mock.patch("otter.check.notebook.os.path.isdir") as mocked_isdir:
+        mocked_isdir.return_value = False
+        with pytest.raises(ValueError, match=f"Tests directory {TESTS_DIR} does not exist"):
+            grader = Notebook(tests_dir=TESTS_DIR, colab=True)
 
-    @patch.object(LogEntry, "shelve")
-    def test_nb_log(self, mock_log):
-        """
-        Checks existence of log when running nb
-        """
+        mocked_isdir.assert_called_once_with(TESTS_DIR)
 
-        mock_log.return_value = LogEntry(EventType.CHECK)
-        grader = Notebook(tests_dir=TEST_FILES_PATH + "tests")
-        output = grader.check_all()
+        mocked_isdir.return_value = True
+        grader = Notebook(tests_dir=TESTS_DIR, colab=True)
 
-        self.assertTrue(os.path.isfile(_OTTER_LOG_FILENAME))
+        # check for appropriate errors
+        with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
+            grader.run_plugin()
 
-    def test_colab(self):
-        """
-        Checks that the ``Notebook`` class correctly disables methods on Google Colab.
-        """
-        tests_dir = TEST_FILES_PATH + "tests"
-        with mock.patch("otter.check.notebook.os.path.isdir") as mocked_isdir:
-            mocked_isdir.return_value = False
-            with self.assertRaises(ValueError, msg=f"Tests directory {tests_dir} does not exist"):
-                grader = Notebook(tests_dir=tests_dir, colab=True)
+        with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
+            grader.to_pdf()
 
-            mocked_isdir.assert_called_once_with(tests_dir)
+        with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
+            grader.add_plugin_files()
 
-            mocked_isdir.return_value = True
-            grader = Notebook(tests_dir=tests_dir, colab=True)
+        with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
+            grader.export()
 
-            # check for appropriate errors
-            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
-                grader.run_plugin()
 
-            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
-                grader.to_pdf()
+def test_jupyterlite():
+    """
+    Checks that the ``Notebook`` class correctly disables methods on Google Colab.
+    """
+    tests_url_prefix = "https://domain.tld/"
+    grader = Notebook(tests_url_prefix=tests_url_prefix, jupyterlite=True)
 
-            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
-                grader.add_plugin_files()
+    # check for appropriate errors
+    with mock.patch("otter.check.notebook.LogEntry") as mocked_event:
+        grader._log_event()
+        mocked_event.assert_not_called()
 
-            with self.assertRaises(RuntimeError, msg="This method is not compatible with Google Colab"):
-                grader.export()
+    with mock.patch("otter.check.utils.import_or_raise") as mocked_import, \
+            mock.patch("otter.check.utils.os") as mocked_os, \
+            mock.patch("otter.check.utils.open", mock.mock_open()) as mocked_open, \
+            mock.patch("otter.check.utils.IPythonInterpreter") as mocked_interp:
+        mocked_interp.PYOLITE.value.running.return_value = True
+        mocked_os.path.join.return_value = FILE_MANAGER.get_path("tests/q1.py")
 
-    def tearDown(self):
-        for i in range(1, 7):
-            file = "demofile{}.otter".format(i)
-            if os.path.isfile(file):
-                os.remove(file)
-        if os.path.isfile(_OTTER_LOG_FILENAME):
-            os.remove(_OTTER_LOG_FILENAME)
-        if os.path.exists("hw00.pdf"):
-            os.remove("hw00.pdf")
-        if os.path.exists("hw00.zip"):
-            os.remove("hw00.zip")
+        grader.check("q1")
+
+        mocked_import.assert_called_with("pyodide")
+        mocked_pyodide = mocked_import.return_value
+        mocked_pyodide.open_url.assert_called_with(f"{tests_url_prefix}q1.py")
+        mocked_os.makedirs.assert_called_with("./tests", exist_ok=True)
+        mocked_open.assert_called_with(mocked_os.path.join.return_value, "w+")
+
+
+def test_grading_mode():
+    """
+    Check that a call to a grading-mode-disabled method is not executed.
+    """
+    with mock.patch.object(Notebook, "_resolve_nb_path") as mocked_resolve, \
+            Notebook.grading_mode(tests_dir="foo"):
+        grader = Notebook(tests_dir=TESTS_DIR)
+        grader.export()
+
+        # TODO: find a better way of doing this than accessing a private field
+        assert grader._path == "foo"
+
+        # if export is called, this method would be called first
+        mocked_resolve.assert_not_called()
+
+
+# TODO: tests for force_save on export and to_pdf
+# TODO: test _resolve_nb_path
+# TODO: tests for event logging and other things in otter.check.utils

@@ -1,0 +1,20 @@
+[run]
+source = otter
+
+[report]
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+
+omit =
+    # This file is just calls otter.cli.cli
+    otter/__main__.py
+
+    # This file is a copy of an external script and is not tested as part of Otter
+    otter/plugins/builtin/gmail_notifications/bin/gmail_oauth2.py
+
+    # The Assign v0 format is deprecated and will be removed in v5
+    otter/assign/v0/*

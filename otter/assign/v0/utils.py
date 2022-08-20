@@ -34,11 +34,11 @@ def get_spec(source, begin):
     Returns the line number of the spec begin line or ``None``. Converts ``begin`` to an uppercase 
     string and looks for a line matching ``f"BEGIN {begin.upper()}"``. Used for finding question and
     assignment metadata, which match ``BEGIN QUESTION`` and ``BEGIN ASSIGNMENT``, resp.
-    
+
     Args:
         source (``list`` of ``str``): cell source as a list of lines of text
         begin (``str``): the spec to look for
-    
+
     Returns:
         ``int``: line number of BEGIN ASSIGNMENT, if present
         ``None``: if BEGIN ASSIGNMENT not present in the cell
@@ -53,7 +53,7 @@ def get_spec(source, begin):
         if source[block_quotes[i]+1].strip(' ') == f"BEGIN {begin.upper()}"
     ]
     assert len(begins) <= 1, f'multiple BEGIN {begin.upper()} blocks defined in {source}'
-    
+
     return begins[0] if begins else None
 
 
@@ -64,10 +64,10 @@ def get_spec(source, begin):
 def is_markdown_cell(cell):
     """
     Returns whether ``cell`` is Markdown cell
-    
+
     Args:
         cell (``nbformat.NotebookNode``): notebook cell
-    
+
     Returns:
         ``bool``: whether the cell is a Markdown cell
     """
@@ -76,7 +76,7 @@ def is_markdown_cell(cell):
 def is_ignore_cell(cell):
     """
     Returns whether the current cell should be ignored
-    
+
     Args:
         cell (``nbformat.NotebookNode``): a notebook cell
 
@@ -94,7 +94,7 @@ def is_ignore_cell(cell):
 def remove_output(nb):
     """
     Removes all outputs from a notebook in-place
-    
+
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
@@ -125,7 +125,7 @@ def str_to_doctest(code_lines, lines):
     Args:
         code_lines (``list``): list of lines of python code
         lines (``list``): set of characters used to create function name
-    
+
     Returns:
         ``list`` of ``str``: doctest formatted list of lines
     """
@@ -145,7 +145,7 @@ def str_to_doctest(code_lines, lines):
 def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
     Runs tests in the autograder version of the notebook
-    
+
     Args:
         nb_path (``pathlib.Path``): path to iPython notebooks
         debug (``bool``, optional): ``True`` if errors should not be ignored
@@ -271,13 +271,13 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if generate_args:
         with open("otter_config.json", "w+") as f:
             json.dump(generate_args, f, indent=2)
-    
+
     # TODO: change generate_autograder so that only necessary kwargs are needed
     generate_autograder(
         tests_dir=test_dir,
         output_path="autograder.zip",
         config="otter_config.json" if generate_args else None,
-        lang="python" if assignment.is_python else "r",
+        lang=None if assignment.is_python else "r",
         requirements=requirements,
         overwrite_requirements=assignment.overwrite_requirements,
         environment="environment.yml" if assignment.environment else None,
@@ -303,13 +303,13 @@ def patch_copytree():
     """
     import errno, shutil
     orig_copyxattr = shutil._copyxattr
-    
+
     def patched_copyxattr(src, dst, *, follow_symlinks=True):
         try:
             orig_copyxattr(src, dst, follow_symlinks=follow_symlinks)
         except OSError as ex:
             if ex.errno != errno.EACCES: raise
-    
+
     shutil._copyxattr = patched_copyxattr
 
     yield

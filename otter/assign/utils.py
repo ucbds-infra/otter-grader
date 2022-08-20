@@ -5,20 +5,15 @@ import datetime as dt
 import json
 import os
 import pathlib
-import pprint
 import re
 import shutil
 
-from contextlib import contextmanager
 from glob import glob
 from textwrap import indent
 
-from .constants import SEED_REGEX, BLOCK_QUOTE, IGNORE_REGEX
-
 from ..execute import grade_notebook
 from ..generate import main as generate_autograder
-from ..generate.token import APIClient
-from ..utils import get_relpath, get_source
+from ..utils import get_source, NOTEBOOK_METADATA_KEY
 
 
 class EmptyCellException(Exception):
@@ -30,45 +25,13 @@ class EmptyCellException(Exception):
 class AssignNotebookFormatException(Exception):
     """
     """
-    def __init__(self, message, question_metadata, cell_index, *args, **kwargs):
-        question_name = question_metadata.get("name")
+    def __init__(self, message, question, cell_index, *args, **kwargs):
         message += " ("
-        if question_name is not None:
-            message += f"question { question_name }, "
-        message = message + f"cell number { cell_index + 1 })"
+        if question is not None:
+            message += f"question { question.name }, "
+        message += f"cell number { cell_index + 1 })"
         super().__init__(message, *args, **kwargs)
 
-
-#---------------------------------------------------------------------------------------------------
-# Getters
-#---------------------------------------------------------------------------------------------------
-
-def get_spec(source, begin):
-    """
-    Returns the line number of the spec begin line or ``None``. Converts ``begin`` to an uppercase 
-    string and looks for a line matching ``f"BEGIN {begin.upper()}"``. Used for finding question and
-    assignment metadata, which match ``BEGIN QUESTION`` and ``BEGIN ASSIGNMENT``, resp.
-    
-    Args:
-        source (``list`` of ``str``): cell source as a list of lines of text
-        begin (``str``): the spec to look for
-    
-    Returns:
-        ``int``: line number of BEGIN ASSIGNMENT, if present
-        ``None``: if BEGIN ASSIGNMENT not present in the cell
-    """
-    block_quotes = [
-        i for i, line in enumerate(source) if line[:3] == BLOCK_QUOTE
-    ]
-    assert len(block_quotes) % 2 == 0, f"wrong number of block quote delimieters in {source}"
-
-    begins = [
-        block_quotes[i] + 1 for i in range(0, len(block_quotes), 2) 
-        if source[block_quotes[i]+1].strip(' ') == f"BEGIN {begin.upper()}"
-    ]
-    assert len(begins) <= 1, f'multiple BEGIN {begin.upper()} blocks defined in {source}'
-    
-    return begins[0] if begins else None
 
 def get_notebook_language(nb):
     """
@@ -83,14 +46,10 @@ def get_notebook_language(nb):
     return nb["metadata"]["kernelspec"]["language"].lower()
 
 
-#---------------------------------------------------------------------------------------------------
-# Cell Type Checkers
-#---------------------------------------------------------------------------------------------------
-
 def is_ignore_cell(cell):
     """
     Returns whether the current cell should be ignored
-    
+
     Args:
         cell (``nbformat.NotebookNode``): a notebook cell
 
@@ -98,20 +57,28 @@ def is_ignore_cell(cell):
         ``bool``: whether the cell is a ignored
     """
     source = get_source(cell)
-    return source and re.match(IGNORE_REGEX, source[0], flags=re.IGNORECASE)
+    return bool(source and
+        re.match(r"(##\s*ignore\s*##\s*|#\s*ignore\s*)", source[0], flags=re.IGNORECASE))
+
 
 def is_cell_type(cell, cell_type):
+    """
+    Determine whether a cell is of a specific type.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to check
+        cell_type (``str``): the cell type to check for
+
+    Returns:
+        ``bool``: whether ``cell`` is of type ``cell_type``        
+    """
     return cell["cell_type"] == cell_type
 
 
-#---------------------------------------------------------------------------------------------------
-# Cell Reformatters
-#---------------------------------------------------------------------------------------------------
-
 def remove_output(nb):
     """
-    Removes all outputs from a notebook in-place
-    
+    Remove all outputs from a notebook in-place.
+
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
@@ -121,10 +88,11 @@ def remove_output(nb):
         if 'execution_count' in cell:
             cell['execution_count'] = None
 
+
 def remove_cell_ids(nb):
     """
-    Removes all cell IDs from a notebook in-place
-    
+    Remove all cell IDs from a notebook in-place.
+
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
@@ -132,9 +100,10 @@ def remove_cell_ids(nb):
         if 'id' in cell:
             cell.pop('id')
 
+
 def lock(cell):
     """
-    Makes a cell non-editable and non-deletable in-place
+    Make a cell non-editable and non-deletable in-place.
 
     Args:
         cell (``nbformat.NotebookNode``): cell to be locked
@@ -143,8 +112,17 @@ def lock(cell):
     m["editable"] = False
     m["deletable"] = False
 
+
 def add_tag(cell, tag):
     """
+    Add a tag to a cell, returning a copy.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to add a tag to
+        tag (``str``): the tag to add
+
+    Returns:
+        ``nbformat.NotebookNode``: a copy of ``cell`` with the tag added
     """
     cell = copy.deepcopy(cell)
     if "tags" not in cell["metadata"]:
@@ -152,13 +130,31 @@ def add_tag(cell, tag):
     cell["metadata"]["tags"].append(tag)
     return cell
 
+
 def has_tag(cell, tag):
     """
+    Determine whether a cell has a tag.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to check
+        tag (``str``): the tag to check for
+
+    Returns:
+        ``nbformat.NotebookNode``: whether ``cell`` is tagged with ``tag``
     """
     return tag in cell["metadata"].get("tags", [])
 
+
 def remove_tag(cell, tag):
     """
+    Remove a tag from a cell, returning a copy.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to remove a tag from
+        tag (``str``): the tag to remove
+
+    Returns:
+        ``nbformat.NotebookNode``: a copy of ``cell`` with the tag removed
     """
     cell = copy.deepcopy(cell)
     if "tags" not in cell["metadata"] or tag not in cell["metadata"]["tags"]:
@@ -167,20 +163,17 @@ def remove_tag(cell, tag):
     return cell
 
 
-#---------------------------------------------------------------------------------------------------
-# Miscellaneous
-#---------------------------------------------------------------------------------------------------
-
 def str_to_doctest(code_lines, lines):
     """
-    Converts a list of lines of Python code ``code_lines`` to a list of doctest-formatted lines ``lines``
+    Convert a list of lines of Python code ``code_lines`` to the doctest format and appending the
+    results to ``lines``.
 
     Args:
-        code_lines (``list``): list of lines of python code
-        lines (``list``): set of characters used to create function name
-    
+        code_lines (``list[str]``): the code to convert
+        lines (``list[str]``): the list to append the converted lines to
+
     Returns:
-        ``list`` of ``str``: doctest formatted list of lines
+        ``list[str]``: a pointer to ``lines``
     """
     if len(code_lines) == 0:
         return lines
@@ -195,15 +188,20 @@ def str_to_doctest(code_lines, lines):
     else:
         return str_to_doctest(code_lines, lines + [">>> " + line])
 
+
 def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     """
-    Runs tests in the autograder version of the notebook
-    
+    Grade a notebook and throw an error if it does not receive a perfect score.
+
     Args:
-        nb_path (``pathlib.Path``): path to iPython notebooks
-        debug (``bool``, optional): ``True`` if errors should not be ignored
-        seed (``int``, optional): random seed for notebook execution
-        plugin_collection(``otter.plugins.PluginCollection``, optional): plugins to run with tests
+        nb_path (``pathlib.Path``): the path to the notebook to grade
+        debug (``bool``, optional): whether to raise errors instead of ignoring them
+        seed (``int``, optional): an RNG seed for notebook execution
+        plugin_collection (``otter.plugins.PluginCollection``, optional): plugins to run while
+            grading
+
+    Raises:
+        ``RuntimeError``: if the grade received by the notebook is not 100%
     """
     curr_dir = os.getcwd()
     os.chdir(nb_path.parent)
@@ -220,65 +218,55 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
 
     os.chdir(curr_dir)
 
-def write_otter_config_file(master, result, assignment):
+
+def write_otter_config_file(assignment):
     """
-    Creates an Otter configuration file (a ``.otter`` file) for students to use Otter tools, including
-    saving environments and submitting to an Otter Service deployment, using assignment configurations.
-    Writes the resulting file to the ``autograder`` and ``student`` subdirectories of ``result``.
+    Create an Otter configuration file (a ``.otter`` file) for students to use Otter tools,
+    including saving environments and submitting to an Otter Service deployment, using assignment
+    configurations. Writes the resulting file to the ``autograder`` and ``student`` subdirectories
+    of ``assignment.result``.
 
     Args:
-        master (``pathlib.Path``): path to master notebook
-        result (``pathlib.Path``): path to result directory
-        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
     """
     config = {}
 
-    config["notebook"] = master.name
+    config["notebook"] = assignment.master.name
     config["save_environment"] = assignment.save_environment
     config["ignore_modules"] = assignment.ignore_modules
 
     if assignment.variables:
         config["variables"] = assignment.variables
 
-    config_name = master.stem + '.otter'
-    with open(result / 'autograder' / config_name, "w+") as f:
+    config_name = assignment.master.stem + '.otter'
+    with open(assignment.get_ag_path(config_name), "w+") as f:
         json.dump(config, f, indent=4)
-    with open(result / 'student' / config_name, "w+") as f:
+    with open(assignment.get_stu_path(config_name), "w+") as f:
         json.dump(config, f, indent=4)
 
+
 # TODO: update for new assign format
-def run_generate_autograder(result, assignment, gs_username, gs_password, plugin_collection=None):
+def run_generate_autograder(assignment, gs_username, gs_password, plugin_collection=None):
     """
-    Runs Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
+    Run Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
     configurations in ``assignment.generate``.
 
     Args:
-        result (``pathlib.Path``): the path to the result directory
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         gs_username (``str``): Gradescope username for token generation
         gs_password (``str``): Gradescope password for token generation
         plugin_collection (``otter.plugins.PluginCollection``, optional): a plugin collection to pass
             to Otter Generate
     """
-    generate_args = assignment.generate
-    if generate_args is True:
-        generate_args = {}
-
-    if "pdfs" in generate_args:
-        raise ValueError("The 'pdfs' key of 'generate' is no longer supported. Put any " + \
-                         "'pdfs' configurations inside the 'generate' key itself.")
-
-    if assignment.is_r:
-        generate_args["lang"] = "r"
-
     curr_dir = os.getcwd()
-    os.chdir(str(result / 'autograder'))
+    os.chdir(str(assignment.get_ag_path()))
 
     # use temp tests dir
     test_dir = "tests"
-    if assignment.is_python and not assignment.test_files and assignment._temp_test_dir is None:
+    if assignment.is_python and not assignment.tests.files and assignment._temp_test_dir is None:
         raise RuntimeError("Failed to create temp tests directory for Otter Generate")
-    elif assignment.is_python and not assignment.test_files:
+
+    elif assignment.is_python and not assignment.tests.files:
         test_dir = str(assignment._temp_test_dir)
 
     requirements = None
@@ -295,7 +283,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     if assignment.autograder_files:
         ag_dir = os.getcwd()
         os.chdir(curr_dir)
-        output_dir  = result / 'autograder'
+        output_dir = assignment.get_ag_path()
 
         # copy files
         for file in assignment.autograder_files:
@@ -317,13 +305,12 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
 
         files += assignment.autograder_files
 
-    # TODO: move this config out of the assignment metadata and into the generate key
-    if assignment.variables:
-        generate_args['serialized_variables'] = str(assignment.variables)
-
-    if generate_args:
+    otter_config = assignment.get_otter_config()
+    if otter_config:
+        # TODO: move this filename into a global variable somewhere and remove all of the places
+        # it's hardcoded
         with open("otter_config.json", "w+") as f:
-            json.dump(generate_args, f, indent=2)
+            json.dump(otter_config, f, indent=2)
 
     # TODO: change generate_autograder so that only necessary kwargs are needed
     timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
@@ -332,7 +319,7 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
     generate_autograder(
         tests_dir=test_dir,
         output_path=output_path,
-        config="otter_config.json" if generate_args else None,
+        config="otter_config.json" if otter_config else None,
         lang="python" if assignment.is_python else "r",
         requirements=requirements,
         overwrite_requirements=assignment.overwrite_requirements,
@@ -351,23 +338,19 @@ def run_generate_autograder(result, assignment, gs_username, gs_password, plugin
 
     os.chdir(curr_dir)
 
-@contextmanager
-def patch_copytree():
-    """
-    A context manager patch for ``shutil.copytree` on WSL. Shamelessly stolen from https://bugs.python.org/issue38633
-    (see for more information)
-    """
-    import errno, shutil
-    orig_copyxattr = shutil._copyxattr
-    
-    def patched_copyxattr(src, dst, *, follow_symlinks=True):
-        try:
-            orig_copyxattr(src, dst, follow_symlinks=follow_symlinks)
-        except OSError as ex:
-            if ex.errno != errno.EACCES: raise
-    
-    shutil._copyxattr = patched_copyxattr
 
-    yield
+def add_assignment_name_to_notebook(nb, assignment):
+    """
+    Add the assignment name from the assignment config to the provided notebook's metadata in-place.
 
-    shutil._copyxattr = orig_copyxattr
+    If ``assignment`` has a name, the name is added to the notebook metadata, as
+    ``nb["metadata"]["otter"]["assignment_name"]``.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to add the name to
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+    """
+    if assignment.name is not None:
+        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+            nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
+        nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_name"] = assignment.name

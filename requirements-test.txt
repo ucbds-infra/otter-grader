@@ -4,3 +4,7 @@ nbformat<5.1.0
 tqdm
 codecov
 rpy2
+pytest
+jupyter_client
+ipykernel
+matplotlib

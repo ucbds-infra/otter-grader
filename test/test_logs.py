@@ -1,197 +1,151 @@
-################################
-##### Tests for Otter Logs #####
-################################
+"""Tests for ``otter.check.logs``"""
 
-import numpy as np
 import os
+import pytest
 import sys
-import unittest
 
 from sklearn.linear_model import LinearRegression
 
 from otter.check.logs import Log
 from otter.check.notebook import Notebook, _OTTER_LOG_FILENAME
 from otter.check.logs import LogEntry, EventType, Log
-from . import TestCase
+
+from .utils import TestFileManager
 
 
-TEST_FILES_PATH = "test/test-logs/"
+FILE_MANAGER = TestFileManager("test/test-logs/")
 
 
-class TestLogs(TestCase):
+@pytest.fixture(autouse=True)
+def cleanup_output(cleanup_enabled):
+    yield
+    if cleanup_enabled and os.path.isfile(_OTTER_LOG_FILENAME):
+        os.remove(_OTTER_LOG_FILENAME)
 
+
+def test_notebook_check():
+    test_directory = FILE_MANAGER.get_path("tests")
     grading_results = {}
-    entry_results = {}
-    test_directory = TEST_FILES_PATH + "tests"
+    grader = Notebook(tests_dir=test_directory)
 
-    def setUp(self):
-        super().setUp()
-        self.grading_results = {}
-        self.entry_results = {}
-        self.maxDiff = None
+    def square(x):
+        return x**2
 
-    def test_Notebook_check(self):
-        grader = Notebook(tests_dir=self.test_directory)
+    for test_file in os.listdir(test_directory):
+        if os.path.splitext(test_file)[1] != ".py":
+            continue
 
-        def square(x):
-            return x**2
+        test_name = os.path.splitext(test_file)[0]
+        grading_results[test_name] = grader.check(test_name)
 
-        for test_file in os.listdir(self.test_directory):
-            if os.path.splitext(test_file)[1] != ".py":
-                continue
-            test_name = os.path.splitext(test_file)[0]
-            self.grading_results[test_name] = grader.check(test_name)
+    log = Log.from_file(_OTTER_LOG_FILENAME)
 
-        log = Log.from_file(_OTTER_LOG_FILENAME)
+    for question in log.get_questions():
+        actual_result = grading_results[question]
 
-        for question in log.get_questions():
-            logged_result = log.get_results(question)
-            actual_result = self.grading_results[question]
+        # checking repr since the results __eq__ method is not defined
+        assert repr(log.get_results(question)) == repr(actual_result), \
+            f"Logged results for {question} are not correct"
 
-            # checking repr since the results __eq__ method is not defined
-            self.assertEqual(repr(logged_result), repr(actual_result), f"Logged results for {question} are not correct")
+        logged_grade = log.get_question_entry(question).get_score_perc()
+        assert logged_grade == actual_result.grade, f"Logged results for {question} are not correct"
+
+        # checking repr since the results __eq__ method is not defined
+        assert repr(log.get_question_entry(question).get_results()) == repr(actual_result), \
+            f"Logged results for {question} are not correct"
 
 
-    def test_grade_check(self):
-        grader = Notebook(tests_dir=self.test_directory)
+def test_shelve():
+    """
+    tests shelve() and unshelve() which call shelve_environment()
+    """
 
-        def square(x):
-            return x**2
-        
-        for test_file in os.listdir(self.test_directory):
-            if os.path.splitext(test_file)[1] != ".py":
-                continue
-            test_name = os.path.splitext(test_file)[0]
-            self.grading_results[test_name] = grader.check(test_name)
+    def square(x):
+        return x**2
 
-        log = Log.from_file(_OTTER_LOG_FILENAME)
+    import calendar 
 
-        for question in log.get_questions():
-            logged_grade = log.get_question_entry(question).get_score_perc()
-            actual_grade = self.grading_results[question].grade
+    env = {
+        "num": 5,
+        "func": square,
+        "model": LinearRegression(),
+        "module": sys,
+        "ignored_func": calendar.setfirstweekday
+    }
 
-            # checking repr since the results __eq__ method is not defined
-            self.assertEqual(logged_grade, actual_grade, f"Logged results for {question} are not correct")
+    entry = LogEntry(
+        event_type=EventType.CHECK,
+        results=[],
+        question="foo",
+        success=True,
+        error=None,
+    )
 
-    def test_question_entry(self):
-        grader = Notebook(tests_dir=self.test_directory)
 
-        def square(x):
-            return x**2
+    entry.shelve(env, delete=True, filename=_OTTER_LOG_FILENAME, ignore_modules=['calendar'])
+    assert entry.shelf
+    assert entry.unshelved == ["module", "ignored_func"]
 
-        for test_file in os.listdir(self.test_directory):
-            if os.path.splitext(test_file)[1] != ".py":
-                continue
-            test_name = os.path.splitext(test_file)[0]
-            self.entry_results[test_name] = grader.check(test_name)
+    entry.flush_to_file(_OTTER_LOG_FILENAME) 
 
-        log = Log.from_file(_OTTER_LOG_FILENAME)
+    from math import factorial
 
-        for question in log.get_questions():
-            logged_result = log.get_question_entry(question).get_results()
-            actual_result = self.entry_results[question]
+    log = Log.from_file(_OTTER_LOG_FILENAME)
+    entry = log.get_question_entry("foo")
+    env = entry.unshelve()
+    assert [*env] == ["num", "func", "model"]
 
-            # checking repr since the results __eq__ method is not defined
-            self.assertEqual(repr(logged_result), repr(actual_result), f"Logged results for {question} are not correct")
+    env_with_factorial = entry.unshelve(dict(factorial = factorial))
+    assert "factorial" in env_with_factorial["func"].__globals__
+    assert factorial is env_with_factorial["func"].__globals__["factorial"]
 
-    def test_shelve(self):
-        # tests shelve() and unshelve() which call shelve_environment()
 
-        def square(x):
-            return x**2
+def test_log_getitem():
+    entry = LogEntry(
+        event_type=EventType.AUTH,
+        results=[],
+        question=None, 
+        success=True, 
+        error=None,
+    )
+    entry.flush_to_file(_OTTER_LOG_FILENAME)
 
-        import calendar 
+    log = Log.from_file(_OTTER_LOG_FILENAME)
+    assert log[0].event_type == entry.event_type and log[0].results == entry.results
 
-        env = {"num": 5, "func": square, "model": LinearRegression(), "module": sys, "ignored_func": calendar.setfirstweekday}
 
-     
-        entry = LogEntry(
-            event_type=EventType.AUTH,
-            results=[],
-            question=None, 
-            success=True, 
-            error=None
-        )
- 
+def test_log_iter():
+    entry1 = LogEntry(
+        event_type=EventType.CHECK,
+        results=[],
+        question= "q1", 
+        success=True, 
+        error=None,
+    )
 
-        entry.shelve(env, delete=True, filename = _OTTER_LOG_FILENAME, ignore_modules=['calendar'])
-        self.assertTrue(entry.shelf)
-        self.assertEqual(entry.unshelved, ["module", "ignored_func"])
+    entry2 = LogEntry(
+        event_type=EventType.CHECK,
+        results=[],
+        question= "q1", 
+        success=True, 
+        error=None,
+    )
 
-        entry.flush_to_file(_OTTER_LOG_FILENAME) 
+    entry3 = LogEntry(
+        event_type=EventType.CHECK,
+        results=[],
+        question= "q2", 
+        success=True, 
+        error=None,
+    )
 
-        from math import factorial
+    entry1.flush_to_file(_OTTER_LOG_FILENAME)
+    entry2.flush_to_file(_OTTER_LOG_FILENAME)
+    entry3.flush_to_file(_OTTER_LOG_FILENAME)
 
-        log = Log.from_file(_OTTER_LOG_FILENAME)
-        env = entry.unshelve()
-        self.assertEqual([*env], ["num", "func", "model"])
+    log = Log.from_file(_OTTER_LOG_FILENAME)
 
-        env_with_factorial = entry.unshelve(dict(factorial = factorial ))
-        self.assertTrue("factorial" in env_with_factorial["func"].__globals__)
-        self.assertTrue(factorial is env_with_factorial["func"].__globals__["factorial"])
-    
-    def test_Log_getItem(self):
-        entry1 = LogEntry(
-            event_type=EventType.AUTH,
-            results=[],
-            question=None, 
-            success=True, 
-            error=None
-        )
-
-        entry1.flush_to_file(_OTTER_LOG_FILENAME)
-
-        log = Log.from_file(_OTTER_LOG_FILENAME)
-
-        self.assertEqual(log.__getitem__(0).event_type, entry1.event_type)
-        
-
-    def test_Log_iter(self):
-        #log = Log.from_file(_OTTER_LOG_FILENAME, ascending = True)
-        #list of entries
-        #logIter = log.iter()
-
-        entry1 = LogEntry(
-            event_type=EventType.CHECK,
-            results=[],
-            question= "q1", 
-            success=True, 
-            error=None
-        )
-
-        entry2 = LogEntry(
-            event_type=EventType.CHECK,
-            results=[],
-            question= "q1", 
-            success=True, 
-            error=None
-        )
-
-        entry3 = LogEntry(
-            event_type=EventType.CHECK,
-            results=[],
-            question= "q2", 
-            success=True, 
-            error=None
-        )
-
-        entry1.flush_to_file(_OTTER_LOG_FILENAME)
-        entry2.flush_to_file(_OTTER_LOG_FILENAME)
-        entry3.flush_to_file(_OTTER_LOG_FILENAME)
-
-        log = Log.from_file(_OTTER_LOG_FILENAME)
-
-        logIter = log.question_iterator() #most recent entries / question
-        self.assertEqual(logIter.questions , ["q1", "q2"])
-
-        nextLogEntry = next(logIter)
-
-        self.assertEqual(nextLogEntry.question, entry2.question)
-
-        nextLogEntry = next(logIter)
-
-        self.assertEqual(nextLogEntry.question, entry3.question)
-
-    def tearDown(self):
-        if os.path.isfile(_OTTER_LOG_FILENAME):
-            os.remove(_OTTER_LOG_FILENAME)
+    log_iter = log.question_iterator()
+    assert log_iter.questions == ["q1", "q2"]
+    assert next(log_iter).question == entry2.question
+    assert next(log_iter).question == entry3.question

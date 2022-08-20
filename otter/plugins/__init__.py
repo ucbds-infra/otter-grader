@@ -42,7 +42,7 @@ class PluginCollection:
     def _parse_plugin_config(plugin_config):
         if not isinstance(plugin_config, list):
             raise ValueError(f"Invalid plugin config: {plugin_config}")
-        
+
         result = []
         for plg in plugin_config:
             if isinstance(plg, str):
@@ -104,7 +104,7 @@ class PluginCollection:
             plugins.append(plugin)
 
         return plugins
-    
+
     def add_new_plugins(self, raw_plugin_config):
         """
         Add any new plugins specified in ``raw_plugin_config`` to this plugin collection. Any plugins
@@ -119,7 +119,7 @@ class PluginCollection:
             name = plg["plugin"]
             if any(c["plugin"] == plg["plugin"] for c in self._plugin_config):
                 plg_cfg.pop(i)
-        
+
         self._plugin_config.extend(plg_cfg)
         self._plugins.extend(self._load_plugins(plg_cfg, self._subm_path, self._subm_meta))
 
@@ -131,7 +131,7 @@ class PluginCollection:
         Args:
             event (``str``): name of the method of the plugin to run
             *args, **kwargs (any): arguments for the method
-        
+
         Returns:
             ``list[Any]``: the values returned by each plugin for the called event
         """
@@ -201,7 +201,7 @@ class PluginCollection:
             body = "\n" + title + "\n" + r + "\n"
 
             report += "\n" + body
-        
+
         report += "\n" + footer
 
         return report

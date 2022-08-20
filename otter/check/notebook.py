@@ -4,27 +4,23 @@ import datetime as dt
 import inspect
 import json
 import os
-import pickle
-import re
-import time
 import warnings
 import zipfile
 
-from getpass import getpass
+from contextlib import contextmanager
 from glob import glob
-from IPython import get_ipython
-from IPython.display import display, HTML, Javascript
+from IPython.display import display, HTML
 from textwrap import indent
-from urllib.parse import urljoin
 
 from .logs import LogEntry, EventType, Log
-from .utils import colab_incompatible, grade_zip_file, logs_event, running_on_colab, save_notebook
+from .utils import grade_zip_file, grading_mode_disabled, incompatible_with, IPythonInterpreter, \
+     list_available_tests, logs_event, resolve_test_info, save_notebook
 
-from ..execute import check
+from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
+from ..utils import Loggable, loggers
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -32,7 +28,7 @@ _SHELVE = False
 _ZIP_NAME_FILENAME = "__zip_filename__"
 
 
-class Notebook:
+class Notebook(Loggable):
     """
     Notebook class for in-notebook autograding
 
@@ -41,19 +37,35 @@ class Notebook:
         tests_dir (``str``, optional): path to tests directory
         colab (``bool``, optional): whether this notebook is being run on Google Colab; if ``None``,
             this information is automatically parsed from IPython on creation
+        jupyterlite (``bool``, optional): whether this notebook is being run on JupyterLite; if
+            ``None``, this information is automatically parsed from IPython on creation
     """
+
+    _grading_mode = False
 
     # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
 
     @logs_event(EventType.INIT)
-    def __init__(self, nb_path=None, tests_dir="./tests", colab=None):
+    def __init__(
+        self,
+        nb_path=None,
+        tests_dir="./tests",
+        tests_url_prefix=None,
+        colab=None,
+        jupyterlite=None,
+    ):
         global _SHELVE
 
-        if colab is None:
-            colab = running_on_colab()
+        interpreter = None
+        if colab or IPythonInterpreter.COLAB.value.running():
+            interpreter = IPythonInterpreter.COLAB
+        elif jupyterlite or IPythonInterpreter.PYOLITE.value.running():
+            interpreter = IPythonInterpreter.PYOLITE
 
-        if colab and not os.path.isdir(tests_dir):
+        self._interpreter = interpreter
+
+        if self._interpreter is IPythonInterpreter.COLAB and not os.path.isdir(tests_dir):
             raise ValueError(f"Tests directory {tests_dir} does not exist")
 
         if type(self)._tests_dir_override is not None:
@@ -61,8 +73,8 @@ class Notebook:
         else:
             self._path = tests_dir
 
-        self._colab = colab
         self._notebook = nb_path
+        self._tests_url_prefix = tests_url_prefix
         self._addl_files = []
         self._plugin_collections = {}
 
@@ -82,6 +94,33 @@ class Notebook:
 
             self._notebook = self._config["notebook"]
 
+    @classmethod
+    @contextmanager
+    def grading_mode(cls, tests_dir):
+        """
+        A context manager for the ``Notebook`` grading mode. Yields a pointer to the list of results
+        that will be populated during grading.
+
+        **It is the caller's responsibility to maintain the pointer.** The pointer in the ``Checker``
+        class will be overwritten when the context exits.
+        """
+        logger = cls._get_logger()
+        logger.info("Entering Notebook grading mode")
+        logger.debug(f"Overriding tests directory: {tests_dir}")
+        cls._grading_mode = True
+        cls._tests_dir_override = tests_dir
+        Checker.clear_results()
+        Checker.enable_tracking()
+
+        yield Checker.get_results()
+
+        logger.info("Exiting Notebook grading mode")
+        cls._grading_mode = False
+        cls._tests_dir_override = None
+        Checker.disable_tracking()
+        Checker.clear_results()
+
+    @incompatible_with(IPythonInterpreter.PYOLITE, throw_error=False)
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
         """
         Logs an event
@@ -113,18 +152,19 @@ class Notebook:
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
 
-    def _resolve_nb_path(self, nb_path):
+    def _resolve_nb_path(self, nb_path, fail_silently=False):
         """
         Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``, ``self._notebook``
-        is checked, then the working directory is searched for ``.ipynb`` files. If none are found, or 
-        more than one is found, a ``ValueError`` is raised.
+        is checked, then the working directory is searched for ``.ipynb`` files.
 
         Args:
             nb_path (``Optional[str]``): path to the notebook
-        
+            fail_silently (``bool``): if true, the method does not fail the notebook path can't be
+                resolved
+
         Returns:
             ``str``: resolved notebook path
-        
+
         Raises:
             ``ValueError``: if no notebooks or too many notebooks are found.
         """
@@ -135,10 +175,10 @@ class Notebook:
 
         elif nb_path is None and glob("*.ipynb"):
             notebooks = glob("*.ipynb")
-            assert len(notebooks) == 1, "nb_path not specified and > 1 notebook in working directory"
-            nb_path = notebooks[0]
+            if len(notebooks) == 1:
+                nb_path = notebooks[0]
 
-        elif nb_path is None:
+        if nb_path is None and not fail_silently:
             raise ValueError("Could not resolve notebook path")
 
         return nb_path
@@ -157,30 +197,37 @@ class Notebook:
         Returns:
             ``otter.test_files.abstract_test.TestFile``: the grade for the question
         """
-        if os.path.isdir(self._path) and os.path.isfile(os.path.join(self._path, question + ".py")):
-            test_path = os.path.join(self._path, question + ".py")
-            test_name = None
+        self._logger.info(f"Running check for question: {question}")
+        test_path, test_name = resolve_test_info(
+            self._path,
+            self._resolve_nb_path(None, fail_silently=True),
+            self._tests_url_prefix,
+            question,
+        )
 
-        elif self._colab:
+        self._logger.debug(f"Resolved test path: {test_path}")
+        self._logger.debug(f"Resolved test name: {test_name}")
+
+        # raise an error for a metadata test on Colab
+        if test_name is not None and self._interpreter is IPythonInterpreter.COLAB:
             raise ValueError(f"Test {question} does not exist")
 
-        else:
-            test_path = self._resolve_nb_path(None)
-            test_name = question
-
         # ensure that desired test exists
-        assert os.path.isfile(test_path), "Test {} does not exist".format(question)
+        if not os.path.isfile(test_path):
+            raise FileNotFoundError(f"Test {question} does not exist")
 
         # pass the correct global environment
         if global_env is None:
+            self._logger.debug(f"Collecting calling global environment")
             global_env = inspect.currentframe().f_back.f_back.f_globals
 
         # run the check
-        result = check(test_path, test_name, global_env)
+        self._logger.debug(f"Calling checker")
+        result = Checker.check(test_path, test_name, global_env)
 
         return question, result, global_env
 
-    @colab_incompatible
+    @incompatible_with(IPythonInterpreter.COLAB)
     def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the plugin ``plugin_name`` with the specified arguments. Use ``nb_path`` if the path
@@ -194,6 +241,8 @@ class Notebook:
             **kwargs: keyword arguments to be passed to the plugin
 
         """
+        self._logger.info(f"Running plugin {plugin_name}")
+        self._logger.debug(f"Running plugin {plugin_name} with args {args} and kwargs {kwargs}")
         nb_path = self._resolve_nb_path(nb_path)
         if plugin_name in self._plugin_collections:
             pc = self._plugin_collections[plugin_name]
@@ -202,7 +251,8 @@ class Notebook:
             self._plugin_collections[plugin_name] = pc
         pc.run("from_notebook", *args, **kwargs)
 
-    @colab_incompatible
+    @grading_mode_disabled
+    @incompatible_with(IPythonInterpreter.COLAB)
     @logs_event(EventType.TO_PDF)
     def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
         """
@@ -218,8 +268,10 @@ class Notebook:
                 notebook (only works in Jupyter Notebook classic, not JupyterLab)
         """
         nb_path = self._resolve_nb_path(nb_path)
+        self._logger.debug(f"Resolved notebook path: {nb_path}")
 
         if force_save:
+            self._logger.debug("Attempting to force-save notebook")
             saved = save_notebook(nb_path)
             if not saved:
                 warnings.warn(
@@ -227,21 +279,23 @@ class Notebook:
                     "Checkpoint and then re-running this cell. The zip file returned by this call "
                     "will use the last saved version of this notebook."
                 )
+            else:
+                self._logger.debug("Force-save successful")
 
-        # convert(nb_path, filtering=filtering, filter_type=filter_type)
-        export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
+        pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
+        self._logger.debug(f"Wrote PDF to zip file: {pdf_path}")
 
         if display_link:
             # create and display output HTML
-            out_html = """
+            out_html = f"""
             <p>Your file has been exported. Download it by right-clicking
-            <a href="{}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
-            """.format(nb_path[:-5] + "pdf")
+            <a href="{pdf_path}" target="_blank">here</a> and selecting <strong>Save Link As</strong>.
+            """
 
             display(HTML(out_html))
-        self._log_event(EventType.TO_PDF)
 
-    @colab_incompatible
+    @grading_mode_disabled
+    @incompatible_with(IPythonInterpreter.COLAB)
     def add_plugin_files(self, plugin_name, *args, nb_path=None, **kwargs):
         """
         Runs the ``notebook_export`` event of the plugin ``plugin_name`` and tracks the file paths
@@ -265,7 +319,8 @@ class Notebook:
             return
         self._addl_files.extend(addl_files)
 
-    @colab_incompatible
+    @grading_mode_disabled
+    @incompatible_with(IPythonInterpreter.COLAB)
     @logs_event(EventType.END_EXPORT)
     def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
             display_link=True, force_save=False, run_tests=False):
@@ -291,8 +346,10 @@ class Notebook:
         self._log_event(EventType.BEGIN_EXPORT)
 
         nb_path = self._resolve_nb_path(nb_path)
+        self._logger.debug(f"Resolved notebook path: {nb_path}")
 
         if force_save:
+            self._logger.debug("Attempting to force-save notebook")
             saved = save_notebook(nb_path)
             if not saved:
                 warnings.warn(
@@ -300,16 +357,13 @@ class Notebook:
                     "Checkpoint and then re-running this cell. The zip file returned by this call "
                     "will use the last saved version of this notebook."
                 )
+            else:
+                self._logger.debug("Force-save successful")
 
-        try:
-            with open(nb_path) as f:
-                assert len(f.read().strip()) > 0, \
-                    f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
-
-        except UnicodeDecodeError:
-            with open(nb_path, "r", encoding="utf-8") as f:
-                assert len(f.read().strip()) > 0, \
-                    f"Notebook {nb_path} is empty. Please save and checkpoint your notebook and rerun this cell."
+        with open(nb_path, "r", encoding="utf-8") as f:
+            if len(f.read().strip()) == 0:
+                raise ValueError(f"Notebook '{nb_path}' is empty. Please save and checkpoint your "
+                    "notebook and rerun this cell.")
 
         timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
         if export_path is None:
@@ -317,32 +371,42 @@ class Notebook:
         else:
             zip_path = export_path
 
+        self._logger.debug(f"Determined export zip path: {zip_path}")
+
         zf = zipfile.ZipFile(zip_path, mode="w")
         zf.write(nb_path)
 
         if pdf:
-            pdf_path = ".".join(nb_path.split(".")[:-1]) + ".pdf"
-            # convert(nb_path, filtering=filtering, filter_type=filter_type)
-            export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
+            pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
             if os.path.isfile(pdf_path):
                 zf.write(pdf_path)
+                self._logger.debug(f"Wrote PDF to zip file: {pdf_path}")
             else:
                 warnings.warn("Could not locate a PDF to include")
 
         if os.path.isfile(_OTTER_LOG_FILENAME):
             zf.write(_OTTER_LOG_FILENAME)
+            self._logger.debug("Added Otter log to zip file")
 
-        zf.writestr(_ZIP_NAME_FILENAME, os.path.basename(zip_path))
+        zip_basename = os.path.basename(zip_path)
+        zf.writestr(_ZIP_NAME_FILENAME, zip_basename)
+        self._logger.debug(f"Added {_ZIP_NAME_FILENAME} to zip file: '{zip_basename}'")
 
-        if glob("*.otter"):
-            assert len(glob("*.otter")) == 1, "Too many .otter files (max 1 allowed)"
-            zf.write(glob("*.otter")[0])
+        dot_otter = glob("*.otter")
+        if dot_otter:
+            if len(dot_otter) != 1:
+                raise ValueError("Too many .otter files (max 1 allowed)")
+            dot_otter = dot_otter[0]
+            zf.write(dot_otter)
+            self._logger.debug(f"Added .otter file to zip file: {dot_otter}")
 
         for file in files:
             zf.write(file)
-        
+            self._logger.debug(f"Added file to zip file: {file}")
+
         for file in self._addl_files:
             zf.write(file)
+            self._logger.debug(f"Added plugin file to zip file: {file}")
 
         zf.close()
 
@@ -351,8 +415,7 @@ class Notebook:
             results = grade_zip_file(zip_path, nb_path, self._path)
             print(
                 "Your submission received the following results when run against " + \
-                "available test cases:\n\n" + indent(results.summary(), "    ")
-            )
+                "available test cases:\n\n" + indent(results.summary(), "    "))
 
         if display_link:
             # create and display output HTML
@@ -363,31 +426,26 @@ class Notebook:
 
             display(HTML(out_html))
 
+    @grading_mode_disabled
     @logs_event(EventType.END_CHECK_ALL)
     def check_all(self):
         """
         Runs all tests on this notebook. Tests are run against the current global environment, so any
         tests with variable name collisions will fail.
         """
-        # TODO: this should use functions in execute.py to run tests in-sequence so that variable
-        # name collisions are accounted for
         self._log_event(EventType.BEGIN_CHECK_ALL)
 
-        # TODO: this is a janky way of resolving where the tests are. Formalize a method of 
-        # determining this and put it into a method in e.g. utils.py
-        tests = [os.path.split(file)[1][:-3] for file in glob(os.path.join(self._path, "*.py")) \
-            if "__init__.py" not in file]
-        if len(tests) == 0:
-            nb_path = self._resolve_nb_path(None)
-            with open(nb_path, encoding="utf-8") as f:
-                nb = json.load(f)
-            tests = list(nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"].keys())
+        tests = list_available_tests(self._path, self._resolve_nb_path(None, fail_silently=True))
 
-        global_env = inspect.currentframe().f_back.f_back.f_globals
+        global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
+
+        self._logger.debug(f"Found available tests: {', '.join(tests)}")
+
         results = []
         if not _SHELVE:
-            for test_name in sorted(tests):
+            for test_name in tests:
                 results.append(self.check(test_name, global_env))
+
         else:
             log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
             for file in sorted(tests):

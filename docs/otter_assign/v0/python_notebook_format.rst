@@ -66,7 +66,7 @@ defaults) is ``export_cell``.
     autograder_files: []           # a list of other files only to include in the autograder
     plugins: []                    # a list of plugin names and configurations
     test_files: true               # whether to store tests in separate .py files rather than in the notebook metadata
-    colab: false                   # whether this assignment will be run on Google Colab
+    runs_on: default               # the interpreter this notebook will be run on if different from the default IPython interpreter (one of {'default', 'colab', 'jupyterlite'})
 
 .. END YAML TARGET
 
@@ -335,22 +335,8 @@ The test metadata supports the following keys with the defaults specified below:
     success_message: null  # a messsge to show to the student when the test case passes
     failure_message: null  # a messsge to show to the student when the test case fails
 
-Because points can be specified at the question level and at the test case level, point values get 
-resolved as follows:
-
-* If one or more test cases specify a point value and no point value is specified for the question, 
-  each test case with unspecified point values is assumed to be worth 0 points.
-* If one or more test cases specify a point value and a point value *is* specified for the question, 
-  each test case with unspecified point values is assumed to be equally weighted and together are 
-  worth the question point value less the sum of specified point values. For example, in a 6-point 
-  question with 4 test cases where two test cases are each specified to be worth 2 points, each of 
-  the other test cases is worth :math:`\frac{6-(2 + 2)}{2} = 1` point.)
-* If no test cases specify a point value and a point value *is* specified for the question, each 
-  test case is assumed to be equally weighted and is assigned a point value of :math:`\frac{p}{n}` 
-  where :math:`p` is the number of points for the question and :math:`n` is the number of test 
-  cases.
-* If no test cases specify a point value and no point value is specified for the question, the 
-  question is assumed to be worth 1 point and each test case is equally weighted.
+Because points can be specified at the question level and at the test case level, Otter will resolve
+the point value of each test case as described :ref:`here <test_files_python_resolve_point_values>`.
 
 **Note:** Currently, the conversion to OK format does not handle multi-line tests if any line but 
 the last one generates output. So, if you want to print twice, make two separate test cells instead 

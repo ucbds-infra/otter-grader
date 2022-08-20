@@ -1,60 +1,14 @@
-"""
-Execution and grading internals for Otter-Grader
-"""
+"""Execution and grading internals for Otter-Grader"""
 
-import json
-import inspect
-import itertools
 import nbformat
 
-from IPython import get_ipython
-
+from .checker import Checker
 from .execute_log import execute_log
 from .execute_notebook import execute_notebook
 from .transforms import filter_ignored_cells, script_to_notebook
 
-from ..test_files import GradingResults, NotebookMetadataOKTestFile, OKTestFile
-from ..utils import id_generator
-
-
-NBFORMAT_VERSION = 4
-
-
-def check(nb_or_test_path, test_name=None, global_env=None):
-    """
-    Checks a global environment against given test file. If global_env is ``None``, the global 
-    environment of the calling frame is used; i.e., the following two calls are equivalent:
-
-    .. code-block:: python
-
-        check('tests/q1.py')
-        check('tests/q1.py', globals())
-    
-    Args:
-        nb_or_test_path (``str``): path to test file or notebook
-        test_name (``str``, optional): the name of the test if a notebook metadata test
-        global_env (``dict``, optional): a global environment resulting from the execution 
-            of a python script or notebook
-
-    Returns:
-        ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
-        given global environment
-    """
-    if test_name is None:
-        test = OKTestFile.from_file(nb_or_test_path)
-    else:
-        test = NotebookMetadataOKTestFile.from_file(nb_or_test_path, test_name)
-
-    if global_env is None:
-        # Get the global env of our callers - one level below us in the stack
-        # The grade method should only be called directly from user / notebook
-        # code. If some other method is calling it, it should also use the
-        # inspect trick to pass in its parents' global env.
-        global_env = inspect.currentframe().f_back.f_globals
-
-    test.run(global_env)
-
-    return test
+from ..test_files import create_test_file, GradingResults
+from ..utils import id_generator, NBFORMAT_VERSION
 
 
 def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors=True, script=False, 
@@ -136,7 +90,7 @@ def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors
                     include = False
 
             if include:
-                extra_tests.append(OKTestFile.from_file(t))
+                extra_tests.append(create_test_file(t))
                 extra_tests[-1].run(global_env)
 
         tests_run += extra_tests
@@ -145,5 +99,5 @@ def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors
 
     if plugin_collection is not None:
         plugin_collection.run("after_grading", results)
-    
+
     return results

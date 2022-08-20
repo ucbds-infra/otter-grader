@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     if: contains('["chrispyles"]', github.actor)
-  
+
     runs-on: ubuntu-latest
 
     env:
@@ -28,7 +28,7 @@ jobs:
           python3 -c 'import os, sys; sys.exit(os.environ["GITHUB_REF"] != "refs/heads/master")'
 
       - uses: actions/checkout@v2
-      
+
       - uses: docker/setup-buildx-action@v1
         id: buildx
         with:
@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: stable
-      
+
       - name: Merge master -> stable
         run: |
           git config --global user.name "github-actions"
@@ -86,7 +86,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
             hub release create -a dist/*.tar.gz -a dist/*.whl \
-            -m 'v${{ github.event.inputs.version }}' ${{ github.event.inputs.version }}
+            -m 'v${{ github.event.inputs.version }}' 'v${{ github.event.inputs.version }}'
 
       - name: PR stable -> main
         env:
@@ -101,7 +101,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ucbdsinfra/otter-grader:${{ github.event.inputs.version }}
+            ucbdsinfra/otter-grader:v${{ github.event.inputs.version }}
             ucbdsinfra/otter-grader:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
