@@ -5,7 +5,7 @@ import sys
 from textwrap import dedent
 
 
-__version__ = "4.0.0.b0"
+__version__ = "4.0.0"
 
 
 LOGO_WITH_VERSION = fr"""
