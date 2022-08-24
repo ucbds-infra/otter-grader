@@ -3,7 +3,6 @@ FROM ${BASE_IMAGE}
 RUN apt-get update && apt-get install -y curl unzip dos2unix && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN mkdir -p /autograder/source
 ARG BASE_IMAGE
-ADD otter-grader /home/otter-grader
 ENV BASE_IMAGE=$BASE_IMAGE
 ADD run_autograder /autograder/run_autograder
 ADD setup.sh environment.yml requirements.* /autograder/source/
