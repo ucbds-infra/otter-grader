@@ -1,5 +1,9 @@
 # Changelog
 
+**v4.0.1 (Unreleased):**
+
+* Fix Otter Grade Dockerfile per [#517](https://github.com/ucbds-infra/otter-grader/issues/517)
+
 **v4.0.0:**
 
 * Added a new test file format based on raising exceptions per [#95](https://github.com/ucbds-infra/otter-grader/issues/95)
