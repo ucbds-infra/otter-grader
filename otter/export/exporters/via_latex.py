@@ -60,16 +60,16 @@ class PDFViaLatexExporter(BaseExporter):
             pdf_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         try:
+            if options["save_tex"]:
+                latex_output = nbconvert.export(latex_exporter, nb)
+                with open(os.path.splitext(dest)[0] + ".tex", "w+") as output_file:
+                    output_file.write(latex_output[0])
+
             pdf_output = nbconvert.export(pdf_exporter, nb)
             with open(dest, "wb") as output_file:
                 output_file.write(pdf_output[0])
 
             success = True
-
-            if options["save_tex"]:
-                latex_output = nbconvert.export(latex_exporter, nb)
-                with open(os.path.splitext(dest)[0] + ".tex", "w+") as output_file:
-                    output_file.write(latex_output[0])
 
             if NBCONVERT_6:
                 nbconvert.TemplateExporter.template_name = orig_template_name
