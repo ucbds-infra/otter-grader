@@ -103,5 +103,7 @@ def main(autograder_dir, **kwargs):
             df.drop(columns=["output"], inplace=True)
         if "visibility" in df.columns:
             df.drop(columns=["visibility"], inplace=True)
+        if "status" in df.columns:
+            df.drop(columns=["status"], inplace=True)
 
         print(df)

@@ -343,6 +343,7 @@ class GradingResults:
             "name": "Public Tests",
             "visibility": "visible",
             "output": self.summary(public_only=True),
+            "status": "passed",
         })
 
         for test_name in self.test_files:
