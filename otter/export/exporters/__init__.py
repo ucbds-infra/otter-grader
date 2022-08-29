@@ -10,10 +10,7 @@ from .via_latex import PDFViaLatexExporter
 from ..utils import WkhtmltopdfNotFoundError
 
 
-EXPORTERS = {
-    "html": PDFViaHTMLExporter,
-    "latex": PDFViaLatexExporter,
-}
+EXPORTERS = {"html", "latex"}
 
 
 def get_exporter(exporter_type=None):
@@ -33,11 +30,13 @@ def get_exporter(exporter_type=None):
     """
     if exporter_type is not None:
         exporter_type = exporter_type.lower()
-        assert exporter_type in EXPORTERS.keys(), f"{exporter_type} is not a valid PDF exporter"
+        assert exporter_type in EXPORTERS, f"{exporter_type} is not a valid PDF exporter"
 
-        if exporter_type == 'html' and shutil.which("wkhtmltopdf") is None:
-            raise WkhtmltopdfNotFoundError("PDF via HTML indicated but wkhtmltopdf not found")
+        if exporter_type == 'html':
+            if shutil.which("wkhtmltopdf") is None:
+                raise WkhtmltopdfNotFoundError("PDF via HTML indicated but wkhtmltopdf not found")
 
-        return EXPORTERS[exporter_type]
+            from .via_html import PDFViaHTMLExporter
+            return PDFViaHTMLExporter
 
     return PDFViaLatexExporter
