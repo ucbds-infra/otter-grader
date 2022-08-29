@@ -114,6 +114,7 @@ def expected_rmd_results():
                 "name": "Public Tests",
                 "output": "q1 results: All test cases passed!",
                 "visibility": "visible",
+                "status": "passed",
             },
             {
                 "max_score": 5,
