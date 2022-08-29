@@ -4,6 +4,7 @@
 
 * Fix Otter Grade Dockerfile per [#517](https://github.com/ucbds-infra/otter-grader/issues/517)
 * Fix display of Public Tests output on Gradescope due to new output format
+* Updated Otter Export to only import the HTML exporter and its dependencies when an HTML export is indicated per [#520](https://github.com/ucbds-infra/otter-grader/issues/520)
 
 **v4.0.0:**
 
