@@ -1,6 +1,6 @@
 # Changelog
 
-**v4.0.1 (Unreleased):**
+**v4.0.1:**
 
 * Fix Otter Grade Dockerfile per [#517](https://github.com/ucbds-infra/otter-grader/issues/517)
 * Fix display of Public Tests output on Gradescope due to new output format
