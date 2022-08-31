@@ -2,7 +2,7 @@
 
 **v4.0.2:**
 
-* Closed temporary file handle before removal when checking tests in `otter.Notebook.export`
+* Close temporary file handle before removal when checking tests in `otter.Notebook.export`
 
 **v4.0.1:**
 
