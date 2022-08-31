@@ -60,7 +60,7 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
     """
     dill = import_or_raise("dill")
 
-    _, results_path = tempfile.mkstemp(suffix=".pkl")
+    results_handle, results_path = tempfile.mkstemp(suffix=".pkl")
 
     try:
         command = [
@@ -83,6 +83,7 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
         return results
 
     finally:
+        os.close(results_handle)
         os.remove(results_path)
 
 
