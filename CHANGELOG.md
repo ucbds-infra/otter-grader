@@ -1,5 +1,9 @@
 # Changelog
 
+**v4.0.2:**
+
+* Closed temporary file handle before removal when checking tests in `otter.Notebook.export`
+
 **v4.0.1:**
 
 * Fix Otter Grade Dockerfile per [#517](https://github.com/ucbds-infra/otter-grader/issues/517)
