@@ -74,6 +74,10 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
         # run the command
         results = run(command, stdout=PIPE, stderr=PIPE)
 
+        # TODO: remove
+        print(results.stdout.decode("utf-8"))
+        print(results.stderr.decode("utf-8"))
+
         if results.stderr:
             raise RuntimeError(results.stderr)
 
