@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import requests
+import sys
 import tempfile
 import time
 import wrapt
@@ -64,7 +65,7 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
 
     try:
         command = [
-            "python3", "-m", "otter.check.validate_export",
+            sys.executable, "-m", "otter.check.validate_export",
             "--zip-path", zip_path,
             "--nb-arcname", nb_arcname,
             "--tests-dir", tests_dir,
