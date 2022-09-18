@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Fixed bu caused by unspecified encoding in Windows JSON loads per [#524](https://github.com/ucbds-infra/otter-grader/issues/524)
+
 **v4.0.1:**
 
 * Fix Otter Grade Dockerfile per [#517](https://github.com/ucbds-infra/otter-grader/issues/517)
