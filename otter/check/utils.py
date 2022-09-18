@@ -1,9 +1,7 @@
 """Utilities for Otter Check"""
 
-import hashlib
-import json
+import nbformat as nbf
 import os
-import requests
 import tempfile
 import time
 import wrapt
@@ -16,7 +14,7 @@ from subprocess import run, PIPE
 
 from .logs import EventType
 
-from ..utils import import_or_raise, NOTEBOOK_METADATA_KEY
+from ..utils import import_or_raise, NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
 
 
 def save_notebook(filename, timeout=10):
@@ -217,9 +215,7 @@ def list_available_tests(tests_dir, nb_path):
         if nb_path is None:
             raise ValueError("Tests directory does not exist and no notebook path provided")
 
-        with open(nb_path) as f:
-            nb = json.load(f)
-
+        nb = nbf.read(nb_path, as_version=NBFORMAT_VERSION)
         tests = list(nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"].keys())
 
     return sorted(tests)
