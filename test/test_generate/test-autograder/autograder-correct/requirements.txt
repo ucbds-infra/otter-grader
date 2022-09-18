@@ -12,6 +12,6 @@ nbconvert
 nbformat
 dill
 numpy
-otter-grader==4.0.1
+git+https://github.com/ucbds-infra/otter-grader.git@fcfb78cb3b97c588743469c774dda44df9f388d0
 
 tqdm
