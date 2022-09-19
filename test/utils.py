@@ -91,7 +91,7 @@ def assert_dirs_equal(dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_e
             [f for f in os.listdir(dir2) if not (os.path.isdir(os.path.join(dir2, f)) and f in ignore_dirs) \
                 and os.path.splitext(f)[1] not in variable_path_exts], 
         )
-        assert sorted(dir1_contents) == sorted(dir2_contents), f"{dir1} and {dir2} have different contents"
+        assert sorted(dir1_contents) == sorted(dir2_contents), f"{dir1} and {dir2} have different contents: {dir1_contents} != {dir2_contents}"
 
         # check that for each variable path ext, there are the same number of files in each dir
         # with that ext
