@@ -4,6 +4,7 @@
 
 * Close temporary file handle before removal when checking tests in `otter.Notebook.export`
 * Fixed bug caused by unspecified encoding in Windows JSON loads per [#524](https://github.com/ucbds-infra/otter-grader/issues/524)
+* Updated autograder zip `setup.sh` file and `r-base` version per [#514](https://github.com/ucbds-infra/otter-grader/issues/514)
 * Fix point value filtering for student tests in Otter Assign per [#503](https://github.com/ucbds-infra/otter-grader/issues/503)
 
 **v4.0.1:**
