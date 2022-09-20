@@ -2,6 +2,8 @@
 
 import nbformat as nbf
 import os
+import requests
+import sys
 import tempfile
 import time
 import wrapt
@@ -58,11 +60,11 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
     """
     dill = import_or_raise("dill")
 
-    _, results_path = tempfile.mkstemp(suffix=".pkl")
+    results_handle, results_path = tempfile.mkstemp(suffix=".pkl")
 
     try:
         command = [
-            "python3", "-m", "otter.check.validate_export",
+            sys.executable, "-m", "otter.check.validate_export",
             "--zip-path", zip_path,
             "--nb-arcname", nb_arcname,
             "--tests-dir", tests_dir,
@@ -71,6 +73,10 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
 
         # run the command
         results = run(command, stdout=PIPE, stderr=PIPE)
+
+        # TODO: remove
+        print(results.stdout.decode("utf-8"))
+        print(results.stderr.decode("utf-8"))
 
         if results.stderr:
             raise RuntimeError(results.stderr)
@@ -81,6 +87,7 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
         return results
 
     finally:
+        os.close(results_handle)
         os.remove(results_path)
 
 
