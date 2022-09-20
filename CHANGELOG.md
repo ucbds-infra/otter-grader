@@ -1,8 +1,9 @@
 # Changelog
 
-**v4.0.2:**
+**Unreleased:**
 
 * Close temporary file handle before removal when checking tests in `otter.Notebook.export`
+* Fixed bug caused by unspecified encoding in Windows JSON loads per [#524](https://github.com/ucbds-infra/otter-grader/issues/524)
 
 **v4.0.1:**
 
