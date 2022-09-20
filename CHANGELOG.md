@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Allow users to specify a Python version in Otter Generate and Otter Assign
+
 **v4.0.2:**
 
 * Close temporary file handle before removal when checking tests in `otter.Notebook.export`
