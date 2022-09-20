@@ -344,6 +344,9 @@ class AssignmentTestsManager:
 
             if not include_hidden:
                 test_info["test_cases"] = [tc for tc in test_info["test_cases"] if not tc.hidden]
+                if isinstance(test_info["points"], list):
+                    test_info["points"] = [p for tc, p in \
+                        zip(test_info["test_cases"], test_info["points"]) if not tc.hidden]
 
             test = \
                 self._format_test(test_info["name"], test_info["points"], test_info["test_cases"])
