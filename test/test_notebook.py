@@ -70,7 +70,7 @@ def test_check():
                         True
 
                 q2 - 2 result:
-                    Test case passed!
+                    ✅ Test case passed
         """).strip(),
         "q3": 'q3 results: All test cases passed!',
         "q4": 'q4 results: All test cases passed!',

@@ -90,7 +90,7 @@ class OKTestFile(TestFile):
         for i, test_case in enumerate(self.test_cases):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
             if passed:
-                result = 'Test case passed!'
+                result = '✅ Test case passed'
 
             self.test_case_results.append(TestCaseResult(
                 test_case = test_case,

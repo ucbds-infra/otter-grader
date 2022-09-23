@@ -74,7 +74,7 @@ def test_otter_check_script():
                                 True
 
                         q2 - 2 result:
-                            Test case passed!
+                            ✅ Test case passed
                     q3 results: All test cases passed!
                     q4 results: All test cases passed!
                     q5 results: All test cases passed!"""), \
@@ -132,7 +132,7 @@ def test_otter_check_notebook():
                                 True
 
                         q2 - 2 result:
-                            Test case passed!
+                            ✅ Test case passed
                     q3 results: All test cases passed!
                     q4 results: All test cases passed!
                     q5 results: All test cases passed!"""), \
