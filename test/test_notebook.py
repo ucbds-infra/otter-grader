@@ -56,6 +56,7 @@ def test_check():
         "q2": dedent("""\
             q2 results:
                 q2 - 1 result:
+                    ❌ Test case FAILED
                     Trying:
                         1 == 1
                     Expecting:

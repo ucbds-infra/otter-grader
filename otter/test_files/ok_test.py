@@ -91,6 +91,8 @@ class OKTestFile(TestFile):
             passed, result = run_doctest(self.name + ' ' + str(i), test_case.body, global_environment)
             if passed:
                 result = '✅ Test case passed'
+            else:
+                result = '❌ Test case FAILED\n' + result
 
             self.test_case_results.append(TestCaseResult(
                 test_case = test_case,
