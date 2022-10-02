@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Display emojis with test results to more clearly show which tests pass and which fail, as per [#533](https://github.com/ucbds-infra/otter-grader/pull/533).
+
 **v4.0.2:**
 
 * Close temporary file handle before removal when checking tests in `otter.Notebook.export`
