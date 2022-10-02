@@ -92,7 +92,7 @@ class OKTestFile(TestFile):
             if passed:
                 result = '✅ Test case passed'
             else:
-                result = '❌ Test case FAILED\n' + result
+                result = '❌ Test case failed\n' + result
 
             self.test_case_results.append(TestCaseResult(
                 test_case = test_case,

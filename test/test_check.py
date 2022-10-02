@@ -60,7 +60,7 @@ def test_otter_check_script():
                     q1 results: All test cases passed!
                     q2 results:
                         q2 - 1 result:
-                            ❌ Test case FAILED
+                            ❌ Test case failed
                             Trying:
                                 1 == 1
                             Expecting:
@@ -119,7 +119,7 @@ def test_otter_check_notebook():
                     q1 results: All test cases passed!
                     q2 results:
                         q2 - 1 result:
-                            ❌ Test case FAILED
+                            ❌ Test case failed
                             Trying:
                                 1 == 1
                             Expecting:
