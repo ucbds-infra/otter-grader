@@ -51,7 +51,17 @@ def run_doctest(name, doctest_string, global_environment):
     if result.failed == 0:
         return (True, '')
     else:
-        return False, runresults.getvalue()
+        from ..assign.assignment import Assignment
+        if Assignment().traceback_length == 'full':
+            return False, runresults.getvalue()
+        elif Assignment().traceback_length == 'assertion_msg':
+            err_msg = runresults.getvalue()
+            if 'AssertionError: ' in err_msg:
+                return False, err_msg[err_msg.index('AssertionError: '):]
+            else:
+                return False, ''
+        elif Assignment().traceback_length == 'none':
+            return False, ''
 
 
 class OKTestFile(TestFile):
