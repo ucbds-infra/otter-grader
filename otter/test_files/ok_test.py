@@ -49,7 +49,7 @@ def run_doctest(name, doctest_string, global_environment):
         result = doctestrunner.summarize(verbose=True)
     # An individual test can only pass or fail
     if result.failed == 0:
-        return (True, '')
+        return True, ''
     else:
         from ..assign.assignment import Assignment
         if Assignment().traceback_length == 'full':
