@@ -15,7 +15,7 @@ from .solutions import has_seed, SOLUTION_CELL_TAG, overwrite_seed_vars, strip_i
     strip_solutions_and_output
 from .tests_manager import AssignmentTestsManager
 from .utils import add_tag, add_assignment_name_to_notebook, AssignNotebookFormatException, \
-    get_source, is_cell_type, is_ignore_cell, remove_cell_ids
+    get_source, is_cell_type, is_ignore_cell, lock, remove_cell_ids
 
 
 class NotebookTransformer:
@@ -305,6 +305,10 @@ class NotebookTransformer:
 
             if has_seed(cell):
                 self.assignment.seed_required = True
+
+            # if this cell is part of the question text, lock it
+            if len(curr_block) == 1:
+                lock(cell)
 
             # this is just a normal cell so add it to transformed_cells
             transformed_cells.append(cell)
