@@ -1,6 +1,5 @@
 """Assignment creation tool for Otter-Grader"""
 
-import json
 import os
 import pathlib
 import warnings
@@ -18,7 +17,7 @@ LOGGER = loggers.get_logger(__name__)
 
 
 def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
-         debug=False, v0=False):
+         debug=False):
     """
     Runs Otter Assign on a master notebook.
 
@@ -31,17 +30,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
-        v0 (``bool``): whether to use Otter Assign Format v0 instead of v1
     """
-    if v0:
-        warnings.warn(
-            "The Otter Assign v0 format is now deprecated and will be removed in Otter v5.",
-            FutureWarning)
-
-        from .v0 import main as v0_main
-        return v0_main(master, result, no_pdfs=no_pdfs, no_run_tests=no_run_tests, username=username, 
-            password=password, debug=debug)
-
     LOGGER.debug(f"User-specified master path: {master}")
     LOGGER.debug(f"User-specified result path: {result}")
     master, result = pathlib.Path(os.path.abspath(master)), pathlib.Path(os.path.abspath(result))
