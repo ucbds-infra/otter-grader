@@ -9,6 +9,7 @@ import warnings
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "Dockerfile",
+    "otter/generate/__init__.py",
     "otter/generate/templates/python/requirements.txt",
     "otter/generate/templates/r/requirements.txt",
     "test/test_generate/test-autograder/autograder-correct/requirements.txt",

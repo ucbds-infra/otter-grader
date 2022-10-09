@@ -8,8 +8,10 @@ import re
 import yaml
 import zipfile
 
+from dataclasses import dataclass
 from glob import glob
 from jinja2 import Template
+from typing import List
 
 from .token import APIClient
 from .utils import zip_folder
@@ -24,6 +26,44 @@ MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.1
 OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "v1.2.0"  # this should match a release tag on GitHub
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
+
+
+@dataclass
+class CondaEnvironment:
+    
+    python_version: str
+
+    requirements: List[str]
+
+    def to_str(self):
+        environment = {
+            "name": OTTER_ENV_NAME,
+            "channels": ["defaults", "conda-forge"],
+            "dependencies": [
+                f"python={self.python_version}",
+                "pip",
+                "nb_conda_kernels",
+                {
+                    "pip": [
+                        "jupyter_client", 
+                        "ipykernel", 
+                        "matplotlib", 
+                        "pandas", 
+                        "ipywidgets", 
+                        "scipy", 
+                        "seaborn", 
+                        "sklearn", 
+                        "jinja2", 
+                        "nbconvert", 
+                        "nbformat", 
+                        "dill", 
+                        "numpy",
+                        "otter-grader==4.0.2",
+                    ],
+                },
+            ],
+        }
+        return yaml.safe_dump(environment, sort_keys=False, indent=2)
 
 
 LANGUAGE_BASED_CONFIGURATIONS = {
