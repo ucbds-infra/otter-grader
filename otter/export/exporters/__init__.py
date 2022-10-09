@@ -4,7 +4,6 @@ Exporters for Otter Export
 
 import shutil
 
-from .via_html import PDFViaHTMLExporter
 from .via_latex import PDFViaLatexExporter
 
 from ..utils import WkhtmltopdfNotFoundError
