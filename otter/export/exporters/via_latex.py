@@ -4,7 +4,9 @@ import nbconvert
 import os
 import warnings
 
-from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
+from textwrap import indent
+
+from .base_exporter import BaseExporter, ExportFailedException, NBCONVERT_6, TEMPLATE_DIR
 
 from ...utils import print_full_width
 
@@ -54,7 +56,6 @@ class PDFViaLatexExporter(BaseExporter):
             if not NBCONVERT_6:
                 latex_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
-        success = False
         pdf_exporter = nbconvert.PDFExporter()
         if not NBCONVERT_6:
             pdf_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
@@ -69,26 +70,19 @@ class PDFViaLatexExporter(BaseExporter):
             with open(dest, "wb") as output_file:
                 output_file.write(pdf_output[0])
 
-            success = True
-
-            if NBCONVERT_6:
-                nbconvert.TemplateExporter.template_name = orig_template_name
-
         except nbconvert.pdf.LatexFailed as error:
             if not xecjk and not no_xecjk:
-                success = cls.convert_notebook(nb_path, dest, xecjk=True, **kwargs)
+                cls.convert_notebook(nb_path, dest, xecjk=True, **kwargs)
 
-            elif not success:
-                print("There was an error generating your LaTeX; showing full error message:")
-                print_full_width("=")
-                print(error.output)
-                print_full_width("=")
+            else:
+                message = "There was an error generating your LaTeX; showing full error message:\n"
+                message += indent(error.output, "    ")
                 if xecjk:
-                    print("If the error above is related to xeCJK or fandol in LaTeX and you don't "
-                        "require this functionality, try running again with no_xecjk set to True "
-                        "or the --no-xecjk flag.")
+                    message += "\n\nIf the error above is related to xeCJK or fandol in LaTeX " \
+                        "and you don't require this functionality, try running again with " \
+                        "no_xecjk set to True or the --no-xecjk flag."
+                raise ExportFailedException(message)
 
-                if NBCONVERT_6:
-                    nbconvert.TemplateExporter.template_name = orig_template_name
-
-        return success
+        finally:
+            if NBCONVERT_6:
+                nbconvert.TemplateExporter.template_name = orig_template_name

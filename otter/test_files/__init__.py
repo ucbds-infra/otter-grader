@@ -89,6 +89,7 @@ class GradingResults:
         # self.results = {}
         self.output = None
         self.all_hidden = False
+        self.pdf_error = None
 
     def __repr__(self):
         return self.summary()
@@ -245,6 +246,15 @@ class GradingResults:
         """
         return self._plugin_data.get(plugin_name, default)
 
+    def set_pdf_error(self, error: Exception):
+        """
+        Set a PDF generation error to be displayed as a failed (0-point) test on Gradescope.
+
+        Args:
+            error (``Exception``): the error thrown
+        """
+        self.pdf_error = error
+
     def verify_against_log(self, log, ignore_hidden=True):
         """
         Verifies these scores against the results stored in this log using the results returned by 
@@ -345,6 +355,15 @@ class GradingResults:
             "output": self.summary(public_only=True),
             "status": "passed",
         })
+
+        # add PDF error test if indicated
+        if ag_config.warn_missing_pdf and self.pdf_error is not None:
+            output["tests"].append({
+                "name": "PDF Generation Failed",
+                "visibility": "visible",
+                "output": str(self.pdf_error),
+                "status": "failed",
+            })
 
         for test_name in self.test_files:
             test_file = self.get_result(test_name)
