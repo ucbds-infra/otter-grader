@@ -11,8 +11,15 @@ from .utils import has_begin, has_end, sub_end_for_new_page
 from ...utils import NBFORMAT_VERSION
 
 
-NBCONVERT_6 = int(nbconvert.__version__.split(".")[0]) >= 6    # for determining template inheritance
+NBCONVERT_6 = int(nbconvert.__version__.split(".")[0]) >= 6  # for determining template inheritance
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
+
+
+class ExportFailedException(Exception):
+    """
+    A generic error class for Otter Export to raise when an export fails.
+    """
+
 
 class BaseExporter(ABC):
     """
