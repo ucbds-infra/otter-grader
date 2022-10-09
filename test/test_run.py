@@ -58,7 +58,7 @@ def expected_results():
                 "name": "Public Tests",
                 "visibility": "visible",
                 "output": "q1 results: All test cases passed!\n\nq2 results:\n    q2 - 1 result:\n        ❌ Test case failed\n        Trying:\n            negate(True)\n        Expecting:\n            False\n        **********************************************************************\n        Line 2, in q2 0\n        Failed example:\n            negate(True)\n        Expected:\n            False\n        Got:\n            True\n\n    q2 - 2 result:\n        ❌ Test case failed\n        Trying:\n            negate(False)\n        Expecting:\n            True\n        **********************************************************************\n        Line 2, in q2 1\n        Failed example:\n            negate(False)\n        Expected:\n            True\n        Got:\n            False\n\nq3 results: All test cases passed!\n\nq4 results: All test cases passed!\n\nq6 results: All test cases passed!\n\nq7 results: All test cases passed!",
-                "status": "passed",
+                "status": "failed",
             },
             {
                 "name": "q1",
@@ -202,6 +202,30 @@ def test_pdf_generation_failure(get_config_path, load_config, expected_results):
 
     assert actual_results == expected_results, \
         f"Actual results did not matched expected:\n{actual_results}"
+
+
+def test_force_public_test_summary(get_config_path, load_config):
+    config = load_config()
+
+    def perform_test(show_hidden, force_public_test_summary, expect_summary):
+        config["show_hidden"] = show_hidden
+        config["force_public_test_summary"] = force_public_test_summary
+        with alternate_config(get_config_path(), config):
+            run_autograder(config['autograder_dir'])
+
+        with FILE_MANAGER.open("autograder/results/results.json") as f:
+            actual_results = json.load(f)
+
+        message = f"show_hidden={show_hidden}, force_public_test_summary={force_public_test_summary}, expect_summary={expect_summary}"
+        if expect_summary:
+            assert actual_results["tests"][0]["name"] == "Public Tests", message
+        else:
+            assert actual_results["tests"][0]["name"] != "Public Tests", message
+
+    perform_test(False, False, True)
+    perform_test(False, True, True)
+    perform_test(True, False, False)
+    perform_test(True, True, True)
 
 
 def test_script(load_config, expected_results):

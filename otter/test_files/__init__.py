@@ -158,6 +158,13 @@ class GradingResults:
         """
         return sum(tr.possible for tr in self.results.values())
 
+    @property
+    def passed_all_public(self):
+        """
+        ``bool``: whether all public tests in these results passed
+        """
+        return all(tr.passed_all_public for tr in self.results.values())
+
     def get_result(self, test_name):
         """
         Returns the ``TestFile`` corresponding to the test with name ``test_name``
@@ -349,12 +356,13 @@ class GradingResults:
             hidden_test_visibility = "visible"
 
         # start w/ summary of public tests
-        output["tests"].append({
-            "name": "Public Tests",
-            "visibility": "visible",
-            "output": self.summary(public_only=True),
-            "status": "passed",
-        })
+        if not ag_config.show_hidden or ag_config.force_public_test_summary:
+            output["tests"].append({
+                "name": "Public Tests",
+                "visibility": "visible",
+                "output": self.summary(public_only=True),
+                "status": "passed" if self.passed_all_public else "failed",
+            })
 
         # add PDF error test if indicated
         if ag_config.warn_missing_pdf and self.pdf_error is not None:

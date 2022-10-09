@@ -6,6 +6,8 @@
 * Allow users to specify a Python version in Otter Generate and Otter Assign
 * Round `results.json` point values to 5 decimal places per [#538](https://github.com/ucbds-infra/otter-grader/issues/538)
 * Optionally display PDF generation/submission failures to students via `results.json` per [#494](https://github.com/ucbds-infra/otter-grader/issues/494)
+* Added the `force_public_test_summary` key to the autograder config per [#539](https://github.com/ucbds-infra/otter-grader/issues/539)
+* Made the "Public Tests" section on Gradescope appear as failing when not all public tests passed per [#539](https://github.com/ucbds-infra/otter-grader/issues/539)
 
 **v4.0.2:**
 
