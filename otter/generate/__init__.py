@@ -26,6 +26,7 @@ MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.1
 OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "v1.2.0"  # this should match a release tag on GitHub
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
+GENERAL_TEMPLATE_DIR = os.path.join(TEMPLATE_DIR, "general")
 
 
 @dataclass
@@ -193,14 +194,13 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
     lang_config = LANGUAGE_BASED_CONFIGURATIONS[ag_config.lang]
 
-    template_dir = lang_config["template_dir"]
-
     templates = {}
-    for fn in os.listdir(template_dir):
-        fp = os.path.join(template_dir, fn)
-        if os.path.isfile(fp): # prevents issue w/ finding __pycache__ in template dirs
-            with open(fp) as f:
-                templates[fn] = Template(f.read())
+    for td in [GENERAL_TEMPLATE_DIR, lang_config["template_dir"]]:
+        for fn in os.listdir(td):
+            fp = os.path.join(td, fn)
+            if os.path.isfile(fp):  # prevents issue w/ finding __pycache__ in template dirs
+                with open(fp) as f:
+                    templates[fn] = Template(f.read())
 
     if python_version is not None:
         match = re.match(r"(\d+)\.(\d+)(\.\d+)?", python_version)
@@ -214,7 +214,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_branch": OTTR_BRANCH,
-        "channel_priority_strict": ag_config.channel_priority_strict, # TODO: why is this appearing in otter_config.json?
+        "channel_priority_strict": ag_config.channel_priority_strict, # TODO: remove from autograder config
         "has_r_requirements": False,
     }
 
@@ -274,7 +274,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
         zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))
 
-        # copy files into tmp
+        # copy files into zip file
         if len(files) > 0:
             for file in files:
                 full_fp = os.path.abspath(file)
@@ -289,5 +289,6 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
                 else:
                     raise ValueError(f"Could not find file or directory '{full_fp}'")
 
+    # TODO: remove when otter assign format v0 is removed
     if assignment is not None:
         assignment._otter_config = otter_config
