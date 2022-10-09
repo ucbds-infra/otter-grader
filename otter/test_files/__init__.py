@@ -158,6 +158,13 @@ class GradingResults:
         """
         return sum(tr.possible for tr in self.results.values())
 
+    @property
+    def passed_all_public(self):
+        """
+        ``bool``: whether all public tests in these results passed
+        """
+        return all(tr.passed_all_public for tr in self.results.values())
+
     def get_result(self, test_name):
         """
         Returns the ``TestFile`` corresponding to the test with name ``test_name``
@@ -354,7 +361,7 @@ class GradingResults:
                 "name": "Public Tests",
                 "visibility": "visible",
                 "output": self.summary(public_only=True),
-                "status": "passed",
+                "status": "passed" if self.passed_all_public else "failed",
             })
 
         # add PDF error test if indicated
