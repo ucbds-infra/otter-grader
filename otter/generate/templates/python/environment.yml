@@ -3,7 +3,7 @@ channels:
     - defaults
     - conda-forge
 dependencies:
-    - python=3.7
+    - python={{ python_version }}
     - pip
     - nb_conda_kernels
     - pip:

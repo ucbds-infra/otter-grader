@@ -192,6 +192,11 @@ class Assignment(fica.Config, Loggable):
         validator=fica.validators.choice(["default", "colab", "jupyterlite"])
     )
 
+    python_version: Optional[Union[str, int, float]] = fica.Key(
+        description="the version of Python to use in the grading image (must be 3.6+)",
+        default=None,
+    )
+
     lang: Optional[str] = None
     """the language of the assignment"""
 
@@ -311,3 +316,13 @@ class Assignment(fica.Config, Loggable):
             ``pathlib.Path``: the path to the student directory or the specified file within it
         """
         return self.result / "student" / path
+
+    def get_python_version(self) -> Optional[str]:
+        """
+        Returns the Python version indicated as a string (to avoid issues with YAML interpreting it
+        as a number) if one is present.
+
+        Returns:
+            ``str | None``: the version string or ``None`` if none is present
+        """
+        return str(self.python_version) if self.python_version is not None else None

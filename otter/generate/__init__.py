@@ -4,6 +4,7 @@ import json
 import os
 import pathlib
 import pkg_resources
+import re
 import yaml
 import zipfile
 
@@ -18,6 +19,7 @@ from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import load_default_file
 
 
+DEFAULT_PYTHON_VERSION = "3.7"
 MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "v1.2.0"  # this should match a release tag on GitHub
@@ -41,7 +43,7 @@ LANGUAGE_BASED_CONFIGURATIONS = {
 def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_config=False, 
          lang=None, requirements=None, no_requirements=False, overwrite_requirements=False, 
          environment=None, no_environment=False, username=None, password=None, token=None, files=[], 
-         assignment=None, plugin_collection=None):
+         assignment=None, plugin_collection=None, python_version=None):
     """
     Runs Otter Generate
 
@@ -64,6 +66,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         files (``list[str]``): list of file paths to add to the zip file
         assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
             if used with Otter Assign
+        python_version (``str | None``): the version of Python to use (installed with conda)
 
     Raises:
         ``FileNotFoundError``: if the specified Otter configuration JSON file could not be found
@@ -124,12 +127,20 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
             with open(fp) as f:
                 templates[fn] = Template(f.read())
 
+    if python_version is not None:
+        match = re.match(r"(\d+)\.(\d+)(\.\d+)?", python_version)
+        if not match:
+            raise ValueError("Invalid Python version specified")
+        if int(match.group(1)) < 3 or int(match.group(2)) < 6:
+            raise ValueError("Otter is only compatible with Python 3.6+")
+
     template_context = {
         "autograder_dir": ag_config.autograder_dir,
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_branch": OTTR_BRANCH,
         "channel_priority_strict": ag_config.channel_priority_strict,
+        "python_version": python_version or DEFAULT_PYTHON_VERSION,
     }
 
     if plugin_collection is None:
