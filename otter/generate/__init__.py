@@ -68,7 +68,7 @@ class CondaEnvironment:
                 "r-stringi",
             ])
 
-        pip_deps = self.requirements if self.overwrite_requirement else [
+        pip_deps = self.requirements if self.overwrite_requirements else [
             "datascience",
             "jupyter_client", 
             "ipykernel", 
