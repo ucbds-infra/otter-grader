@@ -11,10 +11,10 @@ import zipfile
 from dataclasses import dataclass
 from glob import glob
 from jinja2 import Template
-from typing import List
+from typing import Any, Dict, List, Optional
 
 from .token import APIClient
-from .utils import zip_folder
+from .utils import merge_conda_environments, zip_folder
 
 from ..plugins import PluginCollection
 from ..run.run_autograder.autograder_config import AutograderConfig
@@ -30,12 +30,18 @@ TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 
 @dataclass
 class CondaEnvironment:
-    
+
     python_version: str
+
+    is_r: bool
 
     requirements: List[str]
 
-    def to_str(self):
+    overwrite_requirements: bool
+
+    user_environment: Optional[Dict[str, Any]]
+
+    def to_dict(self):
         environment = {
             "name": OTTER_ENV_NAME,
             "channels": ["defaults", "conda-forge"],
@@ -43,27 +49,56 @@ class CondaEnvironment:
                 f"python={self.python_version}",
                 "pip",
                 "nb_conda_kernels",
-                {
-                    "pip": [
-                        "jupyter_client", 
-                        "ipykernel", 
-                        "matplotlib", 
-                        "pandas", 
-                        "ipywidgets", 
-                        "scipy", 
-                        "seaborn", 
-                        "sklearn", 
-                        "jinja2", 
-                        "nbconvert", 
-                        "nbformat", 
-                        "dill", 
-                        "numpy",
-                        "otter-grader==4.0.2",
-                    ],
-                },
             ],
         }
-        return yaml.safe_dump(environment, sort_keys=False, indent=2)
+
+        if self.is_r:
+            environment["dependencies"].extend([
+                "r-base>=4.0.0",
+                "r-essentials",
+                "r-devtools",
+                "libgit2",
+                "libgomp",
+                "r-gert",
+                "r-usethis",
+                "r-testthat",
+                "r-startup",
+                "r-rmarkdown",
+                "r-stringi",
+            ])
+
+        pip_deps = self.requirements if self.overwrite_requirement else [
+            "datascience",
+            "jupyter_client", 
+            "ipykernel", 
+            "matplotlib", 
+            "pandas", 
+            "ipywidgets", 
+            "scipy", 
+            "seaborn", 
+            "sklearn", 
+            "jinja2", 
+            "nbconvert", 
+            "nbformat", 
+            "dill",
+            "numpy",
+            "otter-grader==4.0.2",
+            *self.requirements,
+        ]
+
+        environment["dependencies"].append({"pip": pip_deps})
+
+        if self.is_r:
+            environment["dependencies"][-1]["pip"].append("rpy2")
+
+        if self.user_environment:
+            environment = merge_conda_environments(
+                self.user_environment, environment, OTTER_ENV_NAME)
+
+        return environment
+
+    def to_str(self):
+        return yaml.safe_dump(self.to_dict(), sort_keys=False, indent=2)
 
 
 LANGUAGE_BASED_CONFIGURATIONS = {
@@ -179,8 +214,8 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_branch": OTTR_BRANCH,
-        "channel_priority_strict": ag_config.channel_priority_strict,
-        "python_version": python_version or DEFAULT_PYTHON_VERSION,
+        "channel_priority_strict": ag_config.channel_priority_strict, # TODO: why is this appearing in otter_config.json?
+        "has_r_requirements": False,
     }
 
     if plugin_collection is None:
@@ -192,20 +227,29 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     plugin_collection.run("during_generate", otter_config, assignment)
 
     # open requirements if it exists
+    extra_requirements, r_requirements = [], None
     with load_default_file(requirements, lang_config["requirements_filename"], 
                            default_disabled=no_requirements,) as reqs:
-        template_context["other_requirements"] = reqs if reqs is not None else ""
-
-    template_context["overwrite_requirements"] = overwrite_requirements
+        if lang == "python" and reqs is not None:
+            extra_requirements = reqs.split("\n")
+        elif lang == "r":
+            r_requirements = reqs
+            template_context["has_r_requirements"] = True
 
     # open environment if it exists
-    # unlike requirements.txt, we will always overwrite, not append by default
+    user_environment = None
     with load_default_file(environment, "environment.yml", default_disabled=no_environment) as env_contents:
         template_context["other_environment"] = env_contents
         if env_contents is not None:
-            data = yaml.safe_load(env_contents)
-            data['name'] = template_context["otter_env_name"]
-            template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
+            user_environment = yaml.safe_load(env_contents)
+
+    conda_environment = CondaEnvironment(
+        python_version or DEFAULT_PYTHON_VERSION,
+        lang == "r",
+        extra_requirements,
+        overwrite_requirements,
+        user_environment,
+    )
 
     rendered = {}
     for fn, template in templates.items():
@@ -222,6 +266,11 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         pattern = lang_config["test_file_pattern"]
         for file in glob(os.path.join(tests_dir, pattern)):
             zf.write(file, arcname=os.path.join(arc_test_dir, os.path.basename(file)))
+
+        if r_requirements is not None:
+            zf.writestr("requirements.r", r_requirements)
+
+        zf.writestr("environment.yml", conda_environment.to_str())
 
         zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))
 

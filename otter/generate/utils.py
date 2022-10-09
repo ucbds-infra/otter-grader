@@ -27,3 +27,52 @@ def zip_folder(zf, path, prefix="", exclude=[]):
 
         elif os.path.isdir(child_path):
             zip_folder(zf, child_path, prefix=os.path.join(prefix, parent_basename))
+
+
+def _get_dep_name(d):
+    if "+" in d:
+        return d
+    return d.split(">")[0].split("<")[0].split("=")[0]
+
+
+# TODO: unit test this
+def merge_conda_environments(e1, e2, name):
+    """
+    """
+    e = {"name": name, "dependencies": []}
+    e["channels"] = e1.get("channels", [])
+    e["channels"].extend([c for c in e2.get("channels", []) if c not in e["channels"]])
+
+    seen_deps, dicts = set(), []
+
+    def handle_dep(d, target):
+        if isinstance(d, dict):
+            dicts.append(d)
+            return
+        if not isinstance(d, str):
+            raise TypeError(f"Value of invalid type in dependencies list: {d}")
+        dep_name = _get_dep_name(d)
+        if dep_name not in seen_deps:
+            seen_deps.add(dep_name)
+            target.append(d)
+
+    for ei in [e1, e2]:
+        for d in ei["dependencies"]:
+            handle_dep(d, e["dependencies"])
+
+    if len(dicts) > 2:
+        raise ValueError("Too many dictionaries found in environment dependencies")
+
+    if len(dicts) == 1:
+        e["dependencies"].append(dicts[0])
+
+    elif len(dicts) == 2:
+        target = []
+        e["dependencies"].append({"pip": target})
+        for di in dicts:
+            if set(di.keys()) != {"pip"}:
+                raise ValueError("Dictionaries should only contain the pip key")
+            for d in di["pip"]:
+                handle_dep(d, target)
+
+    return e

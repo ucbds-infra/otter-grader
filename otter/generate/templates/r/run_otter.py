@@ -1,9 +1,4 @@
-"""
-Runs Otter on Gradescope
-"""
-
-import os
-import subprocess
+"""Runs Otter-Grader's autograding process"""
 
 from otter.run.run_autograder import main as run_autograder
 

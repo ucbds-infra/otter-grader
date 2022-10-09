@@ -30,7 +30,8 @@ fi
 # install dependencies with conda
 {% if channel_priority_strict %}conda config --set channel_priority strict
 {% endif %}conda env create -f {{ autograder_dir }}/source/environment.yml
-conda run -n {{ otter_env_name }} Rscript {{ autograder_dir }}/source/requirements.r
+{% if has_r_requirements %}conda run -n {{ otter_env_name }} Rscript {{ autograder_dir }}/source/requirements.r
+{% endif %}
 
 # set conda shell
 conda init --all
