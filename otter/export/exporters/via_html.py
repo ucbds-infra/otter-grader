@@ -10,7 +10,7 @@ from PyPDF2 import PdfFileMerger
 from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
 from .utils import notebook_pdf_generator
 
-from ..utils import import_or_raise
+from ...utils import import_or_raise
 
 
 class PDFViaHTMLExporter(BaseExporter):
