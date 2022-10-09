@@ -182,6 +182,7 @@ class AbstractLanguageRunner(ABC):
         Returns:
             ``str``: the path to the generated PDF
         """
+        ...
 
     @abstractmethod
     def run(self):
