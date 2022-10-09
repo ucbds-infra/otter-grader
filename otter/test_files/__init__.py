@@ -349,12 +349,13 @@ class GradingResults:
             hidden_test_visibility = "visible"
 
         # start w/ summary of public tests
-        output["tests"].append({
-            "name": "Public Tests",
-            "visibility": "visible",
-            "output": self.summary(public_only=True),
-            "status": "passed",
-        })
+        if not ag_config.show_hidden or ag_config.force_public_test_summary:
+            output["tests"].append({
+                "name": "Public Tests",
+                "visibility": "visible",
+                "output": self.summary(public_only=True),
+                "status": "passed",
+            })
 
         # add PDF error test if indicated
         if ag_config.warn_missing_pdf and self.pdf_error is not None:

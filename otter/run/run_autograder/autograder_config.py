@@ -155,3 +155,9 @@ class AutograderConfig(fica.Config):
             "to students whether a PDF was found/generated for this assignment",
         default=False,
     )
+
+    force_public_test_summary = fica.Key(
+        description="whether to show a summary of public test case results when show_hidden is " \
+            "true",
+        default=False,
+    )

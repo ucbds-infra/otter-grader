@@ -204,6 +204,50 @@ def test_pdf_generation_failure(get_config_path, load_config, expected_results):
         f"Actual results did not matched expected:\n{actual_results}"
 
 
+def test_force_public_test_summary(get_config_path, load_config):
+    config = load_config()
+
+    config["show_hidden"] = False
+    config["force_public_test_summary"] = False
+    with alternate_config(get_config_path(), config):
+        run_autograder(config['autograder_dir'])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    assert actual_results["tests"][0]["name"] == "Public Tests"
+
+    config["show_hidden"] = False
+    config["force_public_test_summary"] = True
+    with alternate_config(get_config_path(), config):
+        run_autograder(config['autograder_dir'])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    assert actual_results["tests"][0]["name"] == "Public Tests"
+
+    config["show_hidden"] = True
+    config["force_public_test_summary"] = False
+    with alternate_config(get_config_path(), config):
+        run_autograder(config['autograder_dir'])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    assert actual_results["tests"][0]["name"] != "Public Tests"
+
+    config["show_hidden"] = True
+    config["force_public_test_summary"] = True
+    with alternate_config(get_config_path(), config):
+        run_autograder(config['autograder_dir'])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    assert actual_results["tests"][0]["name"] == "Public Tests"
+
+
 def test_script(load_config, expected_results):
     config = load_config()
     nb_path = FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb")
