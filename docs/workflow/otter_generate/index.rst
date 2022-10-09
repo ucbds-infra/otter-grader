@@ -152,7 +152,8 @@ Autosubmission of Notebook PDFs
 Otter Generate allows instructors to automatically generate PDFs of students' notebooks and upload 
 these as submissions to a separate Gradescope assignment. This requires a Gradescope token, for 
 which you will be prompted to enter your Gradescope account credentials. Otter Generate also needs 
-the course ID and assignment ID of the assignment to which PDFs should be submitted. This 
+the course ID and assignment ID of the assignment to which PDFs should be submitted—a separate 
+assignment from your autograder assignment of type "Homework / Problem Set." This 
 information can be gathered from the assignment URL on Gradescope:
 
 .. code-block::

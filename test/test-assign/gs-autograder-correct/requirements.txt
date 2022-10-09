@@ -12,4 +12,4 @@ nbconvert
 nbformat
 dill
 numpy
-otter-grader==4.0.1
+otter-grader==4.0.2
