@@ -371,8 +371,8 @@ class GradingResults:
 
             output["tests"].append({
                 "name": test_file.name,
-                "score": score,
-                "max_score": possible,
+                "score": round(score, 5),
+                "max_score": round(possible, 5),
                 "visibility": hidden_test_visibility,
                 "output": test_file.summary(),
             })

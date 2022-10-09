@@ -54,7 +54,8 @@ manually.
 ``environment.yml``
 -------------------
 
-This file specifies the conda environment that Otter creates in ``setup.sh``.
+This file specifies the conda environment that Otter creates in ``setup.sh``. By default, it uses
+Python 3.7, but this can be changed using the ``--python-version`` flag to Otter Generate.
 
 .. literalinclude:: ../../../otter/generate/templates/r/environment.yml
 
