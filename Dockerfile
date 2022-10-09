@@ -52,5 +52,5 @@ RUN mkdir /autograder
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-RUN pip install otter-grader==4.0.2
+RUN pip install git+https://github.com/ucbds-infra/otter-grader.git@c1ab04fd05f1b1d311715e55f2e6b54fec88c2b6
 RUN Rscript -e "install.packages('ottr', dependencies=TRUE, repos='http://cran.us.r-project.org')"
