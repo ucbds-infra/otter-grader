@@ -159,5 +159,5 @@ class AutograderConfig(fica.Config):
     force_public_test_summary = fica.Key(
         description="whether to show a summary of public test case results when show_hidden is " \
             "true",
-        default=False,
+        default=True,
     )
