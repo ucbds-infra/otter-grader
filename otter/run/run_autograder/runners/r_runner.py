@@ -1,7 +1,6 @@
 """Autograder runner for R assignments"""
 
 import copy
-import json
 import nbformat as nbf
 import os
 import re
@@ -163,66 +162,34 @@ class RRunner(AbstractLanguageRunner):
 
         return scripts[0]
 
-    def write_pdf(self):
-        """
-        Generate a PDF of a submission using the configurations in ``self.ag_config`` and return the
-        path to the PDF.
-        """
-        try:
-            nbs = glob("*.ipynb")
-            if nbs:
-                subm_path = nbs[0]
-                ipynb = True
+    def write_pdf(self, _):
+        # NOTE: this method ignores the submission_path argument, and instead resolves it again
+        # manually
+        # TODO: de-deduplicate this path resolution logic with resolve_submission_path
+        nbs = glob("*.ipynb")
+        if nbs:
+            subm_path = nbs[0]
+            ipynb = True
+
+        else:
+            rmds = glob("*.Rmd")
+            if rmds:
+                subm_path = rmds[0]
+                ipynb = False
 
             else:
-                rmds = glob("*.Rmd")
-                if rmds:
-                    subm_path = rmds[0]
-                    ipynb = False
+                raise OtterRuntimeError("Could not find a file that can be converted to a PDF")
 
-                else:
-                    raise OtterRuntimeError("Could not find a file that can be converted to a PDF")
+        pdf_path = os.path.splitext(subm_path)[0] + ".pdf"
+        if ipynb:
+            export_notebook(
+                subm_path, dest=pdf_path, filtering=self.ag_config.filtering, 
+                pagebreaks=self.ag_config.pagebreaks, exporter_type="latex")
 
-            pdf_path = os.path.splitext(subm_path)[0] + ".pdf"
-            if ipynb:
-                export_notebook(
-                    subm_path, dest=pdf_path, filtering=self.ag_config.filtering, 
-                    pagebreaks=self.ag_config.pagebreaks, exporter_type="latex")
-
-            else:
-                knit_rmd_file(subm_path, pdf_path)
-
-        except Exception as e:
-            print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
+        else:
+            knit_rmd_file(subm_path, pdf_path)
 
         return pdf_path
-
-    # TODO
-    def submit_pdf(self, client, pdf_path):
-        """
-        Upload a PDF to a Gradescope assignment for manual grading.
-
-        Args:
-            client (``otter.generate.token.APIClient``): the Gradescope client
-            pdf_path (``str``): path to the PDF
-        """
-        try:
-            # get student email
-            with open("../submission_metadata.json", encoding="utf-8") as f:
-                metadata = json.load(f)
-
-            student_emails = []
-            for user in metadata["users"]:
-                student_emails.append(user["email"])
-
-            for student_email in student_emails:
-                client.upload_pdf_submission(
-                    self.ag_config.course_id, self.ag_config.assignment_id, student_email, pdf_path)
-
-            print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
-
-        except Exception as e:
-            print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
 
     def run(self):
         os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH")
@@ -244,10 +211,7 @@ class RRunner(AbstractLanguageRunner):
             scores = GradingResults.from_ottr_json(output)
 
             if generate_pdf:
-                pdf_path = self.write_pdf()
-
-                if has_token:
-                    self.submit_pdf(client, pdf_path)
+                self.write_and_maybe_submit_pdf(client, None, has_token, scores)
 
         # delete the script if necessary
         if self.subm_path_deletion_required:
