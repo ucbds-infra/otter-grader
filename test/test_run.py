@@ -207,45 +207,25 @@ def test_pdf_generation_failure(get_config_path, load_config, expected_results):
 def test_force_public_test_summary(get_config_path, load_config):
     config = load_config()
 
-    config["show_hidden"] = False
-    config["force_public_test_summary"] = False
-    with alternate_config(get_config_path(), config):
-        run_autograder(config['autograder_dir'])
+    def perform_test(show_hidden, force_public_test_summary, expect_summary):
+        config["show_hidden"] = show_hidden
+        config["force_public_test_summary"] = force_public_test_summary
+        with alternate_config(get_config_path(), config):
+            run_autograder(config['autograder_dir'])
 
-    with FILE_MANAGER.open("autograder/results/results.json") as f:
-        actual_results = json.load(f)
+        with FILE_MANAGER.open("autograder/results/results.json") as f:
+            actual_results = json.load(f)
 
-    assert actual_results["tests"][0]["name"] == "Public Tests"
+        message = f"show_hidden={show_hidden}, force_public_test_summary={force_public_test_summary}, expect_summary={expect_summary}"
+        if expect_summary:
+            assert actual_results["tests"][0]["name"] == "Public Tests", message
+        else:
+            assert actual_results["tests"][0]["name"] != "Public Tests", message
 
-    config["show_hidden"] = False
-    config["force_public_test_summary"] = True
-    with alternate_config(get_config_path(), config):
-        run_autograder(config['autograder_dir'])
-
-    with FILE_MANAGER.open("autograder/results/results.json") as f:
-        actual_results = json.load(f)
-
-    assert actual_results["tests"][0]["name"] == "Public Tests"
-
-    config["show_hidden"] = True
-    config["force_public_test_summary"] = False
-    with alternate_config(get_config_path(), config):
-        run_autograder(config['autograder_dir'])
-
-    with FILE_MANAGER.open("autograder/results/results.json") as f:
-        actual_results = json.load(f)
-
-    assert actual_results["tests"][0]["name"] != "Public Tests"
-
-    config["show_hidden"] = True
-    config["force_public_test_summary"] = True
-    with alternate_config(get_config_path(), config):
-        run_autograder(config['autograder_dir'])
-
-    with FILE_MANAGER.open("autograder/results/results.json") as f:
-        actual_results = json.load(f)
-
-    assert actual_results["tests"][0]["name"] == "Public Tests"
+    perform_test(False, False, True)
+    perform_test(False, True, True)
+    perform_test(True, False, False)
+    perform_test(True, True, True)
 
 
 def test_script(load_config, expected_results):
