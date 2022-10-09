@@ -1,5 +1,6 @@
 """Abstract test objects for providing a schema to write and parse test cases"""
 
+import random
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, replace
 from textwrap import indent
@@ -72,13 +73,14 @@ class TestFile(ABC):
 
     def _repr_html_(self):
         if self.passed_all:
+            all_passed_emoji = random.choice(['🍀', '🎉', '🌈', '🙌', '🚀', '🌟', '✨', '💯'])
             if any(tcr.test_case.success_message is not None for tcr in self.test_case_results):
-                ret = f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed!</p>"
+                ret = f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed! {all_passed_emoji}</p>"
                 for tcr in self.test_case_results:
                     if tcr.test_case.success_message is not None:
                         ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.success_message}</p>"
                 return ret
-            return f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed!</p>"
+            return f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed! {all_passed_emoji}</p>"
         else:
             ret = f"<p><strong style='color: red;'><pre style='display: inline;'>{self.name}</pre> results:</strong></p>"
             for tcr in self.test_case_results:
