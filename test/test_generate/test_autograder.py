@@ -93,3 +93,5 @@ def test_lang_r():
 
     with unzip_to_temp(FILE_MANAGER.get_path("autograder.zip")) as unzipped_dir:
         assert_dirs_equal(unzipped_dir, FILE_MANAGER.get_path("autograder-r-correct"))
+
+# TODO: test R with requirements.r
