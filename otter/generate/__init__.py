@@ -54,6 +54,7 @@ class CondaEnvironment:
         }
 
         if self.is_r:
+            environment["channels"].append("r")
             environment["dependencies"].extend([
                 "r-base>=4.0.0",
                 "r-essentials",

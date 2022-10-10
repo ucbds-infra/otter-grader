@@ -2,6 +2,7 @@ name: otter-env
 channels:
   - defaults
   - conda-forge
+  - r
 dependencies:
   - python=3.7
   - pip
