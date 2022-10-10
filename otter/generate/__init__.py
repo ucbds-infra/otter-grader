@@ -103,16 +103,21 @@ class CondaEnvironment:
         # return yaml.safe_dump(self.to_dict(), sort_keys=False, indent=2)
 
 
+COMMON_TEMPLATES = [
+    os.path.join(TEMPLATE_DIR, "common", "run_autograder"),
+    os.path.join(TEMPLATE_DIR, "common", "run_otter.py"),
+]
+
 LANGUAGE_BASED_CONFIGURATIONS = {
     "python": {
         "test_file_pattern": "*.py",
         "requirements_filename": "requirements.txt",
-        "template_dir": os.path.join(TEMPLATE_DIR, "python"),
+        "templates": [*COMMON_TEMPLATES, os.path.join(TEMPLATE_DIR, "python", "setup.sh")]
     },
     "r": {
         "test_file_pattern": "*.[Rr]",
         "requirements_filename": "requirements.R",
-        "template_dir": os.path.join(TEMPLATE_DIR, "r"),
+        "templates": [*COMMON_TEMPLATES, os.path.join(TEMPLATE_DIR, "r", "setup.sh")]
     },
 }
 
@@ -196,12 +201,10 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     lang_config = LANGUAGE_BASED_CONFIGURATIONS[ag_config.lang]
 
     templates = {}
-    for td in [GENERAL_TEMPLATE_DIR, lang_config["template_dir"]]:
-        for fn in os.listdir(td):
-            fp = os.path.join(td, fn)
-            if os.path.isfile(fp):  # prevents issue w/ finding __pycache__ in template dirs
-                with open(fp) as f:
-                    templates[fn] = Template(f.read())
+    for template_path in lang_config["templates"]:
+        fn = os.path.basename(template_path)
+        with open(template_path) as f:
+            templates[fn] = Template(f.read())
 
     if python_version is not None:
         match = re.match(r"(\d+)\.(\d+)(\.\d+)?", python_version)
