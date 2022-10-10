@@ -18,7 +18,7 @@ from .utils import merge_conda_environments, zip_folder
 
 from ..plugins import PluginCollection
 from ..run.run_autograder.autograder_config import AutograderConfig
-from ..utils import load_default_file
+from ..utils import dump_yaml, load_default_file
 
 
 DEFAULT_PYTHON_VERSION = "3.7"
@@ -99,7 +99,8 @@ class CondaEnvironment:
         return environment
 
     def to_str(self):
-        return yaml.safe_dump(self.to_dict(), sort_keys=False, indent=2)
+        return dump_yaml(self.to_dict(), indent=2)
+        # return yaml.safe_dump(self.to_dict(), sort_keys=False, indent=2)
 
 
 LANGUAGE_BASED_CONFIGURATIONS = {
@@ -230,11 +231,12 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     extra_requirements, r_requirements = [], None
     with load_default_file(requirements, lang_config["requirements_filename"], 
                            default_disabled=no_requirements,) as reqs:
-        if lang == "python" and reqs is not None:
-            extra_requirements = reqs.split("\n")
-        elif lang == "r":
-            r_requirements = reqs
-            template_context["has_r_requirements"] = True
+        if reqs is not None:
+            if ag_config.lang == "python":
+                extra_requirements = [l for l in reqs.split("\n") if l.strip() and not l.strip().startswith("#")]
+            elif ag_config.lang == "r":
+                r_requirements = reqs
+                template_context["has_r_requirements"] = True
 
     # open environment if it exists
     user_environment = None
@@ -245,7 +247,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
     conda_environment = CondaEnvironment(
         python_version or DEFAULT_PYTHON_VERSION,
-        lang == "r",
+        ag_config.lang == "r",
         extra_requirements,
         overwrite_requirements,
         user_environment,

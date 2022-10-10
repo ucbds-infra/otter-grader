@@ -39,9 +39,11 @@ def _get_dep_name(d):
 def merge_conda_environments(e1, e2, name):
     """
     """
-    e = {"name": name, "dependencies": []}
-    e["channels"] = e1.get("channels", [])
+    e = {"name": name, "channels": e1.get("channels", []), "dependencies": []}
     e["channels"].extend([c for c in e2.get("channels", []) if c not in e["channels"]])
+
+    if not e["channels"]:
+        e.pop("channels")
 
     seen_deps, dicts = set(), []
 

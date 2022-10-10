@@ -9,8 +9,8 @@ import re
 import string
 import shutil
 import tempfile
+import yaml
 
-from collections.abc import Mapping
 from contextlib import contextmanager, redirect_stdout
 from functools import lru_cache
 from IPython import get_ipython
@@ -438,3 +438,22 @@ def import_or_raise(module):
         return importlib.import_module(module)
     except:
         raise ImportError(f"Could not import required module: {module}")
+
+
+class _CorrectIndentationDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, *args, **kwargs):
+        return super().increase_indent(flow=flow, indentless=False)
+
+
+def dump_yaml(o, **kwargs):
+    """
+    Dump an object to a YAML string using the ``_CorrectIndentationDumper`` dumper.
+
+    Args:
+        o (``object``): the object to dump
+        **kwargs: additional keyword arguments passed to ``yaml.dump``
+
+    Returns:
+        ``str``: the YAML representation of ``o``
+    """
+    return yaml.dump(o, sort_keys=False, Dumper=_CorrectIndentationDumper, **kwargs)
