@@ -8,7 +8,8 @@ import os
 import pytest
 import re
 
-from contextlib import nullcontext
+from contextlib import contextmanager, nullcontext
+from unittest import mock
 
 from otter.run.run_autograder import main as run_autograder
 from otter.run.run_autograder.utils import OtterRuntimeError
@@ -49,7 +50,7 @@ def correct_cwd_on_exit():
     os.chdir(cwd)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def expected_results():
     return {
         "tests": [
@@ -57,7 +58,7 @@ def expected_results():
                 "name": "Public Tests",
                 "visibility": "visible",
                 "output": "q1 results: All test cases passed!\n\nq2 results:\n    q2 - 1 result:\n        ❌ Test case failed\n        Trying:\n            negate(True)\n        Expecting:\n            False\n        **********************************************************************\n        Line 2, in q2 0\n        Failed example:\n            negate(True)\n        Expected:\n            False\n        Got:\n            True\n\n    q2 - 2 result:\n        ❌ Test case failed\n        Trying:\n            negate(False)\n        Expecting:\n            True\n        **********************************************************************\n        Line 2, in q2 1\n        Failed example:\n            negate(False)\n        Expected:\n            True\n        Got:\n            False\n\nq3 results: All test cases passed!\n\nq4 results: All test cases passed!\n\nq6 results: All test cases passed!\n\nq7 results: All test cases passed!",
-                "status": "passed",
+                "status": "failed",
             },
             {
                 "name": "q1",
@@ -127,6 +128,17 @@ def expected_rmd_results():
     }
 
 
+@contextmanager
+def alternate_config(config_path, new_config):
+    with open(config_path) as f:
+        contents = f.read()
+    with open(config_path, "w") as f:
+        json.dump(new_config, f)
+    yield
+    with open(config_path, "w") as f:
+        f.write(contents)
+
+
 def get_expected_error_results(error):
     return {
         "score": 0,
@@ -141,10 +153,17 @@ def get_expected_error_results(error):
 
 
 @pytest.fixture
-def load_config():
-    def load_config_file(rmd=False):
+def get_config_path():
+    def do_get_config_path(rmd=False):
         dirname = "autograder" if not rmd else "rmd-autograder"
-        with FILE_MANAGER.open(f"{dirname}/source/otter_config.json") as f:
+        return FILE_MANAGER.get_path(f"{dirname}/source/otter_config.json")
+    return do_get_config_path
+
+
+@pytest.fixture
+def load_config(get_config_path):
+    def load_config_file(rmd=False):
+        with open(get_config_path(rmd=rmd)) as f:
             return json.load(f)
     return load_config_file
 
@@ -158,6 +177,55 @@ def test_notebook(load_config, expected_results):
 
     assert actual_results == expected_results, \
         f"Actual results did not matched expected:\n{actual_results}"
+
+
+def test_pdf_generation_failure(get_config_path, load_config, expected_results):
+    config = load_config()
+    config["warn_missing_pdf"] = True
+    config["token"] = "abc123"
+
+    expected_results["tests"].insert(1, {
+        "name": "PDF Generation Failed",
+        "visibility": "visible",
+        "output": "nu-uh",
+        "status": "failed",
+    })
+
+    with alternate_config(get_config_path(), config):
+        with mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as \
+                mocked_export:
+            mocked_export.side_effect = ValueError("nu-uh")
+            run_autograder(config['autograder_dir'])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    assert actual_results == expected_results, \
+        f"Actual results did not matched expected:\n{actual_results}"
+
+
+def test_force_public_test_summary(get_config_path, load_config):
+    config = load_config()
+
+    def perform_test(show_hidden, force_public_test_summary, expect_summary):
+        config["show_hidden"] = show_hidden
+        config["force_public_test_summary"] = force_public_test_summary
+        with alternate_config(get_config_path(), config):
+            run_autograder(config['autograder_dir'])
+
+        with FILE_MANAGER.open("autograder/results/results.json") as f:
+            actual_results = json.load(f)
+
+        message = f"show_hidden={show_hidden}, force_public_test_summary={force_public_test_summary}, expect_summary={expect_summary}"
+        if expect_summary:
+            assert actual_results["tests"][0]["name"] == "Public Tests", message
+        else:
+            assert actual_results["tests"][0]["name"] != "Public Tests", message
+
+    perform_test(False, False, True)
+    perform_test(False, True, True)
+    perform_test(True, False, False)
+    perform_test(True, True, True)
 
 
 def test_script(load_config, expected_results):
