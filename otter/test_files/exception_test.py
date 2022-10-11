@@ -164,11 +164,11 @@ class ExceptionTestFile(TestFile):
         test_case_results = []
         for tc in self.test_cases:
             test_case = tc.body
-            passed, message = True, "Test case passed!"
+            passed, message = True, "✅ Test case passed"
             try:
                 test_case.call_func(global_environment)
             except Exception as e:
-                passed, message = False, self._generate_error_message(e)
+                passed, message = False, "❌ Test case failed\n" + self._generate_error_message(e)
 
             test_case_results.append(TestCaseResult(test_case=tc, message=message, passed=passed))
 
