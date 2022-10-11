@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v4.1.0:**
 
 * Display emojis with test results to more clearly show which tests pass and which fail, as per [#533](https://github.com/ucbds-infra/otter-grader/pull/533).
 * Allow users to specify a Python version in Otter Generate and Otter Assign
