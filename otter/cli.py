@@ -140,7 +140,7 @@ defaults = grade.__kwdefaults__
 @click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
 
 # other settings and optional arguments
-@click.option("--containers", type=click.INT, help="Specify number of containers to run in parallel")
+@click.option("--containers", default=defaults["containers"], type=click.INT, help="Specify number of containers to run in parallel")
 @click.option("--image", default=defaults["image"], help="Custom docker image to run on")
 @click.option("--timeout", type=click.INT, help="Submission execution timeout in seconds")
 @click.option("--no-network", is_flag=True, help="Disable networking in the containers")

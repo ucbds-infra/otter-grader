@@ -1,64 +1,75 @@
 """Local grading of submissions in Docker containers for Otter-Grader"""
 
 import os
-import pandas as pd
-import re
 import shutil
 import tempfile
 
-from .containers import launch_grade
+from .containers import launch_containers
 from .utils import merge_csv, prune_images
 
 from ..utils import assert_path_exists, loggers
 
 
-_ALLOWED_EXTENSIONS = ["ipynb", "py", "Rmd", "R", "r"]
+_ALLOWED_EXTENSIONS = ["ipynb", "py", "Rmd", "R", "r", "zip"]
 LOGGER = loggers.get_logger(__name__)
 
 
-def main(*, path="./", output_dir="./", autograder="./autograder.zip", containers=None, 
-         ext="ipynb", no_kill=False, debug=False, zips=False, image="ucbdsinfra/otter-grader", 
-         pdfs=False, verbose=False, prune=False, force=False, timeout=None, no_network=False):
+def main(
+    *,
+    path: str = "./",
+    output_dir: str = "./",
+    autograder: str = "./autograder.zip",
+    containers: int = 4, 
+    ext: str = "ipynb",
+    no_kill: bool = False,
+    image: str = "ubuntu:22.04", 
+    pdfs: bool = False,
+    prune: bool = False,
+    force: bool = False,
+    timeout: bool = None,
+    no_network: bool = False,
+):
     """
-    Runs Otter Grade
+    Run Otter Grade.
 
-    Grades a directory of submissions in parallel Docker containers. Results are outputted as a CSV file
-    called ``final_grades.csv``. If ``prune`` is ``True``, Otter's dangling grading images are pruned 
-    and the program exits.
+    Grades a directory of submissions in parallel Docker containers. Results are written as a CSV
+    file called ``final_grades.csv`` in ``output_dir``. If ``pdfs`` is true, the PDFs generated
+    inside the Docker containers are copied into a subdirectory of ``output_dir`` called
+    ``submission_pdfs``.
+    
+    If ``prune`` is true, Otter's dangling grading images are pruned and the program exits.
 
     Args:
         path (``str``): path to directory of submissions
-        output_dir (``str``): directory in which to write ``final_grades.csv``
-        autograder (``str``): path to Otter autograder configuration zip file
+        output_dir (``str``): path to directory where output should be written
+        autograder (``str``): path to an Otter autograder configuration zip file
         containers (``int``): number of containers to run in parallel
-        ext (``str``): the submission file extension for globbing
+        ext (``str``): the submission file extension (to be used in a glob pattern)
         no_kill (``bool``): whether to keep containers after grading is finished
-        zips (``bool``): whether the submissions are Otter-exported zip files
-        image (``str``): base image from which to build grading image
+        image (``str``): a Docker image tag to use as the base image for the grading image
         pdfs (``bool``): whether to copy notebook PDFs out of the containers
         prune (``bool``): whether to prune the grading images; if true, no grading is performed
         force (``bool``): whether to force-prune the images (do not ask for confirmation)
-        timeout (``int``): timeout in seconds for each container
+        timeout (``int``): an execution timeout in seconds for each container
         no_network (``bool``): whether to disable networking in the containers
 
     Raises:
-        ``AssertionError``: if invalid arguments are provided
+        ``FileNotFoundError``: if a provided directory or file doesn't exist
+        ``ValueError``: if an unsupported extension is passed to ``ext``
     """
     if prune:
         prune_images(force=force)
         return
 
-    # if path leads to single file this indicates
-    # the case and changes path to the directory
-    # as well as updates the ext argument
+    # if path leads to single file this indicates the case and changes path to the directory and
+    # updates the ext argument
     single_file = False
-    temp_file_path = ""
     if os.path.isfile(path):
         single_file = True
         ext = os.path.splitext(path)[1][1:]  # remove the period from extension
         file = os.path.split(path)[1]
         temp_dir = tempfile.mkdtemp(prefix="otter_")
-        temp_file_path = f"{temp_dir}/{file}"
+        temp_file_path = os.path.join(temp_dir, file)
         shutil.copy(path, temp_file_path)
         path = temp_dir
 
@@ -74,14 +85,13 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
 
     LOGGER.info("Launching Docker containers")
 
-    #Docker
-    grade_dfs = launch_grade(autograder,
+    grade_dfs = launch_containers(
+        autograder,
         submissions_dir=path,
         num_containers=containers,
         ext=ext,
         no_kill=no_kill,
         output_path=output_dir,
-        zips=zips,
         image=image,
         pdfs=pdfs,
         timeout=timeout,
@@ -90,7 +100,7 @@ def main(*, path="./", output_dir="./", autograder="./autograder.zip", container
 
     LOGGER.info("Combining grades and saving")
 
-    # Merge Dataframes
+    # Merge dataframes
     output_df = merge_csv(grade_dfs)
     cols = output_df.columns.tolist()
     output_df = output_df[cols[-1:] + cols[:-1]]
