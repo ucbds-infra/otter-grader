@@ -197,6 +197,11 @@ class Assignment(fica.Config, Loggable):
         default=None,
     )
 
+    channel_priority_strict: bool = fica.Key(
+        description="whether to set conda's channel_priority config to strict in the setup.sh file",
+        default=True,
+    )
+
     lang: Optional[str] = None
     """the language of the assignment"""
 

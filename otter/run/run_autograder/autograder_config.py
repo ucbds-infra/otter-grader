@@ -139,11 +139,6 @@ class AutograderConfig(fica.Config):
         default=None,
     )
 
-    channel_priority_strict = fica.Key(
-        description="whether to set conda's channel_priority config to strict in the setup.sh file",
-        default=True,
-    )
-
     assignment_name = fica.Key(
         description="a name for the assignment to ensure that students submit to the correct " \
             "autograder",

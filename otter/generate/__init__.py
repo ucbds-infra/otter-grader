@@ -126,9 +126,9 @@ LANGUAGE_BASED_CONFIGURATIONS = {
 def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_config=False, 
          lang=None, requirements=None, no_requirements=False, overwrite_requirements=False, 
          environment=None, no_environment=False, username=None, password=None, token=None, files=[], 
-         assignment=None, plugin_collection=None, python_version=None):
+         assignment=None, plugin_collection=None, python_version=None, channel_priority_strict=True):
     """
-    Runs Otter Generate
+    Run Otter Generate.
 
     Args:
         tests_dir (``str``): path to directory of test files for this assignment
@@ -150,6 +150,8 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
             if used with Otter Assign
         python_version (``str | None``): the version of Python to use (installed with conda)
+        channel_priority_strict (``bool``): whether to set conda's channel_priority to strict in
+            the ``setup.sh`` file
 
     Raises:
         ``FileNotFoundError``: if the specified Otter configuration JSON file could not be found
@@ -219,7 +221,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_branch": OTTR_BRANCH,
-        "channel_priority_strict": ag_config.channel_priority_strict, # TODO: remove from autograder config
+        "channel_priority_strict": channel_priority_strict,
         "has_r_requirements": False,
     }
 
