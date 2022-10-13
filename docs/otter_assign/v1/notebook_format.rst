@@ -103,7 +103,7 @@ Gradescope assignment by setting the necessary keys under ``generate``:
 .. code-block:: yaml
 
     generate:
-        token: Glsdxkjf0900Qiz # optional
+        token: YOUR_TOKEN      # optional
         course_id: 1234        # required
         assignment_id: 5678    # required
         filtering: true        # true is the default
