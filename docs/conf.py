@@ -21,14 +21,9 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 import nbconvert
-import re
-import shutil
-import yaml
 
 from glob import glob
-from importlib import import_module
-from textwrap import indent
-from otter.utils import convert_config_description_dict, print_full_width
+from otter.utils import print_full_width
 
 
 # -- Project information -----------------------------------------------------

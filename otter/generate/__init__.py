@@ -296,7 +296,3 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
                     zip_folder(zf, full_fp, prefix=os.path.join("files", os.path.split(relative_fp)[0]))
                 else:
                     raise ValueError(f"Could not find file or directory '{full_fp}'")
-
-    # TODO: remove when otter assign format v0 is removed
-    if assignment is not None:
-        assignment._otter_config = otter_config
