@@ -40,7 +40,7 @@ arguments in an assignment config comment:
     -->
 
 You can find a list of available metadata keys and their defaults in the :ref:`notebook format 
-section <otter_assign_v1_assignment_metadata>`.
+section <otter_assign_assignment_metadata>`.
 
 
 Autograded Questions
@@ -147,7 +147,7 @@ provided holds for R Markdown files.
     testthat::expect_equal(some_value, 1.04)
 
 As with notebooks, test cells also support test config blocks; for more information on these, see
-:ref:`otter_assign_v1_r_test_cells`.
+:ref:`otter_assign_r_test_cells`.
 
 
 Manually-Graded Questions

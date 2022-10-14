@@ -16,7 +16,7 @@ available in Python that are not available in R, and these are noted below, but 
 are the same.
 
 
-.. _otter_assign_v1_assignment_metadata:
+.. _otter_assign_assignment_metadata:
 
 Assignment Config
 -----------------
@@ -172,7 +172,7 @@ specify one using the ``python_version`` config:
     python_version: 3.9
 
 
-.. _otter_assign_v1_seed_variables:
+.. _otter_assign_seed_variables:
 
 Intercell Seeding
 +++++++++++++++++
@@ -181,7 +181,7 @@ Python assignments support :ref:`intercell seeding <seeding>`, and there are two
 The first involves the use of a seed variable, and is configured in the assignment config; this 
 allows you to use tools like ``np.random.default_rng`` instead of just ``np.random.seed``. The 
 second flavor involves comments in code cells, and is described 
-:ref:`below <otter_assign_v1_python_seeding>`.
+:ref:`below <otter_assign_python_seeding>`.
 
 To use a seed variable, specify the name of the variable, the autograder seed value, and the student
 seed value in your assignment config.
@@ -266,7 +266,7 @@ included in the filtered PDF.
     export: true
 
 
-.. _otter_assign_v1_python_solution_removal:
+.. _otter_assign_python_solution_removal:
 
 Solution Removal
 ++++++++++++++++
@@ -453,7 +453,7 @@ For example,
         assert env["np"].allclose(env["arr"], [1.2, 3.4, 5.6])  # this also works
 
 
-.. _otter_assign_v1_r_test_cells:
+.. _otter_assign_r_test_cells:
 
 R Test Cells
 ????????????
@@ -471,7 +471,7 @@ the test is determined by whether it raises an error, not by checking the output
     testthat::expect_equal(sieve(3), c(2, 3))
 
 
-.. _otter_assign_v1_python_seeding:
+.. _otter_assign_python_seeding:
 
 Intercell Seeding
 +++++++++++++++++
@@ -487,7 +487,7 @@ For example, the first line of the cell below would be removed in the student ve
     np.random.seed(42) # SEED
     rvs = [np.random.random() for _ in range(1000)] # SOLUTION
 
-The same caveats apply for this type of seeding as :ref:`above <otter_assign_v1_seed_variables>`.
+The same caveats apply for this type of seeding as :ref:`above <otter_assign_seed_variables>`.
 
 
 R Example
@@ -500,7 +500,7 @@ Here is an example autograded question for R:
     <iframe src="../../_static/notebooks/html/assign-r-code-question-v1.html"></iframe>
 
 
-.. _otter_assign_v1_python_manual_questions:
+.. _otter_assign_python_manual_questions:
 
 Manually-Graded Questions
 -------------------------
