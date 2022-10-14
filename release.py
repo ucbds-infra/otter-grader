@@ -9,16 +9,15 @@ import warnings
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "Dockerfile",
-    "otter/generate/templates/python/requirements.txt",
-    "otter/generate/templates/r/requirements.txt",
-    "test/test_generate/test-autograder/autograder-correct/requirements.txt",
-    "test/test_generate/test-autograder/autograder-token-correct/requirements.txt",
-    "test/test_generate/test-autograder/autograder-custom-env/requirements.txt",
-    "test/test_generate/test-autograder/autograder-r-correct/requirements.txt",
-    "test/test-run/autograder/source/requirements.txt",
-    "test/test-assign/example-autograder-correct/requirements.txt",
-    "test/test-assign/gs-autograder-correct/requirements.txt",
-    "test/test-assign/rmd-autograder-correct/requirements.txt",
+    "otter/generate/__init__.py",
+    "test/test_generate/test-autograder/autograder-correct/environment.yml",
+    "test/test_generate/test-autograder/autograder-token-correct/environment.yml",
+    "test/test_generate/test-autograder/autograder-custom-env/environment.yml",
+    "test/test_generate/test-autograder/autograder-r-correct/environment.yml",
+    "test/test-run/autograder/source/environment.yml",
+    "test/test-assign/example-autograder-correct/environment.yml",
+    "test/test-assign/gs-autograder-correct/environment.yml",
+    "test/test-assign/rmd-autograder-correct/environment.yml",
 ]
 
 
@@ -31,7 +30,7 @@ PARSER.add_argument("--no-twine", action="store_true", default=False, help="Don'
 PARSER.add_argument("-f", "--force", action="store_true", default=False, help="Force run (ignore uncommitted changes)")
 
 
-OLD_VERSION_REGEX = r"(otter-grader==\d+\.\d+\.\d+(?:\.\w+)?$|git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@[\w\.]+)$"
+OLD_VERSION_REGEX = r"(otter-grader==\d+\.\d+\.\d+(?:\.\w+)?|git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@[\w\.]+)"
 
 
 if __name__ == "__main__":
@@ -73,12 +72,7 @@ if __name__ == "__main__":
         with open(file) as f:
             contents = f.read()
 
-        contents = re.sub(
-            OLD_VERSION_REGEX, 
-            new_version, 
-            contents,
-            flags=re.MULTILINE
-        )
+        contents = re.sub(OLD_VERSION_REGEX, new_version, contents)
 
         with open(file, "w") as f:
             f.write(contents)

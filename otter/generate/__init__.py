@@ -8,15 +8,17 @@ import re
 import yaml
 import zipfile
 
+from dataclasses import dataclass
 from glob import glob
 from jinja2 import Template
+from typing import Any, Dict, List, Optional
 
 from .token import APIClient
-from .utils import zip_folder
+from .utils import merge_conda_environments, zip_folder
 
 from ..plugins import PluginCollection
 from ..run.run_autograder.autograder_config import AutograderConfig
-from ..utils import load_default_file
+from ..utils import dump_yaml, load_default_file
 
 
 DEFAULT_PYTHON_VERSION = "3.7"
@@ -24,18 +26,99 @@ MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.1
 OTTER_ENV_NAME = "otter-env"
 OTTR_BRANCH = "v1.2.0"  # this should match a release tag on GitHub
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
+GENERAL_TEMPLATE_DIR = os.path.join(TEMPLATE_DIR, "general")
 
+
+@dataclass
+class CondaEnvironment:
+
+    python_version: str
+
+    is_r: bool
+
+    requirements: List[str]
+
+    overwrite_requirements: bool
+
+    user_environment: Optional[Dict[str, Any]]
+
+    def to_dict(self):
+        environment = {
+            "name": OTTER_ENV_NAME,
+            "channels": ["defaults", "conda-forge"],
+            "dependencies": [
+                f"python={self.python_version}",
+                "pip",
+                "nb_conda_kernels",
+            ],
+        }
+
+        if self.is_r:
+            environment["channels"].append("r")
+            environment["dependencies"].extend([
+                "r-base>=4.0.0",
+                "r-essentials",
+                "r-devtools",
+                "libgit2",
+                "libgomp",
+                "r-gert",
+                "r-usethis",
+                "r-testthat",
+                "r-startup",
+                "r-rmarkdown",
+                "r-stringi",
+            ])
+
+        pip_deps = self.requirements if self.overwrite_requirements else [
+            "datascience",
+            "jupyter_client", 
+            "ipykernel", 
+            "matplotlib", 
+            "pandas", 
+            "ipywidgets", 
+            "scipy", 
+            "seaborn", 
+            "sklearn", 
+            "jinja2", 
+            "nbconvert", 
+            "nbformat", 
+            "dill",
+            "numpy",
+            "otter-grader==4.0.2",
+            *self.requirements,
+        ]
+
+        environment["dependencies"].append({"pip": pip_deps})
+
+        if self.is_r:
+            environment["dependencies"][-1]["pip"].append("rpy2")
+
+        if self.user_environment:
+            environment = merge_conda_environments(
+                self.user_environment, environment, OTTER_ENV_NAME)
+
+        return environment
+
+    def to_str(self):
+        return dump_yaml(self.to_dict(), indent=2)
+        # return yaml.safe_dump(self.to_dict(), sort_keys=False, indent=2)
+
+
+COMMON_TEMPLATES = [
+    os.path.join(TEMPLATE_DIR, "common", "run_autograder"),
+    os.path.join(TEMPLATE_DIR, "common", "run_otter.py"),
+]
 
 LANGUAGE_BASED_CONFIGURATIONS = {
     "python": {
         "test_file_pattern": "*.py",
         "requirements_filename": "requirements.txt",
-        "template_dir": os.path.join(TEMPLATE_DIR, "python"),
+        "templates": [*COMMON_TEMPLATES, os.path.join(TEMPLATE_DIR, "python", "setup.sh")]
     },
     "r": {
         "test_file_pattern": "*.[Rr]",
         "requirements_filename": "requirements.R",
-        "template_dir": os.path.join(TEMPLATE_DIR, "r"),
+        "templates": [*COMMON_TEMPLATES, os.path.join(TEMPLATE_DIR, "r", "setup.sh")]
     },
 }
 
@@ -43,9 +126,9 @@ LANGUAGE_BASED_CONFIGURATIONS = {
 def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_config=False, 
          lang=None, requirements=None, no_requirements=False, overwrite_requirements=False, 
          environment=None, no_environment=False, username=None, password=None, token=None, files=[], 
-         assignment=None, plugin_collection=None, python_version=None):
+         assignment=None, plugin_collection=None, python_version=None, channel_priority_strict=True):
     """
-    Runs Otter Generate
+    Run Otter Generate.
 
     Args:
         tests_dir (``str``): path to directory of test files for this assignment
@@ -67,6 +150,8 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
             if used with Otter Assign
         python_version (``str | None``): the version of Python to use (installed with conda)
+        channel_priority_strict (``bool``): whether to set conda's channel_priority to strict in
+            the ``setup.sh`` file
 
     Raises:
         ``FileNotFoundError``: if the specified Otter configuration JSON file could not be found
@@ -118,14 +203,11 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
     lang_config = LANGUAGE_BASED_CONFIGURATIONS[ag_config.lang]
 
-    template_dir = lang_config["template_dir"]
-
     templates = {}
-    for fn in os.listdir(template_dir):
-        fp = os.path.join(template_dir, fn)
-        if os.path.isfile(fp): # prevents issue w/ finding __pycache__ in template dirs
-            with open(fp) as f:
-                templates[fn] = Template(f.read())
+    for template_path in lang_config["templates"]:
+        fn = os.path.basename(template_path)
+        with open(template_path) as f:
+            templates[fn] = Template(f.read())
 
     if python_version is not None:
         match = re.match(r"(\d+)\.(\d+)(\.\d+)?", python_version)
@@ -139,8 +221,8 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         "otter_env_name": OTTER_ENV_NAME,
         "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_branch": OTTR_BRANCH,
-        "channel_priority_strict": ag_config.channel_priority_strict,
-        "python_version": python_version or DEFAULT_PYTHON_VERSION,
+        "channel_priority_strict": channel_priority_strict,
+        "has_r_requirements": False,
     }
 
     if plugin_collection is None:
@@ -152,20 +234,30 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     plugin_collection.run("during_generate", otter_config, assignment)
 
     # open requirements if it exists
+    extra_requirements, r_requirements = [], None
     with load_default_file(requirements, lang_config["requirements_filename"], 
                            default_disabled=no_requirements,) as reqs:
-        template_context["other_requirements"] = reqs if reqs is not None else ""
-
-    template_context["overwrite_requirements"] = overwrite_requirements
+        if reqs is not None:
+            if ag_config.lang == "python":
+                extra_requirements = [l for l in reqs.split("\n") if l.strip() and not l.strip().startswith("#")]
+            elif ag_config.lang == "r":
+                r_requirements = reqs
+                template_context["has_r_requirements"] = True
 
     # open environment if it exists
-    # unlike requirements.txt, we will always overwrite, not append by default
+    user_environment = None
     with load_default_file(environment, "environment.yml", default_disabled=no_environment) as env_contents:
         template_context["other_environment"] = env_contents
         if env_contents is not None:
-            data = yaml.safe_load(env_contents)
-            data['name'] = template_context["otter_env_name"]
-            template_context["other_environment"] = yaml.safe_dump(data, default_flow_style=False)
+            user_environment = yaml.safe_load(env_contents)
+
+    conda_environment = CondaEnvironment(
+        python_version or DEFAULT_PYTHON_VERSION,
+        ag_config.lang == "r",
+        extra_requirements,
+        overwrite_requirements,
+        user_environment,
+    )
 
     rendered = {}
     for fn, template in templates.items():
@@ -183,9 +275,14 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         for file in glob(os.path.join(tests_dir, pattern)):
             zf.write(file, arcname=os.path.join(arc_test_dir, os.path.basename(file)))
 
+        if r_requirements is not None:
+            zf.writestr("requirements.r", r_requirements)
+
+        zf.writestr("environment.yml", conda_environment.to_str())
+
         zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))
 
-        # copy files into tmp
+        # copy files into zip file
         if len(files) > 0:
             for file in files:
                 full_fp = os.path.abspath(file)
@@ -200,5 +297,6 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
                 else:
                     raise ValueError(f"Could not find file or directory '{full_fp}'")
 
+    # TODO: remove when otter assign format v0 is removed
     if assignment is not None:
         assignment._otter_config = otter_config
