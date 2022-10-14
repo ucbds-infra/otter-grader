@@ -6,12 +6,11 @@ are specified as cells in the notebook and their output is used as the expected 
 autograder when generating tests. Each question has metadata, expressed in raw YAML config cell
 when the question is declared.
 
-Note that the major difference between v0 format and v1 format is the use of raw notebook cells as
-delimiters. Each boundary cell denotes the start or end of a block and contains *valid YAML syntax*.
-First-line comments are used in these YAML raw cells to denote what type of block is being entered
-or ended.
+The Otter Assign format uses raw notebook cells as boundary cells. Each boundary cell denotes the
+start or end of a block and contains *valid YAML syntax*. First-line comments are used in these YAML
+raw cells to denote what type of block is being entered or ended.
 
-**In the v1 format, Python and R notebooks follow the same structure.** There are some features
+**In the this format, Python and R notebooks follow the same structure.** There are some features
 available in Python that are not available in R, and these are noted below, but otherwise the formats
 are the same.
 
