@@ -84,7 +84,7 @@ class CondaEnvironment:
             "nbformat", 
             "dill",
             "numpy",
-            "otter-grader==4.0.2",
+            "otter-grader==4.1.0",
             *self.requirements,
         ]
 
