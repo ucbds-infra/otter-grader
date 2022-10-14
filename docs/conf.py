@@ -14,6 +14,7 @@
 
 import os
 import sys
+import yaml
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -23,6 +24,7 @@ sys.path.insert(0, os.path.abspath('..'))
 import nbconvert
 
 from glob import glob
+from otter.generate import CondaEnvironment
 from otter.utils import print_full_width
 
 
@@ -224,3 +226,9 @@ def convert_static_notebooks():
 def setup(app):
     # run nbconvert on all of the notebooks in _static/notebooks
     convert_static_notebooks()
+
+    with open("_static/grading-environment.yml", "w+") as f:
+        f.write(CondaEnvironment(3.7, False, [], False, None).to_str())
+
+    with open("_static/grading-environment-r.yml", "w+") as f:
+        f.write(CondaEnvironment(3.7, True, [], False, None).to_str())
