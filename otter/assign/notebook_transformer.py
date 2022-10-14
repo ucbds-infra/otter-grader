@@ -69,6 +69,7 @@ class NotebookTransformer:
         tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
         source = [tag, ""] + source
         cell['source'] = "\n".join(source)
+        lock(cell)
         return cell
 
     @staticmethod
