@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import zipfile
 
-from .run_autograder import main as run_autograder
+from .run_autograder import main as run_autograder_main
 
 from ..utils import import_or_raise
 
@@ -56,7 +56,7 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
             shutil.copy(submission, os.path.join(ag_dir, "submission"))
 
         logo = not no_logo
-        run_autograder(ag_dir, logo=logo, debug=debug)
+        run_autograder_main(ag_dir, logo=logo, debug=debug)
 
         results_path = os.path.join(ag_dir, "results", "results.json")
         shutil.copy(results_path, output_dir)

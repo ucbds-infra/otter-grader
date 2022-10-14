@@ -163,6 +163,14 @@ name in the metadata.
 You can find more information about how Otter performs assignment name verification
 :ref:`here<workflow_execution_submissions_assignment_name_verification>`.
 
+By default, Otter's grading images uses Python 3.7. If you need a different version, you can
+specify one using the ``python_version`` config:
+
+.. code-block:: yaml
+
+    # ASSIGNMENT CONFIG
+    python_version: 3.9
+
 
 .. _otter_assign_v1_seed_variables:
 

@@ -14,9 +14,9 @@ from otter.assign.assignment import Assignment
 from otter.assign.question_config import QuestionConfig
 from otter.assign.tests_manager import AssignmentTestsManager, TestCase
 from otter.generate.token import APIClient
-from otter.utils import nullcontext
+from otter.utils import dump_yaml, nullcontext
 
-from .utils import assert_dirs_equal, dump_yaml, TestFileManager, unzip_to_temp
+from .utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 
 
 # prevent pytest from thinking TestCase is a testing class

@@ -54,10 +54,10 @@ docker-grade-test:
 	printf "\nconda run -n otter-env pip install /home/otter-grader" >> otter/generate/templates/python/setup.sh
 ifeq ($(OS), Darwin)
 	sed -i '' -e "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/setup.sh
-	sed -i '' -e "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/run_autograder
+	sed -i '' -e "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/common/run_autograder
 else
 	sed -i "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/setup.sh
-	sed -i "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/python/run_autograder
+	sed -i "s+ucbdsinfra/otter-grader+otter-test+" otter/generate/templates/common/run_autograder
 endif
 
 cleanup-docker-grade-test:
@@ -65,8 +65,8 @@ cleanup-docker-grade-test:
 	mv otter/generate/templates/python/old-setup.sh otter/generate/templates/python/setup.sh
 ifeq ($(OS), Darwin)
 	sed -i '' -e "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/setup.sh
-	sed -i '' -e "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/run_autograder
+	sed -i '' -e "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/common/run_autograder
 else
 	sed -i "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/setup.sh
-	sed -i "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/python/run_autograder
+	sed -i "s+otter-test+ucbdsinfra/otter-grader+" otter/generate/templates/common/run_autograder
 endif

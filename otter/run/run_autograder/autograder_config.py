@@ -139,13 +139,20 @@ class AutograderConfig(fica.Config):
         default=None,
     )
 
-    channel_priority_strict = fica.Key(
-        description="whether to set conda's channel_priority config to strict in the setup.sh file",
-        default=True,
-    )
-
     assignment_name = fica.Key(
         description="a name for the assignment to ensure that students submit to the correct " \
             "autograder",
         default=None,
+    )
+
+    warn_missing_pdf = fica.Key(
+        description="whether to add a 0-point public test to the Gradescope output to indicate " \
+            "to students whether a PDF was found/generated for this assignment",
+        default=False,
+    )
+
+    force_public_test_summary = fica.Key(
+        description="whether to show a summary of public test case results when show_hidden is " \
+            "true",
+        default=True,
     )

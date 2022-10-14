@@ -1,16 +1,10 @@
-"""
-Exporters for Otter Export
-"""
+"""Exporters for Otter Export"""
 
 import shutil
 
-from .via_html import PDFViaHTMLExporter
 from .via_latex import PDFViaLatexExporter
 
 from ..utils import WkhtmltopdfNotFoundError
-
-
-EXPORTERS = {"html", "latex"}
 
 
 def get_exporter(exporter_type=None):
@@ -30,7 +24,6 @@ def get_exporter(exporter_type=None):
     """
     if exporter_type is not None:
         exporter_type = exporter_type.lower()
-        assert exporter_type in EXPORTERS, f"{exporter_type} is not a valid PDF exporter"
 
         if exporter_type == 'html':
             if shutil.which("wkhtmltopdf") is None:
@@ -38,5 +31,11 @@ def get_exporter(exporter_type=None):
 
             from .via_html import PDFViaHTMLExporter
             return PDFViaHTMLExporter
+
+        elif exporter_type == "latex":
+            return PDFViaLatexExporter
+
+        else:
+            raise ValueError(f"{exporter_type} is not a valid PDF exporter")
 
     return PDFViaLatexExporter

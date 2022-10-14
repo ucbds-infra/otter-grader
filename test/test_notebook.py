@@ -56,6 +56,7 @@ def test_check():
         "q2": dedent("""\
             q2 results:
                 q2 - 1 result:
+                    ❌ Test case failed
                     Trying:
                         1 == 1
                     Expecting:
@@ -70,7 +71,7 @@ def test_check():
                         True
 
                 q2 - 2 result:
-                    Test case passed!
+                    ✅ Test case passed
         """).strip(),
         "q3": 'q3 results: All test cases passed!',
         "q4": 'q4 results: All test cases passed!',

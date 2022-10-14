@@ -6,5 +6,5 @@ else
     export PATH="/opt/conda/bin:$PATH"
     source /opt/conda/etc/profile.d/conda.sh
 fi
-conda activate {{ otter_env_name }}
-python {{ autograder_dir }}/source/run_otter.py
+conda activate otter-env
+python /autograder/source/run_otter.py
