@@ -1,4 +1,4 @@
-.. _otter_assign_v1_usage:
+.. _otter_assign_usage:
 
 Usage and Output
 ================
