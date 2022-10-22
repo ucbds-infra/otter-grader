@@ -16,10 +16,10 @@ from otter.export import main as export
 from otter.export.exporters.base_exporter import BaseExporter
 from otter.utils import nullcontext
 
-from .utils import TestFileManager
+from ..utils import TestFileManager
 
 
-FILE_MANAGER = TestFileManager("test/test-export")
+FILE_MANAGER = TestFileManager(__file__, True)
 
 
 @pytest.fixture(autouse=True)
