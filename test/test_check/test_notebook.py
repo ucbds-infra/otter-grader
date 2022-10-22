@@ -11,10 +11,10 @@ from unittest import mock
 from otter import Notebook
 from otter.check.notebook import _OTTER_LOG_FILENAME, _ZIP_NAME_FILENAME
 
-from .utils import TestFileManager
+from ..utils import TestFileManager
 
 
-FILE_MANAGER = TestFileManager("test/test-notebook")
+FILE_MANAGER = TestFileManager(__file__, True)
 TESTS_DIR = FILE_MANAGER.get_path("tests")
 TESTS_GLOB = glob(FILE_MANAGER.get_path("tests/*.py"))
 
