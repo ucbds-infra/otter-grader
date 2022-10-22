@@ -1,0 +1,4 @@
+{
+    "lang": "r",
+    "autograder_dir": "test/test_run/files/rmd-autograder"
+}

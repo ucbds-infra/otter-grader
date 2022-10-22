@@ -15,10 +15,10 @@ from otter.run.run_autograder import main as run_autograder
 from otter.run.run_autograder.utils import OtterRuntimeError
 from otter.utils import NBFORMAT_VERSION
 
-from .utils import delete_paths, TestFileManager
+from ..utils import delete_paths, TestFileManager
 
 
-FILE_MANAGER = TestFileManager("test/test-run")
+FILE_MANAGER = TestFileManager(__file__, True)
 
 
 @pytest.fixture(autouse=True)

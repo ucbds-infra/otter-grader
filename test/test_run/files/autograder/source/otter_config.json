@@ -1,5 +1,5 @@
 {
-    "autograder_dir": "test/test-run/autograder",
+    "autograder_dir": "test/test_run/files/autograder",
     "plugins": [
         {
             "otter.plugins.builtin.RateLimiting": {
