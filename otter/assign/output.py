@@ -57,7 +57,7 @@ def write_output_dir(
     transformed_nb.write_tests(str(tests_dir), not sanitize, assignment.tests.files)
 
     # write a temp dir for otter generate tests
-    if not sanitize and assignment.generate:
+    if not sanitize and assignment.generate_enabled:
         assignment._temp_test_dir = pathlib.Path(tempfile.mkdtemp())
         transformed_nb.write_tests(str(assignment._temp_test_dir), True, True)
 
@@ -104,12 +104,12 @@ def write_output_directories(assignment):
     nb_transformer = NotebookTransformer(assignment, tests_mgr)
     transformed_nb = nb_transformer.transform_notebook(nb)
 
-    # update assignment.tests["files"] for R notebooks
-    assignment.tests["files"] |= assignment.is_r
+    # update assignment.tests.files for R notebooks
+    assignment.tests.files |= assignment.is_r
 
     # force test files if a test URL prefix is provided
     if assignment.tests["url_prefix"]:
-        assignment.tests["files"] = True
+        assignment.tests.files = True
 
     # create directories
     autograder_dir = assignment.get_ag_path()

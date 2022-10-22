@@ -15,7 +15,7 @@ from .solutions import remove_ignored_lines
 from .utils import get_source, str_to_doctest
 
 from ..test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
-from ..test_files.metadata_test import NOTEBOOK_METADATA_KEY
+from ..utils import NOTEBOOK_METADATA_KEY
 
 
 BEGIN_TEST_CONFIG_REGEX = r'(?:.\s*=\s*)?""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
@@ -344,6 +344,9 @@ class AssignmentTestsManager:
 
             if not include_hidden:
                 test_info["test_cases"] = [tc for tc in test_info["test_cases"] if not tc.hidden]
+                if isinstance(test_info["points"], list):
+                    test_info["points"] = [p for tc, p in \
+                        zip(test_info["test_cases"], test_info["points"]) if not tc.hidden]
 
             test = \
                 self._format_test(test_info["name"], test_info["points"], test_info["test_cases"])

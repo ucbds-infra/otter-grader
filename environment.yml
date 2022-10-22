@@ -4,7 +4,7 @@ channels:
     - defaults
 dependencies:
     - python>=3.6
-    - r-base
+    - r-base>=4.0.0
     - r-essentials
     - r-devtools
     - pip

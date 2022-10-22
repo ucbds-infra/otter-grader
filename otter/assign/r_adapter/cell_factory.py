@@ -26,7 +26,8 @@ class RCellFactory(CellFactory):
         return []
 
     def create_export_cells(self):
-        export_cell_config = self._get_export_cell_config()
+        if not self.assignment.export_cell:
+            return []
 
         instructions = nbformat.v4.new_markdown_cell()
         instructions.source = "## Submission\n\nMake sure you have run all cells in your " \
@@ -34,8 +35,8 @@ class RCellFactory(CellFactory):
             "in the output. The cell below will generate a zip file for you to submit. **Please " \
             "save before exporting!**"
 
-        if export_cell_config.get("instructions", ""):
-            instructions.source += '\n\n' + export_cell_config["instructions"]
+        if self.assignment.export_cell.instructions:
+            instructions.source += '\n\n' + self.assignment.export_cell.instructions
 
         export = nbformat.v4.new_code_cell()
         source_lines = ["# Save your notebook first, then run this cell to export your submission."]

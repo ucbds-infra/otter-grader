@@ -52,7 +52,7 @@ def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
                 c1, c2 = f1.read(), f2.read()
                 if ignore_trailing_whitespace:
                     c1, c2 = c1.rstrip(), c2.rstrip()
-                diff = subprocess.run(["diff", p1, p2], stdout=subprocess.PIPE).stdout.decode("utf-8")
+                diff = subprocess.run(["diff", "--context=5", p1, p2], stdout=subprocess.PIPE).stdout.decode("utf-8")
                 assert c1 == c2, f"Contents of {p1} did not equal contents of {p2}:\n{diff}"
 
     except UnicodeDecodeError:
@@ -91,7 +91,7 @@ def assert_dirs_equal(dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_e
             [f for f in os.listdir(dir2) if not (os.path.isdir(os.path.join(dir2, f)) and f in ignore_dirs) \
                 and os.path.splitext(f)[1] not in variable_path_exts], 
         )
-        assert sorted(dir1_contents) == sorted(dir2_contents), f"{dir1} and {dir2} have different contents"
+        assert sorted(dir1_contents) == sorted(dir2_contents), f"{dir1} and {dir2} have different contents: {dir1_contents} != {dir2_contents}"
 
         # check that for each variable path ext, there are the same number of files in each dir
         # with that ext
@@ -128,14 +128,3 @@ def unzip_to_temp(zf_path, delete_zip=False):
     shutil.rmtree(tempdir)
     if delete_zip:
         os.remove(zf_path)
-
-
-class _CorrectIndentationDumper(yaml.Dumper):
-    def increase_indent(self, flow=False, *args, **kwargs):
-        return super().increase_indent(flow=flow, indentless=False)
-
-
-def dump_yaml(dct):
-    """
-    """
-    return yaml.dump(dct, sort_keys=False, Dumper=_CorrectIndentationDumper)

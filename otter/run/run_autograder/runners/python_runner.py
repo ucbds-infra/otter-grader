@@ -1,10 +1,8 @@
 """Autograder runner for Python assignments"""
 
 import json
+import nbformat as nbf
 import os
-import shutil
-import warnings
-import zipfile
 
 from glob import glob
 
@@ -35,11 +33,17 @@ class PythonRunner(AbstractLanguageRunner):
         open("__init__.py", "a").close()
         open("submission/__init__.py", "a").close()
 
+    def validate_submission(self, submission_path):
+        if os.path.splitext(submission_path)[1] == ".ipynb":
+            nb = nbf.read(submission_path, as_version=nbf.NO_CONVERT)
+            assignment_name = self.get_notebook_assignment_name(nb)
+            self.validate_assignment_name(assignment_name)
+
     def resolve_submission_path(self):
         nbs = glob("*.ipynb")
 
         if len(nbs) > 1:
-            raise OtterRuntimeError("More than one IPYNB file found in submission")
+            raise OtterRuntimeError("More than one .ipynb file found in submission")
 
         if len(nbs) == 1:
             subm_path = nbs[0]
@@ -59,46 +63,12 @@ class PythonRunner(AbstractLanguageRunner):
         return subm_path
 
     def write_pdf(self, nb_path):
-        """
-        Generate a PDF of a notebook at ``nb_path`` using the configurations in ``self.ag_config`` and
-        return the that to the PDF.
-        """
-        try:
-            pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
-            export_notebook(
-                nb_path, dest=pdf_path, filtering=self.ag_config.filtering, 
-                pagebreaks=self.ag_config.pagebreaks, exporter_type="latex")
-
-        except Exception as e:
-            print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
+        pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
+        export_notebook(
+            nb_path, dest=pdf_path, filtering=self.ag_config.filtering, 
+            pagebreaks=self.ag_config.pagebreaks, exporter_type="latex")
 
         return pdf_path
-
-    def submit_pdf(self, client, pdf_path):
-        """
-        Upload a PDF to a Gradescope assignment for manual grading.
-
-        Args:
-            client (``otter.generate.token.APIClient``): the Gradescope client
-            pdf_path (``str``): path to the PDF
-        """
-        try:
-            # get student email
-            with open("../submission_metadata.json", encoding="utf-8") as f:
-                metadata = json.load(f)
-
-            student_emails = []
-            for user in metadata["users"]:
-                student_emails.append(user["email"])
-
-            for student_email in student_emails:
-                client.upload_pdf_submission(
-                    self.ag_config.course_id, self.ag_config.assignment_id, student_email, pdf_path)
-
-            print("\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails)))
-
-        except Exception as e:
-            print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
 
     def run(self):
         os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH")
@@ -106,6 +76,7 @@ class PythonRunner(AbstractLanguageRunner):
         with chdir("./submission"):
 
             subm_path = self.resolve_submission_path()
+            self.validate_submission(subm_path)
 
             # load plugins
             plugins = self.ag_config.plugins
@@ -166,12 +137,10 @@ class PythonRunner(AbstractLanguageRunner):
                 script = os.path.splitext(subm_path)[1] == ".py",
             )
 
+            # verify the scores against the log
             if self.ag_config.print_summary:
                 print("\n\n\n\n", end="")
                 print_full_width("-", mid_text="GRADING SUMMARY")
-
-            # verify the scores against the log
-            if self.ag_config.print_summary:
                 print()
                 if log is not None:
                     try:
@@ -186,10 +155,7 @@ class PythonRunner(AbstractLanguageRunner):
                     print("No log found with which to verify student scores.")
 
             if generate_pdf:
-                pdf_path = self.write_pdf(subm_path)
-
-                if has_token:
-                    self.submit_pdf(client, pdf_path)
+                self.write_and_maybe_submit_pdf(client, subm_path, has_token, scores)
 
             if plugin_collection:
                 report = plugin_collection.generate_report()

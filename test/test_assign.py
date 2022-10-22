@@ -14,9 +14,9 @@ from otter.assign.assignment import Assignment
 from otter.assign.question_config import QuestionConfig
 from otter.assign.tests_manager import AssignmentTestsManager, TestCase
 from otter.generate.token import APIClient
-from otter.utils import nullcontext
+from otter.utils import dump_yaml, nullcontext
 
-from .utils import assert_dirs_equal, dump_yaml, TestFileManager, unzip_to_temp
+from .utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 
 
 # prevent pytest from thinking TestCase is a testing class
@@ -47,13 +47,12 @@ def disable_pdf_generation(pdfs_enabled):
             return mock.DEFAULT
 
         cm1 = mock.patch("otter.assign.export_notebook", side_effect=create_fake_pdf)
-        cm2 = mock.patch("otter.assign.v0.export_notebook", side_effect=create_fake_pdf)
-        cm3 = mock.patch("otter.assign.knit_rmd_file", side_effect=create_fake_pdf)
+        cm2 = mock.patch("otter.assign.knit_rmd_file", side_effect=create_fake_pdf)
 
     else:
-        cm1, cm2, cm3 = nullcontext(), nullcontext(), nullcontext()
+        cm1, cm2 = nullcontext(), nullcontext()
 
-    with cm1, cm2, cm3:
+    with cm1, cm2:
         yield
 
 
@@ -107,6 +106,13 @@ def test_convert_example():
         FILE_MANAGER.get_path("example.ipynb"), 
         FILE_MANAGER.get_path("example-correct"), 
         assign_kwargs=dict(no_run_tests=True),
+        assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
+    )
+
+    # check gradescope zip file
+    check_gradescope_zipfile(
+        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 
+        FILE_MANAGER.get_path("example-autograder-correct"),
     )
 
 
@@ -128,7 +134,6 @@ def test_otter_example():
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-otter.ipynb"), 
         FILE_MANAGER.get_path("otter-correct"),
-        assign_kwargs=dict(v0=True),
     )
 
 
@@ -140,7 +145,7 @@ def test_pdf_example():
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-pdf.ipynb"),
         FILE_MANAGER.get_path("pdf-correct"),
-        assign_kwargs=dict(no_run_tests=True, v0=True),
+        assign_kwargs=dict(no_run_tests=True),
         assert_dirs_equal_kwargs=dict(ignore_ext=[".pdf"], variable_path_exts=[".zip"]),
     )
 
@@ -158,7 +163,7 @@ def test_gradescope_example(mocked_client):
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-gradescope.ipynb"),
         FILE_MANAGER.get_path("gs-correct"),
-        assign_kwargs=dict(no_run_tests=True, v0=True),
+        assign_kwargs=dict(no_run_tests=True),
         assert_dirs_equal_kwargs=dict(ignore_ext=[".pdf"], variable_path_exts=[".zip"]),
     )
 

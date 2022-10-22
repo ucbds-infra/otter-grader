@@ -1,5 +1,5 @@
 {
-  "seed": 42,
   "show_stdout": true,
-  "show_hidden": true
+  "show_hidden": true,
+  "seed": 42
 }

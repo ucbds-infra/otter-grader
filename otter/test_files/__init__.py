@@ -10,14 +10,12 @@ from collections import namedtuple
 
 from .abstract_test import OK_FORMAT_VARNAME, TestCase, TestCaseResult
 from .exception_test import ExceptionTestFile, test_case
-from .metadata_test import NOTEBOOK_METADATA_KEY, NotebookMetadataExceptionTestFile, \
-    NotebookMetadataOKTestFile
+from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
 from ..check.logs import QuestionNotInLogException
-from ..run.run_autograder.autograder_config import AutograderConfig
-from ..utils import NBFORMAT_VERSION
+from ..utils import NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
 
 
 def create_test_file(path, test_name=None):
@@ -91,6 +89,7 @@ class GradingResults:
         # self.results = {}
         self.output = None
         self.all_hidden = False
+        self.pdf_error = None
 
     def __repr__(self):
         return self.summary()
@@ -158,6 +157,13 @@ class GradingResults:
         ``int`` or ``float``: the total points possible
         """
         return sum(tr.possible for tr in self.results.values())
+
+    @property
+    def passed_all_public(self):
+        """
+        ``bool``: whether all public tests in these results passed
+        """
+        return all(tr.passed_all_public for tr in self.results.values())
 
     def get_result(self, test_name):
         """
@@ -246,6 +252,15 @@ class GradingResults:
             any: the data stored for ``plugin_name`` if found
         """
         return self._plugin_data.get(plugin_name, default)
+
+    def set_pdf_error(self, error: Exception):
+        """
+        Set a PDF generation error to be displayed as a failed (0-point) test on Gradescope.
+
+        Args:
+            error (``Exception``): the error thrown
+        """
+        self.pdf_error = error
 
     def verify_against_log(self, log, ignore_hidden=True):
         """
@@ -341,11 +356,22 @@ class GradingResults:
             hidden_test_visibility = "visible"
 
         # start w/ summary of public tests
-        output["tests"].append({
-            "name": "Public Tests",
-            "visibility": "visible",
-            "output": self.summary(public_only=True),
-        })
+        if not ag_config.show_hidden or ag_config.force_public_test_summary:
+            output["tests"].append({
+                "name": "Public Tests",
+                "visibility": "visible",
+                "output": self.summary(public_only=True),
+                "status": "passed" if self.passed_all_public else "failed",
+            })
+
+        # add PDF error test if indicated
+        if ag_config.warn_missing_pdf and self.pdf_error is not None:
+            output["tests"].append({
+                "name": "PDF Generation Failed",
+                "visibility": "visible",
+                "output": str(self.pdf_error),
+                "status": "failed",
+            })
 
         for test_name in self.test_files:
             test_file = self.get_result(test_name)
@@ -353,8 +379,8 @@ class GradingResults:
 
             output["tests"].append({
                 "name": test_file.name,
-                "score": score,
-                "max_score": possible,
+                "score": round(score, 5),
+                "max_score": round(possible, 5),
                 "visibility": hidden_test_visibility,
                 "output": test_file.summary(),
             })

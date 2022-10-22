@@ -3,10 +3,12 @@
 if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     apt-get clean
     apt-get update
-    apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-generic-recommended build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese
-    apt-get install -y libnlopt-dev cmake libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev apt-utils libpoppler-cpp-dev libavfilter-dev  libharfbuzz-dev libfribidi-dev imagemagick libmagick++-dev pandoc texlive-xetex texlive-fonts-recommended texlive-generic-recommended build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese libxft-dev
+    apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese
+    apt-get install -y libnlopt-dev cmake libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev apt-utils libpoppler-cpp-dev libavfilter-dev  libharfbuzz-dev libfribidi-dev imagemagick libmagick++-dev pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese libxft-dev
 
     # install wkhtmltopdf
+    wget --quiet -O /tmp/libssl1.1.deb http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.20_amd64.deb
+    apt-get install -y /tmp/libssl1.1.deb
     wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
     apt-get install -y /tmp/wkhtmltopdf.deb
 
@@ -28,13 +30,12 @@ fi
 # install dependencies with conda
 conda config --set channel_priority strict
 conda env create -f /autograder/source/environment.yml
-conda run -n otter-env Rscript /autograder/source/requirements.r
 
 # set conda shell
 conda init --all
 
 # install ottr; not sure why it needs to happen twice but whatever
-git clone --single-branch -b 1.1.3 https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
+git clone --single-branch -b v1.2.0 https://github.com/ucbds-infra/ottr.git /autograder/source/ottr
 cd /autograder/source/ottr 
 conda run -n otter-env Rscript -e "devtools::install\\(\\)"
 conda run -n otter-env Rscript -e "devtools::install\\(\\)"

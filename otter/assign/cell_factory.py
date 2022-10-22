@@ -92,20 +92,6 @@ class CellFactory:
 
         return [instructions, check_all]
 
-    def _get_export_cell_config(self):
-        """
-        Get the configurations from ``self.assignment`` for the export cell, coercing ``True`` to
-        an empty ``dict`` if necessary.
-
-        Returns:
-            ``bool | dict``: the configurations dict or ``False`` if the configuration is specified
-                as ``False``
-        """
-        export_cell_config = self.assignment.export_cell
-        if export_cell_config is True:
-            export_cell_config = {}
-        return export_cell_config
-
     def create_export_cells(self):
         """
         Generate export cells that instruct the student the run a code cell calling 
@@ -114,38 +100,37 @@ class CellFactory:
         Returns:
             ``list[nbformat.NotebookNode]``: the export cells
         """
-        export_cell_config = self._get_export_cell_config()
+        if not self.assignment.export_cell:
+            return []
 
         instructions = nbformat.v4.new_markdown_cell()
         instructions.source = "## Submission\n\nMake sure you have run all cells in your " \
             "notebook in order before running the cell below, so that all images/graphs appear " \
             "in the output. The cell below will generate a zip file for you to submit."
 
-        force_save = export_cell_config.get("force_save", False)
-
         # only include save text if force_save is false
-        if not force_save:
+        if not self.assignment.export_cell.force_save:
             instructions.source += " **Please save before exporting!**"
 
-        if export_cell_config.get("instructions", ""):
-            instructions.source += '\n\n' + export_cell_config["instructions"]
+        if self.assignment.export_cell.instructions:
+            instructions.source += '\n\n' + self.assignment.export_cell.instructions
 
         export = nbformat.v4.new_code_cell()
         source_lines = []
 
         # only include save text if force_save is false
-        if not force_save:
+        if not self.assignment.export_cell.force_save:
             source_lines.append(
                 "# Save your notebook first, then run this cell to export your submission.")
 
         args = []
-        if not export_cell_config.get("filtering", True):
+        if not self.assignment.export_cell.filtering:
             args += ["filtering=False"]
-        if not export_cell_config.get("pdf", True):
+        if not self.assignment.export_cell.pdf:
             args += ["pdf=False"]
-        if force_save:
+        if self.assignment.export_cell.force_save:
             args += ["force_save=True"]
-        if export_cell_config.get("run_tests", False):
+        if self.assignment.export_cell.run_tests:
             args += ["run_tests=True"]
 
         source_lines.append(f"grader.export({', '.join(args)})")

@@ -7,21 +7,7 @@
 Grading on Gradescope
 =====================
 
-This section details how the autograder runs and how results are displayed to students and 
-instructors on Gradescope. When a student submits to Gradescpe, the autograder does the following:
-
-#. Copies the tests and support files from the autograder source
-#. Globs the first IPYNB file and assumes this to be the submission to be graded
-#. Reads in the log from the submission if it exists
-#. Grades the notebook, globbing all tests and grading from the log if specified
-#. Looks for discrepancies between the logged scores and the autograder scores and warngs about 
-   these if present
-#. If indicated, exports the notebook as a PDF and POSTs this notebook to the other Gradescope 
-   assignment
-#. Generates the JSON object for Gradescope's results
-#. Makes adjustments to the scores and visibility based on the configurations
-#. Writes the JSON to the results file
-#. Prints the results as a dataframe to stdout
+This section describes how results are displayed to students and instructors on Gradescope.
 
 
 Writing Tests for Gradescope
@@ -46,7 +32,6 @@ the information about test output visibility:
 
 
 .. image:: images/gradescope_autograder_output.png
-    :target: images/gradescope_autograder_output.png
     :alt: 
 
 If ``show_stdout`` was true in your ``otter_config.json``, then the autograder 
@@ -60,7 +45,6 @@ students. If a student fails a hidden test but no public tests, then this box wi
 passed" for that question, even though the student failed a public test.
 
 .. image:: images/gradescope_public_passed.png
-    :target: images/gradescope_public_passed.png
     :alt: 
 
 If the student fails a public test, then the output of the failed public test will be displayed here,
@@ -68,7 +52,6 @@ but no information about hidden tests will be included. In the example below, th
 hidden test case in ``q1`` and a public test case in ``q4``.
 
 .. image:: images/gradescope_public_failed.png
-    :target: images/gradescope_public_failed.png
     :alt: 
 
 Below the "Public Tests" box will be boxes for each question. These are hidden from the student
@@ -79,7 +62,6 @@ become visible to students after grades are published. These boxes show the resu
 If all tests cases are passed, these boxes will indicate so:
 
 .. image:: images/gradescope_questions_passed.png
-    :target: images/gradescope_questions_passed.png
     :alt: 
 
 If the studen fails any test cases, that information will be presented here. In the example below,
@@ -87,5 +69,4 @@ If the studen fails any test cases, that information will be presented here. In 
 Tests" section screenshot above.
 
 .. image:: images/gradescope_question_failed.png
-    :target: images/gradescope_question_failed.png
     :alt: 

@@ -3,10 +3,12 @@
 if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     apt-get clean
     apt-get update
-    apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-generic-recommended build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese
-    apt-get install -y libnlopt-dev cmake libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev apt-utils libpoppler-cpp-dev libavfilter-dev  libharfbuzz-dev libfribidi-dev imagemagick libmagick++-dev pandoc texlive-xetex texlive-fonts-recommended texlive-generic-recommended build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese libxft-dev
+    apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese
+    apt-get install -y libnlopt-dev cmake libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev apt-utils libpoppler-cpp-dev libavfilter-dev  libharfbuzz-dev libfribidi-dev imagemagick libmagick++-dev pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese libxft-dev
 
     # install wkhtmltopdf
+    wget --quiet -O /tmp/libssl1.1.deb http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.20_amd64.deb
+    apt-get install -y /tmp/libssl1.1.deb
     wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
     apt-get install -y /tmp/wkhtmltopdf.deb
 
@@ -25,10 +27,10 @@ if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
     export TAR="/bin/tar"
 fi
 
-# install dependencies with conda
-{% if channel_priority_strict %}conda config --set channel_priority strict
-{% endif %}conda env create -f {{ autograder_dir }}/source/environment.yml
-conda run -n {{ otter_env_name }} Rscript {{ autograder_dir }}/source/requirements.r
+# install dependencies with conda{% if channel_priority_strict %}
+conda config --set channel_priority strict{% endif %}
+conda env create -f {{ autograder_dir }}/source/environment.yml{% if has_r_requirements %}
+conda run -n {{ otter_env_name }} Rscript {{ autograder_dir }}/source/requirements.r{% endif %}
 
 # set conda shell
 conda init --all
