@@ -115,7 +115,7 @@ def test_timeout():
     """
     Check that the notebook `20s.ipynb` is killed due to exceeding the defined timeout.
     """
-    with pytest.raises(Exception, match=r"Executing '[\w./-]*test/test-grade/timeout/20s\.ipynb'" \
+    with pytest.raises(Exception, match=r"Executing '[\w./-]*test/test_grade/files/timeout/20s\.ipynb'" \
             " in docker container failed! Exit code: 137"), loggers.level_context(logging.DEBUG):
         grade(
             path=FILE_MANAGER.get_path("timeout/"),
