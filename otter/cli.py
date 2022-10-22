@@ -133,7 +133,6 @@ defaults = grade.__kwdefaults__
 @click.option("-o", "--output-dir", default=defaults["output_dir"], help="Directory to which to write output")
 
 # submission format arguments
-@click.option("-z", "--zips", is_flag=True, help="Whether submissions are zip files from Notebook.export")
 @click.option("--ext", default=defaults["ext"], type=click.Choice(_ALLOWED_EXTENSIONS), help="The extension to glob for submissions")
 
 # PDF export options
