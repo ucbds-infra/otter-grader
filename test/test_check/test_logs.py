@@ -10,10 +10,10 @@ from otter.check.logs import Log
 from otter.check.notebook import Notebook, _OTTER_LOG_FILENAME
 from otter.check.logs import LogEntry, EventType, Log
 
-from .utils import TestFileManager
+from ..utils import TestFileManager
 
 
-FILE_MANAGER = TestFileManager("test/test-logs/")
+FILE_MANAGER = TestFileManager(__file__, True)
 
 
 @pytest.fixture(autouse=True)
@@ -24,7 +24,7 @@ def cleanup_output(cleanup_enabled):
 
 
 def test_notebook_check():
-    test_directory = FILE_MANAGER.get_path("tests")
+    test_directory = FILE_MANAGER.get_path("logs-tests")
     grading_results = {}
     grader = Notebook(tests_dir=test_directory)
 
