@@ -11,10 +11,10 @@ from unittest import mock
 
 from otter.check import main as check
 
-from .utils import TestFileManager
+from ..utils import TestFileManager
 
 
-FILE_MANAGER = TestFileManager("test/test-check")
+FILE_MANAGER = TestFileManager(__file__)
 
 
 @pytest.fixture(autouse=True)
