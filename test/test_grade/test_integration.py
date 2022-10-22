@@ -7,20 +7,20 @@ import pytest
 import re
 import shutil
 import subprocess
-from unittest import mock
 import zipfile
 
 from glob import glob
+from unittest import mock
 
 from otter.generate import main as generate
 from otter.generate.utils import zip_folder
 from otter.grade import main as grade
 from otter.utils import loggers
 
-from .utils import TestFileManager
+from ..utils import TestFileManager
 
 
-FILE_MANAGER = TestFileManager("test/test-grade")
+FILE_MANAGER = TestFileManager(__file__, True)
 
 
 @pytest.fixture(autouse=True)
