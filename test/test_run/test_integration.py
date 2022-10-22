@@ -31,6 +31,7 @@ def cleanup_output(cleanup_enabled):
             FILE_MANAGER.get_path("autograder/__init__.py"),
             FILE_MANAGER.get_path("autograder/submission/test"),
             FILE_MANAGER.get_path("autograder/submission/tests"),
+            FILE_MANAGER.get_path("autograder/submission/fails2and6H.pdf"),
             FILE_MANAGER.get_path("autograder/submission/__init__.py"),
             FILE_MANAGER.get_path("autograder/submission/.OTTER_LOG"),
             FILE_MANAGER.get_path("rmd-autograder/results/results.json"),
