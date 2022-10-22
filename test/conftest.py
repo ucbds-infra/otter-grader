@@ -1,5 +1,9 @@
 import pytest
 
+from click.testing import CliRunner
+
+from otter.cli import cli
+
 
 def pytest_addoption(parser):
     """
