@@ -15,8 +15,11 @@ from contextlib import contextmanager
 class TestFileManager:
     __test__ = False
 
-    def __init__(self, file_dir):
-        self.dir = pathlib.Path(file_dir).resolve()
+    def __init__(self, test_file_path, new_version=False): # TODO: remove new_version
+        if new_version:
+            self.dir = pathlib.Path(os.path.join(os.path.split(test_file_path)[0], "files"))
+        else:
+            self.dir = pathlib.Path(test_file_path).resolve()
 
     def get_path(self, path):
         return str(self.dir / path)

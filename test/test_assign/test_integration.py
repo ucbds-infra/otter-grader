@@ -16,14 +16,14 @@ from otter.assign.tests_manager import AssignmentTestsManager, TestCase
 from otter.generate.token import APIClient
 from otter.utils import dump_yaml, nullcontext
 
-from .utils import assert_dirs_equal, TestFileManager, unzip_to_temp
+from ..utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 
 
 # prevent pytest from thinking TestCase is a testing class
 TestCase.__test__ = False
 
 
-FILE_MANAGER = TestFileManager("test/test-assign")
+FILE_MANAGER = TestFileManager(__file__, True)
 
 
 @pytest.fixture(autouse=True)
