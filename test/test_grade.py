@@ -7,20 +7,29 @@ import pytest
 import re
 import shutil
 import subprocess
-from unittest import mock
 import zipfile
 
 from glob import glob
+from unittest import mock
 
 from otter.generate import main as generate
 from otter.generate.utils import zip_folder
 from otter.grade import main as grade
+from otter.grade import containers
 from otter.utils import loggers
 
 from .utils import TestFileManager
 
 
+ASSIGNMENT_NAME = "otter-grade-test"
 FILE_MANAGER = TestFileManager("test/test-grade")
+
+
+@pytest.fixture(autouse=True)
+def enable_testing_mode():
+    containers._TESTING = True
+    yield
+    containers._TESTING = False
 
 
 @pytest.fixture(autouse=True)
@@ -41,39 +50,39 @@ def generate_autograder_zip(pdfs=False):
         config = FILE_MANAGER.get_path("otter_config.json") if pdfs else None,
         no_environment = True,
     )
-    with zipfile.ZipFile(FILE_MANAGER.get_path("autograder.zip"), "a") as zip_ref:
-        zip_folder(zip_ref, os.getcwd(), exclude=[".git", "logo", "test", "dist", "build", "otter_grader.egg-info"])
+    # with zipfile.ZipFile(FILE_MANAGER.get_path("autograder.zip"), "a") as zip_ref:
+    #     zip_folder(zip_ref, os.getcwd(), exclude=[".git", "logo", "test", "dist", "build", "otter_grader.egg-info"])
 
 
 @pytest.fixture(autouse=True, scope="module")
 def create_docker_image():    
-    subprocess.run(["make", "docker-grade-test"], check=True)
+    # subprocess.run(["make", "docker-grade-test"], check=True)
 
-    shutil.copy("otter/grade/Dockerfile", "otter/grade/old-Dockerfile")
-    with open("otter/grade/Dockerfile", "r+") as f:
-        lines = f.readlines()
+    # shutil.copy("otter/grade/Dockerfile", "otter/grade/old-Dockerfile")
+    # with open("otter/grade/Dockerfile", "r+") as f:
+    #     lines = f.readlines()
 
-        idx = max([i if "ARG" in lines[i] else -1 for i in range(len(lines))])
-        lines.insert(idx + 1, "ADD otter-grader /home/otter-grader\n")
+    #     idx = max([i if "ARG" in lines[i] else -1 for i in range(len(lines))])
+    #     lines.insert(idx + 1, "ADD otter-grader /home/otter-grader\n")
 
-        f.seek(0)
-        f.write("".join(lines))
+    #     f.seek(0)
+    #     f.write("".join(lines))
 
     generate_autograder_zip(pdfs=True)
 
     yield
 
-    subprocess.run(["make", "cleanup-docker-grade-test"], check=True)
+    # subprocess.run(["make", "cleanup-docker-grade-test"], check=True)
 
-    if os.path.exists("otter/grade/old-Dockerfile"):
-        os.remove("otter/grade/Dockerfile")
-        shutil.move("otter/grade/old-Dockerfile", "otter/grade/Dockerfile")
+    # if os.path.exists("otter/grade/old-Dockerfile"):
+    #     os.remove("otter/grade/Dockerfile")
+    #     shutil.move("otter/grade/old-Dockerfile", "otter/grade/Dockerfile")
 
     if os.path.isfile(FILE_MANAGER.get_path("autograder.zip")):
         os.remove(FILE_MANAGER.get_path("autograder.zip"))
 
     # prune images
-    grade(prune=True, force=True)
+    # grade(prune=True, force=True)
 
 
 @pytest.fixture
@@ -135,12 +144,13 @@ def test_network(expected_points):
     """
     with loggers.level_context(logging.DEBUG):
         grade(
-            path = FILE_MANAGER.get_path("network/"),
+            name = ASSIGNMENT_NAME,
+            paths = [FILE_MANAGER.get_path("network/")],
             output_dir = "test/",
             autograder = FILE_MANAGER.get_path("autograder.zip"),
             containers = 5,
-            image = "otter-test",
-            pdfs = True,
+            # image = "otter-test",
+            # pdfs = True,
             no_network=True,
         )
 

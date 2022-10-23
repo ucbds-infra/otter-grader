@@ -1,8 +1,10 @@
 """Local grading of submissions in Docker containers for Otter-Grader"""
 
 import os
-import shutil
-import tempfile
+import re
+
+from glob import glob
+from typing import List, Optional, Tuple, Union
 
 from .containers import launch_containers
 from .utils import merge_csv, prune_images
@@ -16,7 +18,8 @@ LOGGER = loggers.get_logger(__name__)
 
 def main(
     *,
-    path: str = "./",
+    name: Optional[str] = None,
+    paths: Optional[Union[List[str], Tuple[str]]] = None,
     output_dir: str = "./",
     autograder: str = "./autograder.zip",
     containers: int = 4, 
@@ -40,7 +43,9 @@ def main(
     If ``prune`` is true, Otter's dangling grading images are pruned and the program exits.
 
     Args:
-        path (``str``): path to directory of submissions
+        name (``str``): an assignment name to use in the Docker image tag; must be specified unless
+            ``prune`` is true
+        paths (``tuple[str]``): paths to submission files or directories of submissions for grading
         output_dir (``str``): path to directory where output should be written
         autograder (``str``): path to an Otter autograder configuration zip file
         containers (``int``): number of containers to run in parallel
@@ -53,6 +58,10 @@ def main(
         timeout (``int``): an execution timeout in seconds for each container
         no_network (``bool``): whether to disable networking in the containers
 
+    Returns:
+        ``float | None``: the percentage scored by that submission if a single file was graded
+            otherwise ``None``
+
     Raises:
         ``FileNotFoundError``: if a provided directory or file doesn't exist
         ``ValueError``: if an unsupported extension is passed to ``ext``
@@ -61,21 +70,18 @@ def main(
         prune_images(force=force)
         return
 
-    # if path leads to single file this indicates the case and changes path to the directory and
-    # updates the ext argument
-    single_file = False
-    if os.path.isfile(path):
-        single_file = True
-        ext = os.path.splitext(path)[1][1:]  # remove the period from extension
-        file = os.path.split(path)[1]
-        temp_dir = tempfile.mkdtemp(prefix="otter_")
-        temp_file_path = os.path.join(temp_dir, file)
-        shutil.copy(path, temp_file_path)
-        path = temp_dir
+    if name is None:
+        raise ValueError("You must specify an assignment name")
+    elif not re.match(r"^[\w\-.]+$", name):
+        raise ValueError("Assignment names may only contain letters, nubers, underscores, dashes, and periods")
+
+    if not isinstance(paths, tuple) and not isinstance(paths, list):
+        raise TypeError("paths must be a tuple of valid paths")
+    elif len(paths) == 0:
+        raise ValueError("No paths specified")
 
     # check file paths
     assert_path_exists([
-        (path, True),
         (output_dir, True),
         (autograder, False),
     ])
@@ -85,17 +91,28 @@ def main(
 
     LOGGER.info("Launching Docker containers")
 
+    pattern = f"*.{ext}"
+    submission_paths = []
+    for path in paths:
+        if os.path.isdir(path):
+            submission_paths.extend(glob(os.path.join(path, pattern)))
+        else:
+            submission_paths.append(path)
+
+    LOGGER.debug(f"Resolved submission paths: {submission_paths}")
+
+    pdf_dir = os.path.join(output_dir, "submission_pdfs") if pdfs else None
+
     grade_dfs = launch_containers(
         autograder,
-        submissions_dir=path,
-        num_containers=containers,
-        ext=ext,
-        no_kill=no_kill,
-        output_path=output_dir,
-        image=image,
-        pdfs=pdfs,
-        timeout=timeout,
-        network=not no_network,
+        submission_paths,
+        num_containers = containers,
+        base_image = image,
+        tag = name,
+        no_kill = no_kill,
+        pdf_dir = pdf_dir,
+        timeout = timeout,
+        network = not no_network,
     )
 
     LOGGER.info("Combining grades and saving")
@@ -107,6 +124,7 @@ def main(
 
     # write to CSV file
     output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
-    if single_file:
-        shutil.rmtree(temp_dir)
+
+    # return percentage if a single file was graded
+    if len(paths) == 1 and os.path.isfile(paths[0]):
         return output_df["percent_correct"][0]

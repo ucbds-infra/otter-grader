@@ -1,9 +1,7 @@
 """Docker container management for Otter Grade"""
 
-import glob
 import os
 import pandas as pd
-import pickle
 import pkg_resources
 import shutil
 import tempfile
@@ -12,9 +10,9 @@ import zipfile
 from concurrent.futures import ThreadPoolExecutor, wait
 from python_on_whales import docker
 from textwrap import indent
-from typing import Optional
+from typing import List, Optional
 
-from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
+from .utils import OTTER_DOCKER_IMAGE_NAME
 
 from ..utils import loggers
 
@@ -22,8 +20,13 @@ from ..utils import loggers
 DOCKER_PLATFORM = "linux/amd64"
 LOGGER = loggers.get_logger(__name__)
 
+# Set this to true in a test file to indicate that one of Otter's unit tests is being run; this
+# will tell Otter to copy the working directory (the Otter repo) into the container and install it
+# so that the version of Otter installed in the container has all local edits.
+_TESTING = False
 
-def build_image(ag_zip_path, base_image, tag):
+
+def build_image(ag_zip_path: str, base_image: str, tag: str):
     """
     Creates a grading image based on the autograder zip file and attaches a tag.
 
@@ -35,34 +38,38 @@ def build_image(ag_zip_path, base_image, tag):
     Returns:
         ``str``: the tag of the newly-build Docker image
     """
-    image = OTTER_DOCKER_IMAGE_TAG + ":" + tag
-    dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
+    image = OTTER_DOCKER_IMAGE_NAME + ":" + tag
+    dockerfile_path = pkg_resources.resource_filename(__name__, "Dockerfile")
 
-    if not docker.image.exists(image):
-        LOGGER.info(f"Building new image using {base_image} as base image")
+    LOGGER.info(f"Building image using {base_image} as base image")
 
-        tmp_dir = tempfile.mkdtemp()
+    with tempfile.TemporaryDirectory() as temp_dir:
         with zipfile.ZipFile(ag_zip_path, 'r') as zip_ref:
-            zip_ref.extractall(tmp_dir)
+            zip_ref.extractall(temp_dir)
 
-        docker.build(tmp_dir, build_args={
-            "BASE_IMAGE": base_image
-        }, tags=[image], file=dockerfile, load=True, platforms=[DOCKER_PLATFORM])
-        shutil.rmtree(tmp_dir)
+        build_args = {"BASE_IMAGE": base_image}
+        if _TESTING:
+            build_args["BUILD_ENV"] = "test"
+
+        docker.build(
+            temp_dir,
+            build_args=build_args,
+            tags=[image],
+            file=dockerfile_path,
+            load=True,
+            platforms=[DOCKER_PLATFORM],
+        )
+
     return image
 
 
 def launch_containers(
     ag_zip_path: str,
-    submissions_dir: str,
+    submission_paths: List[str],
     num_containers: int,
-    ext: str,
-    no_kill: bool, 
-    output_path: str,
-    image: str,
-    pdfs: bool, 
-    timeout: Optional[int],
-    network: bool,
+    base_image: str,
+    tag: str,
+    **kwargs,
 ):
     """
     Grade submissions in parallel Docker containers.
@@ -73,16 +80,10 @@ def launch_containers(
 
     Args:
         ag_zip_path (``str``): path to zip file used to set up container
-        submissions_dir (``str``): path to directory of student submissions to be graded
+        submission_paths (``str``): paths of submissions to be graded
         num_containers (``int``, optional): number of containers to run in parallel
-        ext (``str``, optional): the submission file extension (to be used in a glob pattern)
-        no_kill (``bool``, optional): whether the grading containers should be kept running after
-            grading finishes
-        output_path (``str``, optional): path to directory where output should be written
         image (``str``, optional): a base image to use for building Docker images
-        pdfs (``bool``, optional): whether to copy PDFs out of the containers
-        timeout (``int``): timeout in seconds for each container
-        network (``bool``): whether to enable networking in the containers
+        **kwargs: additional kwargs passed to ``grade_submission``
 
     Returns:
         ``list[pandas.core.frame.DataFrame]``: the grades returned by each container spawned
@@ -90,24 +91,11 @@ def launch_containers(
     """
     pool = ThreadPoolExecutor(num_containers)
     futures = []
-    img = build_image(ag_zip_path, image, generate_hash(ag_zip_path))
+    image = build_image(ag_zip_path, base_image, tag)
 
-    pattern = f"*.{ext}"
-
-    submissions = glob.glob(os.path.join(submissions_dir, pattern))
-    pdf_dir = os.path.join(output_path, "submission_pdfs") if pdfs else None
-
-    for subm_path in submissions:
+    for subm_path in submission_paths:
         futures += [
-            pool.submit(
-                grade_assignments,
-                submission_path=subm_path,
-                image=img,
-                no_kill=no_kill,
-                pdf_dir=pdf_dir,
-                timeout=timeout,
-                network=network,
-            )
+            pool.submit(grade_submission, submission_path=subm_path, image=image, **kwargs)
         ]
 
     # stop execution while containers are running
@@ -117,7 +105,7 @@ def launch_containers(
     return [df.result() for df in finished_futures[0]]
 
 
-def grade_assignments(
+def grade_submission(
     submission_path: str,
     image: str,
     no_kill: bool = False,
@@ -140,6 +128,8 @@ def grade_assignments(
     Returns:
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
+    import dill
+
     temp_subm_file, temp_subm_path = tempfile.mkstemp()
     shutil.copyfile(submission_path, temp_subm_path)
 
@@ -200,13 +190,13 @@ def grade_assignments(
                 f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
 
         with open(results_path, "rb") as f:
-            scores = pickle.load(f)
+            scores = dill.load(f)
 
         scores_dict = scores.to_dict()
         scores_dict["percent_correct"] = scores.total / scores.possible
 
         scores_dict = {t: [scores_dict[t]["score"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
-        scores_dict["file"] = os.path.split(submission_path)[1]
+        scores_dict["file"] = submission_path
         df = pd.DataFrame(scores_dict)
 
         if pdf_dir:
