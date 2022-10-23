@@ -33,13 +33,17 @@ autograder to run.
 
 The template for Python assignments is:
 
-.. literalinclude:: ../../../otter/generate/templates/python/setup.sh
+.. literalinclude:: ../../_static/python_setup.sh
     :language: shell
 
 And the template for R assignments is:
 
-.. literalinclude:: ../../../otter/generate/templates/python/setup.sh
+.. literalinclude:: ../../_static/r_setup.sh
     :language: shell
+
+Note that the line ``conda run -n otter-env Rscript /autograder/source/requirements.r`` is only
+included if you have provided an :ref:`R requirements file 
+<otter_generate_container_image_requirements_r>`.
 
 
 ``environment.yml``
@@ -60,6 +64,8 @@ If you're grading an R assignment, the ``environment.yml`` has additional depden
 .. literalinclude:: ../../_static/grading-environment-r.yml
     :language: yaml
 
+
+.. _otter_generate_container_image_requirements_r:
 
 ``requirements.r``
 ------------------

@@ -1,9 +1,7 @@
 """Docker container management for Otter Grade"""
 
-import glob
 import os
 import pandas as pd
-import pickle
 import pkg_resources
 import shutil
 import tempfile
@@ -12,100 +10,84 @@ import zipfile
 from concurrent.futures import ThreadPoolExecutor, wait
 from python_on_whales import docker
 from textwrap import indent
-from typing import Optional
+from typing import List, Optional
 
-from .utils import generate_hash, OTTER_DOCKER_IMAGE_TAG
+from .utils import OTTER_DOCKER_IMAGE_NAME
 
 from ..utils import loggers
 
 
+DOCKER_PLATFORM = "linux/amd64"
 LOGGER = loggers.get_logger(__name__)
 
 
-def build_image(zip_path, base_image, tag):
+def build_image(ag_zip_path: str, base_image: str, tag: str):
     """
     Creates a grading image based on the autograder zip file and attaches a tag.
 
     Args:
-        zip_path (``str``): path to the autograder zip file
+        ag_zip_path (``str``): path to the autograder zip file
         base_image (``str``): base Docker image to build from
         tag (``str``): tag to be added when creating the image
 
     Returns:
         ``str``: the tag of the newly-build Docker image
     """
-    image = OTTER_DOCKER_IMAGE_TAG + ":" + tag
-    dockerfile = pkg_resources.resource_filename(__name__, "Dockerfile")
+    image = OTTER_DOCKER_IMAGE_NAME + ":" + tag
+    dockerfile_path = pkg_resources.resource_filename(__name__, "Dockerfile")
 
-    if not docker.image.exists(image):
-        LOGGER.info(f"Building new image using {base_image} as base image")
+    LOGGER.info(f"Building image using {base_image} as base image")
 
-        tmp_dir = tempfile.mkdtemp()
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(tmp_dir)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with zipfile.ZipFile(ag_zip_path, 'r') as zip_ref:
+            zip_ref.extractall(temp_dir)
 
-        docker.build(tmp_dir, build_args={
-            "BASE_IMAGE": base_image
-        }, tags=[image], file=dockerfile, load=True)
-        shutil.rmtree(tmp_dir)
+        docker.build(
+            temp_dir,
+            build_args={"BASE_IMAGE": base_image},
+            tags=[image],
+            file=dockerfile_path,
+            load=True,
+            platforms=[DOCKER_PLATFORM],
+        )
+
     return image
 
 
-def launch_grade(zip_path, submissions_dir, num_containers=None, ext="ipynb", no_kill=False, 
-                 output_path="./", zips=False, image="ucbdsinfra/otter-grader", pdfs=False, 
-                 timeout=None, network=True):
+def launch_containers(
+    ag_zip_path: str,
+    submission_paths: List[str],
+    num_containers: int,
+    base_image: str,
+    tag: str,
+    **kwargs,
+):
     """
-    Grades notebooks in parallel Docker containers
+    Grade submissions in parallel Docker containers.
 
-    This function runs ``num_containers`` Docker containers in parallel to grade the student submissions
-    in ``submissions_dir`` using the autograder configuration file at ``zip_path``. It can additionally 
-    generate PDFs for the parts of the assignment needing manual grading.
+    This function runs ``num_containers`` Docker containers in parallel to grade the student
+    submissions in ``submissions_dir`` using the autograder configuration file at ``ag_zip_path``. 
+    If indicated, it copies the PDFs generated of the submissions out of their containers.
 
     Args:
-        zip_path(``str``): path to zip file used to set up container
-        submissions_dir (``str``): path to directory of student submissions to be graded
-        num_containers (``int``, optional): The number of parallel containers that will be run
-        ext (``str``, optional): the submission file extension for globbing
-        no_kill (``bool``, optional): whether the grading containers should be kept running after
-            grading finishes
-        output_path (``str``, optional): path at which to write grades CSVs copied from the container
-        zips (``bool``, optional): whether the submissions are zip files formatted from ``Notebook.export``
-        image (``str``, optional): a base image to use for building Docker images
-        pdfs (``bool``, optional): whether to copy PDFs out of the containers
-        timeout (``int``): timeout in seconds for each container
-        network (``bool``): whether to enable networking in the containers
+        ag_zip_path (``str``): path to zip file used to set up container
+        submission_paths (``str``): paths of submissions to be graded
+        num_containers (``int``): number of containers to run in parallel
+        base_image (``str``): the name of a base image to use for building Docker images
+        tag (``str``): a tag to use for the ``otter-grade`` image created for this assignment
+        **kwargs: additional kwargs passed to ``grade_submission``
 
     Returns:
-        ``list`` of ``pandas.core.frame.DataFrame``: the grades returned by each container spawned during
-            grading
+        ``list[pandas.core.frame.DataFrame]``: the grades returned by each container spawned
+            during grading
     """
-    if not num_containers:
-        num_containers = 4
-
     pool = ThreadPoolExecutor(num_containers)
     futures = []
-    img = build_image(zip_path, image, generate_hash(zip_path))
+    image = build_image(ag_zip_path, base_image, tag)
 
-    if zips:
-        pattern = "*.zip"
-    else:
-        pattern = f"*.{ext}"
-
-    submissions = glob.glob(os.path.join(submissions_dir, pattern))
-    pdf_dir = os.path.join(output_path, "submission_pdfs")
-
-    for subm_path in submissions:
+    for subm_path in submission_paths:
         futures += [
-            pool.submit(
-                grade_assignments,
-                submission_path=subm_path,
-                image=img,
-                no_kill=no_kill,
-                pdf_dir=pdf_dir,
-                pdfs=pdfs,
-                timeout=timeout,
-                network=network,
-            )
+            pool.submit(grade_submission, submission_path=subm_path, image=image, **kwargs)
         ]
 
     # stop execution while containers are running
@@ -115,31 +97,37 @@ def launch_grade(zip_path, submissions_dir, num_containers=None, ext="ipynb", no
     return [df.result() for df in finished_futures[0]]
 
 
-def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=False, 
-                      timeout: Optional[int] = None, network=True):
+def grade_submission(
+    submission_path: str,
+    image: str,
+    no_kill: bool = False,
+    pdf_dir: Optional[str] = None,
+    timeout: Optional[int] = None,
+    network: bool = True,
+):
     """
-    Grades multiple submissions in a directory using a single docker container. If no PDF assignment is
-    wanted, set all three PDF params (``unfiltered_pdfs``, ``tag_filter``, and ``html_filter``) to ``False``.
+    Grade a submission in a Docker container.
 
     Args:
         submission_path (``str``): path to the submission to be graded
         image (``str``): a Docker image tag to be used for grading environment
-        no_kill (``bool``, optional): whether the grading containers should be kept running after
+        no_kill (``bool``): whether the grading containers should be kept running after
             grading finishes
-        pdf_dir (``str``, optional): directory in which to put notebook PDFs, if applicable
-        pdfs (``bool``, optional): whether to copy PDFs out of the containers
-        timeout (``int``): timeout in seconds for each container
+        pdf_dir (``str``, optional): a directory in which to put the notebook PDF, if applicable
+        timeout (``int``, optional): timeout in seconds for each container
         network (``bool``): whether to enable networking in the containers
 
     Returns:
         ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
     """
+    import dill
+
     temp_subm_file, temp_subm_path = tempfile.mkstemp()
     shutil.copyfile(submission_path, temp_subm_path)
 
     results_file, results_path = tempfile.mkstemp(suffix=".pkl")
     pdf_path = None
-    if pdfs:
+    if pdf_dir:
         pdf_file, pdf_path = tempfile.mkstemp(suffix=".pdf")
 
     try:
@@ -150,15 +138,21 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
             (temp_subm_path, f"/autograder/submission/{nb_basename}"),
             (results_path, "/autograder/results/results.pkl")
         ]
-        if pdfs:
+        if pdf_dir:
             volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
 
-        args = {}
-
+        run_kwargs = {}
         if network is not None and not network:
-            args['networks'] = 'none'
+            run_kwargs['networks'] = 'none'
 
-        container = docker.container.run(image, command=["/autograder/run_autograder"], volumes=volumes, detach=True, **args)
+        container = docker.container.run(
+            image,
+            command=["/autograder/run_autograder"],
+            volumes=volumes,
+            detach=True,
+            platform=DOCKER_PLATFORM,
+            **run_kwargs,
+        )
 
         if timeout:
             import threading
@@ -184,19 +178,20 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
             container.remove()
 
         if exit != 0:
-            raise Exception(f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
+            raise Exception(
+                f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
 
         with open(results_path, "rb") as f:
-            scores = pickle.load(f)
+            scores = dill.load(f)
 
         scores_dict = scores.to_dict()
         scores_dict["percent_correct"] = scores.total / scores.possible
 
         scores_dict = {t: [scores_dict[t]["score"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
-        scores_dict["file"] = os.path.split(submission_path)[1]
+        scores_dict["file"] = submission_path
         df = pd.DataFrame(scores_dict)
 
-        if pdfs:
+        if pdf_dir:
             os.makedirs(pdf_dir, exist_ok=True)
 
             local_pdf_path = os.path.join(pdf_dir, f"{nb_name}.pdf")
@@ -207,7 +202,7 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
         os.remove(results_path)
         os.close(temp_subm_file)
         os.remove(temp_subm_path)
-        if pdfs:
+        if pdf_dir:
             os.close(pdf_file)
             os.remove(pdf_path)
 

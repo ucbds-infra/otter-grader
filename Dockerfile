@@ -1,56 +1,28 @@
-# Dockerfile forked from https://github.com/jeffheaton/docker-jupyter-python-r/blob/master/Dockerfile
-FROM ubuntu:20.04
+# Docker image for setting up a development environment and Otter's automated tests.
 
-# common packages
-RUN export DEBIAN_FRONTEND=noninteractive && \
-    apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y tzdata git vim wget libssl-dev nano && \
-    rm -rf /var/lib/apt/lists/*
+FROM docker/buildx-bin as buildx
 
-# miniconda
-RUN echo 'export PATH=/opt/conda/bin:$PATH' >> /root/.bashrc && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-    rm ~/miniconda.sh && \
-    rm -rf /var/lib/apt/lists/*
+FROM ubuntu:latest
 
-ENV PATH /opt/conda/bin:$PATH
+# Make docker buildx available in the container
+COPY --from=buildx /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
-# R pre-reqs 
-RUN apt-get clean && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends fonts-dejavu gfortran gcc && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Install apt packages
+RUN apt-get update && apt-get upgrade -y && apt-get install -y wget make
 
-# R
-RUN apt-get clean && \
-    apt-get update && \
-    conda install -y "r-base>=4.0.0" r-essentials && \
-    conda install -c r r-irkernel r-essentials r-devtools -c conda-forge && \
-    rm -rf /var/lib/apt/lists/*
+# Install conda
+RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    -O /tmp/miniconda_install.sh && \
+    chmod +x /tmp/miniconda_install.sh && \
+    /tmp/miniconda_install.sh -b
+ENV PATH=/root/miniconda3/bin:$PATH
 
-# install wkhtmltopdf for otter export
-RUN apt-get clean && \
-    apt-get update && \ 
-    apt-get install -y pandoc && \
-    apt-get install -y -f texlive-xetex texlive-fonts-recommended texlive-lang-chinese && \
-    wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb && \
-    apt-get install -y /tmp/wkhtmltopdf.deb && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Create conda environment
+COPY environment.yml requirements.txt requirements-export.txt requirements-test.txt /tmp/
+RUN mkdir -p /tmp/docs && touch /tmp/docs/requirements.txt
+RUN conda env create -f /tmp/environment.yml
+ADD . /root/otter-grader
+RUN conda run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.us.r-project.org")'
 
-# Set the locale to UTF-8 to ensure that Unicode output is encoded correctly
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
-
-# create dir for autograder
-RUN mkdir /autograder
-
-# Python requirements
-ADD requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
-
-RUN pip install otter-grader==4.1.0
-RUN Rscript -e "install.packages('ottr', dependencies=TRUE, repos='http://cran.us.r-project.org')"
+# Make script executable
+RUN chmod +x /root/otter-grader/bin/run_tests

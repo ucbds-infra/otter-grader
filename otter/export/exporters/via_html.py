@@ -2,11 +2,9 @@
 
 import nbconvert
 import os
-import pdfkit
 import shutil
 
 from io import BytesIO
-from PyPDF2 import PdfFileMerger
 
 from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
 from .utils import notebook_pdf_generator
@@ -32,7 +30,11 @@ class PDFViaHTMLExporter(BaseExporter):
 
     @classmethod
     def convert_notebook(cls, nb_path, dest, **kwargs):
-        assert shutil.which("wkhtmltopdf") is not None, "Cannot export via HTML without wkhtmltopdf"
+        if shutil.which("wkhtmltopdf") is None:
+            raise RuntimeError("Cannot export via HTML without wkhtmltopdf")
+
+        import pdfkit
+        from PyPDF2 import PdfFileMerger
 
         options = cls.default_options.copy()
         options.update(kwargs)
