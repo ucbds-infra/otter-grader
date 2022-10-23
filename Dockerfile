@@ -13,4 +13,4 @@ RUN conda env create -f /tmp/environment.yml
 ADD . /root/otter-grader
 RUN conda init --all
 WORKDIR /root/otter-grader
-CMD bash -c "conda activate otter-grader && make testcov && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml"
+CMD bash -c "source /root/.bashrc && conda activate otter-grader && make testcov && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml"
