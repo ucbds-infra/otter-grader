@@ -53,26 +53,26 @@ def build_image_with_local_changes(*args, **kwargs):
     return image
 
 
-@pytest.fixture(autouse=True, scope="module")
-def generate_zip_file_and_patch_build():
-    """
-    Generate an autograder zip file for use in these tests and patch
-    ``otter.grade.containers.build_image`` with ``build_image_with_local_changes``.
-    """
-    generate(
-        tests_dir = FILE_MANAGER.get_path("tests"), 
-        requirements = FILE_MANAGER.get_path("requirements.txt"), 
-        output_path = AG_ZIP_PATH,
-        config = FILE_MANAGER.get_path("otter_config.json"),
-        no_environment = True,
-    )
+# @pytest.fixture(autouse=True, scope="module")
+# def generate_zip_file_and_patch_build():
+#     """
+#     Generate an autograder zip file for use in these tests and patch
+#     ``otter.grade.containers.build_image`` with ``build_image_with_local_changes``.
+#     """
+#     generate(
+#         tests_dir = FILE_MANAGER.get_path("tests"), 
+#         requirements = FILE_MANAGER.get_path("requirements.txt"), 
+#         output_path = AG_ZIP_PATH,
+#         config = FILE_MANAGER.get_path("otter_config.json"),
+#         no_environment = True,
+#     )
 
-    with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes), \
-            loggers.level_context(logging.DEBUG):
-        yield
+#     with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes), \
+#             loggers.level_context(logging.DEBUG):
+#         yield
 
-    if os.path.isfile(AG_ZIP_PATH):
-        os.remove(AG_ZIP_PATH)
+#     if os.path.isfile(AG_ZIP_PATH):
+#         os.remove(AG_ZIP_PATH)
 
 
 @pytest.fixture
@@ -88,101 +88,101 @@ def expected_points():
     return test_points
 
 
-@pytest.mark.slow
-@pytest.mark.docker
-def test_timeout():
-    """
-    Check that the notebook ``1min.ipynb`` is killed due to exceeding the defined timeout.
-    """
-    with pytest.raises(
-        Exception, match=r"Executing '[\w./-]*test/test-grade/timeout/1min\.ipynb' in docker " \
-            "container failed! Exit code: 137"):
-        grade(
-            name = ASSIGNMENT_NAME,
-            paths = [FILE_MANAGER.get_path("timeout/")],
-            output_dir = "test/",
-            autograder = AG_ZIP_PATH,
-            containers = 5,
-            timeout = 59,
-        )
+# @pytest.mark.slow
+# @pytest.mark.docker
+# def test_timeout():
+#     """
+#     Check that the notebook ``1min.ipynb`` is killed due to exceeding the defined timeout.
+#     """
+#     with pytest.raises(
+#         Exception, match=r"Executing '[\w./-]*test/test-grade/timeout/1min\.ipynb' in docker " \
+#             "container failed! Exit code: 137"):
+#         grade(
+#             name = ASSIGNMENT_NAME,
+#             paths = [FILE_MANAGER.get_path("timeout/")],
+#             output_dir = "test/",
+#             autograder = AG_ZIP_PATH,
+#             containers = 5,
+#             timeout = 59,
+#         )
 
 
-@pytest.mark.slow
-@pytest.mark.docker
-def test_network(expected_points):
-    """
-    Check that the notebook ``network.ipynb`` is unable to do some network requests with disabled
-    networking.
-    """
-    grade(
-        name = ASSIGNMENT_NAME,
-        paths = [FILE_MANAGER.get_path("network/")],
-        output_dir = "test/",
-        autograder = AG_ZIP_PATH,
-        containers = 5,
-        no_network=True,
-    )
+# @pytest.mark.slow
+# @pytest.mark.docker
+# def test_network(expected_points):
+#     """
+#     Check that the notebook ``network.ipynb`` is unable to do some network requests with disabled
+#     networking.
+#     """
+#     grade(
+#         name = ASSIGNMENT_NAME,
+#         paths = [FILE_MANAGER.get_path("network/")],
+#         output_dir = "test/",
+#         autograder = AG_ZIP_PATH,
+#         containers = 5,
+#         no_network=True,
+#     )
 
-    df_test = pd.read_csv("test/final_grades.csv")
+#     df_test = pd.read_csv("test/final_grades.csv")
 
-    # sort by filename
-    df_test = df_test.sort_values("file").reset_index(drop=True)
+#     # sort by filename
+#     df_test = df_test.sort_values("file").reset_index(drop=True)
 
-    for _, row in df_test.iterrows():
-        for test in expected_points:
-            if '/network.ipynb' in row["file"] and ('q2' in test or 'q3' in test):
-                assert row[test] == 0, "{} supposed to fail {} but passed".format(row["file"], test)
-            else:
-                assert row[test] == expected_points[test], "{} supposed to pass {} but failed".format(row["file"], test)
+#     for _, row in df_test.iterrows():
+#         for test in expected_points:
+#             if '/network.ipynb' in row["file"] and ('q2' in test or 'q3' in test):
+#                 assert row[test] == 0, "{} supposed to fail {} but passed".format(row["file"], test)
+#             else:
+#                 assert row[test] == expected_points[test], "{} supposed to pass {} but failed".format(row["file"], test)
 
 
-@pytest.mark.slow
-@pytest.mark.docker
-def test_notebooks_with_pdfs(expected_points):
-    """
-    Checks that notebooks are graded correctly and that PDFs are generated.
-    """
-    grade(
-        name = ASSIGNMENT_NAME,
-        paths = [FILE_MANAGER.get_path("notebooks/")],
-        output_dir = "test/",
-        autograder = AG_ZIP_PATH,
-        containers = 5,
-        pdfs = True,
-    )
+# @pytest.mark.slow
+# @pytest.mark.docker
+# def test_notebooks_with_pdfs(expected_points):
+#     """
+#     Checks that notebooks are graded correctly and that PDFs are generated.
+#     """
+#     grade(
+#         name = ASSIGNMENT_NAME,
+#         paths = [FILE_MANAGER.get_path("notebooks/")],
+#         output_dir = "test/",
+#         autograder = AG_ZIP_PATH,
+#         containers = 5,
+#         pdfs = True,
+#     )
 
-    # read the output and expected output
-    df_test = pd.read_csv("test/final_grades.csv")
+#     # read the output and expected output
+#     df_test = pd.read_csv("test/final_grades.csv")
 
-    # sort by filename
-    df_test = df_test.sort_values("file").reset_index(drop=True)
-    df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
+#     # sort by filename
+#     df_test = df_test.sort_values("file").reset_index(drop=True)
+#     df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
 
-    # add score sum cols for tests
-    for test in expected_points:
-        test_cols = [l for l in df_test.columns if bool(re.search(fr"\b{test}\b", l))]
-        df_test[test] = df_test[test_cols].sum(axis=1)
+#     # add score sum cols for tests
+#     for test in expected_points:
+#         test_cols = [l for l in df_test.columns if bool(re.search(fr"\b{test}\b", l))]
+#         df_test[test] = df_test[test_cols].sum(axis=1)
 
-    # check point values
-    for _, row in df_test.iterrows():
-        for test in expected_points:
-            if int(re.sub(r"\D", "", test)) in row["failures"]:
-                # q6.py has all_or_nothing set to False, so if the hidden tests fail you should get 2.5 points
-                if "6H" in row["file"] and "q6" == test:
-                    assert row[test] == 2.5, "{} supposed to fail {} but passed".format(row["file"], test)
-                else:
-                    assert row[test] == 0, "{} supposed to fail {} but passed".format(row["file"], test)
-            else:
-                assert row[test] == expected_points[test], "{} supposed to pass {} but failed".format(row["file"], test)
+#     # check point values
+#     for _, row in df_test.iterrows():
+#         for test in expected_points:
+#             if int(re.sub(r"\D", "", test)) in row["failures"]:
+#                 # q6.py has all_or_nothing set to False, so if the hidden tests fail you should get 2.5 points
+#                 if "6H" in row["file"] and "q6" == test:
+#                     assert row[test] == 2.5, "{} supposed to fail {} but passed".format(row["file"], test)
+#                 else:
+#                     assert row[test] == 0, "{} supposed to fail {} but passed".format(row["file"], test)
+#             else:
+#                 assert row[test] == expected_points[test], "{} supposed to pass {} but failed".format(row["file"], test)
 
-    assert os.path.exists("test/submission_pdfs"), "PDF folder is missing"
+#     assert os.path.exists("test/submission_pdfs"), "PDF folder is missing"
 
-    # check that an pdf exists for each submission
-    dir1_contents, dir2_contents = (
-        [os.path.splitext(f)[0] for f in os.listdir(FILE_MANAGER.get_path("notebooks/")) if not (os.path.isdir(os.path.join(FILE_MANAGER.get_path("notebooks/"), f)))],
-        [os.path.splitext(f)[0] for f in os.listdir("test/submission_pdfs") if not (os.path.isdir(os.path.join("test/submission_pdfs", f)))],
-    )
-    assert sorted(dir1_contents) == sorted(dir2_contents), f"'{FILE_MANAGER.get_path('notebooks/')}' and 'test/submission_pdfs' have different contents"
+#     # check that an pdf exists for each submission
+#     dir1_contents, dir2_contents = (
+#         [os.path.splitext(f)[0] for f in os.listdir(FILE_MANAGER.get_path("notebooks/")) if not (os.path.isdir(os.path.join(FILE_MANAGER.get_path("notebooks/"), f)))],
+#         [os.path.splitext(f)[0] for f in os.listdir("test/submission_pdfs") if not (os.path.isdir(os.path.join("test/submission_pdfs", f)))],
+#     )
+#     assert sorted(dir1_contents) == sorted(dir2_contents), f"'{FILE_MANAGER.get_path('notebooks/')}' and 'test/submission_pdfs' have different contents"
 
 
 @mock.patch("otter.grade.launch_containers")

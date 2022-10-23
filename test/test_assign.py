@@ -104,7 +104,7 @@ def test_convert_example():
     """
     assign_and_check_output(
         FILE_MANAGER.get_path("example.ipynb"), 
-        FILE_MANAGER.get_path("example-correct"), 
+        FILE_MANAGER.get_path("gs-correct"), 
         assign_kwargs=dict(no_run_tests=True),
         assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
