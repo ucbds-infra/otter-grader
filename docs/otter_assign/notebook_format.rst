@@ -97,24 +97,26 @@ their values:
         show_hidden: true
 
 You can also set the autograder up to automatically upload PDFs to student submissions to another 
-Gradescope assignment by setting the necessary keys in the ``pdfs`` subkey of ``generate``:
+Gradescope assignment by setting the necessary keys under ``generate``:
 
 .. code-block:: yaml
 
     generate:
-        token: ''
+        token: YOUR_TOKEN      # optional
         course_id: 1234        # required
         assignment_id: 5678    # required
         filtering: true        # true is the default
 
-If you don't specify a token, you will be prompted for your username and password when you run Otter
-Assign; optionally, you can specify these via the command line with the ``--username`` and 
-``--password`` flags. You can also run the following to retrieve your token:
+You can run the following to retrieve your token:
 
 .. code-block:: python
 
     from otter.generate.token import APIClient
     print(APIClient.get_token())
+
+If you don't specify a token, you will be prompted for your username and password when you run Otter
+Assign; optionally, you can specify these via the command line with the ``--username`` and
+``--password`` flags.
 
 Any configurations in your ``generate`` key will be put into an ``otter_config.json`` and used when
 running Otter Generate.
