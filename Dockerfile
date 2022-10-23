@@ -13,8 +13,7 @@ RUN conda env create -f /tmp/environment.yml
 ADD . /root/otter-grader
 # RUN conda init --all
 WORKDIR /root/otter-grader
-SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash"]
-CMD source /root/.bashrc && \
-    conda activate otter-grader && \
-    make testcov && coverage xml -i && \
+SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash", "-c"]
+CMD make testcov && \
+    coverage xml -i && \
     cp ./coverage.xml /tmp/coverage.xml
