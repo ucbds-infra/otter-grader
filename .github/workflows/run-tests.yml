@@ -20,7 +20,8 @@ jobs:
 
     env:
       TAR: /bin/tar
-      DOCKER_BUILDKIT: 1 
+      DOCKER_BUILDKIT: 1
+      DOCKER_CLI_EXPERIMENTAL: enabled
 
     steps:
       - uses: actions/checkout@v2
