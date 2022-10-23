@@ -45,7 +45,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test
+          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test /root/otter-grader/bin/run_tests
           cp /tmp/coverage.xml ./coverage.xml
 
       - name: Send to Codecov

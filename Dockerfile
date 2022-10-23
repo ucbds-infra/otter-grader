@@ -13,9 +13,9 @@ RUN conda env create -f /tmp/environment.yml
 ADD . /root/otter-grader
 RUN conda run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.us.r-project.org")'
 # RUN conda init --all
-WORKDIR /root/otter-grader
-RUN chmod +777 bin/run_tests
+# WORKDIR /root/otter-grader
+RUN chmod +777 /root/otter-grader/bin/run_tests
 # SHELL ["/bin/bash", "-c"]
 # SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash", "-c"]
 # RUN which -a docker
-ENTRYPOINT /root/otter-grader/bin/run_tests
+# ENTRYPOINT /root/otter-grader/bin/run_tests
