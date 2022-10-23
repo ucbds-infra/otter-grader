@@ -33,4 +33,4 @@ conda run -n otter-env Rscript /autograder/source/requirements.r
 conda init --all
 
 # install ottr; not sure why it needs to happen twice but whatever
-conda run -n otter-env Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/ottr/ottr_1.1.5.tar.gz", dependencies=TRUE, repos=NULL)'
+conda run -n otter-env Rscript -e 'install.packages("https://cran.r-project.org/package=ottr&version=1.2.0", dependencies=TRUE, repos=NULL)'
