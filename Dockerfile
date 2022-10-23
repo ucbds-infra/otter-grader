@@ -18,4 +18,4 @@ RUN chmod +777 bin/run_tests
 # SHELL ["/bin/bash", "-c"]
 # SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash", "-c"]
 # RUN which -a docker
-ENTRYPOINT [ "bin/run_tests" ]
+ENTRYPOINT /root/otter-grader/bin/run_tests
