@@ -14,24 +14,23 @@ apt-get install -y libnlopt-dev cmake libfreetype6-dev libpng-dev libtiff5-dev l
 # install conda
 if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
     then wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh \
-        -O {{ autograder_dir }}/source/miniconda_install.sh ; \
+        -O /autograder/source/miniconda_install.sh ; \
     else wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-        -O {{ autograder_dir }}/source/miniconda_install.sh ; \
+        -O /autograder/source/miniconda_install.sh ; \
 fi
-chmod +x {{ autograder_dir }}/source/miniconda_install.sh
-{{ autograder_dir }}/source/miniconda_install.sh -b
+chmod +x /autograder/source/miniconda_install.sh
+/autograder/source/miniconda_install.sh -b
 echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
 
 export PATH=/root/miniconda3/bin:$PATH
 export TAR="/bin/tar"
 
-# install dependencies with conda{% if channel_priority_strict %}
-conda config --set channel_priority strict{% endif %}
-conda env create -f {{ autograder_dir }}/source/environment.yml{% if has_r_requirements %}
-conda run -n {{ otter_env_name }} Rscript {{ autograder_dir }}/source/requirements.r{% endif %}
+# install dependencies with conda
+conda env create -f /autograder/source/environment.yml
+conda run -n otter-env Rscript /autograder/source/requirements.r
 
 # set conda shell
 conda init --all
 
 # install ottr; not sure why it needs to happen twice but whatever
-conda run -n otter-env Rscript -e 'install.packages("https://cran.r-project.org/package=ottr&version={{ ottr_version }}", dependencies=TRUE, repos=NULL)'
+conda run -n otter-env Rscript -e 'install.packages("https://cran.r-project.org/package=ottr&version=1.2.0", dependencies=TRUE, repos=NULL)'

@@ -1,4 +1,5 @@
 sphinx_markdown_tables
-sphinx-book-theme==0.1.7
+sphinx-book-theme==0.3.3
 sphinxcontrib-apidoc
 sphinx-click
+jinja2

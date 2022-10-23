@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Runs Otter's tests and copies the resulting coverage.xml file into the /tmp directory. This script
+# should only be used inside a Docker container created by /Dockerfile.
+
+export PATH="/root/miniconda3/bin:$PATH"
+source /root/miniconda3/etc/profile.d/conda.sh
+cd /root/otter-grader
+conda activate otter-grader
+make testcov && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml

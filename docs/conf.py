@@ -14,7 +14,6 @@
 
 import os
 import sys
-import yaml
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -24,6 +23,7 @@ sys.path.insert(0, os.path.abspath('..'))
 import nbconvert
 
 from glob import glob
+from jinja2 import Template
 from otter.generate import CondaEnvironment
 from otter.utils import print_full_width
 
@@ -112,7 +112,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_theme = 'sphinx_book_theme'
-html_logo = '../logo/otter-logo-smaller.png'
+html_logo = '../logo/otter-logo-smallest.png'
 
 html_theme_options = {
     'github_url': 'https://github.com/ucbds-infra/otter-grader',
@@ -222,10 +222,28 @@ def convert_static_notebooks():
     print_full_width("=")
 
 
+def make_setup_sh_files():
+    ctx = {
+        "autograder_dir": "/autograder",
+        "otter_env_name": "otter-env",
+        "has_r_requirements": True,
+    }
+
+    for l in ["python", "r"]:
+        with open(f"../otter/generate/templates/{l}/setup.sh") as f:
+            t = Template(f.read())
+        s = t.render(ctx)
+        with open(f"_static/{l}_setup.sh", "w+") as f:
+            f.write(s)
+
+
 # -- Extension configuration -------------------------------------------------
 def setup(app):
     # run nbconvert on all of the notebooks in _static/notebooks
     convert_static_notebooks()
+
+    # convert templates to valid setup.sh files
+    make_setup_sh_files()
 
     with open("_static/grading-environment.yml", "w+") as f:
         f.write(CondaEnvironment(3.7, False, [], False, None).to_str())
