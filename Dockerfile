@@ -1,4 +1,7 @@
+FROM docker/buildx-bin as buildx
 FROM ubuntu:22.04
+COPY --from=buildx /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+RUN docker buildx --version
 RUN apt-get update && apt-get upgrade -y && apt-get install -y wget make
 RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
     -O /tmp/miniconda_install.sh && \
