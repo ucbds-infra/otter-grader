@@ -11,6 +11,7 @@ COPY environment.yml requirements.txt requirements-export.txt requirements-test.
 RUN mkdir -p /tmp/docs && touch /tmp/docs/requirements.txt
 RUN conda env create -f /tmp/environment.yml
 ADD . /root/otter-grader
+RUN conda run -n otter-env Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.us.r-project.org")'
 # RUN conda init --all
 WORKDIR /root/otter-grader
 SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash", "-c"]
