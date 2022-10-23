@@ -6,18 +6,13 @@ import pandas as pd
 import pytest
 import re
 import shutil
-import subprocess
-import tempfile
-import zipfile
 
 from glob import glob
 from python_on_whales import docker
 from unittest import mock
 
 from otter.generate import main as generate
-from otter.generate.utils import zip_folder
 from otter.grade import main as grade
-# from otter.grade import containers
 from otter.grade.containers import build_image, DOCKER_PLATFORM
 from otter.utils import loggers
 
@@ -27,13 +22,6 @@ from .utils import TestFileManager
 ASSIGNMENT_NAME = "otter-grade-test"
 FILE_MANAGER = TestFileManager("test/test-grade")
 AG_ZIP_PATH = FILE_MANAGER.get_path("autograder.zip")
-
-
-# @pytest.fixture(autouse=True)
-# def enable_testing_mode():
-#     containers._TESTING = True
-#     yield
-#     containers._TESTING = False
 
 
 @pytest.fixture(autouse=True)
@@ -65,57 +53,30 @@ def build_image_with_local_changes(*args, **kwargs):
     return image
 
 
-def generate_autograder_zip(pdfs=False):
+@pytest.fixture(autouse=True, scope="module")
+def generate_zip_file_and_patch_build():
     """
-    Run Otter Generate to create an autograder zip file for use in these tests.
+    Generate an autograder zip file for use in these tests and patch
+    ``otter.grade.containers.build_image`` with ``build_image_with_local_changes``.
     """
     generate(
         tests_dir = FILE_MANAGER.get_path("tests"), 
         requirements = FILE_MANAGER.get_path("requirements.txt"), 
         output_path = AG_ZIP_PATH,
-        config = FILE_MANAGER.get_path("otter_config.json") if pdfs else None,
+        config = FILE_MANAGER.get_path("otter_config.json"),
         no_environment = True,
     )
-    # with zipfile.ZipFile(AG_ZIP_PATH, "a") as zip_ref:
-    #     zip_folder(zip_ref, os.getcwd(), exclude=[".git", "logo", "test", "dist", "build", "otter_grader.egg-info"])
 
-
-@pytest.fixture(autouse=True, scope="module")
-def create_docker_image():    
-    # subprocess.run(["make", "docker-grade-test"], check=True)
-
-    # shutil.copy("otter/grade/Dockerfile", "otter/grade/old-Dockerfile")
-    # with open("otter/grade/Dockerfile", "r+") as f:
-    #     lines = f.readlines()
-
-    #     idx = max([i if "ARG" in lines[i] else -1 for i in range(len(lines))])
-    #     lines.insert(idx + 1, "ADD otter-grader /home/otter-grader\n")
-
-    #     f.seek(0)
-    #     f.write("".join(lines))
-
-    generate_autograder_zip(pdfs=True)
-
-    yield
-
-    # subprocess.run(["make", "cleanup-docker-grade-test"], check=True)
-
-    # if os.path.exists("otter/grade/old-Dockerfile"):
-    #     os.remove("otter/grade/Dockerfile")
-    #     shutil.move("otter/grade/old-Dockerfile", "otter/grade/Dockerfile")
+    with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes), \
+            loggers.level_context(logging.DEBUG):
+        yield
 
     if os.path.isfile(AG_ZIP_PATH):
         os.remove(AG_ZIP_PATH)
 
-    # prune images
-    # grade(prune=True, force=True)
-
 
 @pytest.fixture
 def expected_points():
-    """
-    Load in point values
-    """
     test_points = {}
     for test_file in glob(FILE_MANAGER.get_path("tests/*.py")):
         env = {}
@@ -129,55 +90,38 @@ def expected_points():
 
 @pytest.mark.slow
 @pytest.mark.docker
-def test_docker():
-    """
-    Check that we have the right container installed and that docker is running
-    """
-    # use docker image inspect to see that the image is installed and tagged as otter-grader
-    inspect = subprocess.run(
-        ["docker", "image", "inspect", "otter-test"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-
-    # assert that it didn't fail, it will fail if it is not installed
-    assert len(inspect.stderr) == 0, inspect.stderr.decode("utf-8")
-
-
-@pytest.mark.slow
-@pytest.mark.docker
 def test_timeout():
     """
-    Check that the notebook `20s.ipynb` is killed due to exceeding the defined timeout.
+    Check that the notebook ``1min.ipynb`` is killed due to exceeding the defined timeout.
     """
-    with pytest.raises(Exception, match=r"Executing '[\w./-]*test/test-grade/timeout/20s\.ipynb'" \
-            " in docker container failed! Exit code: 137"), loggers.level_context(logging.DEBUG):
+    with pytest.raises(
+        Exception, match=r"Executing '[\w./-]*test/test-grade/timeout/1min\.ipynb' in docker " \
+            "container failed! Exit code: 137"):
         grade(
             name = ASSIGNMENT_NAME,
             paths = [FILE_MANAGER.get_path("timeout/")],
             output_dir = "test/",
             autograder = AG_ZIP_PATH,
             containers = 5,
-            timeout=35,
+            timeout = 59,
         )
 
 
 @pytest.mark.slow
 @pytest.mark.docker
-@mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes)
 def test_network(expected_points):
     """
-    Check that the notebook `network.ipynb` is unable to do some network requests with disabled networking
+    Check that the notebook ``network.ipynb`` is unable to do some network requests with disabled
+    networking.
     """
-    with loggers.level_context(logging.DEBUG):
-        grade(
-            name = ASSIGNMENT_NAME,
-            paths = [FILE_MANAGER.get_path("network/")],
-            output_dir = "test/",
-            autograder = AG_ZIP_PATH,
-            containers = 5,
-            no_network=True,
-        )
+    grade(
+        name = ASSIGNMENT_NAME,
+        paths = [FILE_MANAGER.get_path("network/")],
+        output_dir = "test/",
+        autograder = AG_ZIP_PATH,
+        containers = 5,
+        no_network=True,
+    )
 
     df_test = pd.read_csv("test/final_grades.csv")
 
@@ -196,18 +140,16 @@ def test_network(expected_points):
 @pytest.mark.docker
 def test_notebooks_with_pdfs(expected_points):
     """
-    Check that the example of 100 notebooks runs correctely locally.
+    Checks that notebooks are graded correctly and that PDFs are generated.
     """
-    # grade the 100 notebooks
-    with loggers.level_context(logging.DEBUG):
-        grade(
-            name = ASSIGNMENT_NAME,
-            paths = [FILE_MANAGER.get_path("notebooks/")],
-            output_dir = "test/",
-            autograder = AG_ZIP_PATH,
-            containers = 5,
-            pdfs = True,
-        )
+    grade(
+        name = ASSIGNMENT_NAME,
+        paths = [FILE_MANAGER.get_path("notebooks/")],
+        output_dir = "test/",
+        autograder = AG_ZIP_PATH,
+        containers = 5,
+        pdfs = True,
+    )
 
     # read the output and expected output
     df_test = pd.read_csv("test/final_grades.csv")
@@ -243,10 +185,10 @@ def test_notebooks_with_pdfs(expected_points):
     assert sorted(dir1_contents) == sorted(dir2_contents), f"'{FILE_MANAGER.get_path('notebooks/')}' and 'test/submission_pdfs' have different contents"
 
 
-@mock.patch("otter.grade.launch_grade")
+@mock.patch("otter.grade.launch_containers")
 def test_single_notebook_grade(mocked_launch_grade):
     """
-    Check that single notebook passed to grade returns percent.
+    Checks that when a single submission is passed to Otter Grade, it returns the percentage score.
     """
     df = pd.DataFrame([{
         "q1": 2.0,
@@ -283,5 +225,5 @@ def test_single_notebook_grade(mocked_launch_grade):
         containers = 1,
     )
 
-    mocked_launch_grade.assert_called_with(notebook_path, **kw_expected)
+    mocked_launch_grade.assert_called_with(notebook_path, [notebook_path], **kw_expected)
     assert output == 1.0
