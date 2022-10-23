@@ -35,7 +35,7 @@ jobs:
 
       - name: Install depdencies
         run: |
-          $CONDA/bin/conda env create -f environment.yml
+          $CONDA/bin/conda env update -n base -f environment.yml
 
       - name: Run tests
         run: |
@@ -43,5 +43,4 @@ jobs:
 
       - name: Send to Codecov
         run: |
-          pip install codecov
-          codecov
+          $CONDA/bin/conda codecov
