@@ -133,7 +133,7 @@ defaults = grade.__kwdefaults__
 @click.option("--ext", default=defaults["ext"], type=click.Choice(_ALLOWED_EXTENSIONS), help="The extension to glob for submissions")
 @click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
 @click.option("--containers", default=defaults["containers"], type=click.INT, help="Specify number of containers to run in parallel")
-@click.option("--image", default=defaults["image"], help="Custom docker image to run on")
+@click.option("--image", default=defaults["image"], help="A Docker image tag to use as the base image")
 @click.option("--timeout", type=click.INT, help="Submission execution timeout in seconds")
 @click.option("--no-network", is_flag=True, help="Disable networking in the containers")
 @click.option("--no-kill", is_flag=True, help="Do not kill containers after grading")
