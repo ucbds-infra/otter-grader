@@ -33,14 +33,29 @@ jobs:
       - name: Expose GitHub Runtime
         uses: crazy-max/ghaction-github-runtime@v1
 
-      - name: Install depdencies
-        run: |
-          $CONDA/bin/conda env update -n base -f environment.yml
+      - name: Build Docker image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          load: true
+          push: false
+          tags: otter-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run tests
         run: |
-          make testcov COVERAGE=$CONDA/bin/coverage
+          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test \
+            bash -c "cd /root/otter-grader; make testcov && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml"
+          cp /tmp/coverage.xml ./coverage.xml
 
       - name: Send to Codecov
         run: |
-          $CONDA/bin/conda codecov
+          pip install codecov
+          codecov
+
+      - name: Send to Codecov
+        run: |
+          pip install codecov
+          codecov
