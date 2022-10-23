@@ -6,9 +6,9 @@ RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.
     /tmp/miniconda_install.sh -b && \
     echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
 ENV PATH=/root/miniconda3/bin:$PATH
+COPY environment.yml requirements.txt requirements-export.txt requirements-test.txt /tmp/
+RUN mkdir -p /tmp/docs
+COPY docs/requirements.txt /tmp/docs/
+RUN conda env create -f /tmp/environment.yml
 ADD . /root/otter-grader
-WORKDIR /root/otter-grader
-RUN mkdir -p docs
-RUN touch docs/requirements.txt
-RUN conda env create -f environment.yml
 RUN conda init --all
