@@ -47,13 +47,13 @@ def build_image(ag_zip_path: str, base_image: str, tag: str):
         with zipfile.ZipFile(ag_zip_path, 'r') as zip_ref:
             zip_ref.extractall(temp_dir)
 
-        build_args = {"BASE_IMAGE": base_image}
-        if _TESTING:
-            build_args["BUILD_ENV"] = "test"
+        # build_args = {"BASE_IMAGE": base_image}
+        # if _TESTING:
+        #     build_args["BUILD_ENV"] = "test"
 
         docker.build(
             temp_dir,
-            build_args=build_args,
+            build_args={"BASE_IMAGE": base_image},
             tags=[image],
             file=dockerfile_path,
             load=True,
