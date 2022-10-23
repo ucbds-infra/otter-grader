@@ -8,4 +8,6 @@ RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.
 ENV PATH=/root/miniconda3/bin:$PATH
 ADD . /root/otter-grader
 WORKDIR /root/otter-grader
+RUN mkdir -p docs
+RUN touch docs/requirements.txt
 RUN conda env create -f environment.yml
