@@ -15,7 +15,7 @@ RUN conda run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=
 # RUN conda init --all
 WORKDIR /root/otter-grader
 SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash", "-c"]
-CMD ls -al ~/.docker/cli-plugins && \
-    make testcov && \
+RUN which -a docker
+CMD make testcov && \
     coverage xml -i && \
     cp ./coverage.xml /tmp/coverage.xml
