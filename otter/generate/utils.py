@@ -30,14 +30,34 @@ def zip_folder(zf, path, prefix="", exclude=[]):
 
 
 def _get_dep_name(d):
+    """
+    Determine the name of a dependency, ignoring version information.
+
+    Args:
+        d (``str``): the dependency
+
+    Returns:
+        ``str``: the dependency name
+    """
     if "+" in d:
         return d
     return d.split(">")[0].split("<")[0].split("=")[0]
 
 
-# TODO: unit test this
 def merge_conda_environments(e1, e2, name):
     """
+    Merge two conda environments into a single environment with the specified name.
+
+    Merges the channels, dependencies, and pip dependencies of two conda environments. If ``e1`` and
+    ``e2`` conflict, the values in ``e1`` are taken.
+
+    Args:
+        e1 (``dict[str, object]``): the first conda environment
+        e2 (``dict[str, object]``): the second conda environment
+        name (``str``): the resulting environment name
+
+    Returns:
+        ``dict[str, object]``: the merged conda environment
     """
     e = {"name": name, "channels": e1.get("channels", []), "dependencies": []}
     e["channels"].extend([c for c in e2.get("channels", []) if c not in e["channels"]])

@@ -331,6 +331,7 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
         plugin_collection=plugin_collection,
         assignment=assignment,
         python_version=assignment.get_python_version(),
+        channel_priority_strict=assignment.channel_priority_strict,
     )
 
     # clean up temp tests dir

@@ -56,7 +56,6 @@ defaults = assign.__kwdefaults__
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--debug", is_flag=True, help="Do not ignore errors in running tests for debugging")
-@click.option("--v0", is_flag=True, help="Use Otter Assign format v0 instead of v1")
 def assign_cli(*args, **kwargs):
     """
     Create distribution versions of the Otter Assign formatted notebook MASTER and write the
@@ -115,6 +114,7 @@ defaults = generate.__kwdefaults__
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--token", help="Gradescope token for uploading PDFs")
 @click.option("--python-version", help="Python version to use in the grading image")
+@click.option("--channel-priority-strict", is_flag=True, help="Whether to set conda's channel_priority to strict in the setup.sh file")
 @click.argument("files", nargs=-1)
 def generate_cli(*args, **kwargs):
     """

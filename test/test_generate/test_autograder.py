@@ -89,9 +89,26 @@ def test_lang_r():
         output_path = OUTPUT_PATH,
         config = FILE_MANAGER.get_path("r_otter_config.json"),
         no_environment = True,
+        channel_priority_strict = False,
     )
 
     with unzip_to_temp(FILE_MANAGER.get_path("autograder.zip")) as unzipped_dir:
         assert_dirs_equal(unzipped_dir, FILE_MANAGER.get_path("autograder-r-correct"))
 
-# TODO: test R with requirements.r
+
+def test_r_with_requirements():
+    """
+    Check that the R autograder configuration with a requirements file is generated correctly.
+    """
+    # create the zipfile
+    generate(
+        tests_dir = FILE_MANAGER.get_path("tests"),
+        output_path = OUTPUT_PATH,
+        config = FILE_MANAGER.get_path("r_otter_config.json"),
+        requirements = FILE_MANAGER.get_path("requirements.r"),
+        no_environment = True,
+        channel_priority_strict = False,
+    )
+
+    with unzip_to_temp(FILE_MANAGER.get_path("autograder.zip")) as unzipped_dir:
+        assert_dirs_equal(unzipped_dir, FILE_MANAGER.get_path("autograder-r-requirements-correct"))
