@@ -11,6 +11,10 @@ COPY environment.yml requirements.txt requirements-export.txt requirements-test.
 RUN mkdir -p /tmp/docs && touch /tmp/docs/requirements.txt
 RUN conda env create -f /tmp/environment.yml
 ADD . /root/otter-grader
-RUN conda init --all
+# RUN conda init --all
 WORKDIR /root/otter-grader
-CMD bash -c "source /root/.bashrc && conda activate otter-grader && make testcov && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml"
+SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash"]
+CMD source /root/.bashrc && \
+    conda activate otter-grader && \
+    make testcov && coverage xml -i && \
+    cp ./coverage.xml /tmp/coverage.xml
