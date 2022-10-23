@@ -52,10 +52,10 @@ def generate_question_envs():
             "d": 4,
         },
     }
-    
 
 
-def test_execute_log():
+@mock.patch("builtins.exec")
+def test_execute_log(mocked_exec):
     """
     """
     nb = generate_nb()
@@ -76,13 +76,13 @@ def test_execute_log():
 
     list_name = "check_results_foo123"
     initial_env = {list_name: [], "grader": mocked_grader}
-    with mock.patch("builtins.exec") as mocked_exec:
-        executed_env = execute_log(nb, mocked_log, check_results_list_name=list_name, initial_env=initial_env)
 
-        mocked_exec.assert_any_call("import otter\ngrader = otter.Notebook()\n", executed_env)
-        mocked_exec.assert_any_call("import numpy as np", executed_env)
-        mocked_exec.assert_any_call("import pandas as pd", executed_env)
-        mocked_exec.assert_any_call("from glob import glob", executed_env)
+    executed_env = execute_log(nb, mocked_log, check_results_list_name=list_name, initial_env=initial_env)
+
+    mocked_exec.assert_any_call("import otter\ngrader = otter.Notebook()\n", executed_env)
+    mocked_exec.assert_any_call("import numpy as np", executed_env)
+    mocked_exec.assert_any_call("import pandas as pd", executed_env)
+    mocked_exec.assert_any_call("from glob import glob", executed_env)
 
     for k, v in expected_env.items():
         assert executed_env[k] == v

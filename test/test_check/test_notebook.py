@@ -96,15 +96,15 @@ def test_check():
             assert result.grade == 0, "Test {} passed".format(q)
 
 
-def test_to_pdf_with_nb_path():
+@mock.patch("otter.check.notebook.export_notebook")
+def test_to_pdf_with_nb_path(mocked_export):
     """
     Checks for existence of notebook PDF
     This test is the general use case WITH a specified notebook path
     """
     nb_path = "foo.ipynb"
     grader = Notebook(tests_dir=TESTS_DIR)
-    with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve, \
-            mock.patch("otter.check.notebook.export_notebook") as mocked_export:
+    with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve:
         mocked_resolve.return_value = nb_path
 
         grader.to_pdf(filtering=False)
@@ -113,7 +113,10 @@ def test_to_pdf_with_nb_path():
         # TODO: test display_link
 
 
-def test_export():
+@mock.patch("otter.check.notebook.dt")
+@mock.patch("otter.check.notebook.zipfile.ZipFile")
+@mock.patch("otter.check.notebook.export_notebook")
+def test_export(mocked_export, mocked_zf, mocked_dt):
     """
     Checks export contents for existence of PDF and equality of zip
     """
@@ -121,10 +124,7 @@ def test_export():
     grader = Notebook(tests_dir=TESTS_DIR)
 
     with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve, \
-            mock.patch("builtins.open", mock.mock_open(read_data="{}")) as mocked_open, \
-            mock.patch("otter.check.notebook.dt") as mocked_dt, \
-            mock.patch("otter.check.notebook.zipfile.ZipFile") as mocked_zf, \
-            mock.patch("otter.check.notebook.export_notebook") as mocked_export, \
+            mock.patch("builtins.open", mock.mock_open(read_data="{}")), \
             open(_OTTER_LOG_FILENAME, mode="wb+"):
         mocked_resolve.return_value = "foo.ipynb"
         mocked_dt.datetime.now.return_value = timestmap
@@ -144,32 +144,32 @@ def test_export():
     # TODO: test display_link
 
 
-def test_colab():
+@mock.patch("otter.check.notebook.os.path.isdir")
+def test_colab(mocked_isdir):
     """
     Checks that the ``Notebook`` class correctly disables methods on Google Colab.
     """
-    with mock.patch("otter.check.notebook.os.path.isdir") as mocked_isdir:
-        mocked_isdir.return_value = False
-        with pytest.raises(ValueError, match=f"Tests directory {TESTS_DIR} does not exist"):
-            grader = Notebook(tests_dir=TESTS_DIR, colab=True)
-
-        mocked_isdir.assert_called_once_with(TESTS_DIR)
-
-        mocked_isdir.return_value = True
+    mocked_isdir.return_value = False
+    with pytest.raises(ValueError, match=f"Tests directory {TESTS_DIR} does not exist"):
         grader = Notebook(tests_dir=TESTS_DIR, colab=True)
 
-        # check for appropriate errors
-        with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
-            grader.run_plugin()
+    mocked_isdir.assert_called_once_with(TESTS_DIR)
 
-        with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
-            grader.to_pdf()
+    mocked_isdir.return_value = True
+    grader = Notebook(tests_dir=TESTS_DIR, colab=True)
 
-        with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
-            grader.add_plugin_files()
+    # check for appropriate errors
+    with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
+        grader.run_plugin()
 
-        with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
-            grader.export()
+    with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
+        grader.to_pdf()
+
+    with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
+        grader.add_plugin_files()
+
+    with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
+        grader.export()
 
 
 def test_jupyterlite():

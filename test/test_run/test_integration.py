@@ -180,7 +180,8 @@ def test_notebook(load_config, expected_results):
         f"Actual results did not matched expected:\n{actual_results}"
 
 
-def test_pdf_generation_failure(get_config_path, load_config, expected_results):
+@mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook")
+def test_pdf_generation_failure(mocked_export, get_config_path, load_config, expected_results):
     config = load_config()
     config["warn_missing_pdf"] = True
     config["token"] = "abc123"
@@ -193,10 +194,8 @@ def test_pdf_generation_failure(get_config_path, load_config, expected_results):
     })
 
     with alternate_config(get_config_path(), config):
-        with mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as \
-                mocked_export:
-            mocked_export.side_effect = ValueError("nu-uh")
-            run_autograder(config['autograder_dir'])
+        mocked_export.side_effect = ValueError("nu-uh")
+        run_autograder(config['autograder_dir'])
 
     with FILE_MANAGER.open("autograder/results/results.json") as f:
         actual_results = json.load(f)

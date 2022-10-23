@@ -24,7 +24,8 @@ def cleanup_check_output(cleanup_enabled):
         os.remove(".OTTER_LOG")
 
 
-def test_otter_check_script():
+@mock.patch("otter.check.block_print")
+def test_otter_check_script(_):
     """
     Checks that the script checker works
     """
@@ -33,56 +34,54 @@ def test_otter_check_script():
         # capture stdout
         output = StringIO()
         with contextlib.redirect_stdout(output):
-
-            # mock block_print otherwise it interferes with capture of stdout
-            with mock.patch("otter.check.block_print"):
-                check(
-                    FILE_MANAGER.get_path("file0.py"),
-                    question = os.path.split(file)[1][:-3],
-                    tests_path = os.path.split(file)[0],
-                )
-
-                if os.path.split(file)[1] != "q2.py":
-                    assert output.getvalue().strip().split("\n")[-1].strip() == \
-                        "All tests passed!", \
-                        "Did not pass test at {}".format(file)
-
-    # run the file for all questions
-    output = StringIO()
-    with contextlib.redirect_stdout(output):
-        with mock.patch("otter.check.block_print"):
             check(
-                FILE_MANAGER.get_path("file0.py"), 
+                FILE_MANAGER.get_path("file0.py"),
+                question = os.path.split(file)[1][:-3],
                 tests_path = os.path.split(file)[0],
             )
-            assert output.getvalue().strip() == \
-                dedent("""\
-                    q1 results: All test cases passed!
-                    q2 results:
-                        q2 - 1 result:
-                            ❌ Test case failed
-                            Trying:
-                                1 == 1
-                            Expecting:
-                                False
-                            **********************************************************************
-                            Line 2, in q2 0
-                            Failed example:
-                                1 == 1
-                            Expected:
-                                False
-                            Got:
-                                True
 
-                        q2 - 2 result:
-                            ✅ Test case passed
-                    q3 results: All test cases passed!
-                    q4 results: All test cases passed!
-                    q5 results: All test cases passed!"""), \
-                "Did not pass correct tests"
+        if os.path.split(file)[1] != "q2.py":
+            assert output.getvalue().strip().split("\n")[-1].strip() == \
+                "All tests passed!", \
+                "Did not pass test at {}".format(file)
+
+    # run the file for all questions
+    output = StringIO()
+    with contextlib.redirect_stdout(output):
+        check(
+            FILE_MANAGER.get_path("file0.py"), 
+            tests_path = os.path.split(file)[0],
+        )
+
+    assert output.getvalue().strip() == \
+        dedent("""\
+            q1 results: All test cases passed!
+            q2 results:
+                q2 - 1 result:
+                    ❌ Test case failed
+                    Trying:
+                        1 == 1
+                    Expecting:
+                        False
+                    **********************************************************************
+                    Line 2, in q2 0
+                    Failed example:
+                        1 == 1
+                    Expected:
+                        False
+                    Got:
+                        True
+
+                q2 - 2 result:
+                    ✅ Test case passed
+            q3 results: All test cases passed!
+            q4 results: All test cases passed!
+            q5 results: All test cases passed!"""), \
+        "Did not pass correct tests"
 
 
-def test_otter_check_notebook():
+@mock.patch("otter.check.block_print")
+def test_otter_check_notebook(_):
     """
     Checks that the script checker works
     """
@@ -91,51 +90,47 @@ def test_otter_check_notebook():
         # capture stdout
         output = StringIO()
         with contextlib.redirect_stdout(output):
-
-            # mock block_print otherwise it interferes with capture of stdout
-            with mock.patch("otter.check.block_print"):
-                check(
-                    FILE_MANAGER.get_path("test-nb.ipynb"), 
-                    question = os.path.split(file)[1][:-3],
-                    tests_path = os.path.split(file)[0],
-                )
-
-                if os.path.split(file)[1] != "q2.py":
-                    assert output.getvalue().strip().split("\n")[-1].strip() == \
-                        "All tests passed!", \
-                        "Did not pass test at {}".format(file)
-
-    # run the file for all questions
-    output = StringIO()
-    with contextlib.redirect_stdout(output):
-        with mock.patch("otter.check.block_print"):
             check(
                 FILE_MANAGER.get_path("test-nb.ipynb"), 
+                question = os.path.split(file)[1][:-3],
                 tests_path = os.path.split(file)[0],
             )
 
-            assert output.getvalue().strip() == \
-                dedent("""\
-                    q1 results: All test cases passed!
-                    q2 results:
-                        q2 - 1 result:
-                            ❌ Test case failed
-                            Trying:
-                                1 == 1
-                            Expecting:
-                                False
-                            **********************************************************************
-                            Line 2, in q2 0
-                            Failed example:
-                                1 == 1
-                            Expected:
-                                False
-                            Got:
-                                True
+        if os.path.split(file)[1] != "q2.py":
+            assert output.getvalue().strip().split("\n")[-1].strip() == \
+                "All tests passed!", \
+                "Did not pass test at {}".format(file)
 
-                        q2 - 2 result:
-                            ✅ Test case passed
-                    q3 results: All test cases passed!
-                    q4 results: All test cases passed!
-                    q5 results: All test cases passed!"""), \
-                "Did not pass correct tests"
+    # run the file for all questions
+    output = StringIO()
+    with contextlib.redirect_stdout(output):
+        check(
+            FILE_MANAGER.get_path("test-nb.ipynb"), 
+            tests_path = os.path.split(file)[0],
+        )
+
+    assert output.getvalue().strip() == \
+        dedent("""\
+            q1 results: All test cases passed!
+            q2 results:
+                q2 - 1 result:
+                    ❌ Test case failed
+                    Trying:
+                        1 == 1
+                    Expecting:
+                        False
+                    **********************************************************************
+                    Line 2, in q2 0
+                    Failed example:
+                        1 == 1
+                    Expected:
+                        False
+                    Got:
+                        True
+
+                q2 - 2 result:
+                    ✅ Test case passed
+            q3 results: All test cases passed!
+            q4 results: All test cases passed!
+            q5 results: All test cases passed!"""), \
+        "Did not pass correct tests"
