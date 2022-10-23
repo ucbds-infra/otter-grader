@@ -46,8 +46,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test \
-            bash -c "cd /root/otter-grader; conda activate otter-grader; make testcov && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml"
+          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test
           cp /tmp/coverage.xml ./coverage.xml
 
       - name: Send to Codecov
