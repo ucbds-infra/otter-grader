@@ -14,11 +14,8 @@ ADD . /root/otter-grader
 RUN conda run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.us.r-project.org")'
 # RUN conda init --all
 WORKDIR /root/otter-grader
-SHELL ["/bin/bash", "-c"]
+RUN chmod +x bin/run_tests
+# SHELL ["/bin/bash", "-c"]
 # SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash", "-c"]
 RUN which -a docker
-CMD . /root/.bashrc && \
-    conda activate otter-grader && \
-    make testcov && \
-    coverage xml -i && \
-    cp ./coverage.xml /tmp/coverage.xml
+ENTRYPOINT [ "bin/run_tests" ]

@@ -1,0 +1,7 @@
+#!/usr/bin
+export PATH="/root/miniconda3/bin:$PATH"
+source /root/miniconda3/etc/profile.d/conda.sh
+conda activate otter-grader
+make testcov
+coverage xml -i
+cp ./coverage.xml /tmp/coverage.xml
