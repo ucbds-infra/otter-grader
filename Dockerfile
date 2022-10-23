@@ -1,3 +1,5 @@
+# Docker image for setting up a development environment and Otter's automated tests.
+
 FROM docker/buildx-bin as buildx
 
 FROM ubuntu:latest

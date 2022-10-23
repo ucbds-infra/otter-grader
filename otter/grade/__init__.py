@@ -45,13 +45,14 @@ def main(
     Args:
         name (``str``): an assignment name to use in the Docker image tag; must be specified unless
             ``prune`` is true
-        paths (``tuple[str]``): paths to submission files or directories of submissions for grading
+        paths (``list[str] | tuple[str]``): paths to submission files or directories of submissions
+            for grading
         output_dir (``str``): path to directory where output should be written
         autograder (``str``): path to an Otter autograder configuration zip file
         containers (``int``): number of containers to run in parallel
         ext (``str``): the submission file extension (to be used in a glob pattern)
         no_kill (``bool``): whether to keep containers after grading is finished
-        image (``str``): a Docker image tag to use as the base image for the grading image
+        image (``str``): a Docker image to use as the base image for the grading image
         pdfs (``bool``): whether to copy notebook PDFs out of the containers
         prune (``bool``): whether to prune the grading images; if true, no grading is performed
         force (``bool``): whether to force-prune the images (do not ask for confirmation)

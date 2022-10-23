@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Runs Otter's tests and copies the resulting coverage.xml file into the /tmp directory. This script
-# should only be used inside the Docker container created in /.github/workflows/run-tests.yml. (It
-# assumes that the container has the directory structured defined therein.)
+# should only be used inside a Docker container created by /Dockerfile.
 
 export PATH="/root/miniconda3/bin:$PATH"
 source /root/miniconda3/etc/profile.d/conda.sh

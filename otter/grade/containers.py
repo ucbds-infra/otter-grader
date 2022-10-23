@@ -20,11 +20,6 @@ from ..utils import loggers
 DOCKER_PLATFORM = "linux/amd64"
 LOGGER = loggers.get_logger(__name__)
 
-# Set this to true in a test file to indicate that one of Otter's unit tests is being run; this
-# will tell Otter to copy the working directory (the Otter repo) into the container and install it
-# so that the version of Otter installed in the container has all local edits.
-_TESTING = False
-
 
 def build_image(ag_zip_path: str, base_image: str, tag: str):
     """
@@ -46,10 +41,6 @@ def build_image(ag_zip_path: str, base_image: str, tag: str):
     with tempfile.TemporaryDirectory() as temp_dir:
         with zipfile.ZipFile(ag_zip_path, 'r') as zip_ref:
             zip_ref.extractall(temp_dir)
-
-        # build_args = {"BASE_IMAGE": base_image}
-        # if _TESTING:
-        #     build_args["BUILD_ENV"] = "test"
 
         docker.build(
             temp_dir,
@@ -81,8 +72,9 @@ def launch_containers(
     Args:
         ag_zip_path (``str``): path to zip file used to set up container
         submission_paths (``str``): paths of submissions to be graded
-        num_containers (``int``, optional): number of containers to run in parallel
-        image (``str``, optional): a base image to use for building Docker images
+        num_containers (``int``): number of containers to run in parallel
+        base_image (``str``): the name of a base image to use for building Docker images
+        tag (``str``): a tag to use for the ``otter-grade`` image created for this assignment
         **kwargs: additional kwargs passed to ``grade_submission``
 
     Returns:
@@ -119,10 +111,10 @@ def grade_submission(
     Args:
         submission_path (``str``): path to the submission to be graded
         image (``str``): a Docker image tag to be used for grading environment
-        no_kill (``bool``, optional): whether the grading containers should be kept running after
+        no_kill (``bool``): whether the grading containers should be kept running after
             grading finishes
         pdf_dir (``str``, optional): a directory in which to put the notebook PDF, if applicable
-        timeout (``int``): timeout in seconds for each container
+        timeout (``int``, optional): timeout in seconds for each container
         network (``bool``): whether to enable networking in the containers
 
     Returns:
