@@ -11,3 +11,4 @@ WORKDIR /root/otter-grader
 RUN mkdir -p docs
 RUN touch docs/requirements.txt
 RUN conda env create -f environment.yml
+RUN conda init --all
