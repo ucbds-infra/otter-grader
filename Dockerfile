@@ -17,5 +17,5 @@ WORKDIR /root/otter-grader
 RUN chmod +x bin/run_tests
 # SHELL ["/bin/bash", "-c"]
 # SHELL ["conda", "run", "-n", "otter-grader", "/bin/bash", "-c"]
-RUN which -a docker
+# RUN which -a docker
 ENTRYPOINT [ "bin/run_tests" ]
