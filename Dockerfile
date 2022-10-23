@@ -1,5 +1,5 @@
 FROM ubuntu:22.04
-RUN apt-get update && apt-get upgrade && apt-get install -y wget
+RUN apt-get update && apt-get upgrade -y && apt-get install -y wget
 RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
     -O /tmp/miniconda_install.sh && \
     chmod +x /tmp/miniconda_install.sh && \
