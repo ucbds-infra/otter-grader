@@ -64,7 +64,7 @@ def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors
 
     if log is not None:
         global_env = execute_log(
-            nb, log, secret, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, 
+            nb, log, results_array, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, 
             variables=variables)
 
     else:
