@@ -37,7 +37,7 @@ def do_assign_test(output_dir):
 
     assert_dirs_equal(
         output_dir,
-        FILE_MANAGER.get_path("expected-dist"),
+        FILE_MANAGER.get_path("expected-assign"),
         ignore_ext=[".pdf"],
         variable_path_exts=[".zip"],
         ignore_log=True,
@@ -61,8 +61,14 @@ def do_grade_test(ag_zip_path, output_dir):
 
 
 @pytest.mark.slow
+@pytest.mark.docker
 def test_integration():
     """"""
     ag_zip_path = do_assign_test(get_output_dir("assign"))
 
     do_grade_test(ag_zip_path,get_output_dir("grade"))
+
+
+# TODO: add submissions
+# TODO: add tests for Otter Run to test_integration
+# TODO: add R integration tests

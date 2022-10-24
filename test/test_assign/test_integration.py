@@ -2,7 +2,6 @@
 
 import nbformat as nbf
 import os
-import pathlib
 import pytest
 import shutil
 
@@ -14,7 +13,7 @@ from otter.assign.assignment import Assignment
 from otter.assign.question_config import QuestionConfig
 from otter.assign.tests_manager import AssignmentTestsManager, TestCase
 from otter.generate.token import APIClient
-from otter.utils import dump_yaml, nullcontext
+from otter.utils import dump_yaml
 
 from ..utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 
@@ -36,28 +35,9 @@ def cleanup_output(cleanup_enabled):
         shutil.rmtree(FILE_MANAGER.get_path("output"))
 
 
-@pytest.fixture(autouse=True)
-def disable_pdf_generation(pdfs_enabled):
-    if not pdfs_enabled:
-        def create_fake_pdf(src, dest, **kwargs):
-            if dest is None:
-                dest = f"{pathlib.Path(src).stem}.pdf"
-
-            open(dest, "wb+").close()
-            return mock.DEFAULT
-
-        cm1 = mock.patch("otter.assign.export_notebook", side_effect=create_fake_pdf)
-        cm2 = mock.patch("otter.assign.knit_rmd_file", side_effect=create_fake_pdf)
-
-    else:
-        cm1, cm2 = nullcontext(), nullcontext()
-
-    with cm1, cm2:
-        yield
-
-
 def check_gradescope_zipfile(path, correct_dir_path):
     """
+    Checks that the autograder zip file at ``path`` matches ``correct_dir_path``.
     """
     with unzip_to_temp(path) as unzipped_dir:
         assert_dirs_equal(unzipped_dir, correct_dir_path)
@@ -65,6 +45,7 @@ def check_gradescope_zipfile(path, correct_dir_path):
 
 def assign_and_check_output(nb_path, correct_dir, assign_kwargs={}, assert_dirs_equal_kwargs={}):
     """
+    Runs Otter Assign and verifies that the output directories are correct.
     """
     output_path = FILE_MANAGER.get_path("output")
     assign(nb_path, output_path, **assign_kwargs)
@@ -223,6 +204,7 @@ def test_point_value_rounding():
 
 def test_jupyterlite(generate_master_notebook):
     """
+    Tests that Otter Assign produces correct notebooks for running on Jupyterlite.
     """
     master_nb_path = generate_master_notebook({
         "runs_on": "jupyterlite",
