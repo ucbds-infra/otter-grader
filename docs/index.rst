@@ -67,32 +67,18 @@ Installation
 
 Otter is a Python package that is compatible with Python 3.6+. The PDF export internals require 
 either LaTeX and Pandoc or wkhtmltopdf to be installed. Docker is also required to grade assignments 
-locally with containerization, and Postgres only if you're using Otter Service. Otter's Python 
-package can be installed using pip. To install the current stable version, install with
+locally with containerization. Otter's Python package can be installed using pip. To install the
+current stable version, install with
 
 .. code-block:: console
 
     pip install otter-grader
 
-If you are going to be autograding R, you must also install the R package using 
-``devtools::install_github``:
-
-.. code-block:: r
-
-    devtools::install_github("ucbds-infra/ottr@stable")
-
 Installing the Python package will install the ``otter`` binary so that Otter can be called from the 
 command line. You can also call Otter as a Python module with ``python3 -m otter``.
 
+If you are going to be autograding R, you must also install the R package ``ottr``:
 
-Docker
-++++++
+.. code-block:: r
 
-Otter uses Docker to create containers in which to run the students' submissions. **Docker and our 
-Docker image are only required if using Otter Grade.** Please make sure that you 
-install Docker and pull our Docker image, which is used to grade the notebooks. To get the Docker 
-image, run
-
-.. code-block:: console
-
-    docker pull ucbdsinfra/otter-grader
+    install.packages("ottr")

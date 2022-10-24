@@ -6,17 +6,21 @@ import pytest
 import shutil
 import subprocess
 import tempfile
-import yaml
 import zipfile
 
 from contextlib import contextmanager
+
+from otter.check.notebook import _OTTER_LOG_FILENAME
 
 
 class TestFileManager:
     __test__ = False
 
-    def __init__(self, file_dir):
-        self.dir = pathlib.Path(file_dir).resolve()
+    def __init__(self, test_file_path, new_version=False): # TODO: remove new_version
+        if new_version:
+            self.dir = pathlib.Path(os.path.join(os.path.split(test_file_path)[0], "files"))
+        else:
+            self.dir = pathlib.Path(test_file_path).resolve()
 
     def get_path(self, path):
         return str(self.dir / path)
@@ -61,7 +65,7 @@ def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
                 assert f1.read() == f2.read(), f"Contents of {p1} did not equal contents of {p2}"
 
 
-def assert_dirs_equal(dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_exts=[]):
+def assert_dirs_equal(dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_exts=[], ignore_log=False):
     """
     Assert that the contents of two directories are equal recursively.
 
@@ -81,7 +85,7 @@ def assert_dirs_equal(dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_e
     assert os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type"
 
     if os.path.isfile(dir1):
-        if os.path.splitext(dir1)[1] not in ignore_ext:
+        if os.path.splitext(dir1)[1] not in ignore_ext and (not ignore_log or os.path.split(dir1)[1] != _OTTER_LOG_FILENAME):
             assert_files_equal(dir1, dir2)
 
     else:
@@ -103,7 +107,7 @@ def assert_dirs_equal(dir1, dir2, ignore_ext=[], ignore_dirs=[], variable_path_e
         for f1, f2 in zip(dir1_contents, dir2_contents):
             f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
             assert_dirs_equal(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs, 
-                variable_path_exts=variable_path_exts)
+                variable_path_exts=variable_path_exts, ignore_log=ignore_log)
 
 
 def delete_paths(paths, error_if_absent=False):
