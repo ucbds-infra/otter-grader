@@ -44,6 +44,7 @@ def cli(version):
     if version:
         print_version_info(logo=True)
         return
+    raise RuntimeError("You must specify a command. For more details run \"otter --help\"")
 
 
 defaults = assign.__kwdefaults__

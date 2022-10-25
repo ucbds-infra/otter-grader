@@ -6,7 +6,7 @@ dependencies:
     - python>=3.6
     - pip
     - pip:
-        - -r requirements.txt
+        - .
         - -r docs/requirements.txt
         - nbconvert
         - ipython

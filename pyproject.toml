@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "otter-grader"
+description = "Python and R autograder"
+authors = [{name = "Christopher Pyles"}, {email = "otter-grader@berkeley.edu"}]
+requires-python = ">=3.7"
+license = {text = "BSD 3-Clause License"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+urls = {Homepage = "https://github.com/ucbds-infra/otter-grader"}
+dependencies = [
+    "dill",
+    "jinja2",
+    "nbformat",
+    "pandas",
+    "PyYAML",
+    "python-on-whales",
+    "requests",
+    "wrapt",
+    "jupytext",
+    "click",
+    "fica>=0.2.0",
+
+    # plugins
+    "google-api-python-client",
+    "google-auth-oauthlib",
+    "gspread",
+    "six",
+]
+dynamic = ["readme", "version"]
+
+[project.optional-dependencies]
+export = [
+    "nbconvert",
+    "pdfkit",
+    "PyPDF2",
+]
+test = [
+    "responses",
+    "scikit-learn",
+    "nbformat",
+    "tqdm",
+    "codecov",
+    "rpy2",
+    "pytest",
+    "jupyter_client",
+    "ipykernel",
+    "matplotlib",
+]
+
+[project.scripts]
+otter = "otter.cli:cli"
+gmail_oauth2 = "otter.plugins.builtin.gmail_notifications.bin.gmail_oauth2:main"
+
+[tool.setuptools]
+packages = ["otter"]
+
+[tool.setuptools.dynamic]
+readme = {file = "README.md"}
+version = {attr = "otter.version.__version__"}
+
+[tool.setuptools.package-data]
+"otter.export.exporters" = ["templates/**/*"]
+"otter.generate" = ["templates/**/*"]
+"otter.grade" = ["Dockerfile"]

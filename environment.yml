@@ -9,7 +9,7 @@ dependencies:
     - r-devtools
     - pip
     - pip:
-        - -r requirements.txt
-        - -r requirements-export.txt
-        - -r requirements-test.txt
+        - .
+        - .[export]
+        - .[test]
         - -r docs/requirements.txt
