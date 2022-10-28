@@ -1,4 +1,5 @@
 {
   "show_stdout": true,
-  "seed": 42
+  "seed": 42,
+  "zips": true
 }

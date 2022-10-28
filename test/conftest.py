@@ -2,7 +2,16 @@ import pathlib
 import pytest
 
 from contextlib import nullcontext
+from python_on_whales import docker
 from unittest import mock
+
+from otter.grade.containers import build_image, DOCKER_PLATFORM
+
+from .utils import TestFileManager
+
+
+FILE_MANAGER = TestFileManager(__file__, True)
+
 
 
 def pytest_addoption(parser):
@@ -62,4 +71,29 @@ def disable_assign_pdf_generation(pdfs_enabled):
         cm1, cm2 = nullcontext(), nullcontext()
 
     with cm1, cm2:
+        yield
+
+
+def build_image_with_local_changes(*args, **kwargs):
+    """
+    Build the normal Otter Grade Docker image and then overwrite it with a new one containing a
+    copy of Otter with all local edits.
+    """
+    image = build_image(*args, **kwargs)
+
+    docker.build(
+        ".",
+        build_args={"BASE_IMAGE": image},
+        tags=[image],
+        file=FILE_MANAGER.get_path("Dockerfile"),
+        load=True,
+        platforms=[DOCKER_PLATFORM],
+    )
+
+    return image
+
+
+@pytest.fixture(autouse=True)
+def patch_build_image():
+    with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes):
         yield
