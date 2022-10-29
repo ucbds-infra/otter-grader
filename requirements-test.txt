@@ -8,4 +8,3 @@ pytest
 jupyter_client
 ipykernel
 matplotlib
-statsmodels
