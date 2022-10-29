@@ -3,6 +3,7 @@
 import fica
 import os
 import pathlib
+import yaml
 
 from typing import Any, Dict, List, Optional, Union
 
@@ -19,6 +20,12 @@ class Assignment(fica.Config, Loggable):
     name: Optional[str] = fica.Key(
         description="a name for the assignment (to validate that students submit to the correct " \
             "autograder)",
+        default=None,
+    )
+
+    config_file: Optional[str] = fica.Key(
+        description="path to a file containing assignment configurations; any configurations in " \
+            "this file are overridden by the in-notebook config",
         default=None,
     )
 
@@ -326,3 +333,20 @@ class Assignment(fica.Config, Loggable):
             ``str | None``: the version string or ``None`` if none is present
         """
         return str(self.python_version) if self.python_version is not None else None
+
+    def load_config_file(self, config_file: str):
+        """
+        Update the values in this config using the values in the specified file.
+
+        Args:
+            config_file (``str``): the configuration file to read
+        """
+        self._logger.info(f"Reading assignment config file {config_file}")
+
+        with open(config_file) as f:
+            config = yaml.full_load(f.read())
+
+        if not isinstance(config, dict):
+            raise TypeError("Configuration files did not produce a dictionary")
+
+        self.update({**config, "config_file": config_file})
