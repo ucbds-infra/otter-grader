@@ -9,19 +9,19 @@ apt-get install -y wget pandoc texlive-xetex texlive-fonts-recommended texlive-p
 # install conda
 if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
     then wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh \
-        -O test/test_generate/test-run-autograder/autograder/source/miniconda_install.sh ; \
+        -O test/test_run/files/autograder/source/miniconda_install.sh ; \
     else wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-        -O test/test_generate/test-run-autograder/autograder/source/miniconda_install.sh ; \
+        -O test/test_run/files/autograder/source/miniconda_install.sh ; \
 fi
-chmod +x test/test_generate/test-run-autograder/autograder/source/miniconda_install.sh
-test/test_generate/test-run-autograder/autograder/source/miniconda_install.sh -b
+chmod +x test/test_run/files/autograder/source/miniconda_install.sh
+test/test_run/files/autograder/source/miniconda_install.sh -b
 echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
 
 export PATH=/root/miniconda3/bin:$PATH
 export TAR="/bin/tar"
 
 # install dependencies with conda
-conda env create -f test/test_generate/test-run-autograder/autograder/source/environment.yml
+conda env create -f test/test_run/files/autograder/source/environment.yml
 
 # set conda shell
 conda init --all
