@@ -14,7 +14,7 @@ from otter.check.notebook import _OTTER_LOG_FILENAME, _ZIP_NAME_FILENAME
 from ..utils import TestFileManager
 
 
-FILE_MANAGER = TestFileManager(__file__, True)
+FILE_MANAGER = TestFileManager(__file__)
 TESTS_DIR = FILE_MANAGER.get_path("tests")
 TESTS_GLOB = glob(FILE_MANAGER.get_path("tests/*.py"))
 

@@ -18,7 +18,7 @@ from otter.utils import NBFORMAT_VERSION
 from ..utils import delete_paths, TestFileManager
 
 
-FILE_MANAGER = TestFileManager(__file__, True)
+FILE_MANAGER = TestFileManager(__file__)
 
 
 @pytest.fixture(autouse=True)

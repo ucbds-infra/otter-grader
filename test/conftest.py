@@ -10,8 +10,7 @@ from otter.grade.containers import build_image, DOCKER_PLATFORM
 from .utils import TestFileManager
 
 
-FILE_MANAGER = TestFileManager(__file__, True)
-
+FILE_MANAGER = TestFileManager(__file__)
 
 
 def pytest_addoption(parser):

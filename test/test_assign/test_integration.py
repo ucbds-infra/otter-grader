@@ -22,7 +22,7 @@ from ..utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 TestCase.__test__ = False
 
 
-FILE_MANAGER = TestFileManager(__file__, True)
+FILE_MANAGER = TestFileManager(__file__)
 
 
 @pytest.fixture(autouse=True)

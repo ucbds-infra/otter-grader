@@ -14,7 +14,7 @@ from otter.check import main as check
 from ..utils import TestFileManager
 
 
-FILE_MANAGER = TestFileManager(__file__, True)
+FILE_MANAGER = TestFileManager(__file__)
 
 
 @pytest.fixture(autouse=True)

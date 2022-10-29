@@ -16,8 +16,6 @@ TestFile.__test__ = False
 
 
 def generate_nb():
-    """
-    """
     nb = nbf.v4.new_notebook()
     nb.cells.append(nbf.v4.new_code_cell(dedent("""\
         import numpy as np
@@ -57,6 +55,7 @@ def generate_question_envs():
 @mock.patch("builtins.exec")
 def test_execute_log(mocked_exec):
     """
+    Tests ``otter.execute.execute_log.execute_log``.
     """
     nb = generate_nb()
     envs = generate_question_envs()

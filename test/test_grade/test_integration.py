@@ -18,7 +18,7 @@ from ..utils import TestFileManager
 
 
 ASSIGNMENT_NAME = "otter-grade-test"
-FILE_MANAGER = TestFileManager(__file__, True)
+FILE_MANAGER = TestFileManager(__file__)
 AG_ZIP_PATH = FILE_MANAGER.get_path("autograder.zip")
 
 
