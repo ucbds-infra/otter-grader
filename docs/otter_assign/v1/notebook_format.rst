@@ -45,6 +45,18 @@ defaults) is ``export_cell``.
 
 .. fica:: otter.assign.assignment.Assignment
 
+For assignments that share several common configurations, these can be specified in a separate YAML
+file whose path is passed to the ``config_file`` key. When this key is encountered, Otter will read
+the file and load the configurations defined therein into the assignment config for the notebook
+it's running. Any keys specified in the notebook itself will override values in the file.
+
+.. code-block:: yaml
+
+    # ASSIGNMENT CONFIG
+    config_file: ../assignment_config.yml
+    files:
+        - data.csv
+
 All paths specified in the configuration should be **relative to the directory containing the master 
 notebook**. If, for example, you were running Otter Assign on the ``lab00.ipynb`` notebook in the 
 structure below:
