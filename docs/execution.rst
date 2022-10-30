@@ -25,7 +25,7 @@ If students are submitting IPython notebooks (``.ipynb`` files), they are execut
     #. The lines are collected into a single multiline string
     #. If a seed is provided, the string is prepended with 
        ``f"np.random.seed({seed})\nrandom.seed({seed})\n"``
-    #. The code lines are run through an ``IPython.core.inputsplitter.IPythonInputSplitter``
+    #. The code lines are run through an ``IPython.core.inputtransformer2.TransformerManager``
     #. The string is run in the dummy environment with ``otter.Notebook.export`` and 
        ``otter.Notebook._log_event`` patched so that they don't run
     #. If the run was successful, the cell contents are added to a collection string. If it fails, 

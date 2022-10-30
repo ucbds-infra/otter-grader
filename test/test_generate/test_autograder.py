@@ -10,7 +10,7 @@ from otter.generate import main as generate
 from ..utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 
 
-FILE_MANAGER = TestFileManager("test/test_generate/test-autograder")
+FILE_MANAGER = TestFileManager(__file__)
 OUTPUT_PATH = FILE_MANAGER.get_path("autograder.zip")
 
 
@@ -38,7 +38,8 @@ def test_autograder():
         assert_dirs_equal(unzipped_dir, FILE_MANAGER.get_path("autograder-correct"))
 
 
-def test_autograder_with_token():
+@mock.patch("otter.generate.APIClient")
+def test_autograder_with_token(mocked_client):
     """
     Check that the correct zip file is generated when a token is specified instead of a username
     and password.
@@ -47,16 +48,16 @@ def test_autograder_with_token():
     argument.
     """
     # create the zipfile
-    with mock.patch("otter.generate.APIClient") as mocked_client:
-        generate(
-            tests_dir = FILE_MANAGER.get_path("tests"),
-            output_path = OUTPUT_PATH,
-            requirements = FILE_MANAGER.get_path("requirements.txt"),
-            config = FILE_MANAGER.get_path("otter_config.json"),
-            files = [FILE_MANAGER.get_path("data")],
-            no_environment = True,  # don't use the environment.yml in the root of the repo
-        )
-        mocked_client.assert_not_called()
+    generate(
+        tests_dir = FILE_MANAGER.get_path("tests"),
+        output_path = OUTPUT_PATH,
+        requirements = FILE_MANAGER.get_path("requirements.txt"),
+        config = FILE_MANAGER.get_path("otter_config.json"),
+        files = [FILE_MANAGER.get_path("data")],
+        no_environment = True,  # don't use the environment.yml in the root of the repo
+    )
+
+    mocked_client.assert_not_called()
 
     with unzip_to_temp(FILE_MANAGER.get_path("autograder.zip")) as unzipped_dir:
         assert_dirs_equal(unzipped_dir, FILE_MANAGER.get_path("autograder-token-correct"))

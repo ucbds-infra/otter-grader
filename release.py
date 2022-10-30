@@ -9,14 +9,14 @@ import warnings
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
     "otter/generate/__init__.py",
-    "test/test_generate/test-autograder/autograder-correct/environment.yml",
-    "test/test_generate/test-autograder/autograder-token-correct/environment.yml",
-    "test/test_generate/test-autograder/autograder-custom-env/environment.yml",
-    "test/test_generate/test-autograder/autograder-r-correct/environment.yml",
-    "test/test-run/autograder/source/environment.yml",
-    "test/test-assign/example-autograder-correct/environment.yml",
-    "test/test-assign/gs-autograder-correct/environment.yml",
-    "test/test-assign/rmd-autograder-correct/environment.yml",
+    "test/test_generate/files/autograder-correct/environment.yml",
+    "test/test_generate/files/autograder-token-correct/environment.yml",
+    "test/test_generate/files/autograder-custom-env/environment.yml",
+    "test/test_generate/files/autograder-r-correct/environment.yml",
+    "test/test_run/files/autograder/source/environment.yml",
+    "test/test_assign/files/example-autograder-correct/environment.yml",
+    "test/test_assign/files/gs-autograder-correct/environment.yml",
+    "test/test_assign/files/rmd-autograder-correct/environment.yml",
 ]
 
 
