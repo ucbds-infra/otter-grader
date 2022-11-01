@@ -4,6 +4,10 @@
 
 * Added configuration files for Otter Assign per [#565](https://github.com/ucbds-infra/otter-grader/issues/565)
 
+**v4.1.1:**
+
+* Added `MANIFEST.in`
+
 **v4.1.0:**
 
 * Display emojis with test results to more clearly show which tests pass and which fail, as per [#533](https://github.com/ucbds-infra/otter-grader/pull/533).
