@@ -132,7 +132,7 @@ class PythonRunner(AbstractLanguageRunner):
                 seed = self.ag_config.seed,
                 seed_variable = self.ag_config.seed_variable,
                 log = log if self.ag_config.grade_from_log else None,
-                variables = self.ag_config.serialized_variables or {},
+                variables = self.ag_config.serialized_variables,
                 plugin_collection = plugin_collection,
                 script = os.path.splitext(subm_path)[1] == ".py",
             )
