@@ -2,7 +2,16 @@
 
 **Unreleased:**
 
+* Added configuration files for Otter Assign per [#565](https://github.com/ucbds-infra/otter-grader/issues/565)
 * Fixed log execution bug from Slack as described in [#571](https://github.com/ucbds-infra/otter-grader/pull/571)
+
+**v4.1.2:**
+
+* Added `ipython` to `install_requires`
+
+**v4.1.1:**
+
+* Added `MANIFEST.in`
 
 **v4.1.0:**
 
