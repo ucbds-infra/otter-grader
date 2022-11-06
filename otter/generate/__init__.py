@@ -19,6 +19,7 @@ from .utils import merge_conda_environments, zip_folder
 from ..plugins import PluginCollection
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import dump_yaml, load_default_file
+from ..version import __version__
 
 
 DEFAULT_PYTHON_VERSION = "3.7"
@@ -84,7 +85,7 @@ class CondaEnvironment:
             "nbformat", 
             "dill",
             "numpy",
-            "otter-grader==4.1.0",
+            f"otter-grader=={__version__}",
             *self.requirements,
         ]
 

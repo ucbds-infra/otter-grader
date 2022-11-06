@@ -8,7 +8,6 @@ import warnings
 
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
-    "otter/generate/__init__.py",
     "test/test_generate/files/autograder-correct/environment.yml",
     "test/test_generate/files/autograder-token-correct/environment.yml",
     "test/test_generate/files/autograder-custom-env/environment.yml",

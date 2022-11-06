@@ -9,6 +9,7 @@ wrapt
 jupytext
 click
 fica>=0.2.0
+ipython
 
 # plugins
 google-api-python-client

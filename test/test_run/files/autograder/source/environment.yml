@@ -21,5 +21,5 @@ dependencies:
       - nbformat
       - dill
       - numpy
-      - otter-grader==4.1.0
+      - otter-grader==4.2.0
       - tqdm
