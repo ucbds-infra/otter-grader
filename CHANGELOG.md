@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v4.2.0:**
 
 * Added configuration files for Otter Assign per [#565](https://github.com/ucbds-infra/otter-grader/issues/565)
 * Fixed log execution bug from Slack as described in [#571](https://github.com/ucbds-infra/otter-grader/pull/571)
