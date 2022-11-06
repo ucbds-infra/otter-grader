@@ -12,6 +12,6 @@ nbconvert
 nbformat
 dill
 numpy
-otter-grader==4.1.2
+otter-grader==4.2.0
 
 tqdm
