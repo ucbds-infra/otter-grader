@@ -163,7 +163,7 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
         for local_path, container_path in volumes:
             docker.container.copy(local_path, (container, container_path))
 
-        docker.container.start(container, **args)
+        docker.container.start(container)
 
         if timeout:
             import threading
