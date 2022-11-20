@@ -84,7 +84,7 @@ def launch_grade(zip_path, submissions_dir, num_containers=None, ext="ipynb", no
 
     pool = ThreadPoolExecutor(num_containers)
     futures = []
-    img = build_image(zip_path, image, generate_hash(zip_path))
+    img = build_image(zip_path, image, generate_hash(zip_path, image))
 
     if zips:
         pattern = "*.zip"

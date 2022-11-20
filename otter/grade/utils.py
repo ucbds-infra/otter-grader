@@ -55,20 +55,21 @@ def prune_images(force=False):
             if any([t.startswith(OTTER_DOCKER_IMAGE_TAG + ":") for t in img.repo_tags]):
                 img.remove(force=True)
 
-def generate_hash(path):
+def generate_hash(path, extra_data):
     """
     Reads in a file and returns an MD5 hash of its contents.
 
     Args:
         path (``str``): path to the file that will be read in and hashed
+        extra_data (``str``): extra data to add to the hash
 
     Returns:
         ``str``: the hash value of the file
     """
-    zip_hash = ""
     m = md5()
     with open(path, "rb") as f:
-        data = f.read() # read file in chunk and call update on each chunk if file is large.
+        data = f.read()
         m.update(data)
-        zip_hash = m.hexdigest()
-    return zip_hash
+
+    m.update(extra_data.encode("utf-8"))
+    return m.hexdigest()
