@@ -158,7 +158,12 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
         if network is not None and not network:
             args['networks'] = 'none'
 
-        container = docker.container.run(image, command=["/autograder/run_autograder"], volumes=volumes, detach=True, **args)
+        container = docker.container.create(image, command=["/autograder/run_autograder"], **args)
+
+        for local_path, container_path in volumes:
+            docker.container.copy(local_path, (container, container_path))
+
+        docker.container.start(container)
 
         if timeout:
             import threading
@@ -179,6 +184,9 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
 
         logs = docker.container.logs(container)
         LOGGER.debug(f"Container {container_id} logs:\n{indent(logs, '    ')}")
+
+        for local_path, container_path in volumes:
+            docker.container.copy((container, container_path), local_path)
 
         if not no_kill:
             container.remove()
