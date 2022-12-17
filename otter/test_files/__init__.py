@@ -8,7 +8,7 @@ import pickle
 
 from collections import namedtuple
 
-from .abstract_test import OK_FORMAT_VARNAME, TestCase, TestCaseResult
+from .abstract_test import OK_FORMAT_VARNAME, TestCase, TestCaseResult, TestFile
 from .exception_test import ExceptionTestFile, test_case
 from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
@@ -125,6 +125,14 @@ class GradingResults:
                     message = tcr["error"],
                     passed = tcr["passed"],
                 ))
+
+            # fix the point values in each test case
+            test_cases = TestFile.resolve_test_file_points(tfr.get("points"), test_cases)
+
+            # TestFile.resolve_test_file_points returns a copy of each TestCase, so update the
+            # TestCaseResults
+            for tc, tcr in zip(test_cases, test_case_results):
+                tcr.test_case = tc
 
             test_file = OttrTestFile(
                 name = os.path.splitext(os.path.basename(tfr["filename"]))[0],
