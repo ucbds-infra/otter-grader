@@ -141,18 +141,16 @@ def grade_submission(
         if pdf_dir:
             volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
 
-        run_kwargs = {}
+        args = {'platform': DOCKER_PLATFORM}
         if network is not None and not network:
-            run_kwargs['networks'] = 'none'
+            args['networks'] = 'none'
 
-        container = docker.container.run(
-            image,
-            command=["/autograder/run_autograder"],
-            volumes=volumes,
-            detach=True,
-            platform=DOCKER_PLATFORM,
-            **run_kwargs,
-        )
+        container = docker.container.create(image, command=["/autograder/run_autograder"], **args)
+
+        for local_path, container_path in volumes:
+            docker.container.copy(local_path, (container, container_path))
+
+        docker.container.start(container)
 
         if timeout:
             import threading
@@ -173,6 +171,9 @@ def grade_submission(
 
         logs = docker.container.logs(container)
         LOGGER.debug(f"Container {container_id} logs:\n{indent(logs, '    ')}")
+
+        for local_path, container_path in volumes:
+            docker.container.copy((container, container_path), local_path)
 
         if not no_kill:
             container.remove()

@@ -8,3 +8,4 @@ pytest
 jupyter_client
 ipykernel
 matplotlib
+gspread
