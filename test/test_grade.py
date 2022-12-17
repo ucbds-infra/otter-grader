@@ -15,6 +15,7 @@ from glob import glob
 from otter.generate import main as generate
 from otter.generate.utils import zip_folder
 from otter.grade import main as grade
+from otter.grade.containers import launch_grade
 from otter.utils import loggers
 
 from .utils import TestFileManager
@@ -243,3 +244,18 @@ def test_single_notebook_grade(expected_points):
         output = grade(**kws)
         mocked_launch_grade.assert_called_with(notebook_path, **kw_expected)
         assert output == 1.0
+
+
+@mock.patch("otter.grade.containers.ThreadPoolExecutor")
+@mock.patch("otter.grade.containers.build_image")
+def test_changed_base_image(mocked_build_image, _):
+    """
+    Tests that changing the base image of a Docker container changes the resulting image's tag.
+    """
+    zip_path = FILE_MANAGER.get_path("autograder.zip")
+    launch_grade(zip_path, "")
+    launch_grade(zip_path, "", image="ubuntu")
+    
+    assert mocked_build_image.call_count == 2
+    assert all(len(call.args) == 3 for call in mocked_build_image.call_args_list)
+    assert mocked_build_image.call_args_list[0].args[2] != mocked_build_image.call_args_list[1].args[2]

@@ -1,5 +1,10 @@
 # Changelog
 
+**v4.2.1:**
+
+* Update Otter Grade image tag when the base image changes per [#583](https://github.com/ucbds-infra/otter-grader/issues/583)
+* Make gspread an optional dependency per [#577](https://github.com/ucbds-infra/otter-grader/issues/577)
+
 **v4.2.0:**
 
 * Added configuration files for Otter Assign per [#565](https://github.com/ucbds-infra/otter-grader/issues/565)
