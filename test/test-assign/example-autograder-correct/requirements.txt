@@ -12,4 +12,5 @@ nbconvert
 nbformat
 dill
 numpy
+gspread
 otter-grader==4.2.0
