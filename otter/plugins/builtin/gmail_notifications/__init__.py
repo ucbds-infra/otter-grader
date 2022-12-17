@@ -2,13 +2,9 @@
 Plugin for using the Gmail API to notify students about the results of public test cases
 """
 
-import os
-import json
-import tempfile
-import gspread
-import pandas as pd
 import base64
 import google.oauth2.credentials
+import os
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
