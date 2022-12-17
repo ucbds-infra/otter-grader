@@ -14,5 +14,4 @@ ipython
 # plugins
 google-api-python-client
 google-auth-oauthlib
-gspread
 six

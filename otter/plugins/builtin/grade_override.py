@@ -5,7 +5,6 @@ Plugin for using Google Sheets to override scores for test cases
 import os
 import json
 import tempfile
-import gspread
 import pandas as pd
 
 from .. import PluginCollection
@@ -47,6 +46,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         Returns:
             ``pandas.core.frame.DataFrame``: the sheet as a dataframe
         """
+        import gspread
         try:
             oauth_json = self.plugin_config["service_account_credentials"]
             with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as ntf:
