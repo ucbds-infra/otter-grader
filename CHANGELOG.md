@@ -3,6 +3,7 @@
 **Unreleased:**
 
 * Update Otter Grade image tag when the base image changes per [#583](https://github.com/ucbds-infra/otter-grader/issues/583)
+* Make gspread an optional dependency per [#577](https://github.com/ucbds-infra/otter-grader/issues/577)
 
 **v4.2.0:**
 
