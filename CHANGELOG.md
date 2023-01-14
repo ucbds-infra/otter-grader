@@ -1,5 +1,9 @@
 # Changelog
 
+**Unreleased:**
+
+* Support dictionary and tuple assignments in solution substitution in Otter Assign per [#587](https://github.com/ucbds-infra/otter-grader/issues/587)
+
 **v4.2.1:**
 
 * Update Otter Grade image tag when the base image changes per [#583](https://github.com/ucbds-infra/otter-grader/issues/583)
