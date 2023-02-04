@@ -38,9 +38,13 @@ class RCellFactory(CellFactory):
         if self.assignment.export_cell.instructions:
             instructions.source += '\n\n' + self.assignment.export_cell.instructions
 
+        pdf_arg = ""
+        if self.assignment.export_cell.pdf:
+            pdf_arg = ", pdf = TRUE"
+
         export = nbformat.v4.new_code_cell()
         source_lines = ["# Save your notebook first, then run this cell to export your submission."]
-        source_lines.append(f'ottr::export("{self.assignment.notebook_basename}")')
+        source_lines.append(f'ottr::export("{self.assignment.notebook_basename}"{pdf_arg})')
         export.source = "\n".join(source_lines)
 
         lock(instructions)
