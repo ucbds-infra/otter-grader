@@ -52,7 +52,7 @@ def overwrite_seed_vars(nb, seed_variable, seed):
     return nb
 
 
-solution_assignment_regex = re.compile(r"(\s*[a-zA-Z0-9_. ]*=).* ?# ?SOLUTION")
+solution_assignment_regex = re.compile(r"(\s*(?:[\w.]+(?:\[['\"].*['\"]\])*(?:,\s*)?)+\s*=).* ?# ?SOLUTION")
 def solution_assignment_sub(match):
     """
     Substitutes the first matching group  with `` ...``
