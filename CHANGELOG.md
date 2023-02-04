@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**4.3.0:**
 
 * Support dictionary and tuple assignments in solution substitution in Otter Assign per [#587](https://github.com/ucbds-infra/otter-grader/issues/587)
 * Add the `pdf` argument to `ottr::export` in R assignments created with Otter Assign per [#440](https://github.com/ucbds-infra/otter-grader/issues/440)
