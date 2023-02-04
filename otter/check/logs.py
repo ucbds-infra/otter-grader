@@ -291,7 +291,8 @@ class LogEntry:
             return log
 
         finally:
-            file.close()
+            if "file" in locals():
+                file.close()
 
     @staticmethod
     def shelve_environment(env, variables=None, ignore_modules=[]):

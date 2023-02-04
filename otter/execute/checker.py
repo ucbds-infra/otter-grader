@@ -81,3 +81,15 @@ class Checker:
             cls._test_files.append(test)
 
         return test
+
+    @classmethod
+    def check_if_not_already_checked(cls, test_path, global_env=None):
+        """
+        """
+        if any(test_path in tf.path or tf.path in test_path for tf in cls._test_files):
+            return
+
+        if global_env is None:
+            global_env = inspect.currentframe().f_back.f_globals
+
+        return cls.check(test_path, global_env=global_env)

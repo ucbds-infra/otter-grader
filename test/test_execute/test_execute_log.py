@@ -7,7 +7,7 @@ from textwrap import dedent
 from unittest import mock
 
 from otter.check.logs import EventType, Log, LogEntry
-from otter.execute.execute_log import execute_log
+# from otter.execute.execute_log import execute_log
 from otter.test_files.abstract_test import TestFile
 
 
@@ -51,41 +51,42 @@ def generate_question_envs():
         },
     }
 
+# TODO: replace with a test in test_run
 
-@mock.patch("builtins.exec")
-def test_execute_log(mocked_exec):
-    """
-    Tests ``otter.execute.execute_log.execute_log``.
-    """
-    nb = generate_nb()
-    envs = generate_question_envs()
-    mocked_log = mock.MagicMock()
-    mocked_grader = mock.MagicMock()
+# @mock.patch("builtins.exec")
+# def test_execute_log(mocked_exec):
+#     """
+#     Tests ``otter.execute.execute_log.execute_log``.
+#     """
+#     nb = generate_nb()
+#     envs = generate_question_envs()
+#     mocked_log = mock.MagicMock()
+#     mocked_grader = mock.MagicMock()
 
-    entries = []
-    expected_env = {}
-    for q in sorted(envs.keys()):
-        mocked_entry = mock.MagicMock()
-        mocked_entry.unshelve.return_value = envs[q]
-        mocked_entry.question = q
-        entries.append(mocked_entry)
-        expected_env.update(envs[q])
+#     entries = []
+#     expected_env = {}
+#     for q in sorted(envs.keys()):
+#         mocked_entry = mock.MagicMock()
+#         mocked_entry.unshelve.return_value = envs[q]
+#         mocked_entry.question = q
+#         entries.append(mocked_entry)
+#         expected_env.update(envs[q])
 
-    mocked_log.question_iterator.return_value = entries
+#     mocked_log.question_iterator.return_value = entries
 
-    list_name = "check_results_foo123"
-    initial_env = {list_name: [], "grader": mocked_grader}
+#     list_name = "check_results_foo123"
+#     initial_env = {list_name: [], "grader": mocked_grader}
 
-    executed_env = execute_log(nb, mocked_log, check_results_list_name=list_name, initial_env=initial_env)
+#     executed_env = execute_log(nb, mocked_log, check_results_list_name=list_name, initial_env=initial_env)
 
-    mocked_exec.assert_any_call("import otter\ngrader = otter.Notebook()\n", executed_env)
-    mocked_exec.assert_any_call("import numpy as np", executed_env)
-    mocked_exec.assert_any_call("import pandas as pd", executed_env)
-    mocked_exec.assert_any_call("from glob import glob", executed_env)
+#     mocked_exec.assert_any_call("import otter\ngrader = otter.Notebook()\n", executed_env)
+#     mocked_exec.assert_any_call("import numpy as np", executed_env)
+#     mocked_exec.assert_any_call("import pandas as pd", executed_env)
+#     mocked_exec.assert_any_call("from glob import glob", executed_env)
 
-    for k, v in expected_env.items():
-        assert executed_env[k] == v
+#     for k, v in expected_env.items():
+#         assert executed_env[k] == v
 
-    assert mocked_grader.check.call_count == len(envs)
-    for q in envs.keys():
-        mocked_grader.check.assert_any_call(q, global_env=executed_env)
+#     assert mocked_grader.check.call_count == len(envs)
+#     for q in envs.keys():
+#         mocked_grader.check.assert_any_call(q, global_env=executed_env)

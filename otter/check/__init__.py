@@ -21,7 +21,7 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 
     Args:
         event_type (``otter.logs.EventType``): the type of event
-        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the 
+        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the
             results of any checks recorded by the entry
         question (``str``, optional): the question name for this check
         success (``bool``, optional): whether the operation was successful
@@ -32,8 +32,8 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
     LogEntry(
         event_type,
         results=results,
-        question=question, 
-        success=success, 
+        question=question,
+        success=success,
         error=error
     ).flush_to_file(_OTTER_LOG_FILENAME)
 
@@ -88,6 +88,7 @@ def main(file, *, tests_path="./tests", question=None, seed=None):
             results = grade_notebook(
                 file,
                 tests_glob=qs,
+                test_dir=tests_path,
                 script=script,
                 seed=seed,
             )

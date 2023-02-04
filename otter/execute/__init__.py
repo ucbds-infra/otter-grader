@@ -1,38 +1,54 @@
 """Execution and grading internals for Otter-Grader"""
 
 import nbformat
+import pickle
+import tempfile
+
+from nbconvert.preprocessors import ExecutePreprocessor
+from traitlets.config import Config
 
 from .checker import Checker
-from .execute_log import execute_log
-from .execute_notebook import execute_notebook
-from .transforms import filter_ignored_cells, script_to_notebook
+from .preprocessor import GradingPreprocessor
 
-from ..test_files import create_test_file, GradingResults
-from ..utils import id_generator, NBFORMAT_VERSION
+from ..test_files import GradingResults
+from ..utils import NBFORMAT_VERSION
 
 
-def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors=True, script=False, 
-    cwd=None, test_dir=None, seed=None, seed_variable=None, log=None, variables=None, 
-    plugin_collection=None):
+def grade_notebook(
+    submission_path,
+    *,
+    tests_glob=[],
+    ignore_errors=True,
+    script=False, 
+    cwd=None,
+    test_dir=None,
+    seed=None,
+    seed_variable=None,
+    log=None,
+    variables=None, 
+    plugin_collection=None,
+):
     """
-    Grade an assignment file and return grade information
+    Grade an assignment file and return grade information.
 
     Args:
         submission_path (``str``): path to a single notebook or Python script
-        tests_glob (``list`` of ``str``, optional): paths to test files to run
-        name (``str``, optional): initial environment name
-        ignore_errors (``bool``, optional): whether errors in execution should be ignored
-        script (``bool``, optional): whether the ``submission_path`` is a Python script
-        cwd (``str``, optional): working directory of execution to be appended to ``sys.path`` in 
-            grading environment
-        test_dir (``str``, optional): path to directory of tests in grading environment
-        seed (``int``, optional): random seed for intercell seeding
-        seed_variable (``str``, optional): a variable name to override with the seed
-        log (``otter.check.logs.Log``, optional): log from which to grade questions
-        variables (``dict``, optional): map of variable names -> type string to check type of deserialized
-            object to prevent arbitrary code from being put into the environment; ignored if log is ``None``
-        plugin_collection (``otter.plugins.PluginCollection``, optional): a set of plugins to run on
-            this assignment during execution and grading
+        tests_glob (``list[str]``): paths of test files that should be run; tests that are included
+            in this list that have not already been run by the submission are run after executing
+            the submission
+        ignore_errors (``bool``): whether errors in execution should be ignored
+        script (``bool``): whether the ``submission_path`` is a Python script
+        cwd (``str``): working directory of execution to be appended to ``sys.path`` before
+            executing the submission
+        test_dir (``str``): path to directory of tests in the grading environment
+        seed (``int``): random seed for intercell seeding
+        seed_variable (``str|None``): a variable name to override with the seed
+        log (``otter.check.logs.Log``): an Otter log from which to deserialize environments to grade
+            questions
+        variables (``dict[str, str]|None``): map of variable names -> type string to use for type
+            checking values deserialized from ``log``
+        plugin_collection (``otter.plugins.PluginCollection``): a set of plugins to run the
+            ``before_execution`` and ``after_grading`` events on this submission
 
     Returns:
         ``otter.test_files.GradingResults``: the results of grading
@@ -44,58 +60,41 @@ def grade_notebook(submission_path, *, tests_glob=None, name=None, ignore_errors
         with open(submission_path) as f:
             nb = f.read()
 
-        nb = script_to_notebook(nb)
+        nb = nbformat.v4.new_notebook(cells=[nbformat.v4.new_code_cell(nb)])
 
     if plugin_collection is not None:
         nb = plugin_collection.before_execution(nb)
 
-    # remove any ignored cells from the notebook
-    if not script:
-        nb = filter_ignored_cells(nb)
+    with tempfile.NamedTemporaryFile() as ntf:
+        c = Config()
 
-    secret = id_generator()
-    results_array = "check_results_{}".format(secret)
-    initial_env = {
-        results_array: []
-    }
+        # GradingPreprocessor config
+        c.GradingPreprocessor.cwd = cwd
+        c.GradingPreprocessor.test_dir = test_dir
+        c.GradingPreprocessor.tests_glob = tests_glob
+        c.GradingPreprocessor.results_path = ntf.name
+        c.GradingPreprocessor.seed = seed
+        c.GradingPreprocessor.seed_variable = seed_variable
+        c.GradingPreprocessor.otter_log = log
+        c.GradingPreprocessor.variables = variables
 
-    if name:
-        initial_env["__name__"] = name
+        # ExecutePreprocessor config
+        c.ExecutePreprocessor.allow_errors = ignore_errors
 
-    if log is not None:
-        global_env = execute_log(
-            nb, log, results_array, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, 
-            variables=variables)
+        gp = GradingPreprocessor(config=c)
+        ep = ExecutePreprocessor(config=c)
 
-    else:
-        global_env = execute_notebook(
-            nb, results_array, initial_env, ignore_errors=ignore_errors, cwd=cwd, test_dir=test_dir, 
-            seed=seed, seed_variable=seed_variable)
+        nb, _ = gp.preprocess(nb)
+        executed_nb, _ = ep.preprocess(nb)
 
-    if plugin_collection is not None:
-        plugin_collection.run("after_execution", global_env)
+        gp.cleanup()
 
-    tests_run = global_env[results_array]
+        results = pickle.load(ntf)
 
-    # Check for tests which were not included in the notebook and specified by tests_globs
-    # Allows instructors to run notebooks with additional tests not accessible to user
-    if tests_glob:
-        # unpack list of paths into a single list
-        tested_set = [test.path for test in tests_run]
-        extra_tests = []
-        for t in sorted(tests_glob):
-            include = True
-            for tested in tested_set:
-                if tested in t or t in tested:     # e.g. if 'tests/q1.py' is in /srv/repo/lab01/tests/q1.py
-                    include = False
+    if not isinstance(results, GradingResults):
+        raise TypeError("Results deserialized from grading notebook were not a GradingResults instance")
 
-            if include:
-                extra_tests.append(create_test_file(t))
-                extra_tests[-1].run(global_env)
-
-        tests_run += extra_tests
-
-    results = GradingResults(tests_run)
+    results.notebook = executed_nb
 
     if plugin_collection is not None:
         plugin_collection.run("after_grading", results)

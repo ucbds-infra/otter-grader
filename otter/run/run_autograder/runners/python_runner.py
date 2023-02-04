@@ -65,7 +65,7 @@ class PythonRunner(AbstractLanguageRunner):
     def write_pdf(self, nb_path):
         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
         export_notebook(
-            nb_path, dest=pdf_path, filtering=self.ag_config.filtering, 
+            nb_path, dest=pdf_path, filtering=self.ag_config.filtering,
             pagebreaks=self.ag_config.pagebreaks, exporter_type="latex")
 
         return pdf_path
@@ -123,12 +123,11 @@ class PythonRunner(AbstractLanguageRunner):
                 log = None
 
             scores = grade_notebook(
-                subm_path, 
-                tests_glob = glob("./tests/*.py"), 
-                name = "submission", 
-                cwd = os.getcwd(), 
+                subm_path,
+                tests_glob = glob("./tests/*.py"),
+                cwd = os.getcwd(),
                 test_dir = "./tests",
-                ignore_errors = not self.ag_config.debug, 
+                ignore_errors = not self.ag_config.debug,
                 seed = self.ag_config.seed,
                 seed_variable = self.ag_config.seed_variable,
                 log = log if self.ag_config.grade_from_log else None,
@@ -160,6 +159,6 @@ class PythonRunner(AbstractLanguageRunner):
             if plugin_collection:
                 report = plugin_collection.generate_report()
                 if report.strip():
-                    print("\n\n" + report)        
+                    print("\n\n" + report)
 
         return scores
