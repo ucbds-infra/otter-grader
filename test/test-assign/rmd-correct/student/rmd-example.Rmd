@@ -112,5 +112,5 @@ Make sure you have run all cells in your notebook in order before running the ce
 
 ```{r}
 # Save your notebook first, then run this cell to export your submission.
-ottr::export("rmd-example.Rmd")
+ottr::export("rmd-example.Rmd", pdf = TRUE)
 ```
