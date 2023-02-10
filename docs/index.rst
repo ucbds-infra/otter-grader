@@ -29,7 +29,7 @@ instructor's assignment distribution and collection pipeline. Otter supports loc
 parallel Docker containers, grading using the autograding platforms of 3rd-party learning management 
 systems (LMSs), non-containerized grading on an instructor's machine, and a client package 
 that allows students to check and instructors to grade assignments their own machines. Otter is 
-designed to grade Pyhon and R executables, Jupyter Notebooks, and RMarkdown documents and is 
+designed to grade Python and R executables, Jupyter Notebooks, and RMarkdown documents and is 
 compatible with a few different LMSs, including Canvas and Gradescope.
 
 The core abstraction of Otter, as compared to other autograders like nbgrader_ and OkPy_, is this:
