@@ -79,7 +79,7 @@ class CondaEnvironment:
             "ipywidgets", 
             "scipy", 
             "seaborn", 
-            "sklearn", 
+            "scikit-learn", 
             "jinja2", 
             "nbconvert", 
             "nbformat", 
