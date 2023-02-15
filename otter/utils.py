@@ -24,6 +24,7 @@ NOTEBOOK_METADATA_KEY = "otter"
 """the key used for all Otter metadata added to a notebook"""
 
 
+# TODO: remove
 @contextmanager
 def block_print():
     """
