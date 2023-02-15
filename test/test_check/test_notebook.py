@@ -200,6 +200,7 @@ def test_jupyterlite():
         mocked_open.assert_called_with(mocked_os.path.join.return_value, "w+")
 
 
+# TODO: remove
 def test_grading_mode():
     """
     Check that a call to a grading-mode-disabled method is not executed.

@@ -65,10 +65,10 @@ class GradingPreprocessor(Preprocessor):
     seed_variable = Unicode(allow_none=True).tag(config=True)
     """"""
 
-    otter_log: Optional[Log] = Instance(Log, allow_none=True)
+    otter_log: Optional[Log] = Instance(Log, allow_none=True).tag(config=True)
     """"""
 
-    variables = Dict(value_trait=Unicode(), key_trait=Unicode())
+    variables = Dict(value_trait=Unicode(), key_trait=Unicode(), allow_none=True).tag(config=True)
     """"""
 
     _notebook_name: str
