@@ -52,19 +52,14 @@ class Checker:
     @classmethod
     def check(cls, nb_or_test_path, test_name=None, global_env=None):
         """
-        Checks a global environment against given test file. If ``global_env`` is ``None``, the global 
-        environment of the calling frame is used; i.e., the following two calls are equivalent:
-
-        .. code-block:: python
-
-            check('tests/q1.py')
-            check('tests/q1.py', global_env=globals())
+        Checks a global environment against a test, which may be stored in a file or in a notebook's
+        metadata.
 
         Args:
             nb_or_test_path (``str``): path to test file or notebook
             test_name (``str``, optional): the name of the test if a notebook metadata test
-            global_env (``dict``, optional): a global environment resulting from the execution 
-                of a python script or notebook
+            global_env (``dict``, optional): the global environment in which to run the test; if
+                unspecified, the calling frame's global environment is used
 
         Returns:
             ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
@@ -85,6 +80,19 @@ class Checker:
     @classmethod
     def check_if_not_already_checked(cls, test_path, global_env=None):
         """
+        Run the specified test if it has not already been run (that is, if its result is not cached
+        in this ``Checker`` instance).
+
+        This method only works with test files.
+
+        Args:
+            test_path (``str``): path to test file
+            global_env (``dict``, optional): the global environment in which to run the test; if
+                unspecified, the calling frame's global environment is used
+
+        Returns:
+            ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
+            given global environment
         """
         if any(test_path in tf.path or tf.path in test_path for tf in cls._test_files):
             return

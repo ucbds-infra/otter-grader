@@ -24,16 +24,6 @@ NOTEBOOK_METADATA_KEY = "otter"
 """the key used for all Otter metadata added to a notebook"""
 
 
-# TODO: remove
-@contextmanager
-def block_print():
-    """
-    Context manager that disables printing to stdout
-    """
-    with open(os.devnull, "w") as f, redirect_stdout(f):
-        yield
-
-
 @contextmanager
 def hide_outputs():
     """

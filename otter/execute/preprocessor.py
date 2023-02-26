@@ -48,31 +48,22 @@ with open("{results_path}", "wb") as f:
 class GradingPreprocessor(Preprocessor):
 
     cwd = Unicode(allow_none=True).tag(config=True)
-    """"""
 
     test_dir = Unicode().tag(config=True)
-    """"""
 
     tests_glob = List(Unicode()).tag(config=True)
-    """"""
 
     results_path = Unicode().tag(config=True)
-    """"""
 
     seed = Integer(allow_none=True).tag(config=True)
-    """"""
 
     seed_variable = Unicode(allow_none=True).tag(config=True)
-    """"""
 
     otter_log: Optional[Log] = Instance(Log, allow_none=True).tag(config=True)
-    """"""
 
     variables = Dict(value_trait=Unicode(), key_trait=Unicode(), allow_none=True).tag(config=True)
-    """"""
 
     _notebook_name: str
-    """"""
 
     _log_temp_file: Optional[Tuple[int, str]] = None
 

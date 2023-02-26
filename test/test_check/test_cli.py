@@ -24,8 +24,7 @@ def cleanup_check_output(cleanup_enabled):
         os.remove(".OTTER_LOG")
 
 
-@mock.patch("otter.check.block_print")
-def test_otter_check_script(_):
+def test_otter_check_script():
     """
     Checks that the script checker works
     """
@@ -80,8 +79,7 @@ def test_otter_check_script(_):
         "Did not pass correct tests"
 
 
-@mock.patch("otter.check.block_print")
-def test_otter_check_notebook(_):
+def test_otter_check_notebook():
     """
     Checks that the script checker works
     """

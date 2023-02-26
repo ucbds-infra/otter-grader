@@ -9,7 +9,7 @@ from .notebook import _OTTER_LOG_FILENAME
 from .utils import list_test_files
 
 from ..execute import grade_notebook
-from ..utils import block_print, loggers
+from ..utils import loggers
 
 
 _ALLOWED_EXTENSIONS = {".py", ".ipynb"}
@@ -85,14 +85,14 @@ def main(file, *, tests_path="./tests", question=None, seed=None):
 
         LOGGER.debug(f"Seed value: {seed}")
         LOGGER.info("Grading submission")
-        with block_print():
-            results = grade_notebook(
-                file,
-                tests_glob=qs,
-                test_dir=tests_path,
-                script=script,
-                seed=seed,
-            )
+
+        results = grade_notebook(
+            file,
+            tests_glob=qs,
+            test_dir=tests_path,
+            script=script,
+            seed=seed,
+        )
 
         percentage = results.total / results.possible
         LOGGER.debug(f"Determined score percentage: {percentage}")

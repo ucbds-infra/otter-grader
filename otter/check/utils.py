@@ -201,7 +201,16 @@ def logs_event(event_type):
 
 
 def list_test_files(tests_dir):
-    """"""
+    """
+    Find all of the test files in the specified directory (that is, all ``.py`` files that are not
+    named ``__init__.py``) and return their paths in a sorted list.
+
+    Args:
+        tests_dir (``str``): the path to the tests directory
+
+    Returns:
+        ``list[str]``: the sorted list of all test file paths in ``tests_dir``
+    """
     return sorted([file for file in glob(os.path.join(tests_dir, "*.py")) \
             if file != "__init__.py"])
 

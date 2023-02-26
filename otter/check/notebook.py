@@ -7,7 +7,6 @@ import os
 import warnings
 import zipfile
 
-from contextlib import contextmanager
 from glob import glob
 from IPython.display import display, HTML
 from textwrap import indent
@@ -20,7 +19,7 @@ from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..utils import Loggable, loggers
+from ..utils import Loggable
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -93,32 +92,6 @@ class Notebook(Loggable):
             self._vars_to_store = self._config.get("variables", None)
 
             self._notebook = self._config["notebook"]
-
-    # @classmethod
-    # @contextmanager
-    # def grading_mode(cls, tests_dir):
-    #     """
-    #     A context manager for the ``Notebook`` grading mode. Yields a pointer to the list of results
-    #     that will be populated during grading.
-
-    #     **It is the caller's responsibility to maintain the pointer.** The pointer in the ``Checker``
-    #     class will be overwritten when the context exits.
-    #     """
-    #     logger = cls._get_logger()
-    #     logger.info("Entering Notebook grading mode")
-    #     logger.debug(f"Overriding tests directory: {tests_dir}")
-    #     cls._grading_mode = True
-    #     cls._tests_dir_override = tests_dir
-    #     Checker.clear_results()
-    #     Checker.enable_tracking()
-
-    #     yield Checker.get_results()
-
-    #     logger.info("Exiting Notebook grading mode")
-    #     cls._grading_mode = False
-    #     cls._tests_dir_override = None
-    #     Checker.disable_tracking()
-    #     Checker.clear_results()
     
     @classmethod
     def init_grading_mode(cls, tests_dir):
