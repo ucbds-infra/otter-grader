@@ -156,16 +156,18 @@ class GradingPreprocessor(Preprocessor):
             e.flush_to_file(log_fn)
 
         nb.cells.append(nbf.v4.new_code_cell(dedent(f"""\
+            import json
             from otter import Notebook
             from otter.check.logs import Log
             from otter.utils import get_variable_type
 
+            variables = json.loads(\"\"\"{json.dumps(self.variables)}\"\"\")
             log = Log.from_file("{log_fn}")
             logged_questions = []
             grader = Notebook()
 
             for entry in log.question_iterator():
-                shelf = unshelve(globals())
+                shelf = entry.unshelve(globals())
 
                 if variables is not None:
                     for k, v in shelf.items():

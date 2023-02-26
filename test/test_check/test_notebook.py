@@ -200,21 +200,21 @@ def test_jupyterlite():
         mocked_open.assert_called_with(mocked_os.path.join.return_value, "w+")
 
 
-# TODO: remove
-def test_grading_mode():
+@mock.patch.object(Notebook, "_resolve_nb_path")
+def test_grading_mode(mocked_resolve):
     """
     Check that a call to a grading-mode-disabled method is not executed.
     """
-    with mock.patch.object(Notebook, "_resolve_nb_path") as mocked_resolve, \
-            Notebook.grading_mode(tests_dir="foo"):
-        grader = Notebook(tests_dir=TESTS_DIR)
-        grader.export()
+    Notebook.init_grading_mode(tests_dir="foo")
 
-        # TODO: find a better way of doing this than accessing a private field
-        assert grader._path == "foo"
+    grader = Notebook(tests_dir=TESTS_DIR)
+    grader.export()
 
-        # if export is called, this method would be called first
-        mocked_resolve.assert_not_called()
+    # TODO: find a better way of doing this than accessing a private field
+    assert grader._path == "foo"
+
+    # if export is called, this method would be called first
+    mocked_resolve.assert_not_called()
 
 
 # TODO: tests for force_save on export and to_pdf
