@@ -5,6 +5,8 @@ import os
 import pathlib
 import warnings
 
+from json import load
+
 from .assignment import Assignment
 from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
@@ -182,3 +184,26 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             )
 
             LOGGER.info("All autograder tests passed.")
+
+        # find number of manual and autograded questions
+        if assignment.is_python:
+            LOGGER.debug("Finding question counts")
+
+            with open(f'{assignment.master}', 'r') as f:
+                nb = load(f)['cells']
+
+            questions = {
+                'manual': 0,
+                'auto': 0
+            }
+
+            for cell in nb:
+                for content in cell['source']:
+                    if 'manual' in content:
+                        if 'True' in content:
+                            questions['manual'] += 1
+                        elif 'False' in content:
+                            questions['auto'] += 1
+                        break
+
+            LOGGER.debug(f"Found {questions['manual']} manual and {questions['auto']} autograded questions.")
