@@ -6,7 +6,7 @@ pandas
 ipywidgets
 scipy
 seaborn
-sklearn
+scikit-learn
 jinja2
 nbconvert
 nbformat
@@ -14,4 +14,4 @@ dill
 rpy2
 numpy
 gspread
-otter-grader==4.3.0
+otter-grader==4.3.1
