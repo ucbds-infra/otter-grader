@@ -89,6 +89,7 @@ def grade_notebook(
 
         gp.cleanup()
 
+        ntf.seek(0)
         results = pickle.load(ntf)
 
     if not isinstance(results, GradingResults):
