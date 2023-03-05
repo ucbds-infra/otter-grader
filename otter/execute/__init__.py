@@ -89,8 +89,12 @@ def grade_notebook(
 
         gp.cleanup()
 
-        ntf.seek(0)
-        results = pickle.load(ntf)
+        try:
+            results = pickle.load(ntf)
+        except EOFError:
+            import pprint
+            pprint.pprint(executed_nb)
+            raise
 
     if not isinstance(results, GradingResults):
         raise TypeError("Results deserialized from grading notebook were not a GradingResults instance")
