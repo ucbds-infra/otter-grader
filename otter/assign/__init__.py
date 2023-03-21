@@ -193,17 +193,26 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 nb = load(f)['cells']
 
             questions = {
-                'manual': 0,
-                'auto': 0
+                'manual': [0, 0],
+                'auto' : [0, 0]
             }
 
             for cell in nb:
-                for content in cell['source']:
-                    if 'manual' in content:
-                        if 'True' in content:
-                            questions['manual'] += 1
-                        elif 'False' in content:
-                            questions['auto'] += 1
+                if any('begin question' in entry.lower() for entry in cell['source']): 
+                    if any('manual' in entry.lower() and 'true' in entry.lower() for entry in cell['source']): 
+                        type = 'manual'
+                    else:
+                        type = 'auto'
+                else:
+                    continue
+                
+                questions[type][0] += 1
+                
+                for entry in cell['source']:
+                    if 'points' in entry.lower():
+                        questions[type][1] += int(entry.split(':')[1].strip())
                         break
 
-            LOGGER.debug(f"Found {questions['manual']} manual and {questions['auto']} autograded questions.")
+            LOGGER.debug(f"{questions['manual'][0]} manual questions, {questions['manual'][1]} points total")
+            LOGGER.debug(f"{questions['auto'][0]} autograded questions, {questions['auto'][1]} points total")
+
