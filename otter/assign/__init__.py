@@ -185,34 +185,34 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
 
             LOGGER.info("All autograder tests passed.")
 
-        # find number of manual and autograded questions
-        if assignment.is_python:
-            LOGGER.debug("Finding question counts")
+    # find number of manual and autograded questions
+    if assignment.is_python:
+        LOGGER.debug("Finding question information")
 
-            with open(f'{assignment.master}', 'r') as f:
-                nb = load(f)['cells']
+        with open(f'{assignment.master}', 'r') as notebook:
+            nb_cells = load(notebook)['cells']
 
-            questions = {
-                'manual': [0, 0],
-                'auto' : [0, 0]
-            }
+        questions = {
+            'manual': [0, 0],
+            'auto' : [0, 0]
+        }
 
-            for cell in nb:
-                if any('begin question' in entry.lower() for entry in cell['source']): 
-                    if any('manual' in entry.lower() and 'true' in entry.lower() for entry in cell['source']): 
-                        type = 'manual'
-                    else:
-                        type = 'auto'
+        for cell in nb_cells:
+            if any('begin question' in entry.lower() for entry in cell['source']): 
+                if any('manual' in entry.lower() and 'true' in entry.lower() for entry in cell['source']): 
+                    type = 'manual'
                 else:
-                    continue
-                
-                questions[type][0] += 1
-                
-                for entry in cell['source']:
-                    if 'points' in entry.lower():
-                        questions[type][1] += int(entry.split(':')[1].strip())
-                        break
+                    type = 'auto'
+            else:
+                continue
+            
+            questions[type][0] += 1
+            
+            for entry in cell['source']:
+                if 'points' in entry.lower():
+                    questions[type][1] += int(entry.split(':')[1].strip())
+                    break
 
-            LOGGER.debug(f"{questions['manual'][0]} manual questions, {questions['manual'][1]} points total")
-            LOGGER.debug(f"{questions['auto'][0]} autograded questions, {questions['auto'][1]} points total")
+        LOGGER.debug(f"{questions['manual'][0]} manual questions, {questions['manual'][1]} points total")
+        LOGGER.debug(f"{questions['auto'][0]} autograded questions, {questions['auto'][1]} points total")
 
