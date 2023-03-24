@@ -8,11 +8,13 @@ on:
       - master
       - stable
       - beta
+      - unstable
   pull_request:
     branches:
       - master
       - stable
       - beta
+      - unstable
 
 jobs:
   build:
