@@ -97,6 +97,11 @@ class Assignment(fica.Config, Loggable):
             default=True,
         )
 
+        files: list = fica.Key(
+            description="a list of other files to include in the student submissions' zip file",
+            default=[],
+        )
+
     export_cell: ExportCellValue = fica.Key(
         description="whether to include an Otter export cell in the output notebooks",
         subkey_container=ExportCellValue,
