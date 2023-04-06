@@ -402,7 +402,6 @@ class Notebook(Loggable):
         for file in files:
             if os.path.isdir(file):
                 sub_files = glob(f"./{file}/*")
-                print(sub_files)
                 for sub_file in sub_files:
                     zf.write(sub_file)
             else:
