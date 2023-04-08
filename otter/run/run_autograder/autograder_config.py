@@ -156,3 +156,9 @@ class AutograderConfig(fica.Config):
             "true",
         default=True,
     )
+
+    submit_blank_pdf_on_export_failure = fica.Key(
+        description="whether to submit a blank PDF to the manual-grading Gradescope assignment " \
+            "if a PDF cannot be generated from the submission",
+        default=False,
+    )
