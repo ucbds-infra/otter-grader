@@ -22,6 +22,9 @@ IGNORE_CELL_TAG = "otter_ignore"
 # TODO: make setting up debug logging cleaner
 
 INIT_CELL_SOURCE = """\
+# TODO: remove
+import sys
+print(sys.executable)
 from otter import Notebook as {notebook_name}
 {notebook_name}.init_grading_mode("{test_dir}")
 
