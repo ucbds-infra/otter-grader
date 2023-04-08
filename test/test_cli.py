@@ -215,7 +215,7 @@ def test_export(mocked_export, run_cli):
         filtering=False,
         pagebreaks=False,
         save=False,
-        no_xecjk=False,
+        xecjk=False,
     )
 
     result = run_cli([*cmd_start])
@@ -242,9 +242,9 @@ def test_export(mocked_export, run_cli):
     assert_cli_result(result, expect_error=False)
     mocked_export.assert_called_with(**{**std_kwargs, "save": True})
 
-    result = run_cli([*cmd_start, "--no-xecjk"])
+    result = run_cli([*cmd_start, "--xecjk"])
     assert_cli_result(result, expect_error=False)
-    mocked_export.assert_called_with(**{**std_kwargs, "no_xecjk": True})
+    mocked_export.assert_called_with(**{**std_kwargs, "xecjk": True})
 
     result = run_cli([*cmd_start, "-e", "latex"])
     assert_cli_result(result, expect_error=False)

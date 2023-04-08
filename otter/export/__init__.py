@@ -45,7 +45,7 @@ def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
 
 
 def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, 
-         no_xecjk=False):
+         xecjk=False):
     """
     Runs Otter Export
 
@@ -57,7 +57,7 @@ def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, sa
         pagebreaks (``bool``): whether to pagebreak between filtered regions; ignored if ``filtering``
             is ``False``
         save (``bool``): whether to save any intermediate files (e.g. ``.tex``, ``.html``)
-        no_xecjk (``bool``): whether to disable xeCJK in the LaTeX template
+        xecjk (``bool``): whether to use xeCJK in the LaTeX template
     """
     export_notebook(
         src,
@@ -67,5 +67,5 @@ def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, sa
         pagebreaks = pagebreaks,
         save_tex = save,
         save_html = save,
-        no_xecjk=no_xecjk,
+        xecjk=xecjk,
     )
