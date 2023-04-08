@@ -22,9 +22,6 @@ IGNORE_CELL_TAG = "otter_ignore"
 # TODO: make setting up debug logging cleaner
 
 INIT_CELL_SOURCE = """\
-# TODO: remove
-import sys
-print(sys.executable)
 from otter import Notebook as {notebook_name}
 {notebook_name}.init_grading_mode("{test_dir}")
 
@@ -150,9 +147,6 @@ class GradingPreprocessor(Preprocessor):
             e.flush_to_file(log_fn)
 
         nb.cells.append(nbf.v4.new_code_cell(dedent(f"""\
-            # TODO: remove
-            import sys
-            print(sys.executable)
             import json
             from otter import Notebook
             from otter.check.logs import Log
