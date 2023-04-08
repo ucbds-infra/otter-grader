@@ -151,6 +151,9 @@ class GradingPreprocessor(Preprocessor):
             from otter import Notebook
             from otter.check.logs import Log
             from otter.utils import get_variable_type
+            # TODO: remove
+            import sys
+            print(sys.executable)
 
             variables = json.loads(\"\"\"{json.dumps(self.variables)}\"\"\")
             log = Log.from_file("{log_fn}")

@@ -89,9 +89,12 @@ def grade_notebook(
 
         gp.cleanup()
 
+        # TODO: remove
         try:
             results = pickle.load(ntf)
         except EOFError:
+            import sys
+            print(sys.executable)
             import pprint
             pprint.pprint(executed_nb)
             raise
