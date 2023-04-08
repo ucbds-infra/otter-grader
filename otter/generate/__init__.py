@@ -86,6 +86,7 @@ class CondaEnvironment:
             "dill",
             "numpy",
             "gspread",
+            "pypdf",
             f"otter-grader=={__version__}",
             *self.requirements,
         ]
