@@ -147,13 +147,13 @@ class GradingPreprocessor(Preprocessor):
             e.flush_to_file(log_fn)
 
         nb.cells.append(nbf.v4.new_code_cell(dedent(f"""\
+            # TODO: remove
+            import sys
+            print(sys.executable)
             import json
             from otter import Notebook
             from otter.check.logs import Log
             from otter.utils import get_variable_type
-            # TODO: remove
-            import sys
-            print(sys.executable)
 
             variables = json.loads(\"\"\"{json.dumps(self.variables)}\"\"\")
             log = Log.from_file("{log_fn}")
