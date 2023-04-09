@@ -11,6 +11,8 @@
 * Add configuration to submit blank PDF to manual-grading Gradescope assignment if PDF generation fails per [#551](https://github.com/ucbds-infra/otter-grader/issues/551)
 * Removed the `after_execution` event from the plugin lifecycle
 * Updated execution internals to use `nbconvert.preprocessors.ExecutePreprocessor` instead of the `exec` function to execute submissions per [#604](https://github.com/ucbds-infra/otter-grader/issues/604)
+* Deprecated the `variables` key of the assignment config in favor of `generate.serialized_variables`
+* Enabled Otter Generate for all assignments created with Otter Assign
 
 **v4.2.1:**
 

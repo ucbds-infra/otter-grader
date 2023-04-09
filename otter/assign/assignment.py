@@ -3,6 +3,7 @@
 import fica
 import os
 import pathlib
+import warnings
 import yaml
 
 from typing import Any, Dict, List, Optional, Union
@@ -125,10 +126,9 @@ class Assignment(fica.Config, Loggable):
         subkey_container=SeedValue,
     )
 
-    generate: Union[bool, AutograderConfig] = fica.Key(
+    generate: AutograderConfig = fica.Key(
         description="grading configurations to be passed to Otter Generate as an " \
-            "otter_config.json; if false, Otter Generate is disabled",
-        default=False,
+            "otter_config.json",
         subkey_container=AutograderConfig,
     )
 
@@ -236,6 +236,11 @@ class Assignment(fica.Config, Loggable):
         if self.generate is True:
             self.generate = AutograderConfig()
 
+        if self.variables:
+            warnings.warn(
+                "The variables key of the assignment config is deprecated and will be removed in " \
+                    "v6.0.0. Please use generate.seed_variables instead.", DeprecationWarning)
+
     def update(self, user_config: Dict[str, Any]):
         self._logger.debug(f"Updating config: {user_config}")
         ret = super().update(user_config)
@@ -264,13 +269,6 @@ class Assignment(fica.Config, Loggable):
         """
         return self.master.suffix.lower() == ".rmd"
 
-    @property
-    def generate_enabled(self):
-        """
-        Whether Otter Generate is enabled for this assignment
-        """
-        return self.generate is not False
-
     def get_otter_config(self):
         """
         Get the contents of ``otter_config.json`` for this assignment.
@@ -278,22 +276,17 @@ class Assignment(fica.Config, Loggable):
         Returns:
             ``dict[str, object]``: the ``otter_config.json`` file as a ``dict``
         """
-        if not self.generate_enabled:
-            raise ValueError("Otter Generate is not configured for this assignment")
-
-        otter_config = self.generate
-
         if self.is_r:
-            otter_config.lang = "r"
+            self.generate.lang = "r"
 
         # TODO: move this config out of the assignment metadata and into the generate key
         if self.variables:
-            otter_config.serialized_variables = str(self.variables)
+            self.generate.serialized_variables = str(self.variables)
 
         if self.name:
-            otter_config.assignment_name = self.name
+            self.generate.assignment_name = self.name
 
-        return otter_config.get_user_config()
+        return self.generate.get_user_config()
 
     @property
     def notebook_basename(self):

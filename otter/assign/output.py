@@ -57,7 +57,7 @@ def write_output_dir(
     transformed_nb.write_tests(str(tests_dir), not sanitize, assignment.tests.files)
 
     # write a temp dir for otter generate tests
-    if not sanitize and assignment.generate_enabled:
+    if not sanitize:
         assignment._temp_test_dir = pathlib.Path(tempfile.mkdtemp())
         transformed_nb.write_tests(str(assignment._temp_test_dir), True, True)
 
