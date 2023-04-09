@@ -3,11 +3,12 @@
 import json
 import os
 import shutil
+import tempfile
 
 from abc import ABC, abstractmethod
 
 from ..autograder_config import AutograderConfig
-from ..utils import OtterRuntimeError
+from ..utils import OtterRuntimeError, write_blank_page_to_stare_at_before_you
 
 from ....utils import NOTEBOOK_METADATA_KEY
 
@@ -124,28 +125,45 @@ class AbstractLanguageRunner(ABC):
             pdf_path = self.write_pdf(submission_path)
 
             if submit:
-                # get student email
-                with open("../submission_metadata.json", encoding="utf-8") as f:
-                    metadata = json.load(f)
-
-                student_emails = []
-                for user in metadata["users"]:
-                    student_emails.append(user["email"])
-
-                for student_email in student_emails:
-                    client.upload_pdf_submission(
-                        self.ag_config.course_id,
-                        self.ag_config.assignment_id,
-                        student_email,
-                        pdf_path,
-                    )
-
-                print("\n\nSuccessfully uploaded submissions for: {}".format(
-                    ", ".join(student_emails)))
+                self.submit_pdf(client, pdf_path)
 
         except Exception as e:
             print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
             scores.set_pdf_error(e)
+
+            if self.ag_config.submit_blank_pdf_on_export_failure and submit:
+                print("\nUploading a blank PDF due to export failure")
+                with tempfile.NamedTemporaryFile(suffix=".pdf") as ntf:
+                    write_blank_page_to_stare_at_before_you(ntf.name)
+                    self.submit_pdf(client, ntf.name)
+
+    def submit_pdf(self, client, pdf_path):
+        """
+        Upload the PDF at ``pdf_path`` to the Gradescope assignment specified in the config. Does
+        not check whether the assignment configuration is valid.
+
+        Args:
+            client (``otter.generate.token.APIClient``): the Gradescope client
+            pdf_path (``str``): path to the PDF file to upload
+        """
+        # get student email
+        with open("../submission_metadata.json", encoding="utf-8") as f:
+            metadata = json.load(f)
+
+        student_emails = []
+        for user in metadata["users"]:
+            student_emails.append(user["email"])
+
+        for student_email in student_emails:
+            client.upload_pdf_submission(
+                self.ag_config.course_id,
+                self.ag_config.assignment_id,
+                student_email,
+                pdf_path,
+            )
+
+        print("\n\nSuccessfully uploaded submissions for: {}".format(
+            ", ".join(student_emails)))
 
     @abstractmethod
     def validate_submission(self, submission_path):
