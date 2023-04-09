@@ -70,7 +70,7 @@ def is_cell_type(cell, cell_type):
         cell_type (``str``): the cell type to check for
 
     Returns:
-        ``bool``: whether ``cell`` is of type ``cell_type``        
+        ``bool``: whether ``cell`` is of type ``cell_type``
     """
     return cell["cell_type"] == cell_type
 
@@ -207,7 +207,7 @@ def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
     os.chdir(nb_path.parent)
 
     results = grade_notebook(
-        nb_path.name, tests_glob=glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
+        nb_path.name, tests_glob=glob(os.path.join("tests", "*.py")), cwd=os.getcwd(),
     	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
         plugin_collection=plugin_collection
     )
@@ -248,7 +248,7 @@ def write_otter_config_file(assignment):
 # TODO: update for new assign format
 def run_generate_autograder(assignment, gs_username, gs_password, plugin_collection=None):
     """
-    Run Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
+    Run Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on
     configurations in ``assignment.generate``.
 
     Args:

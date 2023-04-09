@@ -9,6 +9,8 @@
 * Make `xeCJK` opt-in behavior for exporting notebooks via LaTeX per [#548](https://github.com/ucbds-infra/otter-grader/issues/548)
 * Convert from use of deprecated `PyPDF2` package to `pypdf`
 * Add configuration to submit blank PDF to manual-grading Gradescope assignment if PDF generation fails per [#551](https://github.com/ucbds-infra/otter-grader/issues/551)
+* Removed the `after_execution` event from the plugin lifecycle
+* Updated execution internals to use `nbconvert.preprocessors.ExecutePreprocessor` instead of the `exec` function to execute submissions per [#604](https://github.com/ucbds-infra/otter-grader/issues/604)
 
 **v4.2.1:**
 

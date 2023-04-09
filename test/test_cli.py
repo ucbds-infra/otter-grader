@@ -225,7 +225,7 @@ def test_export(mocked_export, run_cli):
     result = run_cli([*cmd_start, "foo.pdf"])
     assert_cli_result(result, expect_error=False)
     mocked_export.assert_called_with(**{**std_kwargs, "dest": "foo.pdf"})
-    
+
     result = run_cli([*cmd_start, "--filtering"])
     assert_cli_result(result, expect_error=False)
     mocked_export.assert_called_with(**{**std_kwargs, "filtering": True})

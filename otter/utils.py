@@ -25,15 +25,6 @@ NOTEBOOK_METADATA_KEY = "otter"
 
 
 @contextmanager
-def block_print():
-    """
-    Context manager that disables printing to stdout
-    """
-    with open(os.devnull, "w") as f, redirect_stdout(f):
-        yield
-
-
-@contextmanager
 def hide_outputs():
     """
     Context manager for hiding outputs from ``display()`` calls. IPython handles matplotlib outputs 

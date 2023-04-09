@@ -2,6 +2,7 @@
 
 import os
 import pathlib
+import pprint
 import pytest
 import shutil
 import subprocess
@@ -11,6 +12,7 @@ import zipfile
 from contextlib import contextmanager
 
 from otter.check.notebook import _OTTER_LOG_FILENAME
+from otter.test_files import OK_FORMAT_VARNAME
 
 
 class TestFileManager:
@@ -150,3 +152,34 @@ def unzip_to_temp(zf_path, delete_zip=False):
     shutil.rmtree(tempdir)
     if delete_zip:
         os.remove(zf_path)
+
+
+def write_ok_test(
+    path,
+    doctest,
+    hidden=False,
+    points=1,
+    success_message=None,
+    failure_message=None,
+):
+    test = {
+        "name": os.path.splitext(os.path.basename(path))[0],
+        "suites": [
+            {
+                "type": "doctest",
+                "cases": [
+                    {
+                        "code": doctest,
+                        "hidden": hidden,
+                        "points": points,
+                        "success_message": success_message,
+                        "failure_message": failure_message,
+                    }
+                ]
+            }
+        ]
+    }
+
+    with open(path, "w+") as f:
+        f.write(f"{OK_FORMAT_VARNAME} = True\n\ntest = ")
+        pprint.pprint(test, f, indent=4, width=200, depth=None)

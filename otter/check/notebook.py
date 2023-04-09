@@ -7,7 +7,6 @@ import os
 import warnings
 import zipfile
 
-from contextlib import contextmanager
 from glob import glob
 from IPython.display import display, HTML
 from textwrap import indent
@@ -20,7 +19,7 @@ from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..utils import Loggable, loggers
+from ..utils import Loggable
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -95,15 +94,7 @@ class Notebook(Loggable):
             self._notebook = self._config["notebook"]
 
     @classmethod
-    @contextmanager
-    def grading_mode(cls, tests_dir):
-        """
-        A context manager for the ``Notebook`` grading mode. Yields a pointer to the list of results
-        that will be populated during grading.
-
-        **It is the caller's responsibility to maintain the pointer.** The pointer in the ``Checker``
-        class will be overwritten when the context exits.
-        """
+    def init_grading_mode(cls, tests_dir):
         logger = cls._get_logger()
         logger.info("Entering Notebook grading mode")
         logger.debug(f"Overriding tests directory: {tests_dir}")
@@ -111,14 +102,6 @@ class Notebook(Loggable):
         cls._tests_dir_override = tests_dir
         Checker.clear_results()
         Checker.enable_tracking()
-
-        yield Checker.get_results()
-
-        logger.info("Exiting Notebook grading mode")
-        cls._grading_mode = False
-        cls._tests_dir_override = None
-        Checker.disable_tracking()
-        Checker.clear_results()
 
     @incompatible_with(IPythonInterpreter.PYOLITE, throw_error=False)
     def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
