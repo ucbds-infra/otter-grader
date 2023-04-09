@@ -11,7 +11,7 @@ import shutil
 from glob import glob
 from textwrap import indent
 
-from ..execute import grade_notebook
+from ..api import grade_submission
 from ..generate import main as generate_autograder
 from ..utils import get_source, NOTEBOOK_METADATA_KEY
 
@@ -189,34 +189,26 @@ def str_to_doctest(code_lines, lines):
         return str_to_doctest(code_lines, lines + [">>> " + line])
 
 
-def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
+def run_tests(assignment, debug=False):
     """
     Grade a notebook and throw an error if it does not receive a perfect score.
 
     Args:
-        nb_path (``pathlib.Path``): the path to the notebook to grade
-        debug (``bool``, optional): whether to raise errors instead of ignoring them
-        seed (``int``, optional): an RNG seed for notebook execution
-        plugin_collection (``otter.plugins.PluginCollection``, optional): plugins to run while
-            grading
+        assignment (``otter.assgin.assignment.Assignment``): the assignment config
+        debug (``bool``): whether to throw errors instead of swallowing them during grading
 
     Raises:
         ``RuntimeError``: if the grade received by the notebook is not 100%
     """
-    curr_dir = os.getcwd()
-    os.chdir(nb_path.parent)
-
-    results = grade_notebook(
-        nb_path.name, tests_glob=glob(os.path.join("tests", "*.py")), cwd=os.getcwd(),
-    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
-        plugin_collection=plugin_collection
+    results = grade_submission(
+        str(assignment.ag_notebook_path),
+        str(assignment.ag_zip_path),
+        debug=debug,
     )
 
     if results.total != results.possible:
         raise RuntimeError(f"Some autograder tests failed in the autograder notebook:\n" + \
             indent(results.summary(), '    '))
-
-    os.chdir(curr_dir)
 
 
 def write_otter_config_file(assignment):

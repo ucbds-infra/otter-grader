@@ -16,8 +16,16 @@ from ..utils import chdir, get_relpath, knit_rmd_file, loggers
 LOGGER = loggers.get_logger(__name__)
 
 
-def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
-         debug=False):
+def main(
+    master,
+    result,
+    *,
+    no_pdfs=False,
+    no_run_tests=False,
+    username=None,
+    password=None, 
+    debug=False,
+):
     """
     Runs Otter Assign on a master notebook.
 
@@ -143,21 +151,9 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 write_otter_config_file(assignment)
 
         # run tests on autograder notebook
-        if assignment.run_tests and not no_run_tests and assignment.is_python:
+        if assignment.run_tests and not no_run_tests:
             LOGGER.info("Running tests against the solutions notebook")
 
-            seed = assignment.generate.seed
-            LOGGER.debug(f"Resolved seed for running tests: {seed}")
-
-            LOGGER.debug("Retrieving updated plugins from otter_config.json for running tests")
-            test_pc = PluginCollection(
-                assignment.generate.plugins, assignment.ag_notebook_path, {})
-
-            run_tests(
-                assignment.get_ag_path(master.name),
-                debug=debug,
-                seed=seed,
-                plugin_collection=test_pc,
-            )
+            run_tests(assignment, debug=debug)
 
             LOGGER.info("All autograder tests passed.")
