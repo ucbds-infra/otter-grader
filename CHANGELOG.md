@@ -13,6 +13,7 @@
 * Updated execution internals to use `nbconvert.preprocessors.ExecutePreprocessor` instead of the `exec` function to execute submissions per [#604](https://github.com/ucbds-infra/otter-grader/issues/604)
 * Deprecated the `variables` key of the assignment config in favor of `generate.serialized_variables`
 * Enabled Otter Generate for all assignments created with Otter Assign
+* Updated Otter Assign to use Otter Run to validate that all tests in the assignment pass, allowing tests to be run for R assignments as well as Python, per [#427](https://github.com/ucbds-infra/otter-grader/issues/427)
 
 **v4.2.1:**
 
