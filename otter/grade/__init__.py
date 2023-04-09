@@ -39,7 +39,7 @@ def main(
     file called ``final_grades.csv`` in ``output_dir``. If ``pdfs`` is true, the PDFs generated
     inside the Docker containers are copied into a subdirectory of ``output_dir`` called
     ``submission_pdfs``.
-    
+
     If ``prune`` is true, Otter's dangling grading images are pruned and the program exits.
 
     Args:

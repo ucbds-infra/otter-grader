@@ -92,7 +92,7 @@ class Notebook(Loggable):
             self._vars_to_store = self._config.get("variables", None)
 
             self._notebook = self._config["notebook"]
-    
+
     @classmethod
     def init_grading_mode(cls, tests_dir):
         logger = cls._get_logger()

@@ -188,7 +188,7 @@ class GradingPreprocessor(Preprocessor):
 
 class ImportCollector(ast.NodeVisitor):
     imports = []
-    
+
     def visit_Import(self, node):
         self.imports.append(node)
 
