@@ -1,5 +1,6 @@
 """Assignment configurations for Otter Assign"""
 
+import datetime as dt
 import fica
 import os
 import pathlib
@@ -228,6 +229,12 @@ class Assignment(fica.Config, Loggable):
     notebook_basename: Optional[str] = None
     """the basename of the master notebook file"""
 
+    _ag_zip_name: Optional[str] = None
+    """
+    the file name for the autograder zip file; this value is generated the first time it is accessed
+    since it contians a timestamp
+    """
+
     def __init__(self, user_config: Dict[str, Any] = {}, **kwargs) -> None:
         self._logger.debug(f"Initializing with config: {user_config}")
         super().__init__(user_config, **kwargs)
@@ -297,6 +304,19 @@ class Assignment(fica.Config, Loggable):
     def ag_notebook_path(self):
         """the path to the autograder notebook"""
         return self.get_ag_path(self.notebook_basename)
+
+    @property
+    def ag_zip_name(self):
+        """the file name of the autograder zip file"""
+        if self._ag_zip_name is None:
+            timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
+            self._ag_zip_name = f"{self.master.stem}-autograder_{timestamp}.zip"
+        return self._ag_zip_name
+
+    @property
+    def ag_zip_path(self):
+        """the path to the autograder zip file"""
+        return self.get_ag_path(self.ag_zip_name)
 
     def get_ag_path(self, path=""):
         """

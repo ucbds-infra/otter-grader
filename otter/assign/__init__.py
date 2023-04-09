@@ -157,3 +157,6 @@ def main(
             run_tests(assignment, debug=debug)
 
             LOGGER.info("All autograder tests passed.")
+
+        else:
+            LOGGER.info("Skipping tests")

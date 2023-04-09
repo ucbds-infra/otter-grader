@@ -1,19 +1,22 @@
 """Utilities for Otter Assign"""
 
 import copy
-import datetime as dt
 import json
 import os
 import pathlib
 import re
 import shutil
 
-from glob import glob
+from contextlib import redirect_stdout, redirect_stderr
+from io import StringIO
 from textwrap import indent
 
 from ..api import grade_submission
 from ..generate import main as generate_autograder
-from ..utils import get_source, NOTEBOOK_METADATA_KEY
+from ..utils import get_source, NOTEBOOK_METADATA_KEY, loggers
+
+
+LOGGER = loggers.get_logger(__name__)
 
 
 class EmptyCellException(Exception):
@@ -200,11 +203,15 @@ def run_tests(assignment, debug=False):
     Raises:
         ``RuntimeError``: if the grade received by the notebook is not 100%
     """
-    results = grade_submission(
-        str(assignment.ag_notebook_path),
-        str(assignment.ag_zip_path),
-        debug=debug,
-    )
+    stdout = StringIO()
+    with redirect_stdout(stdout), redirect_stderr(stdout):
+        results = grade_submission(
+            str(assignment.ag_notebook_path),
+            str(assignment.ag_zip_path),
+            debug=debug,
+        )
+
+    LOGGER.debug(f"Otter Run output:\n{stdout.getvalue()}")
 
     if results.total != results.possible:
         raise RuntimeError(f"Some autograder tests failed in the autograder notebook:\n" + \
@@ -305,12 +312,9 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
             json.dump(otter_config, f, indent=2)
 
     # TODO: change generate_autograder so that only necessary kwargs are needed
-    timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
-    notebook_name = assignment.master.stem
-    output_path = f"{notebook_name}-autograder_{timestamp}.zip"
     generate_autograder(
         tests_dir=test_dir,
-        output_path=output_path,
+        output_path=assignment.ag_zip_name,
         config="otter_config.json" if otter_config else None,
         lang="python" if assignment.is_python else "r",
         requirements=requirements,
