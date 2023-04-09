@@ -95,7 +95,9 @@ class GradingPreprocessor(Preprocessor):
     def add_seeds(self, nb):
         if self.seed is None or self.from_log: return
 
+        skip_first = False
         if self.seed_variable is None:
+            skip_first = True
             np_name, rand_name = f"np_{id_generator()}", f"random_{id_generator()}"
             nb.cells.insert(
                 0, nbf.v4.new_code_cell(f"import numpy as {np_name}\nimport random as {rand_name}"))
@@ -104,7 +106,8 @@ class GradingPreprocessor(Preprocessor):
         else:
             do_seed = f"{self.seed_variable} = {self.seed}"
 
-        for cell in nb.cells:
+        cells = nb.cells[1:] if skip_first else nb.cells
+        for cell in cells:
             cell.source = f"{do_seed}\n{cell.source}"
 
     def add_checks(self, nb):
