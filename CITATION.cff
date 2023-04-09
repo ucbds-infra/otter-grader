@@ -8,10 +8,10 @@ authors:
   -
     name: UC Berkeley Data Science Education Program
 cff-version: "1.1.0"
-date-released: 2023-02-14
+date-released: 2023-04-09
 license: "BSD-3-Clause"
 message: "If you use this software, please cite it as below."
 repository-code: "https://github.com/ucbds-infra/otter-grader"
 title: "Otter-Grader: A Python and R autograding solution"
-version: "4.3.1"
+version: "4.3.2"
 doi: 10.5281/zenodo.5259955

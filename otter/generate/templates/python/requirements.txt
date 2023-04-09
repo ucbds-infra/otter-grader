@@ -13,6 +13,6 @@ nbformat
 dill
 numpy
 gspread
-otter-grader==4.3.1
+otter-grader==4.3.2
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
