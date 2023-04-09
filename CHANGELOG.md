@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased:**
+**v4.3.2:**
 
 * Fix bug in determining whether the active interpreter is Jupyterlite in `otter.Notebook` per [#511](https://github.com/ucbds-infra/otter-grader/issues/511#issuecomment-1500964637)
 * Fix bug in verifying scores against logs that caused all verifications to throw an error if hidden tests were ignored
