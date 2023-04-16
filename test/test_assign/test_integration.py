@@ -105,6 +105,7 @@ def test_exception_example():
         FILE_MANAGER.get_path("exception-example.ipynb"), 
         FILE_MANAGER.get_path("exception-correct"), 
         assign_kwargs=dict(no_run_tests=True),
+        assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
 
 
@@ -115,6 +116,7 @@ def test_otter_example():
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-otter.ipynb"), 
         FILE_MANAGER.get_path("otter-correct"),
+        assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
 
 
@@ -212,5 +214,6 @@ def test_jupyterlite(generate_master_notebook):
     })
     assign_and_check_output(
         master_nb_path,
-        FILE_MANAGER.get_path("jupyterlite-correct")
+        FILE_MANAGER.get_path("jupyterlite-correct"),
+        assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
