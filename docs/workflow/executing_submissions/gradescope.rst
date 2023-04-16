@@ -42,7 +42,7 @@ that they failed some hidden test in the printed DataFrame from the stdout.
 Below the autograder output, each test case is broken down into boxes. The first box is called
 "Public Tests" and summarizes the results of the *public* test cases only. This box is visible to 
 students. If a student fails a hidden test but no public tests, then this box will show "All tests
-passed" for that question, even though the student failed a public test.
+passed" for that question, even though the student failed a hidden test.
 
 .. image:: images/gradescope_public_passed.png
     :alt: 

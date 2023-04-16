@@ -48,7 +48,7 @@ jobs:
           docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test /root/otter-grader/bin/run_tests
           cp /tmp/coverage.xml ./coverage.xml
 
-      - name: Send to Codecov
-        run: |
-          pip install codecov
-          codecov
+      - uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          verbose: true

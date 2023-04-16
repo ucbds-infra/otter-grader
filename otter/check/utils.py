@@ -104,8 +104,8 @@ class IPythonInterpreter(Enum):
         running) and a display name for error messages and the like.
         """
 
-        def __init__(self, check_str, display_name):
-            self.check_str = check_str
+        def __init__(self, check_strs, display_name):
+            self.check_strs = check_strs
             self.display_name = display_name
 
         def running(self):
@@ -116,12 +116,13 @@ class IPythonInterpreter(Enum):
             Returns:
                 ``bool``: whether this interpreter is running
             """
-            return self.check_str in str(get_ipython())
+            ipython_interp = str(get_ipython())
+            return any(c in ipython_interp for c in self.check_strs)
 
-    COLAB = Interpreter("google.colab", "Google Colab")
+    COLAB = Interpreter(["google.colab"], "Google Colab")
     """the Google Colab interpreter"""
 
-    PYOLITE = Interpreter("pyolite.", "Jupyterlite")
+    PYOLITE = Interpreter(["pyolite.", "pyodide_kernel."], "Jupyterlite")
     """the JupyterLite interpreter"""
 
 
