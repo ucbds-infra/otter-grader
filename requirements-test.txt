@@ -2,7 +2,7 @@ responses
 scikit-learn
 nbformat<5.1.0
 tqdm
-codecov
+coverage
 rpy2
 pytest
 jupyter_client
