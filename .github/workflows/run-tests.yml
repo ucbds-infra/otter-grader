@@ -55,7 +55,7 @@ jobs:
       - name: Run tests
         run: docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt -r requirements-export.txt; make testcov && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml" && cp /tmp/coverage.xml ./coverage.xml
 
-      - name: Send to Codecov
-        run: |
-          pip install codecov
-          codecov
+      - uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          verbose: true
