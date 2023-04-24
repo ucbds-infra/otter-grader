@@ -22,6 +22,7 @@ from ..plugins import PluginCollection
 from ..test_files import GradingResults
 from ..utils import Loggable, loggers
 
+
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
 _SHELVE = False
 _ZIP_NAME_FILENAME = "__zip_filename__"
@@ -47,12 +48,12 @@ class Notebook(Loggable):
 
     @logs_event(EventType.INIT)
     def __init__(
-            self,
-            nb_path=None,
-            tests_dir="./tests",
-            tests_url_prefix=None,
-            colab=None,
-            jupyterlite=None,
+        self,
+        nb_path=None,
+        tests_dir="./tests",
+        tests_url_prefix=None,
+        colab=None,
+        jupyterlite=None,
     ):
         global _SHELVE
 
@@ -321,8 +322,8 @@ class Notebook(Loggable):
     @grading_mode_disabled
     @incompatible_with(IPythonInterpreter.COLAB)
     @logs_event(EventType.END_EXPORT)
-    def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[],
-               display_link=True, force_save=False, run_tests=False):
+    def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
+            display_link=True, force_save=False, run_tests=False):
         """
         Exports a submission to a zip file. Creates a submission zipfile from a notebook at ``nb_path``,
         optionally including a PDF export of the notebook and any files in ``files``.
@@ -362,7 +363,7 @@ class Notebook(Loggable):
         with open(nb_path, "r", encoding="utf-8") as f:
             if len(f.read().strip()) == 0:
                 raise ValueError(f"Notebook '{nb_path}' is empty. Please save and checkpoint your "
-                                 "notebook and rerun this cell.")
+                    "notebook and rerun this cell.")
 
         timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
         if export_path is None:
@@ -400,12 +401,7 @@ class Notebook(Loggable):
             self._logger.debug(f"Added .otter file to zip file: {dot_otter}")
 
         for file in files:
-            if os.path.isdir(file):
-                sub_files = glob(f"./{file}/*")
-                for sub_file in sub_files:
-                    zf.write(sub_file)
-            else:
-                zf.write(file)
+            zf.write(file)
             self._logger.debug(f"Added file to zip file: {file}")
 
         for file in self._addl_files:
