@@ -289,11 +289,11 @@ class GradingResults:
         for test_name, test_file in self.results.items():
             if ignore_hidden:
                 tcrs = [
-                    test_case_result.passed
+                    test_case_result
                     for test_case_result in test_file.test_case_results
                     if not test_case_result.test_case.hidden
                 ]
-                score = sum(tcr.test_case.points for tcr in tcrs)
+                score = sum(tcr.test_case.points for tcr in tcrs if tcr.passed)
             else:
                 score = test_file.score
             try:

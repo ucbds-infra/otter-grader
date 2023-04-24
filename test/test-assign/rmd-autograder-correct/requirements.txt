@@ -14,4 +14,4 @@ dill
 rpy2
 numpy
 gspread
-otter-grader==4.3.1
+otter-grader==4.3.2
