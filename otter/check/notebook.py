@@ -401,7 +401,12 @@ class Notebook(Loggable):
             self._logger.debug(f"Added .otter file to zip file: {dot_otter}")
 
         for file in files:
-            zf.write(file)
+            if os.path.isdir(file):
+                sub_files = glob(f"./{file}/**/*.*")
+                for sub_file in sub_files:
+                    zf.write(sub_file)
+            else:
+                zf.write(file)
             self._logger.debug(f"Added file to zip file: {file}")
 
         for file in self._addl_files:
