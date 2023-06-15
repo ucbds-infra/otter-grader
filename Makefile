@@ -31,7 +31,7 @@ docs:
 docker-test-prepare: 
 	cp -r Dockerfile test-Dockerfile
 	printf "\nADD . /home/otter-grader\nRUN pip install /home/otter-grader" >> test-Dockerfile
-	printf "\nARG DOCKER_VERSION"
+	printf "\nARG DOCKER_VERSION" >> test-Dockerfile
 	printf "\nRUN cd /tmp && curl -sSL -O https://download.docker.com/linux/static/stable/x86_64/docker-$$%s.tgz && tar zxf docker-$$%s.tgz && mv ./docker/docker /usr/local/bin && chmod +x /usr/local/bin/docker && rm -rf /tmp/*" "{DOCKER_VERSION}" "{DOCKER_VERSION}" >> test-Dockerfile
 	printf "\nCOPY --from=docker/buildx-bin /buildx /usr/libexec/docker/cli-plugins/docker-buildx" >> test-Dockerfile
 	printf "\nENV PYTHONUNBUFFERED 1" >> test-Dockerfile
