@@ -69,7 +69,7 @@ console by the grading process during execution when set to ``True`` (default ``
 For more information about grading programmatically, see the |otter.api reference|_.
 
 .. |otter.api reference| replace:: ``otter.api`` reference
-.. _otter.api reference: api_reference
+.. _otter.api reference: :ref:`api_reference`
 
 
 Grading Results
