@@ -52,5 +52,5 @@ RUN mkdir /autograder
 ADD requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-RUN pip install otter-grader==4.3.2
+RUN pip install otter-grader==4.3.3
 RUN Rscript -e "install.packages('ottr', dependencies=TRUE, repos='http://cran.us.r-project.org')"

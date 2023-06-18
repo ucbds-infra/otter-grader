@@ -39,7 +39,7 @@ jobs:
 
       - name: Build Docker image
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: test-Dockerfile
@@ -48,6 +48,8 @@ jobs:
           tags: otter-test
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            DOCKER_VERSION=20.10.24
 
       - name: Clean up Docker image build
         run: make docker-ci-test-cleanup

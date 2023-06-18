@@ -132,7 +132,8 @@ class CellFactory:
             args += ["force_save=True"]
         if self.assignment.export_cell.run_tests:
             args += ["run_tests=True"]
-
+        if len(self.assignment.export_cell.files) != 0:
+            args += [f"files={self.assignment.export_cell.files}"]
         source_lines.append(f"grader.export({', '.join(args)})")
         export.source = "\n".join(source_lines)
 

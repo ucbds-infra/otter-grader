@@ -66,10 +66,7 @@ would run
 ``grade_submission`` has an optional argument ``quiet`` which will suppress anything printed to the 
 console by the grading process during execution when set to ``True`` (default ``False``).
 
-For more information about grading programmatically, see the |otter.api reference|_.
-
-.. |otter.api reference| replace:: ``otter.api`` reference
-.. _otter.api reference: api_reference
+For more information about grading programmatically, see the :ref:`API reference <api_reference>`.
 
 
 Grading Results

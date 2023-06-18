@@ -14,7 +14,7 @@ from textwrap import indent
 
 from .logs import LogEntry, EventType, Log
 from .utils import grade_zip_file, grading_mode_disabled, incompatible_with, IPythonInterpreter, \
-     list_available_tests, logs_event, resolve_test_info, save_notebook
+    list_available_tests, logs_event, resolve_test_info, save_notebook
 
 from ..execute import Checker
 from ..export import export_notebook
@@ -401,7 +401,12 @@ class Notebook(Loggable):
             self._logger.debug(f"Added .otter file to zip file: {dot_otter}")
 
         for file in files:
-            zf.write(file)
+            if os.path.isdir(file):
+                sub_files = glob(f"./{file}/**/*.*")
+                for sub_file in sub_files:
+                    zf.write(sub_file)
+            else:
+                zf.write(file)
             self._logger.debug(f"Added file to zip file: {file}")
 
         for file in self._addl_files:

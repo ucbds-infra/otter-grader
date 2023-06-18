@@ -5,7 +5,6 @@ COVERAGE         = coverage
 DOCKER           = true
 SLOW             = true
 OS              := $(shell uname -s)
-DOCKER_VERSION  := $(shell docker version --format '{{.Server.Version}}' | sed "s/+azure//" | sed  -e "s/-[0-9]*//g")
 
 ifeq ($(DOCKER), false)
 	PYTESTOPTS := $(PYTESTOPTS) -m "not docker"
@@ -32,7 +31,8 @@ docs:
 docker-test-prepare: 
 	cp -r Dockerfile test-Dockerfile
 	printf "\nADD . /home/otter-grader\nRUN pip install /home/otter-grader" >> test-Dockerfile
-	printf "\nRUN cd /tmp && curl -sSL -O https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz && tar zxf docker-${DOCKER_VERSION}.tgz && mv ./docker/docker /usr/local/bin && chmod +x /usr/local/bin/docker && rm -rf /tmp/*" >> test-Dockerfile
+	printf "\nARG DOCKER_VERSION" >> test-Dockerfile
+	printf "\nRUN cd /tmp && curl -sSL -O https://download.docker.com/linux/static/stable/x86_64/docker-$$%s.tgz && tar zxf docker-$$%s.tgz && mv ./docker/docker /usr/local/bin && chmod +x /usr/local/bin/docker && rm -rf /tmp/*" "{DOCKER_VERSION}" "{DOCKER_VERSION}" >> test-Dockerfile
 	printf "\nCOPY --from=docker/buildx-bin /buildx /usr/libexec/docker/cli-plugins/docker-buildx" >> test-Dockerfile
 	printf "\nENV PYTHONUNBUFFERED 1" >> test-Dockerfile
 

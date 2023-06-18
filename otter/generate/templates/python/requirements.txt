@@ -16,6 +16,6 @@ gspread
 google-api-python-client
 google-auth-oauthlib
 six
-otter-grader==4.3.2
+otter-grader==4.3.3
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
