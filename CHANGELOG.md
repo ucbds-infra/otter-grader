@@ -1,5 +1,9 @@
 # Changelog
 
+**v4.4.0 (unreleased):**
+
+* Moved `google-api-python-client`, `google-auth-oauthlib`, and `six` from required installation dependencies to test dependencies to allow installation of Otter with Mamba per [#633](https://github.com/ucbds-infra/otter-grader/issues/633)
+
 **v4.3.2:**
 
 * Fix bug in determining whether the active interpreter is Jupyterlite in `otter.Notebook` per [#511](https://github.com/ucbds-infra/otter-grader/issues/511#issuecomment-1500964637)
