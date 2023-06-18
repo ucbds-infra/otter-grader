@@ -115,7 +115,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_theme = 'sphinx_book_theme'
-html_logo = '../logo/otter-logo-smaller.png'
+html_logo = '../logo/otter-logo-smallest.png'
 
 html_theme_options = {
     'github_url': 'https://github.com/ucbds-infra/otter-grader',
