@@ -1,5 +1,9 @@
 # Changelog
 
+**v4.4.0 (unreleased):**
+
+* Moved `google-api-python-client`, `google-auth-oauthlib`, and `six` from required installation dependencies to test dependencies to allow installation of Otter with Mamba per [#633](https://github.com/ucbds-infra/otter-grader/issues/633)
+
 **v.4.3.3:**
 
 * Fix Otter Assign slowdown due to poor-performance regex per [#634](https://github.com/ucbds-infra/otter-grader/issues/634)
