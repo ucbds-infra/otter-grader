@@ -4,7 +4,7 @@
 
 * Moved `google-api-python-client`, `google-auth-oauthlib`, and `six` from required installation dependencies to test dependencies to allow installation of Otter with Mamba per [#633](https://github.com/ucbds-infra/otter-grader/issues/633)
 
-**v4.3.4 (unreleased):**
+**v4.3.4:**
 
 * Set tests directory path when calling `ottr::run_autograder` from Otter Run
 
