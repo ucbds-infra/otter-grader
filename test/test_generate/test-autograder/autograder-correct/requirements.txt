@@ -13,6 +13,9 @@ nbformat
 dill
 numpy
 gspread
+google-api-python-client
+google-auth-oauthlib
+six
 otter-grader==4.3.3
 
 tqdm
