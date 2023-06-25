@@ -382,6 +382,10 @@ class AssignmentTestsManager:
 
             return question.points if question.points is not None else 1
 
-        resolved_test_cases = TestFile.resolve_test_file_points(question.points, test_cases)
+        try:
+            resolved_test_cases = TestFile.resolve_test_file_points(question.points, test_cases)
+        except Exception as e:
+            raise type(e)(f"Error in \"{question.name}\" test cases: {e}")
+
         points = round(sum(tc.points for tc in resolved_test_cases), 5)
         return int(points) if points % 1 == 0 else points
