@@ -225,7 +225,7 @@ def test_point_value_rounding():
 
 def test_determine_question_point_value_error_message():
     """
-    Tests that point values are rounded appropriately.
+    Tests that error messages for point value validations contain the question name.
     """
     question = QuestionConfig({"name": "q1", "points": 1, "manual": False})
     tests_mgr = AssignmentTestsManager(Assignment())
@@ -240,6 +240,7 @@ def test_determine_question_point_value_error_message():
 
     assert str(exception) == "Error in \"q1\" test cases: More points specified in test cases " \
         "than allowed for test"
+    assert type(exception) == ValueError
 
 
 def test_jupyterlite(generate_master_notebook):
