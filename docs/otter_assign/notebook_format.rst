@@ -8,7 +8,9 @@ when the question is declared.
 
 The Otter Assign format uses raw notebook cells as boundary cells. Each boundary cell denotes the
 start or end of a block and contains *valid YAML syntax*. First-line comments are used in these YAML
-raw cells to denote what type of block is being entered or ended.
+raw cells to denote what type of block is being entered or ended. If you're authoring notebooks in
+an environment where raw cells are unavailable (such as Deepnote or Google Colab), see
+:ref:`otter_assign_v1_raw_cell_alternatives`.
 
 **In the this format, Python and R notebooks follow the same structure.** There are some features
 available in Python that are not available in R, and these are noted below, but otherwise the formats
@@ -602,6 +604,26 @@ currently supports these values:
 * ``colab``, indicating that the notebook will be used on Google Colab
 * ``jupyterlite``, indicating that the notebook will be used on Jupyterlite (or any environment
   using the Pyolite kernel)
+
+
+.. _otter_assign_v1_raw_cell_alternatives:
+
+Alternative to Raw Cells
+------------------------
+
+If you're authoring your notebooks in an environment where raw cells are not supported (such as
+Deepnote or Google Colab), all of the places where Otter requires raw cells can be exchanged for
+normal Markdown cells by wrapping the cell's contents in a code block with the language set to
+``otter``. For example, an assignment configuration cell would look like
+
+.. code-block:: markdown
+
+    ```otter
+    # ASSIGNMENT CONFIG
+    ...
+    ````
+
+There should be nothing else in the Markdown cell.
 
 
 Sample Notebook
