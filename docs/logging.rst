@@ -21,7 +21,7 @@ read in using the class method ``Log.from_file``:
 
 .. code-block:: python
 
-    from otter.logs import Log
+    from otter.check.logs import Log
     log = Log.from_file(".OTTER_LOG")
 
 The log order defaults to chronological (the order in which they were appended to the file) but this 
