@@ -4,6 +4,7 @@
 
 * Moved `google-api-python-client`, `google-auth-oauthlib`, and `six` from required installation dependencies to test dependencies to allow installation of Otter with Mamba per [#633](https://github.com/ucbds-infra/otter-grader/issues/633)
 * Added question name to point value validation error messages per [#586](https://github.com/ucbds-infra/otter-grader/issues/586)
+* Fixed bug in copying plugin configurations from assignment config to `otter_config.json` in Otter Assign
 
 **v4.3.4:**
 
