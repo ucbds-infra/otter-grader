@@ -109,13 +109,14 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         if assignment is not None:
             curr_dir = os.getcwd()
             os.chdir(assignment.master.parent)
-        plugins = assignment.plugins if assignment else otter_config["plugins"]
-        cfg_idx = [self.IMPORTABLE_NAME in c.keys() for c in plugins if isinstance(c, dict)].index(True)
-        creds_path = plugins[cfg_idx][self.IMPORTABLE_NAME]["credentials_json_path"]
+
+        cfg_idx = [self.IMPORTABLE_NAME in c.keys() for c in otter_config["plugins"] if isinstance(c, dict)].index(True)
+        creds_path = otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["credentials_json_path"]
         with open(creds_path, encoding="utf-8") as f:
             creds = json.load(f)
-        plugins[cfg_idx][self.IMPORTABLE_NAME]["service_account_credentials"] = creds
-        otter_config["plugins"] = plugins
+
+        otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["service_account_credentials"] = creds
+
         if assignment is not None:
             os.chdir(curr_dir)
 
