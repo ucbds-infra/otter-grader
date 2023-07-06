@@ -1,13 +1,13 @@
 import argparse
 import datetime as dt
 import re
-import shutil
 import subprocess
 import sys
-import warnings
 
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
+    "docs/_static/grading-environment.yml",
+    "docs/_static/grading-environment-r.yml",
     "test/test_generate/files/autograder-correct/environment.yml",
     "test/test_generate/files/autograder-token-correct/environment.yml",
     "test/test_generate/files/autograder-custom-env/environment.yml",

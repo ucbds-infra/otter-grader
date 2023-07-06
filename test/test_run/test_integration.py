@@ -300,7 +300,7 @@ def test_assignment_name(load_config, expected_results):
     finally:
         delete_paths([nb_path])
         with open(nb_path, "w+") as f:
-            nbformat.write(nb, f)
+            nbformat.write(orig_nb, f)
 
 
 def test_rmd(load_config, expected_rmd_results):

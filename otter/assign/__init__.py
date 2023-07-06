@@ -75,7 +75,7 @@ def main(
             pc.run("during_assign", assignment)
 
             LOGGER.debug("Adding plugin configurations to Otter Generate configuration")
-            assignment.generate.plugins.extend(plugins)
+            assignment.generate.plugins = assignment.generate.plugins + plugins
 
         LOGGER.info("Generating autograder zipfile")
         run_generate_autograder(assignment, username, password, plugin_collection=pc)

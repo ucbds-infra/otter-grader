@@ -34,7 +34,8 @@ jobs:
         uses: crazy-max/ghaction-github-runtime@v1
 
       - name: Build Docker image
-        uses: docker/build-push-action@v3
+        id: docker_build
+        uses: docker/build-push-action@v4
         with:
           context: .
           load: true
@@ -42,6 +43,8 @@ jobs:
           tags: otter-test
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            DOCKER_VERSION=20.10.24
 
       - name: Run tests
         run: |
