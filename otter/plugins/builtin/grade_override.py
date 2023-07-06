@@ -114,6 +114,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         creds_path = otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["credentials_json_path"]
         with open(creds_path, encoding="utf-8") as f:
             creds = json.load(f)
+
         otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["service_account_credentials"] = creds
 
         if assignment is not None:

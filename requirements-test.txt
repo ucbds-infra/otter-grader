@@ -9,3 +9,8 @@ jupyter_client
 ipykernel
 matplotlib
 gspread
+
+# plugins
+google-api-python-client
+google-auth-oauthlib
+six

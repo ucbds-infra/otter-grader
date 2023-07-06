@@ -11,8 +11,3 @@ click
 fica>=0.2.0
 ipython
 astunparse
-
-# plugins
-google-api-python-client
-google-auth-oauthlib
-six

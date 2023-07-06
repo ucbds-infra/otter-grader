@@ -4,6 +4,10 @@ PYTESTOPTS       = -v
 COVERAGE         = coverage
 DOCKER           = true
 SLOW             = true
+<<<<<<< HEAD
+=======
+OS              := $(shell uname -s)
+>>>>>>> master
 
 ifeq ($(DOCKER), false)
 	PYTESTOPTS := $(PYTESTOPTS) -m "not docker"

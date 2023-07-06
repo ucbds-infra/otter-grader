@@ -13,6 +13,9 @@ nbformat
 dill
 numpy
 gspread
-otter-grader==4.3.2
+google-api-python-client
+google-auth-oauthlib
+six
+otter-grader==4.4.0
 {% endif %}{% if other_requirements %}
 {{ other_requirements }}{% endif %}
