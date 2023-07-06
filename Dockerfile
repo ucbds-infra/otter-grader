@@ -8,7 +8,7 @@ FROM ubuntu:latest
 COPY --from=buildx /buildx /usr/libexec/docker/cli-plugins/docker-buildx
 
 # Install apt packages
-RUN apt-get update && apt-get upgrade -y && apt-get install -y wget make
+RUN apt-get update && apt-get upgrade -y && apt-get install -y wget make build-essential
 
 # Install conda
 RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
