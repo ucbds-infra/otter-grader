@@ -1,3 +1,4 @@
+import nbformat as nbf
 import pathlib
 import pytest
 
@@ -5,6 +6,7 @@ from contextlib import nullcontext
 from python_on_whales import docker
 from unittest import mock
 
+from otter import __file__ as OTTER_PATH
 from otter.grade.containers import build_image, DOCKER_PLATFORM
 
 from .utils import TestFileManager
@@ -96,3 +98,20 @@ def build_image_with_local_changes(*args, **kwargs):
 def patch_build_image():
     with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes):
         yield
+
+
+@pytest.fixture(autouse=True)
+def patch_grading_preprocessor_add_init_and_export_cells():
+    """
+    A fixture that patches the ``GradingPreprocessor`` to ensure that the in the notebook being
+    executed Otter is imported from the same place it is currently being imported.
+    """
+    from otter.execute.preprocessor import GradingPreprocessor
+    orig_add_init_and_export_cells = GradingPreprocessor.add_init_and_export_cells
+    
+    def add_cwd_to_sys_path_cell(preprocessor, nb):
+        orig_add_init_and_export_cells(preprocessor, nb)
+        otter_dir = pathlib.Path(OTTER_PATH).parent.parent
+        nb.cells.insert(0, nbf.v4.new_code_cell(f"import sys\nsys.path.insert(0, \"{otter_dir}\")"))
+
+    GradingPreprocessor.add_init_and_export_cells = add_cwd_to_sys_path_cell
