@@ -81,7 +81,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             pc.run("during_assign", assignment)
             if assignment.generate_enabled:
                 LOGGER.debug("Adding plugin configurations to Otter Generate configuration")
-                assignment.generate.plugins.extend(plugins)
+                assignment.generate.plugins = assignment.generate.plugins + plugins
 
         # generate Gradescope autograder zipfile
         if assignment.generate_enabled:

@@ -223,6 +223,26 @@ def test_point_value_rounding():
     assert points == 4
 
 
+def test_determine_question_point_value_error_message():
+    """
+    Tests that error messages for point value validations contain the question name.
+    """
+    question = QuestionConfig({"name": "q1", "points": 1, "manual": False})
+    tests_mgr = AssignmentTestsManager(Assignment())
+    for _ in range(2):
+        tests_mgr._add_test_case(question, TestCase("", "", False, 1, "", ""))
+
+    exception = None
+    try:
+        tests_mgr.determine_question_point_value(question)
+    except Exception as e:
+        exception = e
+
+    assert str(exception) == "Error in \"q1\" test cases: More points specified in test cases " \
+        "than allowed for test"
+    assert type(exception) == ValueError
+
+
 def test_jupyterlite(generate_master_notebook):
     """
     """
