@@ -185,6 +185,13 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
         logs = docker.container.logs(container)
         LOGGER.debug(f"Container {container_id} logs:\n{indent(logs, '    ')}")
 
+        # Close our file handles since docker cp will delete the original file when performing the
+        # copy.
+        os.close(temp_subm_file)
+        os.close(results_file)
+        if pdf_path:
+            os.close(pdf_file)
+
         for local_path, container_path in volumes:
             docker.container.copy((container, container_path), local_path)
 
@@ -211,12 +218,9 @@ def grade_assignments(submission_path, image, no_kill=False, pdf_dir=None, pdfs=
             shutil.copy(pdf_path, local_pdf_path)
 
     finally:
-        os.close(results_file)
         os.remove(results_path)
-        os.close(temp_subm_file)
         os.remove(temp_subm_path)
         if pdfs:
-            os.close(pdf_file)
             os.remove(pdf_path)
 
     return df
