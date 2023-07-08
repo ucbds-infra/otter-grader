@@ -13,6 +13,6 @@ nbformat
 dill
 numpy
 gspread
-otter-grader==4.4.0
+otter-grader==4.4.1
 
 tqdm
