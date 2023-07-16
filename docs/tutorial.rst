@@ -165,14 +165,19 @@ Let's make that a bit prettier:
 The latter, the ``submission_pdfs`` directory, should contain the filtered PDFs of each notebook 
 (which should be relatively similar).
 
-Otter Grade can also grade the zip file exports provided by the ``Notebook.export`` method. All
-we need to do is add the ``--ext zip`` flag to the call to indicate that you're grading zip 
+Otter Grade can also grade the zip file exports provided by the ``Notebook.export`` method. Before 
+grading the zip files, you must edit your ``autograder.zip`` to indicate that you're doing so. To 
+do this, open ``demo.ipynb`` (the file we used with Otter Assign) and edit the first cell of the 
+notebook (beginning with ``BEGIN ASSIGNMENT``) so that the ``zips`` key under ``generate`` is 
+``true`` in the YAML and rerun Otter Assign.
+
+Now, all we need to do is add the ``-z`` flag to the call to indicate that you're grading these zip 
 files. We have provided some, with the same notebooks as above, in the ``zips`` directory, so let's 
 grade those:
 
 .. code-block:: console
 
-    otter grade -p submissions/zips -a dist/autograder/demo-autograder_*.zip -v --ext zip
+    otter grade -p submissions/zips -a dist/autograder/demo-autograder_*.zip -vz
 
 This should have the same CSV output as above but no ``submission_pdfs`` directory since we didn't 
 tell Otter to generate PDFs.
