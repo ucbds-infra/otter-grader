@@ -22,6 +22,10 @@
 * Converted to Mamba from Conda for package management in grading containers per [#660](https://github.com/ucbds-infra/otter-grader/issues/660)
 * Upgraded default Python version in grading containers from 3.7 to 3.9
 
+**v4.4.1:**
+
+* Update Otter Grade to close file handles before copying files out of Docker containers to fix bug on Windows
+
 **v4.4.0:**
 
 * Moved `google-api-python-client`, `google-auth-oauthlib`, and `six` from required installation dependencies to test dependencies to allow installation of Otter with Mamba per [#633](https://github.com/ucbds-infra/otter-grader/issues/633)
