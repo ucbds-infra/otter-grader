@@ -104,8 +104,8 @@ class AutograderConfig(fica.Config):
     )
 
     miniconda_path = fica.Key(
-        description="the path to the miniconda install directory",
-        default="/root/miniconda3",
+        description="the path to the mamba install directory",
+        default="/root/mambaforge",
     )
 
     plugins = fica.Key(
