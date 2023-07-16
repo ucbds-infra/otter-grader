@@ -38,7 +38,7 @@ The steps taken by the autograder are:
 
 #. Copies the tests and support files from the autograder source (the contents of the autograder
    configuration zip file)
-#. Globs all ``.ipynb`` files in the submission directory and ensures there are &lte; 1, taking that
+#. Globs all ``.ipynb`` files in the submission directory and ensures there are >= 1, taking that
    file as the submission
 #. Reads in the log from the submission if it exists
 #. Executes the notebook using the tests provided in the autograder source (or the log if indicated)

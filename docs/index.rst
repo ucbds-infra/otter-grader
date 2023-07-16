@@ -62,6 +62,8 @@ each with a command-line interface:
   CSV file.
 
 
+.. _installation:
+
 Installation
 ------------
 

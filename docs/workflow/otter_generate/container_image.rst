@@ -14,7 +14,6 @@ contents:
     ├── files/
     ├── otter_config.json
     ├── requirements.r
-    ├── requirements.txt
     ├── run_autograder
     ├── run_otter.py
     ├── setup.sh
@@ -41,7 +40,7 @@ And the template for R assignments is:
 .. literalinclude:: ../../_static/r_setup.sh
     :language: shell
 
-Note that the line ``conda run -n otter-env Rscript /autograder/source/requirements.r`` is only
+Note that the line ``mamba run -n otter-env Rscript /autograder/source/requirements.r`` is only
 included if you have provided an :ref:`R requirements file 
 <otter_generate_container_image_requirements_r>`.
 

@@ -2,8 +2,8 @@ Tutorial
 ========
 
 This tutorial can help you to verify that you have installed Otter correctly and introduce you to 
-the general Otter workflow. Once you have :ref:`installed <home>` Otter, download `this zip file 
-<_static/tutorial.zip>`_ and unzip it into some directory on your machine; you should have the 
+the general Otter workflow. Once you have :ref:`installed <installation>` Otter, download `this zip
+file <_static/tutorial.zip>`_ and unzip it into some directory on your machine; you should have the 
 following directory structure:
 
 .. code-block::
@@ -106,7 +106,7 @@ Let's run Otter on the notebooks:
 
     otter grade -n demo -a dist/autograder/demo-autograder_*.zip --pdfs -v submissions/ipynbs
 
-(The ``-v`` flag so that we get verbose output.) After this finishes running, there 
+(The ``-v`` flag is so that we get verbose output.) After this finishes running, there 
 should be a new file and a new folder in the working directory: ``final_grades.csv`` and 
 ``submission_pdfs``. The former should contain the grades for each file, and should look something 
 like this:
@@ -159,13 +159,8 @@ Let's make that a bit prettier:
 The latter, the ``submission_pdfs`` directory, should contain the filtered PDFs of each notebook 
 (which should be relatively similar).
 
-Otter Grade can also grade the zip file exports provided by the ``Notebook.export`` method. Before 
-grading the zip files, you must edit your ``autograder.zip`` to indicate that you're doing so. To 
-do this, open ``demo.ipynb`` (the file we used with Otter Assign) and edit the first cell of the 
-notebook (beginning with ``# ASSIGNMENT CONFIG``) so that the ``zips`` key under ``generate`` is 
-``true`` in the YAML and rerun Otter Assign.
-
-Now, all we need to do is add the ``--ext`` flag to indicate that the submissions are zip files.
+Otter Grade can also grade the zip file exports provided by the ``Notebook.export`` method. All we
+need to do is add the ``--ext`` flag to indicate that the submissions are zip files.
 We have provided some example submissions, with the same notebooks as above, in the ``zips``
 directory, so let's grade those:
 
