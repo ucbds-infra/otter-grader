@@ -1,7 +1,9 @@
 """Docker container management for Otter Grade"""
 
+import json
 import os
 import pandas as pd
+import pathlib
 import pkg_resources
 import shutil
 import tempfile
@@ -14,14 +16,14 @@ from typing import List, Optional
 
 from .utils import OTTER_DOCKER_IMAGE_NAME
 
+from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import loggers
 
 
-DOCKER_PLATFORM = "linux/amd64"
 LOGGER = loggers.get_logger(__name__)
 
 
-def build_image(ag_zip_path: str, base_image: str, tag: str):
+def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderConfig):
     """
     Creates a grading image based on the autograder zip file and attaches a tag.
 
@@ -29,6 +31,8 @@ def build_image(ag_zip_path: str, base_image: str, tag: str):
         ag_zip_path (``str``): path to the autograder zip file
         base_image (``str``): base Docker image to build from
         tag (``str``): tag to be added when creating the image
+        config (``otter.run.run_autograder.autograder_config.AutograderConfig``): config overrides
+            for the autograder
 
     Returns:
         ``str``: the tag of the newly-build Docker image
@@ -42,13 +46,22 @@ def build_image(ag_zip_path: str, base_image: str, tag: str):
         with zipfile.ZipFile(ag_zip_path, 'r') as zip_ref:
             zip_ref.extractall(temp_dir)
 
+        # Update the otter_config.json file from the autograder zip with the provided config
+        # overrides.
+        config_path = pathlib.Path(temp_dir) / "otter_config.json"
+        old_config = AutograderConfig()
+        if config_path.exists():
+            old_config = AutograderConfig(json.loads(config_path.read_text("utf-8")))
+
+        old_config.update(config.get_user_config())
+        config_path.write_text(json.dumps(old_config.get_user_config()))
+
         docker.build(
             temp_dir,
             build_args={"BASE_IMAGE": base_image},
             tags=[image],
             file=dockerfile_path,
             load=True,
-            platforms=[DOCKER_PLATFORM],
         )
 
     return image
@@ -60,6 +73,7 @@ def launch_containers(
     num_containers: int,
     base_image: str,
     tag: str,
+    config: AutograderConfig,
     **kwargs,
 ):
     """
@@ -75,6 +89,8 @@ def launch_containers(
         num_containers (``int``): number of containers to run in parallel
         base_image (``str``): the name of a base image to use for building Docker images
         tag (``str``): a tag to use for the ``otter-grade`` image created for this assignment
+        config (``otter.run.run_autograder.autograder_config.AutograderConfig``): config overrides
+            for the autograder
         **kwargs: additional kwargs passed to ``grade_submission``
 
     Returns:
@@ -83,12 +99,16 @@ def launch_containers(
     """
     pool = ThreadPoolExecutor(num_containers)
     futures = []
-    image = build_image(ag_zip_path, base_image, tag)
+    image = build_image(ag_zip_path, base_image, tag, config)
 
     for subm_path in submission_paths:
-        futures += [
-            pool.submit(grade_submission, submission_path=subm_path, image=image, **kwargs)
-        ]
+        futures += [pool.submit(
+            grade_submission,
+            submission_path=subm_path,
+            image=image,
+            # config=config,
+            **kwargs,
+        )]
 
     # stop execution while containers are running
     finished_futures = wait(futures)
@@ -141,7 +161,7 @@ def grade_submission(
         if pdf_dir:
             volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
 
-        args = {'platform': DOCKER_PLATFORM}
+        args = {}
         if network is not None and not network:
             args['networks'] = 'none'
 

@@ -6,12 +6,14 @@ import pandas as pd
 import pytest
 import re
 import shutil
+import zipfile
 
 from glob import glob
 from unittest import mock
 
 from otter.generate import main as generate
 from otter.grade import main as grade
+from otter.run.run_autograder.autograder_config import AutograderConfig
 from otter.utils import loggers
 
 from ..utils import TestFileManager
@@ -20,6 +22,7 @@ from ..utils import TestFileManager
 ASSIGNMENT_NAME = "otter-grade-test"
 FILE_MANAGER = TestFileManager(__file__)
 AG_ZIP_PATH = FILE_MANAGER.get_path("autograder.zip")
+ZIP_SUBM_PATH = "test/subm.zip"
 
 
 @pytest.fixture(autouse=True)
@@ -30,6 +33,8 @@ def cleanup_output(cleanup_enabled):
             os.remove("test/final_grades.csv")
         if os.path.exists("test/submission_pdfs"):
             shutil.rmtree("test/submission_pdfs")
+        if os.path.exists(ZIP_SUBM_PATH):
+            os.remove(ZIP_SUBM_PATH)
 
 
 @pytest.fixture(autouse=True, scope="module")
@@ -189,7 +194,8 @@ def test_single_notebook_grade(mocked_launch_grade):
         "no_kill": False,
         "pdf_dir": None,
         "timeout": None,
-        "network": True
+        "network": True,
+        "config": AutograderConfig(),
     }
 
     mocked_launch_grade.return_value = [df]
@@ -205,3 +211,79 @@ def test_single_notebook_grade(mocked_launch_grade):
 
     mocked_launch_grade.assert_called_with(notebook_path, [notebook_path], **kw_expected)
     assert output == 1.0
+
+
+@mock.patch("otter.grade.launch_containers")
+def test_config_overrides(mocked_launch_grade):
+    """
+    Checks that the CLI flags are converted to config overrides correctly.
+    """
+    mocked_launch_grade.return_value = [pd.DataFrame([{
+        "q1": 2.0,
+        "q2": 2.0,
+        "q3": 2.0,
+        "q4": 1.0,
+        "q6": 5.0,
+        "q2b": 2.0,
+        "q7": 1.0,
+        "percent_correct": 1.0,
+        "file": "passesAll.ipynb",
+    }])]
+
+    notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
+    grade(
+        name = "foo",
+        paths = [notebook_path],
+        output_dir = "test/",
+        # the value of the autograder argument doesn't matter, it just needs to be a valid file path
+        autograder = notebook_path,
+        containers = 1,
+        pdfs = True,
+        ext = "zip",
+        debug = True,
+    )
+
+    assert mocked_launch_grade.call_args.kwargs["config"].get_user_config() == {
+        "zips": True,
+        "pdf": True,
+        "debug": True,
+    }
+
+
+def test_config_overrides_integration():
+    """
+    Checks that overriding otter_config.json configurations with CLI flags works.
+    """
+    notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
+    with zipfile.ZipFile(ZIP_SUBM_PATH, "x") as zf:
+        zf.write(notebook_path, arcname="passesAll.ipynb")
+
+    output = grade(
+        name = "foo",
+        paths = [ZIP_SUBM_PATH],
+        output_dir = "test/",
+        # the value of the autograder argument doesn't matter, it just needs to be a valid file path
+        autograder = AG_ZIP_PATH,
+        ext = "zip",
+    )
+
+    assert output == 1.0
+
+    got = pd.read_csv("test/final_grades.csv")
+    want = pd.DataFrame([{
+        "q1": 0.0,
+        "q2": 2.0,
+        "q3": 2.0,
+        "q4": 1.0,
+        "q6": 5.0,
+        "q2b": 2.0,
+        "q7": 1.0,
+        "percent_correct": 1.0,
+        "file": ZIP_SUBM_PATH,
+    }])
+
+    # Sort the columns by label so the dataframes can be compared with ==.
+    got = got.reindex(sorted(got.columns), axis=1)
+    want = want.reindex(sorted(want.columns), axis=1)
+    
+    assert got.equals(want)
