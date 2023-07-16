@@ -377,6 +377,12 @@ class TransformedNotebookContainer:
         if self.nb_transformer.assignment.is_rmd:
             rmarkdown_converter.write_as_rmd(nb, str(output_path), not sanitize)
         else:
+            try:
+                from nbformat.validator import normalize
+            except ImportError:
+                normalize = lambda nb: (0, nb)
+
+            _, nb = normalize(nb)
             nbformat.write(nb, str(output_path))
 
     def write_tests(self, tests_dir, include_hidden, force_files):
