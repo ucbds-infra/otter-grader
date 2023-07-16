@@ -250,6 +250,8 @@ def test_config_overrides(mocked_launch_grade):
     }
 
 
+@pytest.mark.slow
+@pytest.mark.docker
 def test_config_overrides_integration():
     """
     Checks that overriding otter_config.json configurations with CLI flags works.
