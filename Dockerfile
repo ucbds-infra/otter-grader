@@ -16,7 +16,7 @@ RUN if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
             -O {{ autograder_dir }}/source/mamba_install.sh ; \
         else wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh \
             -O {{ autograder_dir }}/source/mamba_install.sh ; \
-    fi \
+    fi && \
     chmod +x /tmp/mamba_install.sh && \
     /tmp/mamba_install.sh -b
 ENV PATH=/root/mambaforge/bin:$PATH
