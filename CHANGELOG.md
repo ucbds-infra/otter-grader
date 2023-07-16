@@ -18,6 +18,7 @@
 * Use Otter Grade CLI flags to update `otter_config.json` values in the grading container per [#395](https://github.com/ucbds-infra/otter-grader/issues/395)
 * Removed `linux/amd64` platform specification for Docker images in Otter Grade
 * Updated Otter Assign to normalize notebooks before writing them with `nbformat.validator.normalize` per [#658](https://github.com/ucbds-infra/otter-grader/issues/658)
+* Added summary of assignment questions to Otter Assign logging per [#564](https://github.com/ucbds-infra/otter-grader/issues/564)
 
 **v4.4.0:**
 
