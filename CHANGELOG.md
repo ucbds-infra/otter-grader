@@ -15,6 +15,7 @@
 * Enabled Otter Generate for all assignments created with Otter Assign
 * Updated Otter Assign to use Otter Run to validate that all tests in the assignment pass, allowing tests to be run for R assignments as well as Python, per [#427](https://github.com/ucbds-infra/otter-grader/issues/427)
 * Allow Markdown cells to be used instead of raw cells for Otter Assign per [#592](https://github.com/ucbds-infra/otter-grader/issues/592)
+* Updated Otter Assign to normalize notebooks before writing them with `nbformat.validator.normalize` per [#658](https://github.com/ucbds-infra/otter-grader/issues/658)
 
 **v4.4.0:**
 
