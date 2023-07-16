@@ -20,6 +20,7 @@
 * Updated Otter Assign to normalize notebooks before writing them with `nbformat.validator.normalize` per [#658](https://github.com/ucbds-infra/otter-grader/issues/658)
 * Added summary of assignment questions to Otter Assign logging per [#564](https://github.com/ucbds-infra/otter-grader/issues/564)
 * Converted to Mamba from Conda for package management in grading containers per [#660](https://github.com/ucbds-infra/otter-grader/issues/660)
+* Upgraded default Python version in grading containers from 3.7 to 3.9
 
 **v4.4.0:**
 

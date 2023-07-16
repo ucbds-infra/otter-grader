@@ -4,7 +4,7 @@ channels:
   - conda-forge
   - r
 dependencies:
-  - python=3.7
+  - python=3.9
   - pip
   - nb_conda_kernels
   - r-base>=4.0.0

@@ -22,7 +22,7 @@ from ..utils import dump_yaml, load_default_file
 from ..version import __version__
 
 
-DEFAULT_PYTHON_VERSION = "3.7"
+DEFAULT_PYTHON_VERSION = "3.9"
 OTTER_ENV_NAME = "otter-env"
 OTTR_VERSION = "1.2.0"
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
