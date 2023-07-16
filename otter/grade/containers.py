@@ -20,7 +20,6 @@ from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import loggers
 
 
-DOCKER_PLATFORM = "linux/amd64"
 LOGGER = loggers.get_logger(__name__)
 
 
@@ -63,7 +62,6 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
             tags=[image],
             file=dockerfile_path,
             load=True,
-            # platforms=[DOCKER_PLATFORM],
         )
 
     return image
@@ -163,7 +161,6 @@ def grade_submission(
         if pdf_dir:
             volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
 
-        # args = {'platform': DOCKER_PLATFORM}
         args = {}
         if network is not None and not network:
             args['networks'] = 'none'
