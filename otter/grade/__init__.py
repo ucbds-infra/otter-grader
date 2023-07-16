@@ -9,6 +9,7 @@ from typing import List, Optional, Tuple, Union
 from .containers import launch_containers
 from .utils import merge_csv, prune_images
 
+from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import assert_path_exists, loggers
 
 
@@ -31,6 +32,7 @@ def main(
     force: bool = False,
     timeout: bool = None,
     no_network: bool = False,
+    debug: bool = False,
 ):
     """
     Run Otter Grade.
@@ -58,6 +60,7 @@ def main(
         force (``bool``): whether to force-prune the images (do not ask for confirmation)
         timeout (``int``): an execution timeout in seconds for each container
         no_network (``bool``): whether to disable networking in the containers
+        debug (``bool``): whether to run autograding in debug mode
 
     Returns:
         ``float | None``: the percentage scored by that submission if a single file was graded
@@ -114,6 +117,11 @@ def main(
         pdf_dir = pdf_dir,
         timeout = timeout,
         network = not no_network,
+        config = AutograderConfig({
+            "zips": ext == "zip",
+            "pdf": pdfs,
+            "debug": debug,
+        }),
     )
 
     LOGGER.info("Combining grades and saving")
