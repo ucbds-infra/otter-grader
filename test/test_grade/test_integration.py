@@ -13,6 +13,7 @@ from unittest import mock
 
 from otter.generate import main as generate
 from otter.grade import main as grade
+from otter.run.run_autograder.autograder_config import AutograderConfig
 from otter.utils import loggers
 
 from ..utils import TestFileManager
@@ -193,7 +194,8 @@ def test_single_notebook_grade(mocked_launch_grade):
         "no_kill": False,
         "pdf_dir": None,
         "timeout": None,
-        "network": True
+        "network": True,
+        "config": AutograderConfig(),
     }
 
     mocked_launch_grade.return_value = [df]
