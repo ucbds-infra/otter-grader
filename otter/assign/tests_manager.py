@@ -376,15 +376,20 @@ class AssignmentTestsManager:
             ``int | float``: the point value of the question
         """
         test_cases = self._tests_by_question.get(question.name, [])
+
+        points = question.points
+        if isinstance(points, dict):
+            points = points.get('each', 1) * len(test_cases)
+
         if len(test_cases) == 0:
-            if question.points is None and question.manual:
+            if points is None and question.manual:
                 raise ValueError(
                     f"Point value unspecified for question with no test cases: {question.name}")
 
-            return question.points if question.points is not None else 1
+            return points if points is not None else 1
 
         try:
-            resolved_test_cases = TestFile.resolve_test_file_points(question.points, test_cases)
+            resolved_test_cases = TestFile.resolve_test_file_points(points, test_cases)
         except Exception as e:
             raise type(e)(f"Error in \"{question.name}\" test cases: {e}")
 
