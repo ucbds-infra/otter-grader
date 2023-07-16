@@ -22,4 +22,5 @@ dependencies:
       - dill
       - numpy
       - gspread
-      - otter-grader==4.1.0
+      - pypdf
+      - otter-grader==4.4.0

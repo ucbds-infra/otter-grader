@@ -8,3 +8,5 @@ Here are some resources and examples for using Otter-Grader:
   on the latter two formats.
 * `A quickstart guide to autograding R with Otter 
   <https://econ140-spring2020.shinyapps.io/otter_quickstart/>`_
+* `Otter-Grader JupyterLab Extension <https://github.com/chrispyles/otter-grader-labextension>`_: A
+  JupyterLab extension for authoring Otter Assign-formatted notebooks.
