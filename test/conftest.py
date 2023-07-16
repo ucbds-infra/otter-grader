@@ -7,7 +7,7 @@ from python_on_whales import docker
 from unittest import mock
 
 from otter import __file__ as OTTER_PATH
-from otter.grade.containers import build_image, DOCKER_PLATFORM
+from otter.grade.containers import build_image
 
 from .utils import TestFileManager
 
@@ -88,7 +88,6 @@ def build_image_with_local_changes(*args, **kwargs):
         tags=[image],
         file=FILE_MANAGER.get_path("Dockerfile"),
         load=True,
-        platforms=[DOCKER_PLATFORM],
     )
 
     return image
