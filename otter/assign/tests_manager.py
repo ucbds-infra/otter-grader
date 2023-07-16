@@ -1,6 +1,7 @@
 """Assignment tests manager for Otter Assign"""
 
 import os
+import pandas as pd
 import pprint
 import re
 import yaml
@@ -389,3 +390,26 @@ class AssignmentTestsManager:
 
         points = round(sum(tc.points for tc in resolved_test_cases), 5)
         return int(points) if points % 1 == 0 else points
+
+    def generate_assignment_summary(self):
+        """
+        Generate a summary of the assignment's questions.
+
+        Returns:
+            ``str``: the summary
+        """
+        rows, manual, autograded, total = [], 0, 0, 0
+        for question_name in sorted(self._tests_by_question.keys()):
+            config = self._questions[question_name]
+            points = self.determine_question_point_value(config)
+            rows.append({"name": question_name, "points": points})
+            total += points
+            if config.manual: manual += points
+            else: autograded += points
+
+        summary = f"Assignment summary:\n"
+        summary += f"Total points: {total}\n"
+        summary += f"Autograded:   {autograded}\n"
+        summary += f"Manual:       {manual}\n\n"
+        summary += str(pd.DataFrame(rows))
+        return summary
