@@ -3,8 +3,8 @@
 # Runs Otter's tests and copies the resulting coverage.xml file into the /tmp directory. This script
 # should only be used inside a Docker container created by /Dockerfile.
 
-export PATH="/root/miniconda3/bin:$PATH"
-source /root/miniconda3/etc/profile.d/conda.sh
+export PATH="/root/mambaforge/bin:$PATH"
+source /root/mambaforge/etc/profile.d/mamba.sh
 cd /root/otter-grader
-conda activate otter-grader
+mamba activate otter-grader
 make testcov PYTESTOPTS="-vv" && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml
