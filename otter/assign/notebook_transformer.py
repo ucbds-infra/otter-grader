@@ -3,8 +3,6 @@
 import copy
 import nbformat
 
-from nbformat.validator import normalize
-
 from .assignment import Assignment
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
 from .cell_factory import CellFactory
@@ -379,6 +377,11 @@ class TransformedNotebookContainer:
         if self.nb_transformer.assignment.is_rmd:
             rmarkdown_converter.write_as_rmd(nb, str(output_path), not sanitize)
         else:
+            try:
+                from nbformat.validator import normalize
+            except ImportError:
+                normalize = lambda nb: 0, nb
+
             _, nb = normalize(nb)
             nbformat.write(nb, str(output_path))
 
