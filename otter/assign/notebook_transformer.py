@@ -380,7 +380,7 @@ class TransformedNotebookContainer:
             try:
                 from nbformat.validator import normalize
             except ImportError:
-                normalize = lambda nb: 0, nb
+                normalize = lambda nb: (0, nb)
 
             _, nb = normalize(nb)
             nbformat.write(nb, str(output_path))
