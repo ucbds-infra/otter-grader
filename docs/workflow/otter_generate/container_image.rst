@@ -49,7 +49,7 @@ included if you have provided an :ref:`R requirements file
 -------------------
 
 This file specifies the conda environment that Otter creates in ``setup.sh``. By default, it uses
-Python 3.7, but this can be changed using the ``--python-version`` flag to Otter Generate.
+Python 3.9, but this can be changed using the ``--python-version`` flag to Otter Generate.
 
 .. literalinclude:: ../../_static/grading-environment.yml
     :language: yaml
