@@ -4,6 +4,7 @@
 # should only be used inside a Docker container created by /Dockerfile.
 
 export PATH="/root/mambaforge/bin:$PATH"
+source /root/mambaforge/etc/profile.d/conda.sh
 source /root/mambaforge/etc/profile.d/mamba.sh
 cd /root/otter-grader
 mamba activate otter-grader
