@@ -108,7 +108,8 @@ class GradingPreprocessor(Preprocessor):
 
         cells = nb.cells[1:] if skip_first else nb.cells
         for cell in cells:
-            cell.source = f"{do_seed}\n{cell.source}"
+            if cell.cell_type == "code":
+                cell.source = f"{do_seed}\n{cell.source}"
 
     def add_checks(self, nb):
         if self.from_log: return
