@@ -17,6 +17,7 @@
 * Allow Markdown cells to be used instead of raw cells for Otter Assign per [#592](https://github.com/ucbds-infra/otter-grader/issues/592)
 * Use Otter Grade CLI flags to update `otter_config.json` values in the grading container per [#395](https://github.com/ucbds-infra/otter-grader/issues/395)
 * Removed `linux/amd64` platform specification for Docker images in Otter Grade
+* Updated Otter Assign to normalize notebooks before writing them with `nbformat.validator.normalize` per [#658](https://github.com/ucbds-infra/otter-grader/issues/658)
 
 **v4.4.0:**
 
