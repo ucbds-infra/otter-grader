@@ -23,7 +23,6 @@ from ..version import __version__
 
 
 DEFAULT_PYTHON_VERSION = "3.7"
-MINICONDA_INSTALL_URL = "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.10.3-Linux-x86_64.sh"
 OTTER_ENV_NAME = "otter-env"
 OTTR_VERSION = "1.2.0"
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
@@ -222,7 +221,6 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
     template_context = {
         "autograder_dir": ag_config.autograder_dir,
         "otter_env_name": OTTER_ENV_NAME,
-        "miniconda_install_url": MINICONDA_INSTALL_URL,
         "ottr_version": OTTR_VERSION,
         "channel_priority_strict": channel_priority_strict,
         "has_r_requirements": False,

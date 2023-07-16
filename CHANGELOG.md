@@ -19,6 +19,7 @@
 * Removed `linux/amd64` platform specification for Docker images in Otter Grade
 * Updated Otter Assign to normalize notebooks before writing them with `nbformat.validator.normalize` per [#658](https://github.com/ucbds-infra/otter-grader/issues/658)
 * Added summary of assignment questions to Otter Assign logging per [#564](https://github.com/ucbds-infra/otter-grader/issues/564)
+* Converted to Mamba from Conda for package management in grading containers per [#660](https://github.com/ucbds-infra/otter-grader/issues/660)
 
 **v4.4.0:**
 
