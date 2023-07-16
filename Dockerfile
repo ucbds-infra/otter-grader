@@ -13,9 +13,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y wget make build-e
 # Install mamba
 RUN if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
         then wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-aarch64.sh \
-            -O {{ autograder_dir }}/source/mamba_install.sh ; \
+            -O /tmp/mamba_install.sh ; \
         else wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh \
-            -O {{ autograder_dir }}/source/mamba_install.sh ; \
+            -O /tmp/mamba_install.sh ; \
     fi && \
     chmod +x /tmp/mamba_install.sh && \
     /tmp/mamba_install.sh -b
