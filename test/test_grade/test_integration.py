@@ -77,7 +77,7 @@ def image_name():
     """
     A fixture that returns the name of the Docker image to use as the base image.
     """
-    if docker.images.exists("otter-test"):
+    if docker.image.exists("otter-test"):
         return "otter-test"
     return "ubuntu:22.04"
 
