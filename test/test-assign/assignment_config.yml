@@ -1,7 +1,0 @@
-check_all_cell: true
-export_cell:
-  force_save: true
-  run_tests: false
-tests:
-  files: true
-  ok_format: false
