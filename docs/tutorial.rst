@@ -2,8 +2,8 @@ Tutorial
 ========
 
 This tutorial can help you to verify that you have installed Otter correctly and introduce you to 
-the general Otter workflow. Once you have :ref:`installed <home>` Otter, download `this zip file 
-<_static/tutorial.zip>`_ and unzip it into some directory on your machine; you should have the 
+the general Otter workflow. Once you have :ref:`installed <installation>` Otter, download `this zip
+file <_static/tutorial.zip>`_ and unzip it into some directory on your machine; you should have the 
 following directory structure:
 
 .. code-block::
@@ -44,12 +44,7 @@ Otter Assign on this notebook, run
 
 .. code-block:: console
 
-    $ otter assign demo.ipynb dist
-    Generating views...
-    Generating solutions PDF...
-    Generating autograder zipfile...
-    Running tests...
-    All tests passed!
+    otter assign demo.ipynb dist
 
 Otter Assign should create a ``dist`` directory which contains two further subdirectories: 
 ``autograder`` and ``student``. The ``autograder`` directory contains the Gradescope autograder, 
@@ -101,18 +96,17 @@ machine. You can also grade on Gradescope or without containerization, as descri
 
 Let's now construct a call to Otter that will grade these notebooks. We will use 
 ``dist/autograder/autograder.zip`` from running Otter Assign to configure our grading image. Our notebooks 
-are in the ``ipynbs`` subdirectory, so we'll need to use the ``-p`` flag. The notebooks also contain 
-a couple of written questions, and the :ref:`filtering <pdfs>` is implemented using HTML comments, so 
+are in the ``ipynbs`` subdirectory and contain a couple of written questions, so 
 we'll specify the ``--pdfs`` flag to indicate that Otter should grab the PDFs out of the Docker 
-containers.
+containers. Lastly, we'll name the assignment ``demo`` with the ``-n`` flag.
 
 Let's run Otter on the notebooks:
 
 .. code-block:: console
 
-    otter grade -p submissions/ipynbs -a dist/autograder/demo-autograder_*.zip --pdfs -v
+    otter grade -n demo -a dist/autograder/demo-autograder_*.zip --pdfs -v submissions/ipynbs
 
-(The ``-v`` flag so that we get verbose output.) After this finishes running, there 
+(The ``-v`` flag is so that we get verbose output.) After this finishes running, there 
 should be a new file and a new folder in the working directory: ``final_grades.csv`` and 
 ``submission_pdfs``. The former should contain the grades for each file, and should look something 
 like this:
@@ -165,19 +159,14 @@ Let's make that a bit prettier:
 The latter, the ``submission_pdfs`` directory, should contain the filtered PDFs of each notebook 
 (which should be relatively similar).
 
-Otter Grade can also grade the zip file exports provided by the ``Notebook.export`` method. Before 
-grading the zip files, you must edit your ``autograder.zip`` to indicate that you're doing so. To 
-do this, open ``demo.ipynb`` (the file we used with Otter Assign) and edit the first cell of the 
-notebook (beginning with ``BEGIN ASSIGNMENT``) so that the ``zips`` key under ``generate`` is 
-``true`` in the YAML and rerun Otter Assign.
-
-Now, all we need to do is add the ``-z`` flag to the call to indicate that you're grading these zip 
-files. We have provided some, with the same notebooks as above, in the ``zips`` directory, so let's 
-grade those:
+Otter Grade can also grade the zip file exports provided by the ``Notebook.export`` method. All we
+need to do is add the ``--ext`` flag to indicate that the submissions are zip files.
+We have provided some example submissions, with the same notebooks as above, in the ``zips``
+directory, so let's grade those:
 
 .. code-block:: console
 
-    otter grade -p submissions/zips -a dist/autograder/demo-autograder_*.zip -vz
+    otter grade -n demo -a dist/autograder/demo-autograder_*.zip -v --ext zip submissions/zips
 
 This should have the same CSV output as above but no ``submission_pdfs`` directory since we didn't 
 tell Otter to generate PDFs.

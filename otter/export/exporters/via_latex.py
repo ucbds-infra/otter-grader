@@ -31,11 +31,8 @@ class PDFViaLatexExporter(BaseExporter):
     })
 
     @classmethod
-    def convert_notebook(cls, nb_path, dest, xecjk=False, no_xecjk=False, **kwargs):
+    def convert_notebook(cls, nb_path, dest, xecjk=False, **kwargs):
         warnings.filterwarnings("ignore", r"invalid escape sequence '\\c'", DeprecationWarning)
-
-        if xecjk and no_xecjk:
-            raise ValueError("xeCJK LaTeX template indicated but disallowed")
 
         options = cls.default_options.copy()
         options.update(kwargs)
@@ -71,17 +68,13 @@ class PDFViaLatexExporter(BaseExporter):
                 output_file.write(pdf_output[0])
 
         except nbconvert.pdf.LatexFailed as error:
-            if not xecjk and not no_xecjk:
-                cls.convert_notebook(nb_path, dest, xecjk=True, **kwargs)
-
-            else:
-                message = "There was an error generating your LaTeX; showing full error message:\n"
-                message += indent(error.output, "    ")
-                if xecjk:
-                    message += "\n\nIf the error above is related to xeCJK or fandol in LaTeX " \
-                        "and you don't require this functionality, try running again with " \
-                        "no_xecjk set to True or the --no-xecjk flag."
-                raise ExportFailedException(message)
+            message = "There was an error generating your LaTeX; showing full error message:\n"
+            message += indent(error.output, "    ")
+            if xecjk:
+                message += "\n\nIf the error above is related to xeCJK or fandol in LaTeX " \
+                    "and you don't require this functionality, try running again without " \
+                    "xecjk set to True or the --xecjk flag."
+            raise ExportFailedException(message)
 
         finally:
             if NBCONVERT_6:

@@ -1,0 +1,6 @@
+{
+  "seed": 42,
+  "seed_variable": "rng_seed",
+  "lang": "r",
+  "assignment_name": "hw01"
+}

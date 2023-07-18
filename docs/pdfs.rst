@@ -8,7 +8,7 @@ filtering for generating PDFs for manual grading. There are two options for expo
 
 
 * **PDF via LaTeX:** this uses nbconvert, pandoc, and LaTeX to generate PDFs from TeX files
-* **PDF via HTML:** this uses wkhtmltopdf and the Python packages pdfkit and PyPDF2 to generate PDFs 
+* **PDF via HTML:** this uses wkhtmltopdf and the Python packages pdfkit and pypdf to generate PDFs 
   from HTML files
 
 Otter Export is used by Otter Assign to generate Gradescope PDF templates and solutions, in the 

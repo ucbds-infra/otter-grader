@@ -1,0 +1,294 @@
+---
+title: "Otter Assign for Rmd Test"
+author: "Chris Pyles"
+date: "8/3/2020"
+output: pdf_document
+---
+
+<!--
+# ASSIGNMENT CONFIG
+name: hw01
+generate: true
+solutions_pdf: true
+files:
+    - data.csv
+seed:
+    variable: rng_seed
+    autograder_value: 42
+    student_value: 90
+-->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Otter Assign for Rmd
+
+```{r}
+library(testthat)
+library(ggplot2)
+rng_seed <- 42
+```
+
+<!--
+# BEGIN QUESTION
+name: q1
+points:
+    - 1
+    - 1
+    - 1
+    - 2
+-->
+
+**Question 1.** Assign x to the smallest prime number.
+
+<!-- # BEGIN SOLUTION -->
+
+```{r}
+x <- 2 # SOLUTION
+```
+
+<!-- # END SOLUTION -->
+
+<!-- # BEGIN TESTS -->
+
+```{r}
+testthat::expect_true(is.numeric(x))
+```
+
+```{r}
+testthat::expect_true(0 < x)
+testthat::expect_true(x < 100)
+```
+
+```{r}
+# HIDDEN
+testthat::expect_equal(x, 2)
+```
+
+```{r}
+. = " # BEGIN TEST CONFIG
+name: q1d
+hidden: true
+success_message: congrats
+" # END TEST CONFIG
+testthat::expect_equal(as.character(x), "2")
+```
+
+<!-- # END TESTS -->
+
+<!-- # END QUESTION -->
+
+<!--
+# BEGIN QUESTION
+name: q2
+manual: true
+-->
+
+**Question 2.** Visualize the answer
+
+<!-- # BEGIN SOLUTION -->
+
+```{r}
+set.seed(123) # SEED
+# BEGIN SOLUTION NO PROMPT
+x <- runif(100)
+y <- rnorm(100)
+data <- data.frame(x, y)
+ggplot(data, aes(x=x, y=y)) +
+    geom_point()
+# END SOLUTION
+. = " # BEGIN PROMPT
+plt.plot(...);
+"; # END PROMPT
+```
+
+<!-- # END SOLUTION -->
+
+<!-- # END QUESTION -->
+
+This cell is not part of a question.
+
+```{r}
+y <- 3
+```
+
+<!--
+# BEGIN QUESTION
+name: q3
+points: 2
+-->
+
+**Question 3.** Define `square` and assign `nine` to 3 squared.
+
+<!-- # BEGIN SOLUTION -->
+
+```{r}
+square <- function(x) {
+    y <- x * x # SOLUTION
+    return(y) # SOLUTION
+}
+
+nine <- square(3) # SOLUTION
+```
+
+<!-- # END SOLUTION -->
+
+<!-- # BEGIN TESTS -->
+
+```{r}
+testthat::expect_equal(nine, 9)
+```
+
+```{r}
+testthat::expect_equal(square(16), 256)
+```
+
+```{r}
+# HIDDEN
+testthat::expect_equal(square(1), 1)
+```
+
+<!-- # END TESTS -->
+
+<!-- # END QUESTION -->
+
+<!--
+# BEGIN QUESTION
+name: q4
+points: 2
+manual: True
+-->
+
+**Question 4.** What does equilateral mean?
+
+<!-- # BEGIN SOLUTION -->
+
+Having equal side lengths.
+
+<!-- # END SOLUTION -->
+
+<!-- # END QUESTION -->
+
+```{r}
+# this isn't part of a question
+# it's here to make sure that we get a MD cell above to close the export
+# of question 4
+```
+
+<!--
+# BEGIN QUESTION
+name: question5
+-->
+
+**Question 5.** Approximate the area and circumference of a circle with radius 3.
+
+<!-- # BEGIN SOLUTION -->
+
+```{r}
+pi <- 3.14
+if (TRUE) {
+    # BEGIN SOLUTION
+    radius = 3
+    area = radius * pi * pi
+    # END SOLUTION
+    print(paste0('A circle with radius', radius, 'has area', area))
+}
+
+circumference <- function(r) {
+    # BEGIN SOLUTION NO PROMPT
+    return(2 * pi * r)
+    # END SOLUTION
+    " # BEGIN PROMPT
+    # Next, define a circumference function.
+    "; # END PROMPT
+}
+```
+
+<!-- # END SOLUTION -->
+
+<!-- # END QUESTION -->
+
+```{r}
+# This question has no tests.
+```
+
+<!--
+# BEGIN QUESTION
+name: question6
+manual: true
+-->
+
+**Question 6.** Write something
+
+_This question has a custom prompt below, so that prompt should be in the output. It also has no solution!_
+
+<!-- # BEGIN PROMPT -->
+
+_Write your thing here._
+
+<!-- # END PROMPT -->
+
+<!-- # END QUESTION -->
+
+<!--
+# BEGIN QUESTION
+name: q7
+manual: true
+-->
+
+**Question 7:** What is the answer?
+
+<!-- # BEGIN SOLUTION -->
+
+42
+
+<!-- # END SOLUTION -->
+
+<!-- # END QUESTION -->
+
+<!--
+# BEGIN QUESTION
+name: q8
+-->
+
+**Question 8:** Test intercell seeding by generating 10 random $N(4,2)$ numbers.
+
+<!-- # BEGIN SOLUTION -->
+
+```{r}
+set.seed(42) # SEED
+z <- rnorm(10, 4, 2) # SOLUTION
+z
+```
+
+<!-- # END SOLUTION -->
+
+<!-- # BEGIN TESTS -->
+
+```{r}
+testthat::expect_equal(length(z), 10)
+```
+
+```{r}
+# HIDDEN
+actual <- c(
+    6.74191689429334,
+    2.87060365720782,
+    4.72625682267468,
+    5.26572520992208, 
+    4.808536646282, 
+    3.78775096781703, 
+    7.02304399487788, 
+    3.8106819231738, 
+    8.03684742775408, 
+    3.87457180189516
+)
+testthat::expect_equal(actual, z)
+```
+
+<!-- # END TESTS -->
+
+<!-- # END QUESTION -->
+
+**You're done!**

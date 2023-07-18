@@ -56,7 +56,6 @@ defaults = assign.__kwdefaults__
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--debug", is_flag=True, help="Do not ignore errors in running tests for debugging")
-@click.option("--v0", is_flag=True, help="Use Otter Assign format v0 instead of v1")
 def assign_cli(*args, **kwargs):
     """
     Create distribution versions of the Otter Assign formatted notebook MASTER and write the
@@ -88,7 +87,7 @@ defaults = export.__kwdefaults__
 @click.option("--pagebreaks", is_flag=True, help="Whether the PDF should have pagebreaks between questions")
 @click.option("-s", "--save", is_flag=True, help="Save intermediate file(s) as well")
 @click.option("-e", "--exporter", default=defaults["exporter"], type=click.Choice(["latex", "html"]), help="Type of PDF exporter to use")
-@click.option("--no-xecjk", is_flag=True, help="Force-disable xeCJK in Otter's LaTeX template")
+@click.option("--xecjk", is_flag=True, help="Enable xeCJK in Otter's LaTeX template")
 def export_cli(*args, **kwargs):
     """
     Export a Jupyter Notebook SRC as a PDF at DEST with optional filtering.
@@ -115,6 +114,7 @@ defaults = generate.__kwdefaults__
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--token", help="Gradescope token for uploading PDFs")
 @click.option("--python-version", help="Python version to use in the grading image")
+@click.option("--channel-priority-strict", is_flag=True, help="Whether to set conda's channel_priority to strict in the setup.sh file")
 @click.argument("files", nargs=-1)
 def generate_cli(*args, **kwargs):
     """
@@ -126,31 +126,24 @@ def generate_cli(*args, **kwargs):
 defaults = grade.__kwdefaults__
 @cli.command("grade")
 @_verbosity
-
-# necessary path arguments
-@click.option("-p", "--path", default=defaults["path"], help="Path to directory of submissions")
+@click.argument("paths", nargs=-1, type=click.Path(exists=True))
+@click.option("-n", "--name", help="An assignment name to use in the Docker image tag")
 @click.option("-a", "--autograder", default=defaults["autograder"], help="Path to autograder zip file")
 @click.option("-o", "--output-dir", default=defaults["output_dir"], help="Directory to which to write output")
-
-# submission format arguments
-@click.option("-z", "--zips", is_flag=True, help="Whether submissions are zip files from Notebook.export")
 @click.option("--ext", default=defaults["ext"], type=click.Choice(_ALLOWED_EXTENSIONS), help="The extension to glob for submissions")
-
-# PDF export options
 @click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
-
-# other settings and optional arguments
-@click.option("--containers", type=click.INT, help="Specify number of containers to run in parallel")
-@click.option("--image", default=defaults["image"], help="Custom docker image to run on")
+@click.option("--containers", default=defaults["containers"], type=click.INT, help="Specify number of containers to run in parallel")
+@click.option("--image", default=defaults["image"], help="A Docker image tag to use as the base image")
 @click.option("--timeout", type=click.INT, help="Submission execution timeout in seconds")
 @click.option("--no-network", is_flag=True, help="Disable networking in the containers")
 @click.option("--no-kill", is_flag=True, help="Do not kill containers after grading")
-
+@click.option("--debug", is_flag=True, help="Run in debug mode (without ignoring errors thrown during execution)")
 @click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
 @click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
 def grade_cli(*args, **kwargs):
     """
-    Grade assignments locally using Docker containers.
+    Grade submissions in PATHS locally using Docker containers. PATHS can be individual file paths
+    or directories containing submissions ending with extension EXT.
     """
     g = grade(*args, **kwargs)
     if g is not None:

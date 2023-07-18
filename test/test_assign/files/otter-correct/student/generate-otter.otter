@@ -1,0 +1,5 @@
+{
+    "notebook": "generate-otter.ipynb",
+    "save_environment": true,
+    "ignore_modules": []
+}

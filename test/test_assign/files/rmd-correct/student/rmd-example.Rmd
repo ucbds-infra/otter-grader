@@ -1,0 +1,116 @@
+---
+title: "Otter Assign for Rmd Test"
+author: "Chris Pyles"
+date: "8/3/2020"
+output: pdf_document
+assignment_name: "hw01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Otter Assign for Rmd
+
+```{r}
+library(testthat)
+library(ggplot2)
+rng_seed <- 90
+```
+
+**Question 1.** Assign x to the smallest prime number.
+
+```{r tags=c()}
+x <- NULL # YOUR CODE HERE
+```
+
+```{r}
+. = ottr::check("tests/q1.R")
+```
+
+**Question 2.** Visualize the answer
+
+```{r tags=c()}
+plt.plot(...);
+```
+
+This cell is not part of a question.
+
+```{r}
+y <- 3
+```
+
+**Question 3.** Define `square` and assign `nine` to 3 squared.
+
+```{r tags=c()}
+square <- function(x) {
+    y <- NULL # YOUR CODE HERE
+    # YOUR CODE HERE
+}
+
+nine <- NULL # YOUR CODE HERE
+```
+
+```{r}
+. = ottr::check("tests/q3.R")
+```
+
+**Question 4.** What does equilateral mean?
+
+_Type your answer here, replacing this text._
+
+```{r}
+# this isn't part of a question
+# it's here to make sure that we get a MD cell above to close the export
+# of question 4
+```
+
+**Question 5.** Approximate the area and circumference of a circle with radius 3.
+
+```{r tags=c()}
+pi <- 3.14
+if (TRUE) {
+    # YOUR CODE HERE
+    print(paste0('A circle with radius', radius, 'has area', area))
+}
+
+circumference <- function(r) {
+    # Next, define a circumference function.
+}
+```
+
+```{r}
+# This question has no tests.
+```
+
+**Question 6.** Write something
+
+_This question has a custom prompt below, so that prompt should be in the output. It also has no solution!_
+
+_Write your thing here._
+
+**Question 7:** What is the answer?
+
+_Type your answer here, replacing this text._
+
+**Question 8:** Test intercell seeding by generating 10 random $N(4,2)$ numbers.
+
+```{r tags=c()}
+z <- NULL # YOUR CODE HERE
+z
+```
+
+```{r}
+. = ottr::check("tests/q8.R")
+```
+
+**You're done!**
+
+## Submission
+
+Make sure you have run all cells in your notebook in order before running the cell below, so that all images/graphs appear in the output. The cell below will generate a zip file for you to submit. **Please save before exporting!**
+
+```{r}
+# Save your notebook first, then run this cell to export your submission.
+ottr::export("rmd-example.Rmd", pdf = TRUE)
+```
