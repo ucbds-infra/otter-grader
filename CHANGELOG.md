@@ -1,6 +1,6 @@
 # Changelog
 
-**Unreleased (beta):**
+**v5.0.0:**
 
 * Converted all dependency management in the autograder configuration zip file to Conda per [#501](https://github.com/ucbds-infra/otter-grader/issues/501)
 * Removed deprecated Otter Assign format v0
