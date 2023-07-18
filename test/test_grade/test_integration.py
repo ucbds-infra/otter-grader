@@ -9,6 +9,7 @@ import shutil
 import zipfile
 
 from glob import glob
+from python_on_whales import docker
 from unittest import mock
 
 from otter.generate import main as generate
@@ -71,9 +72,19 @@ def expected_points():
     return test_points
 
 
+@pytest.fixture
+def image_name():
+    """
+    A fixture that returns the name of the Docker image to use as the base image.
+    """
+    if docker.images.exists("otter-test"):
+        return "otter-test"
+    return "ubuntu:22.04"
+
+
 @pytest.mark.slow
 @pytest.mark.docker
-def test_timeout():
+def test_timeout(image_name):
     """
     Check that the notebook ``1min.ipynb`` is killed due to exceeding the defined timeout.
     """
@@ -87,12 +98,13 @@ def test_timeout():
             autograder = AG_ZIP_PATH,
             containers = 5,
             timeout = 59,
+            image = image_name,
         )
 
 
 @pytest.mark.slow
 @pytest.mark.docker
-def test_network(expected_points):
+def test_network(expected_points, image_name):
     """
     Check that the notebook ``network.ipynb`` is unable to do some network requests with disabled
     networking.
@@ -103,7 +115,8 @@ def test_network(expected_points):
         output_dir = "test/",
         autograder = AG_ZIP_PATH,
         containers = 5,
-        no_network=True,
+        no_network = True,
+        image = image_name,
     )
 
     df_test = pd.read_csv("test/final_grades.csv")
@@ -121,7 +134,7 @@ def test_network(expected_points):
 
 @pytest.mark.slow
 @pytest.mark.docker
-def test_notebooks_with_pdfs(expected_points):
+def test_notebooks_with_pdfs(expected_points, image_name):
     """
     Checks that notebooks are graded correctly and that PDFs are generated.
     """
@@ -132,6 +145,7 @@ def test_notebooks_with_pdfs(expected_points):
         autograder = AG_ZIP_PATH,
         containers = 5,
         pdfs = True,
+        image = image_name,
     )
 
     # read the output and expected output
