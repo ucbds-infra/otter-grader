@@ -1,19 +1,22 @@
 """Utilities for Otter Assign"""
 
 import copy
-import datetime as dt
 import json
 import os
 import pathlib
 import re
 import shutil
 
-from glob import glob
+from contextlib import redirect_stdout, redirect_stderr
+from io import StringIO
 from textwrap import indent
 
-from ..execute import grade_notebook
+from ..api import grade_submission
 from ..generate import main as generate_autograder
-from ..utils import get_source, NOTEBOOK_METADATA_KEY
+from ..utils import get_source, NOTEBOOK_METADATA_KEY, loggers
+
+
+LOGGER = loggers.get_logger(__name__)
 
 
 class EmptyCellException(Exception):
@@ -70,7 +73,7 @@ def is_cell_type(cell, cell_type):
         cell_type (``str``): the cell type to check for
 
     Returns:
-        ``bool``: whether ``cell`` is of type ``cell_type``        
+        ``bool``: whether ``cell`` is of type ``cell_type``
     """
     return cell["cell_type"] == cell_type
 
@@ -189,34 +192,30 @@ def str_to_doctest(code_lines, lines):
         return str_to_doctest(code_lines, lines + [">>> " + line])
 
 
-def run_tests(nb_path, debug=False, seed=None, plugin_collection=None):
+def run_tests(assignment, debug=False):
     """
     Grade a notebook and throw an error if it does not receive a perfect score.
 
     Args:
-        nb_path (``pathlib.Path``): the path to the notebook to grade
-        debug (``bool``, optional): whether to raise errors instead of ignoring them
-        seed (``int``, optional): an RNG seed for notebook execution
-        plugin_collection (``otter.plugins.PluginCollection``, optional): plugins to run while
-            grading
+        assignment (``otter.assgin.assignment.Assignment``): the assignment config
+        debug (``bool``): whether to throw errors instead of swallowing them during grading
 
     Raises:
         ``RuntimeError``: if the grade received by the notebook is not 100%
     """
-    curr_dir = os.getcwd()
-    os.chdir(nb_path.parent)
+    stdout = StringIO()
+    with redirect_stdout(stdout), redirect_stderr(stdout):
+        results = grade_submission(
+            str(assignment.ag_notebook_path),
+            str(assignment.ag_zip_path),
+            debug=debug,
+        )
 
-    results = grade_notebook(
-        nb_path.name, tests_glob=glob(os.path.join("tests", "*.py")), cwd=os.getcwd(), 
-    	test_dir=os.path.join(os.getcwd(), "tests"), ignore_errors = not debug, seed=seed,
-        plugin_collection=plugin_collection
-    )
+    LOGGER.debug(f"Otter Run output:\n{stdout.getvalue()}")
 
     if results.total != results.possible:
         raise RuntimeError(f"Some autograder tests failed in the autograder notebook:\n" + \
             indent(results.summary(), '    '))
-
-    os.chdir(curr_dir)
 
 
 def write_otter_config_file(assignment):
@@ -248,7 +247,7 @@ def write_otter_config_file(assignment):
 # TODO: update for new assign format
 def run_generate_autograder(assignment, gs_username, gs_password, plugin_collection=None):
     """
-    Run Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on 
+    Run Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on
     configurations in ``assignment.generate``.
 
     Args:
@@ -313,12 +312,9 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
             json.dump(otter_config, f, indent=2)
 
     # TODO: change generate_autograder so that only necessary kwargs are needed
-    timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
-    notebook_name = assignment.master.stem
-    output_path = f"{notebook_name}-autograder_{timestamp}.zip"
     generate_autograder(
         tests_dir=test_dir,
-        output_path=output_path,
+        output_path=assignment.ag_zip_name,
         config="otter_config.json" if otter_config else None,
         lang="python" if assignment.is_python else "r",
         requirements=requirements,
@@ -331,6 +327,7 @@ def run_generate_autograder(assignment, gs_username, gs_password, plugin_collect
         plugin_collection=plugin_collection,
         assignment=assignment,
         python_version=assignment.get_python_version(),
+        channel_priority_strict=assignment.channel_priority_strict,
     )
 
     # clean up temp tests dir

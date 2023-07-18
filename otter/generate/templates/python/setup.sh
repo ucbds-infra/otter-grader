@@ -1,28 +1,27 @@
 #!/usr/bin/env bash
 
-if [ "${BASE_IMAGE}" != "ucbdsinfra/otter-grader" ]; then
-    apt-get clean
-    apt-get update
-    apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese
+export DEBIAN_FRONTEND=noninteractive
+apt-get clean
+apt-get update
+apt-get install -y wget pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic \
+    build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese
 
-    # install wkhtmltopdf
-    wget --quiet -O /tmp/libssl1.1.deb http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1-1ubuntu2.1~18.04.20_amd64.deb
-    apt-get install -y /tmp/libssl1.1.deb
-    wget --quiet -O /tmp/wkhtmltopdf.deb https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb
-    apt-get install -y /tmp/wkhtmltopdf.deb
-
-    # install conda
-    wget -nv -O {{ autograder_dir }}/source/miniconda_install.sh "{{ miniconda_install_url }}"
-    chmod +x {{ autograder_dir }}/source/miniconda_install.sh
-    {{ autograder_dir }}/source/miniconda_install.sh -b
-    echo "export PATH=/root/miniconda3/bin:\$PATH" >> /root/.bashrc
-
-    export PATH=/root/miniconda3/bin:$PATH
-    export TAR="/bin/tar"
+# install mamba
+if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
+    then wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-aarch64.sh \
+        -O {{ autograder_dir }}/source/mamba_install.sh ; \
+    else wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh \
+        -O {{ autograder_dir }}/source/mamba_install.sh ; \
 fi
+chmod +x {{ autograder_dir }}/source/mamba_install.sh
+{{ autograder_dir }}/source/mamba_install.sh -b
+echo "export PATH=/root/mambaforge/bin:\$PATH" >> /root/.bashrc
 
-# install dependencies with conda
-conda env create -f {{ autograder_dir }}/source/environment.yml
+export PATH=/root/mambaforge/bin:$PATH
+export TAR="/bin/tar"
 
-# set conda shell
-conda init --all
+# install dependencies with mamba
+mamba env create -f {{ autograder_dir }}/source/environment.yml
+
+# set mamba shell
+mamba init --all

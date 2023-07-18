@@ -2,11 +2,9 @@
 
 import nbconvert
 import os
-import pdfkit
 import shutil
 
 from io import BytesIO
-from PyPDF2 import PdfFileMerger
 
 from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
 from .utils import notebook_pdf_generator
@@ -18,7 +16,7 @@ class PDFViaHTMLExporter(BaseExporter):
 
     Converts IPython notebooks to PDFs by first converting them into temporary HTML files that are then
     converted to PDFs using wkhtmltopdf and its Python API pdfkit which are then stitched together (if
-    pagebreaks are enabled) using PyPDF2.
+    pagebreaks are enabled) using pypdf.
 
     Attributes:
         default_options (``dict``): the default options for this exporter
@@ -32,7 +30,11 @@ class PDFViaHTMLExporter(BaseExporter):
 
     @classmethod
     def convert_notebook(cls, nb_path, dest, **kwargs):
-        assert shutil.which("wkhtmltopdf") is not None, "Cannot export via HTML without wkhtmltopdf"
+        if shutil.which("wkhtmltopdf") is None:
+            raise RuntimeError("Cannot export via HTML without wkhtmltopdf")
+
+        import pdfkit
+        from pypdf import PdfMerger
 
         options = cls.default_options.copy()
         options.update(kwargs)
@@ -54,7 +56,7 @@ class PDFViaHTMLExporter(BaseExporter):
             with open(html_path, "wb+") as f:
                 f.write(html.encode("utf-8"))
 
-        merger = PdfFileMerger()
+        merger = PdfMerger()
         for subnb in notebook_pdf_generator(nb):
             html, _ = nbconvert.export(exporter, subnb)
 
@@ -70,7 +72,7 @@ class PDFViaHTMLExporter(BaseExporter):
             output.write(pdf_contents)
             output.seek(0)
 
-            merger.append(output, import_bookmarks=False)
+            merger.append(output, import_outline=False)
 
         merger.write(dest)
 

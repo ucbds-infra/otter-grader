@@ -9,8 +9,8 @@ import re
 import string
 import shutil
 import tempfile
+import yaml
 
-from collections.abc import Mapping
 from contextlib import contextmanager, redirect_stdout
 from functools import lru_cache
 from IPython import get_ipython
@@ -22,15 +22,6 @@ NBFORMAT_VERSION = 4
 
 NOTEBOOK_METADATA_KEY = "otter"
 """the key used for all Otter metadata added to a notebook"""
-
-
-@contextmanager
-def block_print():
-    """
-    Context manager that disables printing to stdout
-    """
-    with open(os.devnull, "w") as f, redirect_stdout(f):
-        yield
 
 
 @contextmanager
@@ -200,88 +191,6 @@ def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs)
     print(out, **kwargs)
 
 
-# TODO: remove when Otter Assign format v0 is removed
-def convert_config_description_dict(configs, for_docs=False):
-    """
-    Recursively converts a documented list of dictionary configurations into a dictionary with the 
-    default values loaded.
-
-    Expects a list of the form:
-
-    .. code-block:: python
-
-        [
-            {
-                "key": "config_name",
-                "description": "a description of the config for documentation",
-                "default": True,  # the default config value
-            },
-            {
-                "key": "required_config_name",
-                "description": "a description of the config for documentation",
-                "required": True,  # indicates that this must be user-specified and has no default
-            },
-            {
-                "key": "nested_config_name",
-                "description": "a description of the config for documentation",
-                "default": None,
-                "subkeys": [  # note that a list is used for nested dict configs
-                    {
-                        "key": "subconfig",
-                        "description": "a nested key",
-                        "default": None,
-                    }
-                ],
-            },
-        ]
-
-    The list above gets converted to a dictionary mapping each ``key`` to each ``default``:
-
-    .. code-block:: python
-
-        {
-            "config_name": True,
-            "nested_config_name": None,
-        }
-
-    If ``for_docs`` is true, then any specified subkeys are set as the mapped value in the dictionary,
-    and if the config is required, its default is set to ``None``.
-
-    .. code-block:: python
-
-        {
-            "config_name": True,
-            "required_config_name": None,
-            "nested_config_name": {
-                "subconfig": None,
-            },
-        }
-
-    Any configurations with ``default`` unspecified have their default value set to ``None``. Any
-    configurations marked with ``"required": True`` are not included in the output dict (so that
-    they raise a ``KeyError`` if unspecified).
-
-    Args:
-        configs (``list[dict[str,object]]``): the configurations with the structure defined above
-
-    Returns:
-        ``dict[str,object]``: a dictionary mapping keys to default values
-    """
-    res = {}
-    for d in configs:
-        default = d.get("default")
-        subkeys = d.get("subkeys")
-        if isinstance(default, list) and len(default) > 0 and \
-                all(isinstance(e, dict) for e in default):
-            default = convert_config_description_dict(default)
-        elif for_docs and isinstance(subkeys, list) and len(subkeys) > 0 and \
-                all(isinstance(e, dict) for e in subkeys):
-            default = convert_config_description_dict(subkeys)
-        if not d.get("required", False) or for_docs:
-            res[d["key"]] = default
-    return res
-
-
 def assert_path_exists(path_tuples):
     """
     Ensure that a series of file paths exist and are of a specific type, or raise a ``ValueError``.
@@ -438,3 +347,22 @@ def import_or_raise(module):
         return importlib.import_module(module)
     except:
         raise ImportError(f"Could not import required module: {module}")
+
+
+class _CorrectIndentationDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, *args, **kwargs):
+        return super().increase_indent(flow=flow, indentless=False)
+
+
+def dump_yaml(o, **kwargs):
+    """
+    Dump an object to a YAML string using the ``_CorrectIndentationDumper`` dumper.
+
+    Args:
+        o (``object``): the object to dump
+        **kwargs: additional keyword arguments passed to ``yaml.dump``
+
+    Returns:
+        ``str``: the YAML representation of ``o``
+    """
+    return yaml.dump(o, sort_keys=False, Dumper=_CorrectIndentationDumper, **kwargs)

@@ -6,9 +6,10 @@ from glob import glob
 
 from .logs import LogEntry, EventType
 from .notebook import _OTTER_LOG_FILENAME
+from .utils import list_test_files
 
 from ..execute import grade_notebook
-from ..utils import block_print, loggers
+from ..utils import loggers
 
 
 _ALLOWED_EXTENSIONS = {".py", ".ipynb"}
@@ -21,7 +22,7 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
 
     Args:
         event_type (``otter.logs.EventType``): the type of event
-        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the 
+        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the
             results of any checks recorded by the entry
         question (``str``, optional): the question name for this check
         success (``bool``, optional): whether the operation was successful
@@ -32,8 +33,8 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
     LogEntry(
         event_type,
         results=results,
-        question=question, 
-        success=success, 
+        question=question,
+        success=success,
         error=error
     ).flush_to_file(_OTTER_LOG_FILENAME)
 
@@ -65,7 +66,7 @@ def main(file, *, tests_path="./tests", question=None, seed=None):
         else:
             LOGGER.info(f"Searching for test files in tests directory")
 
-            qs = glob(os.path.join(tests_path, "*.py"))
+            qs = list_test_files(tests_path)
 
             LOGGER.debug(f"Found test files: {', '.join(qs)}")
 
@@ -84,13 +85,14 @@ def main(file, *, tests_path="./tests", question=None, seed=None):
 
         LOGGER.debug(f"Seed value: {seed}")
         LOGGER.info("Grading submission")
-        with block_print():
-            results = grade_notebook(
-                file,
-                tests_glob=qs,
-                script=script,
-                seed=seed,
-            )
+
+        results = grade_notebook(
+            file,
+            tests_glob=qs,
+            test_dir=tests_path,
+            script=script,
+            seed=seed,
+        )
 
         percentage = results.total / results.possible
         LOGGER.debug(f"Determined score percentage: {percentage}")

@@ -99,16 +99,6 @@ be a string containing the file text. This method should return a properly-forma
 ``NotebookNode`` or string that will be executed in place of the student's original submission.
 
 
-``after_execution``
-+++++++++++++++++++
-
-The ``after_execution`` method will be called after the student's submission is executed but before 
-the results object is created. It will be passed the global environment resulting from the execution 
-of the student's code. Any changes made to the global environment will be reflected in the tests 
-that are run *after execution* (meaning any that do not have a call to ``otter.Notebook.check`` to 
-run them).
-
-
 ``after_grading``
 +++++++++++++++++
 

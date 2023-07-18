@@ -1,0 +1,39 @@
+name: otter-env
+channels:
+  - defaults
+  - conda-forge
+  - r
+dependencies:
+  - python=3.9
+  - pip
+  - nb_conda_kernels
+  - r-base>=4.0.0
+  - r-essentials
+  - r-devtools
+  - libgit2
+  - libgomp
+  - r-gert
+  - r-usethis
+  - r-testthat
+  - r-startup
+  - r-rmarkdown
+  - r-stringi
+  - pip:
+      - datascience
+      - jupyter_client
+      - ipykernel
+      - matplotlib
+      - pandas
+      - ipywidgets
+      - scipy
+      - seaborn
+      - scikit-learn
+      - jinja2
+      - nbconvert
+      - nbformat
+      - dill
+      - numpy
+      - gspread
+      - pypdf
+      - otter-grader==4.4.1
+      - rpy2

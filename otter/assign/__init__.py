@@ -1,6 +1,5 @@
 """Assignment creation tool for Otter-Grader"""
 
-import json
 import os
 import pathlib
 import warnings
@@ -17,8 +16,16 @@ from ..utils import chdir, get_relpath, knit_rmd_file, loggers
 LOGGER = loggers.get_logger(__name__)
 
 
-def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, password=None, 
-         debug=False, v0=False):
+def main(
+    master,
+    result,
+    *,
+    no_pdfs=False,
+    no_run_tests=False,
+    username=None,
+    password=None, 
+    debug=False,
+):
     """
     Runs Otter Assign on a master notebook.
 
@@ -31,17 +38,7 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
-        v0 (``bool``): whether to use Otter Assign Format v0 instead of v1
     """
-    if v0:
-        warnings.warn(
-            "The Otter Assign v0 format is now deprecated and will be removed in Otter v5.",
-            FutureWarning)
-
-        from .v0 import main as v0_main
-        return v0_main(master, result, no_pdfs=no_pdfs, no_run_tests=no_run_tests, username=username, 
-            password=password, debug=debug)
-
     LOGGER.debug(f"User-specified master path: {master}")
     LOGGER.debug(f"User-specified result path: {result}")
     master, result = pathlib.Path(os.path.abspath(master)), pathlib.Path(os.path.abspath(result))
@@ -61,17 +58,14 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
         # update seed variables
         if assignment.seed.variable:
             LOGGER.debug("Processing seed dict")
-            if assignment.generate_enabled:
-                LOGGER.debug("Otter Generate configuration found while processing seed dict")
-                assignment.generate.seed = assignment.seed.autograder_value
-                assignment.generate.seed_variable = assignment.seed.variable
-                LOGGER.debug("Added seed information to assignment.generate")
+            assignment.generate.seed = assignment.seed.autograder_value
+            assignment.generate.seed_variable = assignment.seed.variable
+            LOGGER.debug("Added seed information to assignment.generate")
 
         # check that we have a seed if needed
         if assignment.seed_required:
             LOGGER.debug("Assignment seed is required")
-            if assignment.generate_enabled and \
-                    not isinstance(assignment.generate.seed, int):
+            if not isinstance(assignment.generate.seed, int):
                 raise RuntimeError("Seeding cell found but no or invalid seed provided")
 
         plugins, pc = assignment.plugins, None
@@ -79,14 +73,12 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
             LOGGER.debug("Processing plugins")
             pc = PluginCollection(plugins, "", {})
             pc.run("during_assign", assignment)
-            if assignment.generate_enabled:
-                LOGGER.debug("Adding plugin configurations to Otter Generate configuration")
-                assignment.generate.plugins = assignment.generate.plugins + plugins
 
-        # generate Gradescope autograder zipfile
-        if assignment.generate_enabled:
-            LOGGER.info("Generating autograder zipfile")
-            run_generate_autograder(assignment, username, password, plugin_collection=pc)
+            LOGGER.debug("Adding plugin configurations to Otter Generate configuration")
+            assignment.generate.plugins = assignment.generate.plugins + plugins
+
+        LOGGER.info("Generating autograder zipfile")
+        run_generate_autograder(assignment, username, password, plugin_collection=pc)
 
         # generate PDF of solutions
         if assignment.solutions_pdf and not no_pdfs:
@@ -159,26 +151,12 @@ def main(master, result, *, no_pdfs=False, no_run_tests=False, username=None, pa
                 write_otter_config_file(assignment)
 
         # run tests on autograder notebook
-        if assignment.run_tests and not no_run_tests and assignment.is_python:
+        if assignment.run_tests and not no_run_tests:
             LOGGER.info("Running tests against the solutions notebook")
 
-            seed = assignment.generate.seed if assignment.generate_enabled else None
-            LOGGER.debug(f"Resolved seed for running tests: {seed}")
-
-            if assignment.generate_enabled:
-                LOGGER.debug("Retrieving updated plugins from otter_config.json for running tests")
-                test_pc = PluginCollection(
-                    assignment.generate.plugins, assignment.ag_notebook_path, {})
-
-            else:
-                LOGGER.debug("Using pre-configured plugins for running tests")
-                test_pc = pc
-
-            run_tests(
-                assignment.get_ag_path(master.name),
-                debug=debug,
-                seed=seed,
-                plugin_collection=test_pc,
-            )
+            run_tests(assignment, debug=debug)
 
             LOGGER.info("All autograder tests passed.")
+
+        else:
+            LOGGER.info("Skipping tests")
