@@ -1,6 +1,6 @@
 # Changelog
 
-**v5.0.1 (unreleased):**
+**v5.0.1:**
 
 * Added `nbconvert` as a required dependency for non-WASM environments
 
