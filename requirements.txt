@@ -11,3 +11,4 @@ click
 fica>=0.2.0
 ipython
 astunparse
+nbconvert; sys_platform!='emscripten' and sys_platform!='wasi'
