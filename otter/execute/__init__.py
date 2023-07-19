@@ -4,7 +4,6 @@ import nbformat
 import pickle
 import tempfile
 
-from nbconvert.preprocessors import ExecutePreprocessor
 from traitlets.config import Config
 
 from .checker import Checker
@@ -53,6 +52,8 @@ def grade_notebook(
     Returns:
         ``otter.test_files.GradingResults``: the results of grading
     """
+    from nbconvert.preprocessors import ExecutePreprocessor
+
     if not script:
         nb = nbformat.read(submission_path, as_version=NBFORMAT_VERSION)
 
