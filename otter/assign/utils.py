@@ -364,10 +364,10 @@ def add_assignment_name_to_notebook(nb, assignment):
 def add_require_no_pdf_ack_to_notebook(nb, assignment):
     """
     """
-    if assignment.require_no_pdf_ack:
+    if assignment.export_cell and assignment.export_cell.require_no_pdf_ack:
         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
             nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
-        nb["metadata"][NO_PDF_EXPORT_MESSAGE_KEY][REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY] = True
-        if isinstance(assignment.require_no_pdf_ack, fica.Config):
+        nb["metadata"][NOTEBOOK_METADATA_KEY][REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY] = True
+        if isinstance(assignment.export_cell.require_no_pdf_ack, fica.Config):
             nb["metadata"][NOTEBOOK_METADATA_KEY][NO_PDF_EXPORT_MESSAGE_KEY] = \
-                assignment.require_no_pdf_ack.message
+                assignment.export_cell.require_no_pdf_ack.message
