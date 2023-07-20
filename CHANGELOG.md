@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.1.0 (unreleased):**
+
+* Added a configuration to require students to acknowledge when a PDF of their notebook cannot be generated when using `Notebook.export` before exporting the zip file per [#599](https://github.com/ucbds-infra/otter-grader/issues/599)
+
 **v5.0.1:**
 
 * Added `nbconvert` as a required dependency for non-WASM environments
