@@ -1,5 +1,10 @@
 # Changelog
 
+**v5.1.0 (unreleased):**
+
+* Added notebook force-save to R notebook assignments per [#474](https://github.com/ucbds-infra/otter-grader/issues/474)
+* Updated default version of `ottr` to v1.4.0
+
 **v5.0.1:**
 
 * Added `nbconvert` as a required dependency for non-WASM environments
