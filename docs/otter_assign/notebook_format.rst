@@ -17,6 +17,8 @@ available in Python that are not available in R, and these are noted below, but 
 are the same.
 
 
+.. TODO: add docmentation for message
+
 .. _otter_assign_assignment_metadata:
 
 Assignment Config
