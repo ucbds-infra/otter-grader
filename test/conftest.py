@@ -15,6 +15,7 @@ from .utils import TestFileManager
 
 FILE_MANAGER = TestFileManager(__file__)
 REPO_DIR = os.getcwd()
+REAL_DOCKER_BUILD = docker.build
 
 
 def pytest_addoption(parser):
@@ -100,7 +101,7 @@ def add_repo_dir_to_context_then_build(*args, **kwargs):
     """
     temp_dir = args[0]
     os.symlink(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
-    docker.build(*args, **kwargs)
+    REAL_DOCKER_BUILD(*args, **kwargs)
 
 
 @pytest.fixture(autouse=True)
