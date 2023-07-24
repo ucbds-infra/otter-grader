@@ -72,19 +72,9 @@ def expected_points():
     return test_points
 
 
-@pytest.fixture
-def image_name():
-    """
-    A fixture that returns the name of the Docker image to use as the base image.
-    """
-    if docker.image.exists("otter-test"):
-        return "otter-test"
-    return "ubuntu:22.04"
-
-
 @pytest.mark.slow
 @pytest.mark.docker
-def test_timeout(image_name):
+def test_timeout():
     """
     Check that the notebook ``1min.ipynb`` is killed due to exceeding the defined timeout.
     """
@@ -98,13 +88,12 @@ def test_timeout(image_name):
             autograder = AG_ZIP_PATH,
             containers = 5,
             timeout = 59,
-            image = image_name,
         )
 
 
 @pytest.mark.slow
 @pytest.mark.docker
-def test_network(expected_points, image_name):
+def test_network(expected_points):
     """
     Check that the notebook ``network.ipynb`` is unable to do some network requests with disabled
     networking.
@@ -116,7 +105,6 @@ def test_network(expected_points, image_name):
         autograder = AG_ZIP_PATH,
         containers = 5,
         no_network = True,
-        image = image_name,
     )
 
     df_test = pd.read_csv("test/final_grades.csv")
@@ -134,7 +122,7 @@ def test_network(expected_points, image_name):
 
 @pytest.mark.slow
 @pytest.mark.docker
-def test_notebooks_with_pdfs(expected_points, image_name):
+def test_notebooks_with_pdfs(expected_points):
     """
     Checks that notebooks are graded correctly and that PDFs are generated.
     """
@@ -145,7 +133,6 @@ def test_notebooks_with_pdfs(expected_points, image_name):
         autograder = AG_ZIP_PATH,
         containers = 5,
         pdfs = True,
-        image = image_name,
     )
 
     # read the output and expected output
@@ -215,7 +202,7 @@ def test_single_notebook_grade(mocked_launch_grade):
     mocked_launch_grade.return_value = [df]
 
     output = grade(
-        name = "foo",
+        name = ASSIGNMENT_NAME,
         paths = [notebook_path],
         output_dir = "test/",
         # the value of the autograder argument doesn't matter, it just needs to be a valid file path
@@ -246,7 +233,7 @@ def test_config_overrides(mocked_launch_grade):
 
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
     grade(
-        name = "foo",
+        name = ASSIGNMENT_NAME,
         paths = [notebook_path],
         output_dir = "test/",
         # the value of the autograder argument doesn't matter, it just needs to be a valid file path
@@ -275,7 +262,7 @@ def test_config_overrides_integration():
         zf.write(notebook_path, arcname="passesAll.ipynb")
 
     output = grade(
-        name = "foo",
+        name = ASSIGNMENT_NAME,
         paths = [ZIP_SUBM_PATH],
         output_dir = "test/",
         # the value of the autograder argument doesn't matter, it just needs to be a valid file path
