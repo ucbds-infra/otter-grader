@@ -23,6 +23,10 @@ jobs:
       DOCKER_BUILDKIT: 1
       DOCKER_CLI_EXPERIMENTAL: enabled
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - uses: actions/checkout@v2
 
