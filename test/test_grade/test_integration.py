@@ -191,7 +191,7 @@ def test_single_notebook_grade(mocked_launch_grade):
     kw_expected = {
         "num_containers": 1,
         "base_image": "ubuntu:22.04",
-        "tag": "foo",
+        "tag": ASSIGNMENT_NAME,
         "no_kill": False,
         "pdf_dir": None,
         "timeout": None,
