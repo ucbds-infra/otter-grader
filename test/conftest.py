@@ -9,7 +9,6 @@ from python_on_whales import docker
 from unittest import mock
 
 from otter import __file__ as OTTER_PATH
-# from otter.grade.containers import build_image
 
 from .utils import TestFileManager
 
@@ -82,7 +81,9 @@ def disable_assign_pdf_generation(pdfs_enabled):
 
 @pytest.fixture(autouse=True, scope="session")
 def update_grade_dockerfile():
-    """"""
+    """
+    Update the Dockerfile used in otter grade to install the contents of this repo.
+    """
     with open("otter/grade/Dockerfile") as f:
         contents = f.read()
 
@@ -101,7 +102,6 @@ def add_repo_dir_to_context_then_build(*args, **kwargs):
     copy of Otter with all local edits.
     """
     temp_dir = args[0]
-    # os.symlink(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
     shutil.copytree(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
     REAL_DOCKER_BUILD(*args, **kwargs)
 
