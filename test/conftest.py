@@ -2,6 +2,7 @@ import nbformat as nbf
 import pathlib
 import pytest
 import os
+import shutil
 
 from contextlib import nullcontext
 from python_on_whales import docker
@@ -100,7 +101,8 @@ def add_repo_dir_to_context_then_build(*args, **kwargs):
     copy of Otter with all local edits.
     """
     temp_dir = args[0]
-    os.symlink(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
+    # os.symlink(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
+    shutil.copytree(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
     REAL_DOCKER_BUILD(*args, **kwargs)
 
 
