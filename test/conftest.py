@@ -75,6 +75,22 @@ def disable_assign_pdf_generation(pdfs_enabled):
         yield
 
 
+
+@pytest.fixture(autouse=True, scope="session")
+def update_grade_dockerfile():
+    """"""
+    with open("otter/grade/Dockerfile") as f:
+        contents = f.read()
+    
+    with open("otter/grade/Dockerfile", "a") as f1, FILE_MANAGER.open("partial-dockerfile.txt") as f2:
+        f1.write("\n" + f2.read())
+
+    yield
+
+    with open("otter/grade/Dockerfile", "w") as f:
+        f.write(contents)
+
+
 def build_image_with_local_changes(*args, **kwargs):
     """
     Build the normal Otter Grade Docker image and then overwrite it with a new one containing a
@@ -94,10 +110,10 @@ def build_image_with_local_changes(*args, **kwargs):
     return image
 
 
-@pytest.fixture(autouse=True)
-def patch_build_image():
-    with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes):
-        yield
+# @pytest.fixture(autouse=True)
+# def patch_build_image():
+#     with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes):
+#         yield
 
 
 @pytest.fixture(autouse=True)
