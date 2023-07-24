@@ -84,10 +84,11 @@ def build_image_with_local_changes(*args, **kwargs):
 
     docker.build(
         ".",
-        build_args={"BASE_IMAGE": image},
+        # build_args={"BASE_IMAGE": image},
         tags=[image],
         file=FILE_MANAGER.get_path("Dockerfile"),
         load=True,
+        build_contexts={"base_image": f"docker-image://{image}"},
     )
 
     return image
