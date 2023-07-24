@@ -103,7 +103,7 @@ def add_repo_dir_to_context_then_build(*args, **kwargs):
     """
     temp_dir = args[0]
     shutil.copytree(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
-    REAL_DOCKER_BUILD(*args, **kwargs)
+    REAL_DOCKER_BUILD(*args, **kwargs, cache_from="type=gha", cache_to="type=gha,mode=max")
 
 
 @pytest.fixture(autouse=True)
