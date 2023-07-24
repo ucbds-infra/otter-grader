@@ -42,14 +42,13 @@ jobs:
             bash
           cache-environment: true
 
-      # - name: Install ottr
-      #   run: |
-      #     mamba run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.r-project.org/")'
+      - name: Install ottr
+        run: |
+          micromamba run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.r-project.org/")'
 
       - name: Run tests
         run: |
-          mamba run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.r-project.org/")'
-          mamba activate otter-grader
+          micromamba activate otter-grader
           make testcov PYTESTOPTS="-vv" && coverage xml -i
 
       - uses: codecov/codecov-action@v3
