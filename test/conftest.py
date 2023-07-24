@@ -1,8 +1,10 @@
 import nbformat as nbf
 import pathlib
 import pytest
+import os
 
 from contextlib import nullcontext
+from jinja2 import Template
 from python_on_whales import docker
 from unittest import mock
 
@@ -81,9 +83,9 @@ def update_grade_dockerfile():
     """"""
     with open("otter/grade/Dockerfile") as f:
         contents = f.read()
-    
-    with open("otter/grade/Dockerfile", "a") as f1, FILE_MANAGER.open("partial-dockerfile.txt") as f2:
-        f1.write("\n" + f2.read())
+
+    with open("otter/grade/Dockerfile", "a") as f1, FILE_MANAGER.open("partial-dockerfile.j2") as f2:
+        f1.write(Template("\n" + f2.read()).render({"repo_dir": os.getcwd()}))
 
     yield
 
