@@ -4,17 +4,17 @@ import pytest
 import os
 
 from contextlib import nullcontext
-from jinja2 import Template
 from python_on_whales import docker
 from unittest import mock
 
 from otter import __file__ as OTTER_PATH
-from otter.grade.containers import build_image
+# from otter.grade.containers import build_image
 
 from .utils import TestFileManager
 
 
 FILE_MANAGER = TestFileManager(__file__)
+REPO_DIR = os.getcwd()
 
 
 def pytest_addoption(parser):
@@ -84,8 +84,8 @@ def update_grade_dockerfile():
     with open("otter/grade/Dockerfile") as f:
         contents = f.read()
 
-    with open("otter/grade/Dockerfile", "a") as f1, FILE_MANAGER.open("partial-dockerfile.j2") as f2:
-        f1.write(Template("\n" + f2.read()).render({"repo_dir": os.getcwd()}))
+    with open("otter/grade/Dockerfile", "a") as f1, FILE_MANAGER.open("partial-dockerfile.txt") as f2:
+        f1.write("\n" + f2.read())
 
     yield
 
@@ -93,29 +93,20 @@ def update_grade_dockerfile():
         f.write(contents)
 
 
-def build_image_with_local_changes(*args, **kwargs):
+def add_repo_dir_to_context_then_build(*args, **kwargs):
     """
     Build the normal Otter Grade Docker image and then overwrite it with a new one containing a
     copy of Otter with all local edits.
     """
-    image = build_image(*args, **kwargs)
-
-    docker.build(
-        ".",
-        # build_args={"BASE_IMAGE": image},
-        tags=[image],
-        file=FILE_MANAGER.get_path("Dockerfile"),
-        load=True,
-        build_contexts={"base_image": f"docker-image://{image}"},
-    )
-
-    return image
+    temp_dir = args[0]
+    os.symlink(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
+    docker.build(*args, **kwargs)
 
 
-# @pytest.fixture(autouse=True)
-# def patch_build_image():
-#     with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes):
-#         yield
+@pytest.fixture(autouse=True)
+def patch_docker_build():
+    with mock.patch("otter.grade.containers.docker.build", wraps=add_repo_dir_to_context_then_build):
+        yield
 
 
 @pytest.fixture(autouse=True)

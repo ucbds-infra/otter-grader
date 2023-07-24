@@ -1,4 +1,4 @@
 ENV PATH=/root/mambaforge/bin:$PATH
-ADD {{ repo_dir }} /tmp/otter-grader
+ADD __otter-grader /tmp/otter-grader
 RUN mamba run -n otter-env pip install /tmp/otter-grader
 RUN rm -rf /tmp/*
