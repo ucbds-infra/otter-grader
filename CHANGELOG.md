@@ -1,6 +1,6 @@
 # Changelog
 
-**v5.0.2 (unreleased):**
+**v5.0.2:**
 
 * Fixed local submission zip checking with `otter.Notebook` per [#678](https://github.com/ucbds-infra/otter-grader/issues/678)
 
