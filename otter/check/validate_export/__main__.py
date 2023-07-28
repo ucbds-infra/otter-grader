@@ -30,6 +30,7 @@ def main():
 
         results = grade_notebook(
             nb_path,
+            test_dir=args.tests_dir,
             tests_glob=glob(args.tests_dir + "/*.py"),
             cwd=os.getcwd()
         )

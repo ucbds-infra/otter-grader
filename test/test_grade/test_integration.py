@@ -9,6 +9,7 @@ import shutil
 import zipfile
 
 from glob import glob
+from python_on_whales import docker
 from unittest import mock
 
 from otter.generate import main as generate
@@ -103,7 +104,7 @@ def test_network(expected_points):
         output_dir = "test/",
         autograder = AG_ZIP_PATH,
         containers = 5,
-        no_network=True,
+        no_network = True,
     )
 
     df_test = pd.read_csv("test/final_grades.csv")
@@ -190,7 +191,7 @@ def test_single_notebook_grade(mocked_launch_grade):
     kw_expected = {
         "num_containers": 1,
         "base_image": "ubuntu:22.04",
-        "tag": "foo",
+        "tag": ASSIGNMENT_NAME,
         "no_kill": False,
         "pdf_dir": None,
         "timeout": None,
@@ -201,7 +202,7 @@ def test_single_notebook_grade(mocked_launch_grade):
     mocked_launch_grade.return_value = [df]
 
     output = grade(
-        name = "foo",
+        name = ASSIGNMENT_NAME,
         paths = [notebook_path],
         output_dir = "test/",
         # the value of the autograder argument doesn't matter, it just needs to be a valid file path
@@ -232,7 +233,7 @@ def test_config_overrides(mocked_launch_grade):
 
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
     grade(
-        name = "foo",
+        name = ASSIGNMENT_NAME,
         paths = [notebook_path],
         output_dir = "test/",
         # the value of the autograder argument doesn't matter, it just needs to be a valid file path
@@ -261,7 +262,7 @@ def test_config_overrides_integration():
         zf.write(notebook_path, arcname="passesAll.ipynb")
 
     output = grade(
-        name = "foo",
+        name = ASSIGNMENT_NAME,
         paths = [ZIP_SUBM_PATH],
         output_dir = "test/",
         # the value of the autograder argument doesn't matter, it just needs to be a valid file path

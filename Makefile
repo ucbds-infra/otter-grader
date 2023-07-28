@@ -1,24 +1,28 @@
 PYTEST           = pytest
 TESTPATH         = test
-PYTESTOPTS       = -v
+PYTESTOPTS       =
 COVERAGE         = coverage
 DOCKER           = true
 SLOW             = true
 
+_PYTESTOPTS      := -vv --durations=0
+
 ifeq ($(DOCKER), false)
-	PYTESTOPTS := $(PYTESTOPTS) -m "not docker"
+	_PYTESTOPTS := $(_PYTESTOPTS) -m "not docker"
 endif
 
 ifeq ($(SLOW), false)
-	PYTESTOPTS := $(PYTESTOPTS) -m "not slow"
+	_PYTESTOPTS := $(_PYTESTOPTS) -m "not slow"
 endif
+
+_PYTESTOPTS := $(_PYTESTOPTS) $(PYTESTOPTS)
 
 .PHONY: test
 test:
-	$(PYTEST) $(TESTPATH) $(PYTESTOPTS)
+	$(PYTEST) $(TESTPATH) $(_PYTESTOPTS)
 
 testcov:
-	$(COVERAGE) run -m pytest $(TESTPATH) $(PYTESTOPTS)
+	$(COVERAGE) run -m pytest $(TESTPATH) $(_PYTESTOPTS)
 
 htmlcov: testcov
 	$(COVERAGE) html
