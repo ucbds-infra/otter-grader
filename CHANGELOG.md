@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.0.2 (unreleased):**
+
+* Fixed local submission zip checking with `otter.Notebook` per [#678](https://github.com/ucbds-infra/otter-grader/issues/678)
+
 **v5.0.1:**
 
 * Added `nbconvert` as a required dependency for non-WASM environments
