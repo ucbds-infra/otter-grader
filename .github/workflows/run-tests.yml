@@ -6,13 +6,13 @@ on:
   push:
     branches:
       - master
-      - stable
       - beta
+      - release
   pull_request:
     branches:
       - master
-      - stable
       - beta
+      - release
   workflow_dispatch:
 
 jobs:
