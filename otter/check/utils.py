@@ -1,6 +1,6 @@
 """Utilities for Otter Check"""
 
-import ipylab # TODO: does this need to be inside a function?
+import ipylab
 import nbformat as nbf
 import os
 import sys
@@ -302,6 +302,12 @@ def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
 
 def display_pdf_confirmation_widget(message, callback):
     """
+    Display a widget to the user to acknowledge that a PDF will not be included in their submission
+    zip.
+
+    Args:
+        message (``str | None``): a custom message to use
+        callback (``callable[]``): a callback function to execute after the user ACKs
     """
     o = Output()
     def wrapped_callback(*args):

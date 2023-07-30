@@ -351,6 +351,12 @@ def add_assignment_name_to_notebook(nb, assignment):
 
 def add_require_no_pdf_ack_to_notebook(nb, assignment):
     """
+    Add the no PDF ACK configurtion from the assignment config to the provided notebook's metadata
+    in-place.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to add the name to
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
     """
     if assignment.export_cell and assignment.export_cell.require_no_pdf_ack:
         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
