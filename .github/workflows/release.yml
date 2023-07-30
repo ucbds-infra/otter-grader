@@ -32,17 +32,6 @@ jobs:
         run: |
           python3 -m pip install -r requirements.txt twine wheel setuptools
 
-      - name: Checkout to stable
-        uses: actions/checkout@v2
-        with:
-          ref: stable
-
-      - name: Merge master -> stable
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git merge origin/master -Xtheirs --allow-unrelated-histories
-
       - name: Update versions
         run: |
           python3 release.py ${{ github.event.inputs.version }}
@@ -53,8 +42,11 @@ jobs:
 
       - name: Commit and push
         run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release
           git commit -am 'release v${{ github.event.inputs.version }}'
-          git push origin stable
+          git push --set-upstream origin release
 
       - name: Create dist and push to PyPI
         env:
@@ -73,9 +65,14 @@ jobs:
             hub release create -a dist/*.tar.gz -a dist/*.whl \
             -m 'v${{ github.event.inputs.version }}' 'v${{ github.event.inputs.version }}'
 
-      - name: PR stable -> main
+      - name: Create a latest tag
+        run: |
+          git tag -f latest
+          git push --force origin latest
+
+      - name: PR release -> main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          hub pull-request -b ucbds-infra:master -h ucbds-infra:stable -l "release" -r chrispyles \
+          hub pull-request -b ucbds-infra:master -h ucbds-infra:release -l "release" -r chrispyles \
             -m "Release v${{ github.event.inputs.version }}"$'\n'$'\n'"Updates from the release of version ${{ github.event.inputs.version }}"
