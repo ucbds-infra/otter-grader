@@ -24,7 +24,7 @@ from ..version import __version__
 
 DEFAULT_PYTHON_VERSION = "3.9"
 OTTER_ENV_NAME = "otter-env"
-OTTR_VERSION = "1.2.0"
+OTTR_VERSION = "1.4.0"
 TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
 GENERAL_TEMPLATE_DIR = os.path.join(TEMPLATE_DIR, "general")
 

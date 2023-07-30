@@ -109,10 +109,6 @@ class NotebookTransformer:
             transformed_cells += self.cell_factory.create_check_all_cells()
 
         if self.assignment.export_cell:
-            export_cell = self.assignment.export_cell
-            if export_cell is True:
-                export_cell = {}
-
             transformed_cells += self.cell_factory.create_export_cells()
 
         transformed_nb = copy.deepcopy(nb)
