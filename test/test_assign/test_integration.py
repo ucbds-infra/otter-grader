@@ -237,3 +237,39 @@ def test_jupyterlite(generate_master_notebook):
         FILE_MANAGER.get_path("jupyterlite-correct"),
         assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
+
+
+def test_require_no_pdf_ack(generate_master_notebook):
+    """
+    Tests that Otter Assign produces correct notebooks when configured to require students to
+    acknowledge when a PDF cannot be included in their submission zip.
+    """
+    master_nb_path = generate_master_notebook({
+        "export_cell": {
+            "require_no_pdf_ack": True,
+        },
+    })
+    assign_and_check_output(
+        master_nb_path,
+        FILE_MANAGER.get_path("no-pdf-ack-correct"),
+        assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
+    )
+
+
+# TODO: this format of test makes the repo bloated with several golden files. Can these files be
+# eliminated?
+def test_require_no_pdf_ack_with_message(generate_master_notebook):
+    """
+    Tests that Otter Assign produces correct notebooks when configured to require students to
+    acknowledge when a PDF cannot be included in their submission zip with a custom message.
+    """
+    master_nb_path = generate_master_notebook({
+        "export_cell": {
+            "require_no_pdf_ack": {"message": "no pdf could be created"},
+        },
+    })
+    assign_and_check_output(
+        master_nb_path,
+        FILE_MANAGER.get_path("no-pdf-ack-with-message-correct"),
+        assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
+    )

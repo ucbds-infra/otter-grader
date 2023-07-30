@@ -23,6 +23,18 @@ NBFORMAT_VERSION = 4
 NOTEBOOK_METADATA_KEY = "otter"
 """the key used for all Otter metadata added to a notebook"""
 
+REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY = "require_no_pdf_confirmation"
+"""
+the key in Otter's notebook metadata for requiring students to acknowledge that their notebook could
+not be exported as a PDF before creating the submission zip file
+"""
+
+NO_PDF_EXPORT_MESSAGE_KEY = "export_pdf_failure_message"
+"""
+the key in Otter's notebook metadata for the message to show if a notebook cannot be exported as a
+PDF
+"""
+
 
 @contextmanager
 def hide_outputs():

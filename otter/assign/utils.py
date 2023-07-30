@@ -1,6 +1,7 @@
 """Utilities for Otter Assign"""
 
 import copy
+import fica
 import json
 import os
 import pathlib
@@ -13,7 +14,13 @@ from textwrap import indent
 
 from ..api import grade_submission
 from ..generate import main as generate_autograder
-from ..utils import get_source, NOTEBOOK_METADATA_KEY, loggers
+from ..utils import (
+    get_source,
+    loggers,
+    NO_PDF_EXPORT_MESSAGE_KEY,
+    NOTEBOOK_METADATA_KEY,
+    REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY,
+)
 
 
 LOGGER = loggers.get_logger(__name__)
@@ -340,3 +347,21 @@ def add_assignment_name_to_notebook(nb, assignment):
         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
             nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
         nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_name"] = assignment.name
+
+
+def add_require_no_pdf_ack_to_notebook(nb, assignment):
+    """
+    Add the no PDF ACK configurtion from the assignment config to the provided notebook's metadata
+    in-place.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to add the name to
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+    """
+    if assignment.export_cell and assignment.export_cell.require_no_pdf_ack:
+        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+            nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
+        nb["metadata"][NOTEBOOK_METADATA_KEY][REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY] = True
+        if isinstance(assignment.export_cell.require_no_pdf_ack, fica.Config):
+            nb["metadata"][NOTEBOOK_METADATA_KEY][NO_PDF_EXPORT_MESSAGE_KEY] = \
+                assignment.export_cell.require_no_pdf_ack.message

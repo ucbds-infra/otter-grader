@@ -1,8 +1,8 @@
 """Utilities for Otter Check"""
 
+import ipylab
 import nbformat as nbf
 import os
-import requests
 import sys
 import tempfile
 import time
@@ -12,6 +12,7 @@ from enum import Enum
 from glob import glob
 from IPython import get_ipython
 from IPython.display import display, Javascript
+from ipywidgets import Button, HTML, Output, VBox
 from subprocess import run, PIPE
 
 from .logs import EventType
@@ -33,14 +34,19 @@ def save_notebook(filename, timeout=10):
     if get_ipython() is not None:
         orig_mod_time = os.path.getmtime(filename)
         start = time.time()
+
+        # For classic notebooks
         display(Javascript("""
             if (typeof Jupyter !== 'undefined') {
                 Jupyter.notebook.save_checkpoint();
             }
-            else {
-                document.querySelector('[data-command="docmanager:save"]').click();
-            }
         """))
+
+        # For JupyterLab
+        try:
+            app = ipylab.JupyterFrontEnd()
+            app.commands.execute("docmanager:save")
+        except: pass
 
         while time.time() - start < timeout:
             curr_mod_time = os.path.getmtime(filename)
@@ -292,3 +298,28 @@ def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
         test_name = question
 
     return test_path, test_name
+
+
+def display_pdf_confirmation_widget(message, callback):
+    """
+    Display a widget to the user to acknowledge that a PDF will not be included in their submission
+    zip.
+
+    Args:
+        message (``str | None``): a custom message to use
+        callback (``callable[]``): a callback function to execute after the user ACKs
+    """
+    o = Output()
+    def wrapped_callback(*args):
+        with o: callback()
+
+    if not message:
+        message = "Your notebook could not be exported as a PDF. To continue exporting your " \
+            "submission, please click the button below."
+
+    t = HTML(f"""<p style="margin: 0">{message}</p>""")
+    b = Button(description="Continue export", button_style="warning")
+    b.on_click(wrapped_callback)
+    m = HTML("""<div style="height: 10px; width: 100%"></div>""")
+    
+    display(VBox([t, b, m, o]))

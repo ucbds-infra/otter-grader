@@ -104,6 +104,20 @@ class Assignment(fica.Config, Loggable):
             default=[],
         )
 
+        class RequireNoPDFAckValue(fica.Config):
+
+            message: str = fica.Key(
+                description="a message to show to students if a PDF is meant to be included in " \
+                    "the submission but cannot be generated",
+            )
+
+        require_no_pdf_ack: Union[bool, RequireNoPDFAckValue] = fica.Key(
+            description="whether to require students to acknowledge that a PDF could not be " \
+                "created if one is meant to be included in the submission zip file",
+            default=False,
+            subkey_container=RequireNoPDFAckValue,
+        )
+
     export_cell: ExportCellValue = fica.Key(
         description="whether to include an Otter export cell in the output notebooks",
         subkey_container=ExportCellValue,

@@ -11,11 +11,24 @@ from .plugins import replace_plugins_with_calls
 from .question_config import QuestionConfig
 from .r_adapter import rmarkdown_converter
 from .r_adapter.cell_factory import RCellFactory
-from .solutions import has_seed, SOLUTION_CELL_TAG, overwrite_seed_vars, strip_ignored_lines, \
-    strip_solutions_and_output
+from .solutions import (
+    has_seed,
+    SOLUTION_CELL_TAG,
+    overwrite_seed_vars,
+    strip_ignored_lines,
+    strip_solutions_and_output,
+)
 from .tests_manager import AssignmentTestsManager
-from .utils import add_tag, add_assignment_name_to_notebook, AssignNotebookFormatException, \
-    get_source, is_cell_type, is_ignore_cell, lock
+from .utils import (
+    add_tag,
+    add_assignment_name_to_notebook,
+    add_require_no_pdf_ack_to_notebook,
+    AssignNotebookFormatException,
+    get_source,
+    is_cell_type,
+    is_ignore_cell,
+    lock,
+)
 
 
 class NotebookTransformer:
@@ -121,6 +134,8 @@ class NotebookTransformer:
         transformed_nb = strip_ignored_lines(transformed_nb)
 
         add_assignment_name_to_notebook(transformed_nb, self.assignment)
+
+        add_require_no_pdf_ack_to_notebook(transformed_nb, self.assignment)
 
         return TransformedNotebookContainer(transformed_nb, self)
 
