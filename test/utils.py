@@ -1,5 +1,6 @@
 """Utilities for Otter's testing suite"""
 
+import nbformat as nbf
 import os
 import pathlib
 import pprint
@@ -43,13 +44,22 @@ class TestFileManager:
         return file_manager
 
 
-# def create_cleanup_fixture() # TODO
+def assert_notebooks_equal(p1, p2):
+    nb1, nb2 = nbf.read(p1, as_version=nbf.NO_CONVERT), nbf.read(p2, as_version=nbf.NO_CONVERT)
+    # ignore cell IDs
+    for c in [*nb1.cells, *nb2.cells]:
+        c.pop("id", None)
+    assert nb1 == nb2
 
 
 def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
     """
     Assert that two files have the same conents, optionally ignoring trailing whitespace.
     """
+    assert os.path.splitext(p1)[1] == os.path.splitext(p2)[1]
+    if os.path.splitext(p1)[1] == ".ipynb":
+        assert_notebooks_equal(p1, p2)
+        return
     try:
         with open(p1) as f1:
             with open(p2) as f2:
