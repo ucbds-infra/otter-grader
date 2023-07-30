@@ -258,9 +258,11 @@ class Assignment(fica.Config, Loggable):
         self._logger.debug(f"Initializing with config: {user_config}")
         super().__init__(user_config, **kwargs)
 
-        # convert a boolean to a config object for self.generate if indicated
+        # convert true values masking subkey contains to those containers
         if self.generate is True:
             self.generate = AutograderConfig()
+        if self.export_cell is True:
+            self.export_cell = type(self).ExportCellValue()
 
         if self.variables:
             warnings.warn(
@@ -272,6 +274,8 @@ class Assignment(fica.Config, Loggable):
         ret = super().update(user_config)
         if self.generate is True:
             self.generate = AutograderConfig()
+        if self.export_cell is True:
+            self.export_cell = type(self).ExportCellValue()
         return ret
 
     @property

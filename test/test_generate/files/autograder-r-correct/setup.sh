@@ -32,4 +32,4 @@ mamba env create -f /autograder/source/environment.yml
 mamba init --all
 
 # install ottr
-mamba run -n otter-env Rscript -e 'install.packages("https://cran.r-project.org/package=ottr&version=1.2.0", dependencies=TRUE, repos=NULL)'
+mamba run -n otter-env Rscript -e 'install.packages("https://cran.r-project.org/package=ottr&version=1.4.0", dependencies=TRUE, repos=NULL)'

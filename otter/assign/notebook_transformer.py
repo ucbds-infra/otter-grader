@@ -28,7 +28,6 @@ from .utils import (
     is_cell_type,
     is_ignore_cell,
     lock,
-    remove_cell_ids,
 )
 
 
@@ -123,10 +122,6 @@ class NotebookTransformer:
             transformed_cells += self.cell_factory.create_check_all_cells()
 
         if self.assignment.export_cell:
-            export_cell = self.assignment.export_cell
-            if export_cell is True:
-                export_cell = {}
-
             transformed_cells += self.cell_factory.create_export_cells()
 
         transformed_nb = copy.deepcopy(nb)
@@ -137,10 +132,6 @@ class NotebookTransformer:
 
         # strip out ignored lines
         transformed_nb = strip_ignored_lines(transformed_nb)
-
-        # TODO: this is a bad practice and only a monkey-patch for #340. we should do some better
-        # parsing of the nbformat version info to determine if this is necessary.
-        remove_cell_ids(transformed_nb)
 
         add_assignment_name_to_notebook(transformed_nb, self.assignment)
 
