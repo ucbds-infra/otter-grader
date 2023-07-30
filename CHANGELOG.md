@@ -2,6 +2,7 @@
 
 **v5.1.0 (unreleased):**
 
+* Removed patch that strips cell IDs from notebooks in Otter Assign per [#677](https://github.com/ucbds-infra/otter-grader/issues/677)
 * Added notebook force-save to R notebook assignments per [#474](https://github.com/ucbds-infra/otter-grader/issues/474)
 * Updated default version of `ottr` to v1.4.0
 
