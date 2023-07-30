@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.1.0 (unreleased):**
+
+* Removed patch that strips cell IDs from notebooks in Otter Assign per [#677](https://github.com/ucbds-infra/otter-grader/issues/677)
+
 **v5.0.2:**
 
 * Fixed local submission zip checking with `otter.Notebook` per [#678](https://github.com/ucbds-infra/otter-grader/issues/678)

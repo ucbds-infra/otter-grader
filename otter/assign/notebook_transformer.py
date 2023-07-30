@@ -15,7 +15,7 @@ from .solutions import has_seed, SOLUTION_CELL_TAG, overwrite_seed_vars, strip_i
     strip_solutions_and_output
 from .tests_manager import AssignmentTestsManager
 from .utils import add_tag, add_assignment_name_to_notebook, AssignNotebookFormatException, \
-    get_source, is_cell_type, is_ignore_cell, lock, remove_cell_ids
+    get_source, is_cell_type, is_ignore_cell, lock
 
 
 class NotebookTransformer:
@@ -123,10 +123,6 @@ class NotebookTransformer:
 
         # strip out ignored lines
         transformed_nb = strip_ignored_lines(transformed_nb)
-
-        # TODO: this is a bad practice and only a monkey-patch for #340. we should do some better
-        # parsing of the nbformat version info to determine if this is necessary.
-        remove_cell_ids(transformed_nb)
 
         add_assignment_name_to_notebook(transformed_nb, self.assignment)
 
