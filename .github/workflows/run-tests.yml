@@ -13,6 +13,7 @@ on:
       - master
       - stable
       - beta
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,6 +24,10 @@ jobs:
       DOCKER_BUILDKIT: 1
       DOCKER_CLI_EXPERIMENTAL: enabled
 
+    defaults:
+      run:
+        shell: bash -l {0}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -30,26 +35,21 @@ jobs:
         with:
           install: true
 
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v1
-
-      - name: Build Docker image
-        id: docker_build
-        uses: docker/build-push-action@v4
+      - uses: mamba-org/setup-micromamba@v1
         with:
-          context: .
-          load: true
-          push: false
-          tags: otter-test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            DOCKER_VERSION=20.10.24
+          environment-file: environment.yml
+          init-shell: >-
+            bash
+          cache-environment: true
+
+      - name: Install ottr
+        run: |
+          micromamba run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.r-project.org/")'
 
       - name: Run tests
         run: |
-          docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test /root/otter-grader/bin/run_tests
-          cp /tmp/coverage.xml ./coverage.xml
+          micromamba activate otter-grader
+          make testcov PYTESTOPTS="-vv" && coverage xml -i
 
       - uses: codecov/codecov-action@v3
         with:

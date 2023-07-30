@@ -1,18 +1,21 @@
 import nbformat as nbf
 import pathlib
 import pytest
+import os
+import shutil
 
 from contextlib import nullcontext
 from python_on_whales import docker
 from unittest import mock
 
 from otter import __file__ as OTTER_PATH
-from otter.grade.containers import build_image
 
 from .utils import TestFileManager
 
 
 FILE_MANAGER = TestFileManager(__file__)
+REPO_DIR = os.getcwd()
+REAL_DOCKER_BUILD = docker.build
 
 
 def pytest_addoption(parser):
@@ -75,27 +78,37 @@ def disable_assign_pdf_generation(pdfs_enabled):
         yield
 
 
-def build_image_with_local_changes(*args, **kwargs):
+
+@pytest.fixture(autouse=True, scope="session")
+def update_grade_dockerfile():
+    """
+    Update the Dockerfile used in otter grade to install the contents of this repo.
+    """
+    with open("otter/grade/Dockerfile") as f:
+        contents = f.read()
+
+    with open("otter/grade/Dockerfile", "a") as f1, FILE_MANAGER.open("partial-dockerfile.txt") as f2:
+        f1.write("\n" + f2.read())
+
+    yield
+
+    with open("otter/grade/Dockerfile", "w") as f:
+        f.write(contents)
+
+
+def add_repo_dir_to_context_then_build(*args, **kwargs):
     """
     Build the normal Otter Grade Docker image and then overwrite it with a new one containing a
     copy of Otter with all local edits.
     """
-    image = build_image(*args, **kwargs)
-
-    docker.build(
-        ".",
-        build_args={"BASE_IMAGE": image},
-        tags=[image],
-        file=FILE_MANAGER.get_path("Dockerfile"),
-        load=True,
-    )
-
-    return image
+    temp_dir = args[0]
+    shutil.copytree(REPO_DIR, os.path.join(temp_dir, "__otter-grader"))
+    REAL_DOCKER_BUILD(*args, **kwargs, cache_from="type=gha", cache_to="type=gha,mode=max")
 
 
 @pytest.fixture(autouse=True)
-def patch_build_image():
-    with mock.patch("otter.grade.containers.build_image", wraps=build_image_with_local_changes):
+def patch_docker_build():
+    with mock.patch("otter.grade.containers.docker.build", wraps=add_repo_dir_to_context_then_build):
         yield
 
 
