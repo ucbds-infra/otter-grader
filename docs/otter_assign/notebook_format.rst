@@ -17,8 +17,6 @@ available in Python that are not available in R, and these are noted below, but 
 are the same.
 
 
-.. TODO: add docmentation for message
-
 .. _otter_assign_assignment_metadata:
 
 Assignment Config
@@ -43,8 +41,8 @@ their command line counterparts (if present). The options, their defaults, and d
 listed below. Any unspecified keys will keep their default values. For more information about many 
 of these arguments, see :ref:`otter_assign_usage`. Any keys that map to 
 sub-dictionaries (e.g. ``export_cell``, ``generate``) can have their behaviors turned off by 
-changing their value to ``false``. The only one that defaults to true (with the specified sub-key 
-defaults) is ``export_cell``.
+changing their value to ``false``. The only ones that default to true (with the specified sub-key 
+defaults) are ``export_cell`` and ``generate``.
 
 .. fica:: otter.assign.assignment.Assignment
 
@@ -75,8 +73,8 @@ structure below:
     │       └── utils.py
     └── requirements.txt
 
-and you wanted your requirements from ``dev/requirements.txt`` to be included, your configuration would 
-look something like this:
+and you wanted your requirements from ``dev/requirements.txt`` to be included, your configuration
+would look something like this:
 
 .. code-block:: yaml
 
@@ -84,6 +82,10 @@ look something like this:
     files:
         - data/data.csv
         - utils.py
+
+
+Requirements
+++++++++++++
 
 The `requirements` key of the assignment config can also be formatted as a list of package names in
 lieu of a path to a `requirements.txt` file; for exmaple:
@@ -97,13 +99,25 @@ lieu of a path to a `requirements.txt` file; for exmaple:
 
 This structure is also compatible with the `overwrite_requirements` key.
 
+By default, Otter's grading images uses Python 3.9. If you need a different version, you can
+specify one using the ``python_version`` config:
+
+.. code-block:: yaml
+
+    # ASSIGNMENT CONFIG
+    python_version: 3.10
+
+
+Otter Generate
+++++++++++++++
+
 A note about Otter Generate: the ``generate`` key of the assignment config has two forms. If you 
-just want to generate and require no additional arguments, set ``generate: true`` in the YAML and 
-Otter Assign will simply run ``otter generate`` from the autograder directory (this will also 
-include any files passed to ``files``, whose paths should be **relative to the directory containing 
-the notebook**, not to the directory of execution). If you require additional arguments, e.g. 
-``points`` or ``show_stdout``, then set ``generate`` to a nested dictionary of these parameters and 
-their values:
+just want to generate and require no additional arguments, set ``generate: true`` in the YAML (the
+default) and Otter Assign will simply run ``otter generate`` from the autograder directory (this
+will also include any files passed to ``files``, whose paths should be **relative to the directory
+containing the notebook**, not to the directory of execution). If you require additional arguments,
+e.g. ``points`` or ``show_stdout``, then set ``generate`` to a nested dictionary of these parameters
+and their values:
 
 .. code-block:: yaml
 
@@ -137,6 +151,10 @@ Assign; optionally, you can specify these via the command line with the ``--user
 Any configurations in your ``generate`` key will be put into an ``otter_config.json`` and used when
 running Otter Generate.
 
+
+Log Grading
++++++++++++
+
 If you are grading from the log or would like to store students' environments in the log, use the 
 ``save_environment`` key. If this key is set to ``true``, Otter will serialize the stuednt's 
 environment whenever a check is run, as described in :ref:`logging`. To restrict the 
@@ -152,19 +170,9 @@ environments, storing only variables of the name ``df`` that are pandas datafram
     variables:
         df: pandas.core.frame.DataFrame
 
-As an example, the following assignment config includes an export cell but no filtering, no init 
-cell, and passes the configurations ``points`` and ``seed`` to Otter Generate via the 
-``otter_config.json``.
 
-.. code-block:: yaml
-
-    # ASSIGNMENT CONFIG
-    export_cell:
-        filtering: false
-    init_cell: false
-    generate:
-        points: 3
-        seed: 0
+Assignment Names
+++++++++++++++++
 
 You can also configure assignments created with Otter Assign to ensure that students submit to the
 correct assignment by setting the ``name`` key in the assignment config. When this is set, Otter
@@ -179,14 +187,6 @@ name in the metadata.
 
 You can find more information about how Otter performs assignment name verification
 :ref:`here<workflow_execution_submissions_assignment_name_verification>`.
-
-By default, Otter's grading images uses Python 3.9. If you need a different version, you can
-specify one using the ``python_version`` config:
-
-.. code-block:: yaml
-
-    # ASSIGNMENT CONFIG
-    python_version: 3.10
 
 
 .. _otter_assign_seed_variables:
@@ -256,6 +256,35 @@ deterministic otherwise they will fail on the student's machine. Also note that 
 available, so each RNG must use the same seed.
 
 You can find more information about intercell seeding :ref:`here <seeding>`.
+
+
+Submission Export Cells
++++++++++++++++++++++++
+
+By default, Otter Assign includes cells to help students export their submission as a zip file that
+can be easily submitted and graded. To disable this feature, set ``export_cell: false`` in the
+assignment config.
+
+These submission zip files include a PDF export of the notebook by default (this can be disabled
+with ``export_cell: pdf: false``). In some cases, it may not be possible to export a PDF of the
+notebook (usually due to LaTeX errors), but the zip file may still be generated. Since this can
+occur without students realizing it, it is possible to have students acknowledge that their
+submission zip won't include a PDF before the zip file is generated. To require this
+acknowledgement, set ``export_cell: require_no_pdf_ack: true`` in the assignment config. If this is
+configured and the export cell fails to generate a PDF without raising an exception, the student
+will be presented with this acknowledgement built with ipywidgets:
+
+.. image:: images/assign_no_pdf_confirmation.png
+    :alt: No PDF acknowledgement
+
+To customize the message in the acknowledgement, set the ``message`` key of ``require_no_pdf_ack``:
+
+.. code-block:: yaml
+
+    # ASSIGNMENT CONFIG
+    export_cell:
+        require_no_pdf_ack:
+            message: 'A PDF of your notebook could not be generated. Please acknowledge to contiue submissione export.'
 
 
 Autograded Questions
