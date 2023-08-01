@@ -71,8 +71,11 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
             "--results-path", results_path,
         ]
 
+        # this environment variable is needed to fix #686
+        subprocess_env = {**os.environ, "PYDEVD_DISABLE_FILE_VALIDATION": "1"}
+
         # run the command
-        results = run(command, stdout=PIPE, stderr=PIPE)
+        results = run(command, env=subprocess_env, stdout=PIPE, stderr=PIPE)
 
         # TODO: remove
         print(results.stdout.decode("utf-8"))
