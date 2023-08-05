@@ -2,6 +2,7 @@
 
 import importlib
 import logging
+import logging.handlers
 import os
 import pathlib
 import random
@@ -252,13 +253,24 @@ def knit_rmd_file(rmd_path, pdf_path):
 
 class loggers:
 
-    _format = "[%(levelname)s %(name)s.%(funcName)s] %(message)s"
     _instances = {}
     _log_level = logging.WARNING
+    _formatter = logging.Formatter("[%(levelname)s %(name)s.%(funcName)s] %(message)s")
+    _socket_handler = None
 
     @staticmethod
     def __new__(cls, *args, **kwargs):
         raise NotImplementedError("This class is not meant to be instantiated")
+    
+    @classmethod
+    def send_logs(cls, host, port):
+        """
+        Add a ``SocketHandler`` to all loggers that sends their logs to a TCP socket at the
+        specified host and port.
+        """
+        cls._socket_handler = logging.handlers.SocketHandler(host, port)
+        for logger in cls._instances.values():
+            logger.addHandler(cls._socket_handler)
 
     @classmethod
     def get_logger(cls, name):
@@ -272,9 +284,10 @@ class loggers:
         logger.propagate = False  # prevent child loggers from inheriting the handler
         logger.setLevel(cls._log_level)
         handler = logging.StreamHandler()
-        formatter = logging.Formatter(cls._format)
-        handler.setFormatter(formatter)
+        handler.setFormatter(cls._formatter)
         logger.addHandler(handler)
+        if cls._socket_handler:
+            logger.addHandler(cls._socket_handler)
         cls._instances[name] = logger
         return logger
 

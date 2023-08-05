@@ -8,7 +8,7 @@ import zipfile
 from glob import glob
 
 from .runners import create_runner
-from .utils import OtterRuntimeError
+from .utils import capture_run_output, OtterRuntimeError, print_output
 from ...version import LOGO_WITH_VERSION
 from ...utils import chdir, import_or_raise, loggers
 
@@ -47,7 +47,7 @@ def main(autograder_dir, **kwargs):
     if runner.get_option("logo"):
         # ASCII 8207 is an invisible non-whitespace character; this should prevent gradescope from
         # incorrectly left-stripping the whitespace at the beginning of the logo
-        print(f"{chr(8207)}\n", LOGO_WITH_VERSION, "\n", sep="")
+        print_output(f"{chr(8207)}\n", LOGO_WITH_VERSION, "\n", sep="")
 
     abs_ag_path = os.path.abspath(runner.get_option("autograder_dir"))
     with chdir(abs_ag_path):
@@ -86,7 +86,7 @@ def main(autograder_dir, **kwargs):
                 with open("./results/results.json", "w+") as f:
                     json.dump(output, f, indent=4)                
 
-    print("\n\n", end="")
+    print_output("\n\n", end="")
 
     df = pd.DataFrame(output["tests"])
 
@@ -95,7 +95,7 @@ def main(autograder_dir, **kwargs):
         if "score" in output:
             total, possible = output["score"], runner.get_option("points_possible") or possible
         perc = total / possible * 100
-        print(f"Total Score: {total:.3f} / {possible:.3f} ({perc:.3f}%)\n")
+        print_output(f"Total Score: {total:.3f} / {possible:.3f} ({perc:.3f}%)\n")
 
     if runner.get_option("print_summary"):
         pd.set_option("display.max_rows", None)  # print all rows of the dataframe
@@ -106,4 +106,4 @@ def main(autograder_dir, **kwargs):
         if "status" in df.columns:
             df.drop(columns=["status"], inplace=True)
 
-        print(df)
+        print_output(df)

@@ -29,6 +29,7 @@ from otter import Notebook as {notebook_name}
 import logging
 from otter.utils import loggers
 loggers.set_level(logging.DEBUG)
+loggers.send_logs("{logging_server_host}", {logging_server_port})
 """
 
 EXPORT_CELL_SOURCE = """\
@@ -67,6 +68,10 @@ class GradingPreprocessor(Preprocessor):
 
     _log_temp_file: Optional[Tuple[int, str]] = None
 
+    logging_server_host = Unicode().tag(config=True)
+
+    logging_server_port = Integer().tag(config=True)
+
     @property
     def from_log(self):
         return self.otter_log is not None
@@ -83,7 +88,11 @@ class GradingPreprocessor(Preprocessor):
 
     def add_init_and_export_cells(self, nb):
         nb.cells.insert(0, nbf.v4.new_code_cell(INIT_CELL_SOURCE.format(
-            notebook_name = self._notebook_name, test_dir = self.test_dir)))
+            notebook_name = self._notebook_name,
+            test_dir = self.test_dir,
+            logging_server_host = self.logging_server_host,
+            logging_server_port = self.logging_server_port,
+        )))
         nb.cells.append(nbf.v4.new_code_cell(EXPORT_CELL_SOURCE.format(
             tests_glob_json = json.dumps(self.tests_glob), results_path = self.results_path)))
 

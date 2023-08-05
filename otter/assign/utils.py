@@ -8,12 +8,11 @@ import pathlib
 import re
 import shutil
 
-from contextlib import redirect_stdout, redirect_stderr
-from io import StringIO
 from textwrap import indent
 
 from ..api import grade_submission
 from ..generate import main as generate_autograder
+from ..run import capture_run_output
 from ..utils import (
     get_source,
     loggers,
@@ -198,15 +197,14 @@ def run_tests(assignment, debug=False):
     Raises:
         ``RuntimeError``: if the grade received by the notebook is not 100%
     """
-    stdout = StringIO()
-    with redirect_stdout(stdout), redirect_stderr(stdout):
+    with capture_run_output() as run_output:
         results = grade_submission(
             str(assignment.ag_notebook_path),
             str(assignment.ag_zip_path),
             debug=debug,
         )
 
-    LOGGER.debug(f"Otter Run output:\n{stdout.getvalue()}")
+    LOGGER.debug(f"Otter Run output:\n{run_output.getvalue()}")
 
     if results.total != results.possible:
         raise RuntimeError(f"Some autograder tests failed in the autograder notebook:\n" + \

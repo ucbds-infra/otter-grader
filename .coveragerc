@@ -1,6 +1,8 @@
 [run]
 source = otter
 
+concurrency = thread
+
 [report]
 exclude_lines =
     # Have to re-enable the standard pragma

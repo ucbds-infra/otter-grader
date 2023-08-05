@@ -7,6 +7,7 @@ import os
 import pickle
 
 from collections import namedtuple
+from typing import List
 
 from .abstract_test import OK_FORMAT_VARNAME, TestCase, TestCaseResult, TestFile
 from .exception_test import ExceptionTestFile, test_case
@@ -271,22 +272,22 @@ class GradingResults:
         """
         self.pdf_error = error
 
-    def verify_against_log(self, log, ignore_hidden=True):
+    def verify_against_log(self, log, ignore_hidden=True) -> List[str]:
         """
         Verifies these scores against the results stored in this log using the results returned by 
-        ``Log.get_results`` for comparison. Prints a message if the scores differ by more than the 
-        default tolerance of ``math.isclose``. If ``ignore_hidden`` is ``True``, hidden tests are
-        ignored when verifying scores.
+        ``Log.get_results`` for comparison. A discrepancy occurs if the scores differ by more than
+        the default tolerance of ``math.isclose``. If ``ignore_hidden`` is ``True``, hidden tests
+        are ignored when verifying scores.
 
         Args:
             log (``otter.check.logs.Log``): the log to verify against
             ignore_hidden  (``bool``, optional): whether to ignore hidden tests during verification
 
         Returns:
-            ``bool``: whether a discrepancy was found
+            ``list[str]``: a list of error messages for discrepancies; if none were found, the list
+                is empty
         """
-        found_discrepancy = False
-        # for test_name in  self.test_cases:
+        l = []
         for test_name, test_file in self.results.items():
             if ignore_hidden:
                 tcrs = [
@@ -302,14 +303,12 @@ class GradingResults:
                 # TODO fix
                 logged_score = result.score
                 if not math.isclose(score, logged_score):
-                    print("Score for {} ({:.3f}) differs from logged score ({:.3f})".format(
-                        test_name, score, logged_score
-                    ))
-                    found_discrepancy = True
+                    l.append(
+                        f"Score for {test_name} ({score:.3f}) differs from logged score " \
+                        f"({logged_score:.3f})")
             except QuestionNotInLogException:
-                print(f"No score for {test_name} found in this log")
-                found_discrepancy = True
-        return found_discrepancy
+                l.append(f"No score for {test_name} found in this log")
+        return l
 
     def to_report_str(self):
         """
