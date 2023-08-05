@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import zipfile
 
-from .run_autograder import main as run_autograder_main
+from .run_autograder import capture_run_output, main as run_autograder_main
 
 from ..utils import import_or_raise
 

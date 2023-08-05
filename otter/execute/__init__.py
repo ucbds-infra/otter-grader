@@ -7,6 +7,7 @@ import tempfile
 from traitlets.config import Config
 
 from .checker import Checker
+from .logging import start_server
 from .preprocessor import GradingPreprocessor
 
 from ..test_files import GradingResults
@@ -69,6 +70,8 @@ def grade_notebook(
     with tempfile.NamedTemporaryFile() as ntf:
         c = Config()
 
+        (host, port), stop_server = start_server()
+
         # GradingPreprocessor config
         c.GradingPreprocessor.cwd = cwd
         c.GradingPreprocessor.test_dir = test_dir
@@ -78,6 +81,8 @@ def grade_notebook(
         c.GradingPreprocessor.seed_variable = seed_variable
         c.GradingPreprocessor.otter_log = log
         c.GradingPreprocessor.variables = variables
+        c.GradingPreprocessor.logging_server_host = host
+        c.GradingPreprocessor.logging_server_port = port
 
         # ExecutePreprocessor config
         c.ExecutePreprocessor.allow_errors = ignore_errors
@@ -87,6 +92,8 @@ def grade_notebook(
 
         nb, _ = gp.preprocess(nb)
         executed_nb, _ = ep.preprocess(nb)
+
+        stop_server()
 
         gp.cleanup()
 

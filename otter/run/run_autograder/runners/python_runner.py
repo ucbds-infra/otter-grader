@@ -8,7 +8,7 @@ from glob import glob
 
 from .abstract_runner import AbstractLanguageRunner
 
-from ..utils import OtterRuntimeError
+from ..utils import OtterRuntimeError, print_output
 
 from ....check.logs import Log
 from ....check.notebook import _OTTER_LOG_FILENAME
@@ -113,7 +113,7 @@ class PythonRunner(AbstractLanguageRunner):
                         raise e
 
                     else:
-                        print(f"Could not deserialize the log due to an error:\n{e}")
+                        print_output(f"Could not deserialize the log due to an error:\n{e}")
                         log = None
 
             else:
@@ -138,20 +138,24 @@ class PythonRunner(AbstractLanguageRunner):
 
             # verify the scores against the log
             if self.ag_config.print_summary:
-                print("\n\n\n\n", end="")
-                print_full_width("-", mid_text="GRADING SUMMARY")
-                print()
+                print_output("\n\n\n\n", end="")
+                s = print_full_width("-", mid_text="GRADING SUMMARY", ret_str=True)
+                print_output(s)
+                print_output()
                 if log is not None:
                     try:
-                        found_discrepancy = scores.verify_against_log(log)
-                        if not found_discrepancy and self.ag_config.print_summary:
-                            print("No discrepancies found while verifying scores against the log.")
+                        discrepancies = scores.verify_against_log(log)
+                        if self.ag_config.print_summary:
+                            if not discrepancies:
+                                print_output("No discrepancies found while verifying scores against the log.")
+                            else:
+                                for d in discrepancies: print_output(d)
 
                     except BaseException as e:
-                        print(f"Error encountered while trying to verify scores with log:\n{e}")
+                        print_output(f"Error encountered while trying to verify scores with log:\n{e}")
 
                 else:
-                    print("No log found with which to verify student scores.")
+                    print_output("No log found with which to verify student scores.")
 
             if generate_pdf:
                 self.write_and_maybe_submit_pdf(client, subm_path, has_token, scores)
@@ -159,6 +163,6 @@ class PythonRunner(AbstractLanguageRunner):
             if plugin_collection:
                 report = plugin_collection.generate_report()
                 if report.strip():
-                    print("\n\n" + report)
+                    print_output("\n\n" + report)
 
         return scores
