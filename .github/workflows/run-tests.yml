@@ -6,13 +6,14 @@ on:
   push:
     branches:
       - master
-      - stable
       - beta
+      - release
   pull_request:
     branches:
       - master
-      - stable
       - beta
+      - release
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,42 +21,38 @@ jobs:
 
     env:
       TAR: /bin/tar
-      DOCKER_BUILDKIT: 1 
+      DOCKER_BUILDKIT: 1
+      DOCKER_CLI_EXPERIMENTAL: enabled
+
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
       - uses: actions/checkout@v2
 
-      - uses: docker/setup-buildx-action@v1
-        id: buildx
+      - uses: docker/setup-buildx-action@v2
         with:
           install: true
 
-      - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v1
-
-      - name: Prepare for Docker image build
-        run: |
-          make docker-test-prepare
-
-      - name: Build Docker image
-        id: docker_build
-        uses: docker/build-push-action@v2
+      - uses: mamba-org/setup-micromamba@v1
         with:
-          context: .
-          file: test-Dockerfile
-          load: true
-          push: false
-          tags: otter-test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          environment-file: environment.yml
+          init-shell: >-
+            bash
+          cache-environment: true
+          cache-environment-key: requirements-${{ hashFiles('requirements*.txt') }}
 
-      - name: Clean up Docker image build
-        run: make docker-ci-test-cleanup
+      - name: Install ottr
+        run: |
+          micromamba run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.r-project.org/")'
 
       - name: Run tests
-        run: docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp otter-test bash -c "cd /home/otter-grader; pip install -r requirements-test.txt -r requirements-export.txt; make testcov && coverage xml -i && cp ./coverage.xml /tmp/coverage.xml" && cp /tmp/coverage.xml ./coverage.xml
-
-      - name: Send to Codecov
         run: |
-          pip install codecov
-          codecov
+          micromamba activate otter-grader
+          make testcov PYTESTOPTS="-vv" && coverage xml -i
+
+      - uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          verbose: true

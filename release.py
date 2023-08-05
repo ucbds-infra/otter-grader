@@ -1,24 +1,22 @@
 import argparse
 import datetime as dt
 import re
-import shutil
 import subprocess
 import sys
-import warnings
 
 
 FILES_WITH_VERSIONS = [        # do not include setup.py, otter/version.py
-    "Dockerfile",
-    "otter/generate/templates/python/requirements.txt",
-    "otter/generate/templates/r/requirements.txt",
-    "test/test_generate/test-autograder/autograder-correct/requirements.txt",
-    "test/test_generate/test-autograder/autograder-token-correct/requirements.txt",
-    "test/test_generate/test-autograder/autograder-custom-env/requirements.txt",
-    "test/test_generate/test-autograder/autograder-r-correct/requirements.txt",
-    "test/test-run/autograder/source/requirements.txt",
-    "test/test-assign/example-autograder-correct/requirements.txt",
-    "test/test-assign/gs-autograder-correct/requirements.txt",
-    "test/test-assign/rmd-autograder-correct/requirements.txt",
+    "docs/_static/grading-environment.yml",
+    "docs/_static/grading-environment-r.yml",
+    "test/test_generate/files/autograder-correct/environment.yml",
+    "test/test_generate/files/autograder-token-correct/environment.yml",
+    "test/test_generate/files/autograder-custom-env/environment.yml",
+    "test/test_generate/files/autograder-r-correct/environment.yml",
+    "test/test_generate/files/autograder-r-requirements-correct/environment.yml",
+    "test/test_run/files/autograder/source/environment.yml",
+    "test/test_assign/files/example-autograder-correct/environment.yml",
+    "test/test_assign/files/gs-autograder-correct/environment.yml",
+    "test/test_assign/files/rmd-autograder-correct/environment.yml",
 ]
 
 
@@ -31,7 +29,7 @@ PARSER.add_argument("--no-twine", action="store_true", default=False, help="Don'
 PARSER.add_argument("-f", "--force", action="store_true", default=False, help="Force run (ignore uncommitted changes)")
 
 
-OLD_VERSION_REGEX = r"(otter-grader==\d+\.\d+\.\d+(?:\.\w+)?$|git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@[\w\.]+)$"
+OLD_VERSION_REGEX = r"(otter-grader==\d+\.\d+\.\d+(?:\.\w+)?|git\+https:\/\/github\.com\/ucbds-infra\/otter-grader\.git@[\w\.]+)"
 
 
 if __name__ == "__main__":
@@ -73,12 +71,7 @@ if __name__ == "__main__":
         with open(file) as f:
             contents = f.read()
 
-        contents = re.sub(
-            OLD_VERSION_REGEX, 
-            new_version, 
-            contents,
-            flags=re.MULTILINE
-        )
+        contents = re.sub(OLD_VERSION_REGEX, new_version, contents)
 
         with open(file, "w") as f:
             f.write(contents)

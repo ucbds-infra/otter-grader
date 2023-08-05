@@ -128,7 +128,7 @@ class TestFile(ABC):
         pre_specified = sum(p for p in point_values if p is not None)
         if total_points is not None:
             if pre_specified > total_points:
-                raise ValueError(f"More points specified in test cases that allowed for test")
+                raise ValueError(f"More points specified in test cases than allowed for test")
 
             else:
                 try:

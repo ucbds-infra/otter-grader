@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+export PATH="/root/mambaforge/bin:$PATH"
+source /root/mambaforge/etc/profile.d/conda.sh
+source /root/mambaforge/etc/profile.d/mamba.sh
+mamba activate {{ otter_env_name }}
+python {{ autograder_dir }}/source/run_otter.py

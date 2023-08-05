@@ -14,7 +14,10 @@ from .r_adapter.tests_manager import RAssignmentTestsManager
 from .tests_manager import AssignmentTestsManager
 from .utils import get_notebook_language
 
-from ..utils import NBFORMAT_VERSION
+from ..utils import loggers, NBFORMAT_VERSION
+
+
+LOGGER = loggers.get_logger(__name__)
 
 
 def write_output_dir(
@@ -57,7 +60,7 @@ def write_output_dir(
     transformed_nb.write_tests(str(tests_dir), not sanitize, assignment.tests.files)
 
     # write a temp dir for otter generate tests
-    if not sanitize and assignment.generate_enabled:
+    if not sanitize:
         assignment._temp_test_dir = pathlib.Path(tempfile.mkdtemp())
         transformed_nb.write_tests(str(assignment._temp_test_dir), True, True)
 
@@ -122,3 +125,6 @@ def write_output_directories(assignment):
     # populate directories
     write_output_dir(transformed_nb, autograder_dir, assignment, False)
     write_output_dir(transformed_nb, student_dir, assignment, True)
+
+    # print assignment summary
+    LOGGER.info(nb_transformer.tests_mgr.generate_assignment_summary())

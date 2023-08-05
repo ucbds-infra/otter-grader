@@ -10,8 +10,5 @@ jupytext
 click
 fica>=0.2.0
 ipython
-
-# plugins
-google-api-python-client
-google-auth-oauthlib
-six
+astunparse
+nbconvert; sys_platform!='emscripten' and sys_platform!='wasi'

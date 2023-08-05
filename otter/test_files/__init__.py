@@ -83,13 +83,14 @@ class GradingResults:
         all_hidden (``bool``): whether all results should be hidden from the student on Gradescope
         tests (``list`` of ``str``): list of test names according to the keys of ``results``
     """
-    def __init__(self, test_files):
+    def __init__(self, test_files, notebook=None):
         self._plugin_data = {}
         self.results = {tf.name: tf for tf in test_files}
         # self.results = {}
         self.output = None
         self.all_hidden = False
         self.pdf_error = None
+        self.notebook = notebook
 
     def __repr__(self):
         return self.summary()
@@ -289,11 +290,11 @@ class GradingResults:
         for test_name, test_file in self.results.items():
             if ignore_hidden:
                 tcrs = [
-                    test_case_result.passed
+                    test_case_result
                     for test_case_result in test_file.test_case_results
                     if not test_case_result.test_case.hidden
                 ]
-                score = sum(tcr.test_case.points for tcr in tcrs)
+                score = sum(tcr.test_case.points for tcr in tcrs if tcr.passed)
             else:
                 score = test_file.score
             try:

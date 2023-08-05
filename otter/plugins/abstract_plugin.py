@@ -22,7 +22,6 @@ class AbstractOtterPlugin(ABC):
     - ``notebook_export``: run by ``Notebook.export`` for adding files to the export zip file
     - ``before_grading``: run before the submission is executed for altering configurations
     - ``before_execution``: run before the submission is executed for altering the submission
-    - ``after_execution``: run after the submission is executed
     - ``after_grading``: run after all tests are run and scores are assigned
     - ``generate_report``: run after results are written
 
@@ -163,20 +162,6 @@ class AbstractOtterPlugin(ABC):
 
         Returns:
             ``nbformat.NotebookNode`` or ``str``: the altered submission to be executed
-
-        Raises:
-            ``PluginEventNotSupportedException``: if the event is not supported by this plugin
-        """
-        raise PluginEventNotSupportedException()
-
-    def after_execution(self, global_env):
-        """
-        Plugin event run after the execution of the submission which can modify the resulting global
-        environment.
-
-        Args:
-            global_env (``dict``): the environment resulting from the execution of the students' code;
-                see ``otter.execute``
 
         Raises:
             ``PluginEventNotSupportedException``: if the event is not supported by this plugin

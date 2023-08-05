@@ -104,8 +104,8 @@ class IPythonInterpreter(Enum):
         running) and a display name for error messages and the like.
         """
 
-        def __init__(self, check_str, display_name):
-            self.check_str = check_str
+        def __init__(self, check_strs, display_name):
+            self.check_strs = check_strs
             self.display_name = display_name
 
         def running(self):
@@ -116,12 +116,13 @@ class IPythonInterpreter(Enum):
             Returns:
                 ``bool``: whether this interpreter is running
             """
-            return self.check_str in str(get_ipython())
+            ipython_interp = str(get_ipython())
+            return any(c in ipython_interp for c in self.check_strs)
 
-    COLAB = Interpreter("google.colab", "Google Colab")
+    COLAB = Interpreter(["google.colab"], "Google Colab")
     """the Google Colab interpreter"""
 
-    PYOLITE = Interpreter("pyolite.", "Jupyterlite")
+    PYOLITE = Interpreter(["pyolite.", "pyodide_kernel."], "Jupyterlite")
     """the JupyterLite interpreter"""
 
 
@@ -200,6 +201,21 @@ def logs_event(event_type):
     return event_logger
 
 
+def list_test_files(tests_dir):
+    """
+    Find all of the test files in the specified directory (that is, all ``.py`` files that are not
+    named ``__init__.py``) and return their paths in a sorted list.
+
+    Args:
+        tests_dir (``str``): the path to the tests directory
+
+    Returns:
+        ``list[str]``: the sorted list of all test file paths in ``tests_dir``
+    """
+    return sorted([file for file in glob(os.path.join(tests_dir, "*.py")) \
+            if file != "__init__.py"])
+
+
 def list_available_tests(tests_dir, nb_path):
     """
     Get a list of available questions by searching the tests directory (if present) or the notebook
@@ -215,8 +231,7 @@ def list_available_tests(tests_dir, nb_path):
     get_stem = lambda p: os.path.splitext(os.path.basename(p))[0]
 
     if tests_dir and os.path.isdir(tests_dir):
-        tests = [get_stem(file) for file in glob(os.path.join(tests_dir, "*.py")) \
-            if file != "__init__.py"]
+        tests = map(get_stem, list_test_files(tests_dir))
 
     else:
         if nb_path is None:

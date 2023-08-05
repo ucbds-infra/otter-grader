@@ -2,10 +2,15 @@ responses
 scikit-learn
 nbformat<5.1.0
 tqdm
-codecov
+coverage
 rpy2
 pytest
 jupyter_client
 ipykernel
 matplotlib
 gspread
+
+# plugins
+google-api-python-client
+google-auth-oauthlib
+six

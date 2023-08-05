@@ -21,20 +21,17 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 import nbconvert
-import re
-import shutil
-import yaml
 
 from glob import glob
-from importlib import import_module
-from textwrap import indent
-from otter.utils import convert_config_description_dict, print_full_width
+from jinja2 import Template
+from otter.generate import CondaEnvironment
+from otter.utils import print_full_width
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'Otter-Grader'
-copyright = '2019-2021, UC Berkeley Data Science Education Program'
+copyright = '2019-2023, UC Berkeley Data Science Education Program'
 author = 'UC Berkeley Data Science Education Program Infrastructure Team'
 
 # The short X.Y version
@@ -115,7 +112,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_theme = 'sphinx_book_theme'
-html_logo = '../logo/otter-logo-smaller.png'
+html_logo = '../logo/otter-logo-smallest.png'
 
 html_theme_options = {
     'github_url': 'https://github.com/ucbds-infra/otter-grader',
@@ -203,84 +200,6 @@ texinfo_documents = [
 ]
 
 
-# -- YAML Dictionary Replacement ---------------------------------------------
-# TODO: remove w/ Otter v5
-
-files_to_replace = [
-    "otter_assign/v0/python_notebook_format.rst",
-]
-
-def extract_descriptions_as_comments(config):
-    coms = []
-    # for d in config:
-    #     coms.append("# " + d["description"])
-    #     default = d.get("default", None)
-    #     if isinstance(default, list) and len(default) > 0 and \
-    #             all(isinstance(e, dict) for e in default):
-    #         coms.extend(extract_descriptions_as_comments(default))
-    # return coms
-
-    for d in config:
-        coms.append("# " + d["description"])
-        default = d.get("default")
-        subkeys = d.get("subkeys")
-        if isinstance(default, list) and len(default) > 0 and \
-                all(isinstance(e, dict) for e in default):
-            subcoms = extract_descriptions_as_comments(default)
-        elif isinstance(subkeys, list) and len(subkeys) > 0 and \
-                all(isinstance(e, dict) for e in subkeys):
-            subcoms = extract_descriptions_as_comments(subkeys)
-        else:
-            subcoms = []
-        coms.extend(subcoms)
-    return coms
-
-def add_comments_to_yaml(yaml, comments):
-    lines = yaml.split("\n")
-    ret = []
-    pad_to = max(len(l) for l in lines) + 2
-    for l, c in zip(lines, comments):
-        pad = pad_to - len(l)
-        new_line = l + " " * pad + c
-        ret.append(new_line)
-    return "\n".join(ret)
-
-def update_yaml_block(file):
-    with open(file) as f:
-        lines = f.readlines()
-    lines = [l.strip("\n") for l in lines]
-
-    s, e, obj = [], [], []
-    for i, line in enumerate(lines):
-        match = re.match(r"\.\. BEGIN YAML TARGET: ([\w.]+)\s*", line)
-        if match:
-            obj.append(match.group(1))
-            s.append(i)
-        elif line.rstrip() == ".. END YAML TARGET":
-            e.append(i)
-    assert len(s) > 0 and len(e) > 0, f"Unable to replace YAML targets in {file}"
-    assert all(si < ei for si, ei in zip(s, e)), f"Unable to replace YAML targets in {file}"
-
-    for si, ei, obji in list(zip(s, e, obj))[::-1]:
-        if si + 1 == ei:
-            lines.insert(ei, "")
-            ei += 1
-
-        module_path, member_name = obji.rsplit('.', 1)
-        member_data = getattr(import_module(module_path), member_name)
-
-        defaults = convert_config_description_dict(member_data, for_docs=True)
-        code = yaml.safe_dump(defaults, indent=2, sort_keys=False)
-        comments = extract_descriptions_as_comments(member_data)
-        code = add_comments_to_yaml(code, comments)
-
-        to_replace = "\n.. code-block:: yaml\n\n" + indent(code.rstrip(), "    ") + "\n"
-        lines[si+1:ei] = to_replace.split("\n")
-
-    with open(file, "w") as f:
-        f.write("\n".join(lines) + "\n")
-
-
 def convert_static_notebooks():
     exporter = nbconvert.HTMLExporter()
 
@@ -303,12 +222,31 @@ def convert_static_notebooks():
     print_full_width("=")
 
 
+def make_setup_sh_files():
+    ctx = {
+        "autograder_dir": "/autograder",
+        "otter_env_name": "otter-env",
+        "has_r_requirements": True,
+    }
+
+    for l in ["python", "r"]:
+        with open(f"../otter/generate/templates/{l}/setup.sh") as f:
+            t = Template(f.read())
+        s = t.render(ctx)
+        with open(f"_static/{l}_setup.sh", "w+") as f:
+            f.write(s)
+
+
 # -- Extension configuration -------------------------------------------------
 def setup(app):
     # run nbconvert on all of the notebooks in _static/notebooks
     convert_static_notebooks()
 
-    # update the YAML blocks in the docs files
-    for file in files_to_replace:
-        print(f"Replacing YAML targets in: {file}")
-        update_yaml_block(file)
+    # convert templates to valid setup.sh files
+    make_setup_sh_files()
+
+    with open("_static/grading-environment.yml", "w+") as f:
+        f.write(CondaEnvironment("3.9", False, [], False, None).to_str())
+
+    with open("_static/grading-environment-r.yml", "w+") as f:
+        f.write(CondaEnvironment("3.9", True, [], False, None).to_str())

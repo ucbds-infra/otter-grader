@@ -22,7 +22,7 @@ Before Using Otter Generate
 ---------------------------
 
 Before using Otter Generate, you should already have written :ref:`tests <test_files>` 
-for the assignment and collected extra requirements into a requirements.txt file (see :ref:`here 
+for the assignment and collected extra requirements into a ``requirements.txt`` file (see :ref:`here 
 <workflow_otter_generate_container_image>`). (Note: the default requirements can be overwritten by 
 your requirements by passing the ``--overwrite-requirements`` flag.)
 
@@ -133,7 +133,7 @@ statements are executed. For more inforamtion about saving and using environment
 To configure this behavior, two things are required:
 
 * the use of the ``grade_from_log`` key in your config JSON file
-* providing studens with an :ref:`Otter configuration file <otter_check_dot_otter_files>` that 
+* providing students with an :ref:`Otter configuration file <otter_check_dot_otter_files>` that 
   has ``save_environments`` set to ``true``
 
 This will tell Otter to shelve the global environment each time a student calls ``Notebook.check`` 
@@ -151,11 +151,11 @@ Autosubmission of Notebook PDFs
 
 Otter Generate allows instructors to automatically generate PDFs of students' notebooks and upload
 these as submissions to a separate Gradescope assignment. This requires a Gradescope token or
-entering your Gradescope account credentials when prompted (for details see
-:ref: `the notebook metadata section <otter_assign_v1_assignment_metadata>`).
+entering your Gradescope account credentials when prompted (for details see the
+:ref:`notebook metadata section <otter_assign_assignment_metadata>`).
 Otter Generate also needs the course ID and assignment ID of the assignment to which PDFs should
-be submitted—a separate assignment from your autograder assignment of type "Homework / Problem Set."
-This information can be gathered from the assignment URL on Gradescope:
+be submitted -- a separate assignment from your autograder assignment of type "Homework / Problem
+Set." This information can be gathered from the assignment URL on Gradescope:
 
 .. code-block::
 

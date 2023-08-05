@@ -104,8 +104,8 @@ class AutograderConfig(fica.Config):
     )
 
     miniconda_path = fica.Key(
-        description="the path to the miniconda install directory",
-        default="/root/miniconda3",
+        description="the path to the mamba install directory",
+        default="/root/mambaforge",
     )
 
     plugins = fica.Key(
@@ -139,11 +139,6 @@ class AutograderConfig(fica.Config):
         default=None,
     )
 
-    channel_priority_strict = fica.Key(
-        description="whether to set conda's channel_priority config to strict in the setup.sh file",
-        default=True,
-    )
-
     assignment_name = fica.Key(
         description="a name for the assignment to ensure that students submit to the correct " \
             "autograder",
@@ -160,4 +155,10 @@ class AutograderConfig(fica.Config):
         description="whether to show a summary of public test case results when show_hidden is " \
             "true",
         default=True,
+    )
+
+    submit_blank_pdf_on_export_failure = fica.Key(
+        description="whether to submit a blank PDF to the manual-grading Gradescope assignment " \
+            "if a PDF cannot be generated from the submission",
+        default=False,
     )

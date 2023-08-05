@@ -1,0 +1,10 @@
+{
+  "show_stdout": true,
+  "show_hidden": true,
+  "seed": 42,
+  "token": "token123",
+  "course_id": "123",
+  "assignment_id": "567",
+  "filtering": true,
+  "lang": "python"
+}

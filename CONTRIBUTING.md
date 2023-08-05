@@ -51,33 +51,6 @@ make testcov
 ```
 
 
-### Test Docker Images
-
-To build a Docker image suitable for testing, use the Makefile target `docker-test`. This will
-build a Docker image tagged `otter-test` which includes the development version of Otter in your 
-local copy of the repo as the installed version of Otter.
-
-```
-make docker-test
-```
-
-If you need to build testing images for grading assignments, use the `docker-grade-test` target to 
-edit the Dockerfile in `otter/grade` and then install your local copy of the rpeo:
-
-```
-make docker-grade-test
-pip install .
-```
-
-**Do not commit any changes made by this Makefile target.**
-
-Once you finish, make sure to run the `cleanup-docker-grade-test` target to undo your changes. 
-
-```
-make cleanup-docker-grade-test
-```
-
-
 ## Building the Documentation
 
 To build a local copy of the documentation, use the `docs` target of the Makefile.
