@@ -411,7 +411,7 @@ class Notebook(Loggable):
 
             for file in files:
                 if os.path.isdir(file):
-                    sub_files = glob(f"./{file}/**/*.*")
+                    sub_files = glob(f"{file}/**/*.*", recursive=True)
                     for sub_file in sub_files:
                         zf.write(sub_file)
                 else:

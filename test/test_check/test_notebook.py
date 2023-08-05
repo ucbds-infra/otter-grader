@@ -4,6 +4,7 @@ import datetime as dt
 import nbformat as nbf
 import os
 import pytest
+import shutil
 
 from glob import glob
 from textwrap import dedent
@@ -158,6 +159,33 @@ def test_export(mocked_export, mocked_zf, mocked_dt, write_notebook):
     # TODO: test force_save
     # TODO: test run_tests
     # TODO: test display_link
+
+
+@mock.patch("otter.check.notebook.zipfile.ZipFile")
+def test_export_with_directory_in_files(mocked_zf, write_notebook):
+    """
+    Checks that ``Notebook.export`` correctly recurses into subdirectories to find files when a
+    directory is in the list passed to the ``files`` argument.
+    """
+    write_notebook(nbf.v4.new_notebook())
+
+    file_path = FILE_MANAGER.get_path("data/foo.csv")
+    dir_path = os.path.split(file_path)[0]
+    os.makedirs(dir_path, exist_ok=True)
+    with open(file_path, "w+") as f:
+        f.write("hi there")
+
+    try:
+        grader = Notebook(tests_dir=TESTS_DIR)
+        with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve:
+            mocked_resolve.return_value = NB_PATH
+
+            grader.export(pdf=False, files=[dir_path])
+
+            mocked_zf.return_value.write.assert_any_call(file_path)
+
+    finally:
+        shutil.rmtree(dir_path)
 
 
 @mock.patch("otter.check.utils.Button")
