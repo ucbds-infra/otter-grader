@@ -265,11 +265,12 @@ class loggers:
     @classmethod
     def send_logs(cls, host, port):
         """
+        Add a ``SocketHandler`` to all loggers that sends their logs to a TCP socket at the
+        specified host and port.
         """
         cls._socket_handler = logging.handlers.SocketHandler(host, port)
         for logger in cls._instances.values():
             logger.addHandler(cls._socket_handler)
-        # cls._socket_handler.addFormatter(cls._formatter)
 
     @classmethod
     def get_logger(cls, name):

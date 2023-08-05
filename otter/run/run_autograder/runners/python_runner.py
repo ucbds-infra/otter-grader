@@ -144,9 +144,12 @@ class PythonRunner(AbstractLanguageRunner):
                 print_output()
                 if log is not None:
                     try:
-                        found_discrepancy = scores.verify_against_log(log)
-                        if not found_discrepancy and self.ag_config.print_summary:
-                            print_output("No discrepancies found while verifying scores against the log.")
+                        discrepancies = scores.verify_against_log(log)
+                        if self.ag_config.print_summary:
+                            if not discrepancies:
+                                print_output("No discrepancies found while verifying scores against the log.")
+                            else:
+                                for d in discrepancies: print_output(d)
 
                     except BaseException as e:
                         print_output(f"Error encountered while trying to verify scores with log:\n{e}")

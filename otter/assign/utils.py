@@ -8,8 +8,6 @@ import pathlib
 import re
 import shutil
 
-# from contextlib import redirect_stdout, redirect_stderr
-# from io import StringIO
 from textwrap import indent
 
 from ..api import grade_submission
@@ -200,8 +198,6 @@ def run_tests(assignment, debug=False):
         ``RuntimeError``: if the grade received by the notebook is not 100%
     """
     with capture_run_output() as run_output:
-        # with redirect_stdout(stdout), redirect_stderr(stdout):
-        # TODO: don't print summary, only send it to LOGGER.debug
         results = grade_submission(
             str(assignment.ag_notebook_path),
             str(assignment.ag_zip_path),
