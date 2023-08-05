@@ -271,6 +271,7 @@ class GradingResults:
         """
         self.pdf_error = error
 
+    # TODO: refactor so that otter run prints the outputs, not this function
     def verify_against_log(self, log, ignore_hidden=True):
         """
         Verifies these scores against the results stored in this log using the results returned by 
