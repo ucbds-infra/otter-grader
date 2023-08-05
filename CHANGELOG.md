@@ -6,6 +6,7 @@
 * Added notebook force-save to R notebook assignments per [#474](https://github.com/ucbds-infra/otter-grader/issues/474)
 * Updated default version of `ottr` to v1.4.0
 * Added a configuration to require students to acknowledge when a PDF of their notebook cannot be generated when using `Notebook.export` before exporting the zip file per [#599](https://github.com/ucbds-infra/otter-grader/issues/599)
+* Fixed recursive inclusion of files when a directory is in the list passed to the `files` argument of `Notebook.export` per [#620](https://github.com/ucbds-infra/otter-grader/issues/620)
 
 **v5.0.2:**
 
