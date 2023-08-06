@@ -2,6 +2,7 @@
 
 import importlib
 import logging
+import logging.handlers
 import os
 import pathlib
 import random
@@ -22,6 +23,18 @@ NBFORMAT_VERSION = 4
 
 NOTEBOOK_METADATA_KEY = "otter"
 """the key used for all Otter metadata added to a notebook"""
+
+REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY = "require_no_pdf_confirmation"
+"""
+the key in Otter's notebook metadata for requiring students to acknowledge that their notebook could
+not be exported as a PDF before creating the submission zip file
+"""
+
+NO_PDF_EXPORT_MESSAGE_KEY = "export_pdf_failure_message"
+"""
+the key in Otter's notebook metadata for the message to show if a notebook cannot be exported as a
+PDF
+"""
 
 
 @contextmanager
@@ -240,13 +253,24 @@ def knit_rmd_file(rmd_path, pdf_path):
 
 class loggers:
 
-    _format = "[%(levelname)s %(name)s.%(funcName)s] %(message)s"
     _instances = {}
     _log_level = logging.WARNING
+    _formatter = logging.Formatter("[%(levelname)s %(name)s.%(funcName)s] %(message)s")
+    _socket_handler = None
 
     @staticmethod
     def __new__(cls, *args, **kwargs):
         raise NotImplementedError("This class is not meant to be instantiated")
+    
+    @classmethod
+    def send_logs(cls, host, port):
+        """
+        Add a ``SocketHandler`` to all loggers that sends their logs to a TCP socket at the
+        specified host and port.
+        """
+        cls._socket_handler = logging.handlers.SocketHandler(host, port)
+        for logger in cls._instances.values():
+            logger.addHandler(cls._socket_handler)
 
     @classmethod
     def get_logger(cls, name):
@@ -260,9 +284,10 @@ class loggers:
         logger.propagate = False  # prevent child loggers from inheriting the handler
         logger.setLevel(cls._log_level)
         handler = logging.StreamHandler()
-        formatter = logging.Formatter(cls._format)
-        handler.setFormatter(formatter)
+        handler.setFormatter(cls._formatter)
         logger.addHandler(handler)
+        if cls._socket_handler:
+            logger.addHandler(cls._socket_handler)
         cls._instances[name] = logger
         return logger
 

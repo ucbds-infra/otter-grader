@@ -1,5 +1,15 @@
 # Changelog
 
+**v5.1.0:**
+
+* Removed patch that strips cell IDs from notebooks in Otter Assign per [#677](https://github.com/ucbds-infra/otter-grader/issues/677)
+* Added notebook force-save to R notebook assignments per [#474](https://github.com/ucbds-infra/otter-grader/issues/474)
+* Updated default version of `ottr` to v1.4.0
+* Added a configuration to require students to acknowledge when a PDF of their notebook cannot be generated when using `Notebook.export` before exporting the zip file per [#599](https://github.com/ucbds-infra/otter-grader/issues/599)
+* Added a simple TCP socket server for receiving Otter's logs from the executed notebook to re-enable question logging during Otter Assign per [#589](https://github.com/ucbds-infra/otter-grader/issues/589)
+* Fixed recursive inclusion of files when a directory is in the list passed to the `files` argument of `Notebook.export` per [#620](https://github.com/ucbds-infra/otter-grader/issues/620)
+* Fixed the grader export cell failing due to warnings about frozen modules per [#686](https://github.com/ucbds-infra/otter-grader/issues/686)
+
 **v5.0.2:**
 
 * Fixed local submission zip checking with `otter.Notebook` per [#678](https://github.com/ucbds-infra/otter-grader/issues/678)

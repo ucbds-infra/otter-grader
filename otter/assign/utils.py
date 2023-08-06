@@ -1,19 +1,25 @@
 """Utilities for Otter Assign"""
 
 import copy
+import fica
 import json
 import os
 import pathlib
 import re
 import shutil
 
-from contextlib import redirect_stdout, redirect_stderr
-from io import StringIO
 from textwrap import indent
 
 from ..api import grade_submission
 from ..generate import main as generate_autograder
-from ..utils import get_source, NOTEBOOK_METADATA_KEY, loggers
+from ..run import capture_run_output
+from ..utils import (
+    get_source,
+    loggers,
+    NO_PDF_EXPORT_MESSAGE_KEY,
+    NOTEBOOK_METADATA_KEY,
+    REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY,
+)
 
 
 LOGGER = loggers.get_logger(__name__)
@@ -90,18 +96,6 @@ def remove_output(nb):
             cell['outputs'] = []
         if 'execution_count' in cell:
             cell['execution_count'] = None
-
-
-def remove_cell_ids(nb):
-    """
-    Remove all cell IDs from a notebook in-place.
-
-    Args:
-        nb (``nbformat.NotebookNode``): a notebook
-    """
-    for cell in nb['cells']:
-        if 'id' in cell:
-            cell.pop('id')
 
 
 def lock(cell):
@@ -203,15 +197,14 @@ def run_tests(assignment, debug=False):
     Raises:
         ``RuntimeError``: if the grade received by the notebook is not 100%
     """
-    stdout = StringIO()
-    with redirect_stdout(stdout), redirect_stderr(stdout):
+    with capture_run_output() as run_output:
         results = grade_submission(
             str(assignment.ag_notebook_path),
             str(assignment.ag_zip_path),
             debug=debug,
         )
 
-    LOGGER.debug(f"Otter Run output:\n{stdout.getvalue()}")
+    LOGGER.debug(f"Otter Run output:\n{run_output.getvalue()}")
 
     if results.total != results.possible:
         raise RuntimeError(f"Some autograder tests failed in the autograder notebook:\n" + \
@@ -352,3 +345,21 @@ def add_assignment_name_to_notebook(nb, assignment):
         if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
             nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
         nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_name"] = assignment.name
+
+
+def add_require_no_pdf_ack_to_notebook(nb, assignment):
+    """
+    Add the no PDF ACK configurtion from the assignment config to the provided notebook's metadata
+    in-place.
+
+    Args:
+        nb (``nbformat.NotebookNode``): the notebook to add the name to
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
+    """
+    if assignment.export_cell and assignment.export_cell.require_no_pdf_ack:
+        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
+            nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
+        nb["metadata"][NOTEBOOK_METADATA_KEY][REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY] = True
+        if isinstance(assignment.export_cell.require_no_pdf_ack, fica.Config):
+            nb["metadata"][NOTEBOOK_METADATA_KEY][NO_PDF_EXPORT_MESSAGE_KEY] = \
+                assignment.export_cell.require_no_pdf_ack.message

@@ -8,7 +8,7 @@ import tempfile
 from abc import ABC, abstractmethod
 
 from ..autograder_config import AutograderConfig
-from ..utils import OtterRuntimeError, write_blank_page_to_stare_at_before_you
+from ..utils import OtterRuntimeError, print_output, write_blank_page_to_stare_at_before_you
 
 from ....utils import NOTEBOOK_METADATA_KEY
 
@@ -128,11 +128,11 @@ class AbstractLanguageRunner(ABC):
                 self.submit_pdf(client, pdf_path)
 
         except Exception as e:
-            print(f"\n\nError encountered while generating and submitting PDF:\n{e}")
+            print_output(f"\n\nError encountered while generating and submitting PDF:\n{e}")
             scores.set_pdf_error(e)
 
             if self.ag_config.submit_blank_pdf_on_export_failure and submit:
-                print("\nUploading a blank PDF due to export failure")
+                print_output("\nUploading a blank PDF due to export failure")
                 with tempfile.NamedTemporaryFile(suffix=".pdf") as ntf:
                     write_blank_page_to_stare_at_before_you(ntf.name)
                     self.submit_pdf(client, ntf.name)
@@ -162,7 +162,7 @@ class AbstractLanguageRunner(ABC):
                 pdf_path,
             )
 
-        print("\n\nSuccessfully uploaded submissions for: {}".format(
+        print_output("\n\nSuccessfully uploaded submissions for: {}".format(
             ", ".join(student_emails)))
 
     @abstractmethod

@@ -12,14 +12,28 @@ from IPython.display import display, HTML
 from textwrap import indent
 
 from .logs import LogEntry, EventType, Log
-from .utils import grade_zip_file, grading_mode_disabled, incompatible_with, IPythonInterpreter, \
-    list_available_tests, logs_event, resolve_test_info, save_notebook
+from .utils import (
+    display_pdf_confirmation_widget,
+    grade_zip_file,
+    grading_mode_disabled,
+    incompatible_with,
+    IPythonInterpreter,
+    list_available_tests,
+    logs_event,
+    resolve_test_info,
+    save_notebook,
+)
 
 from ..execute import Checker
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..utils import Loggable
+from ..utils import (
+    Loggable,
+    NO_PDF_EXPORT_MESSAGE_KEY,
+    NOTEBOOK_METADATA_KEY,
+    REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY,
+)
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -72,6 +86,9 @@ class Notebook(Loggable):
         else:
             self._path = tests_dir
 
+        # TODO: clean up logic for handling nb path; this can be determined in __init__ instead of
+        # begin computed every time. Maybe require it as an argument so it can be removed from other
+        # methods?
         self._notebook = nb_path
         self._tests_url_prefix = tests_url_prefix
         self._addl_files = []
@@ -343,10 +360,15 @@ class Notebook(Loggable):
             else:
                 self._logger.debug("Force-save successful")
 
+        otter_nb_config = {}
         with open(nb_path, "r", encoding="utf-8") as f:
             if len(f.read().strip()) == 0:
                 raise ValueError(f"Notebook '{nb_path}' is empty. Please save and checkpoint your "
                     "notebook and rerun this cell.")
+
+            f.seek(0)
+            # TODO: turn the notebook metadata configs into a fica.Config
+            otter_nb_config = json.load(f).get("metadata", {}).get(NOTEBOOK_METADATA_KEY, {})
 
         timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
         if export_path is None:
@@ -359,60 +381,73 @@ class Notebook(Loggable):
         zf = zipfile.ZipFile(zip_path, mode="w")
         zf.write(nb_path)
 
+        pdf_created = True
         if pdf:
             pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
             if os.path.isfile(pdf_path):
+                pdf_created = True
                 zf.write(pdf_path)
                 self._logger.debug(f"Wrote PDF to zip file: {pdf_path}")
             else:
+                pdf_created = False
                 warnings.warn("Could not locate a PDF to include")
 
-        if os.path.isfile(_OTTER_LOG_FILENAME):
-            zf.write(_OTTER_LOG_FILENAME)
-            self._logger.debug("Added Otter log to zip file")
+        def continue_export():
+            if os.path.isfile(_OTTER_LOG_FILENAME):
+                zf.write(_OTTER_LOG_FILENAME)
+                self._logger.debug("Added Otter log to zip file")
 
-        zip_basename = os.path.basename(zip_path)
-        zf.writestr(_ZIP_NAME_FILENAME, zip_basename)
-        self._logger.debug(f"Added {_ZIP_NAME_FILENAME} to zip file: '{zip_basename}'")
+            zip_basename = os.path.basename(zip_path)
+            zf.writestr(_ZIP_NAME_FILENAME, zip_basename)
+            self._logger.debug(f"Added {_ZIP_NAME_FILENAME} to zip file: '{zip_basename}'")
 
-        dot_otter = glob("*.otter")
-        if dot_otter:
-            if len(dot_otter) != 1:
-                raise ValueError("Too many .otter files (max 1 allowed)")
-            dot_otter = dot_otter[0]
-            zf.write(dot_otter)
-            self._logger.debug(f"Added .otter file to zip file: {dot_otter}")
+            dot_otter = glob("*.otter")
+            if dot_otter:
+                if len(dot_otter) != 1:
+                    raise ValueError("Too many .otter files (max 1 allowed)")
+                dot_otter = dot_otter[0]
+                zf.write(dot_otter)
+                self._logger.debug(f"Added .otter file to zip file: {dot_otter}")
 
-        for file in files:
-            if os.path.isdir(file):
-                sub_files = glob(f"./{file}/**/*.*")
-                for sub_file in sub_files:
-                    zf.write(sub_file)
-            else:
+            for file in files:
+                if os.path.isdir(file):
+                    sub_files = glob(f"{file}/**/*.*", recursive=True)
+                    for sub_file in sub_files:
+                        zf.write(sub_file)
+                else:
+                    zf.write(file)
+                self._logger.debug(f"Added file to zip file: {file}")
+
+            for file in self._addl_files:
                 zf.write(file)
-            self._logger.debug(f"Added file to zip file: {file}")
+                self._logger.debug(f"Added plugin file to zip file: {file}")
 
-        for file in self._addl_files:
-            zf.write(file)
-            self._logger.debug(f"Added plugin file to zip file: {file}")
+            zf.close()
 
-        zf.close()
+            if run_tests:
+                print("Running your submission against local test cases...\n")
+                results = grade_zip_file(zip_path, nb_path, self._path)
+                print(
+                    "Your submission received the following results when run against " + \
+                    "available test cases:\n\n" + indent(results.summary(), "    "))
 
-        if run_tests:
-            print("Running your submission against local test cases...\n")
-            results = grade_zip_file(zip_path, nb_path, self._path)
-            print(
-                "Your submission received the following results when run against " + \
-                "available test cases:\n\n" + indent(results.summary(), "    "))
+            if display_link:
+                # create and display output HTML
+                out_html = f"""
+                    <p>
+                        Your submission has been exported. Click
+                        <a href="{zip_path}" downloadzip_path target="_blank">here</a> to download
+                        the zip file.
+                    </p>
+                """
 
-        if display_link:
-            # create and display output HTML
-            out_html = """
-            <p>Your submission has been exported. Click <a href="{}" download="{}" target="_blank">here</a>
-            to download the zip file.</p>
-            """.format(zip_path, zip_path)
+                display(HTML(out_html))
 
-            display(HTML(out_html))
+        if pdf_created or not otter_nb_config.get(REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY, False):
+            continue_export()
+        else:
+            display_pdf_confirmation_widget(
+                otter_nb_config.get(NO_PDF_EXPORT_MESSAGE_KEY), continue_export)
 
     @grading_mode_disabled
     @logs_event(EventType.END_CHECK_ALL)
