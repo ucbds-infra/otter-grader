@@ -62,7 +62,7 @@ jobs:
           GITHUB_USER: ${{ secrets.GITHUB_USER }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            hub release create -a dist/*.tar.gz -a dist/*.whl \
+            hub release create -a dist/*.tar.gz -a dist/*.whl -t release \
             -m 'v${{ github.event.inputs.version }}' 'v${{ github.event.inputs.version }}'
 
       - name: Create a latest tag
