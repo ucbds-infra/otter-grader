@@ -8,6 +8,7 @@
 * Added a configuration to require students to acknowledge when a PDF of their notebook cannot be generated when using `Notebook.export` before exporting the zip file per [#599](https://github.com/ucbds-infra/otter-grader/issues/599)
 * Added a simple TCP socket server for receiving Otter's logs from the executed notebook to re-enable question logging during Otter Assign per [#589](https://github.com/ucbds-infra/otter-grader/issues/589)
 * Fixed recursive inclusion of files when a directory is in the list passed to the `files` argument of `Notebook.export` per [#620](https://github.com/ucbds-infra/otter-grader/issues/620)
+* Fixed the grader export cell failing due to warnings about frozen modules per [#686](https://github.com/ucbds-infra/otter-grader/issues/686)
 
 **v5.0.2:**
 
