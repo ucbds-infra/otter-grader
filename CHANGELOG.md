@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.2.0 (unreleased):**
+
+* Migrate installation of `ottr` from `setup.sh` to `environment.yml` with the [`r-ottr` conda-forge recipe](https://anaconda.org/conda-forge/r-ottr)
+
 **v5.1.0:**
 
 * Removed patch that strips cell IDs from notebooks in Otter Assign per [#677](https://github.com/ucbds-infra/otter-grader/issues/677)

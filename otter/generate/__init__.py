@@ -67,6 +67,7 @@ class CondaEnvironment:
                 "r-startup",
                 "r-rmarkdown",
                 "r-stringi",
+                f"r-ottr=={OTTR_VERSION}",
             ])
 
         pip_deps = self.requirements if self.overwrite_requirements else [
@@ -103,7 +104,6 @@ class CondaEnvironment:
 
     def to_str(self):
         return dump_yaml(self.to_dict(), indent=2)
-        # return yaml.safe_dump(self.to_dict(), sort_keys=False, indent=2)
 
 
 COMMON_TEMPLATES = [
