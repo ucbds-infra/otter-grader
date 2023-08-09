@@ -151,7 +151,7 @@ class AbstractLanguageRunner(ABC):
             metadata = json.load(f)
 
         student_emails = []
-        for user in metadata["users"]:
+        for user in metadata.get("users", []):
             student_emails.append(user["email"])
 
         for student_email in student_emails:

@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.1.1 (unreleased):**
+
+* Fixed a bug in attempting to read the users from the submission metadata when validating the autograder notebook in Otter Assign per [#695](https://github.com/ucbds-infra/otter-grader/issues/695)
+
 **v5.1.0:**
 
 * Removed patch that strips cell IDs from notebooks in Otter Assign per [#677](https://github.com/ucbds-infra/otter-grader/issues/677)
