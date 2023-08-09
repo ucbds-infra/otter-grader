@@ -3,6 +3,7 @@
 **v5.2.0 (unreleased):**
 
 * Migrate installation of `ottr` from `setup.sh` to `environment.yml` with the [`r-ottr` conda-forge recipe](https://anaconda.org/conda-forge/r-ottr)
+* Added `__getstate__` to `test_case` to fix pickling bug for exception style tests per [#696](https://github.com/ucbds-infra/otter-grader/issues/696)
 
 **v5.1.0:**
 
