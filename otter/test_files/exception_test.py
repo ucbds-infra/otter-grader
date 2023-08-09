@@ -97,6 +97,20 @@ class test_case:
         call_kwargs = {arg: (global_environment if arg == "env" else \
                 global_environment.get(arg, None)) for arg in args}
         return self.test_func(**call_kwargs)
+    
+    def __getstate__(self):
+        """
+        Creates a representation of the state of the instance. The attributes of the object are 
+        packaged into a dictionary representation excluding certain attributes. ``test_func`` is 
+        excluded because it cannot be pickled.
+
+        Returns:
+            ``dict``: a dictionary representation of the instance's state
+        """
+        state = self.__dict__.copy()
+        if 'test_func' in state:
+            del state['test_func']
+        return state
 
 
 class ExceptionTestFile(TestFile):
