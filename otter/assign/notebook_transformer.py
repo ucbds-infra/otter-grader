@@ -28,6 +28,7 @@ from .utils import (
     is_cell_type,
     is_ignore_cell,
     lock,
+    remove_cell_ids_if_applicable,
 )
 
 
@@ -136,6 +137,8 @@ class NotebookTransformer:
         add_assignment_name_to_notebook(transformed_nb, self.assignment)
 
         add_require_no_pdf_ack_to_notebook(transformed_nb, self.assignment)
+
+        remove_cell_ids_if_applicable(transformed_nb)
 
         return TransformedNotebookContainer(transformed_nb, self)
 
