@@ -4,6 +4,7 @@
 
 * Fixed a bug in attempting to read the users from the submission metadata when validating the autograder notebook in Otter Assign per [#695](https://github.com/ucbds-infra/otter-grader/issues/695)
 * Added `__getstate__` to `test_case` to fix pickling bug for exception style tests per [#696](https://github.com/ucbds-infra/otter-grader/issues/696)
+* Added back remove cell ID patch to Otter Assign for notebooks with nbformat version < 4.5 per [#701](https://github.com/ucbds-infra/otter-grader/issues/701)
 
 **v5.1.0:**
 

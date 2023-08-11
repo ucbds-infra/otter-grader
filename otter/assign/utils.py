@@ -363,3 +363,17 @@ def add_require_no_pdf_ack_to_notebook(nb, assignment):
         if isinstance(assignment.export_cell.require_no_pdf_ack, fica.Config):
             nb["metadata"][NOTEBOOK_METADATA_KEY][NO_PDF_EXPORT_MESSAGE_KEY] = \
                 assignment.export_cell.require_no_pdf_ack.message
+
+
+
+def remove_cell_ids_if_applicable(nb):
+    """
+    Remove all cell IDs from a notebook in-place iff the nbformat of the notebook is < 4.5.
+
+    Args:
+        nb (``nbformat.NotebookNode``): a notebook
+    """
+    if nb["nbformat"] < 4 or (nb["nbformat"] == 4 and nb["nbformat_minor"] < 5):
+        for cell in nb.cells:
+            if "id" in cell:
+                cell.pop("id")
