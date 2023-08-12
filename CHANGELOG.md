@@ -1,6 +1,6 @@
 # Changelog
 
-**v5.1.1 (unreleased):**
+**v5.1.1:**
 
 * Fixed a bug in attempting to read the users from the submission metadata when validating the autograder notebook in Otter Assign per [#695](https://github.com/ucbds-infra/otter-grader/issues/695)
 * Added `__getstate__` to `test_case` to fix pickling bug for exception style tests per [#696](https://github.com/ucbds-infra/otter-grader/issues/696)
