@@ -4,6 +4,7 @@
 
 * Enabled the use of custom Jupyter kernels by enforcing the use of the `python3` kernel inside Otter grading containers per [#706](https://github.com/ucbds-infra/otter-grader/issues/706)
 * Fixed a bug that was preventing Otter from exiting when an error was thrown during notebook execution caused by the log capturing solution per [#707](https://github.com/ucbds-infra/otter-grader/issues/707)
+* Updated PDF upload logic to surface error statuses returned by the Gradescope API
 
 **v5.1.1:**
 
