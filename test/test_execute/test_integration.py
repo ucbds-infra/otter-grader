@@ -5,6 +5,8 @@ import pytest
 import shutil
 import tempfile
 
+from glob import glob
+
 from otter.check.logs import EventType, Log, LogEntry
 from otter.execute import grade_notebook
 
@@ -19,6 +21,31 @@ def temp_dir():
     d = tempfile.mkdtemp()
     yield d
     shutil.rmtree(d)
+
+
+def test_kernel_override(temp_dir):
+    """
+    Tests that ``otter.execute.grade_notebook`` overrides a custom kernel name when indicated.
+    """
+    nb = nbf.v4.new_notebook(cells=[nbf.v4.new_code_cell("x = 2")])
+    nb["metadata"]["kernelspec"] = {"name": "somekernel"}
+    subm_path = os.path.join(temp_dir, "submission.ipynb")
+    nbf.write(nb, subm_path)
+
+    test_dir = os.path.join(temp_dir, "tests")
+    os.makedirs(test_dir)
+
+    write_ok_test(os.path.join(test_dir, "q1.py"), ">>> assert x == 2")
+
+    results = grade_notebook(
+        subm_path,
+        test_dir=test_dir,
+        tests_glob=glob(os.path.join(test_dir, "*.py")),
+        ignore_errors=False,
+    )
+
+    assert results.notebook["metadata"]["kernelspec"]["name"] == "python3"
+    assert results.total == 1
 
 
 def test_log_execution(temp_dir):
