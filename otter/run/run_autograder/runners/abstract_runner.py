@@ -155,12 +155,15 @@ class AbstractLanguageRunner(ABC):
             student_emails.append(user["email"])
 
         for student_email in student_emails:
-            client.upload_pdf_submission(
+            res = client.upload_pdf_submission(
                 self.ag_config.course_id,
                 self.ag_config.assignment_id,
                 student_email,
                 pdf_path,
             )
+            if res.status_code != 200:
+                raise OtterRuntimeError(
+                    f"Failed to upload submission for {student_email}: [status {res.status_code}] {res.text}")
 
         print_output("\n\nSuccessfully uploaded submissions for: {}".format(
             ", ".join(student_emails)))
