@@ -19,14 +19,15 @@ def grade_notebook(
     *,
     tests_glob=[],
     ignore_errors=True,
-    script=False, 
+    script=False,
     cwd=None,
     test_dir=None,
     seed=None,
     seed_variable=None,
     log=None,
-    variables=None, 
+    variables=None,
     plugin_collection=None,
+    force_python3_kernel=True,
 ):
     """
     Grade an assignment file and return grade information.
@@ -83,6 +84,7 @@ def grade_notebook(
         c.GradingPreprocessor.variables = variables
         c.GradingPreprocessor.logging_server_host = host
         c.GradingPreprocessor.logging_server_port = port
+        c.GradingPreprocessor.force_python3_kernel = force_python3_kernel
 
         # ExecutePreprocessor config
         c.ExecutePreprocessor.allow_errors = ignore_errors

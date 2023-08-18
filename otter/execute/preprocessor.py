@@ -8,7 +8,7 @@ import tempfile
 from nbconvert.exporters import PythonExporter
 from nbconvert.preprocessors import Preprocessor
 from textwrap import dedent
-from traitlets import Dict, Instance, Integer, List, Unicode
+from traitlets import Bool, Dict, Instance, Integer, List, Unicode
 from typing import Optional, Tuple
 
 from ..check.logs import Log
@@ -72,6 +72,8 @@ class GradingPreprocessor(Preprocessor):
 
     logging_server_port = Integer().tag(config=True)
 
+    force_python3_kernel = Bool().tag(config=True)
+
     @property
     def from_log(self):
         return self.otter_log is not None
@@ -83,6 +85,7 @@ class GradingPreprocessor(Preprocessor):
         self.add_checks(nb)
         self.add_seeds(nb)
         self.add_cwd_to_path(nb)
+        self.update_kernel(nb)
         self.add_init_and_export_cells(nb)  # this should always be the last call
         return nb, resources
 
@@ -193,6 +196,11 @@ class GradingPreprocessor(Preprocessor):
         tree = ast.parse(e.from_notebook_node(nb)[0])
         ic.visit(tree)
         nb.cells = [nbf.v4.new_code_cell(ic.to_script())]
+
+    def update_kernel(self, nb):
+        if not self.force_python3_kernel:
+            return
+        nb["metadata"]["kernelspec"]["name"] = "python3"
 
     def cleanup(self):
         if self._log_temp_file:

@@ -162,3 +162,5 @@ class AutograderConfig(fica.Config):
             "if a PDF cannot be generated from the submission",
         default=False,
     )
+
+    _otter_run = False

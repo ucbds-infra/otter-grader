@@ -134,6 +134,7 @@ class PythonRunner(AbstractLanguageRunner):
                 variables = self.ag_config.serialized_variables,
                 plugin_collection = plugin_collection,
                 script = os.path.splitext(subm_path)[1] == ".py",
+                force_python3_kernel=os.getcwd().startswith("/autograder"), # TODO: find a better way of doing this
             )
 
             # verify the scores against the log
