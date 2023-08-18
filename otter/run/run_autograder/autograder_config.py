@@ -164,3 +164,4 @@ class AutograderConfig(fica.Config):
     )
 
     _otter_run = False
+    """whether this autograder run is being run by Otter Run (i.e. without containerization)"""
