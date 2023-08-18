@@ -1,5 +1,10 @@
 # Changelog
 
+**v5.1.2 (unreleased):**
+
+* Enabled the use of custom Jupyter kernels by enforcing the use of the `python3` kernel inside Otter grading containers per [#706](https://github.com/ucbds-infra/otter-grader/issues/706)
+* Fixed a bug that was preventing Otter from exiting when an error was thrown during notebook execution caused by the log capturing solution per [#707](https://github.com/ucbds-infra/otter-grader/issues/707)
+
 **v5.1.1:**
 
 * Fixed a bug in attempting to read the users from the submission metadata when validating the autograder notebook in Otter Assign per [#695](https://github.com/ucbds-infra/otter-grader/issues/695)
