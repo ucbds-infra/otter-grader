@@ -200,11 +200,12 @@ class GradingPreprocessor(Preprocessor):
     def update_kernel(self, nb):
         if not self.force_python3_kernel:
             return
-        nb["metadata"]["kernelspec"]["name"] = "python3"
+        nb["metadata"].get("kernelspec", {})["name"] = "python3"
 
     def cleanup(self):
         if self._log_temp_file:
             os.close(self._log_temp_file[0])
+            os.remove(self._log_temp_file[1])
 
 
 class ImportCollector(ast.NodeVisitor):
