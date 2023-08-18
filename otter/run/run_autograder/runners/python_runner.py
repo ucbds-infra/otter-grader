@@ -134,7 +134,7 @@ class PythonRunner(AbstractLanguageRunner):
                 variables = self.ag_config.serialized_variables,
                 plugin_collection = plugin_collection,
                 script = os.path.splitext(subm_path)[1] == ".py",
-                force_python3_kernel=self.ag_config._otter_run,
+                force_python3_kernel = not self.ag_config._otter_run,
             )
 
             # verify the scores against the log
