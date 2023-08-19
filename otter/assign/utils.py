@@ -160,7 +160,7 @@ def remove_tag(cell, tag):
     return cell
 
 
-def str_to_doctest(code_lines, lines):
+def str_to_doctest(code_lines, lines, opens=None):
     """
     Convert a list of lines of Python code ``code_lines`` to the doctest format and appending the
     results to ``lines``.
@@ -174,16 +174,26 @@ def str_to_doctest(code_lines, lines):
     """
     if len(code_lines) == 0:
         return lines
+    if opens is None:
+        opens = []
+    in_statement = len(opens) > 0
     line = code_lines.pop(0)
+    for c in line:
+        if c == "(" or c == "[" or c == "{":
+            opens.append(c)
+        elif c == ")" or c == "]" or c == "}":
+            opens.pop()
     if line.startswith(" ") or line.startswith("\t"):
-        return str_to_doctest(code_lines, lines + ["... " + line])
+        return str_to_doctest(code_lines, lines + ["... " + line], opens=opens)
     elif bool(re.match(r"^except[\s\w]*:", line)) or line.startswith("elif ") or \
             line.startswith("else:") or line.startswith("finally:"):
-        return str_to_doctest(code_lines, lines + ["... " + line])
+        return str_to_doctest(code_lines, lines + ["... " + line], opens=opens)
     elif len(lines) > 0 and lines[-1].strip().endswith("\\"):
-        return str_to_doctest(code_lines, lines + ["... " + line])
+        return str_to_doctest(code_lines, lines + ["... " + line], opens=opens)
+    elif in_statement:
+        return str_to_doctest(code_lines, lines + ["... " + line], opens=opens)
     else:
-        return str_to_doctest(code_lines, lines + [">>> " + line])
+        return str_to_doctest(code_lines, lines + [">>> " + line], opens=opens)
 
 
 def run_tests(assignment, debug=False):
