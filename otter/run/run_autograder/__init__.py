@@ -16,14 +16,16 @@ from ...utils import chdir, import_or_raise, loggers
 LOGGER = loggers.get_logger(__name__)
 
 
-def main(autograder_dir, **kwargs):
+def main(autograder_dir, otter_run=False, **kwargs):
     """
     Run the autograding process.
 
     Args:
         autograder_dir (``str``): the absolute path of the directory in which autograding is occurring
             (e.g. on Gradescope, this is ``/autograder``)
-        **kwargs: keyword arguments for updating autograder configurations=; these values override
+        otter_run (``bool``): whether this function is being invoked by Otter Run (i.e. without
+            containerization)
+        **kwargs: keyword arguments for updating autograder configurations; these values override
             anything present in ``otter_config.json``
     """
     dill = import_or_raise("dill")
@@ -38,6 +40,7 @@ def main(autograder_dir, **kwargs):
     config["autograder_dir"] = autograder_dir
 
     runner = create_runner(config, **kwargs)
+    runner.ag_config._otter_run = otter_run
 
     if runner.get_option("log_level") is not None:
         loggers.set_level(runner.get_option("log_level"))

@@ -12,16 +12,15 @@ overridden using the ``-l`` flag which takes the name of the language as its arg
 
 The default behavior of Otter Assign is to do the following:
 
-#. Filter test cells from the master notebook and write these to test files
+#. Filter test cells from the master notebook and create test objects from these
 #. Add Otter initialization, export, and ``Notebook.check_all`` cells
 #. Clear outputs and write questions (with metadata hidden), prompts, and solutions to a notebook 
    in a new ``autograder`` directory
-#. Write *all* tests to ``autograder/tests``
+#. Write *all* tests to the notebook metadata of the ``autograder`` notebook
 #. Copy autograder notebook with solutions removed into a new ``student`` directory
-#. Write *public* tests to ``student/tests``
+#. Remove all hidden tests from the notebook in the ``student`` directory``
 #. Copy ``files`` into ``autograder`` and ``student`` directories
-#. (If ``generate`` is passed,) generate a Gradescope autograder zipfile from the ``autograder`` 
-   directory
+#. Generate a Gradescope autograder zipfile from the ``autograder`` directory
 #. Run all tests in ``autograder/tests`` on the solutions notebook to ensure they pass
 
 These behaviors can be customized using command line flags; see the :ref:`cli_reference` for more

@@ -4,6 +4,18 @@
 
 * Migrate installation of `ottr` from `setup.sh` to `environment.yml` with the [`r-ottr` conda-forge recipe](https://anaconda.org/conda-forge/r-ottr)
 
+**v5.1.2:**
+
+* Enabled the use of custom Jupyter kernels by enforcing the use of the `python3` kernel inside Otter grading containers per [#706](https://github.com/ucbds-infra/otter-grader/issues/706)
+* Fixed a bug that was preventing Otter from exiting when an error was thrown during notebook execution caused by the log capturing solution per [#707](https://github.com/ucbds-infra/otter-grader/issues/707)
+* Updated PDF upload logic to surface error statuses returned by the Gradescope API
+
+**v5.1.1:**
+
+* Fixed a bug in attempting to read the users from the submission metadata when validating the autograder notebook in Otter Assign per [#695](https://github.com/ucbds-infra/otter-grader/issues/695)
+* Added `__getstate__` to `test_case` to fix pickling bug for exception style tests per [#696](https://github.com/ucbds-infra/otter-grader/issues/696)
+* Added back remove cell ID patch to Otter Assign for notebooks with nbformat version < 4.5 per [#701](https://github.com/ucbds-infra/otter-grader/issues/701)
+
 **v5.1.0:**
 
 * Removed patch that strips cell IDs from notebooks in Otter Assign per [#677](https://github.com/ucbds-infra/otter-grader/issues/677)

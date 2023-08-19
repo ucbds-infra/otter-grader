@@ -19,14 +19,15 @@ def grade_notebook(
     *,
     tests_glob=[],
     ignore_errors=True,
-    script=False, 
+    script=False,
     cwd=None,
     test_dir=None,
     seed=None,
     seed_variable=None,
     log=None,
-    variables=None, 
+    variables=None,
     plugin_collection=None,
+    force_python3_kernel=True,
 ):
     """
     Grade an assignment file and return grade information.
@@ -72,30 +73,32 @@ def grade_notebook(
 
         (host, port), stop_server = start_server()
 
-        # GradingPreprocessor config
-        c.GradingPreprocessor.cwd = cwd
-        c.GradingPreprocessor.test_dir = test_dir
-        c.GradingPreprocessor.tests_glob = tests_glob
-        c.GradingPreprocessor.results_path = ntf.name
-        c.GradingPreprocessor.seed = seed
-        c.GradingPreprocessor.seed_variable = seed_variable
-        c.GradingPreprocessor.otter_log = log
-        c.GradingPreprocessor.variables = variables
-        c.GradingPreprocessor.logging_server_host = host
-        c.GradingPreprocessor.logging_server_port = port
+        try:
+            # GradingPreprocessor config
+            c.GradingPreprocessor.cwd = cwd
+            c.GradingPreprocessor.test_dir = test_dir
+            c.GradingPreprocessor.tests_glob = tests_glob
+            c.GradingPreprocessor.results_path = ntf.name
+            c.GradingPreprocessor.seed = seed
+            c.GradingPreprocessor.seed_variable = seed_variable
+            c.GradingPreprocessor.otter_log = log
+            c.GradingPreprocessor.variables = variables
+            c.GradingPreprocessor.logging_server_host = host
+            c.GradingPreprocessor.logging_server_port = port
+            c.GradingPreprocessor.force_python3_kernel = force_python3_kernel
 
-        # ExecutePreprocessor config
-        c.ExecutePreprocessor.allow_errors = ignore_errors
+            # ExecutePreprocessor config
+            c.ExecutePreprocessor.allow_errors = ignore_errors
 
-        gp = GradingPreprocessor(config=c)
-        ep = ExecutePreprocessor(config=c)
+            gp = GradingPreprocessor(config=c)
+            ep = ExecutePreprocessor(config=c)
 
-        nb, _ = gp.preprocess(nb)
-        executed_nb, _ = ep.preprocess(nb)
+            nb, _ = gp.preprocess(nb)
+            executed_nb, _ = ep.preprocess(nb)
 
-        stop_server()
-
-        gp.cleanup()
+        finally:
+            stop_server()
+            gp.cleanup()
 
         results = pickle.load(ntf)
 
