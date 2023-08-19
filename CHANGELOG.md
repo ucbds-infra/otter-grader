@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.2.0 (unreleased):**
+
+* Migrate installation of `ottr` from `setup.sh` to `environment.yml` with the [`r-ottr` conda-forge recipe](https://anaconda.org/conda-forge/r-ottr)
+
 **v5.1.2:**
 
 * Enabled the use of custom Jupyter kernels by enforcing the use of the `python3` kernel inside Otter grading containers per [#706](https://github.com/ucbds-infra/otter-grader/issues/706)
