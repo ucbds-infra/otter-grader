@@ -2,7 +2,7 @@ OK_FORMAT = True
 
 test = {   'name': 'q1',
     'points': None,
-    'suites': [   {   'cases': [   {   'code': '>>> isinstance(x, int)\nTrue',
+    'suites': [   {   'cases': [   {   'code': '>>> isinstance(    x,\n...     int,\n... )\nTrue',
                                        'failure_message': 'This is not an int.',
                                        'hidden': False,
                                        'locked': False,
