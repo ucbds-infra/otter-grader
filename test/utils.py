@@ -49,7 +49,11 @@ def assert_notebooks_equal(p1, p2):
     # ignore cell IDs
     for c in [*nb1.cells, *nb2.cells]:
         c.pop("id", None)
-    assert nb1 == nb2
+    diff = subprocess.run(
+                    ["diff", "--context=5", p1, p2],
+                    stdout=subprocess.PIPE,
+                ).stdout.decode("utf-8")
+    assert nb1 == nb2, f"Contents of {p1} did not equal contents of {p2}:\n{diff}"
 
 
 def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):

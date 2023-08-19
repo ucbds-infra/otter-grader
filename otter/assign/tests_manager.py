@@ -1,5 +1,7 @@
 """Assignment tests manager for Otter Assign"""
 
+import ast
+import astunparse
 import os
 import pandas as pd
 import pprint
@@ -251,7 +253,8 @@ class AssignmentTestsManager:
         Returns:
             ``dict``: the OK-formatted test case
         """
-        code_lines = str_to_doctest(test_case.input.split('\n'), [])
+        inp = ast.unparse(ast.parse(test_case.input))
+        code_lines = str_to_doctest(inp.split('\n'), [])
         code_lines.append(test_case.output)
 
         ret = {
