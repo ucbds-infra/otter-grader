@@ -1,8 +1,9 @@
 import pytest
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from otter.execute.checker import Checker
+from otter.nbmeta_config import NBMetadataConfig
 from otter.test_files import OKTestFile
 
 
@@ -18,36 +19,41 @@ def reset_checker():
     Checker.disable_tracking()
 
 
+@pytest.fixture
+def nbmeta_config():
+    return NBMetadataConfig()
+
+
 class TestChecker:
     """
     Tests for ``otter.execute.checker.Checker``.
     """
 
-    def test_tracking_disabled(self, mocked_create_test_file):
+    def test_tracking_disabled(self, mocked_create_test_file, nbmeta_config):
         res = Checker.get_results()
-        Checker.check("")
+        Checker.check("", nbmeta_config)
         assert len(res) == 0
 
-    def test_tracking_enabled(self, mocked_create_test_file):
+    def test_tracking_enabled(self, mocked_create_test_file, nbmeta_config):
         res = Checker.get_results()
         Checker.enable_tracking()
-        Checker.check("")
+        Checker.check("", nbmeta_config)
         assert len(res) == 1
 
-    def test_tracking_toggles(self, mocked_create_test_file):
+    def test_tracking_toggles(self, mocked_create_test_file, nbmeta_config):
         res = Checker.get_results()
-        Checker.check("")
+        Checker.check("", nbmeta_config)
         assert len(res) == 0
 
         Checker.enable_tracking()
-        Checker.check("")
+        Checker.check("", nbmeta_config)
         assert len(res) == 1
 
-        Checker.check("")
+        Checker.check("", nbmeta_config)
         assert len(res) == 2
 
         Checker.disable_tracking()
-        Checker.check("")
+        Checker.check("", nbmeta_config)
         assert len(res) == 2
 
     def test_get_results_and_clear_results(self, mocked_create_test_file):
@@ -58,43 +64,43 @@ class TestChecker:
         assert res is not Checker.get_results()
 
     @patch("otter.execute.checker.inspect.currentframe")
-    def test_check_path_only(self, mocked_currentframe, mocked_create_test_file):
+    def test_check_path_only(self, mocked_currentframe, mocked_create_test_file, nbmeta_config):
         path = "foo.ipynb"
 
-        ret = Checker.check(path)
+        ret = Checker.check(path, nbmeta_config)
 
-        mocked_create_test_file.assert_called_once_with(path, test_name=None)
+        mocked_create_test_file.assert_called_once_with(path, nbmeta_config, test_name=None)
         mocked_currentframe.assert_called_once()
         mocked_create_test_file.return_value.run.assert_called_once_with(
             mocked_currentframe.return_value.f_back.f_globals)
         assert ret is mocked_create_test_file.return_value
 
     @patch("otter.execute.checker.inspect.currentframe")
-    def test_check_path_and_test_name(self, mocked_currentframe, mocked_create_test_file):
+    def test_check_path_and_test_name(self, mocked_currentframe, mocked_create_test_file, nbmeta_config):
         path, test_name = "foo.ipynb", "q1"
 
-        ret = Checker.check(path, test_name)
+        ret = Checker.check(path, nbmeta_config, test_name)
 
-        mocked_create_test_file.assert_called_once_with(path, test_name=test_name)
+        mocked_create_test_file.assert_called_once_with(path, nbmeta_config, test_name=test_name)
         mocked_currentframe.assert_called_once()
         mocked_create_test_file.return_value.run.assert_called_once_with(
             mocked_currentframe.return_value.f_back.f_globals)
         assert ret is mocked_create_test_file.return_value
 
     @patch("otter.execute.checker.inspect.currentframe")
-    def test_check_path_and_global_env(self, mocked_currentframe, mocked_create_test_file):
+    def test_check_path_and_global_env(self, mocked_currentframe, mocked_create_test_file, nbmeta_config):
         path, global_env = "foo.ipynb", {}
 
-        ret = Checker.check(path, global_env=global_env)
+        ret = Checker.check(path, nbmeta_config, global_env=global_env)
 
-        mocked_create_test_file.assert_called_once_with(path, test_name=None)
+        mocked_create_test_file.assert_called_once_with(path, nbmeta_config, test_name=None)
         mocked_currentframe.assert_not_called()
         mocked_create_test_file.return_value.run.assert_called_once_with(global_env)
         assert ret is mocked_create_test_file.return_value
 
     @patch("otter.execute.checker.inspect.currentframe")
     @patch.object(Checker, "check")
-    def test_check_if_not_already_checked(self, mocked_check, mocked_currentframe):
+    def test_check_if_not_already_checked(self, mocked_check, mocked_currentframe, nbmeta_config):
         Checker._test_files = [
             OKTestFile("", "q1.py", []),
             OKTestFile("", "tests/q2.py", []),
@@ -117,7 +123,7 @@ class TestChecker:
 
             if t["want_call"]:
                 global_env = t.get("global_env", mocked_currentframe.return_value.f_back.f_globals)
-                mocked_check.assert_called_once_with(t["path"], global_env=global_env)
+                mocked_check.assert_called_once_with(t["path"], nbmeta_config, global_env=global_env)
                 assert ret is mocked_check.return_value
             else:
                 mocked_check.assert_not_called()

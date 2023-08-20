@@ -126,7 +126,8 @@ class PluginCollection:
     def run(self, event, *args, **kwargs):
         """
         Runs the method ``event`` of each plugin in this collection. Passes ``args`` and ``kwargs``
-        to this method. Ignores plugins that raise ``PluginEventNotSupportedException`` for this event.
+        to this method. Ignores plugins that raise ``PluginEventNotSupportedException`` for this
+        event.
 
         Args:
             event (``str``): name of the method of the plugin to run
@@ -135,7 +136,6 @@ class PluginCollection:
         Returns:
             ``list[Any]``: the values returned by each plugin for the called event
         """
-        # TODO: logging to stdout
         rets = []
         for plugin in self._plugins:
             try:

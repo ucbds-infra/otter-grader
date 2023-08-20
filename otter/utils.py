@@ -12,12 +12,11 @@ import shutil
 import tempfile
 import yaml
 
-from contextlib import contextmanager, redirect_stdout
+from contextlib import contextmanager
 from functools import lru_cache
 from IPython import get_ipython
 
 
-# TODO: migrate other uses to this constant
 NBFORMAT_VERSION = 4
 """the version of the Jupyter notebook format to use"""
 
@@ -35,6 +34,9 @@ NO_PDF_EXPORT_MESSAGE_KEY = "export_pdf_failure_message"
 the key in Otter's notebook metadata for the message to show if a notebook cannot be exported as a
 PDF
 """
+
+OTTER_CONFIG_FILENAME = "otter_config.json"
+"""the file name for the autograder config JSON file"""
 
 
 @contextmanager
@@ -96,7 +98,6 @@ def get_relpath(src, dst):
     Returns:
         ``pathlib.Path``: the relative path
     """
-    # osrc = src
     ups = 0
     while True:
         try:

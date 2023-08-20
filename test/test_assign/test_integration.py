@@ -52,7 +52,6 @@ def assign_and_check_output(nb_path, correct_dir, assign_kwargs={}, assert_dirs_
     assert_dirs_equal(output_path, correct_dir, **assert_dirs_equal_kwargs)
 
 
-# TODO: refactor existing tests to use this
 @pytest.fixture
 def generate_master_notebook(cleanup_enabled):
     """
@@ -67,6 +66,7 @@ def generate_master_notebook(cleanup_enabled):
             raise RuntimeError(f"{nb_path} already exists")
         nb = nbf.read(FILE_MANAGER.get_path("master-skeleton.ipynb"), as_version=nbf.NO_CONVERT)
         config_cell = nbf.v4.new_raw_cell("# ASSIGNMENT CONFIG\n" + dump_yaml(assignment_config))
+        config_cell.pop("id") # all test notebooks use nbformat < 4.5
         nb.cells.insert(0, config_cell)
 
         nbf.write(nb, nb_path)
@@ -256,8 +256,6 @@ def test_require_no_pdf_ack(generate_master_notebook):
     )
 
 
-# TODO: this format of test makes the repo bloated with several golden files. Can these files be
-# eliminated?
 def test_require_no_pdf_ack_with_message(generate_master_notebook):
     """
     Tests that Otter Assign produces correct notebooks when configured to require students to

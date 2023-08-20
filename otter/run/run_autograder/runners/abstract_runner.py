@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from ..autograder_config import AutograderConfig
 from ..utils import OtterRuntimeError, print_output, write_blank_page_to_stare_at_before_you
 
-from ....utils import NOTEBOOK_METADATA_KEY
+from ....nbmeta_config import NBMetadataConfig
 
 
 class AbstractLanguageRunner(ABC):
@@ -26,28 +26,8 @@ class AbstractLanguageRunner(ABC):
     ag_config: AutograderConfig
     """the autograder config"""
 
-    def __init__(self, otter_config, **kwargs):
-        self.ag_config = AutograderConfig({**otter_config, **kwargs})
-
-    @staticmethod
-    def determine_language(otter_config, **kwargs):
-        """
-        Determine the language of the assignment based on user-specified configurations.
-        """
-        # TODO: use fica.Key.get_default when available
-        return kwargs.get("lang", otter_config.get("lang", AutograderConfig.lang.get_value()))
-
-    def get_option(self, option):
-        """
-        Return the value of a configuration, including defaults.
-        """
-        return self.ag_config[option]
-
-    def get_config(self):
-        """
-        Return the autograder config.
-        """
-        return self.ag_config
+    def __init__(self, ag_config: AutograderConfig):
+        self.ag_config = ag_config
 
     def prepare_files(self):
         """
@@ -100,10 +80,8 @@ class AbstractLanguageRunner(ABC):
         Returns:
             ``str | None``: the assignment name of the notebook, if any
         """
-        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
-            return None
-
-        return nb["metadata"][NOTEBOOK_METADATA_KEY].get("assignment_name", None)
+        nbmc = NBMetadataConfig.from_notebook(nb)
+        return nbmc.assignment_name
 
     def write_and_maybe_submit_pdf(self, client, submission_path, submit, scores):
         """

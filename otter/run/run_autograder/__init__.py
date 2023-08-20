@@ -9,8 +9,12 @@ from glob import glob
 
 from .runners import create_runner
 from .utils import capture_run_output, OtterRuntimeError, print_output
+
 from ...version import LOGO_WITH_VERSION
-from ...utils import chdir, import_or_raise, loggers
+from ...utils import chdir, loggers, nullcontext, OTTER_CONFIG_FILENAME
+
+
+__all__ = ["capture_run_output", "main"]
 
 
 LOGGER = loggers.get_logger(__name__)
@@ -28,85 +32,87 @@ def main(autograder_dir, otter_run=False, **kwargs):
         **kwargs: keyword arguments for updating autograder configurations; these values override
             anything present in ``otter_config.json``
     """
-    dill = import_or_raise("dill")
+    import dill
 
-    config_fp = os.path.join(autograder_dir, "source", "otter_config.json")
+    config_fp = os.path.join(autograder_dir, "source", OTTER_CONFIG_FILENAME)
     if os.path.isfile(config_fp):
         with open(config_fp, encoding="utf-8") as f:
             config = json.load(f)
     else:
         config = {}
 
-    config["autograder_dir"] = autograder_dir
-
-    runner = create_runner(config, **kwargs)
+    runner = create_runner(config, autograder_dir=autograder_dir, **kwargs)
     runner.ag_config._otter_run = otter_run
 
-    if runner.get_option("log_level") is not None:
-        loggers.set_level(runner.get_option("log_level"))
-        # TODO: log above calls
-        # TODO: use loggers.level_context
+    ctx = nullcontext()
+    if runner.ag_config.log_level is not None:
+        ctx = loggers.level_context(runner.ag_config.log_level)
 
-    if runner.get_option("logo"):
-        # ASCII 8207 is an invisible non-whitespace character; this should prevent gradescope from
-        # incorrectly left-stripping the whitespace at the beginning of the logo
-        print_output(f"{chr(8207)}\n", LOGO_WITH_VERSION, "\n", sep="")
+    with ctx:
+        LOGGER.debug(f"Detected containerized grading (T/F): {'F' if otter_run else 'T'}")
+        LOGGER.debug(f"Config file path was resolved as: {config_fp}")
+        LOGGER.debug(f"Autograder config was created: {runner.ag_config}")
 
-    abs_ag_path = os.path.abspath(runner.get_option("autograder_dir"))
-    with chdir(abs_ag_path):
-        try:
-            if runner.get_option("zips"):
-                with chdir("./submission"):
-                    zips = glob("*.zip")
-                    if len(zips) > 1:
-                        raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
+        if runner.ag_config.logo:
+            # U+8207 is an invisible non-whitespace character; this should prevent gradescope from
+            # incorrectly left-stripping the whitespace at the beginning of the logo
+            print_output(f"{chr(8207)}\n", LOGO_WITH_VERSION, "\n", sep="")
 
-                    with zipfile.ZipFile(zips[0])  as zf:
-                        zf.extractall()
+        abs_ag_path = os.path.abspath(runner.ag_config.autograder_dir)
+        with chdir(abs_ag_path):
+            try:
+                if runner.ag_config.zips:
+                    with chdir("./submission"):
+                        zips = glob("*.zip")
+                        if len(zips) > 1:
+                            raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
 
-            runner.prepare_files()
-            scores = runner.run()
-            with open("results/results.pkl", "wb+") as f:
-                    dill.dump(scores, f)
+                        with zipfile.ZipFile(zips[0])  as zf:
+                            zf.extractall()
 
-            output = scores.to_gradescope_dict(runner.get_config())
+                runner.prepare_files()
+                scores = runner.run()
+                with open("results/results.pkl", "wb+") as f:
+                        dill.dump(scores, f)
 
-        except OtterRuntimeError as e:
-            output = {
-                "score": 0,
-                "stdout_visibility": "hidden",
-                "tests": [
-                    {
-                        "name": "Autograder Error",
-                        "output": f"Otter encountered an error when grading this submission:\n\n{e}",
-                    },
-                ],
-            }
-            raise e
+                output = scores.to_gradescope_dict(runner.ag_config)
 
-        finally:
-            if "output" in vars():
-                with open("./results/results.json", "w+") as f:
-                    json.dump(output, f, indent=4)                
+            except OtterRuntimeError as e:
+                output = {
+                    "score": 0,
+                    "stdout_visibility": "hidden",
+                    "tests": [
+                        {
+                            "name": "Autograder Error",
+                            "output": f"Otter encountered an error when grading this submission:\n\n{e}",
+                        },
+                    ],
+                }
+                raise e
 
-    print_output("\n\n", end="")
+            finally:
+                if "output" in vars():
+                    with open("./results/results.json", "w+") as f:
+                        json.dump(output, f, indent=4)                
 
-    df = pd.DataFrame(output["tests"])
+        print_output("\n\n", end="")
 
-    if runner.get_option("print_score"):
-        total, possible = df["score"].sum(), df["max_score"].sum()
-        if "score" in output:
-            total, possible = output["score"], runner.get_option("points_possible") or possible
-        perc = total / possible * 100
-        print_output(f"Total Score: {total:.3f} / {possible:.3f} ({perc:.3f}%)\n")
+        df = pd.DataFrame(output["tests"])
 
-    if runner.get_option("print_summary"):
-        pd.set_option("display.max_rows", None)  # print all rows of the dataframe
-        if "output" in df.columns:
-            df.drop(columns=["output"], inplace=True)
-        if "visibility" in df.columns:
-            df.drop(columns=["visibility"], inplace=True)
-        if "status" in df.columns:
-            df.drop(columns=["status"], inplace=True)
+        if runner.ag_config.print_score:
+            total, possible = df["score"].sum(), df["max_score"].sum()
+            if "score" in output:
+                total, possible = output["score"], runner.ag_config.points_possible or possible
+            perc = total / possible * 100
+            print_output(f"Total Score: {total:.3f} / {possible:.3f} ({perc:.3f}%)\n")
 
-        print_output(df)
+        if runner.ag_config.print_summary:
+            pd.set_option("display.max_rows", None)  # print all rows of the dataframe
+            if "output" in df.columns:
+                df.drop(columns=["output"], inplace=True)
+            if "visibility" in df.columns:
+                df.drop(columns=["visibility"], inplace=True)
+            if "status" in df.columns:
+                df.drop(columns=["status"], inplace=True)
+
+            print_output(df)

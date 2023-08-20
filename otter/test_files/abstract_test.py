@@ -1,75 +1,78 @@
 """Abstract test objects for providing a schema to write and parse test cases"""
 
 import random
+
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, replace
 from textwrap import indent
-from typing import Optional, Union
+from typing import List, Optional, Union
 
-
-OK_FORMAT_VARNAME = "OK_FORMAT"
-
-
-# # class for storing the test cases themselves
-# #   - body is the string that gets run for the test
-# #   - hidden is the visibility of the test case
-# #   - points is the number of points this test case is worth
-# TestCase = namedtuple("TestCase", ["name", "body", "hidden", "points", "success_message", "failure_message"])
 
 @dataclass
 class TestCase:
 
     name: str
+    """"""
 
     body: str
+    """"""
 
     hidden: bool
+    """"""
 
     points: Union[int, float]
+    """"""
 
     success_message: Optional[str]
+    """"""
 
     failure_message: Optional[str]
+    """"""
 
 
 @dataclass
 class TestCaseResult:
 
     test_case: TestCase
+    """"""
 
     message: Optional[str]
+    """"""
 
     passed: bool
-
-# # class for storing the results of a single test _case_ (within a test file)
-# #   - message should be a string to print out to the student (ignored if passed is True)
-# #   - passed is whether the test case passed
-# #   - hidden is the visibility of the test case
-# TestCaseResult = namedtuple("TestCaseResult", ["test_case", "message", "passed"])
+    """"""
 
 
 class TestFile(ABC):
     """
-    A (abstract) single test file for Otter. This ABC defines how test results are represented and sets
-    up the instance variables tracked by tests. Subclasses should implement the abstract class method
-    ``from_file`` and the abstract instance method ``run``.
+    An (abstract) single test file for Otter. This ABC defines how test results are represented and
+    sets up the instance variables tracked by tests. Subclasses should implement the abstract class
+    method ``from_file`` and the abstract instance method ``run``.
 
     Args:
         name (``str``): the name of test file
         path (``str``): the path to the test file
-        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
-            cases
-
-    Attributes:
-        name (``str``): the name of test file
-        path (``str``): the path to the test file
-        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
-            cases
-        test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
-            ``test_cases``
+        test_cases (``list[TestCase]``): a list of parsed tests to be run
+        all_or_nothing (``bool``): whether the test should be graded all-or-nothing across cases
     """
+
+    name: str
+    """the name of test file"""
+
+    path: str
+    """the path to the test file"""
+
+    test_cases: List[TestCase]
+    """a list of parsed tests to be run"""
+
+    all_or_nothing: bool
+    """whether the test should be graded all-or-nothing across cases"""
+
+    test_case_results: List[TestCaseResult]
+    """a list of results for the test cases in ``test_cases``"""
+
+    _score: Optional[Union[int, float]]
+    """an override for the overall score for this test file"""
 
     def _repr_html_(self):
         if self.passed_all:
@@ -96,7 +99,6 @@ class TestFile(ABC):
     def __repr__(self):
         return self.summary()
 
-    # @abstractmethod
     def __init__(self, name, path, test_cases, all_or_nothing=True):
         self.name = name
         self.path = path

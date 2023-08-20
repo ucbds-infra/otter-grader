@@ -5,15 +5,6 @@ import os
 from .utils import WkhtmltopdfNotFoundError
 
 
-# TODO: convert to import_or_raise?
-# check for nbconvert and disable otter.export if it's not installed -- #458
-_MISSING_NBCONVERT = False
-try:
-    import nbconvert
-except ImportError:
-    _MISSING_NBCONVERT = True
-
-
 def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
     """
     Exports a notebook file at ``nb_path`` to a PDF with optional filtering and pagebreaks. Accepts
@@ -28,7 +19,10 @@ def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
     Returns:
         ``str``: the path at which the PDF was written
     """
-    if _MISSING_NBCONVERT:
+    # If nbconvert is not installed, users should be informed that it is required for Otter Export.
+    try:
+        import nbconvert as _
+    except:
         raise ImportError("nbconvert is required for Otter Export but it could not be found")
 
     from .exporters import get_exporter

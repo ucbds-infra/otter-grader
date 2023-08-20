@@ -62,12 +62,11 @@ variable name collisions, propagating errors, or other things that would cause t
 fail a test they should be passing.
 
 
-.. TODO: fix this section
-
 Exporting Submissions
 +++++++++++++++++++++
 
-Students can also use the ``Notebook`` class to generate their own PDFs for manual grading using the 
+Students can also use the ``Notebook`` class to generate a zip file containing all of their work for
+submission with the 
 method ``Notebook.export``. This function takes an optional argument of the path to the notebook; if 
 unspecified, it will infer the path by trying to read the config file (if present), using the path 
 of the only notebook in the working directory if there is only one, or it will raise an error 

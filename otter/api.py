@@ -3,8 +3,6 @@
 __all__ = ["export_notebook", "grade_submission"]
 
 import os
-import shutil
-import tempfile
 
 from contextlib import redirect_stdout
 
@@ -41,22 +39,17 @@ def grade_submission(submission_path, ag_path="autograder.zip", quiet=False, deb
         ``otter.test_files.GradingResults``: the results object produced during the grading of the
             submission.
     """
-    dp = tempfile.mkdtemp()
-
     if quiet:
         f = open(os.devnull, "w")
         cm = redirect_stdout(f)
     else:
         cm = nullcontext()
 
-    # TODO: is the output_dir argument of run_grader necessary here?
     with cm:
         results = run_grader(
-            submission_path, autograder=ag_path, output_dir=dp, no_logo=True, debug=debug)
+            submission_path, autograder=ag_path, output_dir=None, no_logo=True, debug=debug)
 
     if quiet:
         f.close()
-
-    shutil.rmtree(dp)
 
     return results

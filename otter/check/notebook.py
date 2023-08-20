@@ -3,6 +3,7 @@
 import datetime as dt
 import inspect
 import json
+import nbformat as nbf
 import os
 import warnings
 import zipfile
@@ -10,6 +11,7 @@ import zipfile
 from glob import glob
 from IPython.display import display, HTML
 from textwrap import indent
+from typing import Any, Dict, List, Optional
 
 from .logs import LogEntry, EventType, Log
 from .utils import (
@@ -19,6 +21,7 @@ from .utils import (
     incompatible_with,
     IPythonInterpreter,
     list_available_tests,
+    LoggedEventReturnValue,
     logs_event,
     resolve_test_info,
     save_notebook,
@@ -26,14 +29,10 @@ from .utils import (
 
 from ..execute import Checker
 from ..export import export_notebook
+from ..nbmeta_config import NBMetadataConfig
 from ..plugins import PluginCollection
 from ..test_files import GradingResults
-from ..utils import (
-    Loggable,
-    NO_PDF_EXPORT_MESSAGE_KEY,
-    NOTEBOOK_METADATA_KEY,
-    REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY,
-)
+from ..utils import Loggable
 
 
 _OTTER_LOG_FILENAME = ".OTTER_LOG"
@@ -46,18 +45,50 @@ class Notebook(Loggable):
     Notebook class for in-notebook autograding
 
     Args:
-        nb_path(``str``, optional): path to the notebook being run
-        tests_dir (``str``, optional): path to tests directory
-        colab (``bool``, optional): whether this notebook is being run on Google Colab; if ``None``,
+        nb_path (``str | None``): path to the notebook being run
+        tests_dir (``str``): path to tests directory
+        tests_url_prefix (``str | None``): a URL prefix to use to download test files
+        colab (``bool | None``): whether this notebook is being run on Google Colab; if ``None``,
             this information is automatically parsed from IPython on creation
-        jupyterlite (``bool``, optional): whether this notebook is being run on JupyterLite; if
+        jupyterlite (``bool | None``): whether this notebook is being run on JupyterLite; if
             ``None``, this information is automatically parsed from IPython on creation
     """
 
     _grading_mode = False
+    """(class property) whether Otter is currently in grading mode"""
 
-    # overrides tests_dir arg in __init__, used for changing tests dir during grading
     _tests_dir_override = None
+    """(class property) an override for the path to the tests directory"""
+
+    _notebook: Optional[str]
+    """"""
+
+    _tests_dir: str
+    """"""
+
+    _tests_url_prefix: Optional[str]
+    """"""
+
+    _addl_files: List[str]
+    """"""
+
+    _plugin_collections: Dict[str, PluginCollection]
+    """"""
+
+    _interpreter: Optional[IPythonInterpreter]
+    """"""
+
+    _nbmeta_config: NBMetadataConfig
+    """"""
+
+    _config: Optional[Dict[str, Any]] = None
+    """"""
+
+    _ignore_modules: Optional[List[str]] = None
+    """"""
+
+    _vars_to_store: Optional[Dict[str, str]] = None
+    """"""
 
     @logs_event(EventType.INIT)
     def __init__(
@@ -82,14 +113,12 @@ class Notebook(Loggable):
             raise ValueError(f"Tests directory {tests_dir} does not exist")
 
         if type(self)._tests_dir_override is not None:
-            self._path = type(self)._tests_dir_override
+            self._tests_dir = type(self)._tests_dir_override
         else:
-            self._path = tests_dir
+            self._tests_dir = tests_dir
 
-        # TODO: clean up logic for handling nb path; this can be determined in __init__ instead of
-        # begin computed every time. Maybe require it as an argument so it can be removed from other
-        # methods?
         self._notebook = nb_path
+        self._notebook = self._resolve_nb_path(nb_path, fail_silently=True)
         self._tests_url_prefix = tests_url_prefix
         self._addl_files = []
         self._plugin_collections = {}
@@ -110,6 +139,12 @@ class Notebook(Loggable):
 
             self._notebook = self._config["notebook"]
 
+        if self._notebook:
+            self._nbmeta_config = NBMetadataConfig.from_notebook(
+                nbf.read(self._notebook, nbf.NO_CONVERT))
+        else:
+            self._nbmeta_config = NBMetadataConfig()
+
     @classmethod
     def init_grading_mode(cls, tests_dir):
         logger = cls._get_logger()
@@ -121,17 +156,26 @@ class Notebook(Loggable):
         Checker.enable_tracking()
 
     @incompatible_with(IPythonInterpreter.PYOLITE, throw_error=False)
-    def _log_event(self, event_type, results=[], question=None, success=True, error=None, shelve_env={}):
+    def _log_event(
+        self,
+        event_type,
+        results=None,
+        question=None,
+        success=True,
+        error=None,
+        shelve_env=None,
+    ):
         """
-        Logs an event
+        Log an event to Otter's client log file.
 
         Args:
             event_type (``otter.logs.EventType``): the type of event
-            results (``list[otter.test_files.abstract_test.TestFile]``, optional):
-                the results of any checks recorded by the entry
-            question (``str``, optional): the question name for this check
-            success (``bool``, optional): whether the operation was successful
-            error (``Exception``, optional): the exception thrown by the operation, if applicable
+            results (``otter.test_files.TestFile | otter.test_files.GradingResults | None``): the
+                results of any checks recorded by the entry
+            question (``str``): the question name for this check
+            success (``bool``): whether the operation was successful
+            error (``Exception``): the exception thrown by the operation, if applicable
+            shelve_env (``Dict[str, object] | None``): the environment to shelve
         """
         entry = LogEntry(
             event_type,
@@ -142,6 +186,9 @@ class Notebook(Loggable):
         )
 
         if _SHELVE and event_type == EventType.CHECK:
+            if not isinstance(shelve_env, dict):
+                raise TypeError(f"shelve_env has an invalid type: {type(shelve_env)}")
+
             entry.shelve(
                 shelve_env,
                 delete=True,
@@ -154,11 +201,11 @@ class Notebook(Loggable):
 
     def _resolve_nb_path(self, nb_path, fail_silently=False):
         """
-        Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``, ``self._notebook``
-        is checked, then the working directory is searched for ``.ipynb`` files.
+        Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``,
+        ``self._notebook`` is checked, then the working directory is searched for ``.ipynb`` files.
 
         Args:
-            nb_path (``Optional[str]``): path to the notebook
+            nb_path (``str | None``): path to the notebook
             fail_silently (``bool``): if true, the method does not fail the notebook path can't be
                 resolved
 
@@ -166,7 +213,8 @@ class Notebook(Loggable):
             ``str``: resolved notebook path
 
         Raises:
-            ``ValueError``: if no notebooks or too many notebooks are found.
+            ``ValueError``: if no notebooks or too many notebooks are found and ``fail_silently`` is
+                false
         """
         if nb_path is None and self._notebook is not None:
             nb_path = self._notebook
@@ -191,16 +239,16 @@ class Notebook(Loggable):
 
         Args:
             question (``str``): name of question being graded
-            global_env (``dict``, optional): global environment resulting from execution of a single
-                notebook
+            global_env (``dict[str, object]  | None``): a global environment in which to run the
+                tests
 
         Returns:
             ``otter.test_files.abstract_test.TestFile``: the grade for the question
         """
         self._logger.info(f"Running check for question: {question}")
         test_path, test_name = resolve_test_info(
-            self._path,
-            self._resolve_nb_path(None, fail_silently=True),
+            self._tests_dir,
+            self._notebook,
             self._tests_url_prefix,
             question,
         )
@@ -223,9 +271,9 @@ class Notebook(Loggable):
 
         # run the check
         self._logger.debug(f"Calling checker")
-        result = Checker.check(test_path, test_name, global_env)
+        result = Checker.check(test_path, self._nbmeta_config, test_name, global_env)
 
-        return question, result, global_env
+        return LoggedEventReturnValue(result, question=question, shelve_env=global_env)
 
     @incompatible_with(IPythonInterpreter.COLAB)
     def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
@@ -254,17 +302,24 @@ class Notebook(Loggable):
     @grading_mode_disabled
     @incompatible_with(IPythonInterpreter.COLAB)
     @logs_event(EventType.TO_PDF)
-    def to_pdf(self, nb_path=None, filtering=True, pagebreaks=True, display_link=True, force_save=False):
+    def to_pdf(
+        self,
+        nb_path=None,
+        filtering=True,
+        pagebreaks=True,
+        display_link=True,
+        force_save=False,
+    ):
         """
         Exports a notebook to a PDF using Otter Export
 
         Args:
-            nb_path (``str``, optional): path to the notebook we want to export; will attempt to infer
+            nb_path (``str | None``): path to the notebook we want to export; will attempt to infer
                 if not provided
-            filtering (``bool``, optional): set true if only exporting a subset of notebook cells to PDF
-            pagebreaks (``bool``, optional): if true, pagebreaks are included between questions
-            display_link (``bool``, optional): whether or not to display a download link
-            force_save (``bool``, optional): whether or not to display JavaScript that force-saves the
+            filtering (``bool``): set true if only exporting a subset of notebook cells to PDF
+            pagebreaks (``bool``): if true, pagebreaks are included between questions
+            display_link (``bool``): whether or not to display a download link
+            force_save (``bool``): whether or not to display JavaScript that force-saves the
                 notebook (only works in Jupyter Notebook classic, not JupyterLab)
         """
         nb_path = self._resolve_nb_path(nb_path)
@@ -305,7 +360,7 @@ class Notebook(Loggable):
             plugin_name (``str``): importable name of an Otter plugin that implements the 
                 ``from_notebook`` hook
             *args: arguments to be passed to the plugin
-            nb_path (``str``, optional): path to the notebook
+            nb_path (``str | None``): path to the notebook
             **kwargs: keyword arguments to be passed to the plugin        
         """
         nb_path = self._resolve_nb_path(nb_path)
@@ -322,28 +377,46 @@ class Notebook(Loggable):
     @grading_mode_disabled
     @incompatible_with(IPythonInterpreter.COLAB)
     @logs_event(EventType.END_EXPORT)
-    def export(self, nb_path=None, export_path=None, pdf=True, filtering=True, pagebreaks=True, files=[], 
-            display_link=True, force_save=False, run_tests=False):
+    def export(
+        self,
+        nb_path=None,
+        export_path=None,
+        pdf=True,
+        filtering=True,
+        pagebreaks=True,
+        files=None, 
+        display_link=True,
+        force_save=False,
+        run_tests=False,
+    ):
         """
-        Exports a submission to a zip file. Creates a submission zipfile from a notebook at ``nb_path``,
-        optionally including a PDF export of the notebook and any files in ``files``.
+        Export a submission zip file.
+        
+        Creates a submission zipfile from a notebook at ``nb_path``, optionally including a PDF
+        export of the notebook and any files in ``files``.
+
+        If ``run_tests`` is true, the zip is validated by running it against local test cases in a
+        separate Python process. The results of this run are printed to stdout.
 
         Args:
-            nb_path (``str``, optional): path to the notebook we want to export; will attempt to infer
+            nb_path (``str | None``): path to the notebook we want to export; will attempt to infer
                 if not provided
-            export_path (``str``, optional): path at which to write zipfile; defaults to notebook's
-                name + ``.zip``
-            pdf (``bool``, optional): whether a PDF should be included
-            filtering (``bool``, optional): whether the PDF should be filtered; ignored if ``pdf`` is
-                ``False``
-            pagebreaks (``bool``, optional): whether pagebreaks should be included between questions
-                in the PDF
-            files (``list`` of ``str``, optional): paths to other files to include in the zip file
-            display_link (``bool``, optional): whether or not to display a download link
-            force_save (``bool``, optional): whether or not to display JavaScript that force-saves the
+            export_path (``str | None``): path at which to write zipfile; defaults to
+                ``{notebook name}_{timestamp}.zip``
+            pdf (``bool``): whether a PDF should be included
+            filtering (``bool``): whether the PDF should be filtered
+            pagebreaks (``bool``): whether pagebreaks should be included between questions in the
+                PDF
+            files (``list[str] | None``): paths to other files to include in the zip file
+            display_link (``bool``): whether or not to display a download link
+            force_save (``bool``): whether or not to display JavaScript that force-saves the
                 notebook (only works in Jupyter Notebook classic, not JupyterLab)
+            run_tests (``bool``): whether to validating the resulting submission zip against local
+                test cases
         """
         self._log_event(EventType.BEGIN_EXPORT)
+
+        files = [] if files is None else files
 
         nb_path = self._resolve_nb_path(nb_path)
         self._logger.debug(f"Resolved notebook path: {nb_path}")
@@ -360,15 +433,12 @@ class Notebook(Loggable):
             else:
                 self._logger.debug("Force-save successful")
 
-        otter_nb_config = {}
         with open(nb_path, "r", encoding="utf-8") as f:
             if len(f.read().strip()) == 0:
                 raise ValueError(f"Notebook '{nb_path}' is empty. Please save and checkpoint your "
                     "notebook and rerun this cell.")
 
             f.seek(0)
-            # TODO: turn the notebook metadata configs into a fica.Config
-            otter_nb_config = json.load(f).get("metadata", {}).get(NOTEBOOK_METADATA_KEY, {})
 
         timestamp = dt.datetime.now().strftime("%Y_%m_%dT%H_%M_%S_%f")
         if export_path is None:
@@ -426,7 +496,7 @@ class Notebook(Loggable):
 
             if run_tests:
                 print("Running your submission against local test cases...\n")
-                results = grade_zip_file(zip_path, nb_path, self._path)
+                results = grade_zip_file(zip_path, nb_path, self._tests_dir)
                 print(
                     "Your submission received the following results when run against " + \
                     "available test cases:\n\n" + indent(results.summary(), "    "))
@@ -443,22 +513,22 @@ class Notebook(Loggable):
 
                 display(HTML(out_html))
 
-        if pdf_created or not otter_nb_config.get(REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY, False):
+        if pdf_created or not self._nbmeta_config.require_no_pdf_confirmation:
             continue_export()
         else:
             display_pdf_confirmation_widget(
-                otter_nb_config.get(NO_PDF_EXPORT_MESSAGE_KEY), continue_export)
+                self._nbmeta_config.export_pdf_failure_message, continue_export)
 
     @grading_mode_disabled
     @logs_event(EventType.END_CHECK_ALL)
     def check_all(self):
         """
-        Runs all tests on this notebook. Tests are run against the current global environment, so any
-        tests with variable name collisions will fail.
+        Runs all tests on this notebook. Tests are run against the current global environment, so
+        any tests with variable name collisions will fail.
         """
         self._log_event(EventType.BEGIN_CHECK_ALL)
 
-        tests = list_available_tests(self._path, self._resolve_nb_path(None, fail_silently=True))
+        tests = list_available_tests(self._tests_dir, self._notebook)
 
         global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
 
@@ -483,4 +553,4 @@ class Notebook(Loggable):
                     result = self.check(test_name, global_env)
                     results.append((test_name, result))
 
-        return GradingResults(results)
+        return LoggedEventReturnValue(GradingResults(results))

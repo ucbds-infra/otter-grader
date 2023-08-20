@@ -228,11 +228,14 @@ def test_force_public_test_summary(get_config_path, load_config):
     perform_test(True, True, True)
 
 
-def test_script(load_config, expected_results):
+def test_script(load_config, expected_results, get_config_path):
     config = load_config()
     nb_path = FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb")
     nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
     os.remove(nb_path)
+
+    # Remove the token so that we don't try to generate a PDF of a script.
+    config.pop("token")
 
     try:
         py, _ = nbconvert.export(nbconvert.PythonExporter, nb)
@@ -243,7 +246,8 @@ def test_script(load_config, expected_results):
         with FILE_MANAGER.open("autograder/submission/fails2and6H.py", "w+") as f:
             f.write(py)
 
-        run_autograder(config['autograder_dir'])
+        with alternate_config(get_config_path(), config):
+            run_autograder(config['autograder_dir'])
 
         with FILE_MANAGER.open("autograder/results/results.json") as f:
             actual_results = json.load(f)

@@ -6,6 +6,7 @@ import types
 import tempfile
 
 from enum import Enum, auto
+from typing import List, Optional, TYPE_CHECKING
 
 from ..utils import import_or_raise
 
@@ -33,14 +34,31 @@ class EventType(Enum):
     """
 
     AUTH = auto()
+    """an auth event"""
+
     BEGIN_CHECK_ALL = auto()
+    """beginning of a check-all cell"""
+
     BEGIN_EXPORT = auto()
+    """beginning of an assignment export"""
+
     CHECK = auto()
+    """a check of a single question"""
+
     END_CHECK_ALL = auto()
+    """ending of a check-all cell"""
+
     END_EXPORT = auto()
+    """ending of an assignment export"""
+
     INIT = auto()
+    """initialization of an :py:class:`otter.check.notebook.Notebook` object"""
+
     SUBMIT = auto()
+    """submission of an assignment (unused since Otter Service was removed)"""
+
     TO_PDF = auto()
+    """PDF export of a notebook (not used during a submission export)"""
 
 
 class LogEntry:
@@ -50,30 +68,53 @@ class LogEntry:
 
     Args:
         event_type (``EventType``): the type of event for this entry
-        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the 
-            results of grading if this is an ``EventType.CHECK`` record
-        question (``str``, optional): the question name for an ``EventType.CHECK`` record
-        success (``bool``, optional): whether the operation was successful
-        error (``Exception``, optional): an error thrown by the process being logged if any
-
-    Attributes:
-        event_type (``EventType``): the entry type
-        shelf (``bytes``): a pickled environment stored as a bytes string
-        unshelved (``list`` of ``str``): a list of variable names that were unable to be pickled during
-            shelving
-        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``): grading results 
-            if this is an ``EventType.CHECK`` entry
-        question (``str``): question name if this is a check entry
-        success (``bool``): whether the operation tracked by this entry was successful
-        error (``Exception``): an error thrown by the tracked process if applicable
-        timestamp (``datetime.datetime``): timestamp of event in UTC
+        results (``otter.test_files.TestFile | otter.test_files.GradingResults | None``): the 
+            results of grading if this is an ``EventType.CHECK`` or ``EventType.END_CHECK_ALL``
+            record
+        question (``str``): the question name for an ``EventType.CHECK`` record
+        success (``bool``): whether the operation was successful
+        error (``Exception``): an error thrown by the process being logged if any
     """
 
-    def __init__(self, event_type, shelf=None, unshelved=[], results=[], question=None, success=True, error=None):
-        assert event_type in EventType, "Invalid event type"
+    event_type: EventType
+    """the entry type"""
+
+    shelf: Optional[bytes]
+    """a pickled environment stored as a bytes string"""
+
+    not_shelved: List[str]
+    """a list of variable names that were not added to the shelf"""
+
+    results: Optional["GradingResults"]
+    """grading results if this is an ``EventType.CHECK`` entry"""
+
+    question: Optional[str]
+    """question name if this is a check entry"""
+
+    success: bool
+    """whether the operation tracked by this entry was successful"""
+
+    error: Optional[Exception]
+    """an error thrown by the tracked process if applicable"""
+
+    timestamp: dt.datetime
+    """timestamp of event in UTC"""
+
+    def __init__(
+        self,
+        event_type: EventType,
+        shelf: Optional[bytes] = None,
+        results: Optional["GradingResults"] = None,
+        question: Optional[str] = None,
+        success: bool = True,
+        error: Optional[Exception] = None,
+    ):
+        if event_type not in EventType:
+            raise TypeError("event_type has is not an EventType")
+
         self.event_type = event_type
         self.shelf = shelf
-        self.unshelved = []
+        self.not_shelved = []
         self.results = results
         self.question = question
         self.timestamp = dt.datetime.utcnow()
@@ -149,7 +190,7 @@ class LogEntry:
         """
         Stores an environment ``env`` in this log entry using dill as a ``bytes`` object in this entry
         as the ``shelf`` attribute. Writes names of any variables in ``env`` that are not stored to
-        the ``unshelved`` attribute.
+        the ``not_shelved`` attribute.
 
         If ``delete`` is ``True``, old environments in the log at ``filename`` for this question are
         cleared before writing ``env``. Any module names in ``ignore_modules`` will have their functions
@@ -209,9 +250,9 @@ class LogEntry:
         except UnboundLocalError:
             pass
 
-        shelf_contents, unshelved = LogEntry.shelve_environment(env, variables=variables, ignore_modules=ignore_modules)
+        shelf_contents, not_shelved = LogEntry.shelve_environment(env, variables=variables, ignore_modules=ignore_modules)
         self.shelf = shelf_contents
-        self.unshelved = unshelved
+        self.not_shelved = not_shelved
         return self
 
     def unshelve(self, global_env={}):
@@ -252,10 +293,10 @@ class LogEntry:
         Args:
             log (``list`` of ``LogEntry``): the log to sort
             ascending (``bool``, optional): whether the log should be sorted in ascending (chronological) 
-                order; default ``True``
+                order
 
         Returns:
-            ``list`` of ``LogEntry``: the sorted log
+            ``list[LogEntry]``: the sorted log
         """
         if ascending:
             return list(sorted(log, key = lambda l: l.timestamp))
@@ -268,11 +309,11 @@ class LogEntry:
 
         Args:
             filename (``str``): the path to the log
-            ascending (``bool``, optional): whether the log should be sorted in ascending (chronological) 
-                order; default ``True``
+            ascending (``bool``): whether the log should be sorted in ascending (chronological) 
+                order
 
         Returns:
-            ``list`` of ``LogEntry``: the sorted log
+            ``list[LogEntry]``: the sorted log
         """
         dill = import_or_raise("dill")
 
@@ -309,23 +350,23 @@ class LogEntry:
             ignore_modules (``list`` of ``str``, optional): the module names to igonre
 
         Returns:
-            ``tuple`` of (``bytes``, ``list`` of ``str``): the pickled environment and list of unshelved
-                variable names.
+            ``tuple[bytes, list[str]``: the pickled environment and list of variable names that were
+                not shelved
         """
         dill = import_or_raise("dill")
 
         from .notebook import Notebook
-        unshelved = []
+        not_shelved = []
         filtered_env = {}
         for k, v in env.items():
 
             # don't store modules or otter.Notebook instances
             if type(v) == types.ModuleType or type(v) == Notebook:
-                unshelved.append(k)
+                not_shelved.append(k)
 
             # ignore any functions whose __module__ is in ignore_modules
             elif type(v) == types.FunctionType and v.__module__ in ignore_modules:
-                unshelved.append(k)
+                not_shelved.append(k)
 
             # ensure object is pickleable by attempting dump and if so add to filtered_env
             else:
@@ -341,21 +382,21 @@ class LogEntry:
                             filtered_env[k] = v
 
                         else:
-                            unshelved.append(k)
+                            not_shelved.append(k)
 
                     else:
-                        unshelved.append(k)
+                        not_shelved.append(k)
 
                 except:
-                    unshelved.append(k)
+                    not_shelved.append(k)
 
-        # dump filtered_env to a temporary file and then return the bytes and unshelved list
+        # dump filtered_env to a temporary file and then return the bytes and not_shelved list
         with tempfile.TemporaryFile() as tf:
             dill.dump(filtered_env, tf)
             tf.seek(0)
             shelf_contents = tf.read()
 
-        return shelf_contents, unshelved
+        return shelf_contents, not_shelved
 
 
 class Log:
@@ -499,3 +540,7 @@ class QuestionLogIterator:
         entry = self.log.get_question_entry(question)
         self.curr_idx += 1
         return entry
+
+
+if TYPE_CHECKING:
+    from ..test_files import GradingResults

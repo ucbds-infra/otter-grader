@@ -84,7 +84,7 @@ def test_shelve():
 
     entry.shelve(env, delete=True, filename=_OTTER_LOG_FILENAME, ignore_modules=['calendar'])
     assert entry.shelf
-    assert entry.unshelved == ["module", "ignored_func"]
+    assert entry.not_shelved == ["module", "ignored_func"]
 
     entry.flush_to_file(_OTTER_LOG_FILENAME) 
 
