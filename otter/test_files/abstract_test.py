@@ -10,37 +10,43 @@ from typing import List, Optional, Union
 
 @dataclass
 class TestCase:
+    """
+    A dataclass representing a single test case in a test file.
+    """
 
     name: str
-    """"""
+    """the name of the test case"""
 
     body: str
-    """"""
+    """the code for the test case"""
 
     hidden: bool
-    """"""
+    """whether this test case is hidden from students"""
 
-    points: Union[int, float]
-    """"""
+    points: Optional[Union[int, float]]
+    """the point value of this test case"""
 
     success_message: Optional[str]
-    """"""
+    """a message to show to students if this test cases passes"""
 
     failure_message: Optional[str]
-    """"""
+    """a message to show to students if this test cases fails"""
 
 
 @dataclass
 class TestCaseResult:
+    """
+    A dataclass representing the results of running a test case.
+    """
 
     test_case: TestCase
-    """"""
+    """the test case"""
 
     message: Optional[str]
-    """"""
+    """an error message if the test case failed"""
 
     passed: bool
-    """"""
+    """whether the test case was passed"""
 
 
 class TestFile(ABC):

@@ -61,34 +61,34 @@ class Notebook(Loggable):
     """(class property) an override for the path to the tests directory"""
 
     _notebook: Optional[str]
-    """"""
+    """the path to the notebook file"""
 
     _tests_dir: str
-    """"""
+    """the path to the tests directory"""
 
     _tests_url_prefix: Optional[str]
-    """"""
+    """a URL prefix to use for downloading test files"""
 
     _addl_files: List[str]
-    """"""
+    """a list of additional file paths to include in the exported submission zip"""
 
     _plugin_collections: Dict[str, PluginCollection]
-    """"""
+    """a cache of ``PluginCollection`` objects for each plugin invoked in the notebook"""
 
     _interpreter: Optional[IPythonInterpreter]
-    """"""
+    """the interpreter that is currently running (if not the standard IPython interpreter)"""
 
     _nbmeta_config: NBMetadataConfig
-    """"""
+    """the metadata config from the notebook"""
 
     _config: Optional[Dict[str, Any]] = None
-    """"""
+    """the config loaded from the .otter file if there was one"""
 
     _ignore_modules: Optional[List[str]] = None
-    """"""
+    """a list of modules to ignore when serializing environments"""
 
     _vars_to_store: Optional[Dict[str, str]] = None
-    """"""
+    """a map of var names -> type name to use when serializing environments"""
 
     @logs_event(EventType.INIT)
     def __init__(

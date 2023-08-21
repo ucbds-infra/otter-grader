@@ -352,7 +352,7 @@ class TransformedNotebookContainer:
     """the notebook transformer used to create ``transformed_nb``"""
 
     nbmeta_config: NBMetadataConfig
-    """"""
+    """the notebook metadata config to include when writing the notebook"""
 
     def __init__(self, transformed_nb, nb_transformer):
         self.transformed_nb = transformed_nb
@@ -361,6 +361,7 @@ class TransformedNotebookContainer:
 
     def _populate_nbmeta_config(self, a: Assignment):
         """
+        Copy configurations from the ``Assignment`` into the ``NBMetadataConfig``.
         """
         self.nbmeta_config = NBMetadataConfig({})
         if a.name:
@@ -390,6 +391,7 @@ class TransformedNotebookContainer:
 
     def _add_nbmeta_config(self, nb):
         """
+        Add the notebook metadata config to the provided notebook's metadata in-place.
         """
         uc = self.nbmeta_config.get_user_config()
         if uc:
