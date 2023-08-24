@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.1.3 (unreleased):**
+
+* Fixed bug in submission zip download link per [#719](https://github.com/ucbds-infra/otter-grader/issues/719)
+
 **v5.1.2:**
 
 * Enabled the use of custom Jupyter kernels by enforcing the use of the `python3` kernel inside Otter grading containers per [#706](https://github.com/ucbds-infra/otter-grader/issues/706)
