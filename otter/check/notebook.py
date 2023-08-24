@@ -436,7 +436,7 @@ class Notebook(Loggable):
                 out_html = f"""
                     <p>
                         Your submission has been exported. Click
-                        <a href="{zip_path}" downloadzip_path target="_blank">here</a> to download
+                        <a href="{zip_path}" download="{zip_path}" target="_blank">here</a> to download
                         the zip file.
                     </p>
                 """
