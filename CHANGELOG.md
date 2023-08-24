@@ -1,6 +1,6 @@
 # Changelog
 
-**v5.1.3 (unreleased):**
+**v5.1.3:**
 
 * Fixed bug in submission zip download link per [#719](https://github.com/ucbds-infra/otter-grader/issues/719)
 
