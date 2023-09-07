@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.1.4 (unreleased):**
+
+* Gracefully handle a failure in reading the results pickle file by returning results indicating that such a failure has occurred per [#723](https://github.com/ucbds-infra/otter-grader/issues/723)
+
 **v5.1.3:**
 
 * Fixed bug in submission zip download link per [#719](https://github.com/ucbds-infra/otter-grader/issues/719)

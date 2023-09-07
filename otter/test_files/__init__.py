@@ -5,6 +5,7 @@ import math
 import nbformat
 import os
 import pickle
+import traceback
 
 from collections import namedtuple
 from typing import List
@@ -92,6 +93,7 @@ class GradingResults:
         self.all_hidden = False
         self.pdf_error = None
         self.notebook = notebook
+        self._catastrophic_error = None
 
     def __repr__(self):
         return self.summary()
@@ -146,6 +148,14 @@ class GradingResults:
             test_files.append(test_file)
 
         return cls(test_files)
+
+    @classmethod
+    def without_results(cls, e):
+        """
+        """
+        instc = cls([])
+        instc._catastrophic_error = e
+        return instc
 
     @property
     def test_files(self):
@@ -342,6 +352,11 @@ class GradingResults:
         """
         return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
 
+    def has_catastrophic_failure(self):
+        """
+        """
+        return self._catastrophic_error is not None
+
     def to_gradescope_dict(self, ag_config):
         """
         Converts these results into a dictionary formatted for Gradescope's autograder. Requires a 
@@ -355,6 +370,27 @@ class GradingResults:
             ``dict``: the results formatted for Gradescope
         """
         output = {"tests": []}
+
+        if self._catastrophic_error:
+            output["tests"].append({
+                "name": "Autograder Failed",
+                "visibility": "visible",
+                "output": "The autograder failed to produce any results. Please alert your instructor to this failure for assistance in debugging it.",
+                "status": "failed",
+            })
+            tb = "".join(traceback.format_exception(
+                type(self._catastrophic_error), 
+                self._catastrophic_error, 
+                self._catastrophic_error.__traceback__,
+            ))
+            output["tests"].append({
+                "name": "Autograder Exception",
+                "visibility": "hidden",
+                "output": f"The exception below was thrown when attempting to read the results from executing the notebook. (This message is not visible to students.)\n\n{tb}",
+                "status": "failed",
+            })
+            output["score"] = 0
+            return output
 
         if self.output is not None:
             output["output"] = self.output
