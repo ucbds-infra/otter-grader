@@ -13,6 +13,7 @@ class TestGradingResults:
 
     def test_without_results(self):
         """
+        Tests for ``otter.test_files.GradingResults.wtihout_results``.
         """
         def foo():
             raise Exception("nope")

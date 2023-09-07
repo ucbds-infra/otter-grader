@@ -152,6 +152,16 @@ class GradingResults:
     @classmethod
     def without_results(cls, e):
         """
+        Creates an empty results object that represents an execution failure during autograding.
+
+        The returned results object will alert students and instructors to this failure, providing
+        the error message and traceback to instructors, and report a score of 0 on Gradescope.
+
+        Args:
+            e (``Exception``): the error that was thrown
+
+        Returns:
+            ``GradingResults``: the results object
         """
         instc = cls([])
         instc._catastrophic_error = e
@@ -354,6 +364,11 @@ class GradingResults:
 
     def has_catastrophic_failure(self):
         """
+        Returns whether these results contain a catastrophic error (i.e. an error that prevented
+        submission results from being generated or read).
+
+        Returns:
+            ``bool``: whether there is such an error
         """
         return self._catastrophic_error is not None
 
