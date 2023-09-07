@@ -100,7 +100,10 @@ def grade_notebook(
             stop_server()
             gp.cleanup()
 
-        results = pickle.load(ntf)
+        try:
+            results = pickle.load(ntf)
+        except Exception as e:
+            results = GradingResults.without_results(e)
 
     if not isinstance(results, GradingResults):
         raise TypeError("Results deserialized from grading notebook were not a GradingResults instance")
