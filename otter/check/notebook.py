@@ -158,16 +158,23 @@ class Notebook(Loggable):
         is checked, then the working directory is searched for ``.ipynb`` files.
 
         Args:
-            nb_path (``Optional[str]``): path to the notebook
+            nb_path (``str | None``): path to the notebook
             fail_silently (``bool``): if true, the method does not fail the notebook path can't be
                 resolved
 
         Returns:
-            ``str``: resolved notebook path
+            ``str | None``: resolved notebook path or ``None`` if it can't be resolved and
+                ``fail_silently`` was true
 
         Raises:
-            ``ValueError``: if no notebooks or too many notebooks are found.
+            ``ValueError``: if no notebooks or too many notebooks are found and ``fail_silently``
+                is false
         """
+        # if in grading mode, don't attempt to resolve the notebook path, since the tests path was
+        # already overridden in __init__
+        if type(self)._grading_mode:
+            return nb_path
+
         if nb_path is None and self._notebook is not None:
             nb_path = self._notebook
             if not os.path.isfile(nb_path):
