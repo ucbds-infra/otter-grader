@@ -19,7 +19,6 @@ from ..utils import delete_paths, TestFileManager
 
 
 FILE_MANAGER = TestFileManager(__file__)
-EMPTY_PDFS = []
 
 
 @pytest.fixture(autouse=True)
@@ -154,21 +153,24 @@ def get_expected_error_results(error):
     }
 
 
-def make_empty_pdf(*args, **kwargs):
-    p = kwargs["dest"]
-    open(p, "wb+").close()
-    EMPTY_PDFS.append((os.getcwd(), p))
-
-
 @pytest.fixture(autouse=True)
-def delete_empty_pdfs(cleanup_enabled):
-    yield
+def mock_export_notebook(cleanup_enabled):
+    empty_pdfs = []
+    def make_empty_pdf(*args, **kwargs):
+        p = kwargs["dest"]
+        open(p, "wb+").close()
+        empty_pdfs.append((os.getcwd(), p))
 
-    if cleanup_enabled:
-        for wd, p in EMPTY_PDFS:
-            os.remove(os.path.join(wd, p))
+    with mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as mocked_export_notebook:
+        mocked_export_notebook.side_effect = make_empty_pdf
+        yield
 
-    EMPTY_PDFS.clear()
+    if not cleanup_enabled: return
+
+    for wd, p in empty_pdfs:
+        full_path = os.path.join(wd, p)
+        if os.path.exists(full_path): os.remove(full_path)
+
 
 @pytest.fixture
 def get_config_path():
@@ -186,10 +188,7 @@ def load_config(get_config_path):
     return load_config_file
 
 
-@mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook")
-def test_notebook(mocked_export_notebook, load_config, expected_results):
-    mocked_export_notebook.side_effect = make_empty_pdf
-
+def test_notebook(load_config, expected_results):
     config = load_config()
     run_autograder(config['autograder_dir'])
 
@@ -293,8 +292,8 @@ def test_assignment_name(load_config, expected_results):
 
         cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
             else nullcontext()
-        with cm, mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as mocked_export_notebook:
-            mocked_export_notebook.side_effect = make_empty_pdf
+        with cm: #, mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as mocked_export_notebook:
+            # mocked_export_notebook.side_effect = make_empty_pdf
 
             run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
 
