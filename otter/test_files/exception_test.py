@@ -6,6 +6,7 @@ import pathlib
 from dataclasses import replace
 from functools import lru_cache
 from textwrap import indent
+from typing import Callable, Optional, Union
 
 from .abstract_test import TestCase, TestCaseResult, TestFile
 
@@ -16,30 +17,40 @@ class test_case:
 
     Holds metadata for the test cases, as well as the test case function itself, and handles calling
     the function.
-
-    Args:
-        name (``str``, optional): the name of test case
-        points (numeric, optional): the point value of the test case, if applicable
-        hidden (``bool``, optional): whether the test case is hidden
-        success_message (``str``, optional): a message to display to students if the test case passes
-        failure_message (``str``, optional): a message to display to students if the test case fails
-
-    Attributes:
-        name (``str``): the name of test case
-        points (numeric): the point value of the test case, if applicable
-        hidden (``bool``): whether the test case is hidden
-        success_message (``str``): a message to display to students if the test case passes
-        failure_message (``str``): a message to display to students if the test case fails
-        test_func (callable): the test case function being decorated
     """
 
-    def __init__(self, name=None, points=None, hidden=False, success_message=None, failure_message=None):
+    name: Optional[str]
+    """the name of test case"""
+
+    points: Optional[Union[int, float]]
+    """the point value of the test case, if applicable"""
+
+    hidden: bool
+    """whether the test case is hidden"""
+
+    success_message: Optional[str]
+    """a message to display to students if the test case passes"""
+
+    failure_message: Optional[str]
+    """a message to display to students if the test case fails"""
+
+    test_func: Callable[..., None]
+    """the test case function being decorated"""
+
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        points: Optional[Union[int, float]] = None,
+        hidden: bool = False,
+        success_message: Optional[str] = None,
+        failure_message: Optional[str] = None,
+    ):
         self.name = name
         self.points = points
         self.hidden = hidden
         self.success_message = success_message
         self.failure_message = failure_message
-        self.test_func = None
+        self.test_func = lambda: None
 
     def __call__(self, test_func):
         """
@@ -90,6 +101,10 @@ class test_case:
                 obj = global_environment.get("obj"),
             )
 
+        Args:
+            global_environment (``dict[str, object]``): the global environment from which to
+                retrieve values for the ``test_func`` arguments
+
         Returns:
             ``object``: the return value of the test case function
         """
@@ -116,36 +131,16 @@ class test_case:
 class ExceptionTestFile(TestFile):
     """
     A single exception-based test file for Otter.
-
-    Args:
-        name (``str``): the name of test file
-        path (``str``): the path to the test file
-        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        value (``int``, optional): the point value of this test, defaults to 1
-        all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
-            cases
-
-    Attributes:
-        name (``str``): the name of test file
-        path (``str``): the path to the test file
-        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        value (``int``): the point value of this test, defaults to 1
-        all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
-            cases
-        passed_all (``bool``): whether all of the test cases were passed
-        test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
-            ``test_cases``
-        grade (``float``): the percentage of ``points`` earned for this test file as a decimal
-        source (``str``): the test file contents
     """
 
-    source = None
+    source: str = ""
+    """the test file contents"""
 
     @property
     @lru_cache(1)
     def source_lines(self):
         """
-        The lines of ``self.source``
+        the lines of ``self.source``
         """
         return self.source.split("\n")
 
@@ -173,7 +168,7 @@ class ExceptionTestFile(TestFile):
         ``self.test_case_results``.
 
         Arguments:
-            ``global_environment`` (``dict``): result of executing a Python notebook/script
+            global_environment (``dict[str, object]``): result of executing a Python notebook/script
         """
         test_case_results = []
         for tc in self.test_cases:
@@ -241,14 +236,14 @@ class ExceptionTestFile(TestFile):
         Parse an exception-based test file as a string and return an ``ExceptionTestFile``.
 
         Args:
-            s (``str``): the test file
+            s (``str``): the test file contents
             path (``str``, optional): the path to the test file
 
         Returns:
             ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
         """
         code = cls._compile_string(s, path=path)
-        instc = cls._from_compiled_code(s, path=path)
+        instc = cls._from_compiled_code(code, path=path)
         instc.source = s
         return instc
 

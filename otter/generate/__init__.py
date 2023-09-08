@@ -18,7 +18,7 @@ from .utils import merge_conda_environments, zip_folder
 
 from ..plugins import PluginCollection
 from ..run.run_autograder.autograder_config import AutograderConfig
-from ..utils import dump_yaml, load_default_file
+from ..utils import dump_yaml, load_default_file, OTTER_CONFIG_FILENAME
 from ..version import __version__
 
 
@@ -160,9 +160,9 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         ``ValueError``: if the configurations specify a Gradescope course ID or assignment ID but not
             both
     """
-    # read in otter_config.json
-    if config is None and os.path.isfile("otter_config.json") and not no_config:
-        config = "otter_config.json"
+    # read in otter config
+    if config is None and os.path.isfile(OTTER_CONFIG_FILENAME) and not no_config:
+        config = OTTER_CONFIG_FILENAME
 
     if config is not None and not os.path.isfile(config):
         raise FileNotFoundError(f"Could not find otter configuration file {config}")
@@ -281,7 +281,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
         zf.writestr("environment.yml", conda_environment.to_str())
 
-        zf.writestr("otter_config.json", json.dumps(otter_config, indent=2))
+        zf.writestr(OTTER_CONFIG_FILENAME, json.dumps(otter_config, indent=2))
 
         # copy files into zip file
         if len(files) > 0:

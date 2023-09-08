@@ -61,8 +61,8 @@ def write_output_dir(
 
     # write a temp dir for otter generate tests
     if not sanitize:
-        assignment._temp_test_dir = pathlib.Path(tempfile.mkdtemp())
-        transformed_nb.write_tests(str(assignment._temp_test_dir), True, True)
+        assignment.generate_tests_dir = tempfile.mkdtemp()
+        transformed_nb.write_tests(assignment.generate_tests_dir, True, True)
 
     transformed_nb.write_transformed_nb(output_path, sanitize)
 
@@ -84,7 +84,7 @@ def write_output_dir(
             shutil.copy(file, str(output_dir / rel_path))
 
 
-def write_output_directories(assignment):
+def write_output_directories(assignment: Assignment):
     """
     Process a master notebook and write the results to the output directories.
 

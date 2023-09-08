@@ -9,6 +9,7 @@ jupyter_client
 ipykernel
 matplotlib
 gspread
+pytest-html
 
 # plugins
 google-api-python-client

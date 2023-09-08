@@ -67,6 +67,3 @@ def test_upload_programming(mocked_post, _):
     mocked_post.return_value = mocked_requests_post()
     client.upload_programming_submission('123', '1', 'email', ['python.py', 'nb.ipynb'])
     assert mocked_post.return_value.status_code == 200
-
-
-# TODO: do any of these tests even check that the *correct* request is being sent out?

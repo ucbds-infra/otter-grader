@@ -19,8 +19,6 @@ CELL_METADATA_KEY = "otter"
 IGNORE_CELL_TAG = "otter_ignore"
 
 
-# TODO: make setting up debug logging cleaner
-
 INIT_CELL_SOURCE = """\
 from otter import Notebook as {notebook_name}
 {notebook_name}.init_grading_mode("{test_dir}")

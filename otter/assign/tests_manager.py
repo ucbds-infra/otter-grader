@@ -4,6 +4,7 @@ import ast
 import astunparse
 import os
 import pandas as pd
+import pathlib
 import pprint
 import re
 import yaml
@@ -17,8 +18,8 @@ from .question_config import QuestionConfig
 from .solutions import remove_ignored_lines
 from .utils import get_source, str_to_doctest
 
-from ..test_files.abstract_test import OK_FORMAT_VARNAME, TestFile
-from ..utils import NOTEBOOK_METADATA_KEY
+from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
+from ..test_files.abstract_test import TestFile
 
 
 BEGIN_TEST_CONFIG_REGEX = r'(?:.\s*=\s*)?""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
@@ -322,24 +323,27 @@ class AssignmentTestsManager:
 
         return test
 
-    def write_tests(self, nb, test_dir, include_hidden=True, force_files=False):
+    def write_tests(
+            self,
+            nbmeta_config: NBMetadataConfig,
+            test_dir: Union[pathlib.Path, str],
+            include_hidden: bool = True,
+            force_files: bool = False,
+        ):
         """
         Write all test files to a notebook's metadata or a tests directory.
 
         Args:
-            nb (``nbformat.NotebookNode``): the notebook
+            nbmeta_config (``otter.nbmeta_config.NBMetadataConfig``): the notebook metadata config
             test_dir (``pathlib.Path | str``): the tests directory
             include_hidden (``bool``): whether to include hidden test cases
             force_files (``bool``): whether to force writing to test files (overriding the
                 assignment config)
         """
-        # TODO: move this notebook to the notebook metadata test classes
-        if isinstance(nb, dict) and not self.assignment.tests.files and not force_files:
-            if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
-                nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
-            nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"] = {}
-            nb["metadata"][NOTEBOOK_METADATA_KEY][OK_FORMAT_VARNAME] = \
-                self.assignment.tests.ok_format
+        use_files = self.assignment.tests.files or force_files
+        if not use_files:
+            nbmeta_config.tests = {}
+            nbmeta_config.ok_format = self.assignment.tests.ok_format
 
         test_ext = ".py" if self.assignment.is_python else ".R"
         for test_name in self._tests_by_question.keys():
@@ -355,7 +359,7 @@ class AssignmentTestsManager:
             test = \
                 self._format_test(test_info["name"], test_info["points"], test_info["test_cases"])
 
-            if self.assignment.tests.files or force_files:
+            if use_files:
                 with open(test_path, "w+") as f:
                     if isinstance(test, dict):
                         f.write(f"{OK_FORMAT_VARNAME} = True\n\ntest = ")
@@ -365,8 +369,7 @@ class AssignmentTestsManager:
                         f.write(test)
 
             else:
-                # TODO: move this notebook to the notebook metadata test classes
-                nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"][test_info["name"]] = test
+                nbmeta_config.tests[test_info["name"]] = test
 
     def determine_question_point_value(self, question):
         """

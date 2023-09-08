@@ -23,7 +23,8 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
     Args:
         submission (``str``): path to a submission to grade
         autograder (``str``): path to an Otter configuration zip file
-        output_dir (``str``): directory at which to copy the results JSON file
+        output_dir (``str | None``): directory at which to copy the results JSON file; if ``None``,
+            the results JSON file is not copied
         no_logo (``bool``): whether to suppress the Otter logo from being printed to stdout
         debug (``bool``); whether to run in debug mode (without ignoring errors)
 
@@ -59,7 +60,8 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
         run_autograder_main(ag_dir, logo=logo, debug=debug, otter_run=True)
 
         results_path = os.path.join(ag_dir, "results", "results.json")
-        shutil.copy(results_path, output_dir)
+        if output_dir:
+            shutil.copy(results_path, output_dir)
 
         results_pkl_path = os.path.join(ag_dir, "results", "results.pkl")
         with open(results_pkl_path, "rb") as f:

@@ -1,11 +1,1 @@
-{
-    "autograder_dir": "test/test_run/files/autograder",
-    "plugins": [
-        {
-            "otter.plugins.builtin.RateLimiting": {
-                "days": 1,
-                "allowed_submissions": 1
-            }
-        }
-    ]
-}
+{"autograder_dir": "test/test_run/files/autograder", "plugins": [{"otter.plugins.builtin.RateLimiting": {"days": 1, "allowed_submissions": 1}}], "warn_missing_pdf": true, "token": "abc123", "show_hidden": false, "force_public_test_summary": false}

@@ -35,15 +35,15 @@ def main(
         no_pdfs (``bool``): whether to ignore any configurations indicating PDF generation for this run
         no_run_tests (``bool``): prevents Otter tests from being automatically run on the solutions 
             notebook
-        username (``str``): a username for Gradescope for generating a token
-        password (``str``): a password for Gradescope for generating a token
+        username (``str | None``): a username for Gradescope for generating a token
+        password (``str | None``): a password for Gradescope for generating a token
         debug (``bool``): whether to run in debug mode (without ignoring errors during testing)
     """
     LOGGER.debug(f"User-specified master path: {master}")
     LOGGER.debug(f"User-specified result path: {result}")
     master, result = pathlib.Path(os.path.abspath(master)), pathlib.Path(os.path.abspath(result))
 
-    assignment = Assignment()
+    assignment = Assignment(require_valid_keys=True)
 
     result = get_relpath(master.parent, result)
 

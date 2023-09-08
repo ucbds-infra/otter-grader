@@ -8,25 +8,30 @@ import tempfile
 import time
 import wrapt
 
+from dataclasses import dataclass
 from enum import Enum
 from glob import glob
 from IPython import get_ipython
 from IPython.display import display, Javascript
 from ipywidgets import Button, HTML, Output, VBox
 from subprocess import run, PIPE
+from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TYPE_CHECKING, TypeVar, Union
 
-from .logs import EventType
+from ..nbmeta_config import NBMetadataConfig
+from ..test_files import GradingResults
+from ..utils import import_or_raise
 
-from ..utils import import_or_raise, NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
+
+T = TypeVar("T")
 
 
-def save_notebook(filename, timeout=10):
+def save_notebook(filename: str, timeout: Union[int, float] = 10) -> bool:
     """
     Force-saves a Jupyter notebook by displaying JavaScript.
 
     Args:
         filename (``str``): path to notebook file being saved
-        timeout (``int`` or ``float``): number of seconds to wait for save before timing-out
+        timeout (``int | float``): number of seconds to wait for save before timing-out
 
     Returns
         ``bool``: whether the notebook was saved successfully
@@ -60,11 +65,20 @@ def save_notebook(filename, timeout=10):
     return True
 
 
-def grade_zip_file(zip_path, nb_arcname, tests_dir):
+def grade_zip_file(zip_path: str, nb_arcname: str, tests_dir: str) -> GradingResults:
     """
-    Grade a submission zip file in a separate process and return the ``GradingResults`` object.
+    Grade a submission zip file in a separate process and return the resulting
+    :py:class:`otter.test_files.GradingResults` object.
+
+    Args:
+        zip_path (``str``): the path to the submission zip file
+        nb_arcname (``str``): the name of the notebook file in the zip file
+        tests_dir (``str``): the path to the tests directory
+
+    Returns:
+        :py:class:`otter.test_files.GradingResults`: the grading results
     """
-    dill = import_or_raise("dill")
+    import dill
 
     results_handle, results_path = tempfile.mkstemp(suffix=".pkl")
 
@@ -83,12 +97,10 @@ def grade_zip_file(zip_path, nb_arcname, tests_dir):
         # run the command
         results = run(command, env=subprocess_env, stdout=PIPE, stderr=PIPE)
 
-        # TODO: remove
         print(results.stdout.decode("utf-8"))
-        print(results.stderr.decode("utf-8"))
 
         if results.stderr:
-            raise RuntimeError(results.stderr)
+            raise RuntimeError(results.stderr.decode("utf-8"))
 
         with open(results_path, "rb") as f:
             results = dill.load(f)
@@ -113,11 +125,11 @@ class IPythonInterpreter(Enum):
         running) and a display name for error messages and the like.
         """
 
-        def __init__(self, check_strs, display_name):
+        def __init__(self, check_strs: List[str], display_name: str):
             self.check_strs = check_strs
             self.display_name = display_name
 
-        def running(self):
+        def running(self) -> bool:
             """
             Determine whether this interpreter is currently running by checking the string
             representation of the return value of ``IPython.get_ipython``.
@@ -135,7 +147,8 @@ class IPythonInterpreter(Enum):
     """the JupyterLite interpreter"""
 
 
-def incompatible_with(interpreter, throw_error = True):
+def incompatible_with(interpreter: IPythonInterpreter, throw_error: bool = True) -> \
+        Callable[[Callable[..., T]], Callable[..., T]]:
     """
     Create a decorator indicating that a method is incompatible with a specific interpreter.
     """
@@ -156,7 +169,12 @@ def incompatible_with(interpreter, throw_error = True):
 
 
 @wrapt.decorator
-def grading_mode_disabled(wrapped, self, args, kwargs):
+def grading_mode_disabled(
+    wrapped: Callable[..., T], 
+    self: "Notebook", 
+    args: Tuple, 
+    kwargs: Dict[str, Any],
+) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """
     A decorator that returns without calling the wrapped function if the ``Notebook`` grading mode
     is enabled.
@@ -166,51 +184,58 @@ def grading_mode_disabled(wrapped, self, args, kwargs):
     return wrapped(*args, **kwargs)
 
 
-# TODO: use this class to replace tuple return values in logs_event
-# class LoggedEventReturnValue:
-#     def __init__(self, return_value, results=None, shelve_env=None):
-#         self.return_value = return_value
-#         self.results = results
-#         self.shelve_env = shelve_env
+@dataclass
+class LoggedEventReturnValue(Generic[T]):
+    return_value: T
+    question: Optional[str] = None
+    shelve_env: Optional[Dict[str, Any]] = None
 
 
-def logs_event(event_type):
+def logs_event(event_type: "EventType") -> Callable[[Callable[..., LoggedEventReturnValue[T]]], T]:
     """
     A decorator that ensures each call is logged in the Otter log with type ``event_type``.
 
-    Events logging a ``EventType.CHECK`` should return a 3-tuple of the question name, the
-    ``TestFile`` and an environment to shelve. All other methods should just return their 
-    default return value, which will be logged.
+    All methods decorated with this function's return value should return either ``None`` or an
+    instance of the :py:class:`LoggedEventReturnValue`` dataclass.
     """
-    @wrapt.decorator        
-    def event_logger(wrapped, self, args, kwargs):
+    @wrapt.decorator
+    def event_logger(
+        wrapped: Callable[..., LoggedEventReturnValue[T]],
+        self: "Notebook",
+        args: Tuple,
+        kwargs: Dict[str, Any],
+    ) -> T:
         """
-        Runs a method, catching any errors and logging the call. Returns the return value
-        of the function, unless ``EventType.CHECK`` is used, in which case the return value
-        is assumed to be a 3-tuple and the second value in the tuple is returned.
+        Runs a method, catching any errors and logging the call. Returns the unwrapped return value
+        of the wrapped function.
         """
         try:
-            if event_type == EventType.CHECK:
-                question, results, shelve_env = wrapped(*args, **kwargs)
-
-            else:
-                results = wrapped(*args, **kwargs)
-                shelve_env = {}
-                question = None
+            ret: Optional[LoggedEventReturnValue[T]] = wrapped(*args, **kwargs)
 
         except Exception as e:
             self._log_event(event_type, success=False, error=e)
             raise e
 
-        else:
-            self._log_event(event_type, results=results, question=question, shelve_env=shelve_env)
+        if ret is None:
+            ret = LoggedEventReturnValue(None)
+        if not isinstance(ret, LoggedEventReturnValue):
+            raise TypeError(
+                f"Method decorated by logs_event returned value of invalid type: {type(ret)}")
 
-        return results
+        else:
+            self._log_event(
+                event_type,
+                results=ret.return_value,
+                question=ret.question,
+                shelve_env=ret.shelve_env,
+            )
+
+        return ret.return_value
 
     return event_logger
 
 
-def list_test_files(tests_dir):
+def list_test_files(tests_dir: str) -> List[str]:
     """
     Find all of the test files in the specified directory (that is, all ``.py`` files that are not
     named ``__init__.py``) and return their paths in a sorted list.
@@ -221,18 +246,21 @@ def list_test_files(tests_dir):
     Returns:
         ``list[str]``: the sorted list of all test file paths in ``tests_dir``
     """
-    return sorted([file for file in glob(os.path.join(tests_dir, "*.py")) \
-            if file != "__init__.py"])
+    return sorted([
+        file
+        for file in glob(os.path.join(tests_dir, "*.py"))
+        if file != "__init__.py"
+    ])
 
 
-def list_available_tests(tests_dir, nb_path):
+def list_available_tests(tests_dir: str, nbmeta_config: NBMetadataConfig) -> List[str]:
     """
     Get a list of available questions by searching the tests directory (if present) or the notebook
     metadata.
 
     Args:
         tests_dir (``str``): the path to the tests directory
-        nb_path (``str``): the path to the notebook
+        nbmeta_config (``otter.nbmeta_config.NBMetadataConfig``): the notebook metadata config
 
     Returns:
         ``list[str]``: the sorted list of question names
@@ -243,16 +271,17 @@ def list_available_tests(tests_dir, nb_path):
         tests = map(get_stem, list_test_files(tests_dir))
 
     else:
-        if nb_path is None:
-            raise ValueError("Tests directory does not exist and no notebook path provided")
-
-        nb = nbf.read(nb_path, as_version=NBFORMAT_VERSION)
-        tests = list(nb["metadata"][NOTEBOOK_METADATA_KEY]["tests"].keys())
+        tests = list(nbmeta_config.tests.keys())
 
     return sorted(tests)
 
 
-def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
+def resolve_test_info(
+    tests_dir: str,
+    nb_path: Optional[str],
+    tests_url_prefix: Optional[str],
+    question: str,
+) -> Tuple[str, Optional[str]]:
     """
     Determine the test path and test name.
 
@@ -262,12 +291,12 @@ def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
 
     Args:
         tests_dir (``str``): the path to the directory of tests
-        nb_path (``str``): the path to the notebook
+        nb_path (``str | None``): the path to the notebook
         tests_url_prefix (``str | None``): the prefix of a URL to the test file
         question (``str``): the question name
 
     Returns:
-        ``tuple[str, str]``: the test path and test name
+        ``tuple[str, str | None]``: the test path and test name (if applicable)
     """
     if tests_url_prefix is not None:
         if not IPythonInterpreter.PYOLITE.value.running():
@@ -303,14 +332,14 @@ def resolve_test_info(tests_dir, nb_path, tests_url_prefix, question):
     return test_path, test_name
 
 
-def display_pdf_confirmation_widget(message, callback):
+def display_pdf_confirmation_widget(message: Optional[str], callback: Callable) -> None:
     """
     Display a widget to the user to acknowledge that a PDF will not be included in their submission
     zip.
 
     Args:
         message (``str | None``): a custom message to use
-        callback (``callable[]``): a callback function to execute after the user ACKs
+        callback (``callable``): a callback function to execute after the user ACKs
     """
     o = Output()
     def wrapped_callback(*args):
@@ -326,3 +355,8 @@ def display_pdf_confirmation_widget(message, callback):
     m = HTML("""<div style="height: 10px; width: 100%"></div>""")
     
     display(VBox([t, b, m, o]))
+
+
+if TYPE_CHECKING:
+    from .logs import EventType
+    from .notebook import Notebook

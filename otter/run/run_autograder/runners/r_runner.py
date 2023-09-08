@@ -165,7 +165,6 @@ class RRunner(AbstractLanguageRunner):
     def write_pdf(self, _):
         # NOTE: this method ignores the submission_path argument, and instead resolves it again
         # manually
-        # TODO: de-deduplicate this path resolution logic with resolve_submission_path
         nbs = glob("*.ipynb")
         if nbs:
             subm_path = nbs[0]
@@ -183,8 +182,12 @@ class RRunner(AbstractLanguageRunner):
         pdf_path = os.path.splitext(subm_path)[0] + ".pdf"
         if ipynb:
             export_notebook(
-                subm_path, dest=pdf_path, filtering=self.ag_config.filtering, 
-                pagebreaks=self.ag_config.pagebreaks, exporter_type="latex")
+                subm_path,
+                dest=pdf_path,
+                filtering=self.ag_config.filtering, 
+                pagebreaks=self.ag_config.pagebreaks,
+                exporter_type="latex",
+            )
 
         else:
             knit_rmd_file(subm_path, pdf_path)

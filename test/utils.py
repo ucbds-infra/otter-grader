@@ -50,9 +50,9 @@ def assert_notebooks_equal(p1, p2):
     for c in [*nb1.cells, *nb2.cells]:
         c.pop("id", None)
     diff = subprocess.run(
-                    ["diff", "--context=5", p1, p2],
-                    stdout=subprocess.PIPE,
-                ).stdout.decode("utf-8")
+        ["diff", "--context=5", p1, p2],
+        stdout=subprocess.PIPE,
+    ).stdout.decode("utf-8")
     assert nb1 == nb2, f"Contents of {p1} did not equal contents of {p2}:\n{diff}"
 
 
