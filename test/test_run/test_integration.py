@@ -19,6 +19,7 @@ from ..utils import delete_paths, TestFileManager
 
 
 FILE_MANAGER = TestFileManager(__file__)
+EMPTY_PDFS = []
 
 
 @pytest.fixture(autouse=True)
@@ -153,7 +154,6 @@ def get_expected_error_results(error):
     }
 
 
-EMPTY_PDFS = []
 def make_empty_pdf(*args, **kwargs):
     p = kwargs["dest"]
     open(p, "wb+").close()
@@ -162,6 +162,8 @@ def make_empty_pdf(*args, **kwargs):
 
 @pytest.fixture(autouse=True)
 def delete_empty_pdfs(cleanup_enabled):
+    yield
+
     if cleanup_enabled:
         for wd, p in EMPTY_PDFS:
             os.remove(os.path.join(wd, p))
