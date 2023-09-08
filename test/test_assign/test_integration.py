@@ -66,7 +66,7 @@ def generate_master_notebook(cleanup_enabled):
             raise RuntimeError(f"{nb_path} already exists")
         nb = nbf.read(FILE_MANAGER.get_path("master-skeleton.ipynb"), as_version=nbf.NO_CONVERT)
         config_cell = nbf.v4.new_raw_cell("# ASSIGNMENT CONFIG\n" + dump_yaml(assignment_config))
-        config_cell.pop("id") # all test notebooks use nbformat < 4.5
+        if "id" in config_cell: config_cell.pop("id") # all test notebooks use nbformat < 4.5
         nb.cells.insert(0, config_cell)
 
         nbf.write(nb, nb_path)
