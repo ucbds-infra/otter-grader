@@ -37,9 +37,9 @@ jobs:
 
       - uses: r-lib/actions/setup-tinytex@v1
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: environment.yml
           init-shell: >-
