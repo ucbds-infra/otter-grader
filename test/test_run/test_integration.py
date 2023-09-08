@@ -153,6 +153,21 @@ def get_expected_error_results(error):
     }
 
 
+EMPTY_PDFS = []
+def make_empty_pdf(*args, **kwargs):
+    p = kwargs["dest"]
+    open(p, "wb+").close()
+    EMPTY_PDFS.append((os.getcwd(), p))
+
+
+@pytest.fixture(autouse=True)
+def delete_empty_pdfs(cleanup_enabled):
+    if cleanup_enabled:
+        for wd, p in EMPTY_PDFS:
+            os.remove(os.path.join(wd, p))
+
+    EMPTY_PDFS.clear()
+
 @pytest.fixture
 def get_config_path():
     def do_get_config_path(rmd=False):
@@ -169,7 +184,10 @@ def load_config(get_config_path):
     return load_config_file
 
 
-def test_notebook(load_config, expected_results):
+@mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook")
+def test_notebook(mocked_export_notebook, load_config, expected_results):
+    mocked_export_notebook.side_effect = make_empty_pdf
+
     config = load_config()
     run_autograder(config['autograder_dir'])
 
@@ -273,7 +291,9 @@ def test_assignment_name(load_config, expected_results):
 
         cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
             else nullcontext()
-        with cm:
+        with cm, mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as mocked_export_notebook:
+            mocked_export_notebook.side_effect = make_empty_pdf
+
             run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
 
         with FILE_MANAGER.open("autograder/results/results.json") as f:
