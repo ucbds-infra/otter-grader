@@ -10,7 +10,6 @@ from glob import glob
 from .runners import create_runner
 from .utils import capture_run_output, OtterRuntimeError, print_output
 
-from ...test_files import GradingResults
 from ...version import LOGO_WITH_VERSION
 from ...utils import chdir, import_or_raise, loggers
 
@@ -74,8 +73,16 @@ def main(autograder_dir, otter_run=False, **kwargs):
             output = scores.to_gradescope_dict(runner.get_config())
 
         except OtterRuntimeError as e:
-            scores = GradingResults.without_results(e)
-            output = scores.to_gradescope_dict(runner.get_config())
+            output = {
+                "score": 0,
+                "stdout_visibility": "hidden",
+                "tests": [
+                    {
+                        "name": "Autograder Error",
+                        "output": f"Otter encountered an error when grading this submission:\n\n{e}",
+                    },
+                ],
+            }
             raise e
 
         finally:
