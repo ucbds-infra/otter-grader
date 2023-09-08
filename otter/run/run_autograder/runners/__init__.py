@@ -15,5 +15,5 @@ def create_runner(otter_config, **kwargs):
     elif config.lang == "r":
         from .r_runner import RRunner
         return RRunner(config)
-    # There is no else required here because AutograderCondig validates that lang is one of the set
+    # There is no else required here because AutograderConfig validates that lang is one of the set
     # of possible values enumerated in the conditions above.

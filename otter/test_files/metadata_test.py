@@ -11,20 +11,21 @@ from ..utils import NOTEBOOK_METADATA_KEY
 
 class _NotebookMetadataTestFileMixin:
     """
+    A mixin for test file classes that read their test data from a notebook's metadata.
     """
 
     @classmethod
     def from_file(cls, path, test_name):
         """
-        Parse an exception-based test from a Jupyter notebook's metadata and return an 
-        ``ExceptionTestFile``.
+        Parse a test from a Jupyter notebook's metadata and return an instance of the test file
+        class.
 
         Args:
             path (``str``): the path to the notebook
             test_name (``str``): the name of the test to extract from the metadata
 
         Returns:
-            ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
+            ``_NotebookMetadataTestFileMixin``: the new test file object created from the given file
         """
         with open(path, encoding="utf-8") as f:
             nb = json.load(f)
@@ -39,6 +40,15 @@ class _NotebookMetadataTestFileMixin:
     @classmethod
     def from_nbmeta_config(cls, path: str, nbmeta_config: NBMetadataConfig, test_name: str):
         """
+        Parse a test from an ``NBMetadataConfig`` and return an instance of the test file class.
+
+        Args:
+            path (``str``): the path to the notebook
+            nbmeta_config (``NBMetadataConfig``): the config
+            test_name (``str``): the name of the test to extract from the metadata
+
+        Returns:
+            ``_NotebookMetadataTestFileMixin``: the new test file object created from the given file
         """
         test_spec = nbmeta_config.tests
         if test_name not in test_spec:

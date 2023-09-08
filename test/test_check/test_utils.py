@@ -22,6 +22,7 @@ def test_save_notebook(
     mocked_getsize,
 ):
     """
+    Tests for ``otter.check.utils.save_notebook``.
     """
     # check unsuccessful save
     mocked_getsize.return_value = 1
