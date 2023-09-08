@@ -35,6 +35,10 @@ jobs:
         with:
           install: true
 
+      - uses: r-lib/actions/setup-tinytex@v1
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
       - uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: environment.yml
