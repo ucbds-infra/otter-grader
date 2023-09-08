@@ -292,9 +292,7 @@ def test_assignment_name(load_config, expected_results):
 
         cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
             else nullcontext()
-        with cm: #, mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as mocked_export_notebook:
-            # mocked_export_notebook.side_effect = make_empty_pdf
-
+        with cm:
             run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
 
         with FILE_MANAGER.open("autograder/results/results.json") as f:
