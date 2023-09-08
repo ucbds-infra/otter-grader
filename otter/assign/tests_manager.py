@@ -254,7 +254,7 @@ class AssignmentTestsManager:
         Returns:
             ``dict``: the OK-formatted test case
         """
-        inp = ast.unparse(ast.parse(test_case.input))
+        inp = astunparse.unparse(ast.parse(test_case.input))
         code_lines = str_to_doctest(inp.split('\n'), [])
         code_lines.append(test_case.output)
 
