@@ -30,7 +30,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
 	],
 	install_requires=install_requires,
-	# scripts=["bin/otter"],
 	entry_points = {
 		"console_scripts": [
 			"otter=otter.cli:cli", 
