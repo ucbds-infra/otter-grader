@@ -16,8 +16,7 @@ from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOK
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
-from ..check.logs import QuestionNotInLogException
-from ..utils import NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
+from ..utils import NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY, QuestionNotInLogException
 
 
 def create_test_file(path, test_name=None):

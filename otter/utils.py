@@ -391,3 +391,9 @@ def dump_yaml(o, **kwargs):
         ``str``: the YAML representation of ``o``
     """
     return yaml.dump(o, sort_keys=False, Dumper=_CorrectIndentationDumper, **kwargs)
+
+
+class QuestionNotInLogException(Exception):
+    """
+    Exception that indicates that a specific question was not found in any entry in the log
+    """

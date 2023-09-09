@@ -3,6 +3,7 @@
 import pickle
 import logging
 import logging.handlers
+import socket
 import socketserver
 import struct
 import threading
@@ -81,8 +82,11 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
         import select
         abort = False
         while not abort:
-            rd, _, _ = select.select(
-                [self.socket.fileno()], [], [], 1)
+            rd = None
+            try:
+                rd, _, _ = select.select([self.socket.fileno()], [], [], 1)
+            except socket.error:
+                pass
             if rd:
                 self.handle_request()
             abort = self.abort
@@ -95,7 +99,7 @@ def start_server():
 
     Returns:
         ``tuple[tuple[str, int], callable]``: a tuple containing a tuple with the server host and
-            port as its first element and a callback to stop the sercer as its second
+            port as its first element and a callback to stop the server as its second
     """
     tcpserver = LogRecordSocketReceiver()
     host, port = tcpserver.server_address

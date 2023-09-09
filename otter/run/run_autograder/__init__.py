@@ -9,6 +9,7 @@ from glob import glob
 
 from .runners import create_runner
 from .utils import capture_run_output, OtterRuntimeError, print_output
+
 from ...version import LOGO_WITH_VERSION
 from ...utils import chdir, import_or_raise, loggers
 
@@ -93,7 +94,7 @@ def main(autograder_dir, otter_run=False, **kwargs):
 
     df = pd.DataFrame(output["tests"])
 
-    if runner.get_option("print_score"):
+    if runner.get_option("print_score") and "score" in df.columns:
         total, possible = df["score"].sum(), df["max_score"].sum()
         if "score" in output:
             total, possible = output["score"], runner.get_option("points_possible") or possible
