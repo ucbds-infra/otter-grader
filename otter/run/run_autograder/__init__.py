@@ -9,6 +9,8 @@ from glob import glob
 
 from .runners import create_runner
 from .utils import capture_run_output, OtterRuntimeError, print_output
+
+from ...test_files import GradingResults
 from ...version import LOGO_WITH_VERSION
 from ...utils import chdir, import_or_raise, loggers
 
@@ -72,16 +74,8 @@ def main(autograder_dir, otter_run=False, **kwargs):
             output = scores.to_gradescope_dict(runner.get_config())
 
         except OtterRuntimeError as e:
-            output = {
-                "score": 0,
-                "stdout_visibility": "hidden",
-                "tests": [
-                    {
-                        "name": "Autograder Error",
-                        "output": f"Otter encountered an error when grading this submission:\n\n{e}",
-                    },
-                ],
-            }
+            scores = GradingResults.without_results(e)
+            output = scores.to_gradescope_dict(runner.get_config())
             raise e
 
         finally:
@@ -93,7 +87,7 @@ def main(autograder_dir, otter_run=False, **kwargs):
 
     df = pd.DataFrame(output["tests"])
 
-    if runner.get_option("print_score"):
+    if runner.get_option("print_score") and "score" in df.columns:
         total, possible = df["score"].sum(), df["max_score"].sum()
         if "score" in output:
             total, possible = output["score"], runner.get_option("points_possible") or possible

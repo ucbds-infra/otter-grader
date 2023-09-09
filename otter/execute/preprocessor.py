@@ -97,7 +97,11 @@ class GradingPreprocessor(Preprocessor):
             logging_server_port = self.logging_server_port,
         )))
         nb.cells.append(nbf.v4.new_code_cell(EXPORT_CELL_SOURCE.format(
-            tests_glob_json = json.dumps(self.tests_glob), results_path = self.results_path)))
+            tests_glob_json = json.dumps(self.tests_glob),
+            # ensure that "\" is properly-escaped for Windows paths since this is going to be
+            # rendered into a string literal
+            results_path = self.results_path.replace("\\", "\\\\"),
+        )))
 
     def add_cwd_to_path(self, nb):
         if self.cwd:
