@@ -5,6 +5,16 @@
 * Migrate installation of `ottr` from `setup.sh` to `environment.yml` with the [`r-ottr` conda-forge recipe](https://anaconda.org/conda-forge/r-ottr)
 * Updated Otter Assign to allow multiline statements in test cases for Python 3.9+ per [#590](https://github.com/ucbds-infra/otter-grader/issues/590)
 
+**v5.1.4:**
+
+* Prevented the `Notebook` class from attempting to resolve the notebook path when in grading mode
+* Gracefully handle a failure in reading the results pickle file by returning results indicating that such a failure has occurred per [#723](https://github.com/ucbds-infra/otter-grader/issues/723)
+* Use `tempfile.mkstemp` instead of `tempfile.NamedTemporaryFile` for the results pickle file used during notebook execution per [#723#issuecomment-1710689536](https://github.com/ucbds-infra/otter-grader/issues/723#issuecomment-1710689536)
+
+**v5.1.3:**
+
+* Fixed bug in submission zip download link per [#719](https://github.com/ucbds-infra/otter-grader/issues/719)
+
 **v5.1.2:**
 
 * Enabled the use of custom Jupyter kernels by enforcing the use of the `python3` kernel inside Otter grading containers per [#706](https://github.com/ucbds-infra/otter-grader/issues/706)

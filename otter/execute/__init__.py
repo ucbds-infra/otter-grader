@@ -1,6 +1,7 @@
 """Execution and grading internals for Otter-Grader"""
 
 import nbformat
+import os
 import pickle
 import tempfile
 
@@ -68,7 +69,9 @@ def grade_notebook(
     if plugin_collection is not None:
         nb = plugin_collection.before_execution(nb)
 
-    with tempfile.NamedTemporaryFile() as ntf:
+    results_handle, results_file = tempfile.mkstemp(suffix=".pkl")
+
+    try:
         c = Config()
 
         (host, port), stop_server = start_server()
@@ -78,7 +81,7 @@ def grade_notebook(
             c.GradingPreprocessor.cwd = cwd
             c.GradingPreprocessor.test_dir = test_dir
             c.GradingPreprocessor.tests_glob = tests_glob
-            c.GradingPreprocessor.results_path = ntf.name
+            c.GradingPreprocessor.results_path = results_file
             c.GradingPreprocessor.seed = seed
             c.GradingPreprocessor.seed_variable = seed_variable
             c.GradingPreprocessor.otter_log = log
@@ -100,14 +103,23 @@ def grade_notebook(
             stop_server()
             gp.cleanup()
 
-        results = pickle.load(ntf)
+        os.close(results_handle)
 
-    if not isinstance(results, GradingResults):
-        raise TypeError("Results deserialized from grading notebook were not a GradingResults instance")
+        try:
+            with open(results_file, "rb") as f:
+                results = pickle.load(f)
+        except Exception as e:
+            results = GradingResults.without_results(e)
 
-    results.notebook = executed_nb
+        if not isinstance(results, GradingResults):
+            raise TypeError("Results deserialized from grading notebook were not a GradingResults instance")
 
-    if plugin_collection is not None:
-        plugin_collection.run("after_grading", results)
+        results.notebook = executed_nb
 
-    return results
+        if plugin_collection is not None:
+            plugin_collection.run("after_grading", results)
+
+        return results
+
+    finally:
+        os.remove(results_file)

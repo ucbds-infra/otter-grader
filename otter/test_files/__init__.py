@@ -5,6 +5,7 @@ import math
 import nbformat as nbf
 import os
 import pickle
+import traceback
 
 from typing import Any, Dict, List, Optional
 
@@ -14,8 +15,8 @@ from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOK
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
-from ..check.logs import QuestionNotInLogException
 from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
+from ..utils import QuestionNotInLogException
 
 
 __all__ = [
@@ -116,6 +117,7 @@ class GradingResults:
         self.all_hidden = False
         self.pdf_error = None
         self.notebook = notebook
+        self._catastrophic_error = None
         self._plugin_data = {}
 
     def __repr__(self):
@@ -171,6 +173,24 @@ class GradingResults:
             test_files.append(test_file)
 
         return cls(test_files)
+
+    @classmethod
+    def without_results(cls, e):
+        """
+        Creates an empty results object that represents an execution failure during autograding.
+
+        The returned results object will alert students and instructors to this failure, providing
+        the error message and traceback to instructors, and report a score of 0 on Gradescope.
+
+        Args:
+            e (``Exception``): the error that was thrown
+
+        Returns:
+            ``GradingResults``: the results object
+        """
+        instc = cls([])
+        instc._catastrophic_error = e
+        return instc
 
     @property
     def test_files(self):
@@ -364,6 +384,16 @@ class GradingResults:
         """
         return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
 
+    def has_catastrophic_failure(self):
+        """
+        Returns whether these results contain a catastrophic error (i.e. an error that prevented
+        submission results from being generated or read).
+
+        Returns:
+            ``bool``: whether there is such an error
+        """
+        return self._catastrophic_error is not None
+
     def to_gradescope_dict(self, ag_config):
         """
         Convert these results into a dictionary formatted for Gradescope's autograder.
@@ -376,6 +406,27 @@ class GradingResults:
             ``dict``: the results formatted for Gradescope
         """
         output = {"tests": []}
+
+        if self._catastrophic_error:
+            output["tests"].append({
+                "name": "Autograder Failed",
+                "visibility": "visible",
+                "output": "The autograder failed to produce any results. Please alert your instructor to this failure for assistance in debugging it.",
+                "status": "failed",
+            })
+            tb = "".join(traceback.format_exception(
+                type(self._catastrophic_error), 
+                self._catastrophic_error, 
+                self._catastrophic_error.__traceback__,
+            ))
+            output["tests"].append({
+                "name": "Autograder Exception",
+                "visibility": "hidden",
+                "output": f"The exception below was thrown when attempting to read the results from executing the notebook. (This message is not visible to students.)\n\n{tb}",
+                "status": "failed",
+            })
+            output["score"] = 0
+            return output
 
         if self.output is not None:
             output["output"] = self.output

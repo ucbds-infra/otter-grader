@@ -8,13 +8,7 @@ import tempfile
 from enum import Enum, auto
 from typing import List, Optional, TYPE_CHECKING
 
-from ..utils import import_or_raise
-
-
-class QuestionNotInLogException(Exception):
-    """
-    Exception that indicates that a specific question was not found in any entry in the log
-    """
+from ..utils import import_or_raise, QuestionNotInLogException
 
 
 class EventType(Enum):

@@ -210,12 +210,18 @@ class Notebook(Loggable):
                 resolved
 
         Returns:
-            ``str``: resolved notebook path
+            ``str | None``: resolved notebook path or ``None`` if it can't be resolved and
+                ``fail_silently`` was true
 
         Raises:
             ``ValueError``: if no notebooks or too many notebooks are found and ``fail_silently`` is
                 false
         """
+        # if in grading mode, don't attempt to resolve the notebook path, since the tests path was
+        # already overridden in __init__
+        if type(self)._grading_mode:
+            return nb_path
+
         if nb_path is None and self._notebook is not None:
             nb_path = self._notebook
             if not os.path.isfile(nb_path):
@@ -506,7 +512,7 @@ class Notebook(Loggable):
                 out_html = f"""
                     <p>
                         Your submission has been exported. Click
-                        <a href="{zip_path}" downloadzip_path target="_blank">here</a> to download
+                        <a href="{zip_path}" download="{zip_path}" target="_blank">here</a> to download
                         the zip file.
                     </p>
                 """

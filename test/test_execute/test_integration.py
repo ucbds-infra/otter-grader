@@ -6,6 +6,7 @@ import shutil
 import tempfile
 
 from glob import glob
+from unittest import mock
 
 from otter.check.logs import EventType, Log, LogEntry
 from otter.execute import grade_notebook
@@ -93,3 +94,30 @@ def test_log_execution(temp_dir):
         d["path"] = os.path.join(test_dir, os.path.split(d["path"])[1])
 
     assert results.to_dict() == expected_results
+
+
+@mock.patch("otter.execute.pickle.load")
+def test_results_load_failure_handling(mocked_pickle_load, temp_dir):
+    """
+    Tests that ``otter.execute.grade_notebook`` handles the case when the results pickle file can't
+    be loaded.
+    """
+    nb = nbf.v4.new_notebook(cells=[nbf.v4.new_code_cell("x = 2")])
+    subm_path = os.path.join(temp_dir, "submission.ipynb")
+    nbf.write(nb, subm_path)
+
+    test_dir = os.path.join(temp_dir, "tests")
+    os.makedirs(test_dir)
+
+    write_ok_test(os.path.join(test_dir, "q1.py"), ">>> assert x == 2")
+
+    mocked_pickle_load.side_effect = Exception("nope")
+
+    results = grade_notebook(
+        subm_path,
+        test_dir=test_dir,
+        tests_glob=glob(os.path.join(test_dir, "*.py")),
+        ignore_errors=False,
+    )
+
+    assert results.has_catastrophic_failure()

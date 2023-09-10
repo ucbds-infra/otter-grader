@@ -99,7 +99,7 @@ def main(autograder_dir, otter_run=False, **kwargs):
 
         df = pd.DataFrame(output["tests"])
 
-        if runner.ag_config.print_score:
+        if runner.ag_config.print_score  and "score" in df.columns:
             total, possible = df["score"].sum(), df["max_score"].sum()
             if "score" in output:
                 total, possible = output["score"], runner.ag_config.points_possible or possible
