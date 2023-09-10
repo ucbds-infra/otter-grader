@@ -1,6 +1,6 @@
 # Changelog
 
-**v5.1.4 (unreleased):**
+**v5.1.4:**
 
 * Prevented the `Notebook` class from attempting to resolve the notebook path when in grading mode
 * Gracefully handle a failure in reading the results pickle file by returning results indicating that such a failure has occurred per [#723](https://github.com/ucbds-infra/otter-grader/issues/723)
