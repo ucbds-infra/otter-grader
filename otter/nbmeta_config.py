@@ -27,7 +27,12 @@ class NBMetadataConfig(fica.Config):
 
     tests: Dict[str, Dict[str, Any]] = fica.Key(
         type_=dict,
+        # This value should never be None unless the value specified in the notebook metadata is
+        # null. It is here as a patch for fica, which doesn't handle type-checking a factory
+        # correctly.
+        # TODO: remove allow_none=True once fica fixes this bug (chrispyles/fica#33)
         allow_none=True,
+        factory=lambda: {},
     )
     """test cases keyed by question name"""
 
