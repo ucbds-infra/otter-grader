@@ -203,7 +203,7 @@ class NotebookTransformer:
                     solution_has_md_cells, prompt_insertion_index = False, None
 
                 elif block_type is BlockType.SOLUTION:
-                    if not has_prompt and solution_has_md_cells:
+                    if not has_prompt and solution_has_md_cells and question.manual:
                         if prompt_insertion_index is None:
                             raise RuntimeError("Could not find prompt insertion index")
                         transformed_cells.insert(
