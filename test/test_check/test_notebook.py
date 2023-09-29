@@ -18,7 +18,7 @@ from otter.utils import (
     REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY,
 )
 
-from ..utils import TestFileManager
+from ..utils import delete_paths, TestFileManager
 
 
 FILE_MANAGER = TestFileManager(__file__)
@@ -37,24 +37,24 @@ def negate(x):
 
 
 @pytest.fixture(autouse=True)
-def cleanup_output(cleanup_enabled):  # TODO: refactor this and similar to use delete_paths
+def cleanup_output(cleanup_enabled):
     yield
-    if cleanup_enabled and os.path.isfile(_OTTER_LOG_FILENAME):
-        os.remove(_OTTER_LOG_FILENAME)
+    if cleanup_enabled:
+        delete_paths([_OTTER_LOG_FILENAME])
 
 
 @pytest.fixture
 def write_notebook(cleanup_enabled):
     yield lambda nb: nbf.write(nb, NB_PATH)
-    if cleanup_enabled and os.path.exists(NB_PATH):
-        os.remove(NB_PATH)
+    if cleanup_enabled:
+        delete_paths([NB_PATH])
 
 
 def test_check():
     """
     Checks that the cor checking behavior of ``otter.Notebook.check`` works correctly.
     """
-    grader = Notebook(tests_dir=TESTS_DIR)  # TODO: move to fixture?
+    grader = Notebook(tests_dir=TESTS_DIR)
 
     def square(x):
         return x ** 2
@@ -126,8 +126,6 @@ def test_to_pdf_with_nb_path(mocked_export):
         grader.to_pdf(filtering=False)
         mocked_export.assert_called_once_with(nb_path, filtering=False, pagebreaks=True)
 
-        # TODO: test display_link
-
 
 @mock.patch("otter.check.notebook.dt")
 @mock.patch("otter.check.notebook.zipfile.ZipFile")
@@ -145,20 +143,15 @@ def test_export(mocked_export, mocked_zf, mocked_dt, write_notebook):
         mocked_resolve.return_value = NB_PATH
         mocked_dt.datetime.now.return_value = timestmap
 
-        grader.export(pdf=False)
+        grader.export()
 
         zip_name = FILE_MANAGER.get_path(
             f"{NB_PATH_STEM}_{timestmap.strftime('%Y_%m_%dT%H_%M_%S_%f')}.zip")
         mocked_zf.assert_called_once_with(zip_name, mode="w")
         mocked_zf.return_value.write.assert_any_call(mocked_resolve.return_value)
         mocked_zf.return_value.write.assert_any_call(_OTTER_LOG_FILENAME)
-        mocked_export.assert_not_called()
+        mocked_export.assert_called_once_with(NB_PATH, filtering=True, pagebreaks=True)
         mocked_zf.return_value.writestr.assert_called_with(_ZIP_NAME_FILENAME, os.path.basename(zip_name))
-
-    # TODO: test with pdf
-    # TODO: test force_save
-    # TODO: test run_tests
-    # TODO: test display_link
 
 
 @mock.patch("otter.check.notebook.zipfile.ZipFile")
@@ -220,35 +213,36 @@ def test_export_with_no_pdf_ack(
     timestmap = dt.datetime(2022, 1, 3, 12, 12, 12, 1212)
     grader = Notebook(NB_PATH)
 
-    with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve:
-        mocked_resolve.return_value = NB_PATH
-        mocked_dt.datetime.now.return_value = timestmap
-        mocked_export.return_value = FILE_MANAGER.get_path(f"{NB_PATH_STEM}.pdf")
+    # with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve:
+        # mocked_resolve.return_value = NB_PATH
+    mocked_dt.datetime.now.return_value = timestmap
+    mocked_export.return_value = FILE_MANAGER.get_path(f"{NB_PATH_STEM}.pdf")
 
-        grader.export()
+    grader.export()
 
-        mocked_export.assert_called_with(NB_PATH, filtering=True, pagebreaks=True)
+    mocked_export.assert_called_with(NB_PATH, filtering=True, pagebreaks=True)
 
-        mocked_ipyw_output.assert_called()
-        mocked_ipyw_html.assert_any_call("""<p style="margin: 0">no pdf</p>""")
-        mocked_ipyw_button.assert_called_with(description="Continue export", button_style="warning")
-        mocked_ipyw_button.return_value.on_click.assert_called()
-        mocked_ipyw_vbox.assert_called_with([
-            mocked_ipyw_html.return_value,
-            mocked_ipyw_button.return_value,
-            mocked_ipyw_html.return_value,
-            mocked_ipyw_output.return_value,
-        ])
-        mocked_ipy_display.assert_called_with(mocked_ipyw_vbox.return_value)
+    mocked_ipyw_output.assert_called()
+    mocked_ipyw_html.assert_any_call("""<p style="margin: 0">no pdf</p>""")
+    mocked_ipyw_button.assert_called_with(description="Continue export", button_style="warning")
+    mocked_ipyw_button.return_value.on_click.assert_called()
+    mocked_ipyw_vbox.assert_called_with([
+        mocked_ipyw_html.return_value,
+        mocked_ipyw_button.return_value,
+        mocked_ipyw_html.return_value,
+        mocked_ipyw_output.return_value,
+    ])
+    mocked_ipy_display.assert_called_with(mocked_ipyw_vbox.return_value)
 
-        mocked_ipyw_button.return_value.on_click.call_args.args[0]()
+    mocked_ipyw_button.return_value.on_click.call_args.args[0]()
 
-        zip_name = FILE_MANAGER.get_path(
-            f"{NB_PATH_STEM}_{timestmap.strftime('%Y_%m_%dT%H_%M_%S_%f')}.zip")
-        mocked_zf.assert_called_once_with(zip_name, mode="w")
-        mocked_zf.return_value.write.assert_any_call(mocked_resolve.return_value)
-        mocked_zf.return_value.write.assert_any_call(_OTTER_LOG_FILENAME)
-        mocked_zf.return_value.writestr.assert_called_with(_ZIP_NAME_FILENAME, os.path.basename(zip_name))
+    zip_name = FILE_MANAGER.get_path(
+        f"{NB_PATH_STEM}_{timestmap.strftime('%Y_%m_%dT%H_%M_%S_%f')}.zip")
+    mocked_zf.assert_called_once_with(zip_name, mode="w")
+    # mocked_zf.return_value.write.assert_any_call(mocked_resolve.return_value)
+    mocked_zf.return_value.write.assert_any_call(NB_PATH)
+    mocked_zf.return_value.write.assert_any_call(_OTTER_LOG_FILENAME)
+    mocked_zf.return_value.writestr.assert_called_with(_ZIP_NAME_FILENAME, os.path.basename(zip_name))
 
 
 @mock.patch("otter.check.notebook.os.path.isdir")
@@ -307,23 +301,27 @@ def test_jupyterlite():
         mocked_open.assert_called_with(mocked_os.path.join.return_value, "w+")
 
 
+@mock.patch("otter.check.notebook.Checker")
+@mock.patch("otter.check.notebook.resolve_test_info")
 @mock.patch.object(Notebook, "_resolve_nb_path")
-def test_grading_mode(mocked_resolve):
+def test_grading_mode(mocked_resolve_nb_path, mocked_resolve_test_info, _):
     """
     Check that a call to a grading-mode-disabled method is not executed.
     """
+    mocked_resolve_nb_path.return_value = None
+    mocked_resolve_test_info.return_value = ("", None)
     Notebook.init_grading_mode(tests_dir="foo")
 
     grader = Notebook(tests_dir=TESTS_DIR)
+
+    # check will try to raise a FileNotFoundError because the test file doesn't exist; this is safe
+    # to ignore since it's thrown after the call to resolve_test_info
+    try: grader.check("q1")
+    except FileNotFoundError: pass
+    mocked_resolve_test_info.assert_called_once_with("foo", None, None, "q1")
+
+    mocked_resolve_nb_path.reset_mock()
+
     grader.export()
-
-    # TODO: find a better way of doing this than accessing a private field
-    assert grader._path == "foo"
-
     # if export is called, this method would be called first
-    mocked_resolve.assert_not_called()
-
-
-# TODO: tests for force_save on export and to_pdf
-# TODO: test _resolve_nb_path
-# TODO: tests for event logging and other things in otter.check.utils
+    mocked_resolve_nb_path.assert_not_called()

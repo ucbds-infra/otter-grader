@@ -1,24 +1,25 @@
 """Utilities for Otter Assign"""
 
 import copy
-import fica
 import json
+import nbformat as nbf
 import os
 import pathlib
 import re
 import shutil
 
 from textwrap import indent
+from typing import List, Optional, TYPE_CHECKING
 
 from ..api import grade_submission
 from ..generate import main as generate_autograder
+from ..plugins import PluginCollection
 from ..run import capture_run_output
 from ..utils import (
+    chdir,
     get_source,
     loggers,
-    NO_PDF_EXPORT_MESSAGE_KEY,
-    NOTEBOOK_METADATA_KEY,
-    REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY,
+    OTTER_CONFIG_FILENAME,
 )
 
 
@@ -33,8 +34,27 @@ class EmptyCellException(Exception):
 
 class AssignNotebookFormatException(Exception):
     """
+    An exception representing an error in the formatting of an Otter Assign master notebook.
+
+    Wraps an error message with information about the question and cell to make the location of the
+    error easy to find for users.
+
+    Args:
+        message (``str``): the error message
+        question (``otter.assign.question_config.QuestionConfig | None``): the question config if
+            the error occurred inside of a question block
+        cell_index (``int``): the index of the cell
+        *args: additional args passed to ``Exception`` constructor
+        **kwargs: additional keyword args passed to ``Exception`` constructor
     """
-    def __init__(self, message, question, cell_index, *args, **kwargs):
+    def __init__(
+        self,
+        message: str,
+        question: Optional["QuestionConfig"],
+        cell_index: int,
+        *args,
+        **kwargs,
+    ):
         message += " ("
         if question is not None:
             message += f"question { question.name }, "
@@ -42,7 +62,7 @@ class AssignNotebookFormatException(Exception):
         super().__init__(message, *args, **kwargs)
 
 
-def get_notebook_language(nb):
+def get_notebook_language(nb: nbf.NotebookNode) -> str:
     """
     Parse the notebook kernel language and return it as a string.
 
@@ -55,7 +75,7 @@ def get_notebook_language(nb):
     return nb["metadata"]["kernelspec"]["language"].lower()
 
 
-def is_ignore_cell(cell):
+def is_ignore_cell(cell: nbf.NotebookNode) -> bool:
     """
     Returns whether the current cell should be ignored
 
@@ -70,7 +90,7 @@ def is_ignore_cell(cell):
         re.match(r"(##\s*ignore\s*##\s*|#\s*ignore\s*)", source[0], flags=re.IGNORECASE))
 
 
-def is_cell_type(cell, cell_type):
+def is_cell_type(cell: nbf.NotebookNode, cell_type: str) -> bool:
     """
     Determine whether a cell is of a specific type.
 
@@ -84,7 +104,7 @@ def is_cell_type(cell, cell_type):
     return cell["cell_type"] == cell_type
 
 
-def remove_output(nb):
+def remove_output(nb: nbf.NotebookNode) -> None:
     """
     Remove all outputs from a notebook in-place.
 
@@ -98,7 +118,7 @@ def remove_output(nb):
             cell['execution_count'] = None
 
 
-def lock(cell):
+def lock(cell: nbf.NotebookNode) -> None:
     """
     Make a cell non-editable and non-deletable in-place.
 
@@ -110,7 +130,7 @@ def lock(cell):
     m["deletable"] = False
 
 
-def add_tag(cell, tag):
+def add_tag(cell: nbf.NotebookNode, tag: str) -> nbf.NotebookNode:
     """
     Add a tag to a cell, returning a copy.
 
@@ -128,7 +148,7 @@ def add_tag(cell, tag):
     return cell
 
 
-def has_tag(cell, tag):
+def has_tag(cell: nbf.NotebookNode, tag: str) -> bool:
     """
     Determine whether a cell has a tag.
 
@@ -142,7 +162,7 @@ def has_tag(cell, tag):
     return tag in cell["metadata"].get("tags", [])
 
 
-def remove_tag(cell, tag):
+def remove_tag(cell: nbf.NotebookNode, tag: str) -> nbf.NotebookNode:
     """
     Remove a tag from a cell, returning a copy.
 
@@ -160,7 +180,7 @@ def remove_tag(cell, tag):
     return cell
 
 
-def str_to_doctest(code_lines, lines):
+def str_to_doctest(code_lines: List[str], lines: List[str]) -> List[str]:
     """
     Convert a list of lines of Python code ``code_lines`` to the doctest format and appending the
     results to ``lines``.
@@ -186,7 +206,7 @@ def str_to_doctest(code_lines, lines):
         return str_to_doctest(code_lines, lines + [">>> " + line])
 
 
-def run_tests(assignment, debug=False):
+def run_tests(assignment: "Assignment", debug: bool = False) -> None:
     """
     Grade a notebook and throw an error if it does not receive a perfect score.
 
@@ -211,7 +231,7 @@ def run_tests(assignment, debug=False):
             indent(results.summary(), '    '))
 
 
-def write_otter_config_file(assignment):
+def write_otter_config_file(assignment: "Assignment") -> None:
     """
     Create an Otter configuration file (a ``.otter`` file) for students to use Otter tools,
     including saving environments and submitting to an Otter Service deployment, using assignment
@@ -237,135 +257,97 @@ def write_otter_config_file(assignment):
         json.dump(config, f, indent=4)
 
 
-# TODO: update for new assign format
-def run_generate_autograder(assignment, gs_username, gs_password, plugin_collection=None):
+def run_generate_autograder(
+    assignment: "Assignment",
+    gs_username: Optional[str],
+    gs_password: Optional[str],
+    plugin_collection: Optional[PluginCollection] = None,
+) -> None:
     """
     Run Otter Generate on the autograder directory to generate a Gradescope zip file. Relies on
     configurations in ``assignment.generate``.
 
     Args:
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
-        gs_username (``str``): Gradescope username for token generation
-        gs_password (``str``): Gradescope password for token generation
+        gs_username (``str | None``): Gradescope username for token generation
+        gs_password (``str | None``): Gradescope password for token generation
         plugin_collection (``otter.plugins.PluginCollection``, optional): a plugin collection to pass
             to Otter Generate
     """
     curr_dir = os.getcwd()
-    os.chdir(str(assignment.get_ag_path()))
+    with chdir(str(assignment.get_ag_path())):
 
-    # use temp tests dir
-    test_dir = "tests"
-    if assignment.is_python and not assignment.tests.files and assignment._temp_test_dir is None:
-        raise RuntimeError("Failed to create temp tests directory for Otter Generate")
+        # use temp tests dir
+        test_dir = "tests"
+        if assignment.is_python and not assignment.tests.files and \
+                assignment.generate_tests_dir is None:
+            raise RuntimeError("Failed to create temp tests directory for Otter Generate")
 
-    elif assignment.is_python and not assignment.tests.files:
-        test_dir = str(assignment._temp_test_dir)
+        elif assignment.is_python and not assignment.tests.files:
+            test_dir = assignment.generate_tests_dir
 
-    requirements = None
-    if assignment.requirements:
-        if assignment.is_r:
-            requirements = 'requirements.R'
-        else:
-            requirements = 'requirements.txt'
-
-    files = []
-    if assignment.files:
-        files += assignment.files
-
-    if assignment.autograder_files:
-        ag_dir = os.getcwd()
-        os.chdir(curr_dir)
-        output_dir = assignment.get_ag_path()
-
-        # copy files
-        for file in assignment.autograder_files:
-
-            # if a directory, copy the entire dir
-            if os.path.isdir(file):
-                shutil.copytree(file, str(output_dir / os.path.basename(file)))
-
+        requirements = None
+        if assignment.requirements:
+            if assignment.is_r:
+                requirements = 'requirements.R'
             else:
-                # check that file is in subdir
-                assert os.getcwd() in os.path.abspath(file), \
-                    f"{file} is not in a subdirectory of the master notebook directory"
-                file_path = pathlib.Path(file).resolve()
-                rel_path = file_path.parent.relative_to(pathlib.Path(os.getcwd()))
-                os.makedirs(output_dir / rel_path, exist_ok=True)
-                shutil.copy(file, str(output_dir / rel_path))
+                requirements = 'requirements.txt'
 
-        os.chdir(ag_dir)
+        files = []
+        if assignment.files:
+            files += assignment.files
 
-        files += assignment.autograder_files
+        if assignment.autograder_files:
+            with chdir(curr_dir):
+                output_dir = assignment.get_ag_path()
 
-    otter_config = assignment.get_otter_config()
-    if otter_config:
-        # TODO: move this filename into a global variable somewhere and remove all of the places
-        # it's hardcoded
-        with open("otter_config.json", "w+") as f:
-            json.dump(otter_config, f, indent=2)
+                # copy files
+                for file in assignment.autograder_files:
 
-    # TODO: change generate_autograder so that only necessary kwargs are needed
-    generate_autograder(
-        tests_dir=test_dir,
-        output_path=assignment.ag_zip_name,
-        config="otter_config.json" if otter_config else None,
-        lang="python" if assignment.is_python else "r",
-        requirements=requirements,
-        overwrite_requirements=assignment.overwrite_requirements,
-        environment="environment.yml" if assignment.environment else None,
-        no_environment=False,
-        username=gs_username,
-        password=gs_password,
-        files=files,
-        plugin_collection=plugin_collection,
-        assignment=assignment,
-        python_version=assignment.get_python_version(),
-        channel_priority_strict=assignment.channel_priority_strict,
-    )
+                    # if a directory, copy the entire dir
+                    if os.path.isdir(file):
+                        shutil.copytree(file, str(output_dir / os.path.basename(file)))
 
-    # clean up temp tests dir
-    if assignment._temp_test_dir is not None:
-        shutil.rmtree(str(assignment._temp_test_dir))
+                    else:
+                        # check that file is in subdir
+                        assert os.getcwd() in os.path.abspath(file), \
+                            f"{file} is not in a subdirectory of the master notebook directory"
+                        file_path = pathlib.Path(file).resolve()
+                        rel_path = file_path.parent.relative_to(pathlib.Path(os.getcwd()))
+                        os.makedirs(output_dir / rel_path, exist_ok=True)
+                        shutil.copy(file, str(output_dir / rel_path))
 
-    os.chdir(curr_dir)
+            files += assignment.autograder_files
 
+        otter_config = assignment.get_otter_config()
+        if otter_config:
+            with open(OTTER_CONFIG_FILENAME, "w+") as f:
+                json.dump(otter_config, f, indent=2)
 
-def add_assignment_name_to_notebook(nb, assignment):
-    """
-    Add the assignment name from the assignment config to the provided notebook's metadata in-place.
+        generate_autograder(
+            tests_dir = test_dir,
+            output_path = assignment.ag_zip_name,
+            config = OTTER_CONFIG_FILENAME if otter_config else None,
+            lang = "python" if assignment.is_python else "r",
+            requirements = requirements,
+            overwrite_requirements = assignment.overwrite_requirements,
+            environment = "environment.yml" if assignment.environment else None,
+            no_environment = False,
+            username = gs_username,
+            password = gs_password,
+            files = files,
+            plugin_collection = plugin_collection,
+            assignment = assignment,
+            python_version = assignment.get_python_version(),
+            channel_priority_strict = assignment.channel_priority_strict,
+        )
 
-    If ``assignment`` has a name, the name is added to the notebook metadata, as
-    ``nb["metadata"]["otter"]["assignment_name"]``.
-
-    Args:
-        nb (``nbformat.NotebookNode``): the notebook to add the name to
-        assignment (``otter.assign.assignment.Assignment``): the assignment config
-    """
-    if assignment.name is not None:
-        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
-            nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
-        nb["metadata"][NOTEBOOK_METADATA_KEY]["assignment_name"] = assignment.name
+        # clean up temp tests dir
+        if assignment.generate_tests_dir is not None:
+            shutil.rmtree(assignment.generate_tests_dir)
 
 
-def add_require_no_pdf_ack_to_notebook(nb, assignment):
-    """
-    Add the no PDF ACK configurtion from the assignment config to the provided notebook's metadata
-    in-place.
-
-    Args:
-        nb (``nbformat.NotebookNode``): the notebook to add the name to
-        assignment (``otter.assign.assignment.Assignment``): the assignment config
-    """
-    if assignment.export_cell and assignment.export_cell.require_no_pdf_ack:
-        if NOTEBOOK_METADATA_KEY not in nb["metadata"]:
-            nb["metadata"][NOTEBOOK_METADATA_KEY] = {}
-        nb["metadata"][NOTEBOOK_METADATA_KEY][REQUIRE_CONFIRMATION_NO_PDF_EXPORT_KEY] = True
-        if isinstance(assignment.export_cell.require_no_pdf_ack, fica.Config):
-            nb["metadata"][NOTEBOOK_METADATA_KEY][NO_PDF_EXPORT_MESSAGE_KEY] = \
-                assignment.export_cell.require_no_pdf_ack.message
-
-
-def remove_cell_ids_if_applicable(nb):
+def remove_cell_ids_if_applicable(nb: nbf.NotebookNode) -> None:
     """
     Remove all cell IDs from a notebook in-place iff the nbformat of the notebook is < 4.5.
 
@@ -376,3 +358,8 @@ def remove_cell_ids_if_applicable(nb):
         for cell in nb.cells:
             if "id" in cell:
                 cell.pop("id")
+
+
+if TYPE_CHECKING:
+    from .assignment import Assignment
+    from .question_config import QuestionConfig

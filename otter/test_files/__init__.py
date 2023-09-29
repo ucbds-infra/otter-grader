@@ -2,24 +2,37 @@
 
 import json
 import math
-import nbformat
+import nbformat as nbf
 import os
 import pickle
 import traceback
 
-from collections import namedtuple
-from typing import List
+from typing import Any, Dict, List, Optional
 
-from .abstract_test import OK_FORMAT_VARNAME, TestCase, TestCaseResult, TestFile
+from .abstract_test import TestCase, TestCaseResult, TestFile
 from .exception_test import ExceptionTestFile, test_case
 from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
-from ..utils import NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY, QuestionNotInLogException
+from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
+from ..utils import QuestionNotInLogException
 
 
-def create_test_file(path, test_name=None):
+__all__ = [
+    "create_test_file",
+    "GradingResults",
+    "test_case",
+    "TestCase",
+    "TestFile",
+]
+
+
+def create_test_file(
+    path: str,
+    nbmeta_config: NBMetadataConfig,
+    test_name: Optional[str] = None,
+) -> TestFile:
     """
     Read a test file or a notebook file and determine the correct ``TestFile`` subclass for this test.
 
@@ -33,36 +46,35 @@ def create_test_file(path, test_name=None):
 
     Returns:
         ``TestFile``: an instance of the correct test file
+
+    Raises:
+        ``ValueError``: if there is no test name specified and ``path`` is a notebook file
+        ``RuntimeError``: if the test file does not define the ``OK_FORMAT`` global variable
     """
     if os.path.splitext(path)[1] == ".ipynb":
         if test_name is None:
             raise ValueError("You must specify a test name when using notebook metadata tests")
 
-        nb = nbformat.read(path, as_version=NBFORMAT_VERSION)
-        if nb["metadata"][NOTEBOOK_METADATA_KEY][OK_FORMAT_VARNAME]:
-            return NotebookMetadataOKTestFile.from_file(path, test_name)
+        if nbmeta_config.ok_format:
+            return NotebookMetadataOKTestFile.from_nbmeta_config(path, nbmeta_config, test_name)
 
         else:
-            return NotebookMetadataExceptionTestFile.from_file(path, test_name)
+            return NotebookMetadataExceptionTestFile.from_nbmeta_config(
+                path, nbmeta_config, test_name)
 
     env = {}
     with open(path) as f:
         exec(f.read(), env)
 
     if OK_FORMAT_VARNAME not in env:
-        raise RuntimeError(f"Malformed test file: does not define the global variable '{OK_FORMAT_VARNAME}'")
+        raise RuntimeError(
+            f"Malformed test file: does not define the global variable '{OK_FORMAT_VARNAME}'")
 
     if env[OK_FORMAT_VARNAME]:
         return OKTestFile.from_file(path)
 
     else:
         return ExceptionTestFile.from_file(path)
-
-
-GradingTestCaseResult = namedtuple(
-    "GradingTestCaseResult", 
-    ["name", "score", "possible", "hidden", "incorrect", "test_case_result", "test_file"]
-)
 
 
 class GradingResults:
@@ -75,24 +87,38 @@ class GradingResults:
     for Gradescope.
 
     Args:
-        results (``list`` of ``TestFile``): the list of test file objects summarized in this grade
-
-    Attributes:
-        results (``dict``): maps test names to ``GradingTestCaseResult`` named tuples containing the 
-            test result information
-        output (``str``): a string to include in the output field for Gradescope
-        all_hidden (``bool``): whether all results should be hidden from the student on Gradescope
-        tests (``list`` of ``str``): list of test names according to the keys of ``results``
+        results (``list[TestFile]``): the list of test file objects summarized in this grade
     """
-    def __init__(self, test_files, notebook=None):
-        self._plugin_data = {}
+
+    results: Dict[str, TestFile]
+    """maps test/question names to their ``TestFile`` objects (which store the results)"""
+
+    output: Optional[str]
+    """a string to include in the output field for Gradescope"""
+
+    all_hidden: bool
+    """whether all results should be hidden from the student on Gradescope"""
+
+    pdf_error: Optional[Exception]
+    """
+    an error thrown while generating/submitting a PDF of the submission to display to students in
+    the Gradescope results
+    """
+
+    notebook: Optional[nbf.NotebookNode]
+    """the executed notebook with outputs that gave these results"""
+
+    _plugin_data: Dict[str, Any]
+    """data requested to be stored in the results by plugins"""
+
+    def __init__(self, test_files: List[TestFile], notebook: Optional[nbf.NotebookNode] = None):
         self.results = {tf.name: tf for tf in test_files}
-        # self.results = {}
         self.output = None
         self.all_hidden = False
         self.pdf_error = None
         self.notebook = notebook
         self._catastrophic_error = None
+        self._plugin_data = {}
 
     def __repr__(self):
         return self.summary()
@@ -100,7 +126,7 @@ class GradingResults:
     @classmethod
     def from_ottr_json(cls, ottr_output):
         """
-        Creates a ``GradingResults`` object from the JSON output of Ottr.
+        Creates a ``GradingResults`` object from the JSON output of Ottr (Otter's R client).
 
         Args:
             ottr_output (``str``): the JSON output of Ottr as a string
@@ -176,14 +202,14 @@ class GradingResults:
     @property
     def total(self):
         """
-        ``int`` or ``float``: the total points earned
+        ``int | float``: the total points earned
         """
         return sum(tr.score for tr in self.results.values())
 
     @property
     def possible(self):
         """
-        ``int`` or ``float``: the total points possible
+        ``int | float``: the total points possible
         """
         return sum(tr.possible for tr in self.results.values())
 
@@ -221,12 +247,11 @@ class GradingResults:
 
     def update_score(self, test_name, new_score):
         """
-        Updates the values in the ``GradingTestCaseResult`` object stored in ``self.results[test_name]`` 
-        with the key-value pairs in ``kwargs``.
+        Override the score for the specified test file.
 
         Args:
-            test_name (``str``): the name of the test
-            new_score (``int`` or ``float``): the new score
+            test_name (``str``): the name of the test file
+            new_score (``int | float``): the new score
         """
         self.results[test_name].update_score(new_score)
 
@@ -242,13 +267,13 @@ class GradingResults:
 
     def clear_results(self):
         """
-        Empties the dictionary of results
+        Empties the dictionary of results.
         """
         self.results = {}
 
     def hide_everything(self):
         """
-        Indicates that all results should be hidden from students on Gradescope
+        Indicates that all results should be hidden from students on Gradescope.
         """
         self.all_hidden = True
 
@@ -263,19 +288,19 @@ class GradingResults:
         try:
             pickle.dumps(data)
         except:
-            raise ValueError(f"Data was not pickleable: {data}")
+            raise ValueError(f"Data was not picklable: {data}")
         self._plugin_data[plugin_name] = data
 
     def get_plugin_data(self, plugin_name, default=None):
         """
-        Retrieves data for plugin ``plugin_name`` in the results
+        Retrieves data for plugin ``plugin_name`` in the results.
 
         This method uses ``dict.get`` to retrive the data, so a ``KeyError`` is never raised if
         ``plugin_name`` is not found; rather, it returns ``None``.
 
         Args:
             plugin_name (``str``): the importable name of a plugin
-            default (any, optional): a default value to return if ``plugin_name`` is not found
+            default (any): a default value to return if ``plugin_name`` is not found
 
         Returns:
             any: the data stored for ``plugin_name`` if found
@@ -300,7 +325,7 @@ class GradingResults:
 
         Args:
             log (``otter.check.logs.Log``): the log to verify against
-            ignore_hidden  (``bool``, optional): whether to ignore hidden tests during verification
+            ignore_hidden (``bool``): whether to ignore hidden tests during verification
 
         Returns:
             ``list[str]``: a list of error messages for discrepancies; if none were found, the list
@@ -318,9 +343,7 @@ class GradingResults:
             else:
                 score = test_file.score
             try:
-                result = log.get_results(test_name)
-                # TODO fix
-                logged_score = result.score
+                logged_score = log.get_results(test_name).score
                 if not math.isclose(score, logged_score):
                     l.append(
                         f"Score for {test_name} ({score:.3f}) differs from logged score " \
@@ -331,8 +354,8 @@ class GradingResults:
 
     def to_report_str(self):
         """
-        Returns these results as a report string generated using the ``__repr__`` of the ``TestFile``
-        class.
+        Returns these results as a report string generated using the ``__repr__`` of the
+        ``TestFile`` class.
 
         Returns:
             ``str``: the report
@@ -341,8 +364,8 @@ class GradingResults:
 
     def to_dict(self):
         """
-        Converts these results into a dictinary, extending the fields of the named tuples in ``results``
-        into key, value pairs in a ``dict``.
+        Converts these results into a dictinary, extending the fields of the named tuples in
+        ``results`` into key, value pairs in a ``dict``.
 
         Returns:
             ``dict``: the results in dictionary form
@@ -354,7 +377,7 @@ class GradingResults:
         Generate a summary of these results and return it as a string.
 
         Args:
-            public_only (``bool``, optional): whether only public test cases should be included
+            public_only (``bool``): whether only public test cases should be included
 
         Returns:
             ``str``: the summary of results
@@ -373,8 +396,7 @@ class GradingResults:
 
     def to_gradescope_dict(self, ag_config):
         """
-        Converts these results into a dictionary formatted for Gradescope's autograder. Requires a 
-        dictionary of configurations for the Gradescope assignment generated using Otter Generate.
+        Convert these results into a dictionary formatted for Gradescope's autograder.
 
         Args:
             ag_config (``otter.run.run_autograder.autograder_config.AutograderConfig``): the
@@ -408,7 +430,6 @@ class GradingResults:
 
         if self.output is not None:
             output["output"] = self.output
-            # TODO: use output to display public test case results?
 
         # hidden visibility determined by show_hidden
         hidden_test_visibility = ("hidden", "after_published")[ag_config.show_hidden]

@@ -1,5 +1,12 @@
 # Changelog
 
+**v5.2.0 (unreleased):**
+
+* Migrate installation of `ottr` from `setup.sh` to `environment.yml` with the [`r-ottr` conda-forge recipe](https://anaconda.org/conda-forge/r-ottr)
+* Updated Otter Assign to allow multiline statements in test cases for Python 3.9+ per [#590](https://github.com/ucbds-infra/otter-grader/issues/590)
+* Added `otter_include` tag to allow inclusion of tagged markdown cells within the solution block into the student notebook per [#730](https://github.com/ucbds-infra/otter-grader/issues/730)
+* Removed dependency on `nbconvert` during import so that Otter can be imported on Jupyterlite per [#736](https://github.com/ucbds-infra/otter-grader/issues/736)
+
 **v5.1.4:**
 
 * Prevented the `Notebook` class from attempting to resolve the notebook path when in grading mode

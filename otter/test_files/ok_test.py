@@ -25,7 +25,7 @@ def run_doctest(name, doctest_string, global_environment):
             script/notebook
 
     Returns:
-        ``tuple`` of (``bool``, ``str``): results from running the test
+        ``tuple[bool, str]``: results from running the test
     """
     examples = doctest.DocTestParser().parse(
         doctest_string,
@@ -57,26 +57,6 @@ def run_doctest(name, doctest_string, global_environment):
 class OKTestFile(TestFile):
     """
     A single OK-formatted test file for Otter.
-
-    Args:
-        name (``str``): the name of test file
-        path (``str``): the path to the test file
-        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        value (``int``, optional): the point value of this test, defaults to 1
-        all_or_nothing (``bool``, optional): whether the test should be graded all-or-nothing across
-            cases
-
-    Attributes:
-        name (``str``): the name of test file
-        path (``str``): the path to the test file
-        test_cases (``list`` of ``TestCase``): a list of parsed tests to be run
-        value (``int``): the point value of this test, defaults to 1
-        all_or_nothing (``bool``): whether the test should be graded all-or-nothing across
-            cases
-        passed_all (``bool``): whether all of the test cases were passed
-        test_case_results (``list`` of ``TestCaseResult``): a list of results for the test cases in
-            ``test_cases``
-        grade (``float``): the percentage of ``points`` earned for this test file as a decimal
     """
 
     def run(self, global_environment):
@@ -106,7 +86,7 @@ class OKTestFile(TestFile):
         Parse an OK-formatted ``dict`` and return an ``OKTestFile``.
 
         Args:
-            test_spec (``dict[str: object]``): the OK-formatted ``dict``
+            test_spec (``dict[str, object]``): the OK-formatted ``dict``
             path (``str``, optional): the path to the test file this ``dict`` was parsed from
 
         Returns:
@@ -153,7 +133,7 @@ class OKTestFile(TestFile):
     @classmethod
     def from_file(cls, path):
         """
-        Parse an OK-formatted test file & return an ``OKTestFile``.
+        Parse an OK-formatted test file and return an ``OKTestFile``.
 
         Args:
             path (``str``): the path to the test file

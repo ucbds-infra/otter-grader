@@ -17,7 +17,7 @@ from typing import List, Optional
 from .utils import OTTER_DOCKER_IMAGE_NAME
 
 from ..run.run_autograder.autograder_config import AutograderConfig
-from ..utils import loggers
+from ..utils import loggers, OTTER_CONFIG_FILENAME
 
 
 LOGGER = loggers.get_logger(__name__)
@@ -48,7 +48,7 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
 
         # Update the otter_config.json file from the autograder zip with the provided config
         # overrides.
-        config_path = pathlib.Path(temp_dir) / "otter_config.json"
+        config_path = pathlib.Path(temp_dir) / OTTER_CONFIG_FILENAME
         old_config = AutograderConfig()
         if config_path.exists():
             old_config = AutograderConfig(json.loads(config_path.read_text("utf-8")))

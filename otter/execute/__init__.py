@@ -9,7 +9,6 @@ from traitlets.config import Config
 
 from .checker import Checker
 from .logging import start_server
-from .preprocessor import GradingPreprocessor
 
 from ..test_files import GradingResults
 from ..utils import NBFORMAT_VERSION
@@ -56,6 +55,7 @@ def grade_notebook(
         ``otter.test_files.GradingResults``: the results of grading
     """
     from nbconvert.preprocessors import ExecutePreprocessor
+    from .preprocessor import GradingPreprocessor
 
     if not script:
         nb = nbformat.read(submission_path, as_version=NBFORMAT_VERSION)

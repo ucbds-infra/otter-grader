@@ -1,6 +1,7 @@
 """Master notebook transformer for Otter Assign"""
 
 import copy
+import fica
 import nbformat
 
 from .assignment import Assignment
@@ -21,8 +22,6 @@ from .solutions import (
 from .tests_manager import AssignmentTestsManager
 from .utils import (
     add_tag,
-    add_assignment_name_to_notebook,
-    add_require_no_pdf_ack_to_notebook,
     AssignNotebookFormatException,
     get_source,
     is_cell_type,
@@ -30,6 +29,9 @@ from .utils import (
     lock,
     remove_cell_ids_if_applicable,
 )
+
+from ..nbmeta_config import NBMetadataConfig
+from ..utils import NOTEBOOK_METADATA_KEY
 
 
 class NotebookTransformer:
@@ -134,10 +136,6 @@ class NotebookTransformer:
         # strip out ignored lines
         transformed_nb = strip_ignored_lines(transformed_nb)
 
-        add_assignment_name_to_notebook(transformed_nb, self.assignment)
-
-        add_require_no_pdf_ack_to_notebook(transformed_nb, self.assignment)
-
         remove_cell_ids_if_applicable(transformed_nb)
 
         return TransformedNotebookContainer(transformed_nb, self)
@@ -205,7 +203,7 @@ class NotebookTransformer:
                     solution_has_md_cells, prompt_insertion_index = False, None
 
                 elif block_type is BlockType.SOLUTION:
-                    if not has_prompt and solution_has_md_cells:
+                    if not has_prompt and solution_has_md_cells and question.manual:
                         if prompt_insertion_index is None:
                             raise RuntimeError("Could not find prompt insertion index")
                         transformed_cells.insert(
@@ -353,9 +351,26 @@ class TransformedNotebookContainer:
     nb_transformer: NotebookTransformer
     """the notebook transformer used to create ``transformed_nb``"""
 
+    nbmeta_config: NBMetadataConfig
+    """the notebook metadata config to include when writing the notebook"""
+
     def __init__(self, transformed_nb, nb_transformer):
         self.transformed_nb = transformed_nb
         self.nb_transformer = nb_transformer
+        self._populate_nbmeta_config(self.nb_transformer.assignment)
+
+    def _populate_nbmeta_config(self, a: Assignment):
+        """
+        Copy configurations from the ``Assignment`` into the ``NBMetadataConfig``.
+        """
+        self.nbmeta_config = NBMetadataConfig({})
+        if a.name:
+            self.nbmeta_config.assignment_name = a.name
+        if a.export_cell and a.export_cell.require_no_pdf_ack:
+            self.nbmeta_config.require_no_pdf_confirmation = True
+            if isinstance(a.export_cell.require_no_pdf_ack, fica.Config):
+                self.nbmeta_config.export_pdf_failure_message = \
+                    a.export_cell.require_no_pdf_ack.message
 
     def _get_sanitized_nb(self):
         """
@@ -374,6 +389,14 @@ class TransformedNotebookContainer:
             )
         return nb
 
+    def _add_nbmeta_config(self, nb):
+        """
+        Add the notebook metadata config to the provided notebook's metadata in-place.
+        """
+        uc = self.nbmeta_config.get_user_config()
+        if uc:
+            nb["metadata"][NOTEBOOK_METADATA_KEY] = uc
+
     def write_transformed_nb(self, output_path, sanitize):
         """
         Write the transformed notebook (either as an autograder or student notebook) to the
@@ -384,8 +407,11 @@ class TransformedNotebookContainer:
             sanitize (``bool``): whether to sanitize the notebook (i.e. write the student version)
         """
         nb = self._get_sanitized_nb() if sanitize else self.transformed_nb
+        self._add_nbmeta_config(nb)
+
         if self.nb_transformer.assignment.is_rmd:
             rmarkdown_converter.write_as_rmd(nb, str(output_path), not sanitize)
+
         else:
             try:
                 from nbformat.validator import normalize
@@ -407,7 +433,7 @@ class TransformedNotebookContainer:
                 assignment config)
         """
         self.nb_transformer.tests_mgr.write_tests(
-            self.transformed_nb,
+            self.nbmeta_config,
             tests_dir,
             include_hidden=include_hidden,
             force_files=force_files,

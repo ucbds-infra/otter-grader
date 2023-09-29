@@ -35,7 +35,7 @@ class APIClient:
         """
         client = cls()
         email = input("Please provide the email address on your Gradescope account: ")
-        password = getpass.getpass('Password: ')
+        password = getpass.getpass('Gradescope password: ')
         client.log_in(email, password)
         return client.token
 

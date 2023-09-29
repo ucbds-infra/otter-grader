@@ -195,6 +195,7 @@ def strip_ignored_lines(nb):
         cell['source'] = '\n'.join(remove_ignored_lines(get_source(cell)))
     return nb
 
+OTTER_INCLUDE_TAG = "otter_include"
 
 def strip_solutions_and_output(nb):
     """
@@ -208,18 +209,21 @@ def strip_solutions_and_output(nb):
     """
     nb = copy.deepcopy(nb)
 
-    md_solutions = []
+    del_md_solutions = []
     lang = get_notebook_language(nb)
     for i, cell in enumerate(nb['cells']):
         if has_tag(cell, SOLUTION_CELL_TAG):
             if is_cell_type(cell, "code"):
                 cell['source'] = '\n'.join(replace_solutions(get_source(cell), lang))
             elif is_cell_type(cell, "markdown"):
-                md_solutions.append(i)
+                if has_tag(cell, OTTER_INCLUDE_TAG):
+                    cell = remove_tag(cell, OTTER_INCLUDE_TAG)
+                else:
+                    del_md_solutions.append(i)
             nb['cells'][i] = remove_tag(cell, SOLUTION_CELL_TAG)
 
-    md_solutions.reverse()
-    for i in md_solutions:
+    del_md_solutions.reverse()
+    for i in del_md_solutions:
         del nb['cells'][i]
 
     # remove output from student version

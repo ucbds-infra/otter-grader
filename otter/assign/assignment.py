@@ -13,7 +13,6 @@ from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import Loggable
 
 
-# TODO: add detection/warnings/errors for when a user provides an invalid key? (to be added to fica)
 class Assignment(fica.Config, Loggable):
     """
     Configurations for the assignment.
@@ -241,8 +240,7 @@ class Assignment(fica.Config, Loggable):
     seed_required: bool = False
     """whether a seeding configuration is required for Otter Generate"""
 
-    # TODO: rename this
-    _temp_test_dir: Optional[str] = None
+    generate_tests_dir: Optional[str] = None
     """the path to a directory of test files for Otter Generate"""
 
     notebook_basename: Optional[str] = None
@@ -267,7 +265,7 @@ class Assignment(fica.Config, Loggable):
         if self.variables:
             warnings.warn(
                 "The variables key of the assignment config is deprecated and will be removed in " \
-                    "v6.0.0. Please use generate.seed_variables instead.", DeprecationWarning)
+                    "v6.0.0. Please use generate.serialized_variables instead.", DeprecationWarning)
 
     def update(self, user_config: Dict[str, Any]):
         self._logger.debug(f"Updating config: {user_config}")
@@ -309,7 +307,6 @@ class Assignment(fica.Config, Loggable):
         if self.is_r:
             self.generate.lang = "r"
 
-        # TODO: move this config out of the assignment metadata and into the generate key
         if self.variables:
             self.generate.serialized_variables = str(self.variables)
 

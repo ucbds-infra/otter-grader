@@ -2,7 +2,10 @@
 
 import inspect
 
-from ..test_files import create_test_file
+from typing import Any, Dict, Optional
+
+from ..test_files import create_test_file, TestFile
+from ..nbmeta_config import NBMetadataConfig
 
 
 class Checker:
@@ -50,7 +53,13 @@ class Checker:
         cls._test_files = []
 
     @classmethod
-    def check(cls, nb_or_test_path, test_name=None, global_env=None):
+    def check(
+        cls,
+        nb_or_test_path: str,
+        nbmeta_config: NBMetadataConfig,
+        test_name: Optional[str] = None,
+        global_env: Optional[Dict[str, Any]] = None,
+    ) -> TestFile:
         """
         Checks a global environment against a test, which may be stored in a file or in a notebook's
         metadata.
@@ -65,7 +74,7 @@ class Checker:
             ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
             given global environment
         """
-        test = create_test_file(nb_or_test_path, test_name=test_name)
+        test = create_test_file(nb_or_test_path, nbmeta_config, test_name=test_name)
 
         if global_env is None:
             global_env = inspect.currentframe().f_back.f_globals
@@ -100,4 +109,4 @@ class Checker:
         if global_env is None:
             global_env = inspect.currentframe().f_back.f_globals
 
-        return cls.check(test_path, global_env=global_env)
+        return cls.check(test_path, NBMetadataConfig(), global_env=global_env)
