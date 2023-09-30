@@ -35,7 +35,7 @@ class _NotebookMetadataTestFileMixin:
             raise ValueError(f"Test {test_name} not found")
 
         test_spec = test_spec[test_name]
-        return cls.from_string(test_spec, path=path)
+        return cls.from_metadata(test_spec, path=path)
 
     @classmethod
     def from_nbmeta_config(cls, path: str, nbmeta_config: NBMetadataConfig, test_name: str):
@@ -55,7 +55,7 @@ class _NotebookMetadataTestFileMixin:
             raise ValueError(f"Test {test_name} not found")
 
         test_spec = test_spec[test_name]
-        return cls.from_string(test_spec, path=path)
+        return cls.from_metadata(test_spec, path=path)
 
 
 class NotebookMetadataExceptionTestFile(ExceptionTestFile, _NotebookMetadataTestFileMixin):

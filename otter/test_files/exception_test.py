@@ -261,3 +261,17 @@ class ExceptionTestFile(TestFile):
         with open(path) as f:
             source = f.read()
         return cls.from_string(source, path=path)
+
+    @classmethod
+    def from_metadata(cls, s, path):
+        """
+        Parse an exception-based test file from its data stored in a notebook's metadata.
+
+        Args:
+            s (``str``): the test file contents from the notebook metadata
+            path (``path``): the path to the notebook
+
+        Returns:
+            ``ExceptionTestFile``: the parsed test file.
+        """
+        return cls.from_string(s, path=path)
