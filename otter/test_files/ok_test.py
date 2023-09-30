@@ -1,15 +1,16 @@
 """Support for OK-formatted test files"""
 
-import os
-import io
 import doctest
-import warnings
+import io
+import json
+import os
 import pathlib
 
 from contextlib import redirect_stderr, redirect_stdout
 from textwrap import dedent
 
 from .abstract_test import TestFile, TestCase, TestCaseResult
+
 from ..utils import hide_outputs
 
 
@@ -129,6 +130,20 @@ class OKTestFile(TestFile):
         all_or_nothing = test_spec.get('all_or_nothing', True)
 
         return cls(test_spec['name'], path, test_cases, all_or_nothing)
+
+    @classmethod
+    def from_metadata(cls, spec, path):
+        """
+        Parse an OK test file from its data stored in a notebook's metadata.
+
+        Args:
+            spec (``dict``): the test data from the notebook metadata
+            path (``str``): the path to the notebook
+
+        Returns:
+            ``OKTestFile``: the parsed test file.
+        """
+        return cls.from_spec(spec, path=path)
 
     @classmethod
     def from_file(cls, path):

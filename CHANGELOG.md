@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.2.1:**
+
+* Fixed an `AttributeError` when using OK tests from notebook metadata per [#743](https://github.com/ucbds-infra/otter-grader/issues/743)
+
 **v5.2.0:**
 
 * Migrate installation of `ottr` from `setup.sh` to `environment.yml` with the [`r-ottr` conda-forge recipe](https://anaconda.org/conda-forge/r-ottr)
