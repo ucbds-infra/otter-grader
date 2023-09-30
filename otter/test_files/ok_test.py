@@ -138,7 +138,7 @@ class OKTestFile(TestFile):
 
         Args:
             spec (``dict``): the test data from the notebook metadata
-            path (``path``): the path to the notebook
+            path (``str``): the path to the notebook
 
         Returns:
             ``OKTestFile``: the parsed test file.

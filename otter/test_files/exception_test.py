@@ -269,7 +269,7 @@ class ExceptionTestFile(TestFile):
 
         Args:
             s (``str``): the test file contents from the notebook metadata
-            path (``path``): the path to the notebook
+            path (``str``): the path to the notebook
 
         Returns:
             ``ExceptionTestFile``: the parsed test file.
