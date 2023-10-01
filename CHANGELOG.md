@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.2.2:**
+
+* Fixed an `AttributeError` when using `Notebook.check_all` per [#746](https://github.com/ucbds-infra/otter-grader/issues/746)
+
 **v5.2.1:**
 
 * Fixed an `AttributeError` when using OK tests from notebook metadata per [#743](https://github.com/ucbds-infra/otter-grader/issues/743)

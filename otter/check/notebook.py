@@ -534,7 +534,7 @@ class Notebook(Loggable):
         """
         self._log_event(EventType.BEGIN_CHECK_ALL)
 
-        tests = list_available_tests(self._tests_dir, self._notebook)
+        tests = list_available_tests(self._tests_dir, self._nbmeta_config)
 
         global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
 
