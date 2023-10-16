@@ -10,4 +10,4 @@ Here are some resources and examples for using Otter-Grader:
   <https://econ140-spring2020.shinyapps.io/otter_quickstart/>`_
 * `Otter-Grader JupyterLab Extension <https://github.com/chrispyles/otter-grader-labextension>`_: A
   JupyterLab extension for authoring Otter Assign-formatted notebooks.
-* `Chris Pyles and Suraj Rampure presenting at Jupytercon 2023 <https://www.youtube.com/watch?v=9_x532_2T2w&list=PL_1BH3ug7n1Ih_Yy2TmM7MZ2zogSLZvzE&index=19>`_  along with a `Jupyterlite demo file <https://t.ly/bb17>`_
+* `Chris Pyles and Suraj Rampure presenting at Jupytercon 2023 <https://www.youtube.com/watch?v=9_x532_2T2w&list=PL_1BH3ug7n1Ih_Yy2TmM7MZ2zogSLZvzE&index=19>`_  along with a `Jupyterlite demo file <https://chrispyles.io/otter-grader-jupytercon-2023/lab/index.html>`_
