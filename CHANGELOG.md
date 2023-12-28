@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.3.0 (unreleased):**
+
+* Updated Otter Assign to throw a `ValueError` when invalid Python code is encountered in test cells per [#756](https://github.com/ucbds-infra/otter-grader/issues/756)
+
 **v5.2.2:**
 
 * Fixed an `AttributeError` when using `Notebook.check_all` per [#746](https://github.com/ucbds-infra/otter-grader/issues/746)

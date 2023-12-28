@@ -145,6 +145,7 @@ class AssignmentTestsManager:
             question (``otter.assign.question_config.QuestionConfig``): the question config
         """
         source = get_source(cell)
+        ensure_valid_syntax(source, question)
 
         if source[0].lstrip().startswith("#"):
             hidden = bool(re.search(r"\bhidden\b", source[0], flags=re.IGNORECASE))
@@ -425,3 +426,20 @@ class AssignmentTestsManager:
         summary += f"Manual:       {manual}\n\n"
         summary += str(pd.DataFrame(rows))
         return summary
+
+
+def ensure_valid_syntax(source: List[str], question: QuestionConfig) -> None:
+    """
+    Check that a cell's source is valid Python syntax.
+
+    Args:
+        source (``list[str]``): the cell source lines
+
+    Raises:
+        ``ValueError``: if invalid syntax is found
+    """
+    source = "\n".join(source)
+    try:
+        ast.parse(source)
+    except SyntaxError as e:
+        raise ValueError(f"A test cell in question {question.name} contains invalid Python syntax:\n{source}")
