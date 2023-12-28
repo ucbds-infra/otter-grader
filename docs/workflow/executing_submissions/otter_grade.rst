@@ -22,12 +22,12 @@ re-downloaded when the image for an assignment is built for the first time.
 Assignment Names
 ++++++++++++++++
 
-Whenever you use Otter Grade, you must specify an assignment name. This assignment name is used as
-the tag for the Docker image that Otter creates (so you will have an image called
-``otter-grade:{assignment name}`` for each assignment). These assignment names are required so that
-Otter can make effective user of Docker's image layer cache. This means that if you make changes to
-tests or need to grade an assignment twice, Docker doesn't need to reinstall all of the dependencies
-Otter defines.
+Whenever you use Otter Grade, you must specify an assignment name with the ``-n`` or ``--name``
+flag. This assignment name is used as the tag for the Docker image that Otter creates (so you will
+have an image called ``otter-grade:{assignment name}`` for each assignment). These assignment names
+are required so that Otter can make effective user of Docker's image layer cache. This means that if
+you make changes to tests or need to grade an assignment twice, Docker doesn't need to reinstall all
+of the dependencies Otter defines.
 
 These images can be quite large (~4GB), so Otter provides a way to easily prune all of the Docker
 images it has created:
