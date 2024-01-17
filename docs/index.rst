@@ -13,6 +13,7 @@ Otter-Grader Documentation
     otter_check/index
     workflow/index
     execution
+    debugging
     plugins/index
     pdfs
     seeding
