@@ -457,10 +457,11 @@ class Notebook(Loggable):
         zf = zipfile.ZipFile(zip_path, mode="w")
         zf.write(nb_path)
 
-        pdf_created = True
+        pdf_path, pdf_created, pdf_error = None, True, None
         if pdf:
-            pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
-            if os.path.isfile(pdf_path):
+            try: pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
+            except Exception as e: pdf_error = e
+            if pdf_path and os.path.isfile(pdf_path):
                 pdf_created = True
                 zf.write(pdf_path)
                 self._logger.debug(f"Wrote PDF to zip file: {pdf_path}")
@@ -520,10 +521,12 @@ class Notebook(Loggable):
                 display(HTML(out_html))
 
         if pdf_created or not self._nbmeta_config.require_no_pdf_confirmation:
+            if pdf_error is not None:
+                raise pdf_error
             continue_export()
         else:
             display_pdf_confirmation_widget(
-                self._nbmeta_config.export_pdf_failure_message, continue_export)
+                self._nbmeta_config.export_pdf_failure_message, pdf_error, continue_export)
 
     @grading_mode_disabled
     @logs_event(EventType.END_CHECK_ALL)

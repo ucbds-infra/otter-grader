@@ -5,6 +5,10 @@
 * Updated Otter Assign to throw a `ValueError` when invalid Python code is encountered in test cells per [#756](https://github.com/ucbds-infra/otter-grader/issues/756)
 * Fixed an error causing intercell seeding code to be added to cells using cell magic commands which caused syntax errors per [#754](https://github.com/ucbds-infra/otter-grader/issues/754)
 
+**v5.2.3:**
+
+* Fixed the no PDF acknowledgement feature to handle when PDF exports throw an error instead of failing silently
+
 **v5.2.2:**
 
 * Fixed an `AttributeError` when using `Notebook.check_all` per [#746](https://github.com/ucbds-infra/otter-grader/issues/746)
