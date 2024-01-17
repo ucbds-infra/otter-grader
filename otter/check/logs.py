@@ -14,17 +14,6 @@ from ..utils import import_or_raise, QuestionNotInLogException
 class EventType(Enum):
     """
     Enum of event types for log entries
-
-    Attributes:
-        AUTH: an auth event
-        BEGIN_CHECK_ALL: beginning of a check-all call
-        BEGIN_EXPORT: beginning of an assignment export
-        CHECK: a check of a single question
-        END_CHECK_ALL: ending of a check-all call
-        END_EXPORT: ending of an assignment export
-        INIT: initialization of an ``otter.Notebook`` object
-        SUBMIT: submission of an assignment
-        TO_PDF: PDF export of a notebook
     """
 
     AUTH = auto()
