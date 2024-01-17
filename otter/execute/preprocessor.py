@@ -122,7 +122,7 @@ class GradingPreprocessor(Preprocessor):
 
         cells = nb.cells[1:] if skip_first else nb.cells
         for cell in cells:
-            if cell.cell_type == "code":
+            if cell.cell_type == "code" and not cell.source.startswith("%%"):
                 cell.source = f"{do_seed}\n{cell.source}"
 
     def add_checks(self, nb):
