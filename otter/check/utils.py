@@ -19,7 +19,7 @@ from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TYPE_CHE
 
 from ..nbmeta_config import NBMetadataConfig
 from ..test_files import GradingResults
-from ..utils import import_or_raise
+from ..utils import format_exception, import_or_raise
 
 
 T = TypeVar("T")
@@ -332,7 +332,7 @@ def resolve_test_info(
     return test_path, test_name
 
 
-def display_pdf_confirmation_widget(message: Optional[str], callback: Callable) -> None:
+def display_pdf_confirmation_widget(message: Optional[str], pdf_error: Optional[Exception], callback: Callable) -> None:
     """
     Display a widget to the user to acknowledge that a PDF will not be included in their submission
     zip.
@@ -349,7 +349,11 @@ def display_pdf_confirmation_widget(message: Optional[str], callback: Callable) 
         message = "Your notebook could not be exported as a PDF. To continue exporting your " \
             "submission, please click the button below."
 
-    t = HTML(f"""<p style="margin: 0">{message}</p>""")
+    message_html = f"""<p style="margin: 0">{message}</p>"""
+    if pdf_error is not None:
+        message_html += f"""<pre>{format_exception(pdf_error)}</pre>"""
+
+    t = HTML(message_html)
     b = Button(description="Continue export", button_style="warning")
     b.on_click(wrapped_callback)
     m = HTML("""<div style="height: 10px; width: 100%"></div>""")

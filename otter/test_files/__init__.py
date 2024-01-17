@@ -5,7 +5,6 @@ import math
 import nbformat as nbf
 import os
 import pickle
-import traceback
 
 from typing import Any, Dict, List, Optional
 
@@ -16,7 +15,7 @@ from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
 
 from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
-from ..utils import QuestionNotInLogException
+from ..utils import format_exception, QuestionNotInLogException
 
 
 __all__ = [
@@ -414,11 +413,7 @@ class GradingResults:
                 "output": "The autograder failed to produce any results. Please alert your instructor to this failure for assistance in debugging it.",
                 "status": "failed",
             })
-            tb = "".join(traceback.format_exception(
-                type(self._catastrophic_error), 
-                self._catastrophic_error, 
-                self._catastrophic_error.__traceback__,
-            ))
+            tb = format_exception(self._catastrophic_error)
             output["tests"].append({
                 "name": "Autograder Exception",
                 "visibility": "hidden",
