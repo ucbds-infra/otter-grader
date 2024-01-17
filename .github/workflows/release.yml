@@ -22,9 +22,9 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Only allow releases off of master
+      - name: Only allow releases off of master (or temp for patches)
         run: |
-          python3 -c 'import os, sys; sys.exit(os.environ["GITHUB_REF"] != "refs/heads/master")'
+          python3 -c 'import os, sys; sys.exit(os.environ["GITHUB_REF"] != "refs/heads/master" and os.environ["GITHUB_REF"] != "refs/heads/temp")'
 
       - uses: actions/checkout@v2
 
