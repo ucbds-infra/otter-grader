@@ -10,6 +10,7 @@ import re
 import string
 import shutil
 import tempfile
+import traceback
 import yaml
 
 from contextlib import contextmanager
@@ -398,3 +399,16 @@ class QuestionNotInLogException(Exception):
     """
     Exception that indicates that a specific question was not found in any entry in the log
     """
+
+
+def format_exception(e: Exception) -> str:
+    """
+    Formats an exception for display with its traceback using the ``traceback`` module.
+
+    Args:
+        e (``Exception``): the exception to format
+
+    Returns:
+        ``str``: the formatted exception
+    """
+    return "".join(traceback.format_exception(type(e), e, e.__traceback__))
