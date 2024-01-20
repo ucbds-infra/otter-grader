@@ -218,7 +218,8 @@ def test_export_with_no_pdf_ack(
     mocked_dt.datetime.now.return_value = timestmap
     mocked_export.return_value = FILE_MANAGER.get_path(f"{NB_PATH_STEM}.pdf")
 
-    grader.export()
+    with pytest.warns(UserWarning, match="Could not locate a PDF to include"):
+        grader.export()
 
     mocked_export.assert_called_with(NB_PATH, filtering=True, pagebreaks=True)
 

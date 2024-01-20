@@ -6,6 +6,7 @@ import shutil
 import tempfile
 
 from abc import ABC, abstractmethod
+from glob import glob
 
 from ..autograder_config import AutograderConfig
 from ..utils import OtterRuntimeError, print_output, write_blank_page_to_stare_at_before_you
@@ -100,7 +101,11 @@ class AbstractLanguageRunner(ABC):
                 appended if needed)
         """
         try:
-            pdf_path = self.write_pdf(submission_path)
+            subm_pdfs = glob("*.pdf")
+            if self.ag_config.use_submission_pdf and subm_pdfs:
+                pdf_path = subm_pdfs[0]
+            else:
+                pdf_path = self.write_pdf(submission_path)
 
             if submit:
                 self.submit_pdf(client, pdf_path)
@@ -131,6 +136,12 @@ class AbstractLanguageRunner(ABC):
         student_emails = []
         for user in metadata.get("users", []):
             student_emails.append(user["email"])
+
+        # validate that a course and assignment ID were specified
+        if self.ag_config.course_id is None:
+            raise OtterRuntimeError("PDF upload course ID not specified")
+        if self.ag_config.assignment_id is None:
+            raise OtterRuntimeError("PDF upload assignment ID not specified")
 
         for student_email in student_emails:
             res = client.upload_pdf_submission(

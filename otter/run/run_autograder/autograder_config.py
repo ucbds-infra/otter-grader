@@ -69,12 +69,12 @@ class AutograderConfig(fica.Config):
 
     course_id = fica.Key(
         description="a Gradescope course ID for uploading a PDF of the notebook",
-        default="None",
+        default=None,
     )
 
     assignment_id = fica.Key(
         description="a Gradescope assignment ID for uploading a PDF of the notebook",
-        default="None",
+        default=None,
     )
 
     filtering = fica.Key(
@@ -160,6 +160,13 @@ class AutograderConfig(fica.Config):
     submit_blank_pdf_on_export_failure = fica.Key(
         description="whether to submit a blank PDF to the manual-grading Gradescope assignment " \
             "if a PDF cannot be generated from the submission",
+        default=False,
+    )
+
+    use_submission_pdf = fica.Key(
+        description="use the PDF in the submission zip file instead of exporting a new one; if " \
+            "no PDF is present, a new one is generated anyway; assumes there is only 1 PDF file " \
+            "in the submission",
         default=False,
     )
 

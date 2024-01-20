@@ -11,6 +11,7 @@ import re
 from contextlib import contextmanager, nullcontext
 from unittest import mock
 
+from otter.generate.token import APIClient
 from otter.run.run_autograder import main as run_autograder
 from otter.run.run_autograder.utils import OtterRuntimeError
 from otter.utils import NBFORMAT_VERSION
@@ -219,6 +220,38 @@ def test_pdf_generation_failure(mocked_export, get_config_path, load_config, exp
     with FILE_MANAGER.open("autograder/results/results.json") as f:
         actual_results = json.load(f)
 
+    assert actual_results == expected_results, \
+        f"Actual results did not matched expected:\n{actual_results}"
+
+
+@mock.patch.object(APIClient, "upload_pdf_submission")
+@mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook")
+def test_use_submission_pdf(
+    mocked_export,
+    mocked_upload_pdf_submission,
+    get_config_path,
+    load_config,
+    expected_results,
+):
+    config = load_config()
+    config["use_submission_pdf"] = True
+    config["token"] = "abc123"
+
+    FILE_MANAGER.open("autograder/submission/fails2and6H.pdf", "wb+").close()
+
+    with alternate_config(get_config_path(), config):
+        run_autograder(config['autograder_dir'])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    mocked_export.assert_not_called()
+    mocked_upload_pdf_submission.assert_called_with(
+        config["course_id"],
+        config["assignment_id"],
+        "student@univ.edu", # from submission_metadata.json in autograder dir
+        "fails2and6H.pdf",
+    )
     assert actual_results == expected_results, \
         f"Actual results did not matched expected:\n{actual_results}"
 
