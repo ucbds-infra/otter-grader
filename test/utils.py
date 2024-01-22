@@ -25,11 +25,8 @@ class TestFileManager:
     def get_path(self, path):
         return str(self.dir / path)
 
-    @contextmanager
     def open(self, path, *args, **kwargs):
-        f = open(self.get_path(path), *args, **kwargs)
-        yield f
-        f.close()
+        return open(self.get_path(path), *args, **kwargs)
 
     def assert_path_exists(self, path, file_okay=True, dir_okay=True):
         path = self.get_path(path)
