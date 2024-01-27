@@ -78,9 +78,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create \
-            -B ucbds-infra:master \
-            -H ucbds-infra:release \
-            -l "release" \
-            -r chrispyles \
-            -m "v${{ github.events.inputs.version }}" \
-            -b "Release v${{ github.event.inputs.version }}"$'\n'$'\n'"Updates from the release of version ${{ github.event.inputs.version }}"
+            --base ucbds-infra:master \
+            --head ucbds-infra:release \
+            --label "release" \
+            --reviewer chrispyles \
+            --milestone "v${{ github.events.inputs.version }}" \
+            --title "Release v${{ github.event.inputs.version }}" \
+            --body "Updates from the release of version ${{ github.event.inputs.version }}"
