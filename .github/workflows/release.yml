@@ -48,21 +48,25 @@ jobs:
           git commit -am 'release v${{ github.event.inputs.version }}'
           git push --set-upstream origin release
 
-      - name: Create dist and push to PyPI
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          python3 setup.py sdist bdist_wheel
-          python3 -m twine upload dist/*
+      # - name: Create dist and push to PyPI
+      #   env:
+      #     TWINE_USERNAME: __token__
+      #     TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      #   run: |
+      #     python3 setup.py sdist bdist_wheel
+      #     python3 -m twine upload dist/*
 
       - name: Create a release on GitHub
         env:
           GITHUB_USER: ${{ secrets.GITHUB_USER }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            hub release create -a dist/*.tar.gz -a dist/*.whl -t release \
-            -m 'v${{ github.event.inputs.version }}' 'v${{ github.event.inputs.version }}'
+            gh release create \
+              --verify-tag \
+              --title 'v${{ github.event.inputs.version }}' \
+              release \
+              dist/*.tar.gz \
+              dist/*.whl
 
       - name: Create a latest tag
         run: |
@@ -73,5 +77,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          hub pull-request -b ucbds-infra:master -h ucbds-infra:release -l "release" -r chrispyles \
-            -m "Release v${{ github.event.inputs.version }}"$'\n'$'\n'"Updates from the release of version ${{ github.event.inputs.version }}"
+          gh pr create \
+            -B ucbds-infra:master \
+            -H ucbds-infra:release \
+            -l "release" \
+            -r chrispyles \
+            -m "v${{ github.events.inputs.version }}" \
+            -b "Release v${{ github.event.inputs.version }}"$'\n'$'\n'"Updates from the release of version ${{ github.event.inputs.version }}"
