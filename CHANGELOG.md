@@ -6,6 +6,7 @@
 * Fixed an error causing intercell seeding code to be added to cells using cell magic commands which caused syntax errors per [#754](https://github.com/ucbds-infra/otter-grader/issues/754)
 * Add support for submitting the PDF uploaded in a submission for manual grading instead of generating a new one per [#764](https://github.com/ucbds-infra/otter-grader/issues/764)
 * Validate that a course ID and assignment ID were provided before attempting PDF upload
+* Updated Otter Assign to ignore blank or whitespace-only lines in test cells per [#718](https://github.com/ucbds-infra/otter-grader/issues/718)
 
 **v5.2.3:**
 

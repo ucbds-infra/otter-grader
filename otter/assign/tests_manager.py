@@ -257,7 +257,7 @@ class AssignmentTestsManager:
         inp = test_case.input
         if hasattr(ast, "unparse"):
             inp = ast.unparse(ast.parse(test_case.input))
-        code_lines = str_to_doctest(inp.split('\n'), [])
+        code_lines = str_to_doctest([l for l in inp.split('\n') if l.strip()], [])
         code_lines.append(test_case.output)
 
         ret = {
