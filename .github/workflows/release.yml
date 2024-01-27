@@ -64,7 +64,8 @@ jobs:
             gh release create \
               --verify-tag \
               --title 'v${{ github.event.inputs.version }}' \
-              release \
+              --target release \
+              'v${{ github.event.inputs.version }}' \
               dist/*.tar.gz \
               dist/*.whl
 
