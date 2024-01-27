@@ -24,5 +24,5 @@ dependencies:
       - numpy
       - gspread
       - pypdf
-      - otter-grader==5.2.3
+      - otter-grader==5.3.0
       - tqdm
