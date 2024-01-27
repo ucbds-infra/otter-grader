@@ -48,12 +48,12 @@ jobs:
           git commit -am 'release v${{ github.event.inputs.version }}'
           git push --set-upstream origin release
 
-      # - name: Create dist and push to PyPI
-      #   env:
-      #     TWINE_USERNAME: __token__
-      #     TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      #   run: |
-      #     python3 setup.py sdist bdist_wheel
+      - name: Create dist and push to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python3 setup.py sdist bdist_wheel
       #     python3 -m twine upload dist/*
 
       - name: Create a release on GitHub
