@@ -88,6 +88,26 @@ as filtering is by defult on. If I instead wanted no filtering, I would use
 
 To generate just a PDF of the notebook, use ``Notebook.to_pdf``.
 
+Both of these methods support force-saving the notebook before exporting it, so that any unsaved
+changes a student has made to their notebook will be reflected in the exported version. In Python,
+this works by using `ipylab` to communicate with the JupyterLab frontend. To use it, set
+``force_save=True``:
+
+.. code-block:: python
+
+    grader.export("hw01.ipynb", force_save=True)
+
+In R, you must install the ``ottr_force_save_labextension``
+`Python package <https://github.com/chrispyles/ottr-force-save-labextension>`_. This JupyterLab
+extension exposes a hook that ``ottr::export`` uses by running JavaScript to save the notebook.
+
+.. code-block:: r
+
+    ottr::export("hw01.ipynb", force_save=TRUE)
+
+Force saving is not supported for Rmd files, and the argument is ignored if used when not running
+on Jupyter.
+
 
 Running on Non-standard Python Environments
 +++++++++++++++++++++++++++++++++++++++++++
