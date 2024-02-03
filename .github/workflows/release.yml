@@ -61,8 +61,12 @@ jobs:
           GITHUB_USER: ${{ secrets.GITHUB_USER }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            hub release create -a dist/*.tar.gz -a dist/*.whl -t release \
-            -m 'v${{ github.event.inputs.version }}' 'v${{ github.event.inputs.version }}'
+            gh release create \
+              --title 'v${{ github.event.inputs.version }}' \
+              --target release \
+              'v${{ github.event.inputs.version }}' \
+              dist/*.tar.gz \
+              dist/*.whl
 
       - name: Create a latest tag
         run: |
@@ -73,5 +77,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          hub pull-request -b ucbds-infra:master -h ucbds-infra:release -l "release" -r chrispyles \
-            -m "Release v${{ github.event.inputs.version }}"$'\n'$'\n'"Updates from the release of version ${{ github.event.inputs.version }}"
+          gh pr create \
+            --base ucbds-infra:master \
+            --head ucbds-infra:release \
+            --label "release" \
+            --reviewer chrispyles \
+            --milestone "v${{ github.events.inputs.version }}" \
+            --title "Release v${{ github.event.inputs.version }}" \
+            --body "Updates from the release of version ${{ github.event.inputs.version }}"
