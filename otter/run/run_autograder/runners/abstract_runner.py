@@ -102,6 +102,10 @@ class AbstractLanguageRunner(ABC):
             ``Exception | None``: an error thrown while trying to write or submit the PDF, if any;
                 a return value of ``None`` indicates a successful export and upload
         """
+        # Don't export or submit a PDF in debug mode.
+        if self.ag_config.debug:
+            return None
+
         try:
             subm_pdfs = glob("*.pdf")
             if self.ag_config.use_submission_pdf and subm_pdfs:
