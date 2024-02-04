@@ -16,7 +16,6 @@ from .abstract_runner import AbstractLanguageRunner
 from ..utils import OtterRuntimeError
 
 from ....export import export_notebook
-from ....generate.token import APIClient
 from ....test_files import GradingResults
 from ....utils import chdir, get_source, knit_rmd_file, NBFORMAT_VERSION
 
@@ -198,23 +197,18 @@ class RRunner(AbstractLanguageRunner):
         os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH")
 
         with chdir("./submission"):
-            if self.ag_config.token is not None:
-                client = APIClient(token=self.ag_config.token)
-                generate_pdf = True
-                has_token = True
+            pdf_error = None
+            if self.ag_config.token is not None or self.ag_config.pdf:
+                pdf_error = self.write_and_maybe_submit_pdf(None)
 
-            else:
-                generate_pdf = self.ag_config.pdf
-                has_token = False
-                client = None
+            self.sanitize_tokens()
 
             subm_path = self.resolve_submission_path()
             output = R_PACKAGES["ottr"].run_autograder(
                 subm_path, ignore_errors = not self.ag_config.debug, test_dir = "./tests")[0]
             scores = GradingResults.from_ottr_json(output)
 
-            if generate_pdf:
-                self.write_and_maybe_submit_pdf(client, None, has_token, scores)
+            if pdf_error: scores.set_pdf_error(pdf_error)
 
         # delete the script if necessary
         if self.subm_path_deletion_required:

@@ -7,8 +7,10 @@ import nbconvert
 import os
 import pytest
 import re
+import shutil
 
 from contextlib import contextmanager, nullcontext
+from textwrap import dedent
 from unittest import mock
 
 from otter.generate.token import APIClient
@@ -136,9 +138,11 @@ def alternate_config(config_path, new_config):
         contents = f.read()
     with open(config_path, "w") as f:
         json.dump(new_config, f)
-    yield
-    with open(config_path, "w") as f:
-        f.write(contents)
+    try: 
+        yield
+    finally:
+        with open(config_path, "w") as f:
+            f.write(contents)
 
 
 def get_expected_error_results(error):
@@ -152,6 +156,33 @@ def get_expected_error_results(error):
             },
         ],
     }
+
+
+@contextmanager
+def alternate_submission(subm_path, new_nb):
+    with open(subm_path) as f:
+        contents = f.read()
+    nbformat.write(new_nb, subm_path)
+    try: 
+        yield
+    finally:
+        with open(subm_path, "w") as f:
+            f.write(contents)
+
+
+@contextmanager
+def alternate_tests(test_files):
+    src, dst = FILE_MANAGER.get_path("autograder/source/tests"), FILE_MANAGER.get_path("autograder/source/tests_orig")
+    os.rename(src, dst)
+    os.makedirs(src, exist_ok=True)
+    for fn, contents in test_files.items():
+        with open(os.path.join(src, fn), "w+") as f:
+            f.write(contents)
+    try: 
+        yield
+    finally:
+        shutil.rmtree(src)
+        os.rename(dst, src)
 
 
 @pytest.fixture(autouse=True)
@@ -408,3 +439,69 @@ def test_rmd(load_config, expected_rmd_results):
         delete_paths([rmd_path])
         with open(rmd_path, "w+") as f:
             f.write(orig_rmd)
+
+
+@mock.patch.object(APIClient, "upload_pdf_submission")
+@mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook")
+def test_token_sanitization(mocked_export, mocked_upload, get_config_path, load_config, expected_results):
+    """
+    Tests that the PDF upload token can't be accessed by the submission.
+    """
+    config = load_config()
+    config["token"] = "abc123"
+    config.pop("plugins")
+
+    nb = nbformat.v4.new_notebook(cells=[nbformat.v4.new_code_cell(dedent("""\
+        import json
+        with open("../source/otter_config.json") as f:
+            config = json.load(f)
+        token = config.get("token")
+    """))])
+
+    tests = {"q1.py": dedent("""\
+        OK_FORMAT = False
+
+        from otter.test_files import test_case
+
+        name = "q1"
+
+        @test_case()
+        def q1_1(env):
+            assert env["token"] is None
+    """)}
+
+    expected_results = {
+        "tests": [
+            {
+                "name": "Public Tests",
+                "visibility": "visible",
+                "output": "q1 results: All test cases passed!",
+                "status": "passed",
+            },
+            {
+                "name": "q1",
+                "score": 1.0,
+                "max_score": 1.0,
+                "visibility": "hidden",
+                "output": "q1 results: All test cases passed!"
+            },
+        ],
+    }
+
+    FILE_MANAGER.open("autograder/submission/fails2and6H.pdf", "wb+").close()
+
+    mocked_upload.return_value.status_code = 200
+
+    with alternate_config(get_config_path(), config), \
+            alternate_submission(FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb"), nb), \
+            alternate_tests(tests):
+        run_autograder(config['autograder_dir'])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    assert actual_results == expected_results, \
+        f"Actual results did not matched expected:\n{actual_results}"
+
+    mocked_export.assert_called()
+    mocked_upload.assert_called()

@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.4.0 (unreleased):**
+
+* Update submission runners to export and submit the PDF and then remove all copies of the API token before executing the submission to ensure that student code can't gain access to the token
+
 **v5.3.0:**
 
 * Updated Otter Assign to throw a `ValueError` when invalid Python code is encountered in test cells per [#756](https://github.com/ucbds-infra/otter-grader/issues/756)
