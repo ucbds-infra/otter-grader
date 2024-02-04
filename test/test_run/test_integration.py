@@ -26,6 +26,10 @@ FILE_MANAGER = TestFileManager(__file__)
 
 @pytest.fixture(autouse=True)
 def cleanup_output(cleanup_enabled):
+    with FILE_MANAGER.open("autograder/source/otter_config.json") as f:
+        cpy = f.read()
+    with FILE_MANAGER.open("rmd-autograder/source/otter_config.json") as f:
+        crmd = f.read()
     yield
     if cleanup_enabled:
         delete_paths([
@@ -45,6 +49,10 @@ def cleanup_output(cleanup_enabled):
             FILE_MANAGER.get_path("rmd-autograder/submission/__init__.py"),
             FILE_MANAGER.get_path("rmd-autograder/submission/.OTTER_LOG"),
         ])
+        with FILE_MANAGER.open("autograder/source/otter_config.json", "w") as f:
+            f.write(cpy)
+        with FILE_MANAGER.open("rmd-autograder/source/otter_config.json", "w") as f:
+            f.write(crmd)
 
 
 @pytest.fixture(autouse=True)
@@ -288,9 +296,8 @@ def test_use_submission_pdf(
 
 
 def test_force_public_test_summary(get_config_path, load_config):
-    config = load_config()
-
     def perform_test(show_hidden, force_public_test_summary, expect_summary):
+        config = load_config()
         config["show_hidden"] = show_hidden
         config["force_public_test_summary"] = force_public_test_summary
         with alternate_config(get_config_path(), config):
@@ -315,7 +322,6 @@ def test_script(load_config, expected_results, get_config_path):
     config = load_config()
     nb_path = FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb")
     nb = nbformat.read(nb_path, as_version=NBFORMAT_VERSION)
-    os.remove(nb_path)
 
     # Remove the token so that we don't try to generate a PDF of a script.
     config.pop("token")
@@ -326,6 +332,7 @@ def test_script(load_config, expected_results, get_config_path):
         # remove magic commands
         py = "\n".join(l for l in py.split("\n") if not l.startswith("get_ipython"))
 
+        os.remove(nb_path)
         with FILE_MANAGER.open("autograder/submission/fails2and6H.py", "w+") as f:
             f.write(py)
 
@@ -442,8 +449,7 @@ def test_rmd(load_config, expected_rmd_results):
 
 
 @mock.patch.object(APIClient, "upload_pdf_submission")
-@mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook")
-def test_token_sanitization(mocked_export, mocked_upload, get_config_path, load_config, expected_results):
+def test_token_sanitization(mocked_upload, get_config_path, load_config, expected_results):
     """
     Tests that the PDF upload token can't be accessed by the submission.
     """
@@ -503,5 +509,4 @@ def test_token_sanitization(mocked_export, mocked_upload, get_config_path, load_
     assert actual_results == expected_results, \
         f"Actual results did not matched expected:\n{actual_results}"
 
-    mocked_export.assert_called()
     mocked_upload.assert_called()
