@@ -78,10 +78,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create \
-            --base ucbds-infra:master \
+            --repo ucbds-infra/otter-grader \
+            --base master \
             --head ucbds-infra:release \
             --label "release" \
             --reviewer chrispyles \
-            --milestone "v${{ github.events.inputs.version }}" \
+            --milestone "v${{ github.event.inputs.version }}" \
             --title "Release v${{ github.event.inputs.version }}" \
             --body "Updates from the release of version ${{ github.event.inputs.version }}"
