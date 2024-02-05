@@ -1,5 +1,6 @@
 """Abstract runner class for the autograder"""
 
+import gc
 import json
 import os
 import shutil
@@ -11,6 +12,7 @@ from glob import glob
 from ..autograder_config import AutograderConfig
 from ..utils import OtterRuntimeError, print_output, write_blank_page_to_stare_at_before_you
 
+from ....generate.token import APIClient
 from ....nbmeta_config import NBMetadataConfig
 
 
@@ -84,7 +86,7 @@ class AbstractLanguageRunner(ABC):
         nbmc = NBMetadataConfig.from_notebook(nb)
         return nbmc.assignment_name
 
-    def write_and_maybe_submit_pdf(self, client, submission_path, submit, scores):
+    def write_and_maybe_submit_pdf(self, submission_path):
         """
         Upload a PDF to a Gradescope assignment for manual grading.
 
@@ -94,12 +96,16 @@ class AbstractLanguageRunner(ABC):
         This method should be called, if appropriate, by ``self.run``.
 
         Args:
-            client (``otter.generate.token.APIClient``): the Gradescope client
             submission_path (``str``): path to the submission
-            submit (``bool``): whether to submit the PDF with ``client``
-            scores (``otter.test_files.GradingResults``): the grading results (so an error can be
-                appended if needed)
+
+        Returns:
+            ``Exception | None``: an error thrown while trying to write or submit the PDF, if any;
+                a return value of ``None`` indicates a successful export and upload
         """
+        # Don't export or submit a PDF in debug mode.
+        if self.ag_config.debug:
+            return None
+
         try:
             subm_pdfs = glob("*.pdf")
             if self.ag_config.use_submission_pdf and subm_pdfs:
@@ -107,18 +113,25 @@ class AbstractLanguageRunner(ABC):
             else:
                 pdf_path = self.write_pdf(submission_path)
 
-            if submit:
+            if self.ag_config.token:
+                client = APIClient(token=self.ag_config.token)
                 self.submit_pdf(client, pdf_path)
+
+                # ensure the client gets garbage collected so that the token can't be accessed
+                # by student code
+                del client
+                gc.collect()
 
         except Exception as e:
             print_output(f"\n\nError encountered while generating and submitting PDF:\n{e}")
-            scores.set_pdf_error(e)
 
-            if self.ag_config.submit_blank_pdf_on_export_failure and submit:
+            if self.ag_config.submit_blank_pdf_on_export_failure and self.ag_config.token:
                 print_output("\nUploading a blank PDF due to export failure")
                 with tempfile.NamedTemporaryFile(suffix=".pdf") as ntf:
                     write_blank_page_to_stare_at_before_you(ntf.name)
                     self.submit_pdf(client, ntf.name)
+
+            return e
 
     def submit_pdf(self, client, pdf_path):
         """
@@ -156,6 +169,22 @@ class AbstractLanguageRunner(ABC):
 
         print_output("\n\nSuccessfully uploaded submissions for: {}".format(
             ", ".join(student_emails)))
+
+    def sanitize_tokens(self):
+        """
+        Sanitize any references to the PDF submission upload token to prevent unauthorized access
+        when executing student code.
+
+        This method should be invokved from inside ``{self.ag_config.autograder_dir}/submission``
+        as part of ``run``.
+        """
+        self.ag_config.token = None
+        if not os.path.exists("../source/otter_config.json"): return
+        with open("../source/otter_config.json") as f:
+            c = json.load(f)
+        if "token" in c: del c["token"]
+        with open("../source/otter_config.json", "w") as f:
+            json.dump(c, f, indent=2)
 
     @abstractmethod
     def validate_submission(self, submission_path):

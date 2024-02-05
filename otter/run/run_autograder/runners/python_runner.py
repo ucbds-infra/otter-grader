@@ -14,7 +14,6 @@ from ....check.logs import Log
 from ....check.notebook import _OTTER_LOG_FILENAME
 from ....execute import grade_notebook
 from ....export import export_notebook
-from ....generate.token import APIClient
 from ....plugins import PluginCollection
 from ....utils import chdir, print_full_width
 
@@ -94,15 +93,11 @@ class PythonRunner(AbstractLanguageRunner):
             if plugin_collection:
                 plugin_collection.run("before_grading", self.ag_config)
 
-            if self.ag_config.token is not None:
-                client = APIClient(token=self.ag_config.token)
-                generate_pdf = True
-                has_token = True
+            pdf_error = None
+            if self.ag_config.token is not None or self.ag_config.pdf:
+                pdf_error = self.write_and_maybe_submit_pdf(subm_path)
 
-            else:
-                generate_pdf = self.ag_config.pdf
-                has_token = False
-                client = None
+            self.sanitize_tokens()
 
             if os.path.isfile(_OTTER_LOG_FILENAME):
                 try:
@@ -137,6 +132,8 @@ class PythonRunner(AbstractLanguageRunner):
                 force_python3_kernel = not self.ag_config._otter_run,
             )
 
+            if pdf_error: scores.set_pdf_error(pdf_error)
+
             # verify the scores against the log
             if self.ag_config.print_summary:
                 print_output("\n\n\n\n", end="")
@@ -157,9 +154,6 @@ class PythonRunner(AbstractLanguageRunner):
 
                 else:
                     print_output("No log found with which to verify student scores.")
-
-            if generate_pdf:
-                self.write_and_maybe_submit_pdf(client, subm_path, has_token, scores)
 
             if plugin_collection:
                 report = plugin_collection.generate_report()
