@@ -1,6 +1,6 @@
 # Changelog
 
-**v5.4.0 (unreleased):**
+**v5.4.0:**
 
 * Updated submission runners to export and submit the PDF and then remove all copies of the API token before executing the submission to ensure that student code can't gain access to the token
 * Updated Otter Run to skip PDF export and upload in debug mode
