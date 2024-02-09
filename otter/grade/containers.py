@@ -56,13 +56,18 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
         old_config.update(config.get_user_config())
         config_path.write_text(json.dumps(old_config.get_user_config()))
 
-        docker.build(
-            temp_dir,
-            build_args={"BASE_IMAGE": base_image},
-            tags=[image],
-            file=dockerfile_path,
-            load=True,
-        )
+        try:
+            docker.build(
+                temp_dir,
+                build_args={"BASE_IMAGE": base_image},
+                tags=[image],
+                file=dockerfile_path,
+                load=True,
+            )
+        except TypeError as e:
+            raise TypeError(
+                f"Docker build failed; if this is your first time seeing this error, ensure that " \
+                "Docker is running on your machine.\n\nOriginal error: {e}")
 
     return image
 
