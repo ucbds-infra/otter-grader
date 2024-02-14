@@ -67,7 +67,7 @@ class PDFViaLatexExporter(BaseExporter):
             with open(dest, "wb") as output_file:
                 output_file.write(pdf_output[0])
 
-        except nbconvert.pdf.LatexFailed as error:
+        except nbconvert.exporters.pdf.LatexFailed as error:
             message = "There was an error generating your LaTeX; showing full error message:\n"
             message += indent(error.output, "    ")
             if xecjk:
