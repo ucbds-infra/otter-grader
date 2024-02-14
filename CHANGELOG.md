@@ -1,6 +1,6 @@
 # Changelog
 
-**v5.4.1 (unreleased):**
+**v5.4.1:**
 
 * Fixed import of the `LatexFailed` error for `nbconvert` 7
 
