@@ -3,6 +3,7 @@
 **v5.4.1:**
 
 * Fixed import of the `LatexFailed` error for `nbconvert` 7
+* Updated default version of `ottr` to v1.5.0
 
 **v5.4.0:**
 
