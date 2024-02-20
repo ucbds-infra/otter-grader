@@ -18,6 +18,7 @@ on:
 
 jobs:
   build:
+    name: Test suite
     runs-on: ubuntu-latest
 
     env:
