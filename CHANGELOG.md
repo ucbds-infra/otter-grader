@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.5.0 (unreleased):**
+
+* Suppress all warnings when running `otter.check.validate_export` as a module per [#735](https://github.com/ucbds-infra/otter-grader/issues/735)
+
 **v5.4.1:**
 
 * Fixed import of the `LatexFailed` error for `nbconvert` 7
