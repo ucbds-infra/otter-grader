@@ -79,17 +79,18 @@ class CondaEnvironment:
 
         pip_deps = self.requirements if self.overwrite_requirements else [
             "datascience",
-            "jupyter_client", 
-            "ipykernel", 
-            "matplotlib", 
-            "pandas", 
-            "ipywidgets", 
-            "scipy", 
-            "seaborn", 
-            "scikit-learn", 
-            "jinja2", 
-            "nbconvert", 
-            "nbformat", 
+            "jupyter_client",
+            "ipykernel",
+            "matplotlib",
+            "pandas",
+            "ipywidgets",
+            "scipy",
+            "seaborn",
+            "scikit-learn",
+            "jinja2",
+            "nbconvert",
+            "nbconvert[webpdf]",
+            "nbformat",
             "dill",
             "numpy",
             "gspread",
@@ -167,7 +168,7 @@ def main(
         overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
             adding to them
         environment (``str``): path to a conda environment file for this assignment
-        no_environment (``bool``): whether ``./environment.yml`` should be automatically checked if 
+        no_environment (``bool``): whether ``./environment.yml`` should be automatically checked if
             ``environment`` is unspecified
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
