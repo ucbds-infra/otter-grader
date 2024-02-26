@@ -6,7 +6,7 @@ import shutil
 
 from io import BytesIO
 
-from .base_exporter import BaseExporter, NBCONVERT_6, TEMPLATE_DIR
+from .base_exporter import BaseExporter, TEMPLATE_DIR
 from .utils import notebook_pdf_generator
 
 
@@ -41,14 +41,11 @@ class PDFViaHTMLExporter(BaseExporter):
 
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
-        if NBCONVERT_6:
-            nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
-            orig_template_name = nbconvert.TemplateExporter.template_name
-            nbconvert.TemplateExporter.template_name = options["template"]
+        nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+        orig_template_name = nbconvert.TemplateExporter.template_name
+        nbconvert.TemplateExporter.template_name = options["template"]
 
         exporter = nbconvert.HTMLExporter()
-        if not NBCONVERT_6:
-            exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         if options["save_html"]:
             html, _ = nbconvert.export(exporter, nb)
@@ -76,5 +73,4 @@ class PDFViaHTMLExporter(BaseExporter):
 
         merger.write(dest)
 
-        if NBCONVERT_6:
-            nbconvert.TemplateExporter.template_name = orig_template_name
+        nbconvert.TemplateExporter.template_name = orig_template_name

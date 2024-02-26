@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.0.0 (unreleased):**
+
+* Removed compatibility patches for nbconvert < 6 per [#777](https://github.com/ucbds-infra/otter-grader/issues/777)
+
 **v5.6.0:**
 
 * Updated Otter Grade to write grading summary for each notebook per [#814](https://github.com/ucbds-infra/otter-grader/issues/814)
