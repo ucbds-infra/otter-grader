@@ -6,7 +6,7 @@ import warnings
 
 from textwrap import indent
 
-from .base_exporter import BaseExporter, ExportFailedException, NBCONVERT_6, TEMPLATE_DIR
+from .base_exporter import BaseExporter, ExportFailedException, TEMPLATE_DIR
 
 from ...utils import print_full_width
 
@@ -43,19 +43,14 @@ class PDFViaLatexExporter(BaseExporter):
 
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
-        if NBCONVERT_6:
-            nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
-            orig_template_name = nbconvert.TemplateExporter.template_name
-            nbconvert.TemplateExporter.template_name = options["template"]
+        nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+        orig_template_name = nbconvert.TemplateExporter.template_name
+        nbconvert.TemplateExporter.template_name = options["template"]
 
         if options["save_tex"]:
             latex_exporter = nbconvert.LatexExporter()
-            if not NBCONVERT_6:
-                latex_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         pdf_exporter = nbconvert.PDFExporter()
-        if not NBCONVERT_6:
-            pdf_exporter.template_file = os.path.join(TEMPLATE_DIR, options["template"] + ".tpl")
 
         try:
             if options["save_tex"]:
@@ -77,5 +72,4 @@ class PDFViaLatexExporter(BaseExporter):
             raise ExportFailedException(message)
 
         finally:
-            if NBCONVERT_6:
-                nbconvert.TemplateExporter.template_name = orig_template_name
+            nbconvert.TemplateExporter.template_name = orig_template_name
