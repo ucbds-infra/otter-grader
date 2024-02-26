@@ -4,10 +4,7 @@ import nbconvert
 import os
 import shutil
 
-from io import BytesIO
-
 from .base_exporter import BaseExporter, TEMPLATE_DIR
-from .utils import notebook_pdf_generator
 
 
 class PDFViaHTMLExporter(BaseExporter):
@@ -33,9 +30,6 @@ class PDFViaHTMLExporter(BaseExporter):
         if shutil.which("wkhtmltopdf") is None:
             raise RuntimeError("Cannot export via HTML without wkhtmltopdf")
 
-        import pdfkit
-        from pypdf import PdfMerger
-
         options = cls.default_options.copy()
         options.update(kwargs)
 
@@ -45,32 +39,11 @@ class PDFViaHTMLExporter(BaseExporter):
         orig_template_name = nbconvert.TemplateExporter.template_name
         nbconvert.TemplateExporter.template_name = options["template"]
 
-        exporter = nbconvert.HTMLExporter()
+        exporter = nbconvert.WebPDFExporter()
 
-        if options["save_html"]:
-            html, _ = nbconvert.export(exporter, nb)
-            html_path = os.path.splitext(dest)[0] + ".html"
-            with open(html_path, "wb+") as f:
-                f.write(html.encode("utf-8"))
-
-        merger = PdfMerger()
-        for subnb in notebook_pdf_generator(nb):
-            html, _ = nbconvert.export(exporter, subnb)
-
-            pdfkit_options = {
-                'enable-local-file-access': None, 
-                'quiet': '', 
-                'print-media-type': '', 
-                'javascript-delay': 2000
-            }
-            pdf_contents = pdfkit.from_string(html, False, options=pdfkit_options)
-
-            output = BytesIO()
-            output.write(pdf_contents)
-            output.seek(0)
-
-            merger.append(output, import_outline=False)
-
-        merger.write(dest)
+        pdf, _ = nbconvert.export(exporter, nb)
+        pdf_path = os.path.splitext(dest)[0] + ".pdf"
+        with open(pdf_path, "wb+") as f:
+            f.write(pdf)
 
         nbconvert.TemplateExporter.template_name = orig_template_name
