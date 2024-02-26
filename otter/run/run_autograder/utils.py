@@ -2,7 +2,7 @@
 
 from contextlib import contextmanager
 from io import StringIO
-from typing import Optional
+from typing import Iterable, Optional
 
 
 _OUTPUT: Optional[StringIO] = None
@@ -30,7 +30,7 @@ def write_blank_page_to_stare_at_before_you(path: str):
 
 
 @contextmanager
-def capture_run_output() -> StringIO:
+def capture_run_output() -> Iterable[StringIO]:
     """
     A context manager for capturing anything that Otter Run would normally print to stdout. Yields
     an ``io.StringIO`` object that the output will be written to.

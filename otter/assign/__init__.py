@@ -8,7 +8,7 @@ from .assignment import Assignment
 from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
 
-from ..export import export_notebook, WkhtmltopdfNotFoundError
+from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..utils import chdir, get_relpath, knit_rmd_file, loggers
 
@@ -90,26 +90,15 @@ def main(
 
             if not assignment.is_rmd:
                 LOGGER.debug(f"Exporting {src} as notebook to {dst}")
-                try:
-                    LOGGER.debug("Attempting PDF via HTML export")
-                    export_notebook(
-                        src,
-                        dest=dst,
-                        filtering=filtering,
-                        pagebreaks=filtering,
-                        exporter_type="html",
-                    )
-                    LOGGER.debug("PDF via HTML export successful")
-
-                except WkhtmltopdfNotFoundError:
-                    LOGGER.debug("PDF via HTML export failed; attempting PDF via LaTeX export")
-                    export_notebook(
-                        src,
-                        dest=dst,
-                        filtering=filtering,
-                        pagebreaks=filtering,
-                    )
-                    LOGGER.debug("PDF via LaTeX export successful")
+                LOGGER.debug("Attempting PDF via HTML export")
+                export_notebook(
+                    src,
+                    dest=dst,
+                    filtering=filtering,
+                    pagebreaks=filtering,
+                    exporter_type="html",
+                )
+                LOGGER.debug("PDF via HTML export successful")
 
             else:
                 LOGGER.debug(f"Knitting {src} to {dst}")

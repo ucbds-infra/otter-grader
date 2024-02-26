@@ -2,8 +2,6 @@
 
 import os
 
-from .utils import WkhtmltopdfNotFoundError
-
 
 def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
     """

@@ -2,18 +2,13 @@
 
 import nbconvert
 import os
-import shutil
 
 from .base_exporter import BaseExporter, TEMPLATE_DIR
 
 
 class PDFViaHTMLExporter(BaseExporter):
     """
-    Exports notebooks to PDF files using HTML as an intermediary
-
-    Converts IPython notebooks to PDFs by first converting them into temporary HTML files that are then
-    converted to PDFs using wkhtmltopdf and its Python API pdfkit which are then stitched together (if
-    pagebreaks are enabled) using pypdf.
+    An exporter that uses nbconvert's WebPDF exporter to convert notebooks to PDFs via HTML.
 
     Attributes:
         default_options (``dict``): the default options for this exporter
@@ -27,9 +22,6 @@ class PDFViaHTMLExporter(BaseExporter):
 
     @classmethod
     def convert_notebook(cls, nb_path, dest, **kwargs):
-        if shutil.which("wkhtmltopdf") is None:
-            raise RuntimeError("Cannot export via HTML without wkhtmltopdf")
-
         options = cls.default_options.copy()
         options.update(kwargs)
 
