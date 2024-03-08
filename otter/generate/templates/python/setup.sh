@@ -27,7 +27,7 @@ export TAR="/bin/tar"
 
 # install dependencies with mamba
 mamba env create -f {{ autograder_dir }}/source/environment.yml
-mamba run -n {{ otter_env_name }} playwright install
+mamba run -n {{ otter_env_name }} playwright install chromium
 
 # set mamba shell
 mamba init --all
