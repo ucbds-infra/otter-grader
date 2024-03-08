@@ -8,17 +8,10 @@ from textwrap import indent
 
 from .base_exporter import BaseExporter, ExportFailedException, TEMPLATE_DIR
 
-from ...utils import print_full_width
-
 
 class PDFViaLatexExporter(BaseExporter):
     """
-    Exports notebooks to PDF files using LaTeX as an intermediary
-
-    Converts IPython notebooks to PDFs by first converting them into temporary TeX files that are then
-    converted to PDFs using nbconvert and pandoc. Pagebreaks, if enabled, are enforced with a custom
-    LaTeX template that clears the document to the next odd numbered page, resulting in responses that
-    are all two pages long.
+    An exporter that uses nbconvert's PDF exporter to convert notebooks to PDFs via LaTeX.
 
     Attributes:
         default_options (``dict``): the default options for this exporter

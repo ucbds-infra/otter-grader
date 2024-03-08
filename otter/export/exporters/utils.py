@@ -1,10 +1,6 @@
 """Utilities for Otter Export exporters"""
 
 import re
-import copy
-import nbformat
-
-from ...utils import get_source
 
 
 BEGIN_QUESTION_REGEX = r"<!--\s*BEGIN QUESTION\s*-->"
@@ -73,45 +69,3 @@ def sub_end_for_new_page(line):
         ``str``: the line with the end question match substituted for the newpage comment
     """
     return re.sub(END_QUESTION_REGEX, NEW_PAGE_CELL_SOURCE, line)
-
-
-def notebook_pdf_generator(nb):
-    """
-    A generator that takes in a notebook ``nb`` with HTML comments for filtering and splits this
-    notebook up into each filtered block, yielding a complete notebook for each chunk. Used for 
-    implementing pagebreaks in PDFs via HTML.
-
-    Args:
-        nb (``nbformat.NotebookNode``): the notebook to be exported
-
-    Yields:
-        ``nbformat.NotebookNode``: a complete notebook containing a single filtered block
-    """
-    dummy_nb = copy.copy(nb)
-    dummy_nb.cells = []
-
-    all_cells, subnb_cells = [], []
-    for cell in nb.cells:
-        source = get_source(cell)
-
-        if NEW_PAGE_CELL_SOURCE in "\n".join(source):
-            for i, line in enumerate(source):
-                if NEW_PAGE_CELL_SOURCE in line:
-                    break
-
-            c1, c2 = nbformat.v4.new_markdown_cell(), nbformat.v4.new_markdown_cell()
-            c1.source, c2.source = "\n".join(source[:i+1]), "\n".join(source[i+1:])
-
-            subnb_cells.append(c1)
-            all_cells.append(subnb_cells)
-            subnb_cells = []
-            subnb_cells.append(c2)
-
-        else:
-            subnb_cells.append(cell)
-
-    all_cells.append(subnb_cells)
-
-    for subnb_cells in all_cells:
-        dummy_nb.cells = subnb_cells
-        yield dummy_nb

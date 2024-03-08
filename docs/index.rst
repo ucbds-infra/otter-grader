@@ -69,9 +69,9 @@ Installation
 ------------
 
 Otter is a Python package that is compatible with Python 3.6+. The PDF export internals require 
-either LaTeX and Pandoc or wkhtmltopdf to be installed. Docker is also required to grade assignments 
-locally with containerization. Otter's Python package can be installed using pip. To install the
-current stable version, install with
+either LaTeX and Pandoc or Playwright and Chromium to be installed. Docker is also required to grade
+assignments locally with containerization. Otter's Python package can be installed using pip. To
+install the current stable version, install with
 
 .. code-block:: console
 

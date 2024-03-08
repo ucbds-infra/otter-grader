@@ -2,9 +2,8 @@
 
 import shutil
 
+from .via_html import PDFViaHTMLExporter
 from .via_latex import PDFViaLatexExporter
-
-from ..utils import WkhtmltopdfNotFoundError
 
 
 def get_exporter(exporter_type=None):
@@ -18,9 +17,6 @@ def get_exporter(exporter_type=None):
 
     Returns:
         ``otter.export.exporters.base_exporter.BaseExporter``: the exporter class
-
-    Raises:
-        ``WkhtmltopdfNotFoundError``: if PDF via HTML is indicated but wkhtmltopdf is not installed.
     """
     # throw an error if the nbconvert version is < 6
     import nbconvert
@@ -31,10 +27,6 @@ def get_exporter(exporter_type=None):
         exporter_type = exporter_type.lower()
 
         if exporter_type == 'html':
-            if shutil.which("wkhtmltopdf") is None:
-                raise WkhtmltopdfNotFoundError("PDF via HTML indicated but wkhtmltopdf not found")
-
-            from .via_html import PDFViaHTMLExporter
             return PDFViaHTMLExporter
 
         elif exporter_type == "latex":
