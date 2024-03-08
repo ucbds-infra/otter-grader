@@ -4,6 +4,8 @@
 
 * Removed compatibility patches for nbconvert < 6 per [#777](https://github.com/ucbds-infra/otter-grader/issues/777)
 * Updated Otter Export to throw an error if nbconvert<6.0.0 is found
+* Converted Otter Export's PDF via HTML exporter to use nbconvert's WebPDF exporter per [#781](https://github.com/ucbds-infra/otter-grader/issues/781)
+* Removed pdfkit from dependencies
 
 **v5.6.0:**
 
