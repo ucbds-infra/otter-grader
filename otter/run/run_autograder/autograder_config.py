@@ -170,5 +170,11 @@ class AutograderConfig(fica.Config):
         default=False,
     )
 
+    pdf_via_html = fica.Key(
+        description="use the PDF via HTML exporter to export the submission PDF; ignored for Rmd " \
+            "submissions",
+        default=False,
+    )
+
     _otter_run = False
     """whether this autograder run is being run by Otter Run (i.e. without containerization)"""

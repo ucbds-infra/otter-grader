@@ -182,10 +182,10 @@ class RRunner(AbstractLanguageRunner):
         if ipynb:
             export_notebook(
                 subm_path,
-                dest=pdf_path,
-                filtering=self.ag_config.filtering, 
-                pagebreaks=self.ag_config.pagebreaks,
-                exporter_type="latex",
+                dest = pdf_path,
+                filtering = self.ag_config.filtering, 
+                pagebreaks = self.ag_config.pagebreaks,
+                exporter_type = "html" if self.ag_config.pdf_via_html else "latex",
             )
 
         else:
