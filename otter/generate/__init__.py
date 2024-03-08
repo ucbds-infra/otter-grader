@@ -82,6 +82,7 @@ class CondaEnvironment:
             "scikit-learn",
             "jinja2",
             "nbconvert",
+            "nbconvert[webpdf]",
             "nbformat",
             "dill",
             "numpy",

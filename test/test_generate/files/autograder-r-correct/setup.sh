@@ -32,6 +32,7 @@ export TAR="/bin/tar"
 
 # install dependencies with mamba
 mamba env create -f /autograder/source/environment.yml
+mamba run -n otter-env playwright install
 
 # set mamba shell
 mamba init --all
