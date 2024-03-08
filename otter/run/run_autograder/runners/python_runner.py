@@ -64,8 +64,12 @@ class PythonRunner(AbstractLanguageRunner):
     def write_pdf(self, nb_path):
         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
         export_notebook(
-            nb_path, dest=pdf_path, filtering=self.ag_config.filtering,
-            pagebreaks=self.ag_config.pagebreaks, exporter_type="latex")
+            nb_path,
+            dest = pdf_path,
+            filtering = self.ag_config.filtering,
+            pagebreaks = self.ag_config.pagebreaks,
+            exporter_type = "html" if self.ag_config.pdf_via_html else "latex",
+        )
 
         return pdf_path
 
