@@ -203,7 +203,7 @@ def mock_export_notebook(cleanup_enabled):
 
     with mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as mocked_export_notebook:
         mocked_export_notebook.side_effect = make_empty_pdf
-        yield
+        yield mocked_export_notebook
 
     if not cleanup_enabled: return
 
@@ -510,3 +510,26 @@ def test_token_sanitization(mocked_upload, get_config_path, load_config, expecte
         f"Actual results did not matched expected:\n{actual_results}"
 
     mocked_upload.assert_called()
+
+
+@mock.patch.object(APIClient, "upload_pdf_submission")
+def test_pdf_via_html(_, mock_export_notebook, get_config_path, load_config, expected_results):
+    config = load_config()
+    config["pdf_via_html"] = True
+    config["token"] = "abc123"
+
+    with alternate_config(get_config_path(), config):
+        run_autograder(config['autograder_dir'])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    assert actual_results == expected_results, \
+        f"Actual results did not matched expected:\n{actual_results}"
+    mock_export_notebook.assert_called_with(
+        "fails2and6H.ipynb",
+        dest = "fails2and6H.pdf",
+        filtering = False,
+        pagebreaks = False,
+        exporter_type = "html",
+    )
