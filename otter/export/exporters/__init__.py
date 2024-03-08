@@ -22,6 +22,11 @@ def get_exporter(exporter_type=None):
     Raises:
         ``WkhtmltopdfNotFoundError``: if PDF via HTML is indicated but wkhtmltopdf is not installed.
     """
+    # throw an error if the nbconvert version is < 6
+    import nbconvert
+    if int(nbconvert.__version__.split(".")[0]) < 6:
+        raise RuntimeError(f"Otter is only compatible with nbconvert>=6.0.0, found {nbconvert.__version__}")
+
     if exporter_type is not None:
         exporter_type = exporter_type.lower()
 
