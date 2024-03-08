@@ -1,5 +1,10 @@
 # Changelog
 
+**v6.0.0 (unreleased):**
+
+* Removed compatibility patches for nbconvert < 6 per [#777](https://github.com/ucbds-infra/otter-grader/issues/777)
+* Updated Otter Export to throw an error if nbconvert<6.0.0 is found
+
 **v5.5.0 (unreleased):**
 
 * Suppress all warnings when running `otter.check.validate_export` as a module per [#735](https://github.com/ucbds-infra/otter-grader/issues/735)
