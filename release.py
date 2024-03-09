@@ -116,5 +116,17 @@ if __name__ == "__main__":
         print(f"Versions updated. Release commit hash is {new_hash} -- commit and push to release")
         sys.exit()
 
-    else:
-        print(f"Versions updated. Release version is {new_version_number}")
+    print(f"Versions updated. Release version is {new_version_number}")
+
+    if to_beta:
+        sys.exit()
+
+    print("Updating CHANGELOG.md")
+    with open("CHANGELOG.md") as f:
+        cl = f.read()
+
+    new_version_regex = new_version_number.replace(".", r"\.")
+    cl = re.sub(fr"{new_version_regex}\s*\(unreleased\)", new_version_number, cl, flags = re.IGNORECASE)
+
+    with open("CHANGELOG.md", "w") as f:
+        f.write(cl)
