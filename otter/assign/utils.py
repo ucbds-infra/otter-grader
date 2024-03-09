@@ -340,6 +340,7 @@ def run_generate_autograder(
             assignment = assignment,
             python_version = assignment.get_python_version(),
             channel_priority_strict = assignment.channel_priority_strict,
+            exclude_conda_defaults = assignment.exclude_conda_defaults,
         )
 
         # clean up temp tests dir

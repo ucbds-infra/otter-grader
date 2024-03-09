@@ -4,6 +4,7 @@
 
 * Suppress all warnings when running `otter.check.validate_export` as a module per [#735](https://github.com/ucbds-infra/otter-grader/issues/735)
 * Updated default version of `ottr` to v1.5.0
+* Added a way to exclude Conda's defaults channel from autograder `environment.yml` files in Otter Assign and Otter Generate per [#778](https://github.com/ucbds-infra/otter-grader/issues/778)
 
 **v5.4.1:**
 

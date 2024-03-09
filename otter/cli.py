@@ -115,6 +115,7 @@ defaults = generate.__kwdefaults__
 @click.option("--token", help="Gradescope token for uploading PDFs")
 @click.option("--python-version", help="Python version to use in the grading image")
 @click.option("--channel-priority-strict", is_flag=True, help="Whether to set conda's channel_priority to strict in the setup.sh file")
+@click.option("--exclude-conda-defaults", is_flag=True, help="Whether to exlucde conda's defaults channel from the environment.yml file")
 @click.argument("files", nargs=-1)
 def generate_cli(*args, **kwargs):
     """

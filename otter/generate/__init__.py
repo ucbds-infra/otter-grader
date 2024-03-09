@@ -42,6 +42,8 @@ class CondaEnvironment:
 
     user_environment: Optional[Dict[str, Any]]
 
+    exclude_conda_defaults: bool
+
     def to_dict(self):
         environment = {
             "name": OTTER_ENV_NAME,
@@ -52,6 +54,9 @@ class CondaEnvironment:
                 "nb_conda_kernels",
             ],
         }
+
+        if self.exclude_conda_defaults:
+            environment["channels"].remove("defaults")
 
         if self.is_r:
             environment["channels"].append("r")
@@ -125,10 +130,27 @@ LANGUAGE_BASED_CONFIGURATIONS = {
 }
 
 
-def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_config=False, 
-         lang=None, requirements=None, no_requirements=False, overwrite_requirements=False, 
-         environment=None, no_environment=False, username=None, password=None, token=None, files=[], 
-         assignment=None, plugin_collection=None, python_version=None, channel_priority_strict=True):
+def main(
+    *,
+    tests_dir = "./tests",
+    output_path = "autograder.zip",
+    config = None,
+    no_config = False, 
+    lang = None,
+    requirements = None,
+    no_requirements = False,
+    overwrite_requirements = False, 
+    environment = None,
+    no_environment = False,
+    username = None,
+    password = None,
+    token = None, files = [], 
+    assignment = None,
+    plugin_collection = None,
+    python_version = None,
+    channel_priority_strict = True,
+    exclude_conda_defaults = False,
+):
     """
     Run Otter Generate.
 
@@ -154,6 +176,8 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         python_version (``str | None``): the version of Python to use (installed with conda)
         channel_priority_strict (``bool``): whether to set conda's channel_priority to strict in
             the ``setup.sh`` file
+        exclude_conda_defaults (``bool``): whether to exclude conda's defaults channel in the
+            generated ``environment.yml`` file
 
     Raises:
         ``FileNotFoundError``: if the specified Otter configuration JSON file could not be found
@@ -236,11 +260,19 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
 
     # open requirements if it exists
     extra_requirements, r_requirements = [], None
-    with load_default_file(requirements, lang_config["requirements_filename"], 
-                           default_disabled=no_requirements,) as reqs:
+    with load_default_file(
+        requirements,
+        lang_config["requirements_filename"],
+        default_disabled=no_requirements,
+    ) as reqs:
         if reqs is not None:
             if ag_config.lang == "python":
-                extra_requirements = [l for l in reqs.split("\n") if l.strip() and not l.strip().startswith("#")]
+                extra_requirements = [
+                    l 
+                    for l 
+                    in reqs.split("\n") 
+                    if l.strip() and not l.strip().startswith("#")
+                ]
             elif ag_config.lang == "r":
                 r_requirements = reqs
                 template_context["has_r_requirements"] = True
@@ -258,6 +290,7 @@ def main(*, tests_dir="./tests", output_path="autograder.zip", config=None, no_c
         extra_requirements,
         overwrite_requirements,
         user_environment,
+        exclude_conda_defaults,
     )
 
     rendered = {}
