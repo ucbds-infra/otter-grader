@@ -4,7 +4,7 @@ FROM ${BASE_IMAGE}
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y curl unzip dos2unix && \
+    apt-get install -y curl unzip dos2unix wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/tmp/*
 

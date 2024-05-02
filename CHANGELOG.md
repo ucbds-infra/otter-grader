@@ -3,6 +3,7 @@
 **v5.6.0(unreleased):**
 
 * final_grades.csv: notebook name is the file name for each row instead of the full path to the notebook and the rows are sorted by notebook name
+* added wget to grade/Dockerfile -- this allows otter-grader version 4 generated autograder.zips to work with otter-grader version 5
 
 **v5.5.0:**
 
