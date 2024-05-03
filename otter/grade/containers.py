@@ -221,7 +221,7 @@ def grade_submission(
         scores_dict["percent_correct"] = scores.total / scores.possible
 
         scores_dict = {t: [scores_dict[t]["score"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
-        scores_dict["file"] = submission_path
+        scores_dict["file"] = nb_name
         df = pd.DataFrame(scores_dict)
 
         if pdf_dir:

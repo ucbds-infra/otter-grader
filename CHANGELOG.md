@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.6.0(unreleased):**
+
+* final_grades.csv: notebook name is the file name for each row instead of the full path to the notebook and the rows are sorted by notebook name
+
 **v5.5.0:**
 
 * Suppress all warnings when running `otter.check.validate_export` as a module per [#735](https://github.com/ucbds-infra/otter-grader/issues/735)
