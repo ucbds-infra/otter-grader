@@ -136,4 +136,4 @@ def main(
 
     # return percentage if a single file was graded
     if len(paths) == 1 and os.path.isfile(paths[0]):
-        return output_df["percent_correct"][0]
+        return output_df["percent_correct"][1]

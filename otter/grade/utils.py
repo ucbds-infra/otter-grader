@@ -8,7 +8,7 @@ from python_on_whales import docker
 
 
 OTTER_DOCKER_IMAGE_NAME = "otter-grade"
-
+POINTS_POSSIBLE_LABEL="points-per-question"
 
 def list_files(path):
     """
@@ -35,8 +35,12 @@ def merge_csv(dataframes):
         ``pandas.core.frame.DataFrame``: A merged dataframe resulting from 'stacking' all input dataframes
 
     """
-    final_dataframe = pd.concat(dataframes, axis=0, join='inner').sort_values(by="file")
-    return final_dataframe
+    final_dataframe = pd.concat(dataframes, axis=0, join='inner')
+    do_not_sort = final_dataframe[final_dataframe['file'] == POINTS_POSSIBLE_LABEL]
+    sort_these = final_dataframe[final_dataframe['file'] != POINTS_POSSIBLE_LABEL]
+    df_sorted = sort_these.sort_values(by="file")
+    df_final = pd.concat([do_not_sort, df_sorted], ignore_index=True)
+    return df_final
 
 
 def prune_images(force=False):

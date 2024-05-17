@@ -14,6 +14,7 @@ from unittest import mock
 
 from otter.generate import main as generate
 from otter.grade import main as grade
+from otter.grade.utils import POINTS_POSSIBLE_LABEL
 from otter.run.run_autograder.autograder_config import AutograderConfig
 from otter.utils import loggers
 
@@ -138,6 +139,9 @@ def test_notebooks_with_pdfs(expected_points):
     # read the output and expected output
     df_test = pd.read_csv("test/final_grades.csv")
 
+    #remove points possible row
+    df_test = df_test[df_test['file'] != POINTS_POSSIBLE_LABEL]
+
     # sort by filename
     df_test = df_test.sort_values("file").reset_index(drop=True)
     df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
@@ -183,6 +187,18 @@ def test_single_notebook_grade(mocked_launch_grade):
         "q2b": 2.0,
         "q7": 1.0,
         "percent_correct": 1.0,
+        "total_points_earned": 15.0,
+        "file": POINTS_POSSIBLE_LABEL,
+    },{
+        "q1": 2.0,
+        "q2": 2.0,
+        "q3": 2.0,
+        "q4": 1.0,
+        "q6": 4.0,
+        "q2b": 2.0,
+        "q7": 1.0,
+        "percent_correct": 0.933333,
+        "total_points_earned": 14.0,
         "file": "passesAll.ipynb",
     }])
 
@@ -211,7 +227,7 @@ def test_single_notebook_grade(mocked_launch_grade):
     )
 
     mocked_launch_grade.assert_called_with(notebook_path, [notebook_path], **kw_expected)
-    assert output == 1.0
+    assert output == 0.933333
 
 
 @mock.patch("otter.grade.launch_containers")
@@ -228,6 +244,18 @@ def test_config_overrides(mocked_launch_grade):
         "q2b": 2.0,
         "q7": 1.0,
         "percent_correct": 1.0,
+        "total_points_earned": 15.0,
+        "file": POINTS_POSSIBLE_LABEL,
+    },{
+        "q1": 2.0,
+        "q2": 2.0,
+        "q3": 2.0,
+        "q4": 1.0,
+        "q6": 5.0,
+        "q2b": 2.0,
+        "q7": 1.0,
+        "percent_correct": 1.0,
+        "total_points_earned": 15.0,
         "file": "passesAll.ipynb",
     }])]
 
@@ -281,12 +309,24 @@ def test_config_overrides_integration():
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": 1.0,
+        "percent_correct": "--",
+        "total_points_earned": 13.0,
+        "file": POINTS_POSSIBLE_LABEL,
+    },{
+        "q1": 0.0,
+        "q2": 2.0,
+        "q3": 2.0,
+        "q4": 1.0,
+        "q6": 5.0,
+        "q2b": 2.0,
+        "q7": 1.0,
+        "percent_correct": "1.0",
+        "total_points_earned": 13.0,
         "file": os.path.splitext(os.path.basename(ZIP_SUBM_PATH))[0],
     }])
 
     # Sort the columns by label so the dataframes can be compared with ==.
     got = got.reindex(sorted(got.columns), axis=1)
     want = want.reindex(sorted(want.columns), axis=1)
-    
+
     assert got.equals(want)

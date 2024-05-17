@@ -14,7 +14,7 @@ from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
-from .utils import OTTER_DOCKER_IMAGE_NAME
+from .utils import OTTER_DOCKER_IMAGE_NAME, POINTS_POSSIBLE_LABEL
 
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import loggers, OTTER_CONFIG_FILENAME
@@ -117,9 +117,14 @@ def launch_containers(
 
     # stop execution while containers are running
     finished_futures = wait(futures)
-
-    # return list of dataframes
-    return [df.result() for df in finished_futures[0]]
+    
+    # return list of dataframes with points possible as first frame
+    full_df = []
+    for f in finished_futures[0]:
+        if not full_df:
+            full_df.append(f.result()["pts_poss"])
+        full_df.append(f.result()["scores"])
+    return full_df 
 
 
 def grade_submission(
@@ -218,12 +223,18 @@ def grade_submission(
             scores = dill.load(f)
 
         scores_dict = scores.to_dict()
-        scores_dict["percent_correct"] = scores.total / scores.possible
+        
+        scores_dict["percent_correct"] = round(scores.total / scores.possible,4)
+        scores_dict["total_points_earned"] = scores.total
 
+        pts_poss_dict = {t: [scores_dict[t]["possible"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
         scores_dict = {t: [scores_dict[t]["score"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
+        pts_poss_dict["file"] = POINTS_POSSIBLE_LABEL
+        pts_poss_dict["percent_correct"] = "--"
+        pts_poss_dict["total_points_earned"] = scores.possible
         scores_dict["file"] = nb_name
-        df = pd.DataFrame(scores_dict)
-
+        df_scores = pd.DataFrame(scores_dict)
+        df_pts_poss = pd.DataFrame(pts_poss_dict)
         if pdf_dir:
             os.makedirs(pdf_dir, exist_ok=True)
 
@@ -234,4 +245,7 @@ def grade_submission(
         os.remove(results_path)
         os.remove(temp_subm_path)
 
-    return df
+    return {
+        "scores": df_scores,
+        "pts_poss": df_pts_poss
+    }
