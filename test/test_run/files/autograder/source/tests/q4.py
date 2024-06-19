@@ -10,7 +10,7 @@ test = {
 				{
 					"code": r"""
 					>>> np.isclose(x, 39.0625)
-					True
+					np.True_
 					""",
 					"hidden": True,
 					"locked": False,
@@ -18,7 +18,7 @@ test = {
 				{
 					"code": r"""
 					>>> np.isclose(x, 39.0625)
-					True
+					np.True_
 					""",
 					"hidden": True,
 					"locked": False,
@@ -26,7 +26,7 @@ test = {
 				{
 					"code": r"""
 					>>> np.isclose(x, 39.0625)
-					True
+					np.True_
 					""",
 					"hidden": True,
 					"locked": False,
@@ -34,7 +34,7 @@ test = {
 				{
 					"code": r"""
 					>>> np.isclose(x, 39.0625)
-					True
+					np.True_
 					""",
 					"hidden": True,
 					"locked": False,
@@ -42,7 +42,7 @@ test = {
 				{
 					"code": r"""
 					>>> np.isclose(x, 39.0625)
-					True
+					np.True_
 					""",
 					"hidden": True,
 					"locked": False,
@@ -50,7 +50,7 @@ test = {
 				{
 					"code": r"""
 					>>> np.isclose(x, 39.0625)
-					True
+					np.True_
 					""",
 					"hidden": True,
 					"locked": False,
@@ -58,7 +58,7 @@ test = {
 				{
 					"code": r"""
 					>>> np.isclose(x, 39.0625)
-					True
+					np.True_
 					""",
 					"hidden": True,
 					"locked": False,

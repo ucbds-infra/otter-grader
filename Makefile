@@ -4,6 +4,7 @@ PYTESTOPTS       =
 COVERAGE         = coverage
 DOCKER           = true
 SLOW             = true
+CLEANUP          = true
 
 _PYTESTOPTS      := -vv --durations=0 --html=pytest-report.html --self-contained-html
 
@@ -13,6 +14,10 @@ endif
 
 ifeq ($(SLOW), false)
 	_PYTESTOPTS := $(_PYTESTOPTS) -m "not slow"
+endif
+
+ifeq ($(CLEANUP), false)
+	_PYTESTOPTS := $(_PYTESTOPTS) --nocleanup
 endif
 
 _PYTESTOPTS := $(_PYTESTOPTS) $(PYTESTOPTS)

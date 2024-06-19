@@ -5,7 +5,6 @@ exclude .gitattributes
 exclude .github
 exclude .gitignore
 exclude .readthedocs.yml
-exclude codecov.yml
 exclude Dockerfile
 exclude docs
 exclude environment.yml

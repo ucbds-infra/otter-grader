@@ -8,10 +8,15 @@
 * Removed pdfkit from dependencies
 * Added ability to export PDFs via HTML in grading containers per [#782](https://github.com/ucbds-infra/otter-grader/issues/782)
 
-**v5.5.0 (unreleased):**
+**v5.6.0(unreleased):**
+
+* final_grades.csv: notebook name is the file name for each row instead of the full path to the notebook and the rows are sorted by notebook name
+
+**v5.5.0:**
 
 * Suppress all warnings when running `otter.check.validate_export` as a module per [#735](https://github.com/ucbds-infra/otter-grader/issues/735)
 * Updated default version of `ottr` to v1.5.0
+* Added a way to exclude Conda's defaults channel from autograder `environment.yml` files in Otter Assign and Otter Generate per [#778](https://github.com/ucbds-infra/otter-grader/issues/778)
 
 **v5.4.1:**
 

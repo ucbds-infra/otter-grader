@@ -56,10 +56,7 @@ jobs:
       - name: Run tests
         run: |
           micromamba activate otter-grader
-          make testcov PYTESTOPTS="-vv" && coverage xml -i
+          make testcov PYTESTOPTS="-vv" && coverage lcov -i
 
-      - uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-          verbose: true
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2

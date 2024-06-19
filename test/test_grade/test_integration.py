@@ -114,7 +114,7 @@ def test_network(expected_points):
 
     for _, row in df_test.iterrows():
         for test in expected_points:
-            if '/network.ipynb' in row["file"] and ('q2' in test or 'q3' in test):
+            if 'network' == row["file"] and ('q2' in test or 'q3' in test):
                 assert row[test] == 0, "{} supposed to fail {} but passed".format(row["file"], test)
             else:
                 assert row[test] == expected_points[test], "{} supposed to pass {} but failed".format(row["file"], test)
@@ -282,7 +282,7 @@ def test_config_overrides_integration():
         "q2b": 2.0,
         "q7": 1.0,
         "percent_correct": 1.0,
-        "file": ZIP_SUBM_PATH,
+        "file": os.path.splitext(os.path.basename(ZIP_SUBM_PATH))[0],
     }])
 
     # Sort the columns by label so the dataframes can be compared with ==.
