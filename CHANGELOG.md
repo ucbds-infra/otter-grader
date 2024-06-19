@@ -2,8 +2,8 @@
 
 **v5.6.0(unreleased):**
 
-* final_grades.csv: notebook name is the file name for each row instead of the full path to the notebook and the rows are sorted by notebook name
-* Added backwards compatibility to Otter Grade for autograder configuration zip files generated in previous major versions of Otter-grader
+* Updated Otter Grade CSV output switched from labeling submissions by file path to notebook name and is now sorted by notebook name per [#738](https://github.com/ucbds-infra/otter-grader/issues/738)
+* Added backwards compatibility to Otter Grade for autograder configuration zip files generated in previous major versions of Otter-Grader
 
 **v5.5.0:**
 
