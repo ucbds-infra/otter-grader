@@ -3,6 +3,7 @@
 **v5.6.0(unreleased):**
 
 * final_grades.csv: notebook name is the file name for each row instead of the full path to the notebook and the rows are sorted by notebook name
+* Added backwards compatibility to Otter Grade for autograder configuration zip files generated in previous major versions of Otter-grader
 
 **v5.5.0:**
 
