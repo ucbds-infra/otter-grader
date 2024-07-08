@@ -8,7 +8,8 @@ from python_on_whales import docker
 
 
 OTTER_DOCKER_IMAGE_NAME = "otter-grade"
-POINTS_POSSIBLE_LABEL="points-per-question"
+
+POINTS_POSSIBLE_LABEL = "points-per-question"
 
 def list_files(path):
     """
