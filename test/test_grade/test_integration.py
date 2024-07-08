@@ -139,9 +139,6 @@ def test_notebooks_with_pdfs(expected_points):
     # read the output and expected output
     df_test = pd.read_csv("test/final_grades.csv")
 
-    #remove points possible row
-    df_test = df_test[df_test['file'] != POINTS_POSSIBLE_LABEL]
-
     # sort by filename
     df_test = df_test.sort_values("file").reset_index(drop=True)
     df_test["failures"] = df_test["file"].apply(lambda x: [int(n) for n in re.split(r"\D+", x) if len(n) > 0])
