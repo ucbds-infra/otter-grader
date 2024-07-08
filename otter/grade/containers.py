@@ -223,15 +223,15 @@ def grade_submission(
             scores = dill.load(f)
 
         scores_dict = scores.to_dict()
+  
+        pts_poss_dict = {t: [scores_dict[t]["possible"]] for t in scores_dict}
+        pts_poss_dict["file"] = POINTS_POSSIBLE_LABEL
+        pts_poss_dict["percent_correct"] = "NA"
+        pts_poss_dict["total_points_earned"] = scores.possible
         
+        scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
         scores_dict["percent_correct"] = round(scores.total / scores.possible,4)
         scores_dict["total_points_earned"] = scores.total
-
-        pts_poss_dict = {t: [scores_dict[t]["possible"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
-        scores_dict = {t: [scores_dict[t]["score"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
-        pts_poss_dict["file"] = POINTS_POSSIBLE_LABEL
-        pts_poss_dict["percent_correct"] = "--"
-        pts_poss_dict["total_points_earned"] = scores.possible
         scores_dict["file"] = nb_name
         df_scores = pd.DataFrame(scores_dict)
         df_pts_poss = pd.DataFrame(pts_poss_dict)
