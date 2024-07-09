@@ -120,10 +120,24 @@ def launch_containers(
     
     # return list of dataframes with points possible as first frame
     full_df = []
+    f = next(iter(finished_futures[0]))
+    scores = f.result()
+    scores_dict = scores.to_dict()
+
+    pts_poss_dict = {t: [scores_dict[t]["possible"]] for t in scores_dict}
+    pts_poss_dict["file"] = POINTS_POSSIBLE_LABEL
+    pts_poss_dict["percent_correct"] = "NA"
+    pts_poss_dict["total_points_earned"] = scores.possible
+    pts_poss_df = pd.DataFrame(pts_poss_dict)
+    full_df.append(pts_poss_df)
     for f in finished_futures[0]:
-        if not full_df:
-            full_df.append(f.result()["pts_poss"])
-        full_df.append(f.result()["scores"])
+        scores_dict = f.result().to_dict()
+        scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
+        scores_dict["percent_correct"] = round(f.result().total / f.result().possible,4)
+        scores_dict["total_points_earned"] = f.result().total
+        scores_dict["file"] = f.result().file
+        df_scores = pd.DataFrame(scores_dict)
+        full_df.append(df_scores)
     return full_df 
 
 
@@ -222,19 +236,8 @@ def grade_submission(
         with open(results_path, "rb") as f:
             scores = dill.load(f)
 
-        scores_dict = scores.to_dict()
-  
-        pts_poss_dict = {t: [scores_dict[t]["possible"]] for t in scores_dict}
-        pts_poss_dict["file"] = POINTS_POSSIBLE_LABEL
-        pts_poss_dict["percent_correct"] = "NA"
-        pts_poss_dict["total_points_earned"] = scores.possible
-        
-        scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
-        scores_dict["percent_correct"] = round(scores.total / scores.possible,4)
-        scores_dict["total_points_earned"] = scores.total
-        scores_dict["file"] = nb_name
-        df_scores = pd.DataFrame(scores_dict)
-        df_pts_poss = pd.DataFrame(pts_poss_dict)
+        scores.file = nb_name
+
         if pdf_dir:
             os.makedirs(pdf_dir, exist_ok=True)
 
@@ -245,7 +248,4 @@ def grade_submission(
         os.remove(results_path)
         os.remove(temp_subm_path)
 
-    return {
-        "scores": df_scores,
-        "pts_poss": df_pts_poss
-    }
+    return scores
