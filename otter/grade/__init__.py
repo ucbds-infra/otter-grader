@@ -7,7 +7,7 @@ from glob import glob
 from typing import List, Optional, Tuple, Union
 
 from .containers import launch_containers
-from .utils import merge_csv, prune_images
+from .utils import merge_csv, prune_images, KEY_SCORES_DICT_FILE, KEY_SCORES_DICT_TTL_PTS,  KEY_SCORES_DICT_PCT_CRT
 
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import assert_path_exists, loggers
@@ -129,11 +129,11 @@ def main(
     # Merge dataframes
     output_df = merge_csv(grade_dfs)
     cols = output_df.columns.tolist()
-    output_df = output_df[cols[-1:] + cols[:-1]]
+    output_df = output_df[[KEY_SCORES_DICT_FILE] + cols[:-3] + [KEY_SCORES_DICT_TTL_PTS, KEY_SCORES_DICT_PCT_CRT]]
 
     # write to CSV file
     output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
 
     # return percentage if a single file was graded
     if len(paths) == 1 and os.path.isfile(paths[0]):
-        return output_df["percent_correct"][1]
+        return output_df[KEY_SCORES_DICT_PCT_CRT][1]

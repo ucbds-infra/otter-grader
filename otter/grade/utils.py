@@ -11,6 +11,12 @@ OTTER_DOCKER_IMAGE_NAME = "otter-grade"
 
 POINTS_POSSIBLE_LABEL = "points-per-question"
 
+KEY_SCORES_DICT_FILE = "file"
+
+KEY_SCORES_DICT_TTL_PTS = "total_points_earned"
+
+KEY_SCORES_DICT_PCT_CRT = "percent_correct"
+
 def list_files(path):
     """
     Returns a list of all non-hidden files in a directory

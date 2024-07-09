@@ -14,7 +14,7 @@ from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
-from .utils import OTTER_DOCKER_IMAGE_NAME, POINTS_POSSIBLE_LABEL
+from .utils import OTTER_DOCKER_IMAGE_NAME, POINTS_POSSIBLE_LABEL, KEY_SCORES_DICT_FILE, KEY_SCORES_DICT_TTL_PTS,  KEY_SCORES_DICT_PCT_CRT
 
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import loggers, OTTER_CONFIG_FILENAME
@@ -125,17 +125,17 @@ def launch_containers(
     scores_dict = scores.to_dict()
 
     pts_poss_dict = {t: [scores_dict[t]["possible"]] for t in scores_dict}
-    pts_poss_dict["file"] = POINTS_POSSIBLE_LABEL
-    pts_poss_dict["percent_correct"] = "NA"
-    pts_poss_dict["total_points_earned"] = scores.possible
+    pts_poss_dict[KEY_SCORES_DICT_FILE] = POINTS_POSSIBLE_LABEL
+    pts_poss_dict[KEY_SCORES_DICT_PCT_CRT] = "NA"
+    pts_poss_dict[KEY_SCORES_DICT_TTL_PTS] = scores.possible
     pts_poss_df = pd.DataFrame(pts_poss_dict)
     full_df.append(pts_poss_df)
     for f in finished_futures[0]:
         scores_dict = f.result().to_dict()
         scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
-        scores_dict["percent_correct"] = round(f.result().total / f.result().possible,4)
-        scores_dict["total_points_earned"] = f.result().total
-        scores_dict["file"] = f.result().file
+        scores_dict[KEY_SCORES_DICT_PCT_CRT] = round(f.result().total / f.result().possible,4)
+        scores_dict[KEY_SCORES_DICT_TTL_PTS] = f.result().total
+        scores_dict[KEY_SCORES_DICT_FILE] = f.result().file
         df_scores = pd.DataFrame(scores_dict)
         full_df.append(df_scores)
     return full_df 
