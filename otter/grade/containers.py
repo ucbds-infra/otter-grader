@@ -2,7 +2,6 @@
 
 import json
 import os
-import pandas as pd
 import pathlib
 import pkg_resources
 import shutil
@@ -14,7 +13,7 @@ from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
-from .utils import OTTER_DOCKER_IMAGE_NAME, POINTS_POSSIBLE_LABEL, KEY_SCORES_DICT_FILE, KEY_SCORES_DICT_TTL_PTS,  KEY_SCORES_DICT_PCT_CRT
+from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df
 
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import loggers, OTTER_CONFIG_FILENAME
@@ -85,7 +84,7 @@ def launch_containers(
     Grade submissions in parallel Docker containers.
 
     This function runs ``num_containers`` Docker containers in parallel to grade the student
-    submissions in ``submissions_dir`` using the autograder configuration file at ``ag_zip_path``. 
+    submissions in ``submissions_dir`` using the autograder configuration file at ``ag_zip_path``.
     If indicated, it copies the PDFs generated of the submissions out of their containers.
 
     Args:
@@ -117,28 +116,8 @@ def launch_containers(
 
     # stop execution while containers are running
     finished_futures = wait(futures)
-    
-    # return list of dataframes with points possible as first frame
-    full_df = []
-    f = next(iter(finished_futures[0]))
-    scores = f.result()
-    scores_dict = scores.to_dict()
-
-    pts_poss_dict = {t: [scores_dict[t]["possible"]] for t in scores_dict}
-    pts_poss_dict[KEY_SCORES_DICT_FILE] = POINTS_POSSIBLE_LABEL
-    pts_poss_dict[KEY_SCORES_DICT_PCT_CRT] = "NA"
-    pts_poss_dict[KEY_SCORES_DICT_TTL_PTS] = scores.possible
-    pts_poss_df = pd.DataFrame(pts_poss_dict)
-    full_df.append(pts_poss_df)
-    for f in finished_futures[0]:
-        scores_dict = f.result().to_dict()
-        scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
-        scores_dict[KEY_SCORES_DICT_PCT_CRT] = round(f.result().total / f.result().possible,4)
-        scores_dict[KEY_SCORES_DICT_TTL_PTS] = f.result().total
-        scores_dict[KEY_SCORES_DICT_FILE] = f.result().file
-        df_scores = pd.DataFrame(scores_dict)
-        full_df.append(df_scores)
-    return full_df 
+    scores = [f.result() for f in finished_futures[0]]
+    return merge_scores_to_df(scores)
 
 
 def grade_submission(

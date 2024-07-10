@@ -4,18 +4,21 @@ import os
 import pandas as pd
 import re
 
+from typing import List
 from python_on_whales import docker
 
+from ..test_files import GradingResults
 
 OTTER_DOCKER_IMAGE_NAME = "otter-grade"
 
 POINTS_POSSIBLE_LABEL = "points-per-question"
 
-KEY_SCORES_DICT_FILE = "file"
+SCORES_DICT_FILE_KEY = "file"
 
-KEY_SCORES_DICT_TTL_PTS = "total_points_earned"
+SCORES_DICT_TOTAL_POINTS_KEY = "total_points_earned"
 
-KEY_SCORES_DICT_PCT_CRT = "percent_correct"
+SCORES_DICT_PERCENT_CORRECT_KEY = "percent_correct"
+
 
 def list_files(path):
     """
@@ -74,3 +77,32 @@ def prune_images(force=False):
 
     else:
         print("Prune cancelled.")
+
+
+def merge_scores_to_df(scores: List[GradingResults]) -> pd.DataFrame:  
+    """  
+    Convert a list of ``GradingResults`` objects to a scores dataframe, including a row  
+    with the total point values for each question.  
+
+    Args:  
+        scores (``list[otter.test_files.GradingResults]``): the score objects to merge  
+
+    Returns:  
+        ``pd.DataFrame``: the scores dataframe  
+    """
+    full_df = []
+    pts_poss_dict = {t: [scores[0].to_dict()[t]["possible"]] for t in scores[0].to_dict()}
+    pts_poss_dict[SCORES_DICT_FILE_KEY] = POINTS_POSSIBLE_LABEL
+    pts_poss_dict[SCORES_DICT_PERCENT_CORRECT_KEY] = "NA"
+    pts_poss_dict[SCORES_DICT_TOTAL_POINTS_KEY] = scores[0].possible
+    pts_poss_df = pd.DataFrame(pts_poss_dict)
+    full_df.append(pts_poss_df)
+    for grading_result in scores:
+        scores_dict = grading_result.to_dict()
+        scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
+        scores_dict[SCORES_DICT_PERCENT_CORRECT_KEY] = round(grading_result.total / grading_result.possible, 4)
+        scores_dict[SCORES_DICT_TOTAL_POINTS_KEY] = grading_result.total
+        scores_dict[SCORES_DICT_FILE_KEY] = grading_result.file
+        df_scores = pd.DataFrame(scores_dict)
+        full_df.append(df_scores)
+    return full_df

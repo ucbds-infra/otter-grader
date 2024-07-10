@@ -169,6 +169,9 @@ def test_notebooks_with_pdfs(expected_points):
     )
     assert sorted(dir1_contents) == sorted(dir2_contents), f"'{FILE_MANAGER.get_path('notebooks/')}' and 'test/submission_pdfs' have different contents"
 
+    # check that the row with point totals for each question exists
+    assert any(POINTS_POSSIBLE_LABEL in row for row in df_test.itertuples(index=False))
+
 
 @mock.patch("otter.grade.launch_containers")
 def test_single_notebook_grade(mocked_launch_grade):
