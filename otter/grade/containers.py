@@ -2,7 +2,6 @@
 
 import json
 import os
-import pandas as pd
 import pathlib
 import pkg_resources
 import shutil
@@ -14,7 +13,7 @@ from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
-from .utils import OTTER_DOCKER_IMAGE_NAME
+from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df
 
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import loggers, OTTER_CONFIG_FILENAME
@@ -85,7 +84,7 @@ def launch_containers(
     Grade submissions in parallel Docker containers.
 
     This function runs ``num_containers`` Docker containers in parallel to grade the student
-    submissions in ``submissions_dir`` using the autograder configuration file at ``ag_zip_path``. 
+    submissions in ``submissions_dir`` using the autograder configuration file at ``ag_zip_path``.
     If indicated, it copies the PDFs generated of the submissions out of their containers.
 
     Args:
@@ -117,9 +116,8 @@ def launch_containers(
 
     # stop execution while containers are running
     finished_futures = wait(futures)
-
-    # return list of dataframes
-    return [df.result() for df in finished_futures[0]]
+    scores = [f.result() for f in finished_futures[0]]
+    return merge_scores_to_df(scores)
 
 
 def grade_submission(
@@ -217,12 +215,7 @@ def grade_submission(
         with open(results_path, "rb") as f:
             scores = dill.load(f)
 
-        scores_dict = scores.to_dict()
-        scores_dict["percent_correct"] = scores.total / scores.possible
-
-        scores_dict = {t: [scores_dict[t]["score"]] if type(scores_dict[t]) == dict else scores_dict[t] for t in scores_dict}
-        scores_dict["file"] = nb_name
-        df = pd.DataFrame(scores_dict)
+        scores.file = nb_name
 
         if pdf_dir:
             os.makedirs(pdf_dir, exist_ok=True)
@@ -234,4 +227,4 @@ def grade_submission(
         os.remove(results_path)
         os.remove(temp_subm_path)
 
-    return df
+    return scores
