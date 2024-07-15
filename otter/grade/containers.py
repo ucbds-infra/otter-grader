@@ -7,6 +7,7 @@ import pkg_resources
 import shutil
 import tempfile
 import zipfile
+from otter.test_files import GradingResults
 
 from concurrent.futures import ThreadPoolExecutor, wait
 from python_on_whales import docker
@@ -20,6 +21,10 @@ from ..utils import loggers, OTTER_CONFIG_FILENAME
 
 
 LOGGER = loggers.get_logger(__name__)
+
+
+class TimeoutException(Exception):
+    pass
 
 
 def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderConfig):
@@ -175,10 +180,13 @@ def grade_submission(
 
         docker.container.start(container)
 
+        did_time_out = False
         if timeout:
             import threading
 
             def kill_container():
+                nonlocal did_time_out
+                did_time_out = True
                 docker.container.kill(container)
 
             timer = threading.Timer(timeout, kill_container)
@@ -208,6 +216,10 @@ def grade_submission(
         if not no_kill:
             container.remove()
 
+        if did_time_out:
+            raise TimeoutException(
+                f"Executing '{submission_path}' in docker container timed out in {timeout} seconds")
+
         if exit != 0:
             raise Exception(
                 f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
@@ -215,15 +227,18 @@ def grade_submission(
         with open(results_path, "rb") as f:
             scores = dill.load(f)
 
-        scores.file = nb_name
-
         if pdf_dir:
             os.makedirs(pdf_dir, exist_ok=True)
 
             local_pdf_path = os.path.join(pdf_dir, f"{nb_name}.pdf")
             shutil.copy(pdf_path, local_pdf_path)
 
+    except TimeoutException as te:
+        scores = GradingResults.without_results(te)
+    except Exception as e:
+        scores = GradingResults.without_results(e)
     finally:
+        scores.file = nb_name
         os.remove(results_path)
         os.remove(temp_subm_path)
 
