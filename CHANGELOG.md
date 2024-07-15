@@ -2,6 +2,7 @@
 
 **v5.6.0 (unreleased):**
 
+* Updated Otter Grade CAV to indicate which notebooks timeout
 * Updated Otter Grade CSV to include the number of points per question in the first row
 * Updated Otter Grade CSV to include total points column
 * Updated Otter Grade CSV to round percentages to four decimal places
