@@ -19,6 +19,10 @@ SCORES_DICT_TOTAL_POINTS_KEY = "total_points_earned"
 
 SCORES_DICT_PERCENT_CORRECT_KEY = "percent_correct"
 
+SCORES_DICT_SUMMARY_KEY = "summary"
+
+SCORES_DICT_GRADING_STATUS_KEY = "grading_status"
+
 
 def list_files(path):
     """
@@ -79,30 +83,64 @@ def prune_images(force=False):
         print("Prune cancelled.")
 
 
-def merge_scores_to_df(scores: List[GradingResults]) -> pd.DataFrame:  
-    """  
-    Convert a list of ``GradingResults`` objects to a scores dataframe, including a row  
-    with the total point values for each question.  
+def get_points_possible_df(scores: List[GradingResults]) -> pd.DataFrame:
+    """
+    From the list of ``GradingResults`` objects try to find one that does not have a catastrophic
+    failure and extract the points-per-question into its own DataFrame. This becomes the
+    first row of final_grades.csv. If all the ``GradingResults`` objects  are catastrophic failures
+    then returns an empty DataFrame
 
-    Args:  
-        scores (``list[otter.test_files.GradingResults]``): the score objects to merge  
+    Args:
+        scores (``list[otter.test_files.GradingResults]``): the score objects to locate the points per question
 
-    Returns:  
-        ``pd.DataFrame``: the scores dataframe  
+    Returns:
+        ``pd.DataFrame``: the points per question dataframe; if all failures empty dataframe
+    """
+    gr_completed = [s for s in scores if not s.has_catastrophic_failure()]
+    pts_poss_df = pd.DataFrame()
+    if gr_completed:
+        pts_poss_dict = {t: [gr_completed[0].to_dict()[t]["possible"]] for t in gr_completed[0].to_dict()}
+        pts_poss_dict[SCORES_DICT_FILE_KEY] = POINTS_POSSIBLE_LABEL
+        pts_poss_dict[SCORES_DICT_PERCENT_CORRECT_KEY] = "--"
+        pts_poss_dict[SCORES_DICT_TOTAL_POINTS_KEY] = gr_completed[0].possible
+        pts_poss_dict[SCORES_DICT_SUMMARY_KEY] = "--"
+        pts_poss_dict[SCORES_DICT_GRADING_STATUS_KEY] = "--"
+        pts_poss_df = pd.DataFrame(pts_poss_dict)
+    return pts_poss_df
+
+
+def merge_scores_to_df(scores: List[GradingResults]) -> pd.DataFrame:
+    """
+    Convert a list of ``GradingResults`` objects to a scores dataframe, including a row
+    with the total point values for each question.
+
+    Args:
+        scores (``list[otter.test_files.GradingResults]``): the score objects to merge
+
+    Returns:
+        ``pd.DataFrame``: the scores dataframe
     """
     full_df = []
-    pts_poss_dict = {t: [scores[0].to_dict()[t]["possible"]] for t in scores[0].to_dict()}
-    pts_poss_dict[SCORES_DICT_FILE_KEY] = POINTS_POSSIBLE_LABEL
-    pts_poss_dict[SCORES_DICT_PERCENT_CORRECT_KEY] = "NA"
-    pts_poss_dict[SCORES_DICT_TOTAL_POINTS_KEY] = scores[0].possible
-    pts_poss_df = pd.DataFrame(pts_poss_dict)
-    full_df.append(pts_poss_df)
-    for grading_result in scores:
-        scores_dict = grading_result.to_dict()
-        scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
-        scores_dict[SCORES_DICT_PERCENT_CORRECT_KEY] = round(grading_result.total / grading_result.possible, 4)
-        scores_dict[SCORES_DICT_TOTAL_POINTS_KEY] = grading_result.total
-        scores_dict[SCORES_DICT_FILE_KEY] = grading_result.file
-        df_scores = pd.DataFrame(scores_dict)
+    pts_poss_df = get_points_possible_df(scores)
+    if not pts_poss_df.empty:
+        full_df.append(pts_poss_df)
+    for gr in scores:
+        scores_dict = gr.to_dict()
+        failed = gr.has_catastrophic_failure()
+        if failed and not pts_poss_df.empty:
+            scores_dict = {t: ["--"] for t in pts_poss_df.to_dict()}
+        elif not failed:
+            scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
+
+        percent_correct = round(gr.total / gr.possible, 4) if gr.possible != 0 and not failed else "--"
+        summary = gr.summary() if not failed else str(gr._catastrophic_error)
+        total_pts = gr.total if not failed else "--"
+
+        scores_dict[SCORES_DICT_TOTAL_POINTS_KEY] = total_pts
+        scores_dict[SCORES_DICT_FILE_KEY] = gr.file
+        scores_dict[SCORES_DICT_PERCENT_CORRECT_KEY] = percent_correct
+        scores_dict[SCORES_DICT_SUMMARY_KEY] = summary
+        scores_dict[SCORES_DICT_GRADING_STATUS_KEY] = "Completed" if not failed else str(gr._catastrophic_error)
+        df_scores = pd.DataFrame(scores_dict, index=[0])
         full_df.append(df_scores)
     return full_df
