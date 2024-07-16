@@ -213,7 +213,7 @@ def test_single_notebook_grade(mocked_launch_grade):
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": "--",
+        "percent_correct": float('nan'),
         "total_points_earned": 15.0,
         "file": POINTS_POSSIBLE_LABEL,
         "grading_status": "--"
@@ -272,7 +272,7 @@ def test_config_overrides(mocked_launch_grade):
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": "--",
+        "percent_correct": float('nan'),
         "total_points_earned": 15.0,
         "file": POINTS_POSSIBLE_LABEL,
         "grading_status": "--"
@@ -340,7 +340,7 @@ def test_config_overrides_integration():
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": "--",
+        "percent_correct": float('nan'),
         "total_points_earned": 13.0,
         "file": POINTS_POSSIBLE_LABEL,
         "grading_status": "--"
@@ -352,7 +352,7 @@ def test_config_overrides_integration():
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": "1.0",
+        "percent_correct": 1.0,
         "total_points_earned": 13.0,
         "file": os.path.splitext(os.path.basename(ZIP_SUBM_PATH))[0],
         "grading_status": "Completed"
