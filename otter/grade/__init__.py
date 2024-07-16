@@ -152,7 +152,7 @@ def main(
     ]]
 
     # write to CSV file
-    output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
+    output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), na_rep='--', index=False)
 
     # return percentage if a single file was graded
     if len(paths) == 1 and os.path.isfile(paths[0]):
