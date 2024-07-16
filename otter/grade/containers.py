@@ -14,17 +14,13 @@ from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
-from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df
+from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df, TimeoutException
 
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import loggers, OTTER_CONFIG_FILENAME
 
 
 LOGGER = loggers.get_logger(__name__)
-
-
-class TimeoutException(Exception):
-    pass
 
 
 def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderConfig):
@@ -135,6 +131,10 @@ def grade_submission(
 ):
     """
     Grade a submission in a Docker container.
+
+    If a sumbission times out, based on the timeout parameter or the container
+    exits in an error state a ``GradingResults`` object is created by using the
+    ``GradingResults.without_results`` function and returned.
 
     Args:
         submission_path (``str``): path to the submission to be graded
