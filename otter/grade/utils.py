@@ -24,6 +24,16 @@ SCORES_DICT_SUMMARY_KEY = "summary"
 SCORES_DICT_GRADING_STATUS_KEY = "grading_status"
 
 
+class TimeoutException(Exception):
+    """
+    This Exception is thrown when grading a notebook exceeds the timeout value specified.
+
+    Extends:
+        Exception
+    """
+    pass
+
+
 def list_files(path):
     """
     Returns a list of all non-hidden files in a directory
