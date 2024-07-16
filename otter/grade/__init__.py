@@ -10,6 +10,7 @@ from .containers import launch_containers
 from .utils import (
     merge_csv,
     prune_images,
+    POINTS_POSSIBLE_LABEL,
     SCORES_DICT_FILE_KEY,
     SCORES_DICT_PERCENT_CORRECT_KEY,
     SCORES_DICT_TOTAL_POINTS_KEY,
@@ -33,6 +34,7 @@ def main(
     autograder: str = "./autograder.zip",
     containers: int = 4, 
     ext: str = "ipynb",
+    summaries: bool = False,
     no_kill: bool = False,
     image: str = "ubuntu:22.04", 
     pdfs: bool = False,
@@ -154,6 +156,17 @@ def main(
 
     # write to CSV file
     output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
+
+    # write score summaries to files
+    if summaries:
+        grading_summary_path = os.path.join(output_dir, "grading-summaries")
+        if not os.path.exists(grading_summary_path):
+            os.mkdir(grading_summary_path)
+        for df in grade_dfs:
+            df_dict = df.to_dict()
+            if df_dict['file'][0] != POINTS_POSSIBLE_LABEL:
+                with open(os.path.join(grading_summary_path, f"{df_dict['file'][0]}.txt"), mode="w") as f:
+                    f.write(df_dict["summary"][0])
 
     # return percentage if a single file was graded
     if len(paths) == 1 and os.path.isfile(paths[0]):

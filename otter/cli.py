@@ -132,6 +132,7 @@ defaults = grade.__kwdefaults__
 @click.option("-a", "--autograder", default=defaults["autograder"], help="Path to autograder zip file")
 @click.option("-o", "--output-dir", default=defaults["output_dir"], help="Directory to which to write output")
 @click.option("--ext", default=defaults["ext"], type=click.Choice(_ALLOWED_EXTENSIONS), help="The extension to glob for submissions")
+@click.option("--summaries", is_flag=True, help="Whether to write the otter run results for each graded notebook")
 @click.option("--pdfs", is_flag=True, help="Whether to copy notebook PDFs out of containers")
 @click.option("--containers", default=defaults["containers"], type=click.INT, help="Specify number of containers to run in parallel")
 @click.option("--image", default=defaults["image"], help="A Docker image tag to use as the base image")

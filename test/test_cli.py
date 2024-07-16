@@ -479,6 +479,10 @@ def test_grade(mocked_grade, run_cli):
         assert_cli_result(result, expect_error=False)
         mocked_grade.assert_called_with(**{**std_kwargs, "ext": ext})
 
+    result = run_cli([*cmd_start, "--summaries"])
+    assert_cli_result(result, expect_error=False)
+    mocked_grade.assert_called_with(**{**std_kwargs, "summaries": True})
+
     result = run_cli([*cmd_start, "--pdfs"])
     assert_cli_result(result, expect_error=False)
     mocked_grade.assert_called_with(**{**std_kwargs, "pdfs": True})

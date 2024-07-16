@@ -37,6 +37,8 @@ def cleanup_output(cleanup_enabled):
             shutil.rmtree("test/submission_pdfs")
         if os.path.exists(ZIP_SUBM_PATH):
             os.remove(ZIP_SUBM_PATH)
+        if os.path.exists("test/grading-summaries"):
+            shutil.rmtree("test/grading-summaries")
 
 
 @pytest.fixture(autouse=True, scope="module")
@@ -362,3 +364,24 @@ def test_config_overrides_integration():
     got = got.reindex(sorted(got.columns), axis=1)
     want = want.reindex(sorted(want.columns), axis=1)
     assert got.equals(want)
+
+
+@pytest.mark.slow
+@pytest.mark.docker
+def test_grade_summaries():
+    """
+    Checks that are grading summaries are written to the disck
+    """
+    grade(
+        name = ASSIGNMENT_NAME,
+        paths = [FILE_MANAGER.get_path("notebooks")],
+        output_dir = "test/",
+        autograder = AG_ZIP_PATH,
+        summaries = True
+    )
+    for filename in os.listdir(FILE_MANAGER.get_path("notebooks")):
+        file_path = os.path.join("test/grading-summaries", filename)
+        if os.path.isfile(file_path):
+            assert os.path.exists(file_path)
+            with open(file_path, 'r') as file:
+                assert file.read()
