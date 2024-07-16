@@ -101,7 +101,7 @@ def get_points_possible_df(scores: List[GradingResults]) -> pd.DataFrame:
     if gr_completed:
         pts_poss_dict = {t: [gr_completed[0].to_dict()[t]["possible"]] for t in gr_completed[0].to_dict()}
         pts_poss_dict[SCORES_DICT_FILE_KEY] = POINTS_POSSIBLE_LABEL
-        pts_poss_dict[SCORES_DICT_PERCENT_CORRECT_KEY] = "--"
+        pts_poss_dict[SCORES_DICT_PERCENT_CORRECT_KEY] = "NA"
         pts_poss_dict[SCORES_DICT_TOTAL_POINTS_KEY] = gr_completed[0].possible
         pts_poss_dict[SCORES_DICT_SUMMARY_KEY] = "--"
         pts_poss_dict[SCORES_DICT_GRADING_STATUS_KEY] = "--"
@@ -128,13 +128,13 @@ def merge_scores_to_df(scores: List[GradingResults]) -> pd.DataFrame:
         scores_dict = gr.to_dict()
         failed = gr.has_catastrophic_failure()
         if failed and not pts_poss_df.empty:
-            scores_dict = {t: ["--"] for t in pts_poss_df.to_dict()}
+            scores_dict = {t: ["NA"] for t in pts_poss_df.to_dict()}
         elif not failed:
             scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
 
-        percent_correct = round(gr.total / gr.possible, 4) if gr.possible != 0 and not failed else "--"
+        percent_correct = round(gr.total / gr.possible, 4) if gr.possible != 0 and not failed else "NA"
         summary = gr.summary() if not failed else str(gr._catastrophic_error)
-        total_pts = gr.total if not failed else "--"
+        total_pts = gr.total if not failed else "NA"
 
         scores_dict[SCORES_DICT_TOTAL_POINTS_KEY] = total_pts
         scores_dict[SCORES_DICT_FILE_KEY] = gr.file
