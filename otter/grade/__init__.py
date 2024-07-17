@@ -16,6 +16,7 @@ from .utils import (
     SCORES_DICT_GRADING_STATUS_KEY,
     SCORES_DICT_SUMMARY_KEY
 )
+
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import assert_path_exists, loggers
 
@@ -152,7 +153,7 @@ def main(
     ]]
 
     # write to CSV file
-    output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), na_rep='--', index=False)
+    output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
 
     # return percentage if a single file was graded
     if len(paths) == 1 and os.path.isfile(paths[0]):

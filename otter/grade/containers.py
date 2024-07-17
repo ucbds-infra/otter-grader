@@ -146,7 +146,7 @@ def grade_submission(
         network (``bool``): whether to enable networking in the containers
 
     Returns:
-        ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
+        ``otter.test_files.GradingResults``: A ``GradingResults`` object containing the grading results
     """
     import dill
 
