@@ -213,7 +213,7 @@ def test_single_notebook_grade(mocked_launch_grade):
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": float('nan'),
+        "percent_correct": 1,
         "total_points_earned": 15.0,
         "file": POINTS_POSSIBLE_LABEL,
         "grading_status": "--"
@@ -272,7 +272,7 @@ def test_config_overrides(mocked_launch_grade):
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": float('nan'),
+        "percent_correct": 1,
         "total_points_earned": 15.0,
         "file": POINTS_POSSIBLE_LABEL,
         "grading_status": "--"
@@ -331,7 +331,7 @@ def test_config_overrides_integration():
 
     assert output == 1.0
 
-    got = pd.read_csv("test/final_grades.csv", na_values='--')
+    got = pd.read_csv("test/final_grades.csv")
     want = pd.DataFrame([{
         "q1": 0.0,
         "q2": 2.0,
@@ -340,10 +340,10 @@ def test_config_overrides_integration():
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": float('nan'),
+        "percent_correct": 1,
         "total_points_earned": 13.0,
         "file": POINTS_POSSIBLE_LABEL,
-        "grading_status": float('nan')
+        "grading_status": "--"
     },{
         "q1": 0.0,
         "q2": 2.0,
