@@ -10,7 +10,7 @@ import zipfile
 
 from contextlib import ExitStack
 from glob import glob
-from python_on_whales import docker
+from multiprocessing import Queue
 from unittest import mock
 
 from otter.generate import main as generate
@@ -366,3 +366,24 @@ def test_grade_summaries(mocked_launch_grade):
         assert os.path.isfile(file_path)
         with open(file_path, "r") as summary_file:
             assert summary_file.read() == expected[filename], f"{filename} has diff"
+
+
+@pytest.mark.slow
+@pytest.mark.docker
+def test_queue():
+    """
+    Checks that the queue is getting progress messages
+    """
+    notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
+    test_queue = Queue()
+    grade(
+        name = ASSIGNMENT_NAME,
+        paths = [notebook_path],
+        output_dir = "test/",
+        autograder = AG_ZIP_PATH,
+        summaries = False,
+        result_queue = test_queue
+    )
+    with open(FILE_MANAGER.get_path("queue/passall_messages.txt"), "r") as f:
+        for line in f:
+            assert test_queue.get() == line.strip()

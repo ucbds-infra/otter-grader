@@ -5,6 +5,7 @@ import pathlib
 import re
 
 from glob import glob
+from multiprocessing import Queue
 from typing import List, Optional, Tuple, Union
 
 from .containers import launch_containers
@@ -43,6 +44,7 @@ def main(
     timeout: Optional[int] = None,
     no_network: bool = False,
     debug: bool = False,
+    result_queue: Optional[Queue] = None,
 ):
     """
     Run Otter Grade.
@@ -71,6 +73,7 @@ def main(
         timeout (``int | None``): an execution timeout in seconds for each container
         no_network (``bool``): whether to disable networking in the containers
         debug (``bool``): whether to run autograding in debug mode
+        result_queue (``multiprocessing.Queue | None``): the queue to store progress messages
 
     Returns:
         ``float | None``: the percentage scored by that submission if a single file was graded
@@ -105,6 +108,9 @@ def main(
 
     output_dir = pathlib.Path(output_dir)
 
+    if result_queue:
+        loggers.add_queue_handler(result_queue)
+
     LOGGER.info("Launching Docker containers")
 
     pattern = f"*.{ext}"
@@ -118,25 +124,27 @@ def main(
     LOGGER.debug(f"Resolved submission paths: {submission_paths}")
 
     pdf_dir = output_dir / "submission_pdfs" if pdfs else None
+    try: 
+        scores = launch_containers(
+            autograder,
+            submission_paths,
+            num_containers = containers,
+            base_image = image,
+            tag = name,
+            no_kill = no_kill,
+            pdf_dir = pdf_dir,
+            timeout = timeout,
+            network = not no_network,
+            config = AutograderConfig({
+                "zips": ext == "zip",
+                "pdf": pdfs,
+                "debug": debug,
+            }),
+        )
 
-    scores = launch_containers(
-        autograder,
-        submission_paths,
-        num_containers = containers,
-        base_image = image,
-        tag = name,
-        no_kill = no_kill,
-        pdf_dir = pdf_dir,
-        timeout = timeout,
-        network = not no_network,
-        config = AutograderConfig({
-            "zips": ext == "zip",
-            "pdf": pdfs,
-            "debug": debug,
-        }),
-    )
-
-    LOGGER.info("Combining grades and saving")
+        LOGGER.info("Combining grades and saving")
+    finally:
+        loggers.remove_queue_handlers()
 
     # Merge scores to dataframe
     output_df = merge_scores_to_df(scores)

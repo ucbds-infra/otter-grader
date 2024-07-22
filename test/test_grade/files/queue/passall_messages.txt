@@ -1,0 +1,7 @@
+Launching Docker containers
+Building image using ubuntu:22.04 as base image
+Notebooks to grade: 1
+Grading passesAll.ipynb
+passesAll.ipynb complete: 1/1
+Notebooks graded: 1
+Combining grades and saving

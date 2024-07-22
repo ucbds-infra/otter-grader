@@ -3,19 +3,18 @@
 import importlib.resources
 import json
 import os
-import pandas as pd
 import pathlib
 import shutil
 import tempfile
 import zipfile
 
-from concurrent.futures import ThreadPoolExecutor, wait
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
 from . import __name__ as pkg_name
-from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df, TimeoutException
+from .utils import OTTER_DOCKER_IMAGE_NAME, TimeoutException
 
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..test_files import GradingResults
@@ -115,13 +114,15 @@ def launch_containers(
             image=image,
             **kwargs,
         )]
+    LOGGER.info(f"Notebooks to grade: {len(futures)}")
+    scores = []
+    for i, future in enumerate(as_completed(futures)):
+        result = future.result()
+        scores.append(result)
+        LOGGER.info(f"{result.file} complete: {i+1}/{len(futures)}")
 
-    # stop execution while containers are running
-    finished_futures, not_finished = wait(futures)
-    if not_finished:
-        raise RuntimeError(f"{len(not_finished)} futures failed to complete")
-
-    return [f.result() for f in finished_futures]
+    LOGGER.info(f"Notebooks graded: {len(futures)}")
+    return scores
 
 
 def grade_submission(
@@ -196,7 +197,8 @@ def grade_submission(
             timer.start()
 
         container_id = container.id[:12]
-        LOGGER.info(f"Grading {submission_path} in container {container_id}...")
+        LOGGER.debug(f"Grading {submission_path} in container {container_id}...")
+        LOGGER.info(f"Grading {nb_basename}")
 
         exit = docker.container.wait(container)
 
@@ -236,9 +238,12 @@ def grade_submission(
             local_pdf_path = pdf_dir / f"{nb_name}.pdf"
             shutil.copy(pdf_path, local_pdf_path)
 
+    except TimeoutException as te:
+        scores = GradingResults.without_results(te)
+        LOGGER.info(f"Notebook Grading Timeout Error: {nb_basename}")
     except Exception as e:
         scores = GradingResults.without_results(e)
-
+        LOGGER.info(f"Notebook Grading Error: {nb_basename}")
     finally:
         scores.file = nb_basename
         os.remove(results_path)

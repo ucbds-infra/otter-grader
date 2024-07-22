@@ -147,6 +147,7 @@ def grade_cli(*args, **kwargs):
     Grade submissions in PATHS locally using Docker containers. PATHS can be individual file paths
     or directories containing submissions ending with extension EXT.
     """
+    kwargs["result_queue"] = None
     g = grade(*args, **kwargs)
     if g is not None:
         click.echo(g)

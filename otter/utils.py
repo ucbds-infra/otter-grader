@@ -15,6 +15,7 @@ import yaml
 
 from contextlib import contextmanager
 from IPython import get_ipython
+from multiprocessing import Queue
 
 
 NBFORMAT_VERSION = 4
@@ -249,6 +250,7 @@ class loggers:
     _log_level = logging.WARNING
     _formatter = logging.Formatter("[%(levelname)s %(name)s.%(funcName)s] %(message)s")
     _socket_handler = None
+    _queue_handler = None
 
     @staticmethod
     def __new__(cls, *args, **kwargs):
@@ -280,8 +282,32 @@ class loggers:
         logger.addHandler(handler)
         if cls._socket_handler:
             logger.addHandler(cls._socket_handler)
+        if cls._queue_handler:
+            logger.addHandler(cls._queue_handler)
+            logger.setLevel(logging.INFO)
         cls._instances[name] = logger
         return logger
+
+    @classmethod
+    def add_queue_handler(cls, result_queue):
+        """
+        adds queue handler to all instances of the logger
+        """
+        cls._queue_handler = QueueLoggingHandler(result_queue)
+        for name in cls._instances:
+            logger = logging.getLogger(name)
+            logger.addHandler(cls._queue_handler)
+            logger.setLevel(logging.INFO)
+
+    @classmethod
+    def remove_queue_handlers(cls):
+        """
+        removes queue handler from all instances of the logger
+        """
+        for name in cls._instances:
+            logger = logging.getLogger(name)
+            logger.removeHandler(cls._queue_handler)
+        cls._queue_handler = None
 
     @classmethod
     def get_level(cls):
@@ -352,6 +378,25 @@ class Loggable:
         """
         cls._load_logger()
         return cls._logger_instance
+
+
+class QueueLoggingHandler(logging.Handler):
+    """The logging handler that writes INFO messages to the log_queue.
+
+    Args:
+        log_queue (multiprocessing.Queue): the queue this handler writes to
+    """
+
+    def __init__(self, log_queue: Queue):
+        super().__init__()
+        self.log_queue = log_queue
+
+    def emit(self, record):
+        try:
+            log_entry = self.format(record)
+            self.log_queue.put(log_entry)
+        except Exception:
+            self.handleError(record)
 
 
 class _CorrectIndentationDumper(yaml.Dumper):
