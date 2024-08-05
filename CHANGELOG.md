@@ -8,6 +8,7 @@
 * Updated Otter Grade CSV output switched from labeling submissions by file path to notebook name and is now sorted by notebook name per [#738](https://github.com/ucbds-infra/otter-grader/issues/738)
 * Added backwards compatibility to Otter Grade for autograder configuration zip files generated in previous major versions of Otter-Grader
 * Add `gcc_linux-64` and `gxx_linux-64` to R grading image dependencies per [#819](https://github.com/ucbds-infra/otter-grader/issues/819)
+* Fixed a bug where the loop variable used in Otter's generated grading code overwrote variables defined by the notebook per [#817](https://github.com/ucbds-infra/otter-grader/issues/817)
 
 **v5.5.0:**
 
