@@ -160,8 +160,15 @@ defaults = run.__kwdefaults__
 @click.option("-o", "--output-dir", default=defaults["output_dir"], type=click.Path(exists=True, file_okay=False), help="Directory to which to write output")
 @click.option("--no-logo", is_flag=True, help="Suppress Otter logo in stdout")
 @click.option("--debug", is_flag=True, help="Do not ignore errors when running submission")
+@click.option("-p", "--pickle-results", is_flag=True, help="Output GradingResults pickle file")
 def run_cli(*args, **kwargs):
     """
-    Run non-containerized Otter on a single submission.
+    Run non-containerized Otter on a single submission, writing results to a JSON file.
     """
-    return run(*args, **kwargs)
+    write_pkl = kwargs.pop("results", False)
+    results = run(*args, **kwargs)
+    if write_pkl:
+        import dill
+        with open("results.pkl", "wb+") as f:
+            dill.dump(results, f)
+    return results
