@@ -1,12 +1,13 @@
 # Changelog
 
-**v5.6.0(unreleased):**
+**v5.6.0 (unreleased):**
 
 * Updated Otter Grade CSV to include the number of points per question in the first row
 * Updated Otter Grade CSV to include total points column
 * Updated Otter Grade CSV to round percentages to four decimal places
 * Updated Otter Grade CSV output switched from labeling submissions by file path to notebook name and is now sorted by notebook name per [#738](https://github.com/ucbds-infra/otter-grader/issues/738)
 * Added backwards compatibility to Otter Grade for autograder configuration zip files generated in previous major versions of Otter-Grader
+* Add `gcc_linux-64` and `gxx_linux-64` to R grading image dependencies per [#819](https://github.com/ucbds-infra/otter-grader/issues/819)
 
 **v5.5.0:**
 
