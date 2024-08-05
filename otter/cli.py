@@ -165,7 +165,7 @@ def run_cli(*args, **kwargs):
     """
     Run non-containerized Otter on a single submission, writing results to a JSON file.
     """
-    write_pkl = kwargs.pop("results", False)
+    write_pkl = kwargs.pop("pickle_results", False)
     results = run(*args, **kwargs)
     if write_pkl:
         import dill
