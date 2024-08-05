@@ -32,8 +32,8 @@ loggers.send_logs("{logging_server_host}", {logging_server_port})
 
 EXPORT_CELL_SOURCE = """\
 from otter.execute import Checker
-for t in {tests_glob_json}:
-    Checker.check_if_not_already_checked(t)
+for {tests_loop_var} in {tests_glob_json}:
+    Checker.check_if_not_already_checked({tests_loop_var})
 
 from otter.test_files import GradingResults
 results = GradingResults(Checker.get_results())
@@ -95,6 +95,7 @@ class GradingPreprocessor(Preprocessor):
             logging_server_port = self.logging_server_port,
         )))
         nb.cells.append(nbf.v4.new_code_cell(EXPORT_CELL_SOURCE.format(
+            tests_loop_var = f"t_{id_generator()}",
             tests_glob_json = json.dumps(self.tests_glob),
             # ensure that "\" is properly-escaped for Windows paths since this is going to be
             # rendered into a string literal
