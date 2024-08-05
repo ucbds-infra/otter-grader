@@ -9,6 +9,7 @@
 * Added backwards compatibility to Otter Grade for autograder configuration zip files generated in previous major versions of Otter-Grader
 * Add `gcc_linux-64` and `gxx_linux-64` to R grading image dependencies per [#819](https://github.com/ucbds-infra/otter-grader/issues/819)
 * Fixed a bug where the loop variable used in Otter's generated grading code overwrote variables defined by the notebook per [#817](https://github.com/ucbds-infra/otter-grader/issues/817)
+* Add `--pickle-results` option to Otter Run to output the results pickle file per [#818](https://github.com/ucbds-infra/otter-grader/issues/818)
 
 **v5.5.0:**
 

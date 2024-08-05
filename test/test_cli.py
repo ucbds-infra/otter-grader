@@ -1,5 +1,6 @@
 """Tests for ``otter.cli``"""
 
+import dill
 import logging
 import os
 import pytest
@@ -12,6 +13,7 @@ from otter.cli import cli
 from otter.generate import main as generate
 from otter.grade import _ALLOWED_EXTENSIONS, main as grade
 from otter.run import main as run
+from otter.test_files import GradingResults
 
 
 def assert_cli_result(result, expect_error):
@@ -531,6 +533,8 @@ def test_run(mocked_run, run_cli):
     open("foo.ipynb", "w+").close()
     open("autograder.zip", "wb+").close()
 
+    mocked_run.return_value = GradingResults([])
+
     std_kwargs = dict(
         submission="foo.ipynb",
         **run.__kwdefaults__,
@@ -548,6 +552,14 @@ def test_run(mocked_run, run_cli):
     result = run_cli([*cmd_start, "--autograder", "foo.zip"])
     assert_cli_result(result, expect_error=False)
     mocked_run.assert_called_with(**{**std_kwargs, "autograder": "foo.zip"})
+
+    result = run_cli([*cmd_start, "--pickle-results"])
+    assert_cli_result(result, expect_error=False)
+    mocked_run.assert_called_with(**std_kwargs)
+    assert os.path.isfile("results.pkl")
+    with open("results.pkl", "rb") as f:
+        gr = dill.load(f)
+    assert isinstance(gr, GradingResults)
 
     os.mkdir("out")
     result = run_cli([*cmd_start, "-o", "out"])
