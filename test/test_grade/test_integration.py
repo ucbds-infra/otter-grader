@@ -75,21 +75,48 @@ def expected_points():
 
 @pytest.mark.slow
 @pytest.mark.docker
-def test_timeout():
+def test_timeout_some_notebooks_finish():
     """
-    Check that the notebook ``1min.ipynb`` is killed due to exceeding the defined timeout.
+    Check notebook ``1min.ipynb`` is killed due to exceeding the defined timeout while notebook ``10s.ipynb`` is graded;
+    The final_grade.csv records everything correctly
     """
-    with pytest.raises(
-        Exception, match=r"Executing '[\w./-]*test/test_grade/files/timeout/1min\.ipynb' in docker " \
-            "container failed! Exit code: 137"):
-        grade(
-            name = ASSIGNMENT_NAME,
-            paths = [FILE_MANAGER.get_path("timeout/")],
-            output_dir = "test/",
-            autograder = AG_ZIP_PATH,
-            containers = 5,
-            timeout = 59,
-        )
+    grade_timeout = 30
+    grade(
+        name = ASSIGNMENT_NAME,
+        paths = [FILE_MANAGER.get_path("timeout/")],
+        output_dir = "test/",
+        autograder = AG_ZIP_PATH,
+        containers = 5,
+        timeout = grade_timeout,
+    )
+    df_test = pd.read_csv("test/final_grades.csv")
+    assert df_test.iloc[0]["grading_status"] == "--"
+    assert df_test.iloc[1]["grading_status"] == "Completed"
+    pattern = rf"Executing '[\w.\/-]*test\/test_grade\/files\/timeout\/1min\.ipynb' in docker container timed out in {grade_timeout} seconds"
+    assert re.match(pattern, df_test.iloc[2]["grading_status"]) is not None
+
+
+@pytest.mark.slow
+@pytest.mark.docker
+def test_timeout_no_notebooks_finish():
+    """
+    Check notebook ``1min.ipynb`` and ``10s.ipynb are killed due to exceeding the defined timeout;
+    The final_grade.csv records everything correctly
+    """
+    grade_timeout = 5
+    grade(
+        name = ASSIGNMENT_NAME,
+        paths = [FILE_MANAGER.get_path("timeout/")],
+        output_dir = "test/",
+        autograder = AG_ZIP_PATH,
+        containers = 5,
+        timeout = grade_timeout,
+    )
+    df_test = pd.read_csv("test/final_grades.csv")
+    pattern1min = rf"Executing '[\w.\/-]*test\/test_grade\/files\/timeout\/1min\.ipynb' in docker container timed out in {grade_timeout} seconds"
+    pattern10s = rf"Executing '[\w.\/-]*test\/test_grade\/files\/timeout\/10s\.ipynb' in docker container timed out in {grade_timeout} seconds"
+    assert re.match(pattern10s, df_test.iloc[0]["grading_status"]) is not None
+    assert re.match(pattern1min, df_test.iloc[1]["grading_status"]) is not None
 
 
 @pytest.mark.slow
@@ -186,9 +213,10 @@ def test_single_notebook_grade(mocked_launch_grade):
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": float('nan'),
+        "percent_correct": 1,
         "total_points_earned": 15.0,
         "file": POINTS_POSSIBLE_LABEL,
+        "grading_status": "--"
     },{
         "q1": 2.0,
         "q2": 2.0,
@@ -200,6 +228,7 @@ def test_single_notebook_grade(mocked_launch_grade):
         "percent_correct": 0.933333,
         "total_points_earned": 14.0,
         "file": "passesAll.ipynb",
+        "grading_status": "Completed"
     }])
 
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
@@ -243,9 +272,10 @@ def test_config_overrides(mocked_launch_grade):
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": float('nan'),
+        "percent_correct": 1,
         "total_points_earned": 15.0,
         "file": POINTS_POSSIBLE_LABEL,
+        "grading_status": "--"
     },{
         "q1": 2.0,
         "q2": 2.0,
@@ -257,6 +287,7 @@ def test_config_overrides(mocked_launch_grade):
         "percent_correct": 1.0,
         "total_points_earned": 15.0,
         "file": "passesAll.ipynb",
+        "grading_status": "Completed"
     }])]
 
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
@@ -309,9 +340,10 @@ def test_config_overrides_integration():
         "q6": 5.0,
         "q2b": 2.0,
         "q7": 1.0,
-        "percent_correct": float('nan'),
+        "percent_correct": 1,
         "total_points_earned": 13.0,
         "file": POINTS_POSSIBLE_LABEL,
+        "grading_status": "--"
     },{
         "q1": 0.0,
         "q2": 2.0,
@@ -323,6 +355,7 @@ def test_config_overrides_integration():
         "percent_correct": 1.0,
         "total_points_earned": 13.0,
         "file": os.path.splitext(os.path.basename(ZIP_SUBM_PATH))[0],
+        "grading_status": "Completed"
     }])
 
     # Sort the columns by label so the dataframes can be compared with ==.
