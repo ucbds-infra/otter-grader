@@ -7,7 +7,6 @@ import pkg_resources
 import shutil
 import tempfile
 import zipfile
-from ..test_files import GradingResults
 
 from concurrent.futures import ThreadPoolExecutor, wait
 from python_on_whales import docker
@@ -17,6 +16,7 @@ from typing import List, Optional
 from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df, TimeoutException
 
 from ..run.run_autograder.autograder_config import AutograderConfig
+from ..test_files import GradingResults
 from ..utils import loggers, OTTER_CONFIG_FILENAME
 
 
