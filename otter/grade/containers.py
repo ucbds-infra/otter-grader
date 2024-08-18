@@ -7,7 +7,7 @@ import pkg_resources
 import shutil
 import tempfile
 import zipfile
-from otter.test_files import GradingResults
+from ..test_files import GradingResults
 
 from concurrent.futures import ThreadPoolExecutor, wait
 from python_on_whales import docker
