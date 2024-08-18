@@ -13,9 +13,10 @@ from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
-from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df
+from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df, TimeoutException
 
 from ..run.run_autograder.autograder_config import AutograderConfig
+from ..test_files import GradingResults
 from ..utils import loggers, OTTER_CONFIG_FILENAME
 
 
@@ -131,6 +132,10 @@ def grade_submission(
     """
     Grade a submission in a Docker container.
 
+    If a sumbission times out, based on the timeout parameter or the container
+    exits in an error state a ``GradingResults`` object is created by using the
+    ``GradingResults.without_results`` function and returned.
+
     Args:
         submission_path (``str``): path to the submission to be graded
         image (``str``): a Docker image tag to be used for grading environment
@@ -141,7 +146,7 @@ def grade_submission(
         network (``bool``): whether to enable networking in the containers
 
     Returns:
-        ``pandas.core.frame.DataFrame``: A dataframe of file to grades information
+        ``otter.test_files.GradingResults``: A ``GradingResults`` object containing the grading results
     """
     import dill
 
@@ -175,10 +180,13 @@ def grade_submission(
 
         docker.container.start(container)
 
+        did_time_out = False
         if timeout:
             import threading
 
             def kill_container():
+                nonlocal did_time_out
+                did_time_out = True
                 docker.container.kill(container)
 
             timer = threading.Timer(timeout, kill_container)
@@ -208,6 +216,10 @@ def grade_submission(
         if not no_kill:
             container.remove()
 
+        if did_time_out:
+            raise TimeoutException(
+                f"Executing '{submission_path}' in docker container timed out in {timeout} seconds")
+
         if exit != 0:
             raise Exception(
                 f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
@@ -215,15 +227,18 @@ def grade_submission(
         with open(results_path, "rb") as f:
             scores = dill.load(f)
 
-        scores.file = nb_name
-
         if pdf_dir:
             os.makedirs(pdf_dir, exist_ok=True)
 
             local_pdf_path = os.path.join(pdf_dir, f"{nb_name}.pdf")
             shutil.copy(pdf_path, local_pdf_path)
 
+    except TimeoutException as te:
+        scores = GradingResults.without_results(te)
+    except Exception as e:
+        scores = GradingResults.without_results(e)
     finally:
+        scores.file = nb_name
         os.remove(results_path)
         os.remove(temp_subm_path)
 
