@@ -14,3 +14,4 @@ astunparse
 nbconvert; sys_platform!='emscripten' and sys_platform!='wasi'
 ipywidgets
 ipylab
+setuptools
