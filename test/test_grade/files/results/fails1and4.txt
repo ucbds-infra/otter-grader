@@ -1,0 +1,86 @@
+q1 results:
+    q1 - 1 result:
+        ❌ Test case failed
+        Trying:
+            square(3)
+        Expecting:
+            9
+        **********************************************************************
+        Line 2, in q1 0
+        Failed example:
+            square(3)
+        Expected:
+            9
+        Got:
+            27
+
+    q1 - 2 result:
+        ❌ Test case failed
+        Trying:
+            square(2.5)
+        Expecting:
+            6.25
+        **********************************************************************
+        Line 2, in q1 1
+        Failed example:
+            square(2.5)
+        Expected:
+            6.25
+        Got:
+            15.625
+
+    q1 - 3 result:
+        ❌ Test case failed
+        Trying:
+            square(6)
+        Expecting:
+            36
+        **********************************************************************
+        Line 2, in q1 2
+        Failed example:
+            square(6)
+        Expected:
+            36
+        Got:
+            216
+
+    q1 - 4 result:
+        ❌ Test case failed
+        Trying:
+            square(1.5)
+        Expecting:
+            2.25
+        **********************************************************************
+        Line 2, in q1 3
+        Failed example:
+            square(1.5)
+        Expected:
+            2.25
+        Got:
+            3.375
+
+q2b results: All test cases passed!
+
+q2 results: All test cases passed!
+
+q3 results: All test cases passed!
+
+q4 results:
+    q4 - 1 result:
+        ❌ Test case failed
+        Trying:
+            np.isclose(x, 39.0625)
+        Expecting:
+            np.True_
+        **********************************************************************
+        Line 2, in q4 0
+        Failed example:
+            np.isclose(x, 39.0625)
+        Expected:
+            np.True_
+        Got:
+            np.False_
+
+q6 results: All test cases passed!
+
+q7 results: All test cases passed!

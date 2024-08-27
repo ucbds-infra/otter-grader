@@ -1,0 +1,130 @@
+q1 results: All test cases passed!
+
+q2b results:
+    q2b - 1 result:
+        ❌ Test case failed
+        Trying:
+            negate([])
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q2b 0
+        Failed example:
+            negate([])
+        Expected:
+            True
+        Got:
+            False
+
+    q2b - 2 result:
+        ❌ Test case failed
+        Trying:
+            negate({})
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q2b 1
+        Failed example:
+            negate({})
+        Expected:
+            True
+        Got:
+            False
+
+    q2b - 3 result:
+        ❌ Test case failed
+        Trying:
+            negate([1])
+        Expecting:
+            False
+        **********************************************************************
+        Line 2, in q2b 2
+        Failed example:
+            negate([1])
+        Expected:
+            False
+        Got:
+            True
+
+q2 results:
+    q2 - 1 result:
+        ❌ Test case failed
+        Trying:
+            negate(True)
+        Expecting:
+            False
+        **********************************************************************
+        Line 2, in q2 0
+        Failed example:
+            negate(True)
+        Expected:
+            False
+        Got:
+            True
+
+    q2 - 2 result:
+        ❌ Test case failed
+        Trying:
+            negate(False)
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q2 1
+        Failed example:
+            negate(False)
+        Expected:
+            True
+        Got:
+            False
+
+    q2 - 3 result:
+        ❌ Test case failed
+        Trying:
+            negate("")
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q2 2
+        Failed example:
+            negate("")
+        Expected:
+            True
+        Got:
+            False
+
+    q2 - 4 result:
+        ❌ Test case failed
+        Trying:
+            negate(1)
+        Expecting:
+            False
+        **********************************************************************
+        Line 2, in q2 3
+        Failed example:
+            negate(1)
+        Expected:
+            False
+        Got:
+            True
+
+q3 results: All test cases passed!
+
+q4 results:
+    q4 - 1 result:
+        ❌ Test case failed
+        Trying:
+            np.isclose(x, 39.0625)
+        Expecting:
+            np.True_
+        **********************************************************************
+        Line 2, in q4 0
+        Failed example:
+            np.isclose(x, 39.0625)
+        Expected:
+            np.True_
+        Got:
+            np.False_
+
+q6 results: All test cases passed!
+
+q7 results: All test cases passed!

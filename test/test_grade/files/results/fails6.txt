@@ -1,0 +1,64 @@
+q1 results: All test cases passed!
+
+q2b results: All test cases passed!
+
+q2 results: All test cases passed!
+
+q3 results: All test cases passed!
+
+q4 results: All test cases passed!
+
+q6 results:
+    q6 - 1 result:
+        ❌ Test case failed
+        Trying:
+            fib = fiberator()
+        Expecting nothing
+        ok
+        Trying:
+            next(fib) == 0 and next(fib) == 1
+        Expecting:
+            True
+        **********************************************************************
+        Line 3, in q6 0
+        Failed example:
+            next(fib) == 0 and next(fib) == 1
+        Expected:
+            True
+        Got:
+            False
+
+    q6 - 2 result:
+        ❌ Test case failed
+        Trying:
+            fib = fiberator()
+        Expecting nothing
+        ok
+        Trying:
+            for _ in range(10):
+                print(next(fib))
+        Expecting:
+            0
+            1
+            1
+            2
+            3
+            5
+            8
+            13
+            21
+            34
+        **********************************************************************
+        Line 3, in q6 1
+        Failed example:
+            for _ in range(10):
+                print(next(fib))
+        Exception raised:
+            Traceback (most recent call last):
+              File "/root/mambaforge/envs/otter-env/lib/python3.9/doctest.py", line 1334, in __run
+                exec(compile(example.source, filename, "single",
+              File "<doctest q6 1[1]>", line 2, in <module>
+                print(next(fib))
+            StopIteration
+
+q7 results: All test cases passed!
