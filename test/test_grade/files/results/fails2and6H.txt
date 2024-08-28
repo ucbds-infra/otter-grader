@@ -1,0 +1,166 @@
+q1 results: All test cases passed!
+
+q2b results:
+    q2b - 1 result:
+        ❌ Test case failed
+        Trying:
+            negate([])
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q2b 0
+        Failed example:
+            negate([])
+        Expected:
+            True
+        Got:
+            []
+
+    q2b - 2 result:
+        ❌ Test case failed
+        Trying:
+            negate({})
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q2b 1
+        Failed example:
+            negate({})
+        Expected:
+            True
+        Got:
+            {}
+
+    q2b - 3 result:
+        ❌ Test case failed
+        Trying:
+            negate([1])
+        Expecting:
+            False
+        **********************************************************************
+        Line 2, in q2b 2
+        Failed example:
+            negate([1])
+        Expected:
+            False
+        Got:
+            [1]
+
+q2 results:
+    q2 - 1 result:
+        ❌ Test case failed
+        Trying:
+            negate(True)
+        Expecting:
+            False
+        **********************************************************************
+        Line 2, in q2 0
+        Failed example:
+            negate(True)
+        Expected:
+            False
+        Got:
+            True
+
+    q2 - 2 result:
+        ❌ Test case failed
+        Trying:
+            negate(False)
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q2 1
+        Failed example:
+            negate(False)
+        Expected:
+            True
+        Got:
+            False
+
+    q2 - 3 result:
+        ❌ Test case failed
+        Trying:
+            negate("")
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q2 2
+        Failed example:
+            negate("")
+        Expected:
+            True
+        Got:
+            ''
+
+    q2 - 4 result:
+        ❌ Test case failed
+        Trying:
+            negate(1)
+        Expecting:
+            False
+        **********************************************************************
+        Line 2, in q2 3
+        Failed example:
+            negate(1)
+        Expected:
+            False
+        Got:
+            1
+
+q3 results: All test cases passed!
+
+q4 results: All test cases passed!
+
+q6 results:
+    q6 - 1 result:
+        ✅ Test case passed
+
+    q6 - 2 result:
+        ❌ Test case failed
+        Trying:
+            fib = fiberator()
+        Expecting nothing
+        ok
+        Trying:
+            for _ in range(10):
+                print(next(fib))
+        Expecting:
+            0
+            1
+            1
+            2
+            3
+            5
+            8
+            13
+            21
+            34
+        **********************************************************************
+        Line 3, in q6 1
+        Failed example:
+            for _ in range(10):
+                print(next(fib))
+        Expected:
+            0
+            1
+            1
+            2
+            3
+            5
+            8
+            13
+            21
+            34
+        Got:
+            0
+            1
+            1
+            1
+            2
+            3
+            5
+            8
+            13
+            21
+
+q7 results: All test cases passed!

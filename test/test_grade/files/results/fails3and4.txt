@@ -1,0 +1,62 @@
+q1 results: All test cases passed!
+
+q2b results: All test cases passed!
+
+q2 results: All test cases passed!
+
+q3 results:
+    q3 - 1 result:
+        ❌ Test case failed
+        Trying:
+            x
+        Expecting:
+            True
+        **********************************************************************
+        Line 2, in q3 0
+        Failed example:
+            x
+        Expected:
+            True
+        Got:
+            False
+
+    q3 - 2 result:
+        ❌ Test case failed
+        Trying:
+            if x:
+                print("yep")
+            else:
+                print("nope")
+        Expecting:
+            yep
+        **********************************************************************
+        Line 2, in q3 1
+        Failed example:
+            if x:
+                print("yep")
+            else:
+                print("nope")
+        Expected:
+            yep
+        Got:
+            nope
+
+q4 results:
+    q4 - 1 result:
+        ❌ Test case failed
+        Trying:
+            np.isclose(x, 39.0625)
+        Expecting:
+            np.True_
+        **********************************************************************
+        Line 2, in q4 0
+        Failed example:
+            np.isclose(x, 39.0625)
+        Expected:
+            np.True_
+        Got:
+            np.False_
+
+q6 results: All test cases passed!
+
+q7 results: All test cases passed!

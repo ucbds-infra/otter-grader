@@ -1,0 +1,63 @@
+q1 results: All test cases passed!
+
+q2b results: All test cases passed!
+
+q2 results: All test cases passed!
+
+q3 results: All test cases passed!
+
+q4 results: All test cases passed!
+
+q6 results:
+    q6 - 1 result:
+        ✅ Test case passed
+
+    q6 - 2 result:
+        ❌ Test case failed
+        Trying:
+            fib = fiberator()
+        Expecting nothing
+        ok
+        Trying:
+            for _ in range(10):
+                print(next(fib))
+        Expecting:
+            0
+            1
+            1
+            2
+            3
+            5
+            8
+            13
+            21
+            34
+        **********************************************************************
+        Line 3, in q6 1
+        Failed example:
+            for _ in range(10):
+                print(next(fib))
+        Expected:
+            0
+            1
+            1
+            2
+            3
+            5
+            8
+            13
+            21
+            34
+        Got:
+            0
+            1
+            1
+            1
+            2
+            3
+            5
+            8
+            13
+            21
+
+q7 results: All test cases passed!

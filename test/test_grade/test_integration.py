@@ -37,6 +37,8 @@ def cleanup_output(cleanup_enabled):
             shutil.rmtree("test/submission_pdfs")
         if os.path.exists(ZIP_SUBM_PATH):
             os.remove(ZIP_SUBM_PATH)
+        if os.path.exists("test/grading-summaries"):
+            shutil.rmtree("test/grading-summaries")
 
 
 @pytest.fixture(autouse=True, scope="module")
@@ -362,3 +364,40 @@ def test_config_overrides_integration():
     got = got.reindex(sorted(got.columns), axis=1)
     want = want.reindex(sorted(want.columns), axis=1)
     assert got.equals(want)
+
+
+@mock.patch("otter.grade.launch_containers")
+def test_grade_summaries(mocked_launch_grade):
+    """
+    Checks that are grading summaries are written to the disck
+    """
+    mock_dfs = []
+    for filename in os.listdir(FILE_MANAGER.get_path("results")):
+        filename = os.path.splitext(filename)[0]
+        test_file_path = os.path.join("test/test_grade/files/results", f"{filename}.txt")
+        with open(test_file_path, 'r') as test_summary_file:
+            mock_dfs.append(pd.DataFrame([{
+                "percent_correct": 1.0,
+                "total_points_earned": 15.0,
+                "file": f"{filename}",
+                "summary": test_summary_file.read(),
+                "grading_status": "Completed"
+            }]))
+    mocked_launch_grade.return_value = mock_dfs
+
+    notebook_path = FILE_MANAGER.get_path("notebooks")
+    grade(
+        name = ASSIGNMENT_NAME,
+        paths = [notebook_path],
+        output_dir = "test/",
+        autograder = AG_ZIP_PATH,
+        summaries = True
+    )
+    for filename in os.listdir(notebook_path):
+        filename = os.path.splitext(filename)[0]
+        file_path = os.path.join("test/grading-summaries", f"{filename}.txt")
+        test_file_path = os.path.join("test/test_grade/files/results", f"{filename}.txt")
+        if os.path.isfile(file_path):
+            assert os.path.exists(file_path)
+            with open(file_path, 'r') as summary_file, open(test_file_path, 'r') as test_summary_file:
+                assert summary_file.read() == test_summary_file.read()

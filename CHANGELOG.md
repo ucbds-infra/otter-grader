@@ -1,7 +1,7 @@
 # Changelog
 
 **v5.6.0 (unreleased):**
-
+* Updated Otter Grade to write grading summary for each notebook per [#814](https://github.com/ucbds-infra/otter-grader/issues/814)
 * Updated Otter Grade CSV to indicate which notebooks timeout per [#813](https://github.com/ucbds-infra/otter-grader/issues/813)
 * Updated Otter Grade CSV to include the number of points per question in the first row
 * Updated Otter Grade CSV to include total points column
