@@ -90,6 +90,20 @@ if __name__ == "__main__":
     with open("otter/version.py", "w") as f:
         f.write(contents)
 
+    # fix pyproject.toml
+    with open("pyproject.toml") as f:
+        contents = f.read()
+
+    if args.new_version is not None:
+        contents = re.sub(
+            r"version = \"\d+\.\d+\.\d+(?:\.\w+)?\"",
+            f"version = \"{new_version_number}\"",
+            contents
+        )
+
+    with open("pyproject.toml", "w") as f:
+        f.write(contents)
+
     # fix CITATION.cff
     with open("CITATION.cff") as f:
         contents = f.read()
