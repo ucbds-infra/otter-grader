@@ -56,6 +56,12 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
         if: ${{ steps.check-branch.outputs.run == 'true' }}
 
+      - uses: liskin/gh-pipx@v1
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        with:
+          packages: >-
+            poetry
+
       - uses: mamba-org/setup-micromamba@v1
         if: ${{ steps.check-branch.outputs.run == 'true' }}
         with:
@@ -63,7 +69,13 @@ jobs:
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('requirements*.txt') }}
+          cache-environment-key: requirements-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install dependencies
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        run: |
+          micromamba activate otter-grader
+          poetry install --with test --all-extras
 
       - name: Install ottr
         if: ${{ steps.check-branch.outputs.run == 'true' }}
