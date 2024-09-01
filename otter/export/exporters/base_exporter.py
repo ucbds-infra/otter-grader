@@ -1,16 +1,17 @@
 """ABC for Otter Export exporters"""
 
+import importlib.resources
 import nbformat
-import pkg_resources
 
 from abc import ABC, abstractmethod
 
+from . import __name__ as pkg_name
 from .utils import has_begin, has_end, sub_end_for_new_page
 
 from ...utils import NBFORMAT_VERSION
 
 
-TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
+TEMPLATE_DIR = importlib.resources.files(pkg_name) / "templates"
 
 
 class ExportFailedException(Exception):

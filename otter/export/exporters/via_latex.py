@@ -36,7 +36,7 @@ class PDFViaLatexExporter(BaseExporter):
 
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
-        nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+        nbconvert.TemplateExporter.extra_template_basedirs = [str(TEMPLATE_DIR)]
         orig_template_name = nbconvert.TemplateExporter.template_name
         nbconvert.TemplateExporter.template_name = options["template"]
 

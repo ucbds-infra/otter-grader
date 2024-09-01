@@ -9,12 +9,12 @@ import nbformat
 import os
 import pytest
 
+from contextlib import nullcontext
 from glob import glob
 from unittest import mock
 
 from otter.export import main as export
 from otter.export.exporters.base_exporter import BaseExporter
-from otter.utils import nullcontext
 
 from ..utils import TestFileManager
 

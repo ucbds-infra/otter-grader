@@ -2,11 +2,15 @@
 
 **v6.0.0 (unreleased):**
 
+* Switched to [poetry](https://python-poetry.org/) for packaging
 * Removed compatibility patches for nbconvert < 6 per [#777](https://github.com/ucbds-infra/otter-grader/issues/777)
 * Updated Otter Export to throw an error if nbconvert<6.0.0 is found
 * Converted Otter Export's PDF via HTML exporter to use nbconvert's WebPDF exporter per [#781](https://github.com/ucbds-infra/otter-grader/issues/781)
 * Removed pdfkit from dependencies
 * Added ability to export PDFs via HTML in grading containers per [#782](https://github.com/ucbds-infra/otter-grader/issues/782)
+* Set default Python version for grading images to 3.12
+* Remove support for Python versions < 3.9 per [#668](https://github.com/ucbds-infra/otter-grader/issues/668)
+* Removed `setuptools` and `pkg_resources` dependencies
 
 **v5.6.0:**
 
