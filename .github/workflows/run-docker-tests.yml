@@ -28,8 +28,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-tags: true
+
+      - name: Fetch origin
+        run: |
+          git fetch origin
 
       - name: Check that branch exists
         id: check-branch
