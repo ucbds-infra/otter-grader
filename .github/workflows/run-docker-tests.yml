@@ -1,0 +1,77 @@
+# Workflow for running the test suite including long-running tests using Docker
+
+name: Run Docker tests
+
+on:
+  schedule:
+    # Run every Friday at 12:00 AM UTC
+    - cron: "0 0 * * 5"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Test suite
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        branch: [master, beta]
+
+    env:
+      TAR: /bin/tar
+      DOCKER_BUILDKIT: 1
+      DOCKER_CLI_EXPERIMENTAL: enabled
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Check that branch exists
+        id: check-branch
+        run: |
+          if git show-ref --quiet refs/heads/${{ matrix.branch }}; then
+            echo "run=true" > $GITHUB_OUTPUT
+          else
+            echo "run=false" > $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/checkout@v4
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        with:
+          ref: ${{ matrix.branch }}
+
+      - uses: docker/setup-buildx-action@v2
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        with:
+          install: true
+
+      - uses: r-lib/actions/setup-tinytex@v2
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+
+      - uses: r-lib/actions/setup-pandoc@v2
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+
+      - uses: mamba-org/setup-micromamba@v1
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        with:
+          environment-file: environment.yml
+          init-shell: >-
+            bash
+          cache-environment: true
+          cache-environment-key: requirements-${{ hashFiles('requirements*.txt') }}
+
+      - name: Install ottr
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        run: |
+          micromamba run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.r-project.org/")'
+
+      - name: Run tests
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        run: |
+          micromamba activate otter-grader
+          make testcov PYTESTOPTS="-vv" && coverage lcov -i
+
+      - name: Coveralls
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        uses: coverallsapp/github-action@v2
