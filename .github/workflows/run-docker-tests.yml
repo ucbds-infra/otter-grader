@@ -28,13 +28,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-tags: true
+
+      - name: Fetch origin
+        run: |
+          git fetch origin
 
       - name: Check that branch exists
         id: check-branch
         run: |
-          if git show-ref --quiet refs/heads/${{ matrix.branch }}; then
+          if git show-ref --quiet refs/remotes/origin/${{ matrix.branch }}; then
             echo "run=true" > $GITHUB_OUTPUT
           else
             echo "run=false" > $GITHUB_OUTPUT
