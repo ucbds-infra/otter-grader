@@ -27,7 +27,9 @@ jobs:
         shell: bash -l {0}
 
     steps:
-      - name: Check that branch exists
+     - uses: actions/checkout@v4
+
+     - name: Check that branch exists
         id: check-branch
         run: |
           if git show-ref --quiet refs/heads/${{ matrix.branch }}; then
