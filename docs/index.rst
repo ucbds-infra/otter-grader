@@ -68,17 +68,22 @@ each with a command-line interface:
 Installation
 ------------
 
-Otter is a Python package that is compatible with Python 3.6+. The PDF export internals require 
+Otter is a Python package that is compatible with Python 3.8+. The PDF export internals require 
 either LaTeX and Pandoc or Playwright and Chromium to be installed. Docker is also required to grade
-assignments locally with containerization. Otter's Python package can be installed using pip. To
-install the current stable version, install with
+assignments locally with containerization. Otter's Python package can be installed using pipx_ or pip.
+
+.. _pipx: https://pipx.pypa.io/
 
 .. code-block:: console
 
+    pipx install otter-grader
+
+    # or
     pip install otter-grader
 
 Installing the Python package will install the ``otter`` binary so that Otter can be called from the 
-command line. You can also call Otter as a Python module with ``python3 -m otter``.
+command line. If you installed with pip, you can also call Otter as a Python module with
+``python3 -m otter``.
 
 If you are going to be autograding R, you must also install the R package ``ottr``:
 

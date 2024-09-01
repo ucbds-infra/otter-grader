@@ -35,13 +35,23 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
+      - uses: liskin/gh-pipx@v1
+        with:
+          packages: >-
+            poetry
+
       - uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: environment.yml
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('requirements*.txt') }}
+          cache-environment-key: requirements-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install dependencies
+        run: |
+          micromamba activate otter-grader
+          poetry install --with test --all-extras
 
       - name: Install ottr
         run: |

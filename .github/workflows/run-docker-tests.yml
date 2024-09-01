@@ -27,10 +27,16 @@ jobs:
         shell: bash -l {0}
 
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch origin
+        run: |
+          git fetch origin
+
       - name: Check that branch exists
         id: check-branch
         run: |
-          if git show-ref --quiet refs/heads/${{ matrix.branch }}; then
+          if git show-ref --quiet refs/remotes/origin/${{ matrix.branch }}; then
             echo "run=true" > $GITHUB_OUTPUT
           else
             echo "run=false" > $GITHUB_OUTPUT
@@ -52,6 +58,12 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
         if: ${{ steps.check-branch.outputs.run == 'true' }}
 
+      - uses: liskin/gh-pipx@v1
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        with:
+          packages: >-
+            poetry
+
       - uses: mamba-org/setup-micromamba@v1
         if: ${{ steps.check-branch.outputs.run == 'true' }}
         with:
@@ -59,7 +71,13 @@ jobs:
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('requirements*.txt') }}
+          cache-environment-key: requirements-${{ hashFiles('pyproject.toml') }}
+
+      - name: Install dependencies
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        run: |
+          micromamba activate otter-grader
+          poetry install --with test --all-extras
 
       - name: Install ottr
         if: ${{ steps.check-branch.outputs.run == 'true' }}

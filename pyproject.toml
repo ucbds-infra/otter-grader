@@ -1,0 +1,87 @@
+[tool.poetry]
+name = "otter-grader"
+version = "5.6.0"
+description = "A Python and R autograding solution"
+authors = ["Christopher Pyles <cpyles@berkeley.edu>"]
+license = "BSD-3-Clause"
+readme = "README.md"
+homepage = "https://otter-grader.readthedocs.io/"
+repository = "https://github.com/ucbds-infra/otter-grader"
+documentation = "https://otter-grader.readthedocs.io/"
+classifiers = [
+		"Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+packages = [
+  { include = "otter" },
+]
+include = [
+  { path = "otter/export/exporters/templates/**/*" },
+  { path = "otter/generate/templates/**/*" },
+  { path = "otter/grade/Dockerfile" },
+]
+
+[tool.poetry.scripts]
+otter = "otter.cli:cli"
+gmail_oauth2 = "otter.plugins.builtin.gmail_notifications.bin.gmail_oauth2:main"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+astunparse = "^1.6.3"
+click = "^8.1.7"
+dill = "^0.3.8"
+fica = ">=0.3.1"
+google-api-python-client = { version = "*", optional = true }
+google-auth-oauthlib = { version = "*", optional = true }
+six = { version = "*", optional = true }
+gspread = { version = "*", optional = true }
+ipylab = "^1.0.0"
+ipython = "*"
+ipywidgets = "^8.1.5"
+jinja2 = "^3.1.4"
+jupytext = "^1.16.4"
+nbconvert = { version = ">=6.0.0", extras = ["webpdf"], markers = "sys_platform != 'emscripten' and sys_platform != 'wasi'" }
+nbformat = ">=5.0.0"
+pandas = ">=2.0.0"
+python-on-whales = "^0.72.0"
+pyyaml = "^6.0.2"
+requests = "^2.32.3"
+rpy2 = { version = "^3.5.16", optional = true }
+setuptools = "^74.0.0"
+wrapt = "^1.16.0"
+
+[tool.poetry.extras]
+plugins = ["google-api-python-client", "google-auth-oauthlib", "gspread", "six"]
+r = ["rpy2"]
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "*"
+jupyter_client = "*"
+matplotlib = "*"
+pypdf = "*"
+scikit-learn = "*"
+tqdm = "*"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+coverage = "^7.2.0"
+pytest = "^8.2.2"
+pytest-html = "*"
+responses = "^0.25.3"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = ">=5.0.0"
+sphinx-book-theme = "1.1.0"
+sphinx-click = "*"
+sphinx_markdown_tables = "*"
+sphinxcontrib-apidoc = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
