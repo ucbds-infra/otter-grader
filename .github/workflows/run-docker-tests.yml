@@ -73,7 +73,12 @@ jobs:
           micromamba run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.r-project.org/")'
 
       - name: Maximize build space
-        uses: easimon/maximize-build-space@master
+        if: ${{ steps.check-branch.outputs.run == 'true' }}
+        run: |
+          sudo swapoff -a
+          sudo rm -f /swapfile
+          sudo apt clean
+          df -h
 
       - name: Run tests
         if: ${{ steps.check-branch.outputs.run == 'true' }}
