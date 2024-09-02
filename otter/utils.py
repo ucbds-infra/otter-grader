@@ -147,15 +147,6 @@ def get_source(cell):
 
 
 @contextmanager
-def nullcontext():
-    """
-    Yields an empty context. Added because ``contextlib.nullcontext`` was added in Python 3.7, so
-    earlier versions of Python require this patch.
-    """
-    yield
-
-
-@contextmanager
 def load_default_file(provided_fn, default_fn, default_disabled=False):
     """
     Reads the contents of a file with an optional default path. If ``proivided_fn`` is not specified

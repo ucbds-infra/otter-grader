@@ -3,7 +3,7 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.9
+  - python=3.12
   - pip
   - nb_conda_kernels
   - pip:
@@ -23,4 +23,4 @@ dependencies:
       - numpy
       - gspread
       - pypdf
-      - otter-grader==5.6.0
+      - otter-grader[grading,plugins]==5.6.0

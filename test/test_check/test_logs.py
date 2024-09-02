@@ -1,10 +1,9 @@
 """Tests for ``otter.check.logs``"""
 
 import os
+import pandas as pd
 import pytest
 import sys
-
-from sklearn.linear_model import LinearRegression
 
 from otter.check.logs import Log
 from otter.check.notebook import Notebook, _OTTER_LOG_FILENAME
@@ -68,7 +67,7 @@ def test_shelve():
     env = {
         "num": 5,
         "func": square,
-        "model": LinearRegression(),
+        "df": pd.DataFrame(),
         "module": sys,
         "ignored_func": calendar.setfirstweekday
     }
@@ -93,7 +92,7 @@ def test_shelve():
     log = Log.from_file(_OTTER_LOG_FILENAME)
     entry = log.get_question_entry("foo")
     env = entry.unshelve()
-    assert [*env] == ["num", "func", "model"]
+    assert [*env] == ["num", "func", "df"]
 
     env_with_factorial = entry.unshelve(dict(factorial = factorial))
     assert "factorial" in env_with_factorial["func"].__globals__

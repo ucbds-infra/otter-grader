@@ -219,7 +219,7 @@ class Assignment(fica.Config, Loggable):
     )
 
     python_version: Optional[Union[str, int, float]] = fica.Key(
-        description = "the version of Python to use in the grading image (must be 3.6+)",
+        description = "the version of Python to use in the grading image (must be 3.9+)",
         default = None,
     )
 

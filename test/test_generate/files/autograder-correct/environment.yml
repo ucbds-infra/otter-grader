@@ -3,26 +3,9 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.9
+  - python=3.12
   - pip
   - nb_conda_kernels
   - pip:
-      - datascience
-      - jupyter_client
-      - ipykernel
-      - matplotlib
-      - pandas
-      - ipywidgets
-      - scipy
-      - seaborn
-      - scikit-learn
-      - jinja2
-      - nbconvert
-      - nbconvert[webpdf]
-      - nbformat
-      - dill
-      - numpy
-      - gspread
-      - pypdf
-      - otter-grader==5.6.0
+      - otter-grader[grading,plugins]==5.6.0
       - tqdm

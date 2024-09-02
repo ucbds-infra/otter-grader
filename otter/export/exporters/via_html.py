@@ -27,13 +27,24 @@ class PDFViaHTMLExporter(BaseExporter):
 
         nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
 
-        nbconvert.TemplateExporter.extra_template_basedirs = [TEMPLATE_DIR]
+        nbconvert.TemplateExporter.extra_template_basedirs = [str(TEMPLATE_DIR)]
         orig_template_name = nbconvert.TemplateExporter.template_name
         nbconvert.TemplateExporter.template_name = options["template"]
 
         exporter = nbconvert.WebPDFExporter()
 
-        pdf, _ = nbconvert.export(exporter, nb)
+        try:
+            pdf, _ = nbconvert.export(exporter, nb)
+        except RuntimeError as e:
+            # Replace nbconvert's error about installing chromium since their flag can't be passed
+            # to Otter.
+            if "--allow-chromium-download" in str(e):
+                raise RuntimeError(
+                    "No suitable version of chromium was found; please install chromium by running "
+                    "'playwright install chromium'"
+                )
+            raise e
+
         pdf_path = os.path.splitext(dest)[0] + ".pdf"
         with open(pdf_path, "wb+") as f:
             f.write(pdf)

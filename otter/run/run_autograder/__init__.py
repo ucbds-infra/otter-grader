@@ -5,13 +5,14 @@ import json
 import pandas as pd
 import zipfile
 
+from contextlib import nullcontext
 from glob import glob
 
 from .runners import create_runner
 from .utils import capture_run_output, OtterRuntimeError, print_output
 
 from ...version import LOGO_WITH_VERSION
-from ...utils import chdir, loggers, nullcontext, OTTER_CONFIG_FILENAME
+from ...utils import chdir, loggers, OTTER_CONFIG_FILENAME
 
 
 __all__ = ["capture_run_output", "main"]

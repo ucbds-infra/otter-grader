@@ -1,9 +1,9 @@
 """Autograder configuration generator for Otter-Grader"""
 
+import importlib.resources
 import json
 import os
 import pathlib
-import pkg_resources
 import re
 import yaml
 import zipfile
@@ -22,11 +22,10 @@ from ..utils import dump_yaml, load_default_file, OTTER_CONFIG_FILENAME
 from ..version import __version__
 
 
-DEFAULT_PYTHON_VERSION = "3.9"
+DEFAULT_PYTHON_VERSION = "3.12"
 OTTER_ENV_NAME = "otter-env"
 OTTR_VERSION = "1.5.0"
-TEMPLATE_DIR = pkg_resources.resource_filename(__name__, "templates")
-GENERAL_TEMPLATE_DIR = os.path.join(TEMPLATE_DIR, "general")
+TEMPLATE_DIR = importlib.resources.files(__name__) / "templates"
 
 
 @dataclass
@@ -63,46 +62,30 @@ class CondaEnvironment:
             environment["dependencies"].extend([
                 "gcc_linux-64",
                 "gxx_linux-64",
-                "r-base>=4.0.0",
-                "r-essentials",
-                "r-devtools",
                 "libgit2",
                 "libgomp",
+                "r-base>=4.0.0",
+                "r-devtools",
+                "r-essentials",
                 "r-gert",
-                "r-usethis",
-                "r-testthat",
-                "r-startup",
                 "r-rmarkdown",
+                "r-startup",
                 "r-stringi",
+                "r-testthat",
+                "r-usethis",
                 f"r-ottr=={OTTR_VERSION}",
             ])
 
+        r_extra = ""
+        if self.is_r:
+            r_extra = ",r"
+
         pip_deps = self.requirements if self.overwrite_requirements else [
-            "datascience",
-            "jupyter_client",
-            "ipykernel",
-            "matplotlib",
-            "pandas",
-            "ipywidgets",
-            "scipy",
-            "seaborn",
-            "scikit-learn",
-            "jinja2",
-            "nbconvert",
-            "nbconvert[webpdf]",
-            "nbformat",
-            "dill",
-            "numpy",
-            "gspread",
-            "pypdf",
-            f"otter-grader=={__version__}",
+            f"otter-grader[grading,plugins{r_extra}]=={__version__}",
             *self.requirements,
         ]
 
         environment["dependencies"].append({"pip": pip_deps})
-
-        if self.is_r:
-            environment["dependencies"][-1]["pip"].append("rpy2")
 
         if self.user_environment:
             environment = merge_conda_environments(
@@ -115,20 +98,20 @@ class CondaEnvironment:
 
 
 COMMON_TEMPLATES = [
-    os.path.join(TEMPLATE_DIR, "common", "run_autograder"),
-    os.path.join(TEMPLATE_DIR, "common", "run_otter.py"),
+    TEMPLATE_DIR / "common" / "run_autograder",
+    TEMPLATE_DIR / "common" / "run_otter.py",
 ]
 
 LANGUAGE_BASED_CONFIGURATIONS = {
     "python": {
         "test_file_pattern": "*.py",
         "requirements_filename": "requirements.txt",
-        "templates": [*COMMON_TEMPLATES, os.path.join(TEMPLATE_DIR, "python", "setup.sh")]
+        "templates": [*COMMON_TEMPLATES, TEMPLATE_DIR / "python" / "setup.sh"]
     },
     "r": {
         "test_file_pattern": "*.[Rr]",
         "requirements_filename": "requirements.R",
-        "templates": [*COMMON_TEMPLATES, os.path.join(TEMPLATE_DIR, "r", "setup.sh")]
+        "templates": [*COMMON_TEMPLATES, TEMPLATE_DIR / "r" / "setup.sh"]
     },
 }
 
@@ -234,10 +217,9 @@ def main(
     lang_config = LANGUAGE_BASED_CONFIGURATIONS[ag_config.lang]
 
     templates = {}
-    for template_path in lang_config["templates"]:
-        fn = os.path.basename(template_path)
-        with open(template_path) as f:
-            templates[fn] = Template(f.read())
+    for template in lang_config["templates"]:
+        fn = os.path.basename(template)
+        templates[fn] = Template(template.read_text())
 
     if python_version is not None:
         match = re.match(r"(\d+)\.(\d+)(\.\d+)?", python_version)

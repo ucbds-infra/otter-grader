@@ -4,12 +4,7 @@ __all__ = ["export_notebook", "grade_submission"]
 
 import os
 
-from contextlib import redirect_stdout
-
-try:
-    from contextlib import nullcontext
-except ImportError:
-    from .utils import nullcontext  # nullcontext is new in Python 3.7
+from contextlib import nullcontext, redirect_stdout
 
 from .export import export_notebook
 from .run import main as run_grader

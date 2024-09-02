@@ -68,7 +68,7 @@ each with a command-line interface:
 Installation
 ------------
 
-Otter is a Python package that is compatible with Python 3.8+. The PDF export internals require 
+Otter is a Python package that is compatible with Python 3.9+. The PDF export internals require 
 either LaTeX and Pandoc or Playwright and Chromium to be installed. Docker is also required to grade
 assignments locally with containerization. Otter's Python package can be installed using pipx_ or pip.
 

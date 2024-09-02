@@ -1,9 +1,9 @@
 """Docker container management for Otter Grade"""
 
+import importlib.resources
 import json
 import os
 import pathlib
-import pkg_resources
 import shutil
 import tempfile
 import zipfile
@@ -13,6 +13,7 @@ from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
+from . import __name__ as pkg_name
 from .utils import OTTER_DOCKER_IMAGE_NAME, merge_scores_to_df, TimeoutException
 
 from ..run.run_autograder.autograder_config import AutograderConfig
@@ -38,7 +39,7 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
         ``str``: the tag of the newly-build Docker image
     """
     image = OTTER_DOCKER_IMAGE_NAME + ":" + tag
-    dockerfile_path = pkg_resources.resource_filename(__name__, "Dockerfile")
+    dockerfile_path = str(importlib.resources.files(pkg_name) / "Dockerfile")
 
     LOGGER.info(f"Building image using {base_image} as base image")
 
