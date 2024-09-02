@@ -43,15 +43,12 @@ class CellFactory:
         Returns:
             ``list[nbformat.NotebookNode]``: the init cell
         """
-        if self.assignment.runs_on == "colab":
-            args = "colab=True"
-        elif self.assignment.runs_on == "jupyterlite":
-            args = "jupyterlite=True"
-        else:
-            args  = f"\"{self.assignment.master.name}\""
+        args = ""
+        if self.assignment.runs_on == "default":
+            args = f"\"{self.assignment.master.name}\""
 
         if self.assignment.tests.url_prefix:
-            args += f", tests_url_prefix=\"{self.assignment.tests.url_prefix}\""
+            args += f"{', ' if args else ''}tests_url_prefix=\"{self.assignment.tests.url_prefix}\""
 
         contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
         cell = nbformat.v4.new_code_cell(contents)

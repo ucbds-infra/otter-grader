@@ -5,6 +5,7 @@ import nbformat as nbf
 import os
 import pytest
 import shutil
+import sys
 
 from glob import glob
 from textwrap import dedent
@@ -247,18 +248,20 @@ def test_export_with_no_pdf_ack(
 
 
 @mock.patch("otter.check.notebook.os.path.isdir")
-def test_colab(mocked_isdir):
+@mock.patch("otter.check.utils.get_ipython")
+def test_colab(mocked_get_ipython, mocked_isdir):
     """
     Checks that the ``Notebook`` class correctly disables methods on Google Colab.
     """
+    mocked_get_ipython.return_value.__str__.return_value = "<google.colab._shell.Shell object at 0x7c0afb37e7d0>"
     mocked_isdir.return_value = False
     with pytest.raises(ValueError, match=f"Tests directory {TESTS_DIR} does not exist"):
-        grader = Notebook(tests_dir=TESTS_DIR, colab=True)
+        grader = Notebook(tests_dir=TESTS_DIR)
 
     mocked_isdir.assert_called_once_with(TESTS_DIR)
 
     mocked_isdir.return_value = True
-    grader = Notebook(tests_dir=TESTS_DIR, colab=True)
+    grader = Notebook(tests_dir=TESTS_DIR)
 
     # check for appropriate errors
     with pytest.raises(RuntimeError, match="This method is not compatible with Google Colab"):
@@ -274,20 +277,26 @@ def test_colab(mocked_isdir):
         grader.export()
 
 
-def test_jupyterlite():
+@mock.patch("otter.check.utils.get_ipython")
+def test_jupyterlite(mocked_get_ipython):
     """
     Checks that the ``Notebook`` class correctly disables methods on Google Colab.
     """
+    mocked_get_ipython.return_value.__str__.return_value = "<pyodide_kernel.interpreter.Interpreter object at 0x2505a80>"
     tests_url_prefix = "https://domain.tld/"
-    grader = Notebook(tests_url_prefix=tests_url_prefix, jupyterlite=True)
+    grader = Notebook(tests_url_prefix=tests_url_prefix)
 
     # check for appropriate errors
     with mock.patch("otter.check.notebook.LogEntry") as mocked_event:
         grader._log_event()
         mocked_event.assert_not_called()
 
-    with mock.patch("otter.check.utils.import_or_raise") as mocked_import, \
-            mock.patch("otter.check.utils.os") as mocked_os, \
+    # Create a fake pyodide module so that the import statement doesn't actually try to import
+    # pyodide, which isn't a test dependency.
+    mocked_pyodide = mock.MagicMock()
+    sys.modules["pyodide"] = mocked_pyodide
+
+    with mock.patch("otter.check.utils.os") as mocked_os, \
             mock.patch("otter.check.utils.open", mock.mock_open()) as mocked_open, \
             mock.patch("otter.check.utils.IPythonInterpreter") as mocked_interp:
         mocked_interp.PYOLITE.value.running.return_value = True
@@ -295,8 +304,6 @@ def test_jupyterlite():
 
         grader.check("q1")
 
-        mocked_import.assert_called_with("pyodide")
-        mocked_pyodide = mocked_import.return_value
         mocked_pyodide.open_url.assert_called_with(f"{tests_url_prefix}q1.py")
         mocked_os.makedirs.assert_called_with("./tests", exist_ok=True)
         mocked_open.assert_called_with(mocked_os.path.join.return_value, "w+")

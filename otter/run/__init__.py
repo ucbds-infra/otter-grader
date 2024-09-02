@@ -1,5 +1,6 @@
 """Non-containerized single notebook grading for Otter-Grader"""
 
+import dill
 import json
 import os
 import shutil
@@ -7,8 +8,6 @@ import tempfile
 import zipfile
 
 from .run_autograder import capture_run_output, main as run_autograder_main
-
-from ..utils import import_or_raise
 
 
 def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=False, debug=False):
@@ -31,7 +30,6 @@ def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=
     Returns:
         ``otter.test_files.GradingResults``: the grading results object
     """
-    dill = import_or_raise("dill")
     dp = tempfile.mkdtemp()
 
     try:

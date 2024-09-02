@@ -14,7 +14,6 @@ import traceback
 import yaml
 
 from contextlib import contextmanager
-from functools import lru_cache
 from IPython import get_ipython
 
 
@@ -353,18 +352,6 @@ class Loggable:
         """
         cls._load_logger()
         return cls._logger_instance
-
-
-@lru_cache(None)
-def import_or_raise(module):
-    """
-    Import a module or raise an ``ImportError`` if it is unable to be imported. Return values are
-    stored in an LRU cache.
-    """
-    try:
-        return importlib.import_module(module)
-    except:
-        raise ImportError(f"Could not import required module: {module}")
 
 
 class _CorrectIndentationDumper(yaml.Dumper):

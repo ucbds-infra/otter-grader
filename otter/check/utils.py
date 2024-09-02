@@ -19,7 +19,7 @@ from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TYPE_CHE
 
 from ..nbmeta_config import NBMetadataConfig
 from ..test_files import GradingResults
-from ..utils import format_exception, import_or_raise
+from ..utils import format_exception
 
 
 T = TypeVar("T")
@@ -112,12 +112,8 @@ def grade_zip_file(zip_path: str, nb_arcname: str, tests_dir: str) -> GradingRes
         os.remove(results_path)
 
 
-class IPythonInterpreter(Enum):
-    """
-    An enum of different types of IPython interpreters.
-    """
-
-    class Interpreter:
+@dataclass
+class _Interpreter:
         """
         A class representing a flavor of IPython interpreter.
 
@@ -125,9 +121,11 @@ class IPythonInterpreter(Enum):
         running) and a display name for error messages and the like.
         """
 
-        def __init__(self, check_strs: List[str], display_name: str):
-            self.check_strs = check_strs
-            self.display_name = display_name
+        check_strs: List[str]
+        """list of substrings to check for in the IPython interpreter string"""
+
+        display_name: str
+        """a display name for this interpreter"""
 
         def running(self) -> bool:
             """
@@ -138,12 +136,19 @@ class IPythonInterpreter(Enum):
                 ``bool``: whether this interpreter is running
             """
             ipython_interp = str(get_ipython())
+            print(ipython_interp)
             return any(c in ipython_interp for c in self.check_strs)
 
-    COLAB = Interpreter(["google.colab"], "Google Colab")
+
+class IPythonInterpreter(Enum):
+    """
+    An enum of different types of IPython interpreters.
+    """
+
+    COLAB = _Interpreter(["google.colab"], "Google Colab")
     """the Google Colab interpreter"""
 
-    PYOLITE = Interpreter(["pyolite.", "pyodide_kernel."], "Jupyterlite")
+    PYOLITE = _Interpreter(["pyolite.", "pyodide_kernel."], "Jupyterlite")
     """the JupyterLite interpreter"""
 
 
@@ -302,7 +307,7 @@ def resolve_test_info(
         if not IPythonInterpreter.PYOLITE.value.running():
             raise ValueError("Downloading test files from URLs is only supported on JupyterLite")
 
-        pyodide = import_or_raise("pyodide")
+        import pyodide
 
         test_url = f"{tests_url_prefix}{'/' if not tests_url_prefix.endswith('/') else ''}{question}.py"
         text = pyodide.open_url(test_url).getvalue()

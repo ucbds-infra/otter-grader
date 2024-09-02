@@ -96,16 +96,14 @@ class Notebook(Loggable):
         nb_path=None,
         tests_dir="./tests",
         tests_url_prefix=None,
-        colab=None,
-        jupyterlite=None,
     ):
         global _SHELVE
 
         interpreter = None
-        if colab or IPythonInterpreter.COLAB.value.running():
-            interpreter = IPythonInterpreter.COLAB
-        elif jupyterlite or IPythonInterpreter.PYOLITE.value.running():
-            interpreter = IPythonInterpreter.PYOLITE
+        for i in IPythonInterpreter:
+            if i.value.running():
+                interpreter = i
+                break
 
         self._interpreter = interpreter
 

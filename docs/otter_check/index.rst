@@ -115,9 +115,7 @@ Running on Non-standard Python Environments
 When running on non-standard Python notebook environments (which use their own interpreters, such as
 Colab or Jupyterlite), some Otter features are disabled due differences in file system access, the
 unavailability of compatible versions of packages, etc. When you instantiate a ``Notebook``, Otter
-automatically tries to determine if you're running on one of these environments, but you can
-manually indicate which you're running on by setting either the ``colab`` or ``jupyterlite``
-argument to ``True``.
+automatically to determines if you're running on one of these environments.
 
 
 Command Line Script Checker

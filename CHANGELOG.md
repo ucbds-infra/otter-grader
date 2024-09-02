@@ -13,6 +13,8 @@
 * Removed `setuptools` and `pkg_resources` dependencies
 * Remove dependencies not strictly required by Otter in the grading environment per [#739](https://github.com/ucbds-infra/otter-grader/issues/739)
 * Handle empty assignment configs in Otter Assign per [#795](https://github.com/ucbds-infra/otter-grader/issues/795)
+* Removed `Notebook` `colab` and `jupyterlite` arguments, switching to always determining the interpreter automatically
+* Made `dill` a required dependency
 
 **v5.6.0:**
 

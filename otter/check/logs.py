@@ -1,6 +1,7 @@
 """Logging for Otter Check"""
 
 import datetime as dt
+import dill
 import os
 import types
 import tempfile
@@ -8,7 +9,7 @@ import tempfile
 from enum import Enum, auto
 from typing import List, Optional, TYPE_CHECKING
 
-from ..utils import import_or_raise, QuestionNotInLogException
+from ..utils import QuestionNotInLogException
 
 
 class EventType(Enum):
@@ -153,8 +154,6 @@ class LogEntry:
         Args:
             filename (``str``): the path to the file to append this entry
         """
-        dill = import_or_raise("dill")
-
         try:
             file = open(filename, "ab+")
             dill.dump(self, file)
@@ -190,8 +189,6 @@ class LogEntry:
         Returns:
             ``LogEntry``: this entry
         """
-        dill = import_or_raise("dill")
-
         # delete old entry without reading entire log
         if delete:
             assert filename, "old env deletion indicated but no log filename provided"
@@ -250,8 +247,6 @@ class LogEntry:
         Returns:
             ``dict``: the shelved environment
         """
-        dill = import_or_raise("dill")
-
         assert self.shelf, "no shelf in this entry"
 
         # read bytes in self.shelf and load with dill
@@ -298,8 +293,6 @@ class LogEntry:
         Returns:
             ``list[LogEntry]``: the sorted log
         """
-        dill = import_or_raise("dill")
-
         try:
             file = open(filename, "rb")
 
@@ -336,8 +329,6 @@ class LogEntry:
             ``tuple[bytes, list[str]``: the pickled environment and list of variable names that were
                 not shelved
         """
-        dill = import_or_raise("dill")
-
         from .notebook import Notebook
         not_shelved = []
         filtered_env = {}
