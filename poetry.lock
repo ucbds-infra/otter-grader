@@ -3615,12 +3615,11 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 type = ["pytest-mypy"]
 
 [extras]
-export = ["pypdf"]
-grading = ["ipykernel", "jupyter_client"]
+grading = ["ipykernel", "jupyter_client", "pypdf"]
 plugins = ["google-api-python-client", "google-auth-oauthlib", "gspread", "six"]
 r = ["rpy2"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "a012c3eed8d11e3c8203694af73d73ee04c8466ba7f74dea1f08c6ee91f1d4f5"
+content-hash = "e612a9b502236c799d0a773b36170e7a9d9c352559f9bc6298277427d5f0efdc"

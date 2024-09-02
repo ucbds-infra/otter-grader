@@ -81,7 +81,7 @@ class CondaEnvironment:
             r_extra = ",r"
 
         pip_deps = self.requirements if self.overwrite_requirements else [
-            f"otter-grader[export,grading,plugins{r_extra}]=={__version__}",
+            f"otter-grader[grading,plugins{r_extra}]=={__version__}",
             *self.requirements,
         ]
 
