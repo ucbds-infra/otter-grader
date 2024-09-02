@@ -119,6 +119,8 @@ def get_cell_config(cell):
     """
     source = get_source(extract_fenced_otter_cell(cell))
     config = yaml.full_load("\n".join(source))
-    if not isinstance(config, dict) and config is not None:
+    if config is None:
+        config = {}
+    if not isinstance(config, dict):
         raise TypeError(f"Found a begin cell configuration that is not a dictionary: {cell}")
     return config

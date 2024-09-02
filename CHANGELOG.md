@@ -12,6 +12,7 @@
 * Remove support for Python versions < 3.9 per [#668](https://github.com/ucbds-infra/otter-grader/issues/668)
 * Removed `setuptools` and `pkg_resources` dependencies
 * Remove dependencies not strictly required by Otter in the grading environment per [#739](https://github.com/ucbds-infra/otter-grader/issues/739)
+* Handle empty assignment configs in Otter Assign per [#795](https://github.com/ucbds-infra/otter-grader/issues/795)
 
 **v5.6.0:**
 
