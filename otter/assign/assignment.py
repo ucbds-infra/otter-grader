@@ -156,11 +156,6 @@ class Assignment(fica.Config, Loggable):
         default = False,
     )
 
-    variables: Optional[Dict[str, str]] = fica.Key(
-        description = "a mapping of variable names to type strings for serializing environments",
-        default = None,
-    )
-
     ignore_modules: List[str] = fica.Key(
         description = "a list of modules to ignore variables from during environment serialization",
         default = [],
@@ -267,11 +262,6 @@ class Assignment(fica.Config, Loggable):
         if self.export_cell is True:
             self.export_cell = type(self).ExportCellValue()
 
-        if self.variables:
-            warnings.warn(
-                "The variables key of the assignment config is deprecated and will be removed in " \
-                    "v6.0.0. Please use generate.serialized_variables instead.", DeprecationWarning)
-
     def update(self, user_config: Dict[str, Any]):
         self._logger.debug(f"Updating config: {user_config}")
         ret = super().update(user_config)
@@ -311,9 +301,6 @@ class Assignment(fica.Config, Loggable):
         """
         if self.is_r:
             self.generate.lang = "r"
-
-        if self.variables:
-            self.generate.serialized_variables = str(self.variables)
 
         if self.name:
             self.generate.assignment_name = self.name

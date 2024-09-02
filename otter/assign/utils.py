@@ -247,8 +247,8 @@ def write_otter_config_file(assignment: "Assignment") -> None:
     config["save_environment"] = assignment.save_environment
     config["ignore_modules"] = assignment.ignore_modules
 
-    if assignment.variables:
-        config["variables"] = assignment.variables
+    if assignment.generate and assignment.generate.serialized_variables:
+        config["variables"] = assignment.generate.serialized_variables
 
     config_name = assignment.master.stem + '.otter'
     with open(assignment.get_ag_path(config_name), "w+") as f:

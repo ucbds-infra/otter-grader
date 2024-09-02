@@ -15,6 +15,7 @@
 * Handle empty assignment configs in Otter Assign per [#795](https://github.com/ucbds-infra/otter-grader/issues/795)
 * Removed `Notebook` `colab` and `jupyterlite` arguments, switching to always determining the interpreter automatically
 * Made `dill` a required dependency
+* Removed `variables` key of assignment config in favor of `generate.serialized_variables` in Otter Assign per [#628](https://github.com/ucbds-infra/otter-grader/issues/628)
 
 **v5.6.0:**
 
