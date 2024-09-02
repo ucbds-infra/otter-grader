@@ -1,6 +1,7 @@
 """Functions for converting Assign-formatted R Markdown files to and from notebook objects"""
 
 import jupytext
+import nbformat as nbf
 import os
 import re
 
@@ -16,7 +17,7 @@ CONFIG_START_REGEX = re.compile(r"#\s+(ASSIGNMENT\s+CONFIG|(BEGIN|END)\s+\w+)", 
 YAML_COMMENT_CHAR = "#"
 
 
-def read_as_notebook(rmd_path):
+def read_as_notebook(rmd_path: str) -> nbf.NotebookNode:
     """
     Read an R Markdown file and convert it to a master notebook to be used with Otter Assign.
 
@@ -94,13 +95,13 @@ def read_as_notebook(rmd_path):
     return nb
 
 
-def write_as_rmd(nb, rmd_path, has_solutions):
+def write_as_rmd(nb: nbf.NotebookNode, rmd_path: str, has_solutions: bool):
     """
     Write an autograder- or student-formatted R notebook as an R Markdown file.
 
     Args:
         nb (``nbformat.NotebookNode``): the notebook to write
-        rmd_path (``pathlib.Path | str``): the path at which to write the R Markdown file
+        rmd_path (``str``): the path at which to write the R Markdown file
         has_solutions (``bool``): whether the provided notebook is an autograder notebook
     """
     if os.path.splitext(rmd_path)[1] != ".Rmd":

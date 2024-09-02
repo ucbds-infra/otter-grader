@@ -1,9 +1,8 @@
 """Question configurations for Otter Assign"""
 
-from pydoc import doc
 import fica
 
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 
 class QuestionConfig(fica.Config):
@@ -11,27 +10,27 @@ class QuestionConfig(fica.Config):
     Configurations for a question.
     """
 
-    name = fica.Key(
+    name: str = fica.Key(
         description="(required) the path to a requirements.txt file",
     )
 
-    manual = fica.Key(
+    manual: bool = fica.Key(
         description="whether this is a manually-graded question",
         default=False,
     )
 
-    points = fica.Key(
+    points: Union[int, float, None] = fica.Key(
         description="how many points this question is worth; defaults to 1 internally",
         default=None,
     )
 
-    check_cell = fica.Key(
+    check_cell: bool = fica.Key(
         description="whether to include a check cell after this question (for autograded " \
             "questions only)",
         default=True,
     )
 
-    export = fica.Key(
+    export: bool = fica.Key(
         description="whether to force-include this question in the exported PDF",
         default=False,
     )

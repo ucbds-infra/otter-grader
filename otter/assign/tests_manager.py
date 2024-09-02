@@ -1,6 +1,7 @@
 """Assignment tests manager for Otter Assign"""
 
 import ast
+import nbformat as nbf
 import os
 import pandas as pd
 import pathlib
@@ -82,12 +83,12 @@ class AssignmentTestsManager:
     _questions: Dict[str, QuestionConfig]
     """a dictionary mapping question names to ``QuestionConfig`` objects"""
 
-    def __init__(self, assignment):
+    def __init__(self, assignment: Assignment):
         self.assignment = assignment
         self._tests_by_question = {}
         self._questions = {}
 
-    def any_public_tests(self, question):
+    def any_public_tests(self, question: QuestionConfig) -> bool:
         """
         Determine whether any of the test cases in the specified question are public.
 
@@ -99,7 +100,7 @@ class AssignmentTestsManager:
         """
         return any(not tc.hidden for tc in self._tests_by_question[question["name"]])
 
-    def _add_test_case(self, question, test_case):
+    def _add_test_case(self, question: QuestionConfig, test_case: TestCase):
         """
         Track a test case for the specified question.
 
@@ -115,7 +116,7 @@ class AssignmentTestsManager:
 
         self._tests_by_question[question_name].append(test_case)
 
-    def _parse_test_config(self, source: List[str]):
+    def _parse_test_config(self, source: List[str]) -> tuple[dict, Union[int, None]]:
         """
         Parse test configurations from the test cell source.
 
@@ -136,7 +137,7 @@ class AssignmentTestsManager:
 
         return config, i
 
-    def read_test(self, cell, question):
+    def read_test(self, cell: nbf.NotebookNode, question: QuestionConfig):
         """
         Parse and track a test case from the provided cell for the specified question.
 
@@ -178,7 +179,7 @@ class AssignmentTestsManager:
             TestCase(test_source, output, hidden, points, success_message, failure_message),
         )
 
-    def has_tests(self, question):
+    def has_tests(self, question: QuestionConfig) -> bool:
         """
         Determine whether the specified question has any test cases.
 
@@ -191,7 +192,10 @@ class AssignmentTestsManager:
         return question.name in self._tests_by_question
 
     @staticmethod
-    def _resolve_test_file_points(total_points, test_cases):
+    def _resolve_test_file_points(
+        total_points: Union[int, float, list[Union[int, float, None]], None],
+        test_cases: list[TestCase],
+    ) -> list[TestCase]:
         """
         Validate and reformat the point values of the provided test cases taking into account the
         total points for the question.
@@ -211,7 +215,7 @@ class AssignmentTestsManager:
         TestFile.resolve_test_file_points(total_points, test_cases)
         return test_cases
 
-    def _create_test_file_info(self, question_name):
+    def _create_test_file_info(self, question_name: str) -> dict:
         """
         Create a ``dict`` containing the test file information for the question with the specified
         name.
@@ -244,7 +248,7 @@ class AssignmentTestsManager:
         }
 
     @staticmethod
-    def _create_ok_test_case(test_case: TestCase):
+    def _create_ok_test_case(test_case: TestCase) -> dict:
         """
         Create an OK-formatted test case for a test case object.
 
@@ -276,7 +280,7 @@ class AssignmentTestsManager:
         return ret
 
     @classmethod
-    def _create_ok_test_suite(cls, test_cases: List[TestCase]):
+    def _create_ok_test_suite(cls, test_cases: List[TestCase]) -> dict:
         """
         Create an OK-formatted test suite for a list of test cases.
 
@@ -294,7 +298,12 @@ class AssignmentTestsManager:
             'type': 'doctest'
         }
 
-    def _format_test(self, name, points, test_cases) -> Union[str, Dict[str, Any]]:
+    def _format_test(
+        self,
+        name: str,
+        points: Union[int, float, list[Union[int, float, None]], None],
+        test_cases: list[TestCase],
+    ) -> Union[str, Dict[str, Any]]:
         """
         Format the test cases for a question based on the assignment config.
 
@@ -373,7 +382,7 @@ class AssignmentTestsManager:
             else:
                 nbmeta_config.tests[test_info["name"]] = test
 
-    def determine_question_point_value(self, question):
+    def determine_question_point_value(self, question: QuestionConfig) -> Union[int, float]:
         """
         Determine the point value of a question using the question config and its test cases.
 
@@ -404,7 +413,7 @@ class AssignmentTestsManager:
         points = round(sum(tc.points for tc in resolved_test_cases), 5)
         return int(points) if points % 1 == 0 else points
 
-    def generate_assignment_summary(self):
+    def generate_assignment_summary(self) -> str:
         """
         Generate a summary of the assignment's questions.
 

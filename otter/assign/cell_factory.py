@@ -4,6 +4,7 @@ import nbformat
 
 from .assignment import Assignment
 from .feature_toggle import FeatureToggle
+from .question_config import QuestionConfig
 from .utils import lock
 
 
@@ -21,10 +22,10 @@ class CellFactory:
     assignment: Assignment
     """the assignment config"""
 
-    def __init__(self, assignment):
+    def __init__(self, assignment: Assignment):
         self.assignment = assignment
 
-    def check_feature_toggle(self, feature_toggle: FeatureToggle):
+    def check_feature_toggle(self, feature_toggle: FeatureToggle) -> bool:
         """
         Check whether the specified feature is enabled for this assignment.
 
@@ -36,7 +37,7 @@ class CellFactory:
         """
         return feature_toggle.value.is_enabled(self.assignment)
 
-    def create_init_cells(self):
+    def create_init_cells(self) -> list[nbformat.NotebookNode]:
         """
         Generate a cell to initialize Otter in the notebook.
 
@@ -55,7 +56,7 @@ class CellFactory:
         lock(cell)
         return [cell]
 
-    def create_check_cells(self, question):
+    def create_check_cells(self, question: QuestionConfig) -> list[nbformat.NotebookNode]:
         """
         Create a cell calling ``otter.Notebook.check`` for the specified question.
 
@@ -70,7 +71,7 @@ class CellFactory:
         lock(cell)
         return [cell]
 
-    def create_check_all_cells(self):
+    def create_check_all_cells(self) -> list[nbformat.NotebookNode]:
         """
         Generate a check-all cell and a Markdown cell with instructions to run all tests in the
         notebook.
@@ -89,7 +90,7 @@ class CellFactory:
 
         return [instructions, check_all]
 
-    def create_export_cells(self):
+    def create_export_cells(self) -> list[nbformat.NotebookNode]:
         """
         Generate export cells that instruct the student the run a code cell calling 
         ``otter.Notebook.export`` to generate and download their submission.
@@ -144,7 +145,7 @@ class CellFactory:
         return cells
 
     @staticmethod
-    def create_markdown_response_cell():
+    def create_markdown_response_cell() -> nbformat.NotebookNode:
         """
         Generate a Markdown response cell with the following contents:
 

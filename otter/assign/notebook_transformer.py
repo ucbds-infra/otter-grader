@@ -3,6 +3,9 @@
 import copy
 import fica
 import nbformat as nbf
+import pathlib
+
+from typing import Union
 
 from .assignment import Assignment
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
@@ -66,7 +69,7 @@ class NotebookTransformer:
         self.cell_factory = (RCellFactory if self.assignment.is_r else CellFactory)(self.assignment)
         self.tests_mgr = tests_mgr
 
-    def add_export_tag_to_cell(self, cell, end=False):
+    def add_export_tag_to_cell(self, cell: nbf.NotebookNode, end: bool = False) -> nbf.NotebookNode:
         """
         Add an HTML comment to open or close question export for PDF filtering to the top of
         ``cell``. ``cell`` should be a Markdown cell.
@@ -89,7 +92,10 @@ class NotebookTransformer:
         return cell
 
     @staticmethod
-    def add_point_value_info_to_cell(cell, points):
+    def add_point_value_info_to_cell(
+        cell: nbf.NotebookNode,
+        points: Union[int, float],
+    ) -> nbf.NotebookNode:
         """
         Add the point value information to the provided cell, returning a copy.
 
@@ -106,7 +112,7 @@ class NotebookTransformer:
         cell["source"] = "\n".join(source)
         return cell
 
-    def transform_notebook(self, nb) -> "TransformedNotebookContainer":
+    def transform_notebook(self, nb: nbf.NotebookNode) -> "TransformedNotebookContainer":
         """
         Transform a master notebook into an autograder-formatted notebook.
 
@@ -140,7 +146,7 @@ class NotebookTransformer:
 
         return TransformedNotebookContainer(transformed_nb, self)
 
-    def _get_transformed_cells(self, cells: list[nbf.NotebookNode]):
+    def _get_transformed_cells(self, cells: list[nbf.NotebookNode]) -> list[nbf.NotebookNode]:
         """
         Takes in a list of cells from the master notebook and returns a list of cells for the
         autograder notebook.
@@ -358,7 +364,7 @@ class TransformedNotebookContainer:
     nbmeta_config: NBMetadataConfig
     """the notebook metadata config to include when writing the notebook"""
 
-    def __init__(self, transformed_nb, nb_transformer):
+    def __init__(self, transformed_nb: nbf.NotebookNode, nb_transformer: NotebookTransformer):
         self.transformed_nb = transformed_nb
         self.nb_transformer = nb_transformer
         self._populate_nbmeta_config(self.nb_transformer.assignment)
@@ -376,7 +382,7 @@ class TransformedNotebookContainer:
                 self.nbmeta_config.export_pdf_failure_message = \
                     a.export_cell.require_no_pdf_ack.message
 
-    def _get_sanitized_nb(self):
+    def _get_sanitized_nb(self) -> nbf.NotebookNode:
         """
         Return a copy of ``self.transformed_nb`` with solutions and outputs stripped and seed
         variables replaced.
@@ -393,7 +399,7 @@ class TransformedNotebookContainer:
             )
         return nb
 
-    def _add_nbmeta_config(self, nb):
+    def _add_nbmeta_config(self, nb: nbf.NotebookNode):
         """
         Add the notebook metadata config to the provided notebook's metadata in-place.
         """
@@ -401,7 +407,7 @@ class TransformedNotebookContainer:
         if uc:
             nb["metadata"][NOTEBOOK_METADATA_KEY] = uc
 
-    def write_transformed_nb(self, output_path, sanitize):
+    def write_transformed_nb(self, output_path: Union[pathlib.Path, str], sanitize: bool):
         """
         Write the transformed notebook (either as an autograder or student notebook) to the
         specified file, converting to R Markdown if necessary.
@@ -425,7 +431,12 @@ class TransformedNotebookContainer:
             _, nb = normalize(nb)
             nbf.write(nb, str(output_path))
 
-    def write_tests(self, tests_dir, include_hidden, force_files):
+    def write_tests(
+        self,
+        tests_dir: Union[pathlib.Path, str, None],
+        include_hidden: bool,
+        force_files: bool,
+    ):
         """
         Write the tests, either to the notebook metadata or files in ``tests_dir`` as indicated by
         the assignment config.

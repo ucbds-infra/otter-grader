@@ -20,7 +20,7 @@ class BlockType(Enum):
     TESTS = "tests"
 
 
-def extract_fenced_otter_cell(cell):
+def extract_fenced_otter_cell(cell: nbformat.NotebookNode) -> nbformat.NotebookNode:
     """
     Converts a Markdown config cell to a raw config cell.
 
@@ -58,7 +58,11 @@ def extract_fenced_otter_cell(cell):
     return cell
 
 
-def is_block_boundary_cell(cell, block_type, end=False):
+def is_block_boundary_cell(
+    cell: nbformat.NotebookNode,
+    block_type: BlockType,
+    end: bool = False,
+) -> bool:
     """
     Determine whether ``cell`` is a boundary cell for a ``block_type`` block. If ``end`` is true,
     the block should be an end block; otherwise, it should be a begin block.
@@ -78,7 +82,7 @@ def is_block_boundary_cell(cell, block_type, end=False):
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 
 
-def is_assignment_config_cell(cell):
+def is_assignment_config_cell(cell: nbformat.NotebookNode) -> bool:
     """
     Determine whether ``cell`` is an assignment configuration cell.
 
@@ -104,7 +108,7 @@ def is_assignment_config_cell(cell):
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 
 
-def get_cell_config(cell):
+def get_cell_config(cell: nbformat.NotebookNode) -> dict:
     """
     Parse a cell's contents as YAML and return the resulting dictionary.
 

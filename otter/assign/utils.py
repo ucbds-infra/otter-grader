@@ -9,7 +9,7 @@ import re
 import shutil
 
 from textwrap import indent
-from typing import List, Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 from ..api import grade_submission
 from ..generate import main as generate_autograder
@@ -180,7 +180,7 @@ def remove_tag(cell: nbf.NotebookNode, tag: str) -> nbf.NotebookNode:
     return cell
 
 
-def str_to_doctest(code_lines: List[str], lines: List[str]) -> List[str]:
+def str_to_doctest(code_lines: list[str], lines: list[str]) -> list[str]:
     """
     Convert a list of lines of Python code ``code_lines`` to the doctest format and appending the
     results to ``lines``.

@@ -1,6 +1,7 @@
 """Solution removal for Otter Assign"""
 
 import copy
+import nbformat as nbf
 import re
 
 from .r_adapter import solutions as r_solutions
@@ -12,7 +13,7 @@ BLOCK_PROMPT = "..."
 SOLUTION_CELL_TAG = "otter_assign_solution_cell"
 
 
-def has_seed(cell):
+def has_seed(cell: nbf.NotebookNode) -> bool:
     """
     Determine whether a cell contains a seed line (a line ending in ``# SEED``).
 
@@ -28,7 +29,7 @@ def has_seed(cell):
     return source and any([l.strip().endswith('# SEED') for l in source])
 
 
-def overwrite_seed_vars(nb, seed_variable, seed):
+def overwrite_seed_vars(nb: nbf.NotebookNode, seed_variable: str, seed: int) -> nbf.NotebookNode:
     """
     Overwrite any assignments of the variable named ``seed_variable`` with the value ``seed`` in a
     notebook.
@@ -53,7 +54,7 @@ def overwrite_seed_vars(nb, seed_variable, seed):
 
 
 solution_assignment_regex = re.compile(r"(\s*(?:[\w.]+(?=[^\w.])(?:\[['\"]?.*['\"]?\])*(?:,\s*)?)+\s*=).* ?# ?SOLUTION")
-def solution_assignment_sub(match):
+def solution_assignment_sub(match: re.Match) -> str:
     """
     Substitutes the first matching group  with `` ...``
     """
@@ -62,7 +63,7 @@ def solution_assignment_sub(match):
 
 
 solution_line_regex = re.compile(r"(\s*).* ?# ?SOLUTION")
-def solution_line_sub(match):
+def solution_line_sub(match: re.Match) -> str:
     """
     Substitutes the first matching group  with ``...``
     """
@@ -82,7 +83,7 @@ SUBSTITUTIONS = {
 }
 
 
-def replace_solutions(lines, lang):
+def replace_solutions(lines: list[str], lang: str) -> list[str]:
     """
     Replace solutions in ``lines``.
 
@@ -138,7 +139,7 @@ def replace_solutions(lines, lang):
     return stripped
 
 
-def remove_ignored_lines(lines):
+def remove_ignored_lines(lines: list[str]) -> list[str]:
     """
     Remove ignored lines in ``lines``.
 
@@ -180,7 +181,7 @@ def remove_ignored_lines(lines):
     return stripped
 
 
-def strip_ignored_lines(nb):
+def strip_ignored_lines(nb: nbf.NotebookNode) -> nbf.NotebookNode:
     """
     Create a copy of a notebook with ignored lines stripped.
 
@@ -197,7 +198,7 @@ def strip_ignored_lines(nb):
 
 OTTER_INCLUDE_TAG = "otter_include"
 
-def strip_solutions_and_output(nb):
+def strip_solutions_and_output(nb: nbf.NotebookNode) -> nbf.NotebookNode:
     """
     Create a copy of a notebook with solutions and outputs stripped.
 

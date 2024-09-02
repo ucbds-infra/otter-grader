@@ -1,6 +1,7 @@
 """Plugin replacement for Otter Assign"""
 
 import copy
+import nbformat as nbf
 import yaml
 
 from .utils import get_source
@@ -11,7 +12,7 @@ END = "# END PLUGIN"
 BEGIN_EXPORT = "# BEGIN PLUGIN EXPORT"
 
 
-def replace_plugins(lines):
+def replace_plugins(lines: list[str]) -> list[str]:
     """
     Replace plugin blocks with plugin calls in a cell's source (a list of strings).
 
@@ -79,7 +80,7 @@ def replace_plugins(lines):
     return lines
 
 
-def replace_plugins_with_calls(nb):
+def replace_plugins_with_calls(nb: nbf.NotebookNode) -> nbf.NotebookNode:
     """
     Replace all plugin blocks in a notebook with plugin calls.
 

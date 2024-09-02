@@ -4,6 +4,8 @@ import os
 import pathlib
 import warnings
 
+from typing import Optional
+
 from .assignment import Assignment
 from .output import write_output_directories
 from .utils import run_tests, write_otter_config_file, run_generate_autograder
@@ -17,14 +19,14 @@ LOGGER = loggers.get_logger(__name__)
 
 
 def main(
-    master,
-    result,
+    master: str,
+    result: str,
     *,
-    no_pdfs=False,
-    no_run_tests=False,
-    username=None,
-    password=None, 
-    debug=False,
+    no_pdfs: bool = False,
+    no_run_tests: bool = False,
+    username: Optional[str] = None,
+    password: Optional[str] = None, 
+    debug: Optional[str] = False,
 ):
     """
     Runs Otter Assign on a master notebook.

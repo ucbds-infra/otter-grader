@@ -2,9 +2,8 @@
 
 import nbformat
 
-from otter.assign.feature_toggle import FeatureToggle
-
 from ..cell_factory import CellFactory
+from ..feature_toggle import FeatureToggle
 from ..utils import lock
 
 
