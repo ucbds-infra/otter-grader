@@ -11,6 +11,7 @@
 * Set default Python version for grading images to 3.12
 * Remove support for Python versions < 3.9 per [#668](https://github.com/ucbds-infra/otter-grader/issues/668)
 * Removed `setuptools` and `pkg_resources` dependencies
+* Remove dependencies not strictly required by Otter in the grading environment per [#739](https://github.com/ucbds-infra/otter-grader/issues/739)
 
 **v5.6.0:**
 
