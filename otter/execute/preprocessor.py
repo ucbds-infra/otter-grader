@@ -12,10 +12,9 @@ from traitlets import Bool, Dict, Instance, Integer, List, Unicode
 from typing import Optional, Tuple
 
 from ..check.logs import Log
-from ..utils import id_generator
+from ..utils import id_generator, NOTEBOOK_METADATA_KEY
 
 
-CELL_METADATA_KEY = "otter"
 IGNORE_CELL_TAG = "otter_ignore"
 
 
@@ -133,7 +132,7 @@ class GradingPreprocessor(Preprocessor):
         for cell in nb.cells:
             new_cells.append(cell)
 
-            config = cell.get("metadata", {}).get(CELL_METADATA_KEY, {})
+            config = cell.get("metadata", {}).get(NOTEBOOK_METADATA_KEY, {})
             if config.get("tests"):
                 source = ""
                 for test in config["tests"]:
@@ -148,7 +147,7 @@ class GradingPreprocessor(Preprocessor):
         for cell in nb.cells:
             m = cell.get("metadata", {})
             if IGNORE_CELL_TAG in m.get("tags", []) or \
-                    m.get(CELL_METADATA_KEY, {}).get("ignore", False):
+                    m.get(NOTEBOOK_METADATA_KEY, {}).get("ignore", False):
                 continue
 
             new_cells.append(cell)

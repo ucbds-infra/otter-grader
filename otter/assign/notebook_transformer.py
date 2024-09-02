@@ -2,7 +2,7 @@
 
 import copy
 import fica
-import nbformat
+import nbformat as nbf
 
 from .assignment import Assignment
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
@@ -14,8 +14,8 @@ from .r_adapter import rmarkdown_converter
 from .r_adapter.cell_factory import RCellFactory
 from .solutions import (
     has_seed,
-    SOLUTION_CELL_TAG,
     overwrite_seed_vars,
+    SOLUTION_CELL_TAG,
     strip_ignored_lines,
     strip_solutions_and_output,
 )
@@ -61,7 +61,7 @@ class NotebookTransformer:
     tests_mgr: AssignmentTestsManager
     """the tests manager to populate"""
 
-    def __init__(self, assignment, tests_mgr):
+    def __init__(self, assignment: Assignment, tests_mgr: AssignmentTestsManager):
         self.assignment = assignment
         self.cell_factory = (RCellFactory if self.assignment.is_r else CellFactory)(self.assignment)
         self.tests_mgr = tests_mgr
@@ -140,19 +140,19 @@ class NotebookTransformer:
 
         return TransformedNotebookContainer(transformed_nb, self)
 
-    def _get_transformed_cells(self, cells):
+    def _get_transformed_cells(self, cells: list[nbf.NotebookNode]):
         """
         Takes in a list of cells from the master notebook and returns a list of cells for the
         autograder notebook.
 
         Args:
-            cells (``list[nbformat.NotebookNode]``): the cells of the master notebook
+            cells (``list[nbf.NotebookNode]``): the cells of the master notebook
 
         Returns:
-            ``list[nbformat.NotebookNode]``: the cells of the autograder notebook
+            ``list[nbf.NotebookNode]``: the cells of the autograder notebook
         """
-        curr_block = []  # allow nested blocks
-        transformed_cells = []
+        curr_block: list[BlockType] = []  # allow nested blocks
+        transformed_cells: list[nbf.NotebookNode] = []
 
         question, has_prompt, no_solution, last_question_md_cell = None, False, False, None
 
@@ -190,6 +190,10 @@ class NotebookTransformer:
                         if (not no_solution or self.tests_mgr.any_public_tests(question)) and \
                                 question.check_cell:
                             transformed_cells.extend(check_cells)
+                        else:
+                            last_cell_meta = transformed_cells[-1]["metadata"]
+                            last_cell_meta.setdefault(NOTEBOOK_METADATA_KEY, {})
+                            last_cell_meta[NOTEBOOK_METADATA_KEY]["tests"] = [question.name]
 
                     # add points to question cell if specified
                     if self.assignment.show_question_points and last_question_md_cell is not None:
@@ -300,7 +304,7 @@ class NotebookTransformer:
                 if is_cell_type(cell, "markdown"):
                     cell = self.add_export_tag_to_cell(cell)
                 elif FeatureToggle.PDF_FILTERING_COMMENTS.value.is_enabled(self.assignment):
-                    export_delim_cell = nbformat.v4.new_markdown_cell()
+                    export_delim_cell = nbf.v4.new_markdown_cell()
                     export_delim_cell = self.add_export_tag_to_cell(export_delim_cell)
                 need_begin_export = False
             if need_end_export:
@@ -308,7 +312,7 @@ class NotebookTransformer:
                     cell = self.add_export_tag_to_cell(cell, end=True)
                 elif FeatureToggle.PDF_FILTERING_COMMENTS.value.is_enabled(self.assignment):
                     if export_delim_cell is None:
-                        export_delim_cell = nbformat.v4.new_markdown_cell()
+                        export_delim_cell = nbf.v4.new_markdown_cell()
                     export_delim_cell = self.add_export_tag_to_cell(export_delim_cell, end=True)
                 need_end_export = False
 
@@ -328,7 +332,7 @@ class NotebookTransformer:
         # if the last cell was the end of a manually-graded question, add a close export tag
         if need_end_export:
             transformed_cells.append(
-                self.add_export_tag_to_cell(nbformat.v4.new_markdown_cell(), end=True))
+                self.add_export_tag_to_cell(nbf.v4.new_markdown_cell(), end=True))
 
         return transformed_cells
 
@@ -345,7 +349,7 @@ class TransformedNotebookContainer:
             ``transformed_nb``
     """
 
-    transformed_nb: nbformat.NotebookNode
+    transformed_nb: nbf.NotebookNode
     """the autograder notebook"""
 
     nb_transformer: NotebookTransformer
@@ -414,12 +418,12 @@ class TransformedNotebookContainer:
 
         else:
             try:
-                from nbformat.validator import normalize
+                from nbf.validator import normalize
             except ImportError:
                 normalize = lambda nb: (0, nb)
 
             _, nb = normalize(nb)
-            nbformat.write(nb, str(output_path))
+            nbf.write(nb, str(output_path))
 
     def write_tests(self, tests_dir, include_hidden, force_files):
         """
