@@ -3,6 +3,7 @@
 import importlib.resources
 import json
 import os
+import pandas as pd
 import pathlib
 import shutil
 import tempfile
@@ -24,7 +25,7 @@ from ..utils import loggers, OTTER_CONFIG_FILENAME
 LOGGER = loggers.get_logger(__name__)
 
 
-def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderConfig):
+def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderConfig) -> str:
     """
     Creates a grading image based on the autograder zip file and attaches a tag.
 
@@ -81,7 +82,7 @@ def launch_containers(
     tag: str,
     config: AutograderConfig,
     **kwargs,
-):
+) -> list[GradingResults]:
     """
     Grade submissions in parallel Docker containers.
 
@@ -100,7 +101,7 @@ def launch_containers(
         **kwargs: additional kwargs passed to ``grade_submission``
 
     Returns:
-        ``list[pandas.core.frame.DataFrame]``: the grades returned by each container spawned
+        ``list[otter.test_files.GradingResults]``: the grades returned by each container spawned
             during grading
     """
     pool = ThreadPoolExecutor(num_containers)
@@ -112,24 +113,25 @@ def launch_containers(
             grade_submission,
             submission_path=subm_path,
             image=image,
-            # config=config,
             **kwargs,
         )]
 
     # stop execution while containers are running
-    finished_futures = wait(futures)
-    scores = [f.result() for f in finished_futures[0]]
-    return merge_scores_to_df(scores)
+    finished_futures, not_finished = wait(futures)
+    if not_finished:
+        raise RuntimeError(f"{len(not_finished)} futures failed to complete")
+
+    return [f.result() for f in finished_futures]
 
 
 def grade_submission(
     submission_path: str,
     image: str,
     no_kill: bool = False,
-    pdf_dir: Optional[str] = None,
+    pdf_dir: Optional[pathlib.Path] = None,
     timeout: Optional[int] = None,
     network: bool = True,
-):
+) -> GradingResults:
     """
     Grade a submission in a Docker container.
 
@@ -142,7 +144,7 @@ def grade_submission(
         image (``str``): a Docker image tag to be used for grading environment
         no_kill (``bool``): whether the grading containers should be kept running after
             grading finishes
-        pdf_dir (``str``, optional): a directory in which to put the notebook PDF, if applicable
+        pdf_dir (``pathlib.Path``, optional): a directory in which to put the notebook PDF, if applicable
         timeout (``int``, optional): timeout in seconds for each container
         network (``bool``): whether to enable networking in the containers
 
@@ -229,17 +231,16 @@ def grade_submission(
             scores = dill.load(f)
 
         if pdf_dir:
-            os.makedirs(pdf_dir, exist_ok=True)
+            pdf_dir.mkdir(parents=True, exist_ok=True)
 
-            local_pdf_path = os.path.join(pdf_dir, f"{nb_name}.pdf")
+            local_pdf_path = pdf_dir / f"{nb_name}.pdf"
             shutil.copy(pdf_path, local_pdf_path)
 
-    except TimeoutException as te:
-        scores = GradingResults.without_results(te)
     except Exception as e:
         scores = GradingResults.without_results(e)
+
     finally:
-        scores.file = nb_name
+        scores.file = nb_basename
         os.remove(results_path)
         os.remove(temp_subm_path)
 

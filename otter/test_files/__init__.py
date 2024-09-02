@@ -110,6 +110,9 @@ class GradingResults:
     _plugin_data: Dict[str, Any]
     """data requested to be stored in the results by plugins"""
 
+    file: Optional[str] = None
+    """the submission file that generated these results; not populated by default"""
+
     def __init__(self, test_files: List[TestFile], notebook: Optional[nbf.NotebookNode] = None):
         self.results = {tf.name: tf for tf in test_files}
         self.output = None
@@ -203,6 +206,7 @@ class GradingResults:
         """
         ``int | float``: the total points earned
         """
+        if self._catastrophic_error: return 0
         return sum(tr.score for tr in self.results.values())
 
     @property
@@ -210,7 +214,16 @@ class GradingResults:
         """
         ``int | float``: the total points possible
         """
+        if self._catastrophic_error: return 0
         return sum(tr.possible for tr in self.results.values())
+
+    @property
+    def percent(self):
+        """
+        ``float``: the ratio of points earned, rounded to 4 digits
+        """
+        if self.possible == 0: return 0
+        return round(self.total / self.possible, 4)
 
     @property
     def passed_all_public(self):
@@ -381,6 +394,8 @@ class GradingResults:
         Returns:
             ``str``: the summary of results
         """
+        if self._catastrophic_error:
+            return str(self._catastrophic_error)
         return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
 
     def has_catastrophic_failure(self):

@@ -8,6 +8,7 @@ import re
 import shutil
 import zipfile
 
+from contextlib import ExitStack
 from glob import glob
 from python_on_whales import docker
 from unittest import mock
@@ -16,6 +17,7 @@ from otter.generate import main as generate
 from otter.grade import main as grade
 from otter.grade.utils import POINTS_POSSIBLE_LABEL
 from otter.run.run_autograder.autograder_config import AutograderConfig
+from otter.test_files import GradingResults
 from otter.utils import loggers
 
 from ..utils import TestFileManager
@@ -143,7 +145,7 @@ def test_network(expected_points):
 
     for _, row in df_test.iterrows():
         for test in expected_points:
-            if 'network' == row["file"] and ('q2' in test or 'q3' in test):
+            if 'network.ipynb' == row["file"] and ('q2' in test or 'q3' in test):
                 assert row[test] == 0, "{} supposed to fail {} but passed".format(row["file"], test)
             else:
                 assert row[test] == expected_points[test], "{} supposed to pass {} but failed".format(row["file"], test)
@@ -206,32 +208,6 @@ def test_single_notebook_grade(mocked_launch_grade):
     """
     Checks that when a single submission is passed to Otter Grade, it returns the percentage score.
     """
-    df = pd.DataFrame([{
-        "q1": 2.0,
-        "q2": 2.0,
-        "q3": 2.0,
-        "q4": 1.0,
-        "q6": 5.0,
-        "q2b": 2.0,
-        "q7": 1.0,
-        "percent_correct": 1,
-        "total_points_earned": 15.0,
-        "file": POINTS_POSSIBLE_LABEL,
-        "grading_status": "--"
-    },{
-        "q1": 2.0,
-        "q2": 2.0,
-        "q3": 2.0,
-        "q4": 1.0,
-        "q6": 4.0,
-        "q2b": 2.0,
-        "q7": 1.0,
-        "percent_correct": 0.933333,
-        "total_points_earned": 14.0,
-        "file": "passesAll.ipynb",
-        "grading_status": "Completed"
-    }])
-
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
 
     kw_expected = {
@@ -245,19 +221,23 @@ def test_single_notebook_grade(mocked_launch_grade):
         "config": AutograderConfig(),
     }
 
-    mocked_launch_grade.return_value = [df]
+    gr = GradingResults([])
+    mocked_launch_grade.return_value = [gr]
 
-    output = grade(
-        name = ASSIGNMENT_NAME,
-        paths = [notebook_path],
-        output_dir = "test/",
-        # the value of the autograder argument doesn't matter, it just needs to be a valid file path
-        autograder = notebook_path,
-        containers = 1,
-    )
+    with mock.patch("otter.test_files.GradingResults.percent", new_callable=mock.PropertyMock) as mocked_percent:
+        mocked_percent.return_value = 0.9333
+
+        output = grade(
+            name = ASSIGNMENT_NAME,
+            paths = [notebook_path],
+            output_dir = "test/",
+            # the value of the autograder argument doesn't matter, it just needs to be a valid file path
+            autograder = notebook_path,
+            containers = 1,
+        )
 
     mocked_launch_grade.assert_called_with(notebook_path, [notebook_path], **kw_expected)
-    assert output == 0.933333
+    assert output == 0.9333
 
 
 @mock.patch("otter.grade.launch_containers")
@@ -265,31 +245,7 @@ def test_config_overrides(mocked_launch_grade):
     """
     Checks that the CLI flags are converted to config overrides correctly.
     """
-    mocked_launch_grade.return_value = [pd.DataFrame([{
-        "q1": 2.0,
-        "q2": 2.0,
-        "q3": 2.0,
-        "q4": 1.0,
-        "q6": 5.0,
-        "q2b": 2.0,
-        "q7": 1.0,
-        "percent_correct": 1,
-        "total_points_earned": 15.0,
-        "file": POINTS_POSSIBLE_LABEL,
-        "grading_status": "--"
-    },{
-        "q1": 2.0,
-        "q2": 2.0,
-        "q3": 2.0,
-        "q4": 1.0,
-        "q6": 5.0,
-        "q2b": 2.0,
-        "q7": 1.0,
-        "percent_correct": 1.0,
-        "total_points_earned": 15.0,
-        "file": "passesAll.ipynb",
-        "grading_status": "Completed"
-    }])]
+    mocked_launch_grade.return_value = [GradingResults([])]
 
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
     grade(
@@ -355,7 +311,7 @@ def test_config_overrides_integration():
         "q7": 1.0,
         "percent_correct": 1.0,
         "total_points_earned": 13.0,
-        "file": os.path.splitext(os.path.basename(ZIP_SUBM_PATH))[0],
+        "file": os.path.basename(ZIP_SUBM_PATH),
         "grading_status": "Completed"
     }])
 
@@ -370,33 +326,43 @@ def test_grade_summaries(mocked_launch_grade):
     """
     Checks that are grading summaries are written to the disck
     """
-    mock_dfs = []
+    scores, mocks, expected = [], [], {}
     for filename in os.listdir(FILE_MANAGER.get_path("results")):
-        filename = os.path.splitext(filename)[0]
-        test_file_path = os.path.join("test/test_grade/files/results", f"{filename}.txt")
-        with open(test_file_path, 'r') as test_summary_file:
-            mock_dfs.append(pd.DataFrame([{
-                "percent_correct": 1.0,
-                "total_points_earned": 15.0,
-                "file": f"{filename}",
-                "summary": test_summary_file.read(),
-                "grading_status": "Completed"
-            }]))
-    mocked_launch_grade.return_value = mock_dfs
+        with open(os.path.join(FILE_MANAGER.get_path("results"), filename), "r") as test_summary_file:
+            summary = test_summary_file.read()
+
+        expected[filename] = summary
+
+        gr = GradingResults([])
+        gr.file = os.path.splitext(filename)[0] + ".ipynb"
+        mock_summary = mock.patch.object(gr, "summary")
+        mocks.append((mock_summary, summary))
+
+        scores.append(gr)
+
+    mocked_launch_grade.return_value = scores
 
     notebook_path = FILE_MANAGER.get_path("notebooks")
-    grade(
-        name = ASSIGNMENT_NAME,
-        paths = [notebook_path],
-        output_dir = "test/",
-        autograder = AG_ZIP_PATH,
-        summaries = True
+
+    with ExitStack() as es:
+        for m, s in mocks:
+            es.enter_context(m).return_value = s
+
+        grade(
+            name = ASSIGNMENT_NAME,
+            paths = [notebook_path],
+            output_dir = "test/",
+            autograder = AG_ZIP_PATH,
+            summaries = True
+        )
+
+    assert (
+        sorted(os.listdir(FILE_MANAGER.get_path("results"))) == 
+            sorted(os.listdir("test/grading-summaries"))
     )
-    for filename in os.listdir(notebook_path):
-        filename = os.path.splitext(filename)[0]
-        file_path = os.path.join("test/grading-summaries", f"{filename}.txt")
-        test_file_path = os.path.join("test/test_grade/files/results", f"{filename}.txt")
-        if os.path.isfile(file_path):
-            assert os.path.exists(file_path)
-            with open(file_path, 'r') as summary_file, open(test_file_path, 'r') as test_summary_file:
-                assert summary_file.read() == test_summary_file.read()
+    for filename in sorted(os.listdir("test/grading-summaries")):
+        file_path = os.path.join("test/grading-summaries", filename)
+
+        assert os.path.isfile(file_path)
+        with open(file_path, "r") as summary_file:
+            assert summary_file.read() == expected[filename], f"{filename} has diff"

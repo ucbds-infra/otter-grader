@@ -1,6 +1,7 @@
 """Local grading of submissions in Docker containers for Otter-Grader"""
 
 import os
+import pathlib
 import re
 
 from glob import glob
@@ -8,14 +9,13 @@ from typing import List, Optional, Tuple, Union
 
 from .containers import launch_containers
 from .utils import (
-    merge_csv,
+    merge_scores_to_df,
     prune_images,
     POINTS_POSSIBLE_LABEL,
     SCORES_DICT_FILE_KEY,
     SCORES_DICT_PERCENT_CORRECT_KEY,
     SCORES_DICT_TOTAL_POINTS_KEY,
     SCORES_DICT_GRADING_STATUS_KEY,
-    SCORES_DICT_SUMMARY_KEY
 )
 
 from ..run.run_autograder.autograder_config import AutograderConfig
@@ -40,7 +40,7 @@ def main(
     pdfs: bool = False,
     prune: bool = False,
     force: bool = False,
-    timeout: bool = None,
+    timeout: Optional[int] = None,
     no_network: bool = False,
     debug: bool = False,
 ):
@@ -68,7 +68,7 @@ def main(
         pdfs (``bool``): whether to copy notebook PDFs out of the containers
         prune (``bool``): whether to prune the grading images; if true, no grading is performed
         force (``bool``): whether to force-prune the images (do not ask for confirmation)
-        timeout (``int``): an execution timeout in seconds for each container
+        timeout (``int | None``): an execution timeout in seconds for each container
         no_network (``bool``): whether to disable networking in the containers
         debug (``bool``): whether to run autograding in debug mode
 
@@ -103,6 +103,8 @@ def main(
     if ext not in _ALLOWED_EXTENSIONS:
         raise ValueError(f"Invalid submission extension specified: {ext}")
 
+    output_dir = pathlib.Path(output_dir)
+
     LOGGER.info("Launching Docker containers")
 
     pattern = f"*.{ext}"
@@ -115,9 +117,9 @@ def main(
 
     LOGGER.debug(f"Resolved submission paths: {submission_paths}")
 
-    pdf_dir = os.path.join(output_dir, "submission_pdfs") if pdfs else None
+    pdf_dir = output_dir / "submission_pdfs" if pdfs else None
 
-    grade_dfs = launch_containers(
+    scores = launch_containers(
         autograder,
         submission_paths,
         num_containers = containers,
@@ -136,37 +138,22 @@ def main(
 
     LOGGER.info("Combining grades and saving")
 
-    # Merge dataframes
-    output_df = merge_csv(grade_dfs)
-    cols = output_df.columns.tolist()
-    question_cols = sorted(c for c in cols if c not in {
-        SCORES_DICT_FILE_KEY,
-        SCORES_DICT_TOTAL_POINTS_KEY,
-        SCORES_DICT_PERCENT_CORRECT_KEY,
-        SCORES_DICT_GRADING_STATUS_KEY,
-        SCORES_DICT_SUMMARY_KEY
-    })
-    output_df = output_df[[
-        SCORES_DICT_FILE_KEY,
-        *question_cols,
-        SCORES_DICT_TOTAL_POINTS_KEY,
-        SCORES_DICT_PERCENT_CORRECT_KEY,
-        SCORES_DICT_GRADING_STATUS_KEY
-    ]]
+    # Merge scores to dataframe
+    output_df = merge_scores_to_df(scores)
 
     # write to CSV file
-    output_df.to_csv(os.path.join(output_dir, "final_grades.csv"), index=False)
+    output_df.to_csv(output_dir / "final_grades.csv", index=False)
 
     # write score summaries to files
     if summaries:
-        grading_summary_path = os.path.join(output_dir, "grading-summaries")
-        if not os.path.exists(grading_summary_path):
-            os.mkdir(grading_summary_path)
-        for df in grade_dfs:
-            df_dict = df.to_dict()
-            if df_dict['file'][0] != POINTS_POSSIBLE_LABEL:
-                with open(os.path.join(grading_summary_path, f"{df_dict['file'][0]}.txt"), mode="w") as f:
-                    f.write(df_dict["summary"][0])
+        grading_summary_path = output_dir / "grading-summaries"
+        if not grading_summary_path.exists():
+            grading_summary_path.mkdir()
+
+        for s in scores:
+            nb_name, _ = os.path.splitext(s.file)
+            with open(grading_summary_path / f"{nb_name}.txt", mode="w") as f:
+                f.write(s.summary())
 
     # return percentage if a single file was graded
     if len(paths) == 1 and os.path.isfile(paths[0]):
