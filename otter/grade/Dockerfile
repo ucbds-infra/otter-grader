@@ -1,6 +1,6 @@
 ARG BASE_IMAGE=ubuntu:22.04
-
 FROM ${BASE_IMAGE}
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
@@ -12,7 +12,6 @@ RUN mkdir -p /autograder/source && \
     mkdir -p /autograder/submission && \
     mkdir -p /autograder/results
 
-ENV BASE_IMAGE=$BASE_IMAGE
 ADD run_autograder /autograder/run_autograder
 ADD setup.sh environment.yml requirements.* /autograder/source/
 

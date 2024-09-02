@@ -42,10 +42,9 @@ def cleanup_output(cleanup_enabled):
 
 
 @pytest.fixture(autouse=True, scope="module")
-def generate_zip_file_and_patch_build():
+def generate_zip_file():
     """
-    Generate an autograder zip file for use in these tests and patch
-    ``otter.grade.containers.build_image`` with ``build_image_with_local_changes``.
+    Generate an autograder zip file for use in these tests.
     """
     generate(
         tests_dir = FILE_MANAGER.get_path("tests"), 
@@ -102,7 +101,7 @@ def test_timeout_some_notebooks_finish():
 @pytest.mark.docker
 def test_timeout_no_notebooks_finish():
     """
-    Check notebook ``1min.ipynb`` and ``10s.ipynb are killed due to exceeding the defined timeout;
+    Check notebook ``1min.ipynb`` and ``10s.ipynb`` are killed due to exceeding the defined timeout;
     The final_grade.csv records everything correctly
     """
     grade_timeout = 5
