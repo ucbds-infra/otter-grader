@@ -44,7 +44,7 @@ jobs:
         with:
           ref: beta
 
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-buildx-action@v3
         if: ${{ steps.check-branch.outputs.run == 'true' }}
         with:
           install: true
