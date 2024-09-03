@@ -18,6 +18,7 @@
 * Removed `variables` key of assignment config in favor of `generate.serialized_variables` in Otter Assign per [#628](https://github.com/ucbds-infra/otter-grader/issues/628)
 * Update Otter Assign to add cell metadata so that questions with no check cell have their tests run after the last solution cell per [#798](https://github.com/ucbds-infra/otter-grader/issues/798)
 * Updated Otter Assign to strip type annotations from generated test code per [#796](https://github.com/ucbds-infra/otter-grader/issues/796)
+* Updated Otter Grade Docker image to create an empty `submission_metadata.json` file in the grading image to prevent plugins from erroring per [#811](https://github.com/ucbds-infra/otter-grader/issues/811)
 
 **v5.6.0:**
 

@@ -21,6 +21,9 @@ RUN dos2unix /autograder/run_autograder /autograder/source/setup.sh && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# create an empty submission_metadata.json file so that plugins don't error when trying to read it
+RUN touch /autograder/submission_metadata.json
+
 ADD otter_config.json run_otter.py /autograder/source/
 ADD files* /autograder/source/files/
 ADD tests /autograder/source/tests/
