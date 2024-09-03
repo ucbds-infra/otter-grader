@@ -258,9 +258,7 @@ class AssignmentTestsManager:
         Returns:
             ``dict``: the OK-formatted test case
         """
-        inp = test_case.input
-        if hasattr(ast, "unparse"):
-            inp = ast.unparse(ast.parse(test_case.input))
+        inp = ast.unparse(_AnnotationRemover().visit(ast.parse(test_case.input)))
         code_lines = str_to_doctest(inp.split('\n'), [])
         code_lines.append(test_case.output)
 
@@ -452,3 +450,19 @@ def ensure_valid_syntax(source: List[str], question: QuestionConfig) -> None:
         ast.parse(source)
     except SyntaxError as e:
         raise ValueError(f"A test cell in question {question.name} contains invalid Python syntax:\n{source}")
+
+
+class _AnnotationRemover(ast.NodeTransformer):
+    """
+    An AST node transformer that removes all type annotations.
+    """
+
+    def visit(self, node):
+        self.generic_visit(node)
+        if hasattr(node, "annotation"):
+            node.annotation = None
+        if hasattr(node, "returns"):
+            node.returns = None
+        if hasattr(node, "type_params"):
+            node.type_params = None
+        return node
