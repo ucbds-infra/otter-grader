@@ -58,6 +58,12 @@ grading = ["ipykernel", "jupyter_client", "pypdf"]
 plugins = ["google-api-python-client", "google-auth-oauthlib", "gspread", "six"]
 r = ["rpy2"]
 
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+
 [tool.poetry.group.test]
 optional = true
 
@@ -78,6 +84,10 @@ sphinx-book-theme = "1.1.0"
 sphinx-click = "*"
 sphinx_markdown_tables = "*"
 sphinxcontrib-apidoc = "*"
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
 
 [build-system]
 requires = ["poetry-core"]
