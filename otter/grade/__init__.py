@@ -12,11 +12,7 @@ from .containers import launch_containers
 from .utils import (
     merge_scores_to_df,
     prune_images,
-    POINTS_POSSIBLE_LABEL,
-    SCORES_DICT_FILE_KEY,
     SCORES_DICT_PERCENT_CORRECT_KEY,
-    SCORES_DICT_TOTAL_POINTS_KEY,
-    SCORES_DICT_GRADING_STATUS_KEY,
 )
 
 from ..run.run_autograder.autograder_config import AutograderConfig
@@ -107,24 +103,24 @@ def main(
         raise ValueError(f"Invalid submission extension specified: {ext}")
 
     output_dir = pathlib.Path(output_dir)
+    try:
+        if result_queue:
+            loggers.add_queue_handler(result_queue)
 
-    if result_queue:
-        loggers.add_queue_handler(result_queue)
+        LOGGER.info("Launching Docker containers")
 
-    LOGGER.info("Launching Docker containers")
+        pattern = f"*.{ext}"
+        submission_paths = []
+        for path in paths:
+            if os.path.isdir(path):
+                submission_paths.extend(glob(os.path.join(path, pattern)))
+            else:
+                submission_paths.append(path)
 
-    pattern = f"*.{ext}"
-    submission_paths = []
-    for path in paths:
-        if os.path.isdir(path):
-            submission_paths.extend(glob(os.path.join(path, pattern)))
-        else:
-            submission_paths.append(path)
+        LOGGER.debug(f"Resolved submission paths: {submission_paths}")
 
-    LOGGER.debug(f"Resolved submission paths: {submission_paths}")
+        pdf_dir = output_dir / "submission_pdfs" if pdfs else None
 
-    pdf_dir = output_dir / "submission_pdfs" if pdfs else None
-    try: 
         scores = launch_containers(
             autograder,
             submission_paths,

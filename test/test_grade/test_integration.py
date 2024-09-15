@@ -376,14 +376,16 @@ def test_queue():
     """
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
     test_queue = Queue()
+    loggers.set_level(logging.INFO)
     grade(
         name = ASSIGNMENT_NAME,
         paths = [notebook_path],
         output_dir = "test/",
         autograder = AG_ZIP_PATH,
         summaries = False,
-        result_queue = test_queue
+        result_queue = test_queue,
     )
     with open(FILE_MANAGER.get_path("queue/passall_messages.txt"), "r") as f:
         for line in f:
             assert test_queue.get() == line.strip()
+        assert test_queue.empty()

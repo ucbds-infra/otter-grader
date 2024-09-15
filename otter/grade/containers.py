@@ -240,10 +240,10 @@ def grade_submission(
 
     except TimeoutException as te:
         scores = GradingResults.without_results(te)
-        LOGGER.info(f"Notebook Grading Timeout Error: {nb_basename}")
+        LOGGER.error(f"Notebook Grading Timeout Error: {nb_basename}")
     except Exception as e:
         scores = GradingResults.without_results(e)
-        LOGGER.info(f"Notebook Grading Error: {nb_basename}")
+        LOGGER.error(f"Notebook Grading Error: {nb_basename}")
     finally:
         scores.file = nb_basename
         os.remove(results_path)

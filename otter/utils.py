@@ -284,25 +284,27 @@ class loggers:
             logger.addHandler(cls._socket_handler)
         if cls._queue_handler:
             logger.addHandler(cls._queue_handler)
-            logger.setLevel(logging.INFO)
         cls._instances[name] = logger
         return logger
 
     @classmethod
     def add_queue_handler(cls, result_queue):
         """
-        adds queue handler to all instances of the logger
+        Set up a ``QueueLoggingHandler`` that sends all logged messages to the provided
+        ``multiprocessing.Queue``.
+
+        Args:
+            result_queue (``multiprocessing.Queue``): the queue to write logs to
         """
         cls._queue_handler = QueueLoggingHandler(result_queue)
         for name in cls._instances:
             logger = logging.getLogger(name)
             logger.addHandler(cls._queue_handler)
-            logger.setLevel(logging.INFO)
 
     @classmethod
     def remove_queue_handlers(cls):
         """
-        removes queue handler from all instances of the logger
+        Remove instance of ``QueueLoggingHandler`` from loggers
         """
         for name in cls._instances:
             logger = logging.getLogger(name)
@@ -384,7 +386,7 @@ class QueueLoggingHandler(logging.Handler):
     """The logging handler that writes INFO messages to the log_queue.
 
     Args:
-        log_queue (multiprocessing.Queue): the queue this handler writes to
+        log_queue (``multiprocessing.Queue``): the queue this handler writes to
     """
 
     def __init__(self, log_queue: Queue):
