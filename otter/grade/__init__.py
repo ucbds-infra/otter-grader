@@ -5,17 +5,14 @@ import pathlib
 import re
 
 from glob import glob
+from multiprocessing import Queue
 from typing import List, Optional, Tuple, Union
 
 from .containers import launch_containers
 from .utils import (
     merge_scores_to_df,
     prune_images,
-    POINTS_POSSIBLE_LABEL,
-    SCORES_DICT_FILE_KEY,
     SCORES_DICT_PERCENT_CORRECT_KEY,
-    SCORES_DICT_TOTAL_POINTS_KEY,
-    SCORES_DICT_GRADING_STATUS_KEY,
 )
 
 from ..run.run_autograder.autograder_config import AutograderConfig
@@ -43,6 +40,7 @@ def main(
     timeout: Optional[int] = None,
     no_network: bool = False,
     debug: bool = False,
+    result_queue: Optional[Queue] = None,
 ):
     """
     Run Otter Grade.
@@ -71,6 +69,7 @@ def main(
         timeout (``int | None``): an execution timeout in seconds for each container
         no_network (``bool``): whether to disable networking in the containers
         debug (``bool``): whether to run autograding in debug mode
+        result_queue (``multiprocessing.Queue | None``): the queue to store progress messages
 
     Returns:
         ``float | None``: the percentage scored by that submission if a single file was graded
@@ -104,39 +103,44 @@ def main(
         raise ValueError(f"Invalid submission extension specified: {ext}")
 
     output_dir = pathlib.Path(output_dir)
+    try:
+        if result_queue:
+            loggers.add_queue_handler(result_queue)
 
-    LOGGER.info("Launching Docker containers")
+        LOGGER.info("Launching Docker containers")
 
-    pattern = f"*.{ext}"
-    submission_paths = []
-    for path in paths:
-        if os.path.isdir(path):
-            submission_paths.extend(glob(os.path.join(path, pattern)))
-        else:
-            submission_paths.append(path)
+        pattern = f"*.{ext}"
+        submission_paths = []
+        for path in paths:
+            if os.path.isdir(path):
+                submission_paths.extend(glob(os.path.join(path, pattern)))
+            else:
+                submission_paths.append(path)
 
-    LOGGER.debug(f"Resolved submission paths: {submission_paths}")
+        LOGGER.debug(f"Resolved submission paths: {submission_paths}")
 
-    pdf_dir = output_dir / "submission_pdfs" if pdfs else None
+        pdf_dir = output_dir / "submission_pdfs" if pdfs else None
 
-    scores = launch_containers(
-        autograder,
-        submission_paths,
-        num_containers = containers,
-        base_image = image,
-        tag = name,
-        no_kill = no_kill,
-        pdf_dir = pdf_dir,
-        timeout = timeout,
-        network = not no_network,
-        config = AutograderConfig({
-            "zips": ext == "zip",
-            "pdf": pdfs,
-            "debug": debug,
-        }),
-    )
+        scores = launch_containers(
+            autograder,
+            submission_paths,
+            num_containers = containers,
+            base_image = image,
+            tag = name,
+            no_kill = no_kill,
+            pdf_dir = pdf_dir,
+            timeout = timeout,
+            network = not no_network,
+            config = AutograderConfig({
+                "zips": ext == "zip",
+                "pdf": pdfs,
+                "debug": debug,
+            }),
+        )
 
-    LOGGER.info("Combining grades and saving")
+        LOGGER.info("Combining grades and saving")
+    finally:
+        loggers.remove_queue_handlers()
 
     # Merge scores to dataframe
     output_df = merge_scores_to_df(scores)
