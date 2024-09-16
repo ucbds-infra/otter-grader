@@ -297,8 +297,7 @@ class loggers:
             result_queue (``multiprocessing.Queue``): the queue to write logs to
         """
         cls._queue_handler = QueueLoggingHandler(result_queue)
-        for name in cls._instances:
-            logger = logging.getLogger(name)
+        for logger in cls._instances.values():
             logger.addHandler(cls._queue_handler)
 
     @classmethod
