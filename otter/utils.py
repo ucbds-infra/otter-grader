@@ -306,8 +306,7 @@ class loggers:
         """
         Remove instance of ``QueueLoggingHandler`` from loggers
         """
-        for name in cls._instances:
-            logger = logging.getLogger(name)
+        for logger in cls._instances.values():
             logger.removeHandler(cls._queue_handler)
         cls._queue_handler = None
 

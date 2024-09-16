@@ -244,6 +244,7 @@ def grade_submission(
     except Exception as e:
         scores = GradingResults.without_results(e)
         LOGGER.error(f"Notebook Grading Error: {nb_basename}")
+
     finally:
         scores.file = nb_basename
         os.remove(results_path)
