@@ -46,12 +46,12 @@ class CellFactory:
         """
         args = ""
         if self.assignment.runs_on == "default":
-            args = f"\"{self.assignment.master.name}\""
+            args = f'"{self.assignment.master.name}"'
 
         if self.assignment.tests.url_prefix:
             args += f"{', ' if args else ''}tests_url_prefix=\"{self.assignment.tests.url_prefix}\""
 
-        contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
+        contents = f"# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})"
         cell = nbformat.v4.new_code_cell(contents)
         lock(cell)
         return [cell]
@@ -80,8 +80,10 @@ class CellFactory:
             ``list[nbformat.NotebookNode]``: the check-all cells
         """
         instructions = nbformat.v4.new_markdown_cell()
-        instructions.source = "---\n\nTo double-check your work, the cell below will rerun all " \
+        instructions.source = (
+            "---\n\nTo double-check your work, the cell below will rerun all "
             "of the autograder tests."
+        )
 
         check_all = nbformat.v4.new_code_cell("grader.check_all()")
 
@@ -92,7 +94,7 @@ class CellFactory:
 
     def create_export_cells(self) -> list[nbformat.NotebookNode]:
         """
-        Generate export cells that instruct the student the run a code cell calling 
+        Generate export cells that instruct the student the run a code cell calling
         ``otter.Notebook.export`` to generate and download their submission.
 
         Returns:
@@ -102,16 +104,18 @@ class CellFactory:
             return []
 
         instructions = nbformat.v4.new_markdown_cell()
-        instructions.source = "## Submission\n\nMake sure you have run all cells in your " \
-            "notebook in order before running the cell below, so that all images/graphs appear " \
+        instructions.source = (
+            "## Submission\n\nMake sure you have run all cells in your "
+            "notebook in order before running the cell below, so that all images/graphs appear "
             "in the output. The cell below will generate a zip file for you to submit."
+        )
 
         # only include save text if force_save is false
         if not self.assignment.export_cell.force_save:
             instructions.source += " **Please save before exporting!**"
 
         if self.assignment.export_cell.instructions:
-            instructions.source += '\n\n' + self.assignment.export_cell.instructions
+            instructions.source += "\n\n" + self.assignment.export_cell.instructions
 
         export = nbformat.v4.new_code_cell()
         source_lines = []
@@ -119,7 +123,8 @@ class CellFactory:
         # only include save text if force_save is false
         if not self.assignment.export_cell.force_save:
             source_lines.append(
-                "# Save your notebook first, then run this cell to export your submission.")
+                "# Save your notebook first, then run this cell to export your submission."
+            )
 
         args = []
         if not self.assignment.export_cell.filtering:

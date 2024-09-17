@@ -24,9 +24,9 @@ class BaseExporter(ABC):
     """
     Abstract base class for Otter Export exporters
 
-    Defines methods that read in notebooks from file paths and filter cells with pagebreak annotations 
+    Defines methods that read in notebooks from file paths and filter cells with pagebreak annotations
     if necessary. Sublcasses are not meant to be instatiated but have class methods called. The abstract
-    class method ``BaseExporter.convert_notebook`` does the heavy lifting of converting a notebook 
+    class method ``BaseExporter.convert_notebook`` does the heavy lifting of converting a notebook
     file path into a PDF file.
 
     Attributes:
@@ -40,7 +40,7 @@ class BaseExporter(ABC):
 
     # def __init_subclass__(cls, **kwargs):
     #     super().__init_subclass__(**kwargs)
-    #     cls.default_options = 
+    #     cls.default_options =
 
     @classmethod
     @abstractmethod
@@ -126,13 +126,17 @@ class BaseExporter(ABC):
                 idx_to_delete.append(curr_idx)
 
             # if both are in cell and before is after end, delete intervening lines
-            elif lines_before_begin != -1 and lines_after_end != -1 and lines_after_end < lines_before_begin:
-                del source[lines_after_end+1:lines_before_begin]
+            elif (
+                lines_before_begin != -1
+                and lines_after_end != -1
+                and lines_after_end < lines_before_begin
+            ):
+                del source[lines_after_end + 1 : lines_before_begin]
 
             else:
                 # if there is an end comment, delete lines after that
                 if lines_after_end != -1:
-                    del source[lines_after_end+1:]
+                    del source[lines_after_end + 1 :]
 
                 # if there is a begin comment, delete lines before that
                 if lines_before_begin != -1:
@@ -149,4 +153,3 @@ class BaseExporter(ABC):
             del cells[idx]
 
         return notebook
-

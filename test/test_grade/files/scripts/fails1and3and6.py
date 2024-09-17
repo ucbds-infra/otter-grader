@@ -6,8 +6,10 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 # get_ipython().run_line_magic('matplotlib', 'inline')
 import otter
+
 grader = otter.Notebook("../tests")
 
 
@@ -97,4 +99,4 @@ def fiberator():
 grader.check("q6")
 
 
-#  
+#

@@ -30,7 +30,7 @@ NB_PATH_STEM = os.path.splitext(os.path.basename(NB_PATH))[0]
 
 
 def square(x):
-    return x ** 2
+    return x**2
 
 
 def negate(x):
@@ -58,7 +58,7 @@ def test_check():
     grader = Notebook(tests_dir=TESTS_DIR)
 
     def square(x):
-        return x ** 2
+        return x**2
 
     def negate(x):
         return not x
@@ -69,8 +69,9 @@ def test_check():
     }
 
     expected_reprs = {
-        "q1": 'q1 results: All test cases passed!',
-        "q2": dedent("""\
+        "q1": "q1 results: All test cases passed!",
+        "q2": dedent(
+            """\
             q2 results:
                 q2 - 1 result:
                     ❌ Test case failed
@@ -89,10 +90,11 @@ def test_check():
 
                 q2 - 2 result:
                     ✅ Test case passed
-        """).strip(),
-        "q3": 'q3 results: All test cases passed!',
-        "q4": 'q4 results: All test cases passed!',
-        "q5": 'q5 results: All test cases passed!',
+        """
+        ).strip(),
+        "q3": "q3 results: All test cases passed!",
+        "q4": "q4 results: All test cases passed!",
+        "q5": "q5 results: All test cases passed!",
     }
 
     for q_path in TESTS_GLOB:
@@ -147,12 +149,15 @@ def test_export(mocked_export, mocked_zf, mocked_dt, write_notebook):
         grader.export()
 
         zip_name = FILE_MANAGER.get_path(
-            f"{NB_PATH_STEM}_{timestmap.strftime('%Y_%m_%dT%H_%M_%S_%f')}.zip")
+            f"{NB_PATH_STEM}_{timestmap.strftime('%Y_%m_%dT%H_%M_%S_%f')}.zip"
+        )
         mocked_zf.assert_called_once_with(zip_name, mode="w")
         mocked_zf.return_value.write.assert_any_call(mocked_resolve.return_value)
         mocked_zf.return_value.write.assert_any_call(_OTTER_LOG_FILENAME)
         mocked_export.assert_called_once_with(NB_PATH, filtering=True, pagebreaks=True)
-        mocked_zf.return_value.writestr.assert_called_with(_ZIP_NAME_FILENAME, os.path.basename(zip_name))
+        mocked_zf.return_value.writestr.assert_called_with(
+            _ZIP_NAME_FILENAME, os.path.basename(zip_name)
+        )
 
 
 @mock.patch("otter.check.notebook.zipfile.ZipFile")
@@ -215,7 +220,7 @@ def test_export_with_no_pdf_ack(
     grader = Notebook(NB_PATH)
 
     # with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve:
-        # mocked_resolve.return_value = NB_PATH
+    # mocked_resolve.return_value = NB_PATH
     mocked_dt.datetime.now.return_value = timestmap
     mocked_export.return_value = FILE_MANAGER.get_path(f"{NB_PATH_STEM}.pdf")
 
@@ -228,23 +233,28 @@ def test_export_with_no_pdf_ack(
     mocked_ipyw_html.assert_any_call("""<p style="margin: 0">no pdf</p>""")
     mocked_ipyw_button.assert_called_with(description="Continue export", button_style="warning")
     mocked_ipyw_button.return_value.on_click.assert_called()
-    mocked_ipyw_vbox.assert_called_with([
-        mocked_ipyw_html.return_value,
-        mocked_ipyw_button.return_value,
-        mocked_ipyw_html.return_value,
-        mocked_ipyw_output.return_value,
-    ])
+    mocked_ipyw_vbox.assert_called_with(
+        [
+            mocked_ipyw_html.return_value,
+            mocked_ipyw_button.return_value,
+            mocked_ipyw_html.return_value,
+            mocked_ipyw_output.return_value,
+        ]
+    )
     mocked_ipy_display.assert_called_with(mocked_ipyw_vbox.return_value)
 
     mocked_ipyw_button.return_value.on_click.call_args.args[0]()
 
     zip_name = FILE_MANAGER.get_path(
-        f"{NB_PATH_STEM}_{timestmap.strftime('%Y_%m_%dT%H_%M_%S_%f')}.zip")
+        f"{NB_PATH_STEM}_{timestmap.strftime('%Y_%m_%dT%H_%M_%S_%f')}.zip"
+    )
     mocked_zf.assert_called_once_with(zip_name, mode="w")
     # mocked_zf.return_value.write.assert_any_call(mocked_resolve.return_value)
     mocked_zf.return_value.write.assert_any_call(NB_PATH)
     mocked_zf.return_value.write.assert_any_call(_OTTER_LOG_FILENAME)
-    mocked_zf.return_value.writestr.assert_called_with(_ZIP_NAME_FILENAME, os.path.basename(zip_name))
+    mocked_zf.return_value.writestr.assert_called_with(
+        _ZIP_NAME_FILENAME, os.path.basename(zip_name)
+    )
 
 
 @mock.patch("otter.check.notebook.os.path.isdir")
@@ -253,7 +263,9 @@ def test_colab(mocked_get_ipython, mocked_isdir):
     """
     Checks that the ``Notebook`` class correctly disables methods on Google Colab.
     """
-    mocked_get_ipython.return_value.__str__.return_value = "<google.colab._shell.Shell object at 0x7c0afb37e7d0>"
+    mocked_get_ipython.return_value.__str__.return_value = (
+        "<google.colab._shell.Shell object at 0x7c0afb37e7d0>"
+    )
     mocked_isdir.return_value = False
     with pytest.raises(ValueError, match=f"Tests directory {TESTS_DIR} does not exist"):
         grader = Notebook(tests_dir=TESTS_DIR)
@@ -282,7 +294,9 @@ def test_jupyterlite(mocked_get_ipython):
     """
     Checks that the ``Notebook`` class correctly disables methods on Google Colab.
     """
-    mocked_get_ipython.return_value.__str__.return_value = "<pyodide_kernel.interpreter.Interpreter object at 0x2505a80>"
+    mocked_get_ipython.return_value.__str__.return_value = (
+        "<pyodide_kernel.interpreter.Interpreter object at 0x2505a80>"
+    )
     tests_url_prefix = "https://domain.tld/"
     grader = Notebook(tests_url_prefix=tests_url_prefix)
 
@@ -296,9 +310,11 @@ def test_jupyterlite(mocked_get_ipython):
     mocked_pyodide = mock.MagicMock()
     sys.modules["pyodide"] = mocked_pyodide
 
-    with mock.patch("otter.check.utils.os") as mocked_os, \
-            mock.patch("otter.check.utils.open", mock.mock_open()) as mocked_open, \
-            mock.patch("otter.check.utils.IPythonInterpreter") as mocked_interp:
+    with (
+        mock.patch("otter.check.utils.os") as mocked_os,
+        mock.patch("otter.check.utils.open", mock.mock_open()) as mocked_open,
+        mock.patch("otter.check.utils.IPythonInterpreter") as mocked_interp,
+    ):
         mocked_interp.PYOLITE.value.running.return_value = True
         mocked_os.path.join.return_value = FILE_MANAGER.get_path("tests/q1.py")
 
@@ -324,8 +340,10 @@ def test_grading_mode(mocked_resolve_nb_path, mocked_resolve_test_info, _):
 
     # check will try to raise a FileNotFoundError because the test file doesn't exist; this is safe
     # to ignore since it's thrown after the call to resolve_test_info
-    try: grader.check("q1")
-    except FileNotFoundError: pass
+    try:
+        grader.check("q1")
+    except FileNotFoundError:
+        pass
     mocked_resolve_test_info.assert_called_once_with("foo", None, None, "q1")
 
     mocked_resolve_nb_path.reset_mock()

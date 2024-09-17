@@ -11,7 +11,7 @@ from ..utils import print_full_width
 class PluginCollection:
     """
     Class for loading, organizing, and running plugins during grading. This class is instantiated with
-    a list of plugin names, which should be importable strings that evaluate to objects that inherit 
+    a list of plugin names, which should be importable strings that evaluate to objects that inherit
     from ``otter.plugins.AbstractOtterPlugin``.
 
     When this class is instantiated, each plugin is imported and passed its configurations specified
@@ -32,7 +32,7 @@ class PluginCollection:
         }
 
     Args:
-        plugin_names (``list[Union[str,dict[str:Any]]]``): the importable names of plugin classes (e.g. 
+        plugin_names (``list[Union[str,dict[str:Any]]]``): the importable names of plugin classes (e.g.
             ``some_package.SomePlugin``) and their configurations
         submission_path (``str``): the absolute path to the submission being graded
         submission_metadata (``dict[str:Any]``): submission metadata
@@ -46,18 +46,22 @@ class PluginCollection:
         result = []
         for plg in plugin_config:
             if isinstance(plg, str):
-                result.append({
-                    "plugin": plg,
-                    "config": {},
-                })
+                result.append(
+                    {
+                        "plugin": plg,
+                        "config": {},
+                    }
+                )
             elif isinstance(plg, dict):
                 keys = list(plg.keys())
                 if not len(keys) == 1:
                     raise ValueError(f"Invalid plugin specification: {plg}")
-                result.append({
-                    "plugin": keys[0],
-                    "config": plg[keys[0]],
-                })
+                result.append(
+                    {
+                        "plugin": keys[0],
+                        "config": plg[keys[0]],
+                    }
+                )
 
         return result
 
@@ -68,7 +72,9 @@ class PluginCollection:
         self._subm_path = submission_path
         self._subm_meta = submission_metadata
 
-        self._plugins = self._load_plugins(self._plugin_config, submission_path, submission_metadata)
+        self._plugins = self._load_plugins(
+            self._plugin_config, submission_path, submission_metadata
+        )
 
     @property
     def _plugin_names(self):
@@ -111,7 +117,7 @@ class PluginCollection:
         listed that have already been isntatiated here are *not* added.
 
         Args:
-            raw_plugin_config (``list[Union[str,dict[str:Any]]]``): the importable names of plugin classes (e.g. 
+            raw_plugin_config (``list[Union[str,dict[str:Any]]]``): the importable names of plugin classes (e.g.
             ``some_package.SomePlugin``) and their configurations
         """
         plg_cfg = self._parse_plugin_config(raw_plugin_config)

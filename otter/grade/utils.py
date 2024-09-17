@@ -23,6 +23,7 @@ class TimeoutException(Exception):
     """
     This Exception is thrown when grading a notebook exceeds the timeout value specified.
     """
+
     pass
 
 
@@ -37,7 +38,11 @@ def list_files(path: str) -> list[str]:
         ``list[str]``: list of filenames in the given directory
 
     """
-    return [file for file in os.listdir(path) if os.path.isfile(os.path.join(path, file)) and file[0] != "."]
+    return [
+        file
+        for file in os.listdir(path)
+        if os.path.isfile(os.path.join(path, file)) and file[0] != "."
+    ]
 
 
 def merge_csv(dataframes: list[pd.DataFrame]) -> pd.DataFrame:
@@ -52,9 +57,9 @@ def merge_csv(dataframes: list[pd.DataFrame]) -> pd.DataFrame:
             dataframes
 
     """
-    final_dataframe = pd.concat(dataframes, axis=0, join='inner')
-    do_not_sort = final_dataframe[final_dataframe['file'] == POINTS_POSSIBLE_LABEL]
-    sort_these = final_dataframe[final_dataframe['file'] != POINTS_POSSIBLE_LABEL]
+    final_dataframe = pd.concat(dataframes, axis=0, join="inner")
+    do_not_sort = final_dataframe[final_dataframe["file"] == POINTS_POSSIBLE_LABEL]
+    sort_these = final_dataframe[final_dataframe["file"] != POINTS_POSSIBLE_LABEL]
     df_sorted = sort_these.sort_values(by="file")
     df_final = pd.concat([do_not_sort, df_sorted], ignore_index=True)
     return df_final
@@ -70,13 +75,15 @@ def prune_images(force: bool = False):
         print(f"    {image.repo_tags[0]}")
 
     if not force:
-        sure = input("Are you sure you want to delete these images? This action cannot be undone [y/N] ")
+        sure = input(
+            "Are you sure you want to delete these images? This action cannot be undone [y/N] "
+        )
         sure = bool(re.match(r"ye?s?", sure, flags=re.IGNORECASE))
 
     else:
         sure = True
 
-    if sure:        
+    if sure:
         for image in images:
             image.remove(force=True)
 
@@ -148,18 +155,25 @@ def merge_scores_to_df(scores: list[GradingResults]) -> pd.DataFrame:
 
     output_df = merge_csv(dfs)
     cols = output_df.columns.tolist()
-    question_cols = sorted(c for c in cols if c not in {
-        SCORES_DICT_FILE_KEY,
-        SCORES_DICT_TOTAL_POINTS_KEY,
-        SCORES_DICT_PERCENT_CORRECT_KEY,
-        SCORES_DICT_GRADING_STATUS_KEY,
-    })
-    output_df = output_df[[
-        SCORES_DICT_FILE_KEY,
-        *question_cols,
-        SCORES_DICT_TOTAL_POINTS_KEY,
-        SCORES_DICT_PERCENT_CORRECT_KEY,
-        SCORES_DICT_GRADING_STATUS_KEY,
-    ]]
+    question_cols = sorted(
+        c
+        for c in cols
+        if c
+        not in {
+            SCORES_DICT_FILE_KEY,
+            SCORES_DICT_TOTAL_POINTS_KEY,
+            SCORES_DICT_PERCENT_CORRECT_KEY,
+            SCORES_DICT_GRADING_STATUS_KEY,
+        }
+    )
+    output_df = output_df[
+        [
+            SCORES_DICT_FILE_KEY,
+            *question_cols,
+            SCORES_DICT_TOTAL_POINTS_KEY,
+            SCORES_DICT_PERCENT_CORRECT_KEY,
+            SCORES_DICT_GRADING_STATUS_KEY,
+        ]
+    ]
 
     return output_df

@@ -37,7 +37,7 @@ class NBMetadataConfig(fica.Config):
     """test cases keyed by question name"""
 
     ok_format: bool = fica.Key(
-        name = OK_FORMAT_VARNAME,
+        name=OK_FORMAT_VARNAME,
         type_=bool,
         allow_none=True,
     )
@@ -55,7 +55,12 @@ class NBMetadataConfig(fica.Config):
     )
     """a custom message to display to students when ACKing the lack of a PDF"""
 
-    def __init__(self, user_config: Dict[str, Any] = {}, documentation_mode: bool = False, require_valid_keys: bool = False) -> None:
+    def __init__(
+        self,
+        user_config: Dict[str, Any] = {},
+        documentation_mode: bool = False,
+        require_valid_keys: bool = False,
+    ) -> None:
         if ("tests" in user_config) != (OK_FORMAT_VARNAME in user_config):
             raise ValueError(f"{OK_FORMAT_VARNAME} must be specified with tests")
 

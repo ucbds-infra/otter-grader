@@ -18,10 +18,12 @@ class PDFViaLatexExporter(BaseExporter):
     """
 
     default_options = BaseExporter.default_options.copy()
-    default_options.update({
-        "save_tex": False,
-        "template": "via_latex",
-    })
+    default_options.update(
+        {
+            "save_tex": False,
+            "template": "via_latex",
+        }
+    )
 
     @classmethod
     def convert_notebook(cls, nb_path, dest, xecjk=False, **kwargs):
@@ -34,7 +36,9 @@ class PDFViaLatexExporter(BaseExporter):
         if xecjk:
             options["template"] = "via_latex_xecjk"
 
-        nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
+        nb = cls.load_notebook(
+            nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"]
+        )
 
         nbconvert.TemplateExporter.extra_template_basedirs = [str(TEMPLATE_DIR)]
         orig_template_name = nbconvert.TemplateExporter.template_name
@@ -59,9 +63,11 @@ class PDFViaLatexExporter(BaseExporter):
             message = "There was an error generating your LaTeX; showing full error message:\n"
             message += indent(error.output, "    ")
             if xecjk:
-                message += "\n\nIf the error above is related to xeCJK or fandol in LaTeX " \
-                    "and you don't require this functionality, try running again without " \
+                message += (
+                    "\n\nIf the error above is related to xeCJK or fandol in LaTeX "
+                    "and you don't require this functionality, try running again without "
                     "xecjk set to True or the --xecjk flag."
+                )
             raise ExportFailedException(message)
 
         finally:

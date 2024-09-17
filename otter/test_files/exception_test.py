@@ -66,8 +66,14 @@ class test_case:
         Returns:
             ``otter.test_files.abstract_test.TestCase``: the test case named tuple
         """
-        return TestCase(name=self.name, body=self, hidden=self.hidden, points=self.points, 
-            success_message=self.success_message, failure_message=self.failure_message)
+        return TestCase(
+            name=self.name,
+            body=self,
+            hidden=self.hidden,
+            points=self.points,
+            success_message=self.success_message,
+            failure_message=self.failure_message,
+        )
 
     def _get_func_params(self):
         """
@@ -83,7 +89,7 @@ class test_case:
         Call the underlying test case function, passig in parameters from the global environment.
 
         If the signature of ``self.test_func`` contains a parameter called ``env``, the environment
-        is passed in. For all other parameters, that value from the global environment is passed in, 
+        is passed in. For all other parameters, that value from the global environment is passed in,
         defaulting to ``None`` if the key is not present. Thus, a function with the signature
 
         .. code-block:: python
@@ -95,8 +101,8 @@ class test_case:
         .. code-block:: python
 
             foo(
-                env = global_environment, 
-                func_a = global_environment.get("func_a"), 
+                env = global_environment,
+                func_a = global_environment.get("func_a"),
                 func_b = global_environment.get("func_b"),
                 obj = global_environment.get("obj"),
             )
@@ -109,22 +115,24 @@ class test_case:
             ``object``: the return value of the test case function
         """
         args = self._get_func_params()
-        call_kwargs = {arg: (global_environment if arg == "env" else \
-                global_environment.get(arg, None)) for arg in args}
+        call_kwargs = {
+            arg: (global_environment if arg == "env" else global_environment.get(arg, None))
+            for arg in args
+        }
         return self.test_func(**call_kwargs)
-    
+
     def __getstate__(self):
         """
-        Creates a representation of the state of the instance. The attributes of the object are 
-        packaged into a dictionary representation excluding certain attributes. ``test_func`` is 
+        Creates a representation of the state of the instance. The attributes of the object are
+        packaged into a dictionary representation excluding certain attributes. ``test_func`` is
         excluded because it cannot be pickled.
 
         Returns:
             ``dict``: a dictionary representation of the instance's state
         """
         state = self.__dict__.copy()
-        if 'test_func' in state:
-            del state['test_func']
+        if "test_func" in state:
+            del state["test_func"]
         return state
 
 
@@ -164,7 +172,7 @@ class ExceptionTestFile(TestFile):
 
     def run(self, global_environment):
         """
-        Run the test cases against ``global_environment``, saving the results in 
+        Run the test cases against ``global_environment``, saving the results in
         ``self.test_case_results``.
 
         Arguments:

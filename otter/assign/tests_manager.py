@@ -25,7 +25,8 @@ from ..test_files.abstract_test import TestFile
 BEGIN_TEST_CONFIG_REGEX = r'(?:.\s*=\s*)?""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
 END_TEST_CONFIG_REGEX = r'""?"?\s*#\s*END\s*TEST\s*CONFIG'
 
-EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template("""\
+EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template(
+    """\
 from otter.test_files import test_case
 
 {{ OK_FORMAT_VARNAME }} = False
@@ -38,7 +39,8 @@ points = {{ points }}
     failure_message="{{ tc.failure_message }}"{% endif %})
 {{ tc.input }}
 {% endfor %}
-""")
+"""
+)
 
 
 @dataclass
@@ -155,24 +157,26 @@ class AssignmentTestsManager:
 
         test_start_line = 0 if hidden else -1
 
-        output = ''
-        for o in cell['outputs']:
-            output += ''.join(o.get('text', ''))
-            results = o.get('data', {}).get('text/plain')
+        output = ""
+        for o in cell["outputs"]:
+            output += "".join(o.get("text", ""))
+            results = o.get("data", {}).get("text/plain")
             if results and isinstance(results, list):
                 output += results[0]
             elif results:
                 output += results
 
         config, maybe_test_start_line = self._parse_test_config(source)
-        test_start_line = maybe_test_start_line if maybe_test_start_line is not None else test_start_line
+        test_start_line = (
+            maybe_test_start_line if maybe_test_start_line is not None else test_start_line
+        )
 
         hidden = config.get("hidden", hidden)
         points = config.get("points", None)
         success_message = config.get("success_message", None)
         failure_message = config.get("failure_message", None)
 
-        test_source = "\n".join(remove_ignored_lines(get_source(cell)[test_start_line + 1:]))
+        test_source = "\n".join(remove_ignored_lines(get_source(cell)[test_start_line + 1 :]))
 
         self._add_test_case(
             question,
@@ -231,12 +235,13 @@ class AssignmentTestsManager:
 
         points = question.points
         if isinstance(points, dict):
-            points = points.get('each', 1) * len(test_cases)
+            points = points.get("each", 1) * len(test_cases)
         elif isinstance(points, list):
             if len(points) != len(test_cases):
                 raise ValueError(
                     f"Error in question {question.name}: length of 'points' is {len(points)} "
-                    f"but there are {len(test_cases)} tests")
+                    f"but there are {len(test_cases)} tests"
+                )
 
         # check for errors in resolving points
         test_cases = self._resolve_test_file_points(points, test_cases)
@@ -259,21 +264,21 @@ class AssignmentTestsManager:
             ``dict``: the OK-formatted test case
         """
         inp = ast.unparse(_AnnotationRemover().visit(ast.parse(test_case.input)))
-        code_lines = str_to_doctest(inp.split('\n'), [])
+        code_lines = str_to_doctest(inp.split("\n"), [])
         code_lines.append(test_case.output)
 
         ret = {
-            'code': '\n'.join(code_lines),
-            'hidden': test_case.hidden,
-            'locked': False,
+            "code": "\n".join(code_lines),
+            "hidden": test_case.hidden,
+            "locked": False,
         }
 
         if test_case.points is not None:
-            ret['points'] = test_case.points
+            ret["points"] = test_case.points
         if test_case.success_message:
-            ret['success_message'] = test_case.success_message
+            ret["success_message"] = test_case.success_message
         if test_case.failure_message:
-            ret['failure_message'] = test_case.failure_message
+            ret["failure_message"] = test_case.failure_message
 
         return ret
 
@@ -288,12 +293,12 @@ class AssignmentTestsManager:
         Returns:
             ``dict``: the OK-formatted test suite
         """
-        return  {
-            'cases': [cls._create_ok_test_case(tc) for tc in test_cases],
-            'scored': True,
-            'setup': '',
-            'teardown': '',
-            'type': 'doctest'
+        return {
+            "cases": [cls._create_ok_test_case(tc) for tc in test_cases],
+            "scored": True,
+            "setup": "",
+            "teardown": "",
+            "type": "doctest",
         }
 
     def _format_test(
@@ -323,9 +328,9 @@ class AssignmentTestsManager:
 
         else:
             template_kwargs = {
-                "name": name, 
-                "points": points, 
-                "test_cases": test_cases, 
+                "name": name,
+                "points": points,
+                "test_cases": test_cases,
                 "OK_FORMAT_VARNAME": OK_FORMAT_VARNAME,
             }
             test = EXCEPTION_BASED_TEST_FILE_TEMPLATE.render(**template_kwargs)
@@ -333,12 +338,12 @@ class AssignmentTestsManager:
         return test
 
     def write_tests(
-            self,
-            nbmeta_config: NBMetadataConfig,
-            test_dir: Union[pathlib.Path, str],
-            include_hidden: bool = True,
-            force_files: bool = False,
-        ):
+        self,
+        nbmeta_config: NBMetadataConfig,
+        test_dir: Union[pathlib.Path, str],
+        include_hidden: bool = True,
+        force_files: bool = False,
+    ):
         """
         Write all test files to a notebook's metadata or a tests directory.
 
@@ -362,11 +367,15 @@ class AssignmentTestsManager:
             if not include_hidden:
                 test_info["test_cases"] = [tc for tc in test_info["test_cases"] if not tc.hidden]
                 if isinstance(test_info["points"], list):
-                    test_info["points"] = [p for tc, p in \
-                        zip(test_info["test_cases"], test_info["points"]) if not tc.hidden]
+                    test_info["points"] = [
+                        p
+                        for tc, p in zip(test_info["test_cases"], test_info["points"])
+                        if not tc.hidden
+                    ]
 
-            test = \
-                self._format_test(test_info["name"], test_info["points"], test_info["test_cases"])
+            test = self._format_test(
+                test_info["name"], test_info["points"], test_info["test_cases"]
+            )
 
             if use_files:
                 with open(test_path, "w+") as f:
@@ -394,19 +403,20 @@ class AssignmentTestsManager:
 
         points = question.points
         if isinstance(points, dict):
-            points = points.get('each', 1) * len(test_cases)
+            points = points.get("each", 1) * len(test_cases)
 
         if len(test_cases) == 0:
             if points is None and question.manual:
                 raise ValueError(
-                    f"Point value unspecified for question with no test cases: {question.name}")
+                    f"Point value unspecified for question with no test cases: {question.name}"
+                )
 
             return points if points is not None else 1
 
         try:
             resolved_test_cases = TestFile.resolve_test_file_points(points, test_cases)
         except Exception as e:
-            raise type(e)(f"Error in \"{question.name}\" test cases: {e}")
+            raise type(e)(f'Error in "{question.name}" test cases: {e}')
 
         points = round(sum(tc.points for tc in resolved_test_cases), 5)
         return int(points) if points % 1 == 0 else points
@@ -424,8 +434,10 @@ class AssignmentTestsManager:
             points = self.determine_question_point_value(config)
             rows.append({"name": question_name, "points": points})
             total += points
-            if config.manual: manual += points
-            else: autograded += points
+            if config.manual:
+                manual += points
+            else:
+                autograded += points
 
         summary = f"Assignment summary:\n"
         summary += f"Total points: {total}\n"
@@ -449,7 +461,9 @@ def ensure_valid_syntax(source: List[str], question: QuestionConfig) -> None:
     try:
         ast.parse(source)
     except SyntaxError as e:
-        raise ValueError(f"A test cell in question {question.name} contains invalid Python syntax:\n{source}")
+        raise ValueError(
+            f"A test cell in question {question.name} contains invalid Python syntax:\n{source}"
+        )
 
 
 class _AnnotationRemover(ast.NodeTransformer):

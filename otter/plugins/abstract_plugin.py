@@ -30,10 +30,10 @@ class AbstractOtterPlugin(ABC):
     ``otter.plugins.PluginEventNotSupportedException``. (This is the default behavior of this ABC, so
     inheriting from this class will do this for you for any methods you don't overwrite.)
 
-    If this plugin requires metadata, it should be included in the plugin configuration of the 
+    If this plugin requires metadata, it should be included in the plugin configuration of the
     ``otter_config.json`` file as a subdictionary with key a key corresponding to the importable name
     of the plugin. If no configurations are required, the plugin name should be listed as a string.
-    For example, the config below provides configurations for ``MyOtterPlugin`` but not 
+    For example, the config below provides configurations for ``MyOtterPlugin`` but not
     ``MyOtherOtterPlugin``.
 
     .. code-block:: json
@@ -54,7 +54,7 @@ class AbstractOtterPlugin(ABC):
         submission_metadata (``dict``): submission metadata; if on Gradescope, see
             https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/
         plugin_config (``dict``): configurations from the ``otter_config.json`` for this plugin, pulled
-            from ``otter_config["plugins"][][PLUGIN_NAME]`` if ``otter_config["plugins"][]`` is a 
+            from ``otter_config["plugins"][][PLUGIN_NAME]`` if ``otter_config["plugins"][]`` is a
             ``dict``
 
     Attributes:
@@ -62,7 +62,7 @@ class AbstractOtterPlugin(ABC):
         submission_metadata (``dict``): submission metadata; if on Gradescope, see
             https://gradescope-autograders.readthedocs.io/en/latest/submission_metadata/
         plugin_config (``dict``): configurations from the ``otter_config.json`` for this plugin, pulled
-            from ``otter_config["plugins"][][PLUGIN_NAME]`` if ``otter_config["plugins"][]`` is a 
+            from ``otter_config["plugins"][][PLUGIN_NAME]`` if ``otter_config["plugins"][]`` is a
             ``dict``
     """
 
@@ -77,7 +77,7 @@ class AbstractOtterPlugin(ABC):
         Assignment configurations are passed in via the ``assignment`` argument.
 
         Args:
-            assignment (``otter.assign.assignment.Assignment``): the ``Assignment`` instance with 
+            assignment (``otter.assign.assignment.Assignment``): the ``Assignment`` instance with
                 configurations for the assignment; used similar to an ``AttrDict`` where keys are
                 accessed with the dot syntax (e.g. ``assignment.master`` is the path to the master
                 notebook)
@@ -93,9 +93,9 @@ class AbstractOtterPlugin(ABC):
         to be written to ``otter_config.json``.
 
         Args:
-            otter_config (``dict``): the dictionary of Otter configurations to be written to 
+            otter_config (``dict``): the dictionary of Otter configurations to be written to
                 ``otter_config.json`` in the zip file
-            assignment (``otter.assign.assignment.Assignment``): the ``Assignment`` instance with 
+            assignment (``otter.assign.assignment.Assignment``): the ``Assignment`` instance with
                 configurations for the assignment if Otter Assign was used to generate this zip file;
                 will be set to ``None`` if Otter Assign is not being used
 
@@ -120,7 +120,7 @@ class AbstractOtterPlugin(ABC):
 
     def notebook_export(self, *args, **kwargs):
         """
-        Plugin event run when a student calls ``Notebook.export``. Accepts arbitrary arguments and 
+        Plugin event run when a student calls ``Notebook.export``. Accepts arbitrary arguments and
         should return a list of file paths to include in the exported zip file.
 
         Args:
@@ -152,12 +152,12 @@ class AbstractOtterPlugin(ABC):
     def before_execution(self, submission):
         """
         Plugin event run before the execution of the submission which can modify the submission itself.
-        This method should return a properly-formatted ``NotebookNode`` or string that will be executed in 
+        This method should return a properly-formatted ``NotebookNode`` or string that will be executed in
         place of the student's original submission.
 
         Args:
-            submission (``nbformat.NotebookNode`` or ``str``): the submission for grading; if it is 
-                a notebook, this will be the JSON-parsed ``dict`` of its contents; if it is a script, 
+            submission (``nbformat.NotebookNode`` or ``str``): the submission for grading; if it is
+                a notebook, this will be the JSON-parsed ``dict`` of its contents; if it is a script,
                 this will be a string containing the code
 
         Returns:
@@ -170,7 +170,7 @@ class AbstractOtterPlugin(ABC):
 
     def after_grading(self, results):
         """
-        Plugin event run after all tests are run on the resulting environment that gets passed the 
+        Plugin event run after all tests are run on the resulting environment that gets passed the
         ``otter.test_files.GradingResults`` object that stores the grading results for each test case.
 
         Args:

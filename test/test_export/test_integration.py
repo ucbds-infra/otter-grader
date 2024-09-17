@@ -29,8 +29,11 @@ def cleanup_output(cleanup_enabled):
     """
     yield
     if cleanup_enabled:
-        for file in glob(FILE_MANAGER.get_path("*.pdf")) + glob(FILE_MANAGER.get_path("*.tex")) + \
-                [FILE_MANAGER.get_path("output.ipynb")]:
+        for file in (
+            glob(FILE_MANAGER.get_path("*.pdf"))
+            + glob(FILE_MANAGER.get_path("*.tex"))
+            + [FILE_MANAGER.get_path("output.ipynb")]
+        ):
             if os.path.exists(file):
                 os.remove(file)
 
@@ -38,14 +41,19 @@ def cleanup_output(cleanup_enabled):
 @pytest.fixture(autouse=True)
 def disable_pdf_generation(pdfs_enabled):
     if not pdfs_enabled:
+
         def create_fake_pdf(exporter, nb):
             contents = "pdf contents"
             if isinstance(exporter, nbconvert.PDFExporter):
                 contents = contents.encode("utf-8")
             return contents, {}
 
-        cm = mock.patch("otter.export.exporters.via_html.nbconvert.export", side_effect=create_fake_pdf)
-        cm2 = mock.patch("otter.export.exporters.via_latex.nbconvert.export", side_effect=create_fake_pdf)
+        cm = mock.patch(
+            "otter.export.exporters.via_html.nbconvert.export", side_effect=create_fake_pdf
+        )
+        cm2 = mock.patch(
+            "otter.export.exporters.via_latex.nbconvert.export", side_effect=create_fake_pdf
+        )
 
     else:
         cm, cm2 = nullcontext(), nullcontext()
@@ -64,7 +72,8 @@ def test_success_HTML():
     """
     test_file = "successful-html-test"
     run_export(
-        FILE_MANAGER.get_path(f"{test_file}.ipynb"), filtering=True, save=True, exporter="latex")
+        FILE_MANAGER.get_path(f"{test_file}.ipynb"), filtering=True, save=True, exporter="latex"
+    )
 
     # check existence of pdf and tex
     FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.pdf"), dir_okay=False)
@@ -77,10 +86,10 @@ def test_success_pagebreak():
     """
     test_file = "success-pagebreak-test"
     run_export(
-        FILE_MANAGER.get_path(f"{test_file}.ipynb"), 
-        filtering=True, 
-        exporter="latex", 
-        pagebreaks=True, 
+        FILE_MANAGER.get_path(f"{test_file}.ipynb"),
+        filtering=True,
+        exporter="latex",
+        pagebreaks=True,
         save=True,
     )
 
@@ -95,10 +104,10 @@ def test_no_close():
     """
     test_file = "no-close-tag-test"
     run_export(
-        FILE_MANAGER.get_path(f"{test_file}.ipynb"), 
-        filtering=True, 
-        exporter="latex", 
-        pagebreaks=True, 
+        FILE_MANAGER.get_path(f"{test_file}.ipynb"),
+        filtering=True,
+        exporter="latex",
+        pagebreaks=True,
         save=True,
     )
 
@@ -117,4 +126,6 @@ def test_load_notebook():
     nbformat.write(node, FILE_MANAGER.get_path("output.ipynb"))
 
     # check file contents
-    assert filecmp.cmp(FILE_MANAGER.get_path("output.ipynb"), FILE_MANAGER.get_path(f"correct/{test_file}.ipynb"))
+    assert filecmp.cmp(
+        FILE_MANAGER.get_path("output.ipynb"), FILE_MANAGER.get_path(f"correct/{test_file}.ipynb")
+    )

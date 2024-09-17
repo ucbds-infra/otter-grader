@@ -25,8 +25,8 @@ class QuestionConfig(fica.Config):
     )
 
     check_cell: bool = fica.Key(
-        description="whether to include a check cell after this question (for autograded " \
-            "questions only)",
+        description="whether to include a check cell after this question (for autograded "
+        "questions only)",
         default=True,
     )
 

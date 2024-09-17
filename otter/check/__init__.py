@@ -31,11 +31,7 @@ def _log_event(event_type, results=[], question=None, success=True, error=None):
     LOGGER.debug(f"Creating a LogEntry of type {event_type}")
 
     LogEntry(
-        event_type,
-        results=results,
-        question=question,
-        success=success,
-        error=error
+        event_type, results=results, question=question, success=success, error=error
     ).flush_to_file(_OTTER_LOG_FILENAME)
 
     LOGGER.debug(f"LogEntry created successfully")
@@ -78,7 +74,9 @@ def main(file, *, tests_path="./tests", question=None, seed=None):
         LOGGER.debug(f"Found submission file extension: '{ext}'")
 
         if ext not in _ALLOWED_EXTENSIONS:
-            raise ValueError(f"Invalid extension for file '{ext}'; must be one of {_ALLOWED_EXTENSIONS}")
+            raise ValueError(
+                f"Invalid extension for file '{ext}'; must be one of {_ALLOWED_EXTENSIONS}"
+            )
 
         script = ext == ".py"
         LOGGER.debug(f"Determined if submission is a Python script: {script}")

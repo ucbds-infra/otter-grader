@@ -36,8 +36,9 @@ def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
     return pdf_name
 
 
-def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, 
-         xecjk=False):
+def main(
+    src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, xecjk=False
+):
     """
     Runs Otter Export
 
@@ -53,11 +54,11 @@ def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, sa
     """
     export_notebook(
         src,
-        dest = dest,
-        exporter_type = exporter,
-        filtering = filtering,
-        pagebreaks = pagebreaks,
-        save_tex = save,
-        save_html = save,
+        dest=dest,
+        exporter_type=exporter,
+        filtering=filtering,
+        pagebreaks=pagebreaks,
+        save_tex=save,
+        save_html=save,
         xecjk=xecjk,
     )

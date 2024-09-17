@@ -20,8 +20,9 @@ def assert_cli_result(result, expect_error):
     """
     Asserts that the ``CliRunner`` result exited with code 0.
     """
-    assert result.exit_code != 0 if expect_error else result.exit_code == 0, \
-        result.stdout_bytes.decode("utf-8")
+    assert (
+        result.exit_code != 0 if expect_error else result.exit_code == 0
+    ), result.stdout_bytes.decode("utf-8")
 
 
 @pytest.fixture()
@@ -435,7 +436,7 @@ def test_grade(mocked_grade, run_cli):
     os.mkdir("notebooks")
     result = run_cli([*cmd_start, "notebooks"])
     assert_cli_result(result, expect_error=False)
-    mocked_grade.assert_called_with(**{**std_kwargs, "paths": ("notebooks", )})
+    mocked_grade.assert_called_with(**{**std_kwargs, "paths": ("notebooks",)})
 
     open("foo.ipynb", "w+").close()
     result = run_cli([*cmd_start, "foo.ipynb"])
@@ -446,7 +447,9 @@ def test_grade(mocked_grade, run_cli):
     open("baz.ipynb", "w+").close()
     result = run_cli([*cmd_start, "foo.ipynb", "bar.ipynb", "baz.ipynb"])
     assert_cli_result(result, expect_error=False)
-    mocked_grade.assert_called_with(**{**std_kwargs, "paths": ("foo.ipynb", "bar.ipynb", "baz.ipynb")})
+    mocked_grade.assert_called_with(
+        **{**std_kwargs, "paths": ("foo.ipynb", "bar.ipynb", "baz.ipynb")}
+    )
 
     result = run_cli([*cmd_start, "-n", "hw01"])
     assert_cli_result(result, expect_error=False)

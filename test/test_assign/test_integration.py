@@ -66,7 +66,8 @@ def generate_master_notebook(cleanup_enabled):
             raise RuntimeError(f"{nb_path} already exists")
         nb = nbf.read(FILE_MANAGER.get_path("master-skeleton.ipynb"), as_version=nbf.NO_CONVERT)
         config_cell = nbf.v4.new_raw_cell("# ASSIGNMENT CONFIG\n" + dump_yaml(assignment_config))
-        if "id" in config_cell: config_cell.pop("id") # all test notebooks use nbformat < 4.5
+        if "id" in config_cell:
+            config_cell.pop("id")  # all test notebooks use nbformat < 4.5
         nb.cells.insert(0, config_cell)
 
         nbf.write(nb, nb_path)
@@ -84,15 +85,15 @@ def test_convert_example():
     Checks that otter assign filters and outputs correctly
     """
     assign_and_check_output(
-        FILE_MANAGER.get_path("example.ipynb"), 
-        FILE_MANAGER.get_path("example-correct"), 
+        FILE_MANAGER.get_path("example.ipynb"),
+        FILE_MANAGER.get_path("example-correct"),
         assign_kwargs=dict(no_run_tests=True),
         assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
 
     # check gradescope zip file
     check_gradescope_zipfile(
-        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 
+        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0],
         FILE_MANAGER.get_path("example-autograder-correct"),
     )
 
@@ -102,8 +103,8 @@ def test_exception_example():
     Checks that otter assign filters and outputs correctly
     """
     assign_and_check_output(
-        FILE_MANAGER.get_path("exception-example.ipynb"), 
-        FILE_MANAGER.get_path("exception-correct"), 
+        FILE_MANAGER.get_path("exception-example.ipynb"),
+        FILE_MANAGER.get_path("exception-correct"),
         assign_kwargs=dict(no_run_tests=True),
         assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
@@ -114,7 +115,7 @@ def test_otter_example():
     Checks that otter assign filters and outputs correctly, as well as creates a correct .otter file
     """
     assign_and_check_output(
-        FILE_MANAGER.get_path("generate-otter.ipynb"), 
+        FILE_MANAGER.get_path("generate-otter.ipynb"),
         FILE_MANAGER.get_path("otter-correct"),
         assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
@@ -141,7 +142,7 @@ def test_gradescope_example(mocked_client):
     """
     # set a return value that does not match the token in the notebook, so we'll know if APIClient
     # is called
-    mocked_client.return_value = 'token'
+    mocked_client.return_value = "token"
 
     assign_and_check_output(
         FILE_MANAGER.get_path("generate-gradescope.ipynb"),
@@ -152,7 +153,7 @@ def test_gradescope_example(mocked_client):
 
     # check gradescope zip file
     check_gradescope_zipfile(
-        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 
+        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0],
         FILE_MANAGER.get_path("gs-autograder-correct"),
     )
 
@@ -184,7 +185,7 @@ def test_rmd_example():
 
     # check gradescope zip file
     check_gradescope_zipfile(
-        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0], 
+        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0],
         FILE_MANAGER.get_path("rmd-autograder-correct"),
     )
 
@@ -219,8 +220,10 @@ def test_determine_question_point_value_error_message():
     except Exception as e:
         exception = e
 
-    assert str(exception) == "Error in \"q1\" test cases: More points specified in test cases " \
+    assert (
+        str(exception) == 'Error in "q1" test cases: More points specified in test cases '
         "than allowed for test"
+    )
     assert type(exception) == ValueError
 
 
@@ -228,10 +231,9 @@ def test_jupyterlite(generate_master_notebook):
     """
     Tests that Otter Assign produces correct notebooks for running on Jupyterlite.
     """
-    master_nb_path = generate_master_notebook({
-        "runs_on": "jupyterlite",
-        "tests": {"url_prefix": "https://domain.tld/tests/"}
-    })
+    master_nb_path = generate_master_notebook(
+        {"runs_on": "jupyterlite", "tests": {"url_prefix": "https://domain.tld/tests/"}}
+    )
     assign_and_check_output(
         master_nb_path,
         FILE_MANAGER.get_path("jupyterlite-correct"),
@@ -244,11 +246,13 @@ def test_require_no_pdf_ack(generate_master_notebook):
     Tests that Otter Assign produces correct notebooks when configured to require students to
     acknowledge when a PDF cannot be included in their submission zip.
     """
-    master_nb_path = generate_master_notebook({
-        "export_cell": {
-            "require_no_pdf_ack": True,
-        },
-    })
+    master_nb_path = generate_master_notebook(
+        {
+            "export_cell": {
+                "require_no_pdf_ack": True,
+            },
+        }
+    )
     assign_and_check_output(
         master_nb_path,
         FILE_MANAGER.get_path("no-pdf-ack-correct"),
@@ -261,11 +265,13 @@ def test_require_no_pdf_ack_with_message(generate_master_notebook):
     Tests that Otter Assign produces correct notebooks when configured to require students to
     acknowledge when a PDF cannot be included in their submission zip with a custom message.
     """
-    master_nb_path = generate_master_notebook({
-        "export_cell": {
-            "require_no_pdf_ack": {"message": "no pdf could be created"},
-        },
-    })
+    master_nb_path = generate_master_notebook(
+        {
+            "export_cell": {
+                "require_no_pdf_ack": {"message": "no pdf could be created"},
+            },
+        }
+    )
     assign_and_check_output(
         master_nb_path,
         FILE_MANAGER.get_path("no-pdf-ack-with-message-correct"),

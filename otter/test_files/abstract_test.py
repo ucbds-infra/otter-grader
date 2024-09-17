@@ -82,7 +82,7 @@ class TestFile(ABC):
 
     def _repr_html_(self):
         if self.passed_all:
-            all_passed_emoji = random.choice(['🍀', '🎉', '🌈', '🙌', '🚀', '🌟', '✨', '💯'])
+            all_passed_emoji = random.choice(["🍀", "🎉", "🌈", "🙌", "🚀", "🌟", "✨", "💯"])
             if any(tcr.test_case.success_message is not None for tcr in self.test_case_results):
                 ret = f"<p><strong><pre style='display: inline;'>{self.name}</pre></strong> passed! {all_passed_emoji}</p>"
                 for tcr in self.test_case_results:
@@ -117,7 +117,9 @@ class TestFile(ABC):
     def resolve_test_file_points(total_points, test_cases):
         if isinstance(total_points, list):
             if len(total_points) != len(test_cases):
-                raise ValueError("Points specified in test has different length than number of test cases")
+                raise ValueError(
+                    "Points specified in test has different length than number of test cases"
+                )
             test_cases = [replace(tc, points=pt) for tc, pt in zip(test_cases, total_points)]
             total_points = None
 
@@ -127,7 +129,10 @@ class TestFile(ABC):
         point_values = []
         for i, test_case in enumerate(test_cases):
             if test_case.points is not None:
-                assert type(test_case.points) in (int, float), f"Invalid point type: {type(test_case.points)}"
+                assert type(test_case.points) in (
+                    int,
+                    float,
+                ), f"Invalid point type: {type(test_case.points)}"
                 point_values.append(test_case.points)
 
             else:
@@ -140,7 +145,9 @@ class TestFile(ABC):
 
             else:
                 try:
-                    per_remaining = (total_points - pre_specified) / sum(1 for p in point_values if p is None)
+                    per_remaining = (total_points - pre_specified) / sum(
+                        1 for p in point_values if p is None
+                    )
                 except ZeroDivisionError:
                     per_remaining = 0.0
 
@@ -181,8 +188,9 @@ class TestFile(ABC):
         elif self.all_or_nothing and self.passed_all:
             return 1
         else:
-            return sum(tcr.test_case.points for tcr in self.test_case_results if tcr.passed) / \
-                sum(tc.points for tc in self.test_cases)
+            return sum(tcr.test_case.points for tcr in self.test_case_results if tcr.passed) / sum(
+                tc.points for tc in self.test_cases
+            )
 
     @property
     def score(self):
@@ -211,8 +219,9 @@ class TestFile(ABC):
     def summary(self, public_only=False):
         if (not public_only and self.passed_all) or (public_only and self.passed_all_public):
             ret = f"{self.name} results: All test cases passed!"
-            if (not public_only and self.passed_all) and \
-                    any(tcr.test_case.success_message is not None for tcr in self.test_case_results):
+            if (not public_only and self.passed_all) and any(
+                tcr.test_case.success_message is not None for tcr in self.test_case_results
+            ):
                 for tcr in self.test_case_results:
                     if tcr.test_case.success_message is not None:
                         ret += f"\n{tcr.test_case.name} message: {tcr.test_case.success_message}"
@@ -238,9 +247,7 @@ class TestFile(ABC):
 
     @classmethod
     @abstractmethod
-    def from_file(cls, path):
-        ...
+    def from_file(cls, path): ...
 
     @abstractmethod
-    def run(self, global_environment):
-        ...
+    def run(self, global_environment): ...

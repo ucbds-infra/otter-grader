@@ -20,13 +20,16 @@ def get_exporter(exporter_type=None):
     """
     # throw an error if the nbconvert version is < 6
     import nbconvert
+
     if int(nbconvert.__version__.split(".")[0]) < 6:
-        raise RuntimeError(f"Otter is only compatible with nbconvert>=6.0.0, found {nbconvert.__version__}")
+        raise RuntimeError(
+            f"Otter is only compatible with nbconvert>=6.0.0, found {nbconvert.__version__}"
+        )
 
     if exporter_type is not None:
         exporter_type = exporter_type.lower()
 
-        if exporter_type == 'html':
+        if exporter_type == "html":
             return PDFViaHTMLExporter
 
         elif exporter_type == "latex":

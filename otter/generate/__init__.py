@@ -59,37 +59,44 @@ class CondaEnvironment:
 
         if self.is_r:
             environment["channels"].append("r")
-            environment["dependencies"].extend([
-                "gcc_linux-64",
-                "gxx_linux-64",
-                "libgit2",
-                "libgomp",
-                "r-base>=4.0.0",
-                "r-devtools",
-                "r-essentials",
-                "r-gert",
-                "r-rmarkdown",
-                "r-startup",
-                "r-stringi",
-                "r-testthat",
-                "r-usethis",
-                f"r-ottr=={OTTR_VERSION}",
-            ])
+            environment["dependencies"].extend(
+                [
+                    "gcc_linux-64",
+                    "gxx_linux-64",
+                    "libgit2",
+                    "libgomp",
+                    "r-base>=4.0.0",
+                    "r-devtools",
+                    "r-essentials",
+                    "r-gert",
+                    "r-rmarkdown",
+                    "r-startup",
+                    "r-stringi",
+                    "r-testthat",
+                    "r-usethis",
+                    f"r-ottr=={OTTR_VERSION}",
+                ]
+            )
 
         r_extra = ""
         if self.is_r:
             r_extra = ",r"
 
-        pip_deps = self.requirements if self.overwrite_requirements else [
-            f"otter-grader[grading,plugins{r_extra}]=={__version__}",
-            *self.requirements,
-        ]
+        pip_deps = (
+            self.requirements
+            if self.overwrite_requirements
+            else [
+                f"otter-grader[grading,plugins{r_extra}]=={__version__}",
+                *self.requirements,
+            ]
+        )
 
         environment["dependencies"].append({"pip": pip_deps})
 
         if self.user_environment:
             environment = merge_conda_environments(
-                self.user_environment, environment, OTTER_ENV_NAME)
+                self.user_environment, environment, OTTER_ENV_NAME
+            )
 
         return environment
 
@@ -106,37 +113,37 @@ LANGUAGE_BASED_CONFIGURATIONS = {
     "python": {
         "test_file_pattern": "*.py",
         "requirements_filename": "requirements.txt",
-        "templates": [*COMMON_TEMPLATES, TEMPLATE_DIR / "python" / "setup.sh"]
+        "templates": [*COMMON_TEMPLATES, TEMPLATE_DIR / "python" / "setup.sh"],
     },
     "r": {
         "test_file_pattern": "*.[Rr]",
         "requirements_filename": "requirements.R",
-        "templates": [*COMMON_TEMPLATES, TEMPLATE_DIR / "r" / "setup.sh"]
+        "templates": [*COMMON_TEMPLATES, TEMPLATE_DIR / "r" / "setup.sh"],
     },
 }
 
 
 def main(
     *,
-    tests_dir = "./tests",
-    output_path = "autograder.zip",
-    config = None,
-    no_config = False, 
-    lang = None,
-    requirements = None,
-    no_requirements = False,
-    overwrite_requirements = False, 
-    environment = None,
-    no_environment = False,
-    username = None,
-    password = None,
-    token = None,
-    files = [], 
-    assignment = None,
-    plugin_collection = None,
-    python_version = None,
-    channel_priority_strict = True,
-    exclude_conda_defaults = False,
+    tests_dir="./tests",
+    output_path="autograder.zip",
+    config=None,
+    no_config=False,
+    lang=None,
+    requirements=None,
+    no_requirements=False,
+    overwrite_requirements=False,
+    environment=None,
+    no_environment=False,
+    username=None,
+    password=None,
+    token=None,
+    files=[],
+    assignment=None,
+    plugin_collection=None,
+    python_version=None,
+    channel_priority_strict=True,
+    exclude_conda_defaults=False,
 ):
     """
     Run Otter Generate.
@@ -192,7 +199,11 @@ def main(
     if "token" not in otter_config and token is not None:
         otter_config["token"] = token
 
-    elif "token" not in otter_config and "course_id" in otter_config and "assignment_id" in otter_config:
+    elif (
+        "token" not in otter_config
+        and "course_id" in otter_config
+        and "assignment_id" in otter_config
+    ):
         client = APIClient()
         if username is not None and password is not None:
             client.log_in(username, password)
@@ -254,10 +265,7 @@ def main(
         if reqs is not None:
             if ag_config.lang == "python":
                 extra_requirements = [
-                    l 
-                    for l 
-                    in reqs.split("\n") 
-                    if l.strip() and not l.strip().startswith("#")
+                    l for l in reqs.split("\n") if l.strip() and not l.strip().startswith("#")
                 ]
             elif ag_config.lang == "r":
                 r_requirements = reqs
@@ -265,7 +273,9 @@ def main(
 
     # open environment if it exists
     user_environment = None
-    with load_default_file(environment, "environment.yml", default_disabled=no_environment) as env_contents:
+    with load_default_file(
+        environment, "environment.yml", default_disabled=no_environment
+    ) as env_contents:
         template_context["other_environment"] = env_contents
         if env_contents is not None:
             user_environment = yaml.safe_load(env_contents)
@@ -313,6 +323,8 @@ def main(
                 if os.path.isfile(full_fp):
                     zf.write(file, arcname=os.path.join("files", relative_fp))
                 elif os.path.isdir(full_fp):
-                    zip_folder(zf, full_fp, prefix=os.path.join("files", os.path.split(relative_fp)[0]))
+                    zip_folder(
+                        zf, full_fp, prefix=os.path.join("files", os.path.split(relative_fp)[0])
+                    )
                 else:
                     raise ValueError(f"Could not find file or directory '{full_fp}'")

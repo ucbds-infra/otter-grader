@@ -43,15 +43,17 @@ def test_notebook_check():
         actual_result = grading_results[question]
 
         # checking repr since the results __eq__ method is not defined
-        assert repr(log.get_results(question)) == repr(actual_result), \
-            f"Logged results for {question} are not correct"
+        assert repr(log.get_results(question)) == repr(
+            actual_result
+        ), f"Logged results for {question} are not correct"
 
         logged_grade = log.get_question_entry(question).get_score_perc()
         assert logged_grade == actual_result.grade, f"Logged results for {question} are not correct"
 
         # checking repr since the results __eq__ method is not defined
-        assert repr(log.get_question_entry(question).get_results()) == repr(actual_result), \
-            f"Logged results for {question} are not correct"
+        assert repr(log.get_question_entry(question).get_results()) == repr(
+            actual_result
+        ), f"Logged results for {question} are not correct"
 
 
 def test_shelve():
@@ -62,14 +64,14 @@ def test_shelve():
     def square(x):
         return x**2
 
-    import calendar 
+    import calendar
 
     env = {
         "num": 5,
         "func": square,
         "df": pd.DataFrame(),
         "module": sys,
-        "ignored_func": calendar.setfirstweekday
+        "ignored_func": calendar.setfirstweekday,
     }
 
     entry = LogEntry(
@@ -80,12 +82,11 @@ def test_shelve():
         error=None,
     )
 
-
-    entry.shelve(env, delete=True, filename=_OTTER_LOG_FILENAME, ignore_modules=['calendar'])
+    entry.shelve(env, delete=True, filename=_OTTER_LOG_FILENAME, ignore_modules=["calendar"])
     assert entry.shelf
     assert entry.not_shelved == ["module", "ignored_func"]
 
-    entry.flush_to_file(_OTTER_LOG_FILENAME) 
+    entry.flush_to_file(_OTTER_LOG_FILENAME)
 
     from math import factorial
 
@@ -94,7 +95,7 @@ def test_shelve():
     env = entry.unshelve()
     assert [*env] == ["num", "func", "df"]
 
-    env_with_factorial = entry.unshelve(dict(factorial = factorial))
+    env_with_factorial = entry.unshelve(dict(factorial=factorial))
     assert "factorial" in env_with_factorial["func"].__globals__
     assert factorial is env_with_factorial["func"].__globals__["factorial"]
 
@@ -103,8 +104,8 @@ def test_log_getitem():
     entry = LogEntry(
         event_type=EventType.AUTH,
         results=[],
-        question=None, 
-        success=True, 
+        question=None,
+        success=True,
         error=None,
     )
     entry.flush_to_file(_OTTER_LOG_FILENAME)
@@ -117,24 +118,24 @@ def test_log_iter():
     entry1 = LogEntry(
         event_type=EventType.CHECK,
         results=[],
-        question= "q1", 
-        success=True, 
+        question="q1",
+        success=True,
         error=None,
     )
 
     entry2 = LogEntry(
         event_type=EventType.CHECK,
         results=[],
-        question= "q1", 
-        success=True, 
+        question="q1",
+        success=True,
         error=None,
     )
 
     entry3 = LogEntry(
         event_type=EventType.CHECK,
         results=[],
-        question= "q2", 
-        success=True, 
+        question="q2",
+        success=True,
         error=None,
     )
 

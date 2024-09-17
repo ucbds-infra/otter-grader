@@ -15,7 +15,7 @@ def has_begin(line):
     """
     Returns whether a string contains a begin question comment
 
-    A begin question comment is an HTML comment on a single line that denotes the beginning of an 
+    A begin question comment is an HTML comment on a single line that denotes the beginning of an
     export block. The begin question comment looks like:
 
     .. code-block:: html
@@ -35,7 +35,7 @@ def has_end(line):
     """
     Returns whether a string contains an end question comment
 
-    An end question comment is an HTML comment on a single line that denotes the end of an export 
+    An end question comment is an HTML comment on a single line that denotes the end of an export
     block. The begin question comment looks like:
 
     .. code-block:: html

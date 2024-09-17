@@ -8,7 +8,7 @@ from textwrap import dedent
 __version__ = "5.6.0"
 
 
-LOGO_WITH_VERSION = fr"""
+LOGO_WITH_VERSION = rf"""
   _________        __          __               
  /  _____  \    __|  |__    __|  |__               
 |  /     \  |  |__    __|  |__    __|   _______    _  _____
@@ -18,7 +18,9 @@ LOGO_WITH_VERSION = fr"""
 |  \_____/  |     |  |_       |  |_    | |_____   |  |
  \_________/       \ __|       \ __|    \______|  |__|
                                                 v{__version__}
-"""[1:]  # remove beginning newline
+"""[
+    1:
+]  # remove beginning newline
 
 
 def print_version_info(logo=False):
@@ -30,6 +32,10 @@ def print_version_info(logo=False):
     """
     if logo:
         print(LOGO_WITH_VERSION)
-    print(dedent(f"""\
+    print(
+        dedent(
+            f"""\
         Python version: {".".join(str(v) for v in sys.version_info[:3])}
-        Otter-Grader version: {__version__}"""))
+        Otter-Grader version: {__version__}"""
+        )
+    )

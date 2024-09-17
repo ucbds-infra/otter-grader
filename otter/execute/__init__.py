@@ -112,7 +112,9 @@ def grade_notebook(
             results = GradingResults.without_results(e)
 
         if not isinstance(results, GradingResults):
-            raise TypeError("Results deserialized from grading notebook were not a GradingResults instance")
+            raise TypeError(
+                "Results deserialized from grading notebook were not a GradingResults instance"
+            )
 
         results.notebook = executed_nb
 

@@ -15,7 +15,18 @@ from IPython import get_ipython
 from IPython.display import display, Javascript
 from ipywidgets import Button, HTML, Output, VBox
 from subprocess import run, PIPE
-from typing import Any, Callable, Dict, Generic, List, Optional, Tuple, TYPE_CHECKING, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Tuple,
+    TYPE_CHECKING,
+    TypeVar,
+    Union,
+)
 
 from ..nbmeta_config import NBMetadataConfig
 from ..test_files import GradingResults
@@ -41,17 +52,22 @@ def save_notebook(filename: str, timeout: Union[int, float] = 10) -> bool:
         start = time.time()
 
         # For classic notebooks
-        display(Javascript("""
+        display(
+            Javascript(
+                """
             if (typeof Jupyter !== 'undefined') {
                 Jupyter.notebook.save_checkpoint();
             }
-        """))
+        """
+            )
+        )
 
         # For JupyterLab
         try:
             app = ipylab.JupyterFrontEnd()
             app.commands.execute("docmanager:save")
-        except: pass
+        except:
+            pass
 
         while time.time() - start < timeout:
             curr_mod_time = os.path.getmtime(filename)
@@ -84,11 +100,17 @@ def grade_zip_file(zip_path: str, nb_arcname: str, tests_dir: str) -> GradingRes
 
     try:
         command = [
-            sys.executable, "-m", "otter.check.validate_export",
-            "--zip-path", zip_path,
-            "--nb-arcname", nb_arcname,
-            "--tests-dir", tests_dir,
-            "--results-path", results_path,
+            sys.executable,
+            "-m",
+            "otter.check.validate_export",
+            "--zip-path",
+            zip_path,
+            "--nb-arcname",
+            nb_arcname,
+            "--tests-dir",
+            tests_dir,
+            "--results-path",
+            results_path,
         ]
 
         # this environment variable is needed to fix #686
@@ -114,30 +136,30 @@ def grade_zip_file(zip_path: str, nb_arcname: str, tests_dir: str) -> GradingRes
 
 @dataclass
 class _Interpreter:
+    """
+    A class representing a flavor of IPython interpreter.
+
+    Contains attributes for an importable name substring (used to check which interpreter is
+    running) and a display name for error messages and the like.
+    """
+
+    check_strs: List[str]
+    """list of substrings to check for in the IPython interpreter string"""
+
+    display_name: str
+    """a display name for this interpreter"""
+
+    def running(self) -> bool:
         """
-        A class representing a flavor of IPython interpreter.
+        Determine whether this interpreter is currently running by checking the string
+        representation of the return value of ``IPython.get_ipython``.
 
-        Contains attributes for an importable name substring (used to check which interpreter is
-        running) and a display name for error messages and the like.
+        Returns:
+            ``bool``: whether this interpreter is running
         """
-
-        check_strs: List[str]
-        """list of substrings to check for in the IPython interpreter string"""
-
-        display_name: str
-        """a display name for this interpreter"""
-
-        def running(self) -> bool:
-            """
-            Determine whether this interpreter is currently running by checking the string
-            representation of the return value of ``IPython.get_ipython``.
-
-            Returns:
-                ``bool``: whether this interpreter is running
-            """
-            ipython_interp = str(get_ipython())
-            print(ipython_interp)
-            return any(c in ipython_interp for c in self.check_strs)
+        ipython_interp = str(get_ipython())
+        print(ipython_interp)
+        return any(c in ipython_interp for c in self.check_strs)
 
 
 class IPythonInterpreter(Enum):
@@ -152,11 +174,13 @@ class IPythonInterpreter(Enum):
     """the JupyterLite interpreter"""
 
 
-def incompatible_with(interpreter: IPythonInterpreter, throw_error: bool = True) -> \
-        Callable[[Callable[..., T]], Callable[..., T]]:
+def incompatible_with(
+    interpreter: IPythonInterpreter, throw_error: bool = True
+) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """
     Create a decorator indicating that a method is incompatible with a specific interpreter.
     """
+
     @wrapt.decorator
     def incompatible(wrapped, self, args, kwargs):
         """
@@ -165,7 +189,9 @@ def incompatible_with(interpreter: IPythonInterpreter, throw_error: bool = True)
         """
         if self._interpreter is interpreter:
             if throw_error:
-                raise RuntimeError(f"This method is not compatible with {interpreter.value.display_name}")
+                raise RuntimeError(
+                    f"This method is not compatible with {interpreter.value.display_name}"
+                )
             else:
                 return
         return wrapped(*args, **kwargs)
@@ -175,9 +201,9 @@ def incompatible_with(interpreter: IPythonInterpreter, throw_error: bool = True)
 
 @wrapt.decorator
 def grading_mode_disabled(
-    wrapped: Callable[..., T], 
-    self: "Notebook", 
-    args: Tuple, 
+    wrapped: Callable[..., T],
+    self: "Notebook",
+    args: Tuple,
     kwargs: Dict[str, Any],
 ) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """
@@ -203,6 +229,7 @@ def logs_event(event_type: "EventType") -> Callable[[Callable[..., LoggedEventRe
     All methods decorated with this function's return value should return either ``None`` or an
     instance of the :py:class:`LoggedEventReturnValue`` dataclass.
     """
+
     @wrapt.decorator
     def event_logger(
         wrapped: Callable[..., LoggedEventReturnValue[T]],
@@ -225,7 +252,8 @@ def logs_event(event_type: "EventType") -> Callable[[Callable[..., LoggedEventRe
             ret = LoggedEventReturnValue(None)
         if not isinstance(ret, LoggedEventReturnValue):
             raise TypeError(
-                f"Method decorated by logs_event returned value of invalid type: {type(ret)}")
+                f"Method decorated by logs_event returned value of invalid type: {type(ret)}"
+            )
 
         else:
             self._log_event(
@@ -251,11 +279,7 @@ def list_test_files(tests_dir: str) -> List[str]:
     Returns:
         ``list[str]``: the sorted list of all test file paths in ``tests_dir``
     """
-    return sorted([
-        file
-        for file in glob(os.path.join(tests_dir, "*.py"))
-        if file != "__init__.py"
-    ])
+    return sorted([file for file in glob(os.path.join(tests_dir, "*.py")) if file != "__init__.py"])
 
 
 def list_available_tests(tests_dir: str, nbmeta_config: NBMetadataConfig) -> List[str]:
@@ -309,7 +333,9 @@ def resolve_test_info(
 
         import pyodide
 
-        test_url = f"{tests_url_prefix}{'/' if not tests_url_prefix.endswith('/') else ''}{question}.py"
+        test_url = (
+            f"{tests_url_prefix}{'/' if not tests_url_prefix.endswith('/') else ''}{question}.py"
+        )
         text = pyodide.open_url(test_url).getvalue()
 
         os.makedirs(tests_dir, exist_ok=True)
@@ -337,7 +363,9 @@ def resolve_test_info(
     return test_path, test_name
 
 
-def display_pdf_confirmation_widget(message: Optional[str], pdf_error: Optional[Exception], callback: Callable) -> None:
+def display_pdf_confirmation_widget(
+    message: Optional[str], pdf_error: Optional[Exception], callback: Callable
+) -> None:
     """
     Display a widget to the user to acknowledge that a PDF will not be included in their submission
     zip.
@@ -347,12 +375,16 @@ def display_pdf_confirmation_widget(message: Optional[str], pdf_error: Optional[
         callback (``callable``): a callback function to execute after the user ACKs
     """
     o = Output()
+
     def wrapped_callback(*args):
-        with o: callback()
+        with o:
+            callback()
 
     if not message:
-        message = "Your notebook could not be exported as a PDF. To continue exporting your " \
+        message = (
+            "Your notebook could not be exported as a PDF. To continue exporting your "
             "submission, please click the button below."
+        )
 
     message_html = f"""<p style="margin: 0">{message}</p>"""
     if pdf_error is not None:
@@ -362,7 +394,7 @@ def display_pdf_confirmation_widget(message: Optional[str], pdf_error: Optional[
     b = Button(description="Continue export", button_style="warning")
     b.on_click(wrapped_callback)
     m = HTML("""<div style="height: 10px; width: 100%"></div>""")
-    
+
     display(VBox([t, b, m, o]))
 
 

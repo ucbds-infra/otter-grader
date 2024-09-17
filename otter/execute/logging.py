@@ -43,7 +43,7 @@ class LogRecordStreamHandler(socketserver.StreamRequestHandler):
             chunk = self.connection.recv(4)
             if len(chunk) < 4:
                 break
-            slen = struct.unpack('>L', chunk)[0]
+            slen = struct.unpack(">L", chunk)[0]
             chunk = self.connection.recv(slen)
             while len(chunk) < slen:
                 chunk = chunk + self.connection.recv(slen - len(chunk))
@@ -71,15 +71,16 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
     abort = False
 
     def __init__(
-            self,
-            host="localhost",
-            port=0,
-            handler=LogRecordStreamHandler,
-        ):
+        self,
+        host="localhost",
+        port=0,
+        handler=LogRecordStreamHandler,
+    ):
         super().__init__((host, port), handler)
 
     def serve_until_stopped(self):
         import select
+
         abort = False
         while not abort:
             rd = None

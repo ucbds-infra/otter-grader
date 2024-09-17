@@ -52,7 +52,7 @@ class LogEntry:
 
     Args:
         event_type (``EventType``): the type of event for this entry
-        results (``otter.test_files.TestFile | otter.test_files.GradingResults | None``): the 
+        results (``otter.test_files.TestFile | otter.test_files.GradingResults | None``): the
             results of grading if this is an ``EventType.CHECK`` or ``EventType.END_CHECK_ALL``
             record
         question (``str``): the question name for an ``EventType.CHECK`` record
@@ -107,8 +107,10 @@ class LogEntry:
 
     def __repr__(self):
         if self.question:
-            return "otter.logs.LogEntry(event_type={}, question={}, success={}, timestamp={})".format(
-                self.event_type, self.question, self.success, self.timestamp.isoformat()
+            return (
+                "otter.logs.LogEntry(event_type={}, question={}, success={}, timestamp={})".format(
+                    self.event_type, self.question, self.success, self.timestamp.isoformat()
+                )
             )
 
         return "otter.logs.LogEntry(event_type={}, success={}, timestamp={})".format(
@@ -120,7 +122,7 @@ class LogEntry:
         Get the results stored in this log entry
 
         Returns:
-            ``list`` of ``otter.test_files.abstract_test.TestCollectionResults``: the results at this 
+            ``list`` of ``otter.test_files.abstract_test.TestCollectionResults``: the results at this
                 entry if this is an ``EventType.CHECK`` record
         """
         assert self.event_type is EventType.CHECK, "this record type has no results"
@@ -176,14 +178,14 @@ class LogEntry:
 
         If ``delete`` is ``True``, old environments in the log at ``filename`` for this question are
         cleared before writing ``env``. Any module names in ``ignore_modules`` will have their functions
-        ignored during pickling. 
+        ignored during pickling.
 
         Args:
             env (``dict``): the environment to pickle
             delete (``bool``, optional): whether to delete old environments
             filename (``str``, optional): path to log file; ignored if ``delete`` is ``False``
             ignore_modules (``list`` of ``str``, optional): module names to ignore during pickling
-            variables (``dict``, optional): map of variable name to type string indicating **only** 
+            variables (``dict``, optional): map of variable name to type string indicating **only**
                 variables to include (all variables not in this dictionary will be ignored)
 
         Returns:
@@ -192,7 +194,7 @@ class LogEntry:
         # delete old entry without reading entire log
         if delete:
             assert filename, "old env deletion indicated but no log filename provided"
-            try:                
+            try:
                 # copy the existing log to a temporary file so that we can edit the original
                 with tempfile.TemporaryFile() as tf:
                     with open(filename, "rb") as f:
@@ -226,11 +228,13 @@ class LogEntry:
 
         try:
             if isinstance(variables_stored, list):
-                variables = {k : v for k, v in variables.items() if k in variables_stored}
+                variables = {k: v for k, v in variables.items() if k in variables_stored}
         except UnboundLocalError:
             pass
 
-        shelf_contents, not_shelved = LogEntry.shelve_environment(env, variables=variables, ignore_modules=ignore_modules)
+        shelf_contents, not_shelved = LogEntry.shelve_environment(
+            env, variables=variables, ignore_modules=ignore_modules
+        )
         self.shelf = shelf_contents
         self.not_shelved = not_shelved
         return self
@@ -270,15 +274,15 @@ class LogEntry:
 
         Args:
             log (``list`` of ``LogEntry``): the log to sort
-            ascending (``bool``, optional): whether the log should be sorted in ascending (chronological) 
+            ascending (``bool``, optional): whether the log should be sorted in ascending (chronological)
                 order
 
         Returns:
             ``list[LogEntry]``: the sorted log
         """
         if ascending:
-            return list(sorted(log, key = lambda l: l.timestamp))
-        return list(sorted(log, key = lambda l: l.timestamp, reverse = True))
+            return list(sorted(log, key=lambda l: l.timestamp))
+        return list(sorted(log, key=lambda l: l.timestamp, reverse=True))
 
     @staticmethod
     def log_from_file(filename, ascending=True):
@@ -287,7 +291,7 @@ class LogEntry:
 
         Args:
             filename (``str``): the path to the log
-            ascending (``bool``): whether the log should be sorted in ascending (chronological) 
+            ascending (``bool``): whether the log should be sorted in ascending (chronological)
                 order
 
         Returns:
@@ -303,7 +307,7 @@ class LogEntry:
                 except EOFError:
                     break
 
-            log = list(sorted(log, key = lambda l: l.timestamp, reverse = not ascending))
+            log = list(sorted(log, key=lambda l: l.timestamp, reverse=not ascending))
 
             return log
 
@@ -320,8 +324,8 @@ class LogEntry:
 
         Args:
             env (``dict``): the environment to shelve
-            variables (``dict`` *or* ``list``, optional): a map of variable name to type string indicating 
-                **only** variables to include (all variables not in this dictionary will be ignored) 
+            variables (``dict`` *or* ``list``, optional): a map of variable name to type string indicating
+                **only** variables to include (all variables not in this dictionary will be ignored)
                 or a list of variable names to include regardless of tpye
             ignore_modules (``list`` of ``str``, optional): the module names to igonre
 
@@ -330,6 +334,7 @@ class LogEntry:
                 not shelved
         """
         from .notebook import Notebook
+
         not_shelved = []
         filtered_env = {}
         for k, v in env.items():
@@ -351,8 +356,11 @@ class LogEntry:
                     if (variables and k in variables) or not variables:
                         full_type = type(v).__module__ + "." + type(v).__name__
 
-                        if (isinstance(variables, dict) and full_type == variables[k]) or \
-                            isinstance(variables, list) or not variables:
+                        if (
+                            (isinstance(variables, dict) and full_type == variables[k])
+                            or isinstance(variables, list)
+                            or not variables
+                        ):
                             filtered_env[k] = v
 
                         else:
@@ -375,7 +383,7 @@ class LogEntry:
 
 class Log:
     """
-    A class for reading and interacting with a log. Allows you to iterate over the entries in the log 
+    A class for reading and interacting with a log. Allows you to iterate over the entries in the log
     and supports integer indexing. *Does not support editing the log file.*
 
     Args:
@@ -429,7 +437,9 @@ class Log:
         Returns:
             ``list`` of ``str``: the questions in this log
         """
-        all_questions = [entry.question for entry in self.entries if entry.event_type == EventType.CHECK]
+        all_questions = [
+            entry.question for entry in self.entries if entry.event_type == EventType.CHECK
+        ]
         return list(sorted(set(all_questions)))
 
     @classmethod
@@ -439,13 +449,15 @@ class Log:
 
         Args:
             filename (``str``): the path to the log
-            ascending (``bool``, optional): whether the log should be sorted in ascending (chronological) 
+            ascending (``bool``, optional): whether the log should be sorted in ascending (chronological)
                 order; default ``True``
 
         Returns:
             ``Log``: the ``Log`` instance created from the file
         """
-        return cls(entries=LogEntry.log_from_file(filename, ascending=ascending), ascending=ascending)
+        return cls(
+            entries=LogEntry.log_from_file(filename, ascending=ascending), ascending=ascending
+        )
 
     def get_question_entry(self, question):
         """
@@ -496,6 +508,7 @@ class QuestionLogIterator:
         questions (``list`` of ``str``): the list of question names
         curr_idx (``int``): the integer index of the next question in  ``questions``
     """
+
     def __init__(self, log):
         log.sort(ascending=False)
         log.sort()

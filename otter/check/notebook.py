@@ -139,7 +139,8 @@ class Notebook(Loggable):
 
         if self._notebook:
             self._nbmeta_config = NBMetadataConfig.from_notebook(
-                nbf.read(self._notebook, nbf.NO_CONVERT))
+                nbf.read(self._notebook, nbf.NO_CONVERT)
+            )
         else:
             self._nbmeta_config = NBMetadataConfig()
 
@@ -176,11 +177,7 @@ class Notebook(Loggable):
             shelve_env (``Dict[str, object] | None``): the environment to shelve
         """
         entry = LogEntry(
-            event_type,
-            results=results,
-            question=question,
-            success=success,
-            error=error
+            event_type, results=results, question=question, success=success, error=error
         )
 
         if _SHELVE and event_type == EventType.CHECK:
@@ -192,7 +189,7 @@ class Notebook(Loggable):
                 delete=True,
                 filename=_OTTER_LOG_FILENAME,
                 ignore_modules=self._ignore_modules,
-                variables=self._vars_to_store
+                variables=self._vars_to_store,
             )
 
         entry.flush_to_file(_OTTER_LOG_FILENAME)
@@ -223,7 +220,9 @@ class Notebook(Loggable):
         if nb_path is None and self._notebook is not None:
             nb_path = self._notebook
             if not os.path.isfile(nb_path):
-                raise ValueError(f"Expected a notebook file named '{nb_path}' but no such file found")
+                raise ValueError(
+                    f"Expected a notebook file named '{nb_path}' but no such file found"
+                )
 
         elif nb_path is None and glob("*.ipynb"):
             notebooks = glob("*.ipynb")
@@ -286,7 +285,7 @@ class Notebook(Loggable):
         to the notebook is not configured.
 
         Args:
-            plugin_name (``str``): importable name of an Otter plugin that implements the 
+            plugin_name (``str``): importable name of an Otter plugin that implements the
                 ``from_notebook`` hook
             *args: arguments to be passed to the plugin
             nb_path (``str``, optional): path to the notebook
@@ -361,11 +360,11 @@ class Notebook(Loggable):
         it returns to be included when calling ``Notebook.export``.
 
         Args:
-            plugin_name (``str``): importable name of an Otter plugin that implements the 
+            plugin_name (``str``): importable name of an Otter plugin that implements the
                 ``from_notebook`` hook
             *args: arguments to be passed to the plugin
             nb_path (``str | None``): path to the notebook
-            **kwargs: keyword arguments to be passed to the plugin        
+            **kwargs: keyword arguments to be passed to the plugin
         """
         nb_path = self._resolve_nb_path(nb_path)
         if plugin_name in self._plugin_collections:
@@ -388,14 +387,14 @@ class Notebook(Loggable):
         pdf=True,
         filtering=True,
         pagebreaks=True,
-        files=None, 
+        files=None,
         display_link=True,
         force_save=False,
         run_tests=False,
     ):
         """
         Export a submission zip file.
-        
+
         Creates a submission zipfile from a notebook at ``nb_path``, optionally including a PDF
         export of the notebook and any files in ``files``.
 
@@ -439,8 +438,10 @@ class Notebook(Loggable):
 
         with open(nb_path, "r", encoding="utf-8") as f:
             if len(f.read().strip()) == 0:
-                raise ValueError(f"Notebook '{nb_path}' is empty. Please save and checkpoint your "
-                    "notebook and rerun this cell.")
+                raise ValueError(
+                    f"Notebook '{nb_path}' is empty. Please save and checkpoint your "
+                    "notebook and rerun this cell."
+                )
 
             f.seek(0)
 
@@ -457,8 +458,10 @@ class Notebook(Loggable):
 
         pdf_path, pdf_created, pdf_error = None, True, None
         if pdf:
-            try: pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
-            except Exception as e: pdf_error = e
+            try:
+                pdf_path = export_notebook(nb_path, filtering=filtering, pagebreaks=pagebreaks)
+            except Exception as e:
+                pdf_error = e
             if pdf_path and os.path.isfile(pdf_path):
                 pdf_created = True
                 zf.write(pdf_path)
@@ -503,8 +506,10 @@ class Notebook(Loggable):
                 print("Running your submission against local test cases...\n")
                 results = grade_zip_file(zip_path, nb_path, self._tests_dir)
                 print(
-                    "Your submission received the following results when run against " + \
-                    "available test cases:\n\n" + indent(results.summary(), "    "))
+                    "Your submission received the following results when run against "
+                    + "available test cases:\n\n"
+                    + indent(results.summary(), "    ")
+                )
 
             if display_link:
                 # create and display output HTML
@@ -524,7 +529,8 @@ class Notebook(Loggable):
             continue_export()
         else:
             display_pdf_confirmation_widget(
-                self._nbmeta_config.export_pdf_failure_message, pdf_error, continue_export)
+                self._nbmeta_config.export_pdf_failure_message, pdf_error, continue_export
+            )
 
     @grading_mode_disabled
     @logs_event(EventType.END_CHECK_ALL)

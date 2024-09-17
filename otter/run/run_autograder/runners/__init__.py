@@ -11,9 +11,11 @@ def create_runner(otter_config, **kwargs):
 
     if config.lang == "python":
         from .python_runner import PythonRunner
+
         return PythonRunner(config)
     elif config.lang == "r":
         from .r_runner import RRunner
+
         return RRunner(config)
     # There is no else required here because AutograderConfig validates that lang is one of the set
     # of possible values enumerated in the conditions above.

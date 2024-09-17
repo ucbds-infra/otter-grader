@@ -34,7 +34,9 @@ def test_save_notebook(
 
     assert end - start > 10  # check that it slept in between checks
     mocked_display.assert_called_with(mocked_Javascript.return_value)
-    mocked_ipylab.JupyterFrontEnd.return_value.commands.execute.assert_called_with("docmanager:save")
+    mocked_ipylab.JupyterFrontEnd.return_value.commands.execute.assert_called_with(
+        "docmanager:save"
+    )
 
     # check successful save
     mocked_getmtime.side_effect = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0]
@@ -47,7 +49,9 @@ def test_save_notebook(
 
     assert end - start > 1  # check that it slept in between checks
     mocked_display.assert_called_with(mocked_Javascript.return_value)
-    mocked_ipylab.JupyterFrontEnd.return_value.commands.execute.assert_called_with("docmanager:save")
+    mocked_ipylab.JupyterFrontEnd.return_value.commands.execute.assert_called_with(
+        "docmanager:save"
+    )
 
     mocked_display.reset_mock()
 

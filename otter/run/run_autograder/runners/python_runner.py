@@ -65,10 +65,10 @@ class PythonRunner(AbstractLanguageRunner):
         pdf_path = os.path.splitext(nb_path)[0] + ".pdf"
         export_notebook(
             nb_path,
-            dest = pdf_path,
-            filtering = self.ag_config.filtering,
-            pagebreaks = self.ag_config.pagebreaks,
-            exporter_type = "html" if self.ag_config.pdf_via_html else "latex",
+            dest=pdf_path,
+            filtering=self.ag_config.filtering,
+            pagebreaks=self.ag_config.pagebreaks,
+            exporter_type="html" if self.ag_config.pdf_via_html else "latex",
         )
 
         return pdf_path
@@ -89,7 +89,8 @@ class PythonRunner(AbstractLanguageRunner):
                     submission_metadata = json.load(f)
 
                 plugin_collection = PluginCollection(
-                    plugins, os.path.abspath(subm_path), submission_metadata)
+                    plugins, os.path.abspath(subm_path), submission_metadata
+                )
 
             else:
                 plugin_collection = None
@@ -123,20 +124,21 @@ class PythonRunner(AbstractLanguageRunner):
 
             scores = grade_notebook(
                 subm_path,
-                tests_glob = glob("./tests/*.py"),
-                cwd = os.getcwd(),
-                test_dir = "./tests",
-                ignore_errors = not self.ag_config.debug,
-                seed = self.ag_config.seed,
-                seed_variable = self.ag_config.seed_variable,
-                log = log if self.ag_config.grade_from_log else None,
-                variables = self.ag_config.serialized_variables,
-                plugin_collection = plugin_collection,
-                script = os.path.splitext(subm_path)[1] == ".py",
-                force_python3_kernel = not self.ag_config._otter_run,
+                tests_glob=glob("./tests/*.py"),
+                cwd=os.getcwd(),
+                test_dir="./tests",
+                ignore_errors=not self.ag_config.debug,
+                seed=self.ag_config.seed,
+                seed_variable=self.ag_config.seed_variable,
+                log=log if self.ag_config.grade_from_log else None,
+                variables=self.ag_config.serialized_variables,
+                plugin_collection=plugin_collection,
+                script=os.path.splitext(subm_path)[1] == ".py",
+                force_python3_kernel=not self.ag_config._otter_run,
             )
 
-            if pdf_error: scores.set_pdf_error(pdf_error)
+            if pdf_error:
+                scores.set_pdf_error(pdf_error)
 
             # verify the scores against the log
             if self.ag_config.print_summary:
@@ -149,12 +151,17 @@ class PythonRunner(AbstractLanguageRunner):
                         discrepancies = scores.verify_against_log(log)
                         if self.ag_config.print_summary:
                             if not discrepancies:
-                                print_output("No discrepancies found while verifying scores against the log.")
+                                print_output(
+                                    "No discrepancies found while verifying scores against the log."
+                                )
                             else:
-                                for d in discrepancies: print_output(d)
+                                for d in discrepancies:
+                                    print_output(d)
 
                     except BaseException as e:
-                        print_output(f"Error encountered while trying to verify scores with log:\n{e}")
+                        print_output(
+                            f"Error encountered while trying to verify scores with log:\n{e}"
+                        )
 
                 else:
                     print_output("No log found with which to verify student scores.")

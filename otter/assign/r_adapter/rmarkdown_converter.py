@@ -12,7 +12,7 @@ from ...utils import get_source, NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
 
 HTML_COMMENT_START = "<!--"
 HTML_COMMENT_END = "-->"
-EXTRACT_COMMENT_REGEX = re.compile(fr"{HTML_COMMENT_START}\s*(#\s*[\w ]+)\s*{HTML_COMMENT_END}")
+EXTRACT_COMMENT_REGEX = re.compile(rf"{HTML_COMMENT_START}\s*(#\s*[\w ]+)\s*{HTML_COMMENT_END}")
 CONFIG_START_REGEX = re.compile(r"#\s+(ASSIGNMENT\s+CONFIG|(BEGIN|END)\s+\w+)", re.IGNORECASE)
 YAML_COMMENT_CHAR = "#"
 
@@ -43,8 +43,8 @@ def read_as_notebook(rmd_path: str) -> nbf.NotebookNode:
                 continue
 
         if in_comment and l.strip() == HTML_COMMENT_END:
-                new_lines.append("<!-- #endraw -->")
-                in_comment = False
+            new_lines.append("<!-- #endraw -->")
+            in_comment = False
 
         elif l.startswith(HTML_COMMENT_START):
             if HTML_COMMENT_END in l:
@@ -113,8 +113,11 @@ def write_as_rmd(nb: nbf.NotebookNode, rmd_path: str, has_solutions: bool):
     # notebook (resolves whitespace issues caused by the use of prompts for written questions)
     if not has_solutions:
         for i, cell in enumerate(nb["cells"]):
-            if i < len(nb["cells"]) - 1 and cell["cell_type"] == "markdown" and \
-                    nb["cells"][i + 1]["cell_type"] == "markdown":
+            if (
+                i < len(nb["cells"]) - 1
+                and cell["cell_type"] == "markdown"
+                and nb["cells"][i + 1]["cell_type"] == "markdown"
+            ):
                 cell["metadata"]["lines_to_next_cell"] = 0
 
     # add assignment name to Rmd metadata if necessary
@@ -122,7 +125,7 @@ def write_as_rmd(nb: nbf.NotebookNode, rmd_path: str, has_solutions: bool):
     if assignment_name:
         config_cell = nb["cells"][0]
         source = get_source(config_cell)
-        source.insert(-1, f"assignment_name: \"{assignment_name}\"")
+        source.insert(-1, f'assignment_name: "{assignment_name}"')
         config_cell["source"] = "\n".join(source)
 
     jupytext.write(nb, rmd_path)

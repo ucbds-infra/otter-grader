@@ -36,7 +36,7 @@ class AbstractLanguageRunner(ABC):
         """
         Copies tests and support files needed for running the autograder.
 
-        When this method is invoked, the working directory is assumed to already be 
+        When this method is invoked, the working directory is assumed to already be
         ``self.ag_config.autograder_dir``.
         """
         # put files into submission directory
@@ -69,8 +69,10 @@ class AbstractLanguageRunner(ABC):
                 grading should be aborted
         """
         if self.ag_config.assignment_name and got != self.ag_config.assignment_name:
-            message = f"Received submission for assignment '{got}' (this is assignment " \
+            message = (
+                f"Received submission for assignment '{got}' (this is assignment "
                 f"'{self.ag_config.assignment_name}')"
+            )
             raise OtterRuntimeError(message)
 
     def get_notebook_assignment_name(self, nb):
@@ -165,10 +167,12 @@ class AbstractLanguageRunner(ABC):
             )
             if res.status_code != 200:
                 raise OtterRuntimeError(
-                    f"Failed to upload submission for {student_email}: [status {res.status_code}] {res.text}")
+                    f"Failed to upload submission for {student_email}: [status {res.status_code}] {res.text}"
+                )
 
-        print_output("\n\nSuccessfully uploaded submissions for: {}".format(
-            ", ".join(student_emails)))
+        print_output(
+            "\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails))
+        )
 
     def sanitize_tokens(self):
         """
@@ -179,10 +183,12 @@ class AbstractLanguageRunner(ABC):
         as part of ``run``.
         """
         self.ag_config.token = None
-        if not os.path.exists("../source/otter_config.json"): return
+        if not os.path.exists("../source/otter_config.json"):
+            return
         with open("../source/otter_config.json") as f:
             c = json.load(f)
-        if "token" in c: del c["token"]
+        if "token" in c:
+            del c["token"]
         with open("../source/otter_config.json", "w") as f:
             json.dump(c, f, indent=2)
 
@@ -205,7 +211,7 @@ class AbstractLanguageRunner(ABC):
         Determine the path to the submission file, performing any necessary transformations on the
         file.
 
-        When this method is invoked, the working directory is assumed to already be 
+        When this method is invoked, the working directory is assumed to already be
         ``{self.ag_config.autograder_dir}/submission``.
         """
         ...
@@ -228,7 +234,7 @@ class AbstractLanguageRunner(ABC):
         """
         Run the autograder according to the configurations in ``self.ag_config``.
 
-        When this method is invoked, the working directory is assumed to already be 
+        When this method is invoked, the working directory is assumed to already be
         ``self.ag_config.autograder_dir``.
 
         Returns:

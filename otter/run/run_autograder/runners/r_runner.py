@@ -157,7 +157,7 @@ class RRunner(AbstractLanguageRunner):
             raise OtterRuntimeError("No gradable files found in submission")
 
         if self.ag_config.seed is not None:
-            self.add_seed_to_script(scripts[0]) 
+            self.add_seed_to_script(scripts[0])
 
         return scripts[0]
 
@@ -182,10 +182,10 @@ class RRunner(AbstractLanguageRunner):
         if ipynb:
             export_notebook(
                 subm_path,
-                dest = pdf_path,
-                filtering = self.ag_config.filtering, 
-                pagebreaks = self.ag_config.pagebreaks,
-                exporter_type = "html" if self.ag_config.pdf_via_html else "latex",
+                dest=pdf_path,
+                filtering=self.ag_config.filtering,
+                pagebreaks=self.ag_config.pagebreaks,
+                exporter_type="html" if self.ag_config.pdf_via_html else "latex",
             )
 
         else:
@@ -205,10 +205,12 @@ class RRunner(AbstractLanguageRunner):
 
             subm_path = self.resolve_submission_path()
             output = R_PACKAGES["ottr"].run_autograder(
-                subm_path, ignore_errors = not self.ag_config.debug, test_dir = "./tests")[0]
+                subm_path, ignore_errors=not self.ag_config.debug, test_dir="./tests"
+            )[0]
             scores = GradingResults.from_ottr_json(output)
 
-            if pdf_error: scores.set_pdf_error(pdf_error)
+            if pdf_error:
+                scores.set_pdf_error(pdf_error)
 
         # delete the script if necessary
         if self.subm_path_deletion_required:

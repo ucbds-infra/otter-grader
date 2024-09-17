@@ -51,8 +51,11 @@ def extract_fenced_otter_cell(cell: nbformat.NotebookNode) -> nbformat.NotebookN
         return cell
 
     source = get_source(cell)
-    if source[0].strip() == "```otter" and \
-            all(not l.strip() == "```" for l in source[1:-1]) and source[-1].strip() == "```":
+    if (
+        source[0].strip() == "```otter"
+        and all(not l.strip() == "```" for l in source[1:-1])
+        and source[-1].strip() == "```"
+    ):
         return nbformat.v4.new_raw_cell("\n".join(source[1:-1]))
 
     return cell
@@ -76,8 +79,8 @@ def is_block_boundary_cell(
         ``bool``: whether the cell is a boundary cell of type ``block_type``
     """
     cell = extract_fenced_otter_cell(cell)
-    begin_or_end = 'end' if end else 'begin'
-    regex = fr"#\s+{ begin_or_end }\s+{ block_type.value }\s*"
+    begin_or_end = "end" if end else "begin"
+    regex = rf"#\s+{ begin_or_end }\s+{ block_type.value }\s*"
     source = get_source(cell)
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 

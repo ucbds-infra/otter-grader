@@ -43,7 +43,7 @@ OTTER_CONFIG_FILENAME = "otter_config.json"
 @contextmanager
 def hide_outputs():
     """
-    Context manager for hiding outputs from ``display()`` calls. IPython handles matplotlib outputs 
+    Context manager for hiding outputs from ``display()`` calls. IPython handles matplotlib outputs
     specially, so those are supressed too.
     """
     ipy = get_ipython()
@@ -72,7 +72,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     Returns:
         ``str``: randomized string name for grading function
     """
-    return ''.join(random.choice(chars) for _ in range(size))
+    return "".join(random.choice(chars) for _ in range(size))
 
 
 def get_variable_type(obj):
@@ -121,10 +121,10 @@ def chdir(new_dir):
     curr_dir = os.getcwd()
     os.chdir(new_dir)
 
-    try: 
+    try:
         yield
 
-    finally: 
+    finally:
         os.chdir(curr_dir)
 
 
@@ -171,7 +171,7 @@ def load_default_file(provided_fn, default_fn, default_disabled=False):
 def print_full_width(char, mid_text="", whitespace=" ", ret_str=False, **kwargs):
     """
     Prints a character at the full terminal width. If ``mid_text`` is supplied, this text is printed
-    in the middle of the terminal, surrounded by ``whitespace``. Additional kwargs passed to 
+    in the middle of the terminal, surrounded by ``whitespace``. Additional kwargs passed to
     ``print``.
 
     If ``ret_str`` is true, the string is returned; if not, it is printed directly to the console.
@@ -201,8 +201,8 @@ def assert_path_exists(path_tuples):
     """
     Ensure that a series of file paths exist and are of a specific type, or raise a ``ValueError``.
 
-    Elements of ``path_tuples`` should be 2-tuples where the first element is a string representing 
-    the file path and the second element is ``True`` if the path should be a directory, ``False`` if 
+    Elements of ``path_tuples`` should be 2-tuples where the first element is a string representing
+    the file path and the second element is ``True`` if the path should be a directory, ``False`` if
     it should be a file, and ``None`` if it doesn't matter.
 
     Args:
@@ -234,8 +234,9 @@ def knit_rmd_file(rmd_path, pdf_path):
         with open(rmd_path) as f:
             contents = f.read()
 
-        contents = "```{r cache = F, include = F}\nknitr::opts_chunk$set(error = TRUE)\n```\n" + \
-            contents
+        contents = (
+            "```{r cache = F, include = F}\nknitr::opts_chunk$set(error = TRUE)\n```\n" + contents
+        )
         ntf.write(contents)
         ntf.seek(0)
 
@@ -255,7 +256,7 @@ class loggers:
     @staticmethod
     def __new__(cls, *args, **kwargs):
         raise NotImplementedError("This class is not meant to be instantiated")
-    
+
     @classmethod
     def send_logs(cls, host, port):
         """
@@ -269,7 +270,7 @@ class loggers:
     @classmethod
     def get_logger(cls, name):
         """
-        Retrieve ``logging.Logger`` with name ``name`` and return it, setting the log level to the 
+        Retrieve ``logging.Logger`` with name ``name`` and return it, setting the log level to the
         class log level.
         """
         if name in cls._instances:

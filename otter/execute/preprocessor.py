@@ -75,7 +75,7 @@ class GradingPreprocessor(Preprocessor):
     def from_log(self):
         return self.otter_log is not None
 
-    def preprocess(self, nb, resources = None):
+    def preprocess(self, nb, resources=None):
         self._notebook_name = f"notebook_{id_generator()}"
         self.filter_ignored_cells(nb)
         self.logging_transform(nb)
@@ -87,34 +87,44 @@ class GradingPreprocessor(Preprocessor):
         return nb, resources
 
     def add_init_and_export_cells(self, nb):
-        nb.cells.insert(0, nbf.v4.new_code_cell(INIT_CELL_SOURCE.format(
-            notebook_name = self._notebook_name,
-            test_dir = self.test_dir,
-            logging_server_host = self.logging_server_host,
-            logging_server_port = self.logging_server_port,
-        )))
-        nb.cells.append(nbf.v4.new_code_cell(EXPORT_CELL_SOURCE.format(
-            tests_loop_var = f"t_{id_generator()}",
-            tests_glob_json = json.dumps(self.tests_glob),
-            # ensure that "\" is properly-escaped for Windows paths since this is going to be
-            # rendered into a string literal
-            results_path = self.results_path.replace("\\", "\\\\"),
-        )))
+        nb.cells.insert(
+            0,
+            nbf.v4.new_code_cell(
+                INIT_CELL_SOURCE.format(
+                    notebook_name=self._notebook_name,
+                    test_dir=self.test_dir,
+                    logging_server_host=self.logging_server_host,
+                    logging_server_port=self.logging_server_port,
+                )
+            ),
+        )
+        nb.cells.append(
+            nbf.v4.new_code_cell(
+                EXPORT_CELL_SOURCE.format(
+                    tests_loop_var=f"t_{id_generator()}",
+                    tests_glob_json=json.dumps(self.tests_glob),
+                    # ensure that "\" is properly-escaped for Windows paths since this is going to be
+                    # rendered into a string literal
+                    results_path=self.results_path.replace("\\", "\\\\"),
+                )
+            )
+        )
 
     def add_cwd_to_path(self, nb):
         if self.cwd:
-            nb.cells.insert(
-                0, nbf.v4.new_code_cell(f"import sys\nsys.path.append(r\"{self.cwd}\")"))
+            nb.cells.insert(0, nbf.v4.new_code_cell(f'import sys\nsys.path.append(r"{self.cwd}")'))
 
     def add_seeds(self, nb):
-        if self.seed is None or self.from_log: return
+        if self.seed is None or self.from_log:
+            return
 
         skip_first = False
         if self.seed_variable is None:
             skip_first = True
             np_name, rand_name = f"np_{id_generator()}", f"random_{id_generator()}"
             nb.cells.insert(
-                0, nbf.v4.new_code_cell(f"import numpy as {np_name}\nimport random as {rand_name}"))
+                0, nbf.v4.new_code_cell(f"import numpy as {np_name}\nimport random as {rand_name}")
+            )
             do_seed = f"{np_name}.random.seed({self.seed})\n{rand_name}.seed({self.seed})"
 
         else:
@@ -126,7 +136,8 @@ class GradingPreprocessor(Preprocessor):
                 cell.source = f"{do_seed}\n{cell.source}"
 
     def add_checks(self, nb):
-        if self.from_log: return
+        if self.from_log:
+            return
 
         new_cells = []
         for cell in nb.cells:
@@ -136,7 +147,7 @@ class GradingPreprocessor(Preprocessor):
             if config.get("tests"):
                 source = ""
                 for test in config["tests"]:
-                    source += f"{self._notebook_name}().check(\"{test}\")\n"
+                    source += f'{self._notebook_name}().check("{test}")\n'
 
                 new_cells.append(nbf.v4.new_code_cell(source))
 
@@ -146,8 +157,9 @@ class GradingPreprocessor(Preprocessor):
         new_cells = []
         for cell in nb.cells:
             m = cell.get("metadata", {})
-            if IGNORE_CELL_TAG in m.get("tags", []) or \
-                    m.get(NOTEBOOK_METADATA_KEY, {}).get("ignore", False):
+            if IGNORE_CELL_TAG in m.get("tags", []) or m.get(NOTEBOOK_METADATA_KEY, {}).get(
+                "ignore", False
+            ):
                 continue
 
             new_cells.append(cell)
@@ -155,7 +167,8 @@ class GradingPreprocessor(Preprocessor):
         nb.cells = new_cells
 
     def logging_transform(self, nb):
-        if not self.from_log: return
+        if not self.from_log:
+            return
 
         self.filter_out_non_imports(nb)
 
@@ -164,7 +177,10 @@ class GradingPreprocessor(Preprocessor):
         for e in self.otter_log.entries:
             e.flush_to_file(log_fn)
 
-        nb.cells.append(nbf.v4.new_code_cell(dedent(f"""\
+        nb.cells.append(
+            nbf.v4.new_code_cell(
+                dedent(
+                    f"""\
             import json
             from otter import Notebook
             from otter.check.logs import Log
@@ -190,7 +206,10 @@ class GradingPreprocessor(Preprocessor):
                 logged_questions.append(entry.question)
 
             print(f"Questions executed from log: {{', '.join(logged_questions)}}")
-        """)))
+        """
+                )
+            )
+        )
 
     def filter_out_non_imports(self, nb):
         e = PythonExporter()

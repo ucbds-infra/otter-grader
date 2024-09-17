@@ -29,11 +29,11 @@ def main(
     paths: Optional[Union[List[str], Tuple[str]]] = None,
     output_dir: str = "./",
     autograder: str = "./autograder.zip",
-    containers: int = 4, 
+    containers: int = 4,
     ext: str = "ipynb",
     summaries: bool = False,
     no_kill: bool = False,
-    image: str = "ubuntu:22.04", 
+    image: str = "ubuntu:22.04",
     pdfs: bool = False,
     prune: bool = False,
     force: bool = False,
@@ -86,7 +86,9 @@ def main(
     if name is None:
         raise ValueError("You must specify an assignment name")
     elif not re.match(r"^[\w\-.]+$", name):
-        raise ValueError("Assignment names may only contain letters, nubers, underscores, dashes, and periods")
+        raise ValueError(
+            "Assignment names may only contain letters, nubers, underscores, dashes, and periods"
+        )
 
     if not isinstance(paths, tuple) and not isinstance(paths, list):
         raise TypeError("paths must be a tuple of valid paths")
@@ -94,10 +96,12 @@ def main(
         raise ValueError("No paths specified")
 
     # check file paths
-    assert_path_exists([
-        (output_dir, True),
-        (autograder, False),
-    ])
+    assert_path_exists(
+        [
+            (output_dir, True),
+            (autograder, False),
+        ]
+    )
 
     if ext not in _ALLOWED_EXTENSIONS:
         raise ValueError(f"Invalid submission extension specified: {ext}")
@@ -124,18 +128,20 @@ def main(
         scores = launch_containers(
             autograder,
             submission_paths,
-            num_containers = containers,
-            base_image = image,
-            tag = name,
-            no_kill = no_kill,
-            pdf_dir = pdf_dir,
-            timeout = timeout,
-            network = not no_network,
-            config = AutograderConfig({
-                "zips": ext == "zip",
-                "pdf": pdfs,
-                "debug": debug,
-            }),
+            num_containers=containers,
+            base_image=image,
+            tag=name,
+            no_kill=no_kill,
+            pdf_dir=pdf_dir,
+            timeout=timeout,
+            network=not no_network,
+            config=AutograderConfig(
+                {
+                    "zips": ext == "zip",
+                    "pdf": pdfs,
+                    "debug": debug,
+                }
+            ),
         )
 
         LOGGER.info("Combining grades and saving")

@@ -71,7 +71,7 @@ class Checker:
                 unspecified, the calling frame's global environment is used
 
         Returns:
-            ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
+            ``otter.test_files.abstract_test.TestFile``: result of running the tests in the
             given global environment
         """
         test = create_test_file(nb_or_test_path, nbmeta_config, test_name=test_name)
@@ -100,7 +100,7 @@ class Checker:
                 unspecified, the calling frame's global environment is used
 
         Returns:
-            ``otter.test_files.abstract_test.TestFile``: result of running the tests in the 
+            ``otter.test_files.abstract_test.TestFile``: result of running the tests in the
             given global environment
         """
         if any(test_path in tf.path or tf.path in test_path for tf in cls._test_files):

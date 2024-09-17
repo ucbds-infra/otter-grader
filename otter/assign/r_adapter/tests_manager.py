@@ -14,7 +14,8 @@ from ...test_files.abstract_test import TestFile
 
 
 # DON'T change this template or the regex that removes hidden tests will break in the R adapter!
-OTTR_TEST_FILE_TEMPLATE = Template("""\
+OTTR_TEST_FILE_TEMPLATE = Template(
+    """\
 test = list(
   name = "{{ name }}",
   cases = list({% for tc in test_cases %}
@@ -29,8 +30,9 @@ test = list(
       }
     ){% if not loop.last %},{% endif %}{% endfor %}
   )
-)""")
-OTTR_TEST_FILE_TEMPLATE.globals['indent'] = indent
+)"""
+)
+OTTR_TEST_FILE_TEMPLATE.globals["indent"] = indent
 
 
 @dataclass
@@ -62,7 +64,9 @@ class RAssignmentTestsManager(AssignmentTestsManager):
         test_start_line = 0 if hidden else -1
 
         config, maybe_test_start_line = self._parse_test_config(source)
-        test_start_line = maybe_test_start_line if maybe_test_start_line is not None else test_start_line
+        test_start_line = (
+            maybe_test_start_line if maybe_test_start_line is not None else test_start_line
+        )
 
         test_name = config.get("name", None)
         hidden = config.get("hidden", hidden)
@@ -73,7 +77,7 @@ class RAssignmentTestsManager(AssignmentTestsManager):
         self._add_test_case(
             question,
             RTestCase(
-                '\n'.join(source[test_start_line+1:]),
+                "\n".join(source[test_start_line + 1 :]),
                 hidden,
                 points,
                 success_message,
@@ -87,5 +91,5 @@ class RAssignmentTestsManager(AssignmentTestsManager):
         return TestFile.resolve_test_file_points(total_points, test_cases)
 
     def _format_test(self, name, points, test_cases):
-        template_data = {'name': name, 'test_cases': test_cases}
+        template_data = {"name": name, "test_cases": test_cases}
         return OTTR_TEST_FILE_TEMPLATE.render(**template_data)

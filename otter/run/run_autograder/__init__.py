@@ -66,15 +66,17 @@ def main(autograder_dir, otter_run=False, **kwargs):
                     with chdir("./submission"):
                         zips = glob("*.zip")
                         if len(zips) > 1:
-                            raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
+                            raise OtterRuntimeError(
+                                "More than one zip file found in submission and 'zips' config is true"
+                            )
 
-                        with zipfile.ZipFile(zips[0])  as zf:
+                        with zipfile.ZipFile(zips[0]) as zf:
                             zf.extractall()
 
                 runner.prepare_files()
                 scores = runner.run()
                 with open("results/results.pkl", "wb+") as f:
-                        dill.dump(scores, f)
+                    dill.dump(scores, f)
 
                 output = scores.to_gradescope_dict(runner.ag_config)
 
@@ -94,13 +96,13 @@ def main(autograder_dir, otter_run=False, **kwargs):
             finally:
                 if "output" in vars():
                     with open("./results/results.json", "w+") as f:
-                        json.dump(output, f, indent=4)                
+                        json.dump(output, f, indent=4)
 
         print_output("\n\n", end="")
 
         df = pd.DataFrame(output["tests"])
 
-        if runner.ag_config.print_score  and "score" in df.columns:
+        if runner.ag_config.print_score and "score" in df.columns:
             total, possible = df["score"].sum(), df["max_score"].sum()
             if "score" in output:
                 total, possible = output["score"], runner.ag_config.points_possible or possible

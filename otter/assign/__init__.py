@@ -25,7 +25,7 @@ def main(
     no_pdfs: bool = False,
     no_run_tests: bool = False,
     username: Optional[str] = None,
-    password: Optional[str] = None, 
+    password: Optional[str] = None,
     debug: Optional[str] = False,
 ):
     """
@@ -35,7 +35,7 @@ def main(
         master (``str``): path to master notebook
         result (``str``): path to result directory
         no_pdfs (``bool``): whether to ignore any configurations indicating PDF generation for this run
-        no_run_tests (``bool``): prevents Otter tests from being automatically run on the solutions 
+        no_run_tests (``bool``): prevents Otter tests from being automatically run on the solutions
             notebook
         username (``str | None``): a username for Gradescope for generating a token
         password (``str | None``): a password for Gradescope for generating a token
@@ -85,10 +85,10 @@ def main(
         # generate PDF of solutions
         if assignment.solutions_pdf and not no_pdfs:
             LOGGER.info("Generating solutions PDF")
-            filtering = assignment.solutions_pdf == 'filtered'
+            filtering = assignment.solutions_pdf == "filtered"
 
             src = os.path.abspath(str(assignment.get_ag_path(master.name)))
-            dst = os.path.abspath(str(assignment.get_ag_path(master.stem + '-sol.pdf')))
+            dst = os.path.abspath(str(assignment.get_ag_path(master.stem + "-sol.pdf")))
 
             if not assignment.is_rmd:
                 LOGGER.debug(f"Exporting {src} as notebook to {dst}")
@@ -113,23 +113,25 @@ def main(
         if assignment.template_pdf and not no_pdfs:
             LOGGER.info("Generating template PDF")
 
-            src = os.path.abspath(str(assignment.get_ag_path( master.name)))
-            dst = os.path.abspath(str(assignment.get_ag_path(master.stem + '-template.pdf')))
+            src = os.path.abspath(str(assignment.get_ag_path(master.name)))
+            dst = os.path.abspath(str(assignment.get_ag_path(master.stem + "-template.pdf")))
 
             if not assignment.is_rmd:
                 LOGGER.debug("Attempting PDF via LaTeX export")
                 export_notebook(
                     src,
-                    dest=dst, 
-                    filtering=True, 
-                    pagebreaks=True, 
+                    dest=dst,
+                    filtering=True,
+                    pagebreaks=True,
                     exporter_type="latex",
                 )
                 LOGGER.debug("PDF via LaTeX export successful")
 
             else:
-                raise ValueError(f"Filtering is not supported with RMarkdown assignments; use " + \
-                    "solutions_pdf to generate a Gradescope template instead.")
+                raise ValueError(
+                    f"Filtering is not supported with RMarkdown assignments; use "
+                    + "solutions_pdf to generate a Gradescope template instead."
+                )
 
         # generate the .otter file if needed
         if not assignment.is_rmd and assignment.save_environment:
@@ -137,7 +139,8 @@ def main(
             if assignment.is_r:
                 warnings.warn(
                     "Otter Service and serialized environments are unsupported with R, "
-                    "configurations ignored")
+                    "configurations ignored"
+                )
             else:
                 write_otter_config_file(assignment)
 
