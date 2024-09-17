@@ -14,7 +14,7 @@ from glob import glob
 from IPython import get_ipython
 from IPython.display import display, Javascript
 from ipywidgets import Button, HTML, Output, VBox
-from subprocess import run, PIPE
+from subprocess import PIPE, run
 from typing import (
     Any,
     Callable,

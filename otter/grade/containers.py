@@ -8,14 +8,13 @@ import shutil
 import tempfile
 import zipfile
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import as_completed, ThreadPoolExecutor
 from python_on_whales import docker
 from textwrap import indent
 from typing import List, Optional
 
 from . import __name__ as pkg_name
 from .utils import OTTER_DOCKER_IMAGE_NAME, TimeoutException
-
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..test_files import GradingResults
 from ..utils import loggers, OTTER_CONFIG_FILENAME

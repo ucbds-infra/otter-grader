@@ -3,10 +3,10 @@
 import datetime as dt
 import dill
 import os
-import types
 import tempfile
+import types
 
-from enum import Enum, auto
+from enum import auto, Enum
 from typing import List, Optional, TYPE_CHECKING
 
 from ..utils import QuestionNotInLogException

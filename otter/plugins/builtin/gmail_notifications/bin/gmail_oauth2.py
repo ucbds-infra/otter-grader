@@ -60,17 +60,16 @@ IMAPFE and pass it as the second argument to the AUTHENTICATE command.
     a AUTHENTICATE XOAUTH2 a9sha9sfs[...]9dfja929dk==
 """
 
-from __future__ import print_function
-
 import base64
 import imaplib
 import json
-from optparse import OptionParser
+import six
 import smtplib
 import sys
 import urllib
 
-import six
+from __future__ import print_function
+from optparse import OptionParser
 
 
 def SetupOptionParser():

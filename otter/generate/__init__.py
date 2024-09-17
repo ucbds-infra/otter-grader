@@ -15,7 +15,6 @@ from typing import Any, Dict, List, Optional
 
 from .token import APIClient
 from .utils import merge_conda_environments, zip_folder
-
 from ..plugins import PluginCollection
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import dump_yaml, load_default_file, OTTER_CONFIG_FILENAME

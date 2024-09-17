@@ -4,7 +4,6 @@ import json
 
 from .exception_test import ExceptionTestFile
 from .ok_test import OKTestFile
-
 from ..nbmeta_config import NBMetadataConfig
 from ..utils import NOTEBOOK_METADATA_KEY
 

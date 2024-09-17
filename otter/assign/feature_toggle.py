@@ -1,7 +1,6 @@
 """Feature toggling for Otter Assign"""
 
 from enum import Enum
-
 from typing import Callable
 
 from .assignment import Assignment

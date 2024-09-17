@@ -32,7 +32,6 @@ from .utils import (
     lock,
     remove_cell_ids_if_applicable,
 )
-
 from ..nbmeta_config import NBMetadataConfig
 from ..utils import NOTEBOOK_METADATA_KEY
 

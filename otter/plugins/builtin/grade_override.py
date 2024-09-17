@@ -2,10 +2,10 @@
 Plugin for using Google Sheets to override scores for test cases
 """
 
-import os
 import json
-import tempfile
+import os
 import pandas as pd
+import tempfile
 
 from .. import PluginCollection
 from ..abstract_plugin import AbstractOtterPlugin

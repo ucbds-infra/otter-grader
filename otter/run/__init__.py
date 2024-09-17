@@ -7,7 +7,8 @@ import shutil
 import tempfile
 import zipfile
 
-from .run_autograder import capture_run_output, main as run_autograder_main
+from .run_autograder import capture_run_output
+from .run_autograder import main as run_autograder_main
 
 
 def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=False, debug=False):

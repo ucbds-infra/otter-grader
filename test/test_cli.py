@@ -11,7 +11,8 @@ from unittest import mock
 from otter import __version__
 from otter.cli import cli
 from otter.generate import main as generate
-from otter.grade import _ALLOWED_EXTENSIONS, main as grade
+from otter.grade import _ALLOWED_EXTENSIONS
+from otter.grade import main as grade
 from otter.run import main as run
 from otter.test_files import GradingResults
 

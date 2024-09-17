@@ -12,9 +12,7 @@ from nbconvert.exporters import ScriptExporter
 from rpy2.robjects.packages import importr
 
 from .abstract_runner import AbstractLanguageRunner
-
 from ..utils import OtterRuntimeError
-
 from ....export import export_notebook
 from ....test_files import GradingResults
 from ....utils import chdir, get_source, knit_rmd_file, NBFORMAT_VERSION

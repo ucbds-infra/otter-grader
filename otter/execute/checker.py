@@ -4,8 +4,8 @@ import inspect
 
 from typing import Any, Dict, Optional
 
-from ..test_files import create_test_file, TestFile
 from ..nbmeta_config import NBMetadataConfig
+from ..test_files import create_test_file, TestFile
 
 
 class Checker:

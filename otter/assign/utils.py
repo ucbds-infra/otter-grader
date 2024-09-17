@@ -15,12 +15,7 @@ from ..api import grade_submission
 from ..generate import main as generate_autograder
 from ..plugins import PluginCollection
 from ..run import capture_run_output
-from ..utils import (
-    chdir,
-    get_source,
-    loggers,
-    OTTER_CONFIG_FILENAME,
-)
+from ..utils import chdir, get_source, loggers, OTTER_CONFIG_FILENAME
 
 
 LOGGER = loggers.get_logger(__name__)

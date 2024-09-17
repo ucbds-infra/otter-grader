@@ -17,7 +17,6 @@ from .assignment import Assignment
 from .question_config import QuestionConfig
 from .solutions import remove_ignored_lines
 from .utils import get_source, str_to_doctest
-
 from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
 from ..test_files.abstract_test import TestFile
 

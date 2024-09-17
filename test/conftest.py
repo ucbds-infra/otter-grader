@@ -1,7 +1,7 @@
 import nbformat as nbf
+import os
 import pathlib
 import pytest
-import os
 import shutil
 
 from contextlib import nullcontext

@@ -8,8 +8,7 @@ from typing import Optional
 
 from .assignment import Assignment
 from .output import write_output_directories
-from .utils import run_tests, write_otter_config_file, run_generate_autograder
-
+from .utils import run_generate_autograder, run_tests, write_otter_config_file
 from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..utils import chdir, get_relpath, knit_rmd_file, loggers

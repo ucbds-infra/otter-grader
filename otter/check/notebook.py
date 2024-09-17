@@ -13,7 +13,7 @@ from IPython.display import display, HTML
 from textwrap import indent
 from typing import Any, Dict, List, Optional
 
-from .logs import LogEntry, EventType, Log
+from .logs import EventType, Log, LogEntry
 from .utils import (
     display_pdf_confirmation_widget,
     grade_zip_file,
@@ -26,7 +26,6 @@ from .utils import (
     resolve_test_info,
     save_notebook,
 )
-
 from ..execute import Checker
 from ..export import export_notebook
 from ..nbmeta_config import NBMetadataConfig

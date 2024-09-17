@@ -5,9 +5,8 @@ import pandas as pd
 import pytest
 import sys
 
-from otter.check.logs import Log
-from otter.check.notebook import Notebook, _OTTER_LOG_FILENAME
-from otter.check.logs import LogEntry, EventType, Log
+from otter.check.logs import EventType, Log, LogEntry
+from otter.check.notebook import _OTTER_LOG_FILENAME, Notebook
 
 from ..utils import TestFileManager
 

@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 
 from . import __name__ as pkg_name
 from .utils import has_begin, has_end, sub_end_for_new_page
-
 from ...utils import NBFORMAT_VERSION
 
 

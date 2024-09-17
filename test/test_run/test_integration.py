@@ -2,8 +2,8 @@
 
 import copy
 import json
-import nbformat
 import nbconvert
+import nbformat
 import os
 import pytest
 import re

@@ -9,12 +9,7 @@ from multiprocessing import Queue
 from typing import List, Optional, Tuple, Union
 
 from .containers import launch_containers
-from .utils import (
-    merge_scores_to_df,
-    prune_images,
-    SCORES_DICT_PERCENT_CORRECT_KEY,
-)
-
+from .utils import merge_scores_to_df, prune_images, SCORES_DICT_PERCENT_CORRECT_KEY
 from ..run.run_autograder.autograder_config import AutograderConfig
 from ..utils import assert_path_exists, loggers
 

@@ -4,10 +4,9 @@ import os
 
 from glob import glob
 
-from .logs import LogEntry, EventType
+from .logs import EventType, LogEntry
 from .notebook import _OTTER_LOG_FILENAME
 from .utils import list_test_files
-
 from ..execute import grade_notebook
 from ..utils import loggers
 

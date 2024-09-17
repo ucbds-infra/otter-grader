@@ -9,7 +9,6 @@ from typing import ClassVar
 
 from ..tests_manager import AssignmentTestsManager, TestCase
 from ..utils import get_source
-
 from ...test_files.abstract_test import TestFile
 
 

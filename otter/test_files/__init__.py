@@ -13,7 +13,6 @@ from .exception_test import ExceptionTestFile, test_case
 from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
-
 from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
 from ..utils import format_exception, QuestionNotInLogException
 

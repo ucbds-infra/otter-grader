@@ -9,8 +9,7 @@ import pathlib
 from contextlib import redirect_stderr, redirect_stdout
 from textwrap import dedent
 
-from .abstract_test import TestFile, TestCase, TestCaseResult
-
+from .abstract_test import TestCase, TestCaseResult, TestFile
 from ..utils import hide_outputs
 
 

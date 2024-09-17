@@ -1,7 +1,7 @@
 """Autograding process internals for Otter-Grader"""
 
-import os
 import json
+import os
 import pandas as pd
 import zipfile
 
@@ -10,9 +10,8 @@ from glob import glob
 
 from .runners import create_runner
 from .utils import capture_run_output, OtterRuntimeError, print_output
-
-from ...version import LOGO_WITH_VERSION
 from ...utils import chdir, loggers, OTTER_CONFIG_FILENAME
+from ...version import LOGO_WITH_VERSION
 
 
 __all__ = ["capture_run_output", "main"]

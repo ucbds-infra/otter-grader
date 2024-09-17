@@ -11,7 +11,6 @@ from glob import glob
 
 from ..autograder_config import AutograderConfig
 from ..utils import OtterRuntimeError, print_output, write_blank_page_to_stare_at_before_you
-
 from ....generate.token import APIClient
 from ....nbmeta_config import NBMetadataConfig
 

@@ -1,8 +1,8 @@
 """A logging server for receiving logs from the grading process"""
 
-import pickle
 import logging
 import logging.handlers
+import pickle
 import socket
 import socketserver
 import struct

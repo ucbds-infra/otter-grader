@@ -4,6 +4,7 @@
 # in the calling code -- see #735
 import warnings
 
+
 warnings.simplefilter("ignore")
 
 import argparse
