@@ -34,10 +34,13 @@ jobs:
         with:
           python-version: "3.9"
 
-      - uses: liskin/gh-pipx@v1
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
         with:
-          packages: >-
-            poetry
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: .venv
+          installer-parallel: true
 
       - name: Install dependencies
         run: |
@@ -45,4 +48,5 @@ jobs:
 
       - name: Run formatters
         run: |
+          source .venv/bin/activate
           make format CI=true
