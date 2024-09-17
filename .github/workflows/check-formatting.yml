@@ -1,0 +1,48 @@
+name: Check formatting
+
+on:
+  push:
+    branches:
+      - master
+      - beta
+      - release
+  pull_request:
+    branches:
+      - master
+      - beta
+      - release
+      - temp
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Check formatting
+    runs-on: ubuntu-latest
+
+    env:
+      TAR: /bin/tar
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - uses: liskin/gh-pipx@v1
+        with:
+          packages: >-
+            poetry
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev --no-root
+
+      - name: Run formatters
+        run: |
+          make format CI=true

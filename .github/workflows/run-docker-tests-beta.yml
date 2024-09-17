@@ -74,7 +74,7 @@ jobs:
         if: ${{ steps.check-branch.outputs.run == 'true' }}
         run: |
           micromamba activate otter-grader
-          poetry install --with test --all-extras
+          poetry install --with dev,test --all-extras
 
       - name: Install ottr
         if: ${{ steps.check-branch.outputs.run == 'true' }}
