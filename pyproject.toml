@@ -63,6 +63,7 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
+isort = "^5.13.2"
 
 [tool.poetry.group.test]
 optional = true
@@ -88,6 +89,19 @@ sphinxcontrib-apidoc = "*"
 [tool.black]
 line-length = 100
 target-version = ["py39"]
+
+[tool.isort]
+py_version = "39"
+skip_glob = ["test/**/files/*"]
+line_length = 100
+sections = ["THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+multi_line_output = 3
+use_parentheses = true
+order_by_type = false
+lines_after_imports = 2
+lines_between_types = 1
+include_trailing_comma = true
+reverse_relative = true
 
 [build-system]
 requires = ["poetry-core"]

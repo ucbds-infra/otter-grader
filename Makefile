@@ -5,8 +5,14 @@ COVERAGE         = coverage
 DOCKER           = true
 SLOW             = true
 CLEANUP          = true
+ISORT            = isort
+BLACK            = black
+BLACKOPTS        = --exclude .*.ipynb
+CI               = false
 
 _PYTESTOPTS      := -vv --durations=0 --html=pytest-report.html --self-contained-html
+_ISORTOPTS       :=
+_BLACKOPTS       :=
 
 ifeq ($(DOCKER), false)
 	_PYTESTOPTS := $(_PYTESTOPTS) -m "not docker"
@@ -18,6 +24,11 @@ endif
 
 ifeq ($(CLEANUP), false)
 	_PYTESTOPTS := $(_PYTESTOPTS) --nocleanup
+endif
+
+ifeq ($(CI), true)
+	_ISORTOPTS := --check --diff
+	_BLACKOPTS := --check --diff
 endif
 
 _PYTESTOPTS := $(_PYTESTOPTS) $(PYTESTOPTS)
@@ -41,3 +52,7 @@ tutorial:
 	zip -r tutorial.zip submissions demo.ipynb requirements.txt -x "*.DS_Store"; \
 	cp tutorial.zip ../_static; \
 	rm tutorial.zip
+
+format:
+	$(ISORT) $(_ISORTOPTS) .
+	$(BLACK) $(_BLACKOPTS) $(BLACKOPTS) .
