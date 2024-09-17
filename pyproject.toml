@@ -89,6 +89,12 @@ sphinxcontrib-apidoc = "*"
 [tool.black]
 line-length = 100
 target-version = ["py39"]
+extend-exclude = """
+(
+  .*.ipynb               # exclude ipynb files
+  | test/.*/files/.*.py  # exclude test goldens
+)
+"""
 
 [tool.isort]
 py_version = "39"

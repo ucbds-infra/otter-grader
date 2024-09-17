@@ -10,7 +10,7 @@ import zipfile
 
 from dataclasses import dataclass
 from glob import glob
-from jinja2 import Template
+from jinja2 import Environment, PackageLoader
 from typing import Any, Dict, List, Optional
 
 from .token import APIClient
@@ -22,6 +22,7 @@ from ..version import __version__
 
 
 DEFAULT_PYTHON_VERSION = "3.12"
+JINJA_ENV = Environment(loader=PackageLoader(__name__), keep_trailing_newline=True)
 OTTER_ENV_NAME = "otter-env"
 OTTR_VERSION = "1.5.0"
 TEMPLATE_DIR = importlib.resources.files(__name__) / "templates"
@@ -104,20 +105,20 @@ class CondaEnvironment:
 
 
 COMMON_TEMPLATES = [
-    TEMPLATE_DIR / "common" / "run_autograder",
-    TEMPLATE_DIR / "common" / "run_otter.py",
+    "common/run_autograder",
+    "common/run_otter.py",
 ]
 
 LANGUAGE_BASED_CONFIGURATIONS = {
     "python": {
         "test_file_pattern": "*.py",
         "requirements_filename": "requirements.txt",
-        "templates": [*COMMON_TEMPLATES, TEMPLATE_DIR / "python" / "setup.sh"],
+        "templates": [*COMMON_TEMPLATES, "python/setup.sh"],
     },
     "r": {
         "test_file_pattern": "*.[Rr]",
         "requirements_filename": "requirements.R",
-        "templates": [*COMMON_TEMPLATES, TEMPLATE_DIR / "r" / "setup.sh"],
+        "templates": [*COMMON_TEMPLATES, "r/setup.sh"],
     },
 }
 
@@ -229,7 +230,7 @@ def main(
     templates = {}
     for template in lang_config["templates"]:
         fn = os.path.basename(template)
-        templates[fn] = Template(template.read_text())
+        templates[fn] = JINJA_ENV.get_template(template)
 
     if python_version is not None:
         match = re.match(r"(\d+)\.(\d+)(\.\d+)?", python_version)

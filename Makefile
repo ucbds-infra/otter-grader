@@ -6,8 +6,9 @@ DOCKER           = true
 SLOW             = true
 CLEANUP          = true
 ISORT            = isort
+ISORTOPTS        =
 BLACK            = black
-BLACKOPTS        = --exclude .*.ipynb
+BLACKOPTS        =
 CI               = false
 
 _PYTESTOPTS      := -vv --durations=0 --html=pytest-report.html --self-contained-html
@@ -54,5 +55,5 @@ tutorial:
 	rm tutorial.zip
 
 format:
-	$(ISORT) $(_ISORTOPTS) .
+	$(ISORT) $(_ISORTOPTS) $(ISORTOPTS) .
 	$(BLACK) $(_BLACKOPTS) $(BLACKOPTS) .
