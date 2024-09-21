@@ -31,7 +31,7 @@ python = "^3.9"
 astunparse = "^1.6.3"
 click = "^8.1.7"
 dill = "^0.3.8"
-fica = ">=0.3.1"
+fica = ">=0.4.1"
 google-api-python-client = { version = "*", optional = true }
 google-auth-oauthlib = { version = "*", optional = true }
 six = { version = "*", optional = true }
