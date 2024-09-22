@@ -8,9 +8,16 @@ from contextlib import nullcontext, redirect_stdout
 
 from .export import export_notebook
 from .run import main as run_grader
+from .test_files import GradingResults
 
 
-def grade_submission(submission_path, ag_path="autograder.zip", quiet=False, debug=False):
+def grade_submission(
+    submission_path: str,
+    ag_path: str = "autograder.zip",
+    *,
+    quiet: bool = False,
+    debug: bool = False,
+) -> GradingResults:
     """
     Runs non-containerized grading on a single submission at ``submission_path`` using the autograder
     configuration file at ``ag_path``.
@@ -25,9 +32,9 @@ def grade_submission(submission_path, ag_path="autograder.zip", quiet=False, deb
     Args:
         submission_path (``str``): path to submission file
         ag_path (``str``): path to autograder zip file
-        quiet (``bool``, optional): whether to suppress print statements during grading; default
+        quiet (``bool``): whether to suppress print statements during grading; default
             ``False``
-        debug (``bool``, optional): whether to run the submission in debug mode (without ignoring
+        debug (``bool``): whether to run the submission in debug mode (without ignoring
             errors)
 
     Returns:

@@ -26,14 +26,13 @@ from .tests_manager import AssignmentTestsManager
 from .utils import (
     add_tag,
     AssignNotebookFormatException,
-    get_source,
     is_cell_type,
     is_ignore_cell,
     lock,
     remove_cell_ids_if_applicable,
 )
 from ..nbmeta_config import NBMetadataConfig
-from ..utils import NOTEBOOK_METADATA_KEY
+from ..utils import get_source, NOTEBOOK_METADATA_KEY
 
 
 class NotebookTransformer:
@@ -388,21 +387,22 @@ class TransformedNotebookContainer:
     def __init__(self, transformed_nb: nbf.NotebookNode, nb_transformer: NotebookTransformer):
         self.transformed_nb = transformed_nb
         self.nb_transformer = nb_transformer
-        self._populate_nbmeta_config(self.nb_transformer.assignment)
 
-    def _populate_nbmeta_config(self, a: Assignment):
-        """
-        Copy configurations from the ``Assignment`` into the ``NBMetadataConfig``.
-        """
+        # populate NBMetadataConfig
         self.nbmeta_config = NBMetadataConfig({})
-        if a.name:
-            self.nbmeta_config.assignment_name = a.name
-        if a.export_cell and a.export_cell.require_no_pdf_ack:
+        if self.assignment.name:
+            self.nbmeta_config.assignment_name = self.assignment.name
+        if self.assignment.export_cell and self.assignment.export_cell.require_no_pdf_ack:
             self.nbmeta_config.require_no_pdf_confirmation = True
-            if isinstance(a.export_cell.require_no_pdf_ack, fica.Config):
+            if isinstance(self.assignment.export_cell.require_no_pdf_ack, fica.Config):
                 self.nbmeta_config.export_pdf_failure_message = (
-                    a.export_cell.require_no_pdf_ack.message
+                    self.assignment.export_cell.require_no_pdf_ack.message
                 )
+
+    @property
+    def assignment(self) -> Assignment:
+        """the assignment config for this notebook"""
+        return self.nb_transformer.assignment
 
     def _get_sanitized_nb(self) -> nbf.NotebookNode:
         """
@@ -446,7 +446,7 @@ class TransformedNotebookContainer:
 
         else:
             try:
-                from nbf.validator import normalize
+                from nbformat.validator import normalize
             except ImportError:
                 normalize = lambda nb: (0, nb)
 

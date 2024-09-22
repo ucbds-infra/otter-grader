@@ -12,7 +12,7 @@ from textwrap import dedent
 from unittest import mock
 
 from otter import Notebook
-from otter.check.notebook import _OTTER_LOG_FILENAME, _ZIP_NAME_FILENAME
+from otter.check.notebook import _ZIP_NAME_FILENAME, OTTER_LOG_FILENAME
 from otter.utils import (
     NO_PDF_EXPORT_MESSAGE_KEY,
     NOTEBOOK_METADATA_KEY,
@@ -41,7 +41,7 @@ def negate(x):
 def cleanup_output(cleanup_enabled):
     yield
     if cleanup_enabled:
-        delete_paths([_OTTER_LOG_FILENAME])
+        delete_paths([OTTER_LOG_FILENAME])
 
 
 @pytest.fixture
@@ -153,7 +153,7 @@ def test_export(mocked_export, mocked_zf, mocked_dt, write_notebook):
         )
         mocked_zf.assert_called_once_with(zip_name, mode="w")
         mocked_zf.return_value.write.assert_any_call(mocked_resolve.return_value)
-        mocked_zf.return_value.write.assert_any_call(_OTTER_LOG_FILENAME)
+        mocked_zf.return_value.write.assert_any_call(OTTER_LOG_FILENAME)
         mocked_export.assert_called_once_with(NB_PATH, filtering=True, pagebreaks=True)
         mocked_zf.return_value.writestr.assert_called_with(
             _ZIP_NAME_FILENAME, os.path.basename(zip_name)
@@ -251,7 +251,7 @@ def test_export_with_no_pdf_ack(
     mocked_zf.assert_called_once_with(zip_name, mode="w")
     # mocked_zf.return_value.write.assert_any_call(mocked_resolve.return_value)
     mocked_zf.return_value.write.assert_any_call(NB_PATH)
-    mocked_zf.return_value.write.assert_any_call(_OTTER_LOG_FILENAME)
+    mocked_zf.return_value.write.assert_any_call(OTTER_LOG_FILENAME)
     mocked_zf.return_value.writestr.assert_called_with(
         _ZIP_NAME_FILENAME, os.path.basename(zip_name)
     )

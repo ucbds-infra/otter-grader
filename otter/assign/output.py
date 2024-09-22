@@ -13,10 +13,11 @@ from .r_adapter import rmarkdown_converter
 from .r_adapter.tests_manager import RAssignmentTestsManager
 from .tests_manager import AssignmentTestsManager
 from .utils import get_notebook_language
-from ..utils import loggers, NBFORMAT_VERSION
+from .. import logging
+from ..utils import NBFORMAT_VERSION
 
 
-LOGGER = loggers.get_logger(__name__)
+LOGGER = logging.get_logger(__name__)
 
 
 def write_output_dir(

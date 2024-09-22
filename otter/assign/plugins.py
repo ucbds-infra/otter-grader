@@ -4,7 +4,7 @@ import copy
 import nbformat as nbf
 import yaml
 
-from .utils import get_source
+from ..utils import get_source
 
 
 BEGIN = "# BEGIN PLUGIN"

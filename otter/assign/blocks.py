@@ -5,8 +5,10 @@ import re
 import yaml
 
 from enum import Enum
+from typing import Any
 
-from .utils import get_source, is_cell_type
+from .utils import is_cell_type
+from ..utils import get_source
 
 
 class BlockType(Enum):
@@ -73,7 +75,7 @@ def is_block_boundary_cell(
     Args:
         cell (``nbformat.NotebookNode``): the cell to check
         block_type (``BlockType``): the block type to check for
-        end (``bool``, optional): whether to check for an end boundary instead of a begin
+        end (``bool``): whether to check for an end boundary instead of a begin
 
     Returns:
         ``bool``: whether the cell is a boundary cell of type ``block_type``
@@ -111,7 +113,7 @@ def is_assignment_config_cell(cell: nbformat.NotebookNode) -> bool:
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 
 
-def get_cell_config(cell: nbformat.NotebookNode) -> dict:
+def get_cell_config(cell: nbformat.NotebookNode) -> dict[str, Any]:
     """
     Parse a cell's contents as YAML and return the resulting dictionary.
 

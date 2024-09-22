@@ -2,16 +2,16 @@
 
 import click
 import functools
-import logging
 
+from typing import Any, Callable
+
+from . import logging
 from .assign import main as assign
 from .check import main as check
 from .export import main as export
 from .generate import main as generate
-from .grade import _ALLOWED_EXTENSIONS
-from .grade import main as grade
+from .grade import ALLOWED_EXTENSIONS, main as grade
 from .run import main as run
-from .utils import loggers
 from .version import print_version_info
 
 
@@ -22,13 +22,13 @@ _VERBOSITY_LEVELS = {
 }
 
 
-def _verbosity(f):
+def _verbosity(f: Callable[..., Any]):
     @click.option("-v", "--verbose", "verbosity", count=True, help="Verbosity of the logged output")
     @functools.wraps(f)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: tuple[Any], **kwargs: dict[str, Any]):
         # set the log level
         verbosity = kwargs.pop("verbosity")
-        loggers.set_level(_VERBOSITY_LEVELS[min(verbosity, max(_VERBOSITY_LEVELS.keys()))])
+        logging.set_level(_VERBOSITY_LEVELS[min(verbosity, max(_VERBOSITY_LEVELS.keys()))])
         return f(*args, **kwargs)
 
     return wrapper
@@ -36,7 +36,7 @@ def _verbosity(f):
 
 @click.group(invoke_without_command=True)
 @click.option("--version", is_flag=True, help="Show the version and exit")
-def cli(version):
+def cli(version: bool):
     """
     Command-line utility for Otter-Grader, a Python-based autograder for Jupyter Notebooks,
     RMarkdown files, and Python and R scripts. For more information, see
@@ -61,7 +61,7 @@ defaults = assign.__kwdefaults__
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--debug", is_flag=True, help="Do not ignore errors in running tests for debugging")
-def assign_cli(*args, **kwargs):
+def assign_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
     """
     Create distribution versions of the Otter Assign formatted notebook MASTER and write the
     results to the directory RESULT, which will be created if it does not already exist.
@@ -84,7 +84,7 @@ defaults = check.__kwdefaults__
     help="Path to the direcotry of test files",
 )
 @click.option("--seed", type=click.INT, help="A random seed to be executed before each cell")
-def check_cli(*args, **kwargs):
+def check_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
     """
     Check the Python script or Jupyter Notebook FILE against tests.
     """
@@ -111,7 +111,7 @@ defaults = export.__kwdefaults__
     help="Type of PDF exporter to use",
 )
 @click.option("--xecjk", is_flag=True, help="Enable xeCJK in Otter's LaTeX template")
-def export_cli(*args, **kwargs):
+def export_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
     """
     Export a Jupyter Notebook SRC as a PDF at DEST with optional filtering.
 
@@ -193,7 +193,7 @@ defaults = generate.__kwdefaults__
     help="Whether to exlucde conda's defaults channel from the environment.yml file",
 )
 @click.argument("files", nargs=-1)
-def generate_cli(*args, **kwargs):
+def generate_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
     """
     Generate a zip file to configure an Otter autograder, including FILES as support files.
     """
@@ -216,7 +216,7 @@ defaults = grade.__kwdefaults__
 @click.option(
     "--ext",
     default=defaults["ext"],
-    type=click.Choice(_ALLOWED_EXTENSIONS),
+    type=click.Choice(ALLOWED_EXTENSIONS),
     help="The extension to glob for submissions",
 )
 @click.option(
@@ -244,7 +244,7 @@ defaults = grade.__kwdefaults__
 )
 @click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
 @click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
-def grade_cli(*args, **kwargs):
+def grade_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
     """
     Grade submissions in PATHS locally using Docker containers. PATHS can be individual file paths
     or directories containing submissions ending with extension EXT.
@@ -279,7 +279,7 @@ defaults = run.__kwdefaults__
 @click.option("--no-logo", is_flag=True, help="Suppress Otter logo in stdout")
 @click.option("--debug", is_flag=True, help="Do not ignore errors when running submission")
 @click.option("-p", "--pickle-results", is_flag=True, help="Output GradingResults pickle file")
-def run_cli(*args, **kwargs):
+def run_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
     """
     Run non-containerized Otter on a single submission, writing results to a JSON file.
     """

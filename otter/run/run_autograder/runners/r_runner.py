@@ -31,7 +31,7 @@ class RRunner(AbstractLanguageRunner):
     subm_path_deletion_required = False
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
 
-    def validate_submission(self, submission_path):
+    def validate_submission(self, submission_path: str):
         assignment_name = False
         ext = os.path.splitext(submission_path)[1].lower()
         if ext == ".ipynb":
@@ -50,7 +50,7 @@ class RRunner(AbstractLanguageRunner):
         if assignment_name is not False:
             self.validate_assignment_name(assignment_name)
 
-    def filter_cells_with_syntax_errors(self, nb):
+    def filter_cells_with_syntax_errors(self, nb: nbf.NotebookNode) -> nbf.NotebookNode:
         """
         Filter out cells in an R notebook with syntax errors.
         """
@@ -65,7 +65,7 @@ class RRunner(AbstractLanguageRunner):
         nb["cells"] = new_cells
         return nb
 
-    def add_seeds_to_rmd_file(self, rmd_path):
+    def add_seeds_to_rmd_file(self, rmd_path: str):
         """
         Add intercell seeding to an Rmd file.
         """
@@ -88,7 +88,7 @@ class RRunner(AbstractLanguageRunner):
         with open(rmd_path, "w") as f:
             f.write("\n".join(lines))
 
-    def add_seed_to_script(self, script_path):
+    def add_seed_to_script(self, script_path: str):
         """
         Add a line calling ``set.seed`` to the top of the R script at the specified path.
         """
@@ -100,7 +100,7 @@ class RRunner(AbstractLanguageRunner):
         with open(script_path, "w") as f:
             f.write(script)
 
-    def resolve_submission_path(self):
+    def resolve_submission_path(self) -> str:
         # create a temporary file at which to write a script if necessary
         _, script_path = tempfile.mkstemp(suffix=".R")
 
@@ -159,7 +159,7 @@ class RRunner(AbstractLanguageRunner):
 
         return scripts[0]
 
-    def write_pdf(self, _):
+    def write_pdf(self, submission_path: str) -> str:
         # NOTE: this method ignores the submission_path argument, and instead resolves it again
         # manually
         nbs = glob("*.ipynb")
@@ -192,7 +192,7 @@ class RRunner(AbstractLanguageRunner):
         return pdf_path
 
     def run(self):
-        os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH")
+        os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH", "")
 
         with chdir("./submission"):
             pdf_error = None

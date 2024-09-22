@@ -11,12 +11,12 @@ import zipfile
 from dataclasses import dataclass
 from glob import glob
 from jinja2 import Environment, PackageLoader
-from typing import Any, Dict, List, Optional
+from typing import Any, Literal, Optional, TYPE_CHECKING, Union
 
 from .token import APIClient
 from .utils import merge_conda_environments, zip_folder
 from ..plugins import PluginCollection
-from ..run.run_autograder.autograder_config import AutograderConfig
+from ..run import AutograderConfig
 from ..utils import dump_yaml, load_default_file, OTTER_CONFIG_FILENAME
 from ..version import __version__
 
@@ -35,16 +35,16 @@ class CondaEnvironment:
 
     is_r: bool
 
-    requirements: List[str]
+    requirements: list[str]
 
     overwrite_requirements: bool
 
-    user_environment: Optional[Dict[str, Any]]
+    user_environment: Optional[dict[str, Any]]
 
     exclude_conda_defaults: bool
 
     def to_dict(self):
-        environment = {
+        environment: dict[str, Any] = {
             "name": OTTER_ENV_NAME,
             "channels": ["defaults", "conda-forge"],
             "dependencies": [
@@ -125,25 +125,25 @@ LANGUAGE_BASED_CONFIGURATIONS = {
 
 def main(
     *,
-    tests_dir="./tests",
-    output_path="autograder.zip",
-    config=None,
-    no_config=False,
-    lang=None,
-    requirements=None,
-    no_requirements=False,
-    overwrite_requirements=False,
-    environment=None,
-    no_environment=False,
-    username=None,
-    password=None,
-    token=None,
-    files=[],
-    assignment=None,
-    plugin_collection=None,
-    python_version=None,
-    channel_priority_strict=True,
-    exclude_conda_defaults=False,
+    tests_dir: str = "./tests",
+    output_path: str = "autograder.zip",
+    config: Optional[str] = None,
+    no_config: bool = False,
+    lang: Optional[Union[Literal["python"], Literal["r"]]] = None,
+    requirements: Optional[str] = None,
+    no_requirements: bool = False,
+    overwrite_requirements: bool = False,
+    environment: Optional[str] = None,
+    no_environment: bool = False,
+    username: Optional[str] = None,
+    password: Optional[str] = None,
+    token: Optional[str] = None,
+    files: Optional[list[str]] = None,
+    assignment: Optional["Assignment"] = None,
+    plugin_collection: Optional[PluginCollection] = None,
+    python_version: Optional[str] = None,
+    channel_priority_strict: bool = True,
+    exclude_conda_defaults: bool = False,
 ):
     """
     Run Otter Generate.
@@ -153,7 +153,7 @@ def main(
         output_path (``str``): the path at which to write the output zip file
         config (``str``): path to an Otter configuration JSON file
         no_config (``bool``): disables auto-inclusion of Otter config file at ./otter_config.json
-        lang (``str``): the language of the assignment; one of ``["python", "r"]``
+        lang (``"python" | "r" | None``): the language of the assignment
         requirements (``str``): path to a Python or R requirements file for this assignment
         no_requirements (``bool``): disables auto-inclusion of requirements file at ./requirements.txt
         overwrite_requirements (``bool``): whether to overwrite the default requirements instead of
@@ -164,8 +164,8 @@ def main(
         username (``str``): a username for Gradescope for generating a token
         password (``str``): a password for Gradescope for generating a token
         token (``str``): a token for Gradescope
-        files (``list[str]``): list of file paths to add to the zip file
-        assignment (``otter.assign.assignment.Assignment``, optional): the assignment configurations
+        files (``list[str] | None``): list of file paths to add to the zip file
+        assignment (``otter.assign.assignment.Assignment``): the assignment configurations
             if used with Otter Assign
         python_version (``str | None``): the version of Python to use (installed with conda)
         channel_priority_strict (``bool``): whether to set conda's channel_priority to strict in
@@ -178,6 +178,9 @@ def main(
         ``ValueError``: if the configurations specify a Gradescope course ID or assignment ID but not
             both
     """
+    if files is None:
+        files = []
+
     # read in otter config
     if config is None and os.path.isfile(OTTER_CONFIG_FILENAME) and not no_config:
         config = OTTER_CONFIG_FILENAME
@@ -328,3 +331,7 @@ def main(
                     )
                 else:
                     raise ValueError(f"Could not find file or directory '{full_fp}'")
+
+
+if TYPE_CHECKING:
+    from ..assign import Assignment

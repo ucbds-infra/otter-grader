@@ -5,14 +5,8 @@ import nbformat as nbf
 import re
 
 from .r_adapter import solutions as r_solutions
-from .utils import (
-    get_notebook_language,
-    get_source,
-    has_tag,
-    is_cell_type,
-    remove_output,
-    remove_tag,
-)
+from .utils import get_notebook_language, has_tag, is_cell_type, remove_output, remove_tag
+from ..utils import get_source
 
 
 BLOCK_PROMPT = "..."
@@ -32,7 +26,7 @@ def has_seed(cell: nbf.NotebookNode) -> bool:
     if not is_cell_type(cell, "code"):
         return False
     source = get_source(cell)
-    return source and any([l.strip().endswith("# SEED") for l in source])
+    return bool(source) and any([l.strip().endswith("# SEED") for l in source])
 
 
 def overwrite_seed_vars(nb: nbf.NotebookNode, seed_variable: str, seed: int) -> nbf.NotebookNode:
@@ -64,7 +58,7 @@ solution_assignment_regex = re.compile(
 )
 
 
-def solution_assignment_sub(match: re.Match) -> str:
+def solution_assignment_sub(match: re.Match[str]) -> str:
     """
     Substitutes the first matching group  with `` ...``
     """
@@ -75,7 +69,7 @@ def solution_assignment_sub(match: re.Match) -> str:
 solution_line_regex = re.compile(r"(\s*).* ?# ?SOLUTION")
 
 
-def solution_line_sub(match: re.Match) -> str:
+def solution_line_sub(match: re.Match[str]) -> str:
     """
     Substitutes the first matching group  with ``...``
     """
@@ -106,10 +100,11 @@ def replace_solutions(lines: list[str], lang: str) -> list[str]:
     Returns:
         ``list[str]``: stripped version of lines without solutions
     """
+    block_prompt: str
     if lang == "r":
-        from .r_adapter.solutions import BLOCK_PROMPT
+        from .r_adapter.solutions import BLOCK_PROMPT as block_prompt
     else:
-        BLOCK_PROMPT = globals()["BLOCK_PROMPT"]
+        block_prompt = globals()["BLOCK_PROMPT"]
 
     stripped = []
     solution = False
@@ -135,7 +130,7 @@ def replace_solutions(lines: list[str], lang: str) -> list[str]:
             assert not solution, f"Nested BEGIN SOLUTION in {lines}"
             solution = True
             if not begin_solution.group(2):
-                line = begin_solution.group(1) + BLOCK_PROMPT
+                line = begin_solution.group(1) + block_prompt
             else:
                 continue
         for exp, sub in SUBSTITUTIONS[lang]:

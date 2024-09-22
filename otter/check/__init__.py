@@ -2,50 +2,62 @@
 
 import os
 
-from glob import glob
+from typing import Optional
 
 from .logs import EventType, LogEntry
-from .notebook import _OTTER_LOG_FILENAME
+from .notebook import OTTER_LOG_FILENAME
 from .utils import list_test_files
+from .. import logging
 from ..execute import grade_notebook
-from ..utils import loggers
+from ..test_files import GradingResults
 
 
-_ALLOWED_EXTENSIONS = {".py", ".ipynb"}
-LOGGER = loggers.get_logger(__name__)
+ALLOWED_EXTENSIONS = {".py", ".ipynb"}
+LOGGER = logging.get_logger(__name__)
 
 
-def _log_event(event_type, results=[], question=None, success=True, error=None):
+def _log_event(
+    event_type: EventType,
+    results: Optional[list[GradingResults]] = None,
+    question: Optional[str] = None,
+    success: bool = True,
+    error: Optional[Exception] = None,
+):
     """
     Logs an event
 
     Args:
         event_type (``otter.logs.EventType``): the type of event
-        results (``list`` of ``otter.test_files.abstract_test.TestCollectionResults``, optional): the
+        results (``list[otter.test_files.GradingResults]``): the
             results of any checks recorded by the entry
-        question (``str``, optional): the question name for this check
-        success (``bool``, optional): whether the operation was successful
-        error (``Exception``, optional): the exception thrown by the operation, if applicable
+        question (``str | None``): the question name for this check
+        success (``bool``): whether the operation was successful
+        error (``Exception | None``): the exception thrown by the operation, if applicable
     """
     LOGGER.debug(f"Creating a LogEntry of type {event_type}")
 
     LogEntry(
         event_type, results=results, question=question, success=success, error=error
-    ).flush_to_file(_OTTER_LOG_FILENAME)
+    ).flush_to_file(OTTER_LOG_FILENAME)
 
     LOGGER.debug(f"LogEntry created successfully")
 
 
-def main(file, *, tests_path="./tests", question=None, seed=None):
+def main(
+    file: str,
+    *,
+    tests_path: str = "./tests",
+    question: Optional[str] = None,
+    seed: Optional[int] = None,
+):
     """
     Runs Otter Check
 
     Args:
         file (``str``): path to the file to check
         tests_path (``str``): path to tests directory
-        question (``str``): test name to run; ``None`` if all tests should be run
-        seed (``int``): a seed to set before execution
-        **kwargs: ignored kwargs (a remnant of how the argument parser is built)
+        question (``str | None``): test name to run; ``None`` if all tests should be run
+        seed (``int | None``): a seed to set before execution
     """
     try:
         if question:
@@ -72,9 +84,9 @@ def main(file, *, tests_path="./tests", question=None, seed=None):
         ext = os.path.splitext(file)[1]
         LOGGER.debug(f"Found submission file extension: '{ext}'")
 
-        if ext not in _ALLOWED_EXTENSIONS:
+        if ext not in ALLOWED_EXTENSIONS:
             raise ValueError(
-                f"Invalid extension for file '{ext}'; must be one of {_ALLOWED_EXTENSIONS}"
+                f"Invalid extension for file '{ext}'; must be one of {ALLOWED_EXTENSIONS}"
             )
 
         script = ext == ".py"

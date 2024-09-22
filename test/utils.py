@@ -12,7 +12,7 @@ import zipfile
 
 from contextlib import contextmanager
 
-from otter.check.notebook import _OTTER_LOG_FILENAME
+from otter.check.notebook import OTTER_LOG_FILENAME
 from otter.test_files import OK_FORMAT_VARNAME
 
 
@@ -59,7 +59,7 @@ def assert_notebooks_equal(p1, p2):
 
 def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
     """
-    Assert that two files have the same conents, optionally ignoring trailing whitespace.
+    Assert that two files have the same conentsly ignoring trailing whitespace.
     """
     assert os.path.splitext(p1)[1] == os.path.splitext(p2)[1]
     if os.path.splitext(p1)[1] == ".ipynb":
@@ -97,9 +97,9 @@ def assert_dirs_equal(
     Args:
         dir1 (``str``): the first directory
         dir1 (``str``): the second directory
-        ignore_ext (``list[str]``, optional): a list of extensions for which the contents of any
+        ignore_ext (``list[str]``): a list of extensions for which the contents of any
             such files will not be compared when checking directories
-        ignore_dirs (``list[str]``, optional): a list of directory names whose contents should
+        ignore_dirs (``list[str]``): a list of directory names whose contents should
             be assumed to be the same (i.e. not to check)
         variable_path_exts(``list[str]``. optional): a list of extensions for paths whose stems
             may be different; if present, the number of files with these extensions is compared,
@@ -111,7 +111,7 @@ def assert_dirs_equal(
 
     if os.path.isfile(dir1):
         if os.path.splitext(dir1)[1] not in ignore_ext and (
-            not ignore_log or os.path.split(dir1)[1] != _OTTER_LOG_FILENAME
+            not ignore_log or os.path.split(dir1)[1] != OTTER_LOG_FILENAME
         ):
             assert_files_equal(dir1, dir2)
 

@@ -144,7 +144,7 @@ def merge_scores_to_df(scores: list[GradingResults]) -> pd.DataFrame:
         elif not failed:
             scores_dict = {t: [scores_dict[t]["score"]] for t in scores_dict}
 
-        grading_status = "Completed" if not failed else str(gr._catastrophic_error)
+        grading_status = "Completed" if not failed else str(gr.catastrophic_error)
 
         scores_dict[SCORES_DICT_TOTAL_POINTS_KEY] = gr.total
         scores_dict[SCORES_DICT_FILE_KEY] = gr.file

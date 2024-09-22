@@ -9,7 +9,7 @@ BLOCK_PROMPT = "# YOUR CODE HERE"
 solution_assignment_regex = re.compile(r"(\s*[\w. $()]*(=|<-))(.*) ?# ?SOLUTION")
 
 
-def solution_assignment_sub(match: re.Match) -> str:
+def solution_assignment_sub(match: re.Match[str]) -> str:
     """
     Substitutes the first matching group  with `` NULL # YOUR CODE HERE``
     """
@@ -20,7 +20,7 @@ def solution_assignment_sub(match: re.Match) -> str:
 solution_line_regex = re.compile(r"(\s*).* ?# ?SOLUTION")
 
 
-def solution_line_sub(match: re.Match) -> str:
+def solution_line_sub(match: re.Match[str]) -> str:
     """
     Substitutes the first matching group  with ``# YOUR CODE HERE``
     """

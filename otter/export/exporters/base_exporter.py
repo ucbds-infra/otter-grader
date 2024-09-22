@@ -4,6 +4,7 @@ import importlib.resources
 import nbformat
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 from . import __name__ as pkg_name
 from .utils import has_begin, has_end, sub_end_for_new_page
@@ -37,34 +38,31 @@ class BaseExporter(ABC):
         "pagebreaks": True,
     }
 
-    # def __init_subclass__(cls, **kwargs):
-    #     super().__init_subclass__(**kwargs)
-    #     cls.default_options =
-
     @classmethod
     @abstractmethod
-    def convert_notebook(cls, nb_path, dest, debug=False, **kwargs):
+    def convert_notebook(cls, nb_path: str, dest: str, **kwargs: dict[str, Any]):
         """
         Writes a notebook at ``nb_path`` to a PDF file
 
         Args:
             nb_path (``str``): path to notebook
             dest (``str``): path to write PDF
-            debug (``bool``, optional): whether to run export in debug mode
             **kwargs: additional arguments use during conversion by subclasses
         """
         ...
 
     @classmethod
-    def load_notebook(cls, nb_path, filtering=False, pagebreaks=True):
+    def load_notebook(
+        cls, nb_path: str, filtering: bool = False, pagebreaks: bool = True
+    ) -> nbformat.NotebookNode:
         """
-        Loads notebook at ``nb_path`` with nbformat and returns the parsed notebook, optionally filtered
+        Loads notebook at ``nb_path`` with nbformat and returns the parsed notebookly filtered
         and with pagebreak metadata hidden in HTML comments.
 
         Args:
             nb_path (``str``): path to notebook
-            filtering (``bool``, optional): whetheer cells should be filtered
-            pagebreaks (``bool``, optional): whether to include pagebreaks between each question; ignored
+            filtering (``bool``): whetheer cells should be filtered
+            pagebreaks (``bool``): whether to include pagebreaks between each question; ignored
                 if ``filtering`` is ``False``
 
         Returns:
@@ -77,14 +75,14 @@ class BaseExporter(ABC):
         return notebook
 
     @classmethod
-    def filter_cells(cls, notebook, pagebreaks=True):
+    def filter_cells(cls, notebook: nbformat.NotebookNode, pagebreaks: bool = True):
         """
         Filters a parsed notebook using HTML comments in Markdown cells. Optionally inserts pagebreak
         metadata as HTML comments.
 
         Args:
             notebook (``nbformat.NotebookNode``): the parsed notebook
-            pagebreaks (``bool``, optional): whether to include pagebreaks between questions
+            pagebreaks (``bool``): whether to include pagebreaks between questions
 
         Returns:
             ``nbformat.NotebookNode``: the filtered notebook with (optional) pagebreaks

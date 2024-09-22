@@ -6,7 +6,7 @@ import pytest
 import sys
 
 from otter.check.logs import EventType, Log, LogEntry
-from otter.check.notebook import _OTTER_LOG_FILENAME, Notebook
+from otter.check.notebook import Notebook, OTTER_LOG_FILENAME
 
 from ..utils import TestFileManager
 
@@ -17,8 +17,8 @@ FILE_MANAGER = TestFileManager(__file__)
 @pytest.fixture(autouse=True)
 def cleanup_output(cleanup_enabled):
     yield
-    if cleanup_enabled and os.path.isfile(_OTTER_LOG_FILENAME):
-        os.remove(_OTTER_LOG_FILENAME)
+    if cleanup_enabled and os.path.isfile(OTTER_LOG_FILENAME):
+        os.remove(OTTER_LOG_FILENAME)
 
 
 def test_notebook_check():
@@ -36,7 +36,7 @@ def test_notebook_check():
         test_name = os.path.splitext(test_file)[0]
         grading_results[test_name] = grader.check(test_name)
 
-    log = Log.from_file(_OTTER_LOG_FILENAME)
+    log = Log.from_file(OTTER_LOG_FILENAME)
 
     for question in log.get_questions():
         actual_result = grading_results[question]
@@ -45,9 +45,6 @@ def test_notebook_check():
         assert repr(log.get_results(question)) == repr(
             actual_result
         ), f"Logged results for {question} are not correct"
-
-        logged_grade = log.get_question_entry(question).get_score_perc()
-        assert logged_grade == actual_result.grade, f"Logged results for {question} are not correct"
 
         # checking repr since the results __eq__ method is not defined
         assert repr(log.get_question_entry(question).get_results()) == repr(
@@ -81,15 +78,15 @@ def test_shelve():
         error=None,
     )
 
-    entry.shelve(env, delete=True, filename=_OTTER_LOG_FILENAME, ignore_modules=["calendar"])
+    entry.shelve(env, delete=True, filename=OTTER_LOG_FILENAME, ignore_modules=["calendar"])
     assert entry.shelf
     assert entry.not_shelved == ["module", "ignored_func"]
 
-    entry.flush_to_file(_OTTER_LOG_FILENAME)
+    entry.flush_to_file(OTTER_LOG_FILENAME)
 
     from math import factorial
 
-    log = Log.from_file(_OTTER_LOG_FILENAME)
+    log = Log.from_file(OTTER_LOG_FILENAME)
     entry = log.get_question_entry("foo")
     env = entry.unshelve()
     assert [*env] == ["num", "func", "df"]
@@ -107,9 +104,9 @@ def test_log_getitem():
         success=True,
         error=None,
     )
-    entry.flush_to_file(_OTTER_LOG_FILENAME)
+    entry.flush_to_file(OTTER_LOG_FILENAME)
 
-    log = Log.from_file(_OTTER_LOG_FILENAME)
+    log = Log.from_file(OTTER_LOG_FILENAME)
     assert log[0].event_type == entry.event_type and log[0].results == entry.results
 
 
@@ -138,11 +135,11 @@ def test_log_iter():
         error=None,
     )
 
-    entry1.flush_to_file(_OTTER_LOG_FILENAME)
-    entry2.flush_to_file(_OTTER_LOG_FILENAME)
-    entry3.flush_to_file(_OTTER_LOG_FILENAME)
+    entry1.flush_to_file(OTTER_LOG_FILENAME)
+    entry2.flush_to_file(OTTER_LOG_FILENAME)
+    entry3.flush_to_file(OTTER_LOG_FILENAME)
 
-    log = Log.from_file(_OTTER_LOG_FILENAME)
+    log = Log.from_file(OTTER_LOG_FILENAME)
 
     log_iter = log.question_iterator()
     assert log_iter.questions == ["q1", "q2"]

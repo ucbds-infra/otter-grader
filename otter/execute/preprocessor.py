@@ -9,14 +9,16 @@ from nbconvert.exporters import PythonExporter
 from nbconvert.preprocessors import Preprocessor
 from textwrap import dedent
 from traitlets import Bool, Dict, Instance, Integer, List, Unicode
-from typing import Optional, Tuple
+from typing import Optional, TypeVar
 
 from ..check.logs import Log
 from ..utils import id_generator, NOTEBOOK_METADATA_KEY
 
 
-IGNORE_CELL_TAG = "otter_ignore"
+T = TypeVar("T")
 
+
+IGNORE_CELL_TAG = "otter_ignore"
 
 INIT_CELL_SOURCE = """\
 from otter import Notebook as {notebook_name}
@@ -24,9 +26,9 @@ from otter import Notebook as {notebook_name}
 
 # set up Otter's logging
 import logging
-from otter.utils import loggers
-loggers.set_level(logging.DEBUG)
-loggers.send_logs("{logging_server_host}", {logging_server_port})
+from otter import logging
+logging.set_level(logging.DEBUG)
+logging.send_logs("{logging_server_host}", {logging_server_port})
 """
 
 EXPORT_CELL_SOURCE = """\
@@ -61,9 +63,9 @@ class GradingPreprocessor(Preprocessor):
 
     variables = Dict(value_trait=Unicode(), key_trait=Unicode(), allow_none=True).tag(config=True)
 
-    _notebook_name: str
+    _notebook_name: str = ""
 
-    _log_temp_file: Optional[Tuple[int, str]] = None
+    _log_temp_file: Optional[tuple[int, str]] = None
 
     logging_server_host = Unicode().tag(config=True)
 
@@ -75,7 +77,7 @@ class GradingPreprocessor(Preprocessor):
     def from_log(self):
         return self.otter_log is not None
 
-    def preprocess(self, nb, resources=None):
+    def preprocess(self, nb: nbf.NotebookNode, resources: T = None) -> tuple[nbf.NotebookNode, T]:
         self._notebook_name = f"notebook_{id_generator()}"
         self.filter_ignored_cells(nb)
         self.logging_transform(nb)
@@ -86,7 +88,7 @@ class GradingPreprocessor(Preprocessor):
         self.add_init_and_export_cells(nb)  # this should always be the last call
         return nb, resources
 
-    def add_init_and_export_cells(self, nb):
+    def add_init_and_export_cells(self, nb: nbf.NotebookNode):
         nb.cells.insert(
             0,
             nbf.v4.new_code_cell(
@@ -110,11 +112,11 @@ class GradingPreprocessor(Preprocessor):
             )
         )
 
-    def add_cwd_to_path(self, nb):
+    def add_cwd_to_path(self, nb: nbf.NotebookNode):
         if self.cwd:
             nb.cells.insert(0, nbf.v4.new_code_cell(f'import sys\nsys.path.append(r"{self.cwd}")'))
 
-    def add_seeds(self, nb):
+    def add_seeds(self, nb: nbf.NotebookNode):
         if self.seed is None or self.from_log:
             return
 
@@ -135,7 +137,7 @@ class GradingPreprocessor(Preprocessor):
             if cell.cell_type == "code" and not cell.source.startswith("%%"):
                 cell.source = f"{do_seed}\n{cell.source}"
 
-    def add_checks(self, nb):
+    def add_checks(self, nb: nbf.NotebookNode):
         if self.from_log:
             return
 
@@ -153,7 +155,7 @@ class GradingPreprocessor(Preprocessor):
 
         nb.cells = new_cells
 
-    def filter_ignored_cells(self, nb):
+    def filter_ignored_cells(self, nb: nbf.NotebookNode):
         new_cells = []
         for cell in nb.cells:
             m = cell.get("metadata", {})
@@ -166,7 +168,7 @@ class GradingPreprocessor(Preprocessor):
 
         nb.cells = new_cells
 
-    def logging_transform(self, nb):
+    def logging_transform(self, nb: nbf.NotebookNode):
         if not self.from_log:
             return
 
@@ -211,14 +213,14 @@ class GradingPreprocessor(Preprocessor):
             )
         )
 
-    def filter_out_non_imports(self, nb):
+    def filter_out_non_imports(self, nb: nbf.NotebookNode):
         e = PythonExporter()
         ic = ImportCollector()
         tree = ast.parse(e.from_notebook_node(nb)[0])
         ic.visit(tree)
         nb.cells = [nbf.v4.new_code_cell(ic.to_script())]
 
-    def update_kernel(self, nb):
+    def update_kernel(self, nb: nbf.NotebookNode):
         if not self.force_python3_kernel:
             return
         nb["metadata"].get("kernelspec", {})["name"] = "python3"
@@ -232,10 +234,10 @@ class GradingPreprocessor(Preprocessor):
 class ImportCollector(ast.NodeVisitor):
     imports = []
 
-    def visit_Import(self, node):
+    def visit_Import(self, node: ast.Import):
         self.imports.append(node)
 
-    def visit_ImportFrom(self, node):
+    def visit_ImportFrom(self, node: ast.ImportFrom):
         self.imports.append(node)
 
     def to_module(self):

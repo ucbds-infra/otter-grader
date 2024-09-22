@@ -13,12 +13,12 @@ from glob import glob
 from multiprocessing import Queue
 from unittest import mock
 
+from otter import logging
 from otter.generate import main as generate
 from otter.grade import main as grade
 from otter.grade.utils import POINTS_POSSIBLE_LABEL
-from otter.run.run_autograder.autograder_config import AutograderConfig
+from otter.run import AutograderConfig
 from otter.test_files import GradingResults
-from otter.utils import loggers
 
 from ..utils import TestFileManager
 
@@ -56,7 +56,7 @@ def generate_zip_file():
         no_environment=True,
     )
 
-    with loggers.level_context(logging.DEBUG):
+    with logging.level_context(logging.DEBUG):
         yield
 
     if os.path.isfile(AG_ZIP_PATH):
@@ -404,7 +404,7 @@ def test_queue():
     """
     notebook_path = FILE_MANAGER.get_path("notebooks/passesAll.ipynb")
     test_queue = Queue()
-    loggers.set_level(logging.INFO)
+    logging.set_level(logging.INFO)
     grade(
         name=ASSIGNMENT_NAME,
         paths=[notebook_path],

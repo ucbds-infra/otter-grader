@@ -2,7 +2,7 @@
 
 import inspect
 
-from typing import Any, Dict, Optional
+from typing import Any, ClassVar, Optional
 
 from ..nbmeta_config import NBMetadataConfig
 from ..test_files import create_test_file, TestFile
@@ -15,10 +15,13 @@ class Checker:
     This class is not meant to be instantiated and is composed solely of class methods.
     """
 
-    _track_results = False
-    _test_files = []
+    _track_results: ClassVar[bool] = False
+    """whether to store check results"""
 
-    def __new__(cls, *args, **kwargs):
+    _test_files: ClassVar[list[TestFile]] = []
+    """stored check results"""
+
+    def __new__(cls, *args: tuple[Any], **kwargs: dict[str, Any]):
         raise NotImplementedError("The Checker class cannot be instantiated")
 
     @classmethod
@@ -36,7 +39,7 @@ class Checker:
         cls._track_results = False
 
     @classmethod
-    def get_results(cls):
+    def get_results(cls) -> list[TestFile]:
         """
         Get a pointer to the list into which check results are being collected.
         """
@@ -58,7 +61,7 @@ class Checker:
         nb_or_test_path: str,
         nbmeta_config: NBMetadataConfig,
         test_name: Optional[str] = None,
-        global_env: Optional[Dict[str, Any]] = None,
+        global_env: Optional[dict[str, Any]] = None,
     ) -> TestFile:
         """
         Checks a global environment against a test, which may be stored in a file or in a notebook's
@@ -66,8 +69,8 @@ class Checker:
 
         Args:
             nb_or_test_path (``str``): path to test file or notebook
-            test_name (``str``, optional): the name of the test if a notebook metadata test
-            global_env (``dict``, optional): the global environment in which to run the test; if
+            test_name (``str``): the name of the test if a notebook metadata test
+            global_env (``dict``): the global environment in which to run the test; if
                 unspecified, the calling frame's global environment is used
 
         Returns:
@@ -87,7 +90,9 @@ class Checker:
         return test
 
     @classmethod
-    def check_if_not_already_checked(cls, test_path, global_env=None):
+    def check_if_not_already_checked(
+        cls, test_path: str, global_env: Optional[dict[str, Any]] = None
+    ) -> Optional[TestFile]:
         """
         Run the specified test if it has not already been run (that is, if its result is not cached
         in this ``Checker`` instance).
@@ -96,11 +101,11 @@ class Checker:
 
         Args:
             test_path (``str``): path to test file
-            global_env (``dict``, optional): the global environment in which to run the test; if
+            global_env (``dict[str, Any] | None``): the global environment in which to run the test; if
                 unspecified, the calling frame's global environment is used
 
         Returns:
-            ``otter.test_files.abstract_test.TestFile``: result of running the tests in the
+            ``otter.test_files.abstract_test.TestFile | None``: result of running the tests in the
             given global environment
         """
         if any(test_path in tf.path or tf.path in test_path for tf in cls._test_files):

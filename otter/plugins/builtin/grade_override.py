@@ -7,7 +7,6 @@ import os
 import pandas as pd
 import tempfile
 
-from .. import PluginCollection
 from ..abstract_plugin import AbstractOtterPlugin
 
 

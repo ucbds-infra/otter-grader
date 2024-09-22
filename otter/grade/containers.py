@@ -11,16 +11,17 @@ import zipfile
 from concurrent.futures import as_completed, ThreadPoolExecutor
 from python_on_whales import docker
 from textwrap import indent
-from typing import List, Optional
+from typing import Any, Optional
 
 from . import __name__ as pkg_name
 from .utils import OTTER_DOCKER_IMAGE_NAME, TimeoutException
-from ..run.run_autograder.autograder_config import AutograderConfig
+from .. import logging
+from ..run import AutograderConfig
 from ..test_files import GradingResults
-from ..utils import loggers, OTTER_CONFIG_FILENAME
+from ..utils import OTTER_CONFIG_FILENAME
 
 
-LOGGER = loggers.get_logger(__name__)
+LOGGER = logging.get_logger(__name__)
 
 
 def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderConfig) -> str:
@@ -67,7 +68,7 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
         except TypeError as e:
             raise TypeError(
                 f"Docker build failed; if this is your first time seeing this error, ensure that "
-                "Docker is running on your machine.\n\nOriginal error: {e}"
+                f"Docker is running on your machine.\n\nOriginal error: {e}"
             )
 
     return image
@@ -75,12 +76,12 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
 
 def launch_containers(
     ag_zip_path: str,
-    submission_paths: List[str],
+    submission_paths: list[str],
     num_containers: int,
     base_image: str,
     tag: str,
     config: AutograderConfig,
-    **kwargs,
+    **kwargs: dict[str, Any],
 ) -> list[GradingResults]:
     """
     Grade submissions in parallel Docker containers.
@@ -147,8 +148,8 @@ def grade_submission(
         image (``str``): a Docker image tag to be used for grading environment
         no_kill (``bool``): whether the grading containers should be kept running after
             grading finishes
-        pdf_dir (``pathlib.Path``, optional): a directory in which to put the notebook PDF, if applicable
-        timeout (``int``, optional): timeout in seconds for each container
+        pdf_dir (``pathlib.Path``): a directory in which to put the notebook PDF, if applicable
+        timeout (``int``): timeout in seconds for each container
         network (``bool``): whether to enable networking in the containers
 
     Returns:
@@ -176,7 +177,7 @@ def grade_submission(
             volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
 
         args = {}
-        if network is not None and not network:
+        if not network:
             args["networks"] = "none"
 
         container = docker.container.create(image, command=["/autograder/run_autograder"], **args)

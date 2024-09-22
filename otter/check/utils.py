@@ -11,22 +11,11 @@ import wrapt
 from dataclasses import dataclass
 from enum import Enum
 from glob import glob
-from IPython import get_ipython
+from IPython.core.getipython import get_ipython
 from IPython.display import display, Javascript
 from ipywidgets import Button, HTML, Output, VBox
 from subprocess import PIPE, run
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generic,
-    List,
-    Optional,
-    Tuple,
-    TYPE_CHECKING,
-    TypeVar,
-    Union,
-)
+from typing import Any, Callable, Generic, Optional, TYPE_CHECKING, TypeVar, Union
 
 from ..nbmeta_config import NBMetadataConfig
 from ..test_files import GradingResults
@@ -92,7 +81,7 @@ def grade_zip_file(zip_path: str, nb_arcname: str, tests_dir: str) -> GradingRes
         tests_dir (``str``): the path to the tests directory
 
     Returns:
-        :py:class:`otter.test_files.GradingResults`: the grading results
+        ``otter.test_files.GradingResults``: the grading results
     """
     import dill
 
@@ -143,7 +132,7 @@ class _Interpreter:
     running) and a display name for error messages and the like.
     """
 
-    check_strs: List[str]
+    check_strs: list[str]
     """list of substrings to check for in the IPython interpreter string"""
 
     display_name: str
@@ -176,18 +165,20 @@ class IPythonInterpreter(Enum):
 
 def incompatible_with(
     interpreter: IPythonInterpreter, throw_error: bool = True
-) -> Callable[[Callable[..., T]], Callable[..., T]]:
+) -> Callable[[Callable[..., T]], Callable[..., Optional[T]]]:
     """
     Create a decorator indicating that a method is incompatible with a specific interpreter.
     """
 
     @wrapt.decorator
-    def incompatible(wrapped, self, args, kwargs):
+    def incompatible(
+        wrapped: Callable[..., T], self: "Notebook", args: tuple[Any], kwargs: dict[str, Any]
+    ) -> Optional[T]:
         """
         A decorator that raises an error or performs no action (depending on ``throw_error``) if the
         wrapped function is called in an environment running on the specified interpreter.
         """
-        if self._interpreter is interpreter:
+        if self.interpreter is interpreter:
             if throw_error:
                 raise RuntimeError(
                     f"This method is not compatible with {interpreter.value.display_name}"
@@ -203,9 +194,9 @@ def incompatible_with(
 def grading_mode_disabled(
     wrapped: Callable[..., T],
     self: "Notebook",
-    args: Tuple,
-    kwargs: Dict[str, Any],
-) -> Callable[[Callable[..., T]], Callable[..., T]]:
+    args: tuple[Any],
+    kwargs: dict[str, Any],
+) -> Optional[T]:
     """
     A decorator that returns without calling the wrapped function if the ``Notebook`` grading mode
     is enabled.
@@ -219,10 +210,12 @@ def grading_mode_disabled(
 class LoggedEventReturnValue(Generic[T]):
     return_value: T
     question: Optional[str] = None
-    shelve_env: Optional[Dict[str, Any]] = None
+    shelve_env: Optional[dict[str, Any]] = None
 
 
-def logs_event(event_type: "EventType") -> Callable[[Callable[..., LoggedEventReturnValue[T]]], T]:
+def logs_event(
+    event_type: "EventType",
+) -> Callable[[Callable[..., LoggedEventReturnValue[T]]], Callable[..., T]]:
     """
     A decorator that ensures each call is logged in the Otter log with type ``event_type``.
 
@@ -232,10 +225,10 @@ def logs_event(event_type: "EventType") -> Callable[[Callable[..., LoggedEventRe
 
     @wrapt.decorator
     def event_logger(
-        wrapped: Callable[..., LoggedEventReturnValue[T]],
+        wrapped: Callable[..., Optional[LoggedEventReturnValue[T]]],
         self: "Notebook",
-        args: Tuple,
-        kwargs: Dict[str, Any],
+        args: tuple[Any],
+        kwargs: dict[str, Any],
     ) -> T:
         """
         Runs a method, catching any errors and logging the call. Returns the unwrapped return value
@@ -268,7 +261,7 @@ def logs_event(event_type: "EventType") -> Callable[[Callable[..., LoggedEventRe
     return event_logger
 
 
-def list_test_files(tests_dir: str) -> List[str]:
+def list_test_files(tests_dir: str) -> list[str]:
     """
     Find all of the test files in the specified directory (that is, all ``.py`` files that are not
     named ``__init__.py``) and return their paths in a sorted list.
@@ -282,7 +275,7 @@ def list_test_files(tests_dir: str) -> List[str]:
     return sorted([file for file in glob(os.path.join(tests_dir, "*.py")) if file != "__init__.py"])
 
 
-def list_available_tests(tests_dir: str, nbmeta_config: NBMetadataConfig) -> List[str]:
+def list_available_tests(tests_dir: str, nbmeta_config: NBMetadataConfig) -> list[str]:
     """
     Get a list of available questions by searching the tests directory (if present) or the notebook
     metadata.
@@ -310,7 +303,7 @@ def resolve_test_info(
     nb_path: Optional[str],
     tests_url_prefix: Optional[str],
     question: str,
-) -> Tuple[str, Optional[str]]:
+) -> tuple[str, Optional[str]]:
     """
     Determine the test path and test name.
 
@@ -364,7 +357,7 @@ def resolve_test_info(
 
 
 def display_pdf_confirmation_widget(
-    message: Optional[str], pdf_error: Optional[Exception], callback: Callable
+    message: Optional[str], pdf_error: Optional[Exception], callback: Callable[..., Any]
 ) -> None:
     """
     Display a widget to the user to acknowledge that a PDF will not be included in their submission
@@ -376,7 +369,7 @@ def display_pdf_confirmation_widget(
     """
     o = Output()
 
-    def wrapped_callback(*args):
+    def wrapped_callback(*_: tuple[Any]):
         with o:
             callback()
 

@@ -4,13 +4,12 @@ import datetime as dt
 import fica
 import os
 import pathlib
-import warnings
 import yaml
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Literal, Optional, Union
 
-from ..run.run_autograder.autograder_config import AutograderConfig
-from ..utils import Loggable
+from ..logging import Loggable
+from ..run import AutograderConfig
 
 
 class Assignment(fica.Config, Loggable):
@@ -50,7 +49,7 @@ class Assignment(fica.Config, Loggable):
         default=True,
     )
 
-    solutions_pdf: bool = fica.Key(
+    solutions_pdf: Union[bool, Literal["filtered"]] = fica.Key(
         description="whether to generate a PDF of the solutions notebook",
         default=False,
     )
@@ -98,7 +97,7 @@ class Assignment(fica.Config, Loggable):
             default=True,
         )
 
-        files: list = fica.Key(
+        files: list[str] = fica.Key(
             description="a list of other files to include in the student submissions' zip file",
             default=[],
         )
@@ -156,22 +155,22 @@ class Assignment(fica.Config, Loggable):
         default=False,
     )
 
-    ignore_modules: List[str] = fica.Key(
+    ignore_modules: list[str] = fica.Key(
         description="a list of modules to ignore variables from during environment serialization",
         default=[],
     )
 
-    files: List[str] = fica.Key(
+    files: list[str] = fica.Key(
         description="a list of other files to include in the output directories and autograder",
         default=[],
     )
 
-    autograder_files: List[str] = fica.Key(
+    autograder_files: list[str] = fica.Key(
         description="a list of other files only to include in the autograder",
         default=[],
     )
 
-    plugins: List[str] = fica.Key(
+    plugins: list[str] = fica.Key(
         description="a list of plugin names and configurations",
         default=[],
     )
@@ -243,16 +242,17 @@ class Assignment(fica.Config, Loggable):
     generate_tests_dir: Optional[str] = None
     """the path to a directory of test files for Otter Generate"""
 
-    notebook_basename: Optional[str] = None
-    """the basename of the master notebook file"""
-
     _ag_zip_name: Optional[str] = None
     """
     the file name for the autograder zip file; this value is generated the first time it is accessed
     since it contians a timestamp
     """
 
-    def __init__(self, user_config: Dict[str, Any] = {}, **kwargs) -> None:
+    def __init__(
+        self, user_config: Optional[dict[str, Any]] = None, **kwargs: dict[str, Any]
+    ) -> None:
+        if user_config is None:
+            user_config = {}
         self._logger.debug(f"Initializing with config: {user_config}")
         super().__init__(user_config, **kwargs)
 
@@ -262,7 +262,7 @@ class Assignment(fica.Config, Loggable):
         if self.export_cell is True:
             self.export_cell = type(self).ExportCellValue()
 
-    def update(self, user_config: Dict[str, Any]):
+    def update(self, user_config: dict[str, Any]):
         self._logger.debug(f"Updating config: {user_config}")
         ret = super().update(user_config)
         if self.generate is True:
@@ -330,7 +330,7 @@ class Assignment(fica.Config, Loggable):
         """the path to the autograder zip file"""
         return self.get_ag_path(self.ag_zip_name)
 
-    def get_ag_path(self, path=""):
+    def get_ag_path(self, path: Union[str, pathlib.Path] = "") -> pathlib.Path:
         """
         Get the path to the autograder output directory or a file in that directory.
 
@@ -342,7 +342,7 @@ class Assignment(fica.Config, Loggable):
         """
         return self.result / "autograder" / path
 
-    def get_stu_path(self, path=""):
+    def get_stu_path(self, path: Union[str, pathlib.Path] = "") -> pathlib.Path:
         """
         Get the path to the student output directory or a file in that directory.
 

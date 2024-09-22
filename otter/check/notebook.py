@@ -11,7 +11,7 @@ import zipfile
 from glob import glob
 from IPython.display import display, HTML
 from textwrap import indent
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar, Optional, Union
 
 from .logs import EventType, Log, LogEntry
 from .utils import (
@@ -28,14 +28,13 @@ from .utils import (
 )
 from ..execute import Checker
 from ..export import export_notebook
+from ..logging import Loggable
 from ..nbmeta_config import NBMetadataConfig
 from ..plugins import PluginCollection
-from ..test_files import GradingResults
-from ..utils import Loggable
+from ..test_files import GradingResults, TestFile
 
 
-_OTTER_LOG_FILENAME = ".OTTER_LOG"
-_SHELVE = False
+OTTER_LOG_FILENAME = ".OTTER_LOG"
 _ZIP_NAME_FILENAME = "__zip_filename__"
 
 
@@ -47,17 +46,16 @@ class Notebook(Loggable):
         nb_path (``str | None``): path to the notebook being run
         tests_dir (``str``): path to tests directory
         tests_url_prefix (``str | None``): a URL prefix to use to download test files
-        colab (``bool | None``): whether this notebook is being run on Google Colab; if ``None``,
-            this information is automatically parsed from IPython on creation
-        jupyterlite (``bool | None``): whether this notebook is being run on JupyterLite; if
-            ``None``, this information is automatically parsed from IPython on creation
     """
 
-    _grading_mode = False
-    """(class property) whether Otter is currently in grading mode"""
+    _grading_mode: ClassVar[bool] = False
+    """whether Otter is currently in grading mode"""
 
-    _tests_dir_override = None
-    """(class property) an override for the path to the tests directory"""
+    _shelve: ClassVar[bool] = False
+    """whether to shelve the global environment in log entries"""
+
+    _tests_dir_override: ClassVar[Optional[str]] = None
+    """an override for the path to the tests directory"""
 
     _notebook: Optional[str]
     """the path to the notebook file"""
@@ -68,49 +66,48 @@ class Notebook(Loggable):
     _tests_url_prefix: Optional[str]
     """a URL prefix to use for downloading test files"""
 
-    _addl_files: List[str]
+    _addl_files: list[str]
     """a list of additional file paths to include in the exported submission zip"""
 
-    _plugin_collections: Dict[str, PluginCollection]
+    _plugin_collections: dict[str, PluginCollection]
     """a cache of ``PluginCollection`` objects for each plugin invoked in the notebook"""
 
-    _interpreter: Optional[IPythonInterpreter]
+    interpreter: Optional[IPythonInterpreter]
     """the interpreter that is currently running (if not the standard IPython interpreter)"""
 
     _nbmeta_config: NBMetadataConfig
     """the metadata config from the notebook"""
 
-    _config: Optional[Dict[str, Any]] = None
+    _config: Optional[dict[str, Any]] = None
     """the config loaded from the .otter file if there was one"""
 
-    _ignore_modules: Optional[List[str]] = None
+    _ignore_modules: Optional[list[str]] = None
     """a list of modules to ignore when serializing environments"""
 
-    _vars_to_store: Optional[Dict[str, str]] = None
+    _vars_to_store: Optional[dict[str, str]] = None
     """a map of var names -> type name to use when serializing environments"""
 
     @logs_event(EventType.INIT)
     def __init__(
         self,
-        nb_path=None,
-        tests_dir="./tests",
-        tests_url_prefix=None,
+        nb_path: Optional[str] = None,
+        tests_dir: str = "./tests",
+        tests_url_prefix: Optional[str] = None,
     ):
-        global _SHELVE
-
         interpreter = None
         for i in IPythonInterpreter:
             if i.value.running():
                 interpreter = i
                 break
 
-        self._interpreter = interpreter
+        self.interpreter = interpreter
 
-        if self._interpreter is IPythonInterpreter.COLAB and not os.path.isdir(tests_dir):
+        if self.interpreter is IPythonInterpreter.COLAB and not os.path.isdir(tests_dir):
             raise ValueError(f"Tests directory {tests_dir} does not exist")
 
-        if type(self)._tests_dir_override is not None:
-            self._tests_dir = type(self)._tests_dir_override
+        cls = type(self)
+        if cls._tests_dir_override is not None:
+            self._tests_dir = cls._tests_dir_override
         else:
             self._tests_dir = tests_dir
 
@@ -130,7 +127,10 @@ class Notebook(Loggable):
             with open(otter_configs[0], encoding="utf-8") as f:
                 self._config = json.load(f)
 
-            _SHELVE = self._config.get("save_environment", False)
+            if not isinstance(self._config, dict):
+                raise ValueError(f'"{otter_configs[0]}" does not contain a valid config')
+
+            type(self)._shelve = self._config.get("save_environment", False)
             self._ignore_modules = self._config.get("ignore_modules", [])
             self._vars_to_store = self._config.get("variables", None)
 
@@ -144,7 +144,7 @@ class Notebook(Loggable):
             self._nbmeta_config = NBMetadataConfig()
 
     @classmethod
-    def init_grading_mode(cls, tests_dir):
+    def init_grading_mode(cls, tests_dir: str):
         logger = cls._get_logger()
         logger.info("Entering Notebook grading mode")
         logger.debug(f"Overriding tests directory: {tests_dir}")
@@ -156,44 +156,46 @@ class Notebook(Loggable):
     @incompatible_with(IPythonInterpreter.PYOLITE, throw_error=False)
     def _log_event(
         self,
-        event_type,
-        results=None,
-        question=None,
-        success=True,
-        error=None,
-        shelve_env=None,
+        event_type: EventType,
+        results: Optional[Union[GradingResults, TestFile]] = None,
+        question: Optional[str] = None,
+        success: bool = True,
+        error: Optional[Exception] = None,
+        shelve_env: Optional[dict[str, Any]] = None,
     ):
         """
         Log an event to Otter's client log file.
 
         Args:
             event_type (``otter.logs.EventType``): the type of event
-            results (``otter.test_files.TestFile | otter.test_files.GradingResults | None``): the
-                results of any checks recorded by the entry
-            question (``str``): the question name for this check
+            results (``otter.test_files.TestFile | None``): the results of any checks recorded
+                by the entry
+            question (``str | None``): the question name for this check
             success (``bool``): whether the operation was successful
-            error (``Exception``): the exception thrown by the operation, if applicable
-            shelve_env (``Dict[str, object] | None``): the environment to shelve
+            error (``Exception | None``): the exception thrown by the operation, if applicable
+            shelve_env (``dict[str, Any] | None``): the environment to shelve
         """
         entry = LogEntry(
             event_type, results=results, question=question, success=success, error=error
         )
 
-        if _SHELVE and event_type == EventType.CHECK:
+        if type(self)._shelve and event_type == EventType.CHECK:
             if not isinstance(shelve_env, dict):
                 raise TypeError(f"shelve_env has an invalid type: {type(shelve_env)}")
 
             entry.shelve(
                 shelve_env,
                 delete=True,
-                filename=_OTTER_LOG_FILENAME,
+                filename=OTTER_LOG_FILENAME,
                 ignore_modules=self._ignore_modules,
                 variables=self._vars_to_store,
             )
 
-        entry.flush_to_file(_OTTER_LOG_FILENAME)
+        entry.flush_to_file(OTTER_LOG_FILENAME)
 
-    def _resolve_nb_path(self, nb_path, fail_silently=False):
+    def _resolve_nb_path(
+        self, nb_path: Optional[str], fail_silently: bool = False
+    ) -> Optional[str]:
         """
         Attempts to resolve the path to the notebook being run. If ``nb_path`` is ``None``,
         ``self._notebook`` is checked, then the working directory is searched for ``.ipynb`` files.
@@ -234,7 +236,9 @@ class Notebook(Loggable):
         return nb_path
 
     @logs_event(EventType.CHECK)
-    def check(self, question, global_env=None):
+    def check(
+        self, question: str, global_env: Optional[dict[str, Any]] = None
+    ) -> LoggedEventReturnValue[TestFile]:
         """
         Runs tests for a specific question against a global environment. If no global environment
         is provided, the test is run against the calling frame's environment.
@@ -259,7 +263,7 @@ class Notebook(Loggable):
         self._logger.debug(f"Resolved test name: {test_name}")
 
         # raise an error for a metadata test on Colab
-        if test_name is not None and self._interpreter is IPythonInterpreter.COLAB:
+        if test_name is not None and self.interpreter is IPythonInterpreter.COLAB:
             raise ValueError(f"Test {question} does not exist")
 
         # ensure that desired test exists
@@ -278,7 +282,13 @@ class Notebook(Loggable):
         return LoggedEventReturnValue(result, question=question, shelve_env=global_env)
 
     @incompatible_with(IPythonInterpreter.COLAB)
-    def run_plugin(self, plugin_name, *args, nb_path=None, **kwargs):
+    def run_plugin(
+        self,
+        plugin_name: str,
+        *args: tuple[Any],
+        nb_path: Optional[str] = None,
+        **kwargs: dict[str, Any],
+    ):
         """
         Runs the plugin ``plugin_name`` with the specified arguments. Use ``nb_path`` if the path
         to the notebook is not configured.
@@ -287,9 +297,8 @@ class Notebook(Loggable):
             plugin_name (``str``): importable name of an Otter plugin that implements the
                 ``from_notebook`` hook
             *args: arguments to be passed to the plugin
-            nb_path (``str``, optional): path to the notebook
+            nb_path (``str | None``): path to the notebook
             **kwargs: keyword arguments to be passed to the plugin
-
         """
         self._logger.info(f"Running plugin {plugin_name}")
         self._logger.debug(f"Running plugin {plugin_name} with args {args} and kwargs {kwargs}")
@@ -306,11 +315,11 @@ class Notebook(Loggable):
     @logs_event(EventType.TO_PDF)
     def to_pdf(
         self,
-        nb_path=None,
-        filtering=True,
-        pagebreaks=True,
-        display_link=True,
-        force_save=False,
+        nb_path: Optional[str] = None,
+        filtering: bool = True,
+        pagebreaks: bool = True,
+        display_link: bool = True,
+        force_save: bool = False,
     ):
         """
         Exports a notebook to a PDF using Otter Export
@@ -353,7 +362,13 @@ class Notebook(Loggable):
 
     @grading_mode_disabled
     @incompatible_with(IPythonInterpreter.COLAB)
-    def add_plugin_files(self, plugin_name, *args, nb_path=None, **kwargs):
+    def add_plugin_files(
+        self,
+        plugin_name: str,
+        *args: tuple[Any],
+        nb_path: Optional[str] = None,
+        **kwargs: dict[str, Any],
+    ):
         """
         Runs the ``notebook_export`` event of the plugin ``plugin_name`` and tracks the file paths
         it returns to be included when calling ``Notebook.export``.
@@ -381,15 +396,15 @@ class Notebook(Loggable):
     @logs_event(EventType.END_EXPORT)
     def export(
         self,
-        nb_path=None,
-        export_path=None,
-        pdf=True,
-        filtering=True,
-        pagebreaks=True,
-        files=None,
-        display_link=True,
-        force_save=False,
-        run_tests=False,
+        nb_path: Optional[str] = None,
+        export_path: Optional[str] = None,
+        pdf: bool = True,
+        filtering: bool = True,
+        pagebreaks: bool = True,
+        files: Optional[list[str]] = None,
+        display_link: bool = True,
+        force_save: bool = False,
+        run_tests: bool = False,
     ):
         """
         Export a submission zip file.
@@ -470,8 +485,8 @@ class Notebook(Loggable):
                 warnings.warn("Could not locate a PDF to include")
 
         def continue_export():
-            if os.path.isfile(_OTTER_LOG_FILENAME):
-                zf.write(_OTTER_LOG_FILENAME)
+            if os.path.isfile(OTTER_LOG_FILENAME):
+                zf.write(OTTER_LOG_FILENAME)
                 self._logger.debug("Added Otter log to zip file")
 
             zip_basename = os.path.basename(zip_path)
@@ -547,12 +562,12 @@ class Notebook(Loggable):
         self._logger.debug(f"Found available tests: {', '.join(tests)}")
 
         results = []
-        if not _SHELVE:
+        if not type(self)._shelve:
             for test_name in tests:
                 results.append(self.check(test_name, global_env))
 
         else:
-            log = Log.from_file(_OTTER_LOG_FILENAME, ascending=False)
+            log = Log.from_file(OTTER_LOG_FILENAME, ascending=False)
             for file in sorted(tests):
                 if "__init__.py" not in file:
                     test_name = os.path.splitext(os.path.split(file)[1])[0]

@@ -2,18 +2,20 @@
 
 import doctest
 import io
-import json
 import os
 import pathlib
 
 from contextlib import redirect_stderr, redirect_stdout
 from textwrap import dedent
+from typing import Any
 
 from .abstract_test import TestCase, TestCaseResult, TestFile
 from ..utils import hide_outputs
 
 
-def run_doctest(name, doctest_string, global_environment):
+def run_doctest(
+    name: str, doctest_string: str, global_environment: dict[str, Any]
+) -> tuple[bool, str]:
     """
     Run a single test with given ``global_environment``. Returns ``(True, '')`` if the doctest passes.
     Returns ``(False, failure_message)`` if the doctest fails.
@@ -21,8 +23,8 @@ def run_doctest(name, doctest_string, global_environment):
     Args:
         name (``str``): name of doctest
         doctest_string (``str``): doctest in string form
-        global_environment (``dict``): global environment resulting from the execution of a python
-            script/notebook
+        global_environment (``dict[str, Any]``): global environment resulting from the execution of
+            a python script/notebook
 
     Returns:
         ``tuple[bool, str]``: results from running the test
@@ -56,7 +58,7 @@ class OKTestFile(TestFile):
     A single OK-formatted test file for Otter.
     """
 
-    def run(self, global_environment):
+    def run(self, global_environment: dict[str, Any]):
         """
         Run the test cases on ``global_environment``, saving the results in
         ``self.test_case_results``.
@@ -82,13 +84,13 @@ class OKTestFile(TestFile):
             )
 
     @classmethod
-    def from_spec(cls, test_spec, path=""):
+    def from_spec(cls, test_spec: dict[str, Any], path: str = "") -> "OKTestFile":
         """
         Parse an OK-formatted ``dict`` and return an ``OKTestFile``.
 
         Args:
-            test_spec (``dict[str, object]``): the OK-formatted ``dict``
-            path (``str``, optional): the path to the test file this ``dict`` was parsed from
+            test_spec (``dict[str, Any]``): the OK-formatted ``dict``
+            path (``str``): the path to the test file this ``dict`` was parsed from
 
         Returns:
             ``OKTestFile``: the new ``OKTestFile`` object created from the given file
@@ -134,7 +136,7 @@ class OKTestFile(TestFile):
         return cls(test_spec["name"], path, test_cases, all_or_nothing)
 
     @classmethod
-    def from_metadata(cls, spec, path):
+    def from_metadata(cls, s: Any, path: str) -> "OKTestFile":
         """
         Parse an OK test file from its data stored in a notebook's metadata.
 
@@ -145,10 +147,10 @@ class OKTestFile(TestFile):
         Returns:
             ``OKTestFile``: the parsed test file.
         """
-        return cls.from_spec(spec, path=path)
+        return cls.from_spec(s, path=path)
 
     @classmethod
-    def from_file(cls, path):
+    def from_file(cls, path: str) -> "OKTestFile":
         """
         Parse an OK-formatted test file and return an ``OKTestFile``.
 

@@ -9,16 +9,17 @@ import re
 import shutil
 
 from textwrap import indent
-from typing import Optional, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 
+from .. import logging
 from ..api import grade_submission
 from ..generate import main as generate_autograder
 from ..plugins import PluginCollection
 from ..run import capture_run_output
-from ..utils import chdir, get_source, loggers, OTTER_CONFIG_FILENAME
+from ..utils import chdir, get_source, OTTER_CONFIG_FILENAME
 
 
-LOGGER = loggers.get_logger(__name__)
+LOGGER = logging.get_logger(__name__)
 
 
 class EmptyCellException(Exception):
@@ -48,8 +49,8 @@ class AssignNotebookFormatException(Exception):
         message: str,
         question: Optional["QuestionConfig"],
         cell_index: int,
-        *args,
-        **kwargs,
+        *args: tuple[Any],
+        **kwargs: dict[str, Any],
     ):
         message += " ("
         if question is not None:
@@ -274,7 +275,7 @@ def run_generate_autograder(
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         gs_username (``str | None``): Gradescope username for token generation
         gs_password (``str | None``): Gradescope password for token generation
-        plugin_collection (``otter.plugins.PluginCollection``, optional): a plugin collection to pass
+        plugin_collection (``otter.plugins.PluginCollection``): a plugin collection to pass
             to Otter Generate
     """
     curr_dir = os.getcwd()

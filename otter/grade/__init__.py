@@ -6,22 +6,23 @@ import re
 
 from glob import glob
 from multiprocessing import Queue
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 from .containers import launch_containers
 from .utils import merge_scores_to_df, prune_images, SCORES_DICT_PERCENT_CORRECT_KEY
-from ..run.run_autograder.autograder_config import AutograderConfig
-from ..utils import assert_path_exists, loggers
+from .. import logging
+from ..run import AutograderConfig
+from ..utils import assert_path_exists
 
 
-_ALLOWED_EXTENSIONS = ["ipynb", "py", "Rmd", "R", "r", "zip"]
-LOGGER = loggers.get_logger(__name__)
+ALLOWED_EXTENSIONS = ["ipynb", "py", "Rmd", "R", "r", "zip"]
+LOGGER = logging.get_logger(__name__)
 
 
 def main(
     *,
     name: Optional[str] = None,
-    paths: Optional[Union[List[str], Tuple[str]]] = None,
+    paths: Optional[Union[list[str], tuple[str]]] = None,
     output_dir: str = "./",
     autograder: str = "./autograder.zip",
     containers: int = 4,
@@ -35,7 +36,7 @@ def main(
     timeout: Optional[int] = None,
     no_network: bool = False,
     debug: bool = False,
-    result_queue: Optional[Queue] = None,
+    result_queue: Optional["Queue[str]"] = None,
 ):
     """
     Run Otter Grade.
@@ -64,7 +65,7 @@ def main(
         timeout (``int | None``): an execution timeout in seconds for each container
         no_network (``bool``): whether to disable networking in the containers
         debug (``bool``): whether to run autograding in debug mode
-        result_queue (``multiprocessing.Queue | None``): the queue to store progress messages
+        result_queue (``multiprocessing.Queue[str] | None``): the queue to store progress messages
 
     Returns:
         ``float | None``: the percentage scored by that submission if a single file was graded
@@ -98,13 +99,13 @@ def main(
         ]
     )
 
-    if ext not in _ALLOWED_EXTENSIONS:
+    if ext not in ALLOWED_EXTENSIONS:
         raise ValueError(f"Invalid submission extension specified: {ext}")
 
-    output_dir = pathlib.Path(output_dir)
+    out = pathlib.Path(output_dir)
     try:
         if result_queue:
-            loggers.add_queue_handler(result_queue)
+            logging.add_queue_handler(result_queue)
 
         LOGGER.info("Launching Docker containers")
 
@@ -118,7 +119,7 @@ def main(
 
         LOGGER.debug(f"Resolved submission paths: {submission_paths}")
 
-        pdf_dir = output_dir / "submission_pdfs" if pdfs else None
+        pdf_dir = out / "submission_pdfs" if pdfs else None
 
         scores = launch_containers(
             autograder,
@@ -141,17 +142,17 @@ def main(
 
         LOGGER.info("Combining grades and saving")
     finally:
-        loggers.remove_queue_handlers()
+        logging.remove_queue_handlers()
 
     # Merge scores to dataframe
     output_df = merge_scores_to_df(scores)
 
     # write to CSV file
-    output_df.to_csv(output_dir / "final_grades.csv", index=False)
+    output_df.to_csv(out / "final_grades.csv", index=False)
 
     # write score summaries to files
     if summaries:
-        grading_summary_path = output_dir / "grading-summaries"
+        grading_summary_path = out / "grading-summaries"
         if not grading_summary_path.exists():
             grading_summary_path.mkdir()
 

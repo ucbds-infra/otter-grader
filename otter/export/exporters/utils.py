@@ -11,7 +11,7 @@ NEW_PAGE_CELL_SOURCE = f"<!-- {NEW_PAGE_MARKER} -->"
 NEW_PAGE_CLASS_NAME = "otter-page-break-after"
 
 
-def has_begin(line):
+def has_begin(line: str) -> bool:
     """
     Returns whether a string contains a begin question comment
 
@@ -31,7 +31,7 @@ def has_begin(line):
     return bool(re.search(BEGIN_QUESTION_REGEX, line, flags=re.IGNORECASE))
 
 
-def has_end(line):
+def has_end(line: str) -> bool:
     """
     Returns whether a string contains an end question comment
 
@@ -51,7 +51,7 @@ def has_end(line):
     return bool(re.search(END_QUESTION_REGEX, line, flags=re.IGNORECASE))
 
 
-def sub_end_for_new_page(line):
+def sub_end_for_new_page(line: str) -> str:
     """
     Subsitutes an end question comment for a newpage comment
 
@@ -63,7 +63,7 @@ def sub_end_for_new_page(line):
         <!-- #newpage -->
 
     Args:
-        ``line``: the line to substitute in
+        line (``str``): the line to substitute in
 
     Returns:
         ``str``: the line with the end question match substituted for the newpage comment

@@ -1,22 +1,26 @@
 """Exporters for Otter Export"""
 
-import shutil
+from typing import Literal, Optional, Union
 
+from .base_exporter import BaseExporter
 from .via_html import PDFViaHTMLExporter
 from .via_latex import PDFViaLatexExporter
 
 
-def get_exporter(exporter_type=None):
+ExporterType = Union[Literal["html"], Literal["latex"]]
+
+
+def get_exporter(exporter_type: Optional[ExporterType] = None) -> type[BaseExporter]:
     """
     Returns the preferred exporter to use. Defaults to PDF via LaTeX exporter. Pass a string to
     ``exporter_type`` to override this behavior.
 
     Args:
-        exporter_type (``str``, optional): a string identifying the type of exporter to use; can be one
-            of ``["html", "latex"]``
+        exporter_type (``"html" | "latex" | None``): a string identifying the type of exporter to
+            use; can be one of ``["html", "latex"]``
 
     Returns:
-        ``otter.export.exporters.base_exporter.BaseExporter``: the exporter class
+        ``type[otter.export.exporters.base_exporter.BaseExporter]``: the exporter class
     """
     # throw an error if the nbconvert version is < 6
     import nbconvert

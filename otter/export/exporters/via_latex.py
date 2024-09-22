@@ -5,6 +5,7 @@ import os
 import warnings
 
 from textwrap import indent
+from typing import Any
 
 from .base_exporter import BaseExporter, ExportFailedException, TEMPLATE_DIR
 
@@ -26,7 +27,9 @@ class PDFViaLatexExporter(BaseExporter):
     )
 
     @classmethod
-    def convert_notebook(cls, nb_path, dest, xecjk=False, **kwargs):
+    def convert_notebook(
+        cls, nb_path: str, dest: str, *, xecjk: bool = False, **kwargs: dict[str, Any]
+    ):
         warnings.filterwarnings("ignore", r"invalid escape sequence '\\c'", DeprecationWarning)
 
         options = cls.default_options.copy()

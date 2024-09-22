@@ -11,8 +11,9 @@ from unittest import mock
 from otter.assign import main as assign
 from otter.assign.assignment import Assignment
 from otter.assign.question_config import QuestionConfig
-from otter.assign.tests_manager import AssignmentTestsManager, TestCase
+from otter.assign.tests_manager import AssignmentTestsManager
 from otter.generate.token import APIClient
+from otter.test_files import TestCase
 from otter.utils import dump_yaml
 
 from ..utils import assert_dirs_equal, TestFileManager, unzip_to_temp
@@ -26,7 +27,7 @@ FILE_MANAGER = TestFileManager(__file__)
 
 
 @pytest.fixture(autouse=True)
-def cleanup_output(cleanup_enabled):
+def cleanup_output(cleanup_enabled: bool):
     """
     Removes assign output
     """
@@ -35,7 +36,7 @@ def cleanup_output(cleanup_enabled):
         shutil.rmtree(FILE_MANAGER.get_path("output"))
 
 
-def check_gradescope_zipfile(path, correct_dir_path):
+def check_gradescope_zipfile(path: str, correct_dir_path: str):
     """
     Checks that the autograder zip file at ``path`` matches ``correct_dir_path``.
     """

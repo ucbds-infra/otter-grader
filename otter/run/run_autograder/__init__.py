@@ -7,20 +7,23 @@ import zipfile
 
 from contextlib import nullcontext
 from glob import glob
+from typing import Any, Union
 
+from .autograder_config import AutograderConfig
 from .runners import create_runner
 from .utils import capture_run_output, OtterRuntimeError, print_output
-from ...utils import chdir, loggers, OTTER_CONFIG_FILENAME
+from ... import logging
+from ...utils import chdir, OTTER_CONFIG_FILENAME
 from ...version import LOGO_WITH_VERSION
 
 
-__all__ = ["capture_run_output", "main"]
+__all__ = ["AutograderConfig", "capture_run_output", "main"]
 
 
-LOGGER = loggers.get_logger(__name__)
+LOGGER = logging.get_logger(__name__)
 
 
-def main(autograder_dir, otter_run=False, **kwargs):
+def main(autograder_dir: str, *, otter_run: bool = False, **kwargs: dict[str, Any]):
     """
     Run the autograding process.
 
@@ -42,11 +45,11 @@ def main(autograder_dir, otter_run=False, **kwargs):
         config = {}
 
     runner = create_runner(config, autograder_dir=autograder_dir, **kwargs)
-    runner.ag_config._otter_run = otter_run
+    runner.ag_config.otter_run = otter_run
 
     ctx = nullcontext()
     if runner.ag_config.log_level is not None:
-        ctx = loggers.level_context(runner.ag_config.log_level)
+        ctx = logging.level_context(runner.ag_config.log_level)
 
     with ctx:
         LOGGER.debug(f"Detected containerized grading (T/F): {'F' if otter_run else 'T'}")
@@ -102,6 +105,8 @@ def main(autograder_dir, otter_run=False, **kwargs):
         df = pd.DataFrame(output["tests"])
 
         if runner.ag_config.print_score and "score" in df.columns:
+            total: Union[int, float]
+            possible: Union[int, float]
             total, possible = df["score"].sum(), df["max_score"].sum()
             if "score" in output:
                 total, possible = output["score"], runner.ag_config.points_possible or possible

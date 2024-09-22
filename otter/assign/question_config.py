@@ -2,7 +2,7 @@
 
 import fica
 
-from typing import Any, Dict, Union
+from typing import Any, Optional, Union
 
 
 class QuestionConfig(fica.Config):
@@ -37,10 +37,12 @@ class QuestionConfig(fica.Config):
 
     def __init__(
         self,
-        user_config: Dict[str, Any] = {},
+        user_config: Optional[dict[str, Any]] = None,
         documentation_mode: bool = False,
         **kwargs,
     ):
+        if user_config is None:
+            user_config = {}
         if "name" not in user_config and not documentation_mode:
             raise ValueError(f"Question name not specified: {user_config}")
 

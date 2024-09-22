@@ -2,7 +2,7 @@
 
 import traceback
 
-from otter.run.run_autograder.autograder_config import AutograderConfig
+from otter.run import AutograderConfig
 from otter.test_files import GradingResults
 
 

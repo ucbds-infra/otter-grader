@@ -2,7 +2,7 @@
 Abstract base plugin class for Otter
 """
 
-from abc import ABC, abstractmethod
+from abc import ABC
 
 
 class PluginEventNotSupportedException(Exception):
@@ -78,7 +78,7 @@ class AbstractOtterPlugin(ABC):
 
         Args:
             assignment (``otter.assign.assignment.Assignment``): the ``Assignment`` instance with
-                configurations for the assignment; used similar to an ``AttrDict`` where keys are
+                configurations for the assignment; used similar to an ``Attrdict`` where keys are
                 accessed with the dot syntax (e.g. ``assignment.master`` is the path to the master
                 notebook)
 
