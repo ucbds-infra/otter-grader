@@ -285,9 +285,9 @@ class Notebook(Loggable):
     def run_plugin(
         self,
         plugin_name: str,
-        *args: tuple[Any],
+        *args: Any,
         nb_path: Optional[str] = None,
-        **kwargs: dict[str, Any],
+        **kwargs: Any,
     ):
         """
         Runs the plugin ``plugin_name`` with the specified arguments. Use ``nb_path`` if the path
@@ -365,9 +365,9 @@ class Notebook(Loggable):
     def add_plugin_files(
         self,
         plugin_name: str,
-        *args: tuple[Any],
+        *args: Any,
         nb_path: Optional[str] = None,
-        **kwargs: dict[str, Any],
+        **kwargs: Any,
     ):
         """
         Runs the ``notebook_export`` event of the plugin ``plugin_name`` and tracks the file paths

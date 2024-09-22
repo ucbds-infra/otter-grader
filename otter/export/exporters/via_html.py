@@ -20,7 +20,7 @@ class PDFViaHTMLExporter(BaseExporter):
     default_options.update({"save_html": False, "template": "via_html"})
 
     @classmethod
-    def convert_notebook(cls, nb_path: str, dest: str, **kwargs: dict[str, Any]):
+    def convert_notebook(cls, nb_path: str, dest: str, **kwargs: Any):
         options = cls.default_options.copy()
         options.update(kwargs)
 

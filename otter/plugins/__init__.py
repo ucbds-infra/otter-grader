@@ -154,7 +154,7 @@ class PluginCollection:
         self._plugin_config.extend(plg_cfg)
         self._plugins.extend(self._load_plugins(plg_cfg, self._subm_path, self._subm_meta))
 
-    def run(self, event: str, *args: tuple[Any], **kwargs: dict[str, Any]):
+    def run(self, event: str, *args: Any, **kwargs: Any):
         """
         Runs the method ``event`` of each plugin in this collection. Passes ``args`` and ``kwargs``
         to this method. Ignores plugins that raise ``PluginEventNotSupportedException`` for this

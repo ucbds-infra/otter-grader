@@ -21,7 +21,7 @@ class Checker:
     _test_files: ClassVar[list[TestFile]] = []
     """stored check results"""
 
-    def __new__(cls, *args: tuple[Any], **kwargs: dict[str, Any]):
+    def __new__(cls, *args: Any, **kwargs: Any):
         raise NotImplementedError("The Checker class cannot be instantiated")
 
     @classmethod

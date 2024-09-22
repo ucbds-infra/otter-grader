@@ -5,7 +5,7 @@ from typing import Any
 from ..autograder_config import AutograderConfig
 
 
-def create_runner(otter_config: dict[str, Any], **kwargs: dict[str, Any]):
+def create_runner(otter_config: dict[str, Any], **kwargs: Any):
     """
     Return an instantiated runner for the assignment based on user-specified configurations.
     """

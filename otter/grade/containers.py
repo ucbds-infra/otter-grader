@@ -81,7 +81,7 @@ def launch_containers(
     base_image: str,
     tag: str,
     config: AutograderConfig,
-    **kwargs: dict[str, Any],
+    **kwargs: Any,
 ) -> list[GradingResults]:
     """
     Grade submissions in parallel Docker containers.

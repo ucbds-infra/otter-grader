@@ -49,8 +49,8 @@ class AssignNotebookFormatException(Exception):
         message: str,
         question: Optional["QuestionConfig"],
         cell_index: int,
-        *args: tuple[Any],
-        **kwargs: dict[str, Any],
+        *args: Any,
+        **kwargs: Any,
     ):
         message += " ("
         if question is not None:

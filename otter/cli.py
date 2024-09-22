@@ -25,7 +25,7 @@ _VERBOSITY_LEVELS = {
 def _verbosity(f: Callable[..., Any]):
     @click.option("-v", "--verbose", "verbosity", count=True, help="Verbosity of the logged output")
     @functools.wraps(f)
-    def wrapper(*args: tuple[Any], **kwargs: dict[str, Any]):
+    def wrapper(*args: Any, **kwargs: Any):
         # set the log level
         verbosity = kwargs.pop("verbosity")
         logging.set_level(_VERBOSITY_LEVELS[min(verbosity, max(_VERBOSITY_LEVELS.keys()))])
@@ -61,7 +61,7 @@ defaults = assign.__kwdefaults__
 @click.option("--username", help="Gradescope username for generating a token")
 @click.option("--password", help="Gradescope password for generating a token")
 @click.option("--debug", is_flag=True, help="Do not ignore errors in running tests for debugging")
-def assign_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
+def assign_cli(*args: Any, **kwargs: Any):
     """
     Create distribution versions of the Otter Assign formatted notebook MASTER and write the
     results to the directory RESULT, which will be created if it does not already exist.
@@ -84,7 +84,7 @@ defaults = check.__kwdefaults__
     help="Path to the direcotry of test files",
 )
 @click.option("--seed", type=click.INT, help="A random seed to be executed before each cell")
-def check_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
+def check_cli(*args: Any, **kwargs: Any):
     """
     Check the Python script or Jupyter Notebook FILE against tests.
     """
@@ -111,7 +111,7 @@ defaults = export.__kwdefaults__
     help="Type of PDF exporter to use",
 )
 @click.option("--xecjk", is_flag=True, help="Enable xeCJK in Otter's LaTeX template")
-def export_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
+def export_cli(*args: Any, **kwargs: Any):
     """
     Export a Jupyter Notebook SRC as a PDF at DEST with optional filtering.
 
@@ -193,7 +193,7 @@ defaults = generate.__kwdefaults__
     help="Whether to exlucde conda's defaults channel from the environment.yml file",
 )
 @click.argument("files", nargs=-1)
-def generate_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
+def generate_cli(*args: Any, **kwargs: Any):
     """
     Generate a zip file to configure an Otter autograder, including FILES as support files.
     """
@@ -244,7 +244,7 @@ defaults = grade.__kwdefaults__
 )
 @click.option("--prune", is_flag=True, help="Prune all of Otter's grading images")
 @click.option("-f", "--force", is_flag=True, help="Force action (don't ask for confirmation)")
-def grade_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
+def grade_cli(*args: Any, **kwargs: Any):
     """
     Grade submissions in PATHS locally using Docker containers. PATHS can be individual file paths
     or directories containing submissions ending with extension EXT.
@@ -279,7 +279,7 @@ defaults = run.__kwdefaults__
 @click.option("--no-logo", is_flag=True, help="Suppress Otter logo in stdout")
 @click.option("--debug", is_flag=True, help="Do not ignore errors when running submission")
 @click.option("-p", "--pickle-results", is_flag=True, help="Output GradingResults pickle file")
-def run_cli(*args: tuple[Any], **kwargs: dict[str, Any]):
+def run_cli(*args: Any, **kwargs: Any):
     """
     Run non-containerized Otter on a single submission, writing results to a JSON file.
     """

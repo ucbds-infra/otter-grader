@@ -42,7 +42,7 @@ class APIClient:
         client.log_in(email, password)
         return client.token
 
-    def post(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> requests.Response:
+    def post(self, *args: Any, **kwargs: Any) -> requests.Response:
         return self.session.post(*args, **kwargs)
 
     def log_in(self, email: str, password: str):

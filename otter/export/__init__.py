@@ -11,7 +11,7 @@ def export_notebook(
     nb_path: str,
     dest: Optional[str] = None,
     exporter_type: Optional[ExporterType] = None,
-    **kwargs: dict[str, Any],
+    **kwargs: Any,
 ):
     """
     Exports a notebook file at ``nb_path`` to a PDF with optional filtering and pagebreaks. Accepts

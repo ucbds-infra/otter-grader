@@ -27,9 +27,7 @@ class PDFViaLatexExporter(BaseExporter):
     )
 
     @classmethod
-    def convert_notebook(
-        cls, nb_path: str, dest: str, *, xecjk: bool = False, **kwargs: dict[str, Any]
-    ):
+    def convert_notebook(cls, nb_path: str, dest: str, *, xecjk: bool = False, **kwargs: Any):
         warnings.filterwarnings("ignore", r"invalid escape sequence '\\c'", DeprecationWarning)
 
         options = cls.default_options.copy()

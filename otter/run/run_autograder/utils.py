@@ -45,7 +45,7 @@ def capture_run_output() -> Iterable[StringIO]:
     _output = None
 
 
-def print_output(*args: tuple[Any], **kwargs: dict[str, Any]):
+def print_output(*args: Any, **kwargs: Any):
     """
     Print output for Otter Run. If output is being captured, this prints the output to the
     ``io.StringIO`` object it is being captured to, otherwise it prints to stdout. All arguments are

@@ -40,7 +40,7 @@ class BaseExporter(ABC):
 
     @classmethod
     @abstractmethod
-    def convert_notebook(cls, nb_path: str, dest: str, **kwargs: dict[str, Any]):
+    def convert_notebook(cls, nb_path: str, dest: str, **kwargs: Any):
         """
         Writes a notebook at ``nb_path`` to a PDF file
 

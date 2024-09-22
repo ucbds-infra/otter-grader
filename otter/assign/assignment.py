@@ -248,9 +248,7 @@ class Assignment(fica.Config, Loggable):
     since it contians a timestamp
     """
 
-    def __init__(
-        self, user_config: Optional[dict[str, Any]] = None, **kwargs: dict[str, Any]
-    ) -> None:
+    def __init__(self, user_config: Optional[dict[str, Any]] = None, **kwargs: Any) -> None:
         if user_config is None:
             user_config = {}
         self._logger.debug(f"Initializing with config: {user_config}")

@@ -23,7 +23,7 @@ __all__ = ["AutograderConfig", "capture_run_output", "main"]
 LOGGER = logging.get_logger(__name__)
 
 
-def main(autograder_dir: str, *, otter_run: bool = False, **kwargs: dict[str, Any]):
+def main(autograder_dir: str, *, otter_run: bool = False, **kwargs: Any):
     """
     Run the autograding process.
 

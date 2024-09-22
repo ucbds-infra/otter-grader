@@ -192,9 +192,7 @@ def format_full_width(char: str, mid_text: str = "", whitespace: str = " ") -> s
     return out
 
 
-def print_full_width(
-    char: str, mid_text: str = "", whitespace: str = " ", **kwargs: dict[str, Any]
-):
+def print_full_width(char: str, mid_text: str = "", whitespace: str = " ", **kwargs: Any):
     """
     Prints a character at the full terminal width. Additional kwargs passed to ``print``.
 
@@ -252,11 +250,11 @@ def knit_rmd_file(rmd_path: str, pdf_path: str):
 
 
 class _CorrectIndentationDumper(yaml.Dumper):
-    def increase_indent(self, flow: bool = False, *args: tuple[Any], **kwargs: dict[str, Any]):
+    def increase_indent(self, flow: bool = False, *args: Any, **kwargs: Any):
         return super().increase_indent(flow=flow, indentless=False)
 
 
-def dump_yaml(o: Any, **kwargs: dict[str, Any]) -> str:
+def dump_yaml(o: Any, **kwargs: Any) -> str:
     """
     Dump an object to a YAML string using the ``_CorrectIndentationDumper`` dumper.
 
