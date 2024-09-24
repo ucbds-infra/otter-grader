@@ -3,6 +3,8 @@
 import nbconvert
 import os
 
+from typing import Any
+
 from .base_exporter import BaseExporter, TEMPLATE_DIR
 
 
@@ -15,17 +17,16 @@ class PDFViaHTMLExporter(BaseExporter):
     """
 
     default_options = BaseExporter.default_options.copy()
-    default_options.update({
-        "save_html": False,
-        "template": "via_html"
-    })
+    default_options.update({"save_html": False, "template": "via_html"})
 
     @classmethod
-    def convert_notebook(cls, nb_path, dest, **kwargs):
+    def convert_notebook(cls, nb_path: str, dest: str, **kwargs: Any):
         options = cls.default_options.copy()
         options.update(kwargs)
 
-        nb = cls.load_notebook(nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"])
+        nb = cls.load_notebook(
+            nb_path, filtering=options["filtering"], pagebreaks=options["pagebreaks"]
+        )
 
         nbconvert.TemplateExporter.extra_template_basedirs = [str(TEMPLATE_DIR)]
         orig_template_name = nbconvert.TemplateExporter.template_name

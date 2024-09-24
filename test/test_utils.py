@@ -19,7 +19,8 @@ def test_hide_outputs(mocked_get_ipython):
 
 
 # Used in test_get_variable_type
-class Foo: pass
+class Foo:
+    pass
 
 
 def test_get_variable_type():

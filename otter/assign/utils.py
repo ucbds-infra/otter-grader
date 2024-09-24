@@ -9,21 +9,17 @@ import re
 import shutil
 
 from textwrap import indent
-from typing import Optional, TYPE_CHECKING
+from typing import Any, Optional, TYPE_CHECKING
 
+from .. import logging
 from ..api import grade_submission
 from ..generate import main as generate_autograder
 from ..plugins import PluginCollection
 from ..run import capture_run_output
-from ..utils import (
-    chdir,
-    get_source,
-    loggers,
-    OTTER_CONFIG_FILENAME,
-)
+from ..utils import chdir, get_source, OTTER_CONFIG_FILENAME
 
 
-LOGGER = loggers.get_logger(__name__)
+LOGGER = logging.get_logger(__name__)
 
 
 class EmptyCellException(Exception):
@@ -47,13 +43,14 @@ class AssignNotebookFormatException(Exception):
         *args: additional args passed to ``Exception`` constructor
         **kwargs: additional keyword args passed to ``Exception`` constructor
     """
+
     def __init__(
         self,
         message: str,
         question: Optional["QuestionConfig"],
         cell_index: int,
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ):
         message += " ("
         if question is not None:
@@ -86,8 +83,9 @@ def is_ignore_cell(cell: nbf.NotebookNode) -> bool:
         ``bool``: whether the cell is a ignored
     """
     source = get_source(cell)
-    return bool(source and
-        re.match(r"(##\s*ignore\s*##\s*|#\s*ignore\s*)", source[0], flags=re.IGNORECASE))
+    return bool(
+        source and re.match(r"(##\s*ignore\s*##\s*|#\s*ignore\s*)", source[0], flags=re.IGNORECASE)
+    )
 
 
 def is_cell_type(cell: nbf.NotebookNode, cell_type: str) -> bool:
@@ -111,11 +109,11 @@ def remove_output(nb: nbf.NotebookNode) -> None:
     Args:
         nb (``nbformat.NotebookNode``): a notebook
     """
-    for cell in nb['cells']:
-        if 'outputs' in cell:
-            cell['outputs'] = []
-        if 'execution_count' in cell:
-            cell['execution_count'] = None
+    for cell in nb["cells"]:
+        if "outputs" in cell:
+            cell["outputs"] = []
+        if "execution_count" in cell:
+            cell["execution_count"] = None
 
 
 def lock(cell: nbf.NotebookNode) -> None:
@@ -125,7 +123,7 @@ def lock(cell: nbf.NotebookNode) -> None:
     Args:
         cell (``nbformat.NotebookNode``): cell to be locked
     """
-    m = cell['metadata']
+    m = cell["metadata"]
     m["editable"] = False
     m["deletable"] = False
 
@@ -197,8 +195,12 @@ def str_to_doctest(code_lines: list[str], lines: list[str]) -> list[str]:
     line = code_lines.pop(0)
     if line.startswith(" ") or line.startswith("\t"):
         return str_to_doctest(code_lines, lines + ["... " + line])
-    elif bool(re.match(r"^except[\s\w]*:", line)) or line.startswith("elif ") or \
-            line.startswith("else:") or line.startswith("finally:"):
+    elif (
+        bool(re.match(r"^except[\s\w]*:", line))
+        or line.startswith("elif ")
+        or line.startswith("else:")
+        or line.startswith("finally:")
+    ):
         return str_to_doctest(code_lines, lines + ["... " + line])
     elif len(lines) > 0 and lines[-1].strip().endswith("\\"):
         return str_to_doctest(code_lines, lines + ["... " + line])
@@ -227,8 +229,10 @@ def run_tests(assignment: "Assignment", debug: bool = False) -> None:
     LOGGER.debug(f"Otter Run output:\n{run_output.getvalue()}")
 
     if results.total != results.possible:
-        raise RuntimeError(f"Some autograder tests failed in the autograder notebook:\n" + \
-            indent(results.summary(), '    '))
+        raise RuntimeError(
+            f"Some autograder tests failed in the autograder notebook:\n"
+            + indent(results.summary(), "    ")
+        )
 
 
 def write_otter_config_file(assignment: "Assignment") -> None:
@@ -250,7 +254,7 @@ def write_otter_config_file(assignment: "Assignment") -> None:
     if assignment.generate and assignment.generate.serialized_variables:
         config["variables"] = assignment.generate.serialized_variables
 
-    config_name = assignment.master.stem + '.otter'
+    config_name = assignment.master.stem + ".otter"
     with open(assignment.get_ag_path(config_name), "w+") as f:
         json.dump(config, f, indent=4)
     with open(assignment.get_stu_path(config_name), "w+") as f:
@@ -271,7 +275,7 @@ def run_generate_autograder(
         assignment (``otter.assign.assignment.Assignment``): the assignment configurations
         gs_username (``str | None``): Gradescope username for token generation
         gs_password (``str | None``): Gradescope password for token generation
-        plugin_collection (``otter.plugins.PluginCollection``, optional): a plugin collection to pass
+        plugin_collection (``otter.plugins.PluginCollection``): a plugin collection to pass
             to Otter Generate
     """
     curr_dir = os.getcwd()
@@ -279,8 +283,11 @@ def run_generate_autograder(
 
         # use temp tests dir
         test_dir = "tests"
-        if assignment.is_python and not assignment.tests.files and \
-                assignment.generate_tests_dir is None:
+        if (
+            assignment.is_python
+            and not assignment.tests.files
+            and assignment.generate_tests_dir is None
+        ):
             raise RuntimeError("Failed to create temp tests directory for Otter Generate")
 
         elif assignment.is_python and not assignment.tests.files:
@@ -289,9 +296,9 @@ def run_generate_autograder(
         requirements = None
         if assignment.requirements:
             if assignment.is_r:
-                requirements = 'requirements.R'
+                requirements = "requirements.R"
             else:
-                requirements = 'requirements.txt'
+                requirements = "requirements.txt"
 
         files = []
         if assignment.files:
@@ -310,8 +317,9 @@ def run_generate_autograder(
 
                     else:
                         # check that file is in subdir
-                        assert os.getcwd() in os.path.abspath(file), \
-                            f"{file} is not in a subdirectory of the master notebook directory"
+                        assert os.getcwd() in os.path.abspath(
+                            file
+                        ), f"{file} is not in a subdirectory of the master notebook directory"
                         file_path = pathlib.Path(file).resolve()
                         rel_path = file_path.parent.relative_to(pathlib.Path(os.getcwd()))
                         os.makedirs(output_dir / rel_path, exist_ok=True)
@@ -325,22 +333,22 @@ def run_generate_autograder(
                 json.dump(otter_config, f, indent=2)
 
         generate_autograder(
-            tests_dir = test_dir,
-            output_path = assignment.ag_zip_name,
-            config = OTTER_CONFIG_FILENAME if otter_config else None,
-            lang = "python" if assignment.is_python else "r",
-            requirements = requirements,
-            overwrite_requirements = assignment.overwrite_requirements,
-            environment = "environment.yml" if assignment.environment else None,
-            no_environment = False,
-            username = gs_username,
-            password = gs_password,
-            files = files,
-            plugin_collection = plugin_collection,
-            assignment = assignment,
-            python_version = assignment.get_python_version(),
-            channel_priority_strict = assignment.channel_priority_strict,
-            exclude_conda_defaults = assignment.exclude_conda_defaults,
+            tests_dir=test_dir,
+            output_path=assignment.ag_zip_name,
+            config=OTTER_CONFIG_FILENAME if otter_config else None,
+            lang="python" if assignment.is_python else "r",
+            requirements=requirements,
+            overwrite_requirements=assignment.overwrite_requirements,
+            environment="environment.yml" if assignment.environment else None,
+            no_environment=False,
+            username=gs_username,
+            password=gs_password,
+            files=files,
+            plugin_collection=plugin_collection,
+            assignment=assignment,
+            python_version=assignment.get_python_version(),
+            channel_priority_strict=assignment.channel_priority_strict,
+            exclude_conda_defaults=assignment.exclude_conda_defaults,
         )
 
         # clean up temp tests dir

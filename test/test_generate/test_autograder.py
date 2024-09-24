@@ -27,11 +27,11 @@ def test_autograder():
     """
     # create the zipfile
     generate(
-        tests_dir = FILE_MANAGER.get_path("tests"),
-        output_path = OUTPUT_PATH,
-        requirements = FILE_MANAGER.get_path("requirements.txt"),
-        files = [FILE_MANAGER.get_path("data/test-df.csv")],
-        no_environment = True,  # don't use the environment.yml in the root of the repo
+        tests_dir=FILE_MANAGER.get_path("tests"),
+        output_path=OUTPUT_PATH,
+        requirements=FILE_MANAGER.get_path("requirements.txt"),
+        files=[FILE_MANAGER.get_path("data/test-df.csv")],
+        no_environment=True,  # don't use the environment.yml in the root of the repo
     )
 
     with unzip_to_temp(FILE_MANAGER.get_path("autograder.zip")) as unzipped_dir:
@@ -49,12 +49,12 @@ def test_autograder_with_token(mocked_client):
     """
     # create the zipfile
     generate(
-        tests_dir = FILE_MANAGER.get_path("tests"),
-        output_path = OUTPUT_PATH,
-        requirements = FILE_MANAGER.get_path("requirements.txt"),
-        config = FILE_MANAGER.get_path("otter_config.json"),
-        files = [FILE_MANAGER.get_path("data")],
-        no_environment = True,  # don't use the environment.yml in the root of the repo
+        tests_dir=FILE_MANAGER.get_path("tests"),
+        output_path=OUTPUT_PATH,
+        requirements=FILE_MANAGER.get_path("requirements.txt"),
+        config=FILE_MANAGER.get_path("otter_config.json"),
+        files=[FILE_MANAGER.get_path("data")],
+        no_environment=True,  # don't use the environment.yml in the root of the repo
     )
 
     mocked_client.assert_not_called()
@@ -69,11 +69,11 @@ def test_custom_env():
     """
     # create the zipfile
     generate(
-        tests_dir = FILE_MANAGER.get_path("tests"),
-        output_path = OUTPUT_PATH,
-        requirements = FILE_MANAGER.get_path("requirements.txt"),
-        environment = FILE_MANAGER.get_path("environment.yml"),
-        files = [FILE_MANAGER.get_path("data/test-df.csv")],
+        tests_dir=FILE_MANAGER.get_path("tests"),
+        output_path=OUTPUT_PATH,
+        requirements=FILE_MANAGER.get_path("requirements.txt"),
+        environment=FILE_MANAGER.get_path("environment.yml"),
+        files=[FILE_MANAGER.get_path("data/test-df.csv")],
     )
 
     with unzip_to_temp(FILE_MANAGER.get_path("autograder.zip")) as unzipped_dir:
@@ -86,11 +86,11 @@ def test_lang_r():
     """
     # create the zipfile
     generate(
-        tests_dir = FILE_MANAGER.get_path("tests"),
-        output_path = OUTPUT_PATH,
-        config = FILE_MANAGER.get_path("r_otter_config.json"),
-        no_environment = True,
-        channel_priority_strict = False,
+        tests_dir=FILE_MANAGER.get_path("tests"),
+        output_path=OUTPUT_PATH,
+        config=FILE_MANAGER.get_path("r_otter_config.json"),
+        no_environment=True,
+        channel_priority_strict=False,
     )
 
     with unzip_to_temp(FILE_MANAGER.get_path("autograder.zip")) as unzipped_dir:
@@ -103,12 +103,12 @@ def test_r_with_requirements():
     """
     # create the zipfile
     generate(
-        tests_dir = FILE_MANAGER.get_path("tests"),
-        output_path = OUTPUT_PATH,
-        config = FILE_MANAGER.get_path("r_otter_config.json"),
-        requirements = FILE_MANAGER.get_path("requirements.r"),
-        no_environment = True,
-        channel_priority_strict = False,
+        tests_dir=FILE_MANAGER.get_path("tests"),
+        output_path=OUTPUT_PATH,
+        config=FILE_MANAGER.get_path("r_otter_config.json"),
+        requirements=FILE_MANAGER.get_path("requirements.r"),
+        no_environment=True,
+        channel_priority_strict=False,
     )
 
     with unzip_to_temp(FILE_MANAGER.get_path("autograder.zip")) as unzipped_dir:

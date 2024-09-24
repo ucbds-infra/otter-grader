@@ -9,23 +9,23 @@ import pprint
 import re
 import yaml
 
-from dataclasses import dataclass
 from jinja2 import Template
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Union
 
 from .assignment import Assignment
 from .question_config import QuestionConfig
 from .solutions import remove_ignored_lines
-from .utils import get_source, str_to_doctest
-
+from .utils import str_to_doctest
 from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
-from ..test_files.abstract_test import TestFile
+from ..test_files.abstract_test import TestCase, TestFile
+from ..utils import get_source
 
 
 BEGIN_TEST_CONFIG_REGEX = r'(?:.\s*=\s*)?""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
 END_TEST_CONFIG_REGEX = r'""?"?\s*#\s*END\s*TEST\s*CONFIG'
 
-EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template("""\
+EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template(
+    """\
 from otter.test_files import test_case
 
 {{ OK_FORMAT_VARNAME }} = False
@@ -36,34 +36,10 @@ points = {{ points }}
 {% for tc in test_cases %}@test_case(points={{ tc.points }}, hidden={{ tc.hidden }}{% if tc.success_message is not none %}, 
     success_message="{{ tc.success_message }}"{% endif %}{% if tc.failure_message is not none %}, 
     failure_message="{{ tc.failure_message }}"{% endif %})
-{{ tc.input }}
+{{ tc.body }}
 {% endfor %}
-""")
-
-
-@dataclass
-class TestCase:
-    """
-    A dataclass representing a test case for a question.
-    """
-
-    input: str
-    """the input of the test case"""
-
-    output: str
-    """the expected output of the test case"""
-
-    hidden: bool
-    """whether the test case is hidden"""
-
-    points: Optional[Union[int, float]]
-    """the point value of the test case"""
-
-    success_message: Optional[str]
-    """a message to show to the student if the test passes"""
-
-    failure_message: Optional[str]
-    """a message to show to the student if the test fails"""
+"""
+)
 
 
 class AssignmentTestsManager:
@@ -77,10 +53,10 @@ class AssignmentTestsManager:
     assignment: Assignment
     """the assignment config"""
 
-    _tests_by_question: Dict[str, List[TestCase]]
+    _tests_by_question: dict[str, list[TestCase]]
     """a dictionary mapping question names to lists of test cases"""
 
-    _questions: Dict[str, QuestionConfig]
+    _questions: dict[str, QuestionConfig]
     """a dictionary mapping question names to ``QuestionConfig`` objects"""
 
     def __init__(self, assignment: Assignment):
@@ -116,7 +92,7 @@ class AssignmentTestsManager:
 
         self._tests_by_question[question_name].append(test_case)
 
-    def _parse_test_config(self, source: List[str]) -> tuple[dict, Union[int, None]]:
+    def _parse_test_config(self, source: list[str]) -> tuple[dict[str, Any], Union[int, None]]:
         """
         Parse test configurations from the test cell source.
 
@@ -155,28 +131,36 @@ class AssignmentTestsManager:
 
         test_start_line = 0 if hidden else -1
 
-        output = ''
-        for o in cell['outputs']:
-            output += ''.join(o.get('text', ''))
-            results = o.get('data', {}).get('text/plain')
+        output = ""
+        for o in cell["outputs"]:
+            output += "".join(o.get("text", ""))
+            results = o.get("data", {}).get("text/plain")
             if results and isinstance(results, list):
                 output += results[0]
             elif results:
                 output += results
 
         config, maybe_test_start_line = self._parse_test_config(source)
-        test_start_line = maybe_test_start_line if maybe_test_start_line is not None else test_start_line
+        test_start_line = (
+            maybe_test_start_line if maybe_test_start_line is not None else test_start_line
+        )
 
         hidden = config.get("hidden", hidden)
         points = config.get("points", None)
         success_message = config.get("success_message", None)
         failure_message = config.get("failure_message", None)
 
-        test_source = "\n".join(remove_ignored_lines(get_source(cell)[test_start_line + 1:]))
+        body: str = "\n".join(remove_ignored_lines(get_source(cell)[test_start_line + 1 :]))
+        if self.assignment.tests.ok_format:
+            inp = ast.unparse(_AnnotationRemover().visit(ast.parse(body)))
+            body_lines = str_to_doctest(inp.split("\n"), [])
+            body_lines.extend(output.split("\n"))
+            body = "\n".join(body_lines)
 
         self._add_test_case(
             question,
-            TestCase(test_source, output, hidden, points, success_message, failure_message),
+            # TODO: does the test case need a name?
+            TestCase("", body, hidden, points, success_message, failure_message),
         )
 
     def has_tests(self, question: QuestionConfig) -> bool:
@@ -215,7 +199,7 @@ class AssignmentTestsManager:
         TestFile.resolve_test_file_points(total_points, test_cases)
         return test_cases
 
-    def _create_test_file_info(self, question_name: str) -> dict:
+    def _create_test_file_info(self, question_name: str) -> dict[str, Any]:
         """
         Create a ``dict`` containing the test file information for the question with the specified
         name.
@@ -231,12 +215,13 @@ class AssignmentTestsManager:
 
         points = question.points
         if isinstance(points, dict):
-            points = points.get('each', 1) * len(test_cases)
+            points = points.get("each", 1) * len(test_cases)
         elif isinstance(points, list):
             if len(points) != len(test_cases):
                 raise ValueError(
                     f"Error in question {question.name}: length of 'points' is {len(points)} "
-                    f"but there are {len(test_cases)} tests")
+                    f"but there are {len(test_cases)} tests"
+                )
 
         # check for errors in resolving points
         test_cases = self._resolve_test_file_points(points, test_cases)
@@ -248,7 +233,7 @@ class AssignmentTestsManager:
         }
 
     @staticmethod
-    def _create_ok_test_case(test_case: TestCase) -> dict:
+    def _create_ok_test_case(test_case: TestCase) -> dict[str, Any]:
         """
         Create an OK-formatted test case for a test case object.
 
@@ -258,27 +243,23 @@ class AssignmentTestsManager:
         Returns:
             ``dict``: the OK-formatted test case
         """
-        inp = ast.unparse(_AnnotationRemover().visit(ast.parse(test_case.input)))
-        code_lines = str_to_doctest(inp.split('\n'), [])
-        code_lines.append(test_case.output)
-
         ret = {
-            'code': '\n'.join(code_lines),
-            'hidden': test_case.hidden,
-            'locked': False,
+            "code": test_case.body,
+            "hidden": test_case.hidden,
+            "locked": False,
         }
 
         if test_case.points is not None:
-            ret['points'] = test_case.points
+            ret["points"] = test_case.points
         if test_case.success_message:
-            ret['success_message'] = test_case.success_message
+            ret["success_message"] = test_case.success_message
         if test_case.failure_message:
-            ret['failure_message'] = test_case.failure_message
+            ret["failure_message"] = test_case.failure_message
 
         return ret
 
     @classmethod
-    def _create_ok_test_suite(cls, test_cases: List[TestCase]) -> dict:
+    def _create_ok_test_suite(cls, test_cases: list[TestCase]) -> dict[str, Any]:
         """
         Create an OK-formatted test suite for a list of test cases.
 
@@ -288,12 +269,12 @@ class AssignmentTestsManager:
         Returns:
             ``dict``: the OK-formatted test suite
         """
-        return  {
-            'cases': [cls._create_ok_test_case(tc) for tc in test_cases],
-            'scored': True,
-            'setup': '',
-            'teardown': '',
-            'type': 'doctest'
+        return {
+            "cases": [cls._create_ok_test_case(tc) for tc in test_cases],
+            "scored": True,
+            "setup": "",
+            "teardown": "",
+            "type": "doctest",
         }
 
     def _format_test(
@@ -301,7 +282,7 @@ class AssignmentTestsManager:
         name: str,
         points: Union[int, float, list[Union[int, float, None]], None],
         test_cases: list[TestCase],
-    ) -> Union[str, Dict[str, Any]]:
+    ) -> Union[str, dict[str, Any]]:
         """
         Format the test cases for a question based on the assignment config.
 
@@ -323,9 +304,9 @@ class AssignmentTestsManager:
 
         else:
             template_kwargs = {
-                "name": name, 
-                "points": points, 
-                "test_cases": test_cases, 
+                "name": name,
+                "points": points,
+                "test_cases": test_cases,
                 "OK_FORMAT_VARNAME": OK_FORMAT_VARNAME,
             }
             test = EXCEPTION_BASED_TEST_FILE_TEMPLATE.render(**template_kwargs)
@@ -333,12 +314,12 @@ class AssignmentTestsManager:
         return test
 
     def write_tests(
-            self,
-            nbmeta_config: NBMetadataConfig,
-            test_dir: Union[pathlib.Path, str],
-            include_hidden: bool = True,
-            force_files: bool = False,
-        ):
+        self,
+        nbmeta_config: NBMetadataConfig,
+        test_dir: Union[pathlib.Path, str],
+        include_hidden: bool = True,
+        force_files: bool = False,
+    ):
         """
         Write all test files to a notebook's metadata or a tests directory.
 
@@ -362,11 +343,15 @@ class AssignmentTestsManager:
             if not include_hidden:
                 test_info["test_cases"] = [tc for tc in test_info["test_cases"] if not tc.hidden]
                 if isinstance(test_info["points"], list):
-                    test_info["points"] = [p for tc, p in \
-                        zip(test_info["test_cases"], test_info["points"]) if not tc.hidden]
+                    test_info["points"] = [
+                        p
+                        for tc, p in zip(test_info["test_cases"], test_info["points"])
+                        if not tc.hidden
+                    ]
 
-            test = \
-                self._format_test(test_info["name"], test_info["points"], test_info["test_cases"])
+            test = self._format_test(
+                test_info["name"], test_info["points"], test_info["test_cases"]
+            )
 
             if use_files:
                 with open(test_path, "w+") as f:
@@ -394,19 +379,20 @@ class AssignmentTestsManager:
 
         points = question.points
         if isinstance(points, dict):
-            points = points.get('each', 1) * len(test_cases)
+            points = points.get("each", 1) * len(test_cases)
 
         if len(test_cases) == 0:
             if points is None and question.manual:
                 raise ValueError(
-                    f"Point value unspecified for question with no test cases: {question.name}")
+                    f"Point value unspecified for question with no test cases: {question.name}"
+                )
 
             return points if points is not None else 1
 
         try:
             resolved_test_cases = TestFile.resolve_test_file_points(points, test_cases)
         except Exception as e:
-            raise type(e)(f"Error in \"{question.name}\" test cases: {e}")
+            raise type(e)(f'Error in "{question.name}" test cases: {e}')
 
         points = round(sum(tc.points for tc in resolved_test_cases), 5)
         return int(points) if points % 1 == 0 else points
@@ -424,8 +410,10 @@ class AssignmentTestsManager:
             points = self.determine_question_point_value(config)
             rows.append({"name": question_name, "points": points})
             total += points
-            if config.manual: manual += points
-            else: autograded += points
+            if config.manual:
+                manual += points
+            else:
+                autograded += points
 
         summary = f"Assignment summary:\n"
         summary += f"Total points: {total}\n"
@@ -435,7 +423,7 @@ class AssignmentTestsManager:
         return summary
 
 
-def ensure_valid_syntax(source: List[str], question: QuestionConfig) -> None:
+def ensure_valid_syntax(source: list[str], question: QuestionConfig) -> None:
     """
     Check that a cell's source is valid Python syntax.
 
@@ -448,8 +436,10 @@ def ensure_valid_syntax(source: List[str], question: QuestionConfig) -> None:
     source = "\n".join(source)
     try:
         ast.parse(source)
-    except SyntaxError as e:
-        raise ValueError(f"A test cell in question {question.name} contains invalid Python syntax:\n{source}")
+    except SyntaxError:
+        raise ValueError(
+            f"A test cell in question {question.name} contains invalid Python syntax:\n{source}"
+        )
 
 
 class _AnnotationRemover(ast.NodeTransformer):
@@ -457,7 +447,7 @@ class _AnnotationRemover(ast.NodeTransformer):
     An AST node transformer that removes all type annotations.
     """
 
-    def visit(self, node):
+    def visit(self, node: Any):
         self.generic_visit(node)
         if hasattr(node, "annotation"):
             node.annotation = None

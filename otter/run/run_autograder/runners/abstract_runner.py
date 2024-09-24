@@ -2,18 +2,20 @@
 
 import gc
 import json
+import nbformat
 import os
 import shutil
 import tempfile
 
 from abc import ABC, abstractmethod
 from glob import glob
+from typing import Optional
 
 from ..autograder_config import AutograderConfig
 from ..utils import OtterRuntimeError, print_output, write_blank_page_to_stare_at_before_you
-
 from ....generate.token import APIClient
 from ....nbmeta_config import NBMetadataConfig
+from ....test_files import GradingResults
 
 
 class AbstractLanguageRunner(ABC):
@@ -36,7 +38,7 @@ class AbstractLanguageRunner(ABC):
         """
         Copies tests and support files needed for running the autograder.
 
-        When this method is invoked, the working directory is assumed to already be 
+        When this method is invoked, the working directory is assumed to already be
         ``self.ag_config.autograder_dir``.
         """
         # put files into submission directory
@@ -54,7 +56,7 @@ class AbstractLanguageRunner(ABC):
             shutil.rmtree("./submission/tests")
         shutil.copytree("./source/tests", "./submission/tests")
 
-    def validate_assignment_name(self, got):
+    def validate_assignment_name(self, got: Optional[str]):
         """
         Raise an ``OtterRuntimeError`` if the assignment name of the notebook is invalid.
 
@@ -69,11 +71,13 @@ class AbstractLanguageRunner(ABC):
                 grading should be aborted
         """
         if self.ag_config.assignment_name and got != self.ag_config.assignment_name:
-            message = f"Received submission for assignment '{got}' (this is assignment " \
+            message = (
+                f"Received submission for assignment '{got}' (this is assignment "
                 f"'{self.ag_config.assignment_name}')"
+            )
             raise OtterRuntimeError(message)
 
-    def get_notebook_assignment_name(self, nb):
+    def get_notebook_assignment_name(self, nb: nbformat.NotebookNode) -> Optional[str]:
         """
         Get the assignment name in the metadata of the provided notebook, if any.
 
@@ -86,7 +90,7 @@ class AbstractLanguageRunner(ABC):
         nbmc = NBMetadataConfig.from_notebook(nb)
         return nbmc.assignment_name
 
-    def write_and_maybe_submit_pdf(self, submission_path):
+    def write_and_maybe_submit_pdf(self, submission_path: str) -> Optional[Exception]:
         """
         Upload a PDF to a Gradescope assignment for manual grading.
 
@@ -133,7 +137,7 @@ class AbstractLanguageRunner(ABC):
 
             return e
 
-    def submit_pdf(self, client, pdf_path):
+    def submit_pdf(self, client: APIClient, pdf_path: str):
         """
         Upload the PDF at ``pdf_path`` to the Gradescope assignment specified in the config. Does
         not check whether the assignment configuration is valid.
@@ -165,10 +169,12 @@ class AbstractLanguageRunner(ABC):
             )
             if res.status_code != 200:
                 raise OtterRuntimeError(
-                    f"Failed to upload submission for {student_email}: [status {res.status_code}] {res.text}")
+                    f"Failed to upload submission for {student_email}: [status {res.status_code}] {res.text}"
+                )
 
-        print_output("\n\nSuccessfully uploaded submissions for: {}".format(
-            ", ".join(student_emails)))
+        print_output(
+            "\n\nSuccessfully uploaded submissions for: {}".format(", ".join(student_emails))
+        )
 
     def sanitize_tokens(self):
         """
@@ -179,15 +185,17 @@ class AbstractLanguageRunner(ABC):
         as part of ``run``.
         """
         self.ag_config.token = None
-        if not os.path.exists("../source/otter_config.json"): return
+        if not os.path.exists("../source/otter_config.json"):
+            return
         with open("../source/otter_config.json") as f:
             c = json.load(f)
-        if "token" in c: del c["token"]
+        if "token" in c:
+            del c["token"]
         with open("../source/otter_config.json", "w") as f:
             json.dump(c, f, indent=2)
 
     @abstractmethod
-    def validate_submission(self, submission_path):
+    def validate_submission(self, submission_path: str):
         """
         Validate the submission, raising an error/warning if appropriate.
 
@@ -200,18 +208,18 @@ class AbstractLanguageRunner(ABC):
         ...
 
     @abstractmethod
-    def resolve_submission_path(self):
+    def resolve_submission_path(self) -> str:
         """
         Determine the path to the submission file, performing any necessary transformations on the
         file.
 
-        When this method is invoked, the working directory is assumed to already be 
+        When this method is invoked, the working directory is assumed to already be
         ``{self.ag_config.autograder_dir}/submission``.
         """
         ...
 
     @abstractmethod
-    def write_pdf(self, submission_path):
+    def write_pdf(self, submission_path: str) -> str:
         """
         Convert the submission to a PDF, returning the path to the PDF file.
 
@@ -224,11 +232,11 @@ class AbstractLanguageRunner(ABC):
         ...
 
     @abstractmethod
-    def run(self):
+    def run(self) -> GradingResults:
         """
         Run the autograder according to the configurations in ``self.ag_config``.
 
-        When this method is invoked, the working directory is assumed to already be 
+        When this method is invoked, the working directory is assumed to already be
         ``self.ag_config.autograder_dir``.
 
         Returns:

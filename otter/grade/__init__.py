@@ -6,41 +6,37 @@ import re
 
 from glob import glob
 from multiprocessing import Queue
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 from .containers import launch_containers
-from .utils import (
-    merge_scores_to_df,
-    prune_images,
-    SCORES_DICT_PERCENT_CORRECT_KEY,
-)
-
-from ..run.run_autograder.autograder_config import AutograderConfig
-from ..utils import assert_path_exists, loggers
+from .utils import merge_scores_to_df, prune_images, SCORES_DICT_PERCENT_CORRECT_KEY
+from .. import logging
+from ..run import AutograderConfig
+from ..utils import assert_path_exists
 
 
-_ALLOWED_EXTENSIONS = ["ipynb", "py", "Rmd", "R", "r", "zip"]
-LOGGER = loggers.get_logger(__name__)
+ALLOWED_EXTENSIONS = ["ipynb", "py", "Rmd", "R", "r", "zip"]
+LOGGER = logging.get_logger(__name__)
 
 
 def main(
     *,
     name: Optional[str] = None,
-    paths: Optional[Union[List[str], Tuple[str]]] = None,
+    paths: Optional[Union[list[str], tuple[str]]] = None,
     output_dir: str = "./",
     autograder: str = "./autograder.zip",
-    containers: int = 4, 
+    containers: int = 4,
     ext: str = "ipynb",
     summaries: bool = False,
     no_kill: bool = False,
-    image: str = "ubuntu:22.04", 
+    image: str = "ubuntu:22.04",
     pdfs: bool = False,
     prune: bool = False,
     force: bool = False,
     timeout: Optional[int] = None,
     no_network: bool = False,
     debug: bool = False,
-    result_queue: Optional[Queue] = None,
+    result_queue: Optional["Queue[str]"] = None,
 ):
     """
     Run Otter Grade.
@@ -69,7 +65,7 @@ def main(
         timeout (``int | None``): an execution timeout in seconds for each container
         no_network (``bool``): whether to disable networking in the containers
         debug (``bool``): whether to run autograding in debug mode
-        result_queue (``multiprocessing.Queue | None``): the queue to store progress messages
+        result_queue (``multiprocessing.Queue[str] | None``): the queue to store progress messages
 
     Returns:
         ``float | None``: the percentage scored by that submission if a single file was graded
@@ -86,7 +82,9 @@ def main(
     if name is None:
         raise ValueError("You must specify an assignment name")
     elif not re.match(r"^[\w\-.]+$", name):
-        raise ValueError("Assignment names may only contain letters, nubers, underscores, dashes, and periods")
+        raise ValueError(
+            "Assignment names may only contain letters, nubers, underscores, dashes, and periods"
+        )
 
     if not isinstance(paths, tuple) and not isinstance(paths, list):
         raise TypeError("paths must be a tuple of valid paths")
@@ -94,18 +92,20 @@ def main(
         raise ValueError("No paths specified")
 
     # check file paths
-    assert_path_exists([
-        (output_dir, True),
-        (autograder, False),
-    ])
+    assert_path_exists(
+        [
+            (output_dir, True),
+            (autograder, False),
+        ]
+    )
 
-    if ext not in _ALLOWED_EXTENSIONS:
+    if ext not in ALLOWED_EXTENSIONS:
         raise ValueError(f"Invalid submission extension specified: {ext}")
 
-    output_dir = pathlib.Path(output_dir)
+    out = pathlib.Path(output_dir)
     try:
         if result_queue:
-            loggers.add_queue_handler(result_queue)
+            logging.add_queue_handler(result_queue)
 
         LOGGER.info("Launching Docker containers")
 
@@ -119,38 +119,40 @@ def main(
 
         LOGGER.debug(f"Resolved submission paths: {submission_paths}")
 
-        pdf_dir = output_dir / "submission_pdfs" if pdfs else None
+        pdf_dir = out / "submission_pdfs" if pdfs else None
 
         scores = launch_containers(
             autograder,
             submission_paths,
-            num_containers = containers,
-            base_image = image,
-            tag = name,
-            no_kill = no_kill,
-            pdf_dir = pdf_dir,
-            timeout = timeout,
-            network = not no_network,
-            config = AutograderConfig({
-                "zips": ext == "zip",
-                "pdf": pdfs,
-                "debug": debug,
-            }),
+            num_containers=containers,
+            base_image=image,
+            tag=name,
+            no_kill=no_kill,
+            pdf_dir=pdf_dir,
+            timeout=timeout,
+            network=not no_network,
+            config=AutograderConfig(
+                {
+                    "zips": ext == "zip",
+                    "pdf": pdfs,
+                    "debug": debug,
+                }
+            ),
         )
 
         LOGGER.info("Combining grades and saving")
     finally:
-        loggers.remove_queue_handlers()
+        logging.remove_queue_handlers()
 
     # Merge scores to dataframe
     output_df = merge_scores_to_df(scores)
 
     # write to CSV file
-    output_df.to_csv(output_dir / "final_grades.csv", index=False)
+    output_df.to_csv(out / "final_grades.csv", index=False)
 
     # write score summaries to files
     if summaries:
-        grading_summary_path = output_dir / "grading-summaries"
+        grading_summary_path = out / "grading-summaries"
         if not grading_summary_path.exists():
             grading_summary_path.mkdir()
 

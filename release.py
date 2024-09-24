@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 
-FILES_WITH_VERSIONS = [        # do not include pyproject.toml, CITATION.cff, otter/version.py
+FILES_WITH_VERSIONS = [  # do not include pyproject.toml, CITATION.cff, otter/version.py
     "docs/_static/grading-environment.yml",
     "docs/_static/grading-environment-r.yml",
     "test/test_generate/files/autograder-correct/environment.yml",
@@ -22,8 +22,19 @@ FILES_WITH_VERSIONS = [        # do not include pyproject.toml, CITATION.cff, ot
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("new_version", nargs="?", default=None, help="Old version for regex search")
-PARSER.add_argument("--dry-run", action="store_true", default=False, help="Update files only but do not push release")
-PARSER.add_argument("-f", "--force", action="store_true", default=False, help="Force run (ignore uncommitted changes)")
+PARSER.add_argument(
+    "--dry-run",
+    action="store_true",
+    default=False,
+    help="Update files only but do not push release",
+)
+PARSER.add_argument(
+    "-f",
+    "--force",
+    action="store_true",
+    default=False,
+    help="Force run (ignore uncommitted changes)",
+)
 
 
 OLD_VERSION_REGEX = r"otter-grader(?:\[[\w,]+\])?==\d+\.\d+\.\d+(?:\.\w+)?"
@@ -32,10 +43,14 @@ OLD_VERSION_REGEX = r"otter-grader(?:\[[\w,]+\])?==\d+\.\d+\.\d+(?:\.\w+)?"
 if __name__ == "__main__":
     args = PARSER.parse_args()
 
-    if subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip() and not args.dry_run and not args.force:
+    if (
+        subprocess.run(["git", "diff"], stdout=subprocess.PIPE).stdout.decode("utf-8").strip()
+        and not args.dry_run
+        and not args.force
+    ):
         raise RuntimeError(
             "You have uncommitted changes. Please add and commit these changes before pushing "
-            "a release." 
+            "a release."
         )
 
     to_beta = False
@@ -71,8 +86,8 @@ if __name__ == "__main__":
     if args.new_version is not None:
         contents = re.sub(
             r"__version__\s*=\s*['\"]\d+\.\d+\.\d+(?:\.\w+)?['\"]",
-            f"__version__ = \"{new_version_number}\"",
-            contents
+            f'__version__ = "{new_version_number}"',
+            contents,
         )
 
     with open("otter/version.py", "w") as f:
@@ -84,9 +99,7 @@ if __name__ == "__main__":
 
     if args.new_version is not None:
         contents = re.sub(
-            r"version = \"\d+\.\d+\.\d+(?:\.\w+)?\"",
-            f"version = \"{new_version_number}\"",
-            contents
+            r"version = \"\d+\.\d+\.\d+(?:\.\w+)?\"", f'version = "{new_version_number}"', contents
         )
 
     with open("pyproject.toml", "w") as f:
@@ -99,16 +112,16 @@ if __name__ == "__main__":
     if args.new_version is not None:
         contents = re.sub(
             r"^version:\s*\"\d+.\d+.\d+(?:\.\w+)?\"",
-            f"version: \"{new_version_number}\"",
+            f'version: "{new_version_number}"',
             contents,
-            flags = re.MULTILINE
+            flags=re.MULTILINE,
         )
 
         contents = re.sub(
             r"^date-released:\s*\d{4}-\d{2}-\d{2}",
             f"date-released: {dt.date.today().strftime('%Y-%m-%d')}",
             contents,
-            flags = re.MULTILINE
+            flags=re.MULTILINE,
         )
 
     with open("CITATION.cff", "w") as f:
@@ -124,7 +137,9 @@ if __name__ == "__main__":
         cl = f.read()
 
     new_version_regex = new_version_number.replace(".", r"\.")
-    cl = re.sub(fr"{new_version_regex}\s*\(unreleased\)", new_version_number, cl, flags = re.IGNORECASE)
+    cl = re.sub(
+        rf"{new_version_regex}\s*\(unreleased\)", new_version_number, cl, flags=re.IGNORECASE
+    )
 
     with open("CHANGELOG.md", "w") as f:
         f.write(cl)

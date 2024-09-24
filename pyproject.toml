@@ -31,7 +31,7 @@ python = "^3.9"
 astunparse = "^1.6.3"
 click = "^8.1.7"
 dill = "^0.3.8"
-fica = ">=0.3.1"
+fica = ">=0.4.1"
 google-api-python-client = { version = "*", optional = true }
 google-auth-oauthlib = { version = "*", optional = true }
 six = { version = "*", optional = true }
@@ -58,6 +58,14 @@ grading = ["ipykernel", "jupyter_client", "pypdf"]
 plugins = ["google-api-python-client", "google-auth-oauthlib", "gspread", "six"]
 r = ["rpy2"]
 
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+isort = "^5.13.2"
+twine = "^5.1.1"
+
 [tool.poetry.group.test]
 optional = true
 
@@ -78,6 +86,30 @@ sphinx-book-theme = "1.1.0"
 sphinx-click = "*"
 sphinx_markdown_tables = "*"
 sphinxcontrib-apidoc = "*"
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+extend-exclude = """
+(
+  .*.ipynb               # exclude ipynb files
+  | test/.*/files/.*.py  # exclude test goldens
+)
+"""
+
+[tool.isort]
+py_version = "39"
+skip_glob = ["test/**/files/*"]
+line_length = 100
+sections = ["THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+multi_line_output = 3
+use_parentheses = true
+order_by_type = false
+lines_after_imports = 2
+lines_between_types = 1
+include_trailing_comma = true
+reverse_relative = true
+combine_as_imports = true
 
 [build-system]
 requires = ["poetry-core"]

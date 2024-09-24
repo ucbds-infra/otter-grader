@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --with dev --no-root
 
       - name: Update versions
         run: |

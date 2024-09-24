@@ -5,8 +5,10 @@ import re
 import yaml
 
 from enum import Enum
+from typing import Any
 
-from .utils import get_source, is_cell_type
+from .utils import is_cell_type
+from ..utils import get_source
 
 
 class BlockType(Enum):
@@ -51,8 +53,11 @@ def extract_fenced_otter_cell(cell: nbformat.NotebookNode) -> nbformat.NotebookN
         return cell
 
     source = get_source(cell)
-    if source[0].strip() == "```otter" and \
-            all(not l.strip() == "```" for l in source[1:-1]) and source[-1].strip() == "```":
+    if (
+        source[0].strip() == "```otter"
+        and all(not l.strip() == "```" for l in source[1:-1])
+        and source[-1].strip() == "```"
+    ):
         return nbformat.v4.new_raw_cell("\n".join(source[1:-1]))
 
     return cell
@@ -70,14 +75,14 @@ def is_block_boundary_cell(
     Args:
         cell (``nbformat.NotebookNode``): the cell to check
         block_type (``BlockType``): the block type to check for
-        end (``bool``, optional): whether to check for an end boundary instead of a begin
+        end (``bool``): whether to check for an end boundary instead of a begin
 
     Returns:
         ``bool``: whether the cell is a boundary cell of type ``block_type``
     """
     cell = extract_fenced_otter_cell(cell)
-    begin_or_end = 'end' if end else 'begin'
-    regex = fr"#\s+{ begin_or_end }\s+{ block_type.value }\s*"
+    begin_or_end = "end" if end else "begin"
+    regex = rf"#\s+{ begin_or_end }\s+{ block_type.value }\s*"
     source = get_source(cell)
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 
@@ -108,7 +113,7 @@ def is_assignment_config_cell(cell: nbformat.NotebookNode) -> bool:
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 
 
-def get_cell_config(cell: nbformat.NotebookNode) -> dict:
+def get_cell_config(cell: nbformat.NotebookNode) -> dict[str, Any]:
     """
     Parse a cell's contents as YAML and return the resulting dictionary.
 

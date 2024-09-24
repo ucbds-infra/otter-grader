@@ -7,10 +7,21 @@ import shutil
 import tempfile
 import zipfile
 
-from .run_autograder import capture_run_output, main as run_autograder_main
+from .run_autograder import AutograderConfig, capture_run_output, main as run_autograder_main
+from ..test_files import GradingResults
 
 
-def main(submission, *, autograder="./autograder.zip", output_dir="./", no_logo=False, debug=False):
+__all__ = ["AutograderConfig", "capture_run_output", "main"]
+
+
+def main(
+    submission: str,
+    *,
+    autograder: str = "./autograder.zip",
+    output_dir: str = "./",
+    no_logo: bool = False,
+    debug: bool = False,
+) -> GradingResults:
     """
     Grades a single submission using the autograder configuration ``autograder`` without
     containerization.

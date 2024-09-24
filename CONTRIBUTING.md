@@ -22,7 +22,7 @@ To install development dependencies, use [`poetry`](https://python-poetry.org/) 
 
 ```
 mamba activate otter-grader
-poetry install
+poetry install --with dev,test
 ```
 
 

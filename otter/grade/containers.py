@@ -8,20 +8,20 @@ import shutil
 import tempfile
 import zipfile
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import as_completed, ThreadPoolExecutor
 from python_on_whales import docker
 from textwrap import indent
-from typing import List, Optional
+from typing import Any, Optional
 
 from . import __name__ as pkg_name
 from .utils import OTTER_DOCKER_IMAGE_NAME, TimeoutException
-
-from ..run.run_autograder.autograder_config import AutograderConfig
+from .. import logging
+from ..run import AutograderConfig
 from ..test_files import GradingResults
-from ..utils import loggers, OTTER_CONFIG_FILENAME
+from ..utils import OTTER_CONFIG_FILENAME
 
 
-LOGGER = loggers.get_logger(__name__)
+LOGGER = logging.get_logger(__name__)
 
 
 def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderConfig) -> str:
@@ -44,7 +44,7 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
     LOGGER.info(f"Building image using {base_image} as base image")
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        with zipfile.ZipFile(ag_zip_path, 'r') as zip_ref:
+        with zipfile.ZipFile(ag_zip_path, "r") as zip_ref:
             zip_ref.extractall(temp_dir)
 
         # Update the otter_config.json file from the autograder zip with the provided config
@@ -67,20 +67,21 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
             )
         except TypeError as e:
             raise TypeError(
-                f"Docker build failed; if this is your first time seeing this error, ensure that " \
-                "Docker is running on your machine.\n\nOriginal error: {e}")
+                f"Docker build failed; if this is your first time seeing this error, ensure that "
+                f"Docker is running on your machine.\n\nOriginal error: {e}"
+            )
 
     return image
 
 
 def launch_containers(
     ag_zip_path: str,
-    submission_paths: List[str],
+    submission_paths: list[str],
     num_containers: int,
     base_image: str,
     tag: str,
     config: AutograderConfig,
-    **kwargs,
+    **kwargs: Any,
 ) -> list[GradingResults]:
     """
     Grade submissions in parallel Docker containers.
@@ -108,12 +109,14 @@ def launch_containers(
     image = build_image(ag_zip_path, base_image, tag, config)
 
     for subm_path in submission_paths:
-        futures += [pool.submit(
-            grade_submission,
-            submission_path=subm_path,
-            image=image,
-            **kwargs,
-        )]
+        futures += [
+            pool.submit(
+                grade_submission,
+                submission_path=subm_path,
+                image=image,
+                **kwargs,
+            )
+        ]
     LOGGER.info(f"Notebooks to grade: {len(futures)}")
     scores = []
     for i, future in enumerate(as_completed(futures)):
@@ -145,8 +148,8 @@ def grade_submission(
         image (``str``): a Docker image tag to be used for grading environment
         no_kill (``bool``): whether the grading containers should be kept running after
             grading finishes
-        pdf_dir (``pathlib.Path``, optional): a directory in which to put the notebook PDF, if applicable
-        timeout (``int``, optional): timeout in seconds for each container
+        pdf_dir (``pathlib.Path``): a directory in which to put the notebook PDF, if applicable
+        timeout (``int``): timeout in seconds for each container
         network (``bool``): whether to enable networking in the containers
 
     Returns:
@@ -168,14 +171,14 @@ def grade_submission(
 
         volumes = [
             (temp_subm_path, f"/autograder/submission/{nb_basename}"),
-            (results_path, "/autograder/results/results.pkl")
+            (results_path, "/autograder/results/results.pkl"),
         ]
         if pdf_dir:
             volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
 
         args = {}
-        if network is not None and not network:
-            args['networks'] = 'none'
+        if not network:
+            args["networks"] = "none"
 
         container = docker.container.create(image, command=["/autograder/run_autograder"], **args)
 
@@ -223,11 +226,13 @@ def grade_submission(
 
         if did_time_out:
             raise TimeoutException(
-                f"Executing '{submission_path}' in docker container timed out in {timeout} seconds")
+                f"Executing '{submission_path}' in docker container timed out in {timeout} seconds"
+            )
 
         if exit != 0:
             raise Exception(
-                f"Executing '{submission_path}' in docker container failed! Exit code: {exit}")
+                f"Executing '{submission_path}' in docker container failed! Exit code: {exit}"
+            )
 
         with open(results_path, "rb") as f:
             scores = dill.load(f)
