@@ -76,7 +76,7 @@ q3 results:
             x
         Exception raised:
             Traceback (most recent call last):
-              File "/root/mambaforge/envs/otter-env/lib/python3.9/doctest.py", line 1334, in __run
+              File "/root/miniforge3/envs/otter-env/lib/python3.9/doctest.py", line 1334, in __run
                 exec(compile(example.source, filename, "single",
               File "<doctest q3 0[0]>", line 1, in <module>
                 x
@@ -100,7 +100,7 @@ q3 results:
                 print("nope")
         Exception raised:
             Traceback (most recent call last):
-              File "/root/mambaforge/envs/otter-env/lib/python3.9/doctest.py", line 1334, in __run
+              File "/root/miniforge3/envs/otter-env/lib/python3.9/doctest.py", line 1334, in __run
                 exec(compile(example.source, filename, "single",
               File "<doctest q3 1[0]>", line 1, in <module>
                 if x:
@@ -155,7 +155,7 @@ q6 results:
                 print(next(fib))
         Exception raised:
             Traceback (most recent call last):
-              File "/root/mambaforge/envs/otter-env/lib/python3.9/doctest.py", line 1334, in __run
+              File "/root/miniforge3/envs/otter-env/lib/python3.9/doctest.py", line 1334, in __run
                 exec(compile(example.source, filename, "single",
               File "<doctest q6 1[1]>", line 2, in <module>
                 print(next(fib))

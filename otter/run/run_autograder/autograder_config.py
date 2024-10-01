@@ -14,8 +14,8 @@ class AutograderConfig(fica.Config):
     )
 
     points_possible = fica.Key(
-        description="a custom total score for the assignment; if unspecified the sum of question " \
-            "point values is used.",
+        description="a custom total score for the assignment; if unspecified the sum of question "
+        "point values is used.",
         default=None,
     )
 
@@ -45,20 +45,20 @@ class AutograderConfig(fica.Config):
     )
 
     grade_from_log = fica.Key(
-        description="whether to re-assemble the student's environment from the log rather than " \
-            "by re-executing their submission",
+        description="whether to re-assemble the student's environment from the log rather than "
+        "by re-executing their submission",
         default=False,
     )
 
     serialized_variables = fica.Key(
-        description="a mapping of variable names to type strings for validating a deserialized " \
-            "student environment",
+        description="a mapping of variable names to type strings for validating a deserialized "
+        "student environment",
         default=None,
     )
 
     pdf = fica.Key(
-        description="whether to generate a PDF of the notebook when not using Gradescope " \
-            "auto-upload",
+        description="whether to generate a PDF of the notebook when not using Gradescope "
+        "auto-upload",
         default=False,
     )
 
@@ -105,7 +105,7 @@ class AutograderConfig(fica.Config):
 
     miniconda_path = fica.Key(
         description="the path to the mamba install directory",
-        default="/root/mambaforge",
+        default="/root/miniforge3",
     )
 
     plugins = fica.Key(
@@ -134,39 +134,39 @@ class AutograderConfig(fica.Config):
     )
 
     log_level = fica.Key(
-        description="a log level for logging messages; any value suitable for " \
-            "``logging.Logger.setLevel``",
+        description="a log level for logging messages; any value suitable for "
+        "``logging.Logger.setLevel``",
         default=None,
     )
 
     assignment_name = fica.Key(
-        description="a name for the assignment to ensure that students submit to the correct " \
-            "autograder",
+        description="a name for the assignment to ensure that students submit to the correct "
+        "autograder",
         default=None,
     )
 
     warn_missing_pdf = fica.Key(
-        description="whether to add a 0-point public test to the Gradescope output to indicate " \
-            "to students whether a PDF was found/generated for this assignment",
+        description="whether to add a 0-point public test to the Gradescope output to indicate "
+        "to students whether a PDF was found/generated for this assignment",
         default=False,
     )
 
     force_public_test_summary = fica.Key(
-        description="whether to show a summary of public test case results when show_hidden is " \
-            "true",
+        description="whether to show a summary of public test case results when show_hidden is "
+        "true",
         default=True,
     )
 
     submit_blank_pdf_on_export_failure = fica.Key(
-        description="whether to submit a blank PDF to the manual-grading Gradescope assignment " \
-            "if a PDF cannot be generated from the submission",
+        description="whether to submit a blank PDF to the manual-grading Gradescope assignment "
+        "if a PDF cannot be generated from the submission",
         default=False,
     )
 
     use_submission_pdf = fica.Key(
-        description="use the PDF in the submission zip file instead of exporting a new one; if " \
-            "no PDF is present, a new one is generated anyway; assumes there is only 1 PDF file " \
-            "in the submission",
+        description="use the PDF in the submission zip file instead of exporting a new one; if "
+        "no PDF is present, a new one is generated anyway; assumes there is only 1 PDF file "
+        "in the submission",
         default=False,
     )
 
