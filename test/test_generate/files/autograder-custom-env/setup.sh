@@ -13,9 +13,9 @@ dpkg -i /tmp/pandoc.deb
 
 # install mamba
 if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
-    then wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-aarch64.sh \
+    then wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh \
         -O /autograder/source/mamba_install.sh ; \
-    else wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh \
+    else wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh \
         -O /autograder/source/mamba_install.sh ; \
 fi
 chmod +x /autograder/source/mamba_install.sh
