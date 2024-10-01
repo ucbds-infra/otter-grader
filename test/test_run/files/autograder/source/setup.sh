@@ -20,9 +20,9 @@ if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
 fi
 chmod +x test/test_run/files/autograder/source/mamba_install.sh
 test/test_run/files/autograder/source/mamba_install.sh -b
-echo "export PATH=/root/mambaforge/bin:\$PATH" >> /root/.bashrc
+echo "export PATH=/root/miniforge3/bin:\$PATH" >> /root/.bashrc
 
-export PATH=/root/mambaforge/bin:$PATH
+export PATH=/root/miniforge3/bin:$PATH
 export TAR="/bin/tar"
 
 # install dependencies with mamba
