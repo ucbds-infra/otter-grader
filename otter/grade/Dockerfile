@@ -25,8 +25,3 @@ RUN dos2unix /autograder/run_autograder /autograder/source/setup.sh && \
 ADD otter_config.json run_otter.py /autograder/source/
 ADD files* /autograder/source/files/
 ADD tests /autograder/source/tests/
-
-ENV PATH=/root/miniforge3/bin:$PATH
-ADD __otter-grader /tmp/otter-grader
-RUN mamba run -n otter-env pip install /tmp/otter-grader
-RUN rm -rf /tmp/*
