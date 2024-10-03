@@ -1,5 +1,9 @@
 # Changelog
 
+**v5.7.1:**
+
+* Removed testing code unintentioanlly committed in v5.7.0 per [#849](https://github.com/ucbds-infra/otter-grader/issues/849)
+
 **v5.7.0:**
 
 * Switch grading image from Mambaforge to Miniforge due to the [sunestting of Mambaforge](https://conda-forge.org/news/2024/07/29/sunsetting-mambaforge/) per [#846](https://github.com/ucbds-infra/otter-grader/issues/846)
