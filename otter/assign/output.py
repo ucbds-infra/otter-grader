@@ -56,6 +56,21 @@ def write_output_dir(
             output_fn = "environment.yml"
             shutil.copy(assignment.environment, str(output_dir / output_fn))
 
+        if assignment.student_files:
+            for file in assignment.student_files:
+                # TODO: dedupe this logic with handling of autograder_files utils.py and logic below
+                # for assignment.files
+                if not os.path.isfile(file):
+                    raise FileNotFoundError(f"{file} is not a file")
+                if str(assignment.master.parent) not in os.path.abspath(file):
+                    raise ValueError(
+                        f"{file} is not in a subdirectory of the master notebook direcotry"
+                    )
+                file_path = pathlib.Path(file).resolve()
+                rel_path = file_path.parent.relative_to(assignment.master.parent)
+                os.makedirs(output_dir / rel_path, exist_ok=True)
+                shutil.copy(file, str(output_dir / rel_path))
+
     # write tests
     transformed_nb.write_tests(str(tests_dir), not sanitize, assignment.tests.files)
 

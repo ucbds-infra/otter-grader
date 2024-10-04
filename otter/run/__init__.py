@@ -3,9 +3,12 @@
 import dill
 import json
 import os
+import pathlib
 import shutil
 import tempfile
 import zipfile
+
+from typing import Optional
 
 from .run_autograder import AutograderConfig, capture_run_output, main as run_autograder_main
 from ..test_files import GradingResults
@@ -21,6 +24,7 @@ def main(
     output_dir: str = "./",
     no_logo: bool = False,
     debug: bool = False,
+    extra_submission_files: Optional[list[str]] = None,
 ) -> GradingResults:
     """
     Grades a single submission using the autograder configuration ``autograder`` without
@@ -37,6 +41,8 @@ def main(
             the results JSON file is not copied
         no_logo (``bool``): whether to suppress the Otter logo from being printed to stdout
         debug (``bool``); whether to run in debug mode (without ignoring errors)
+        extra_submission_files (``list[str] | None``): extra files to copy into the submission
+            directory; this should really only be used internally by Otter, so use at your own risk
 
     Returns:
         ``otter.test_files.GradingResults``: the grading results object
@@ -64,6 +70,12 @@ def main(
 
         else:
             shutil.copy(submission, os.path.join(ag_dir, "submission"))
+
+        for file in extra_submission_files:
+            fp = pathlib.Path(os.path.join(ag_dir, file))
+            # create any intermediate directories before copying the file
+            fp.parents[0].mkdir(parents=True, exist_ok=True)
+            shutil.copy(file, os.path.join(ag_dir, "submission", file))
 
         logo = not no_logo
         run_autograder_main(ag_dir, logo=logo, debug=debug, otter_run=True)

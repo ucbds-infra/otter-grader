@@ -5,6 +5,7 @@ __all__ = ["export_notebook", "grade_submission"]
 import os
 
 from contextlib import nullcontext, redirect_stdout
+from typing import Optional
 
 from .export import export_notebook
 from .run import main as run_grader
@@ -17,6 +18,7 @@ def grade_submission(
     *,
     quiet: bool = False,
     debug: bool = False,
+    extra_submission_files: Optional[list[str]] = None,
 ) -> GradingResults:
     """
     Runs non-containerized grading on a single submission at ``submission_path`` using the autograder
@@ -36,6 +38,8 @@ def grade_submission(
             ``False``
         debug (``bool``): whether to run the submission in debug mode (without ignoring
             errors)
+        extra_submission_files (``list[str] | None``): extra files to copy into the submission
+            directory; this should really only be used internally by Otter, so use at your own risk
 
     Returns:
         ``otter.test_files.GradingResults``: the results object produced during the grading of the
@@ -49,7 +53,12 @@ def grade_submission(
 
     with cm:
         results = run_grader(
-            submission_path, autograder=ag_path, output_dir=None, no_logo=True, debug=debug
+            submission_path,
+            autograder=ag_path,
+            output_dir=None,
+            no_logo=True,
+            debug=debug,
+            extra_submission_files=extra_submission_files,
         )
 
     if quiet:
