@@ -48,11 +48,20 @@ def cleanup_output(cleanup_enabled):
             FILE_MANAGER.get_path("rmd-autograder/submission/tests"),
             FILE_MANAGER.get_path("rmd-autograder/submission/__init__.py"),
             FILE_MANAGER.get_path("rmd-autograder/submission/.OTTER_LOG"),
+            FILE_MANAGER.get_path("qmd-autograder/results/results.json"),
+            FILE_MANAGER.get_path("qmd-autograder/results/results.pkl"),
+            FILE_MANAGER.get_path("qmd-autograder/__init__.py"),
+            FILE_MANAGER.get_path("qmd-autograder/submission/test"),
+            FILE_MANAGER.get_path("qmd-autograder/submission/tests"),
+            FILE_MANAGER.get_path("qmd-autograder/submission/__init__.py"),
+            FILE_MANAGER.get_path("qmd-autograder/submission/.OTTER_LOG"),
         ])
         with FILE_MANAGER.open("autograder/source/otter_config.json", "w") as f:
             f.write(cpy)
         with FILE_MANAGER.open("rmd-autograder/source/otter_config.json", "w") as f:
             f.write(crmd)
+        with FILE_MANAGER.open("qmd-autograder/source/otter_config.json", "w") as f:
+            f.write(cqmd)
 
 
 @pytest.fixture(autouse=True)
@@ -121,6 +130,26 @@ def expected_results():
 
 @pytest.fixture(scope="module")
 def expected_rmd_results():
+    return {
+        "tests": [
+            {
+                "name": "Public Tests",
+                "output": "q1 results: All test cases passed!",
+                "visibility": "visible",
+                "status": "passed",
+            },
+            {
+                "max_score": 5,
+                "name": "q1",
+                "output": "q1 results: All test cases passed!\nq1d message: congrats",
+                "score": 5,
+                "visibility": "hidden",
+            },
+        ],
+    }
+
+@pytest.fixture(scope="module")
+def expected_qmd_results():
     return {
         "tests": [
             {
@@ -214,19 +243,25 @@ def mock_export_notebook(cleanup_enabled):
 
 @pytest.fixture
 def get_config_path():
-    def do_get_config_path(rmd=False):
-        dirname = "autograder" if not rmd else "rmd-autograder"
+    def do_get_config_path(rmd=False, qmd=False):
+        #dirname = "autograder" if not rmd else "rmd-autograder"
+        if rmd == False & qmd == False:
+            dirname = "autograder"
+        if rmd == True & qmd == False:
+            dirname = "rmd-autograder"
+        if rmd == False & qmd == True:
+            dirname = "rmd-autograder"
         return FILE_MANAGER.get_path(f"{dirname}/source/otter_config.json")
     return do_get_config_path
 
-
 @pytest.fixture
 def load_config(get_config_path):
-    def load_config_file(rmd=False):
-        with open(get_config_path(rmd=rmd)) as f:
+    def load_config_file(rmd=False, qmd=False):
+        with open(get_config_path(rmd=rmd, qmd=False)) as f:
+            return json.load(f)
+        with open(get_config_path(rmd=False, qmd=qmd)) as f:
             return json.load(f)
     return load_config_file
-
 
 def test_notebook(load_config, expected_results):
     config = load_config()
@@ -399,7 +434,7 @@ def test_assignment_name(load_config, expected_results):
 
 def test_rmd(load_config, expected_rmd_results):
     name = "hw01"
-    config = load_config(True)
+    config = load_config(rmd=True)
     rmd_path = FILE_MANAGER.get_path("rmd-autograder/submission/hw01.Rmd")
     with open(rmd_path) as f:
         orig_rmd = f.read()
@@ -447,6 +482,55 @@ def test_rmd(load_config, expected_rmd_results):
         with open(rmd_path, "w+") as f:
             f.write(orig_rmd)
 
+def test_qmd(load_config, expected_qmd_results):
+    name = "hw01"
+    config = load_config(qmd=True)
+    qmd_path = FILE_MANAGER.get_path("rmd-autograder/submission/hw01.qmd")
+    with open(qmd_path) as f:
+        orig_qmd = f.read()
+
+    sub_name = lambda n: re.sub(r"assignment_name: \"\w+\"", f"assignment_name: \"{n}\"", orig_qmd)
+
+    def perform_test(qmd, expected_results, error=None, **kwargs):
+        with open(qmd_path, "w") as f:
+            f.write(qmd)
+
+        cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
+            else nullcontext()
+        with cm:
+            run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
+
+        with FILE_MANAGER.open("qmd-autograder/results/results.json") as f:
+            actual_results = json.load(f)
+
+        assert actual_results == expected_results, \
+            f"Actual results did not matched expected:\n{actual_results}"
+
+    error_message_template = "Received submission for assignment '{got}' (this is assignment " \
+            "'{want}')"
+
+    try:
+        # test with correct name
+        perform_test(orig_qmd, expected_qmd_results)
+
+        # test with wrong name
+        bad_name = "lab01"
+        error_message = error_message_template.format(got=bad_name, want=name)
+        perform_test(
+            sub_name(bad_name), get_expected_error_results(error_message), error=error_message)
+
+        # test with no name in qmd
+        error_message = error_message_template.format(got=None, want=name)
+        perform_test(
+            "\n".join([l for l in orig_qmd.split("\n") if not l.startswith("assignment_name: ")]),
+            get_expected_error_results(error_message),
+            error=error_message,
+        )
+
+    finally:
+        delete_paths([qmd_path])
+        with open(qmd_path, "w+") as f:
+            f.write(orig_qmd)
 
 @mock.patch.object(APIClient, "upload_pdf_submission")
 def test_token_sanitization(mocked_upload, get_config_path, load_config, expected_results):
