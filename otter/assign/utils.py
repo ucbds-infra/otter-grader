@@ -7,6 +7,8 @@ import os
 import pathlib
 import re
 import shutil
+import tempfile
+import zipfile
 
 from textwrap import indent
 from typing import Any, Optional, TYPE_CHECKING
@@ -224,6 +226,7 @@ def run_tests(assignment: "Assignment", debug: bool = False) -> None:
             str(assignment.ag_notebook_path),
             str(assignment.ag_zip_path),
             debug=debug,
+            extra_submission_files=assignment.student_files,
         )
 
     LOGGER.debug(f"Otter Run output:\n{run_output.getvalue()}")

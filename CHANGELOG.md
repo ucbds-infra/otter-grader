@@ -20,6 +20,7 @@
 * Updated Otter Assign to strip type annotations from generated test code per [#796](https://github.com/ucbds-infra/otter-grader/issues/796)
 * Updated Otter Grade Docker image to create an empty `submission_metadata.json` file in the grading image to prevent plugins from erroring per [#811](https://github.com/ucbds-infra/otter-grader/issues/811)
 * Added ability to monitor grading progress to Otter Grade per [#827](https://github.com/ucbds-infra/otter-grader/issues/827)
+* Added handling of student-created files with the `student_files` configuration in Otter Assign per [#737](https://github.com/ucbds-infra/otter-grader/issues/737)
 
 **v5.6.0:**
 

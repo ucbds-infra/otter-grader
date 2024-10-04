@@ -546,6 +546,8 @@ def test_run(mocked_run, run_cli):
         submission="foo.ipynb",
         **run.__kwdefaults__,
     )
+    # extra_submission_files is not used by the CLI
+    std_kwargs.pop("extra_submission_files")
 
     result = run_cli([*cmd_start])
     assert_cli_result(result, expect_error=False)
