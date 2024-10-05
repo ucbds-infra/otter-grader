@@ -107,7 +107,7 @@ class AutograderConfig(fica.Config):
 
     miniconda_path: str = fica.Key(
         description="the path to the mamba install directory",
-        default="/root/mambaforge",
+        default="/root/miniforge3",
     )
 
     plugins: list[Union[str, dict[str, Any]]] = fica.Key(

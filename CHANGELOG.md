@@ -22,6 +22,14 @@
 * Added ability to monitor grading progress to Otter Grade per [#827](https://github.com/ucbds-infra/otter-grader/issues/827)
 * Added handling of student-created files with the `student_files` configuration in Otter Assign per [#737](https://github.com/ucbds-infra/otter-grader/issues/737)
 
+**v5.7.1:**
+
+* Removed testing code unintentioanlly committed in v5.7.0 per [#849](https://github.com/ucbds-infra/otter-grader/issues/849)
+
+**v5.7.0:**
+
+* Switch grading image from Mambaforge to Miniforge due to the [sunestting of Mambaforge](https://conda-forge.org/news/2024/07/29/sunsetting-mambaforge/) per [#846](https://github.com/ucbds-infra/otter-grader/issues/846)
+
 **v5.6.0:**
 
 * Updated Otter Grade to write grading summary for each notebook per [#814](https://github.com/ucbds-infra/otter-grader/issues/814)

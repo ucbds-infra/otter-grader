@@ -35,5 +35,6 @@ dependencies:
       - dill
       - numpy
       - gspread
-      - otter-grader[grading,plugins]==5.6.0
+      - pypdf
+      - otter-grader[grading,plugins]==5.7.1
       - rpy2

@@ -40,7 +40,7 @@ jobs:
           packages: >-
             poetry
 
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: environment.yml
           init-shell: >-

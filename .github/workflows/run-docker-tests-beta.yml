@@ -61,7 +61,7 @@ jobs:
           packages: >-
             poetry
 
-      - uses: mamba-org/setup-micromamba@v1
+      - uses: mamba-org/setup-micromamba@v2
         if: ${{ steps.check-branch.outputs.run == 'true' }}
         with:
           environment-file: environment.yml

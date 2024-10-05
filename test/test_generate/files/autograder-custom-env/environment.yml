@@ -8,5 +8,5 @@ dependencies:
   - nb_conda_kernels
   - pip:
       - statsmodels
-      - otter-grader[grading,plugins]==5.6.0
+      - otter-grader[grading,plugins]==5.7.1
       - tqdm
