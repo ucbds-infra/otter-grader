@@ -53,26 +53,30 @@ def test_log_execution(temp_dir):
     """
     Test for ``otter.execute.grade_notebook`` when a log is provided.
     """
-    log = Log([
-        LogEntry(EventType.INIT),
-        LogEntry(EventType.CHECK, question="q1"),
-        LogEntry(EventType.CHECK, question="q2"),
-        LogEntry(EventType.CHECK, question="q3"),
-        LogEntry(EventType.BEGIN_EXPORT),
-        LogEntry(EventType.END_EXPORT),
-    ])
+    log = Log(
+        [
+            LogEntry(EventType.INIT),
+            LogEntry(EventType.CHECK, question="q1"),
+            LogEntry(EventType.CHECK, question="q2"),
+            LogEntry(EventType.CHECK, question="q3"),
+            LogEntry(EventType.BEGIN_EXPORT),
+            LogEntry(EventType.END_EXPORT),
+        ]
+    )
 
     log.entries[1].shelve({"a": 1, "b": 2})
     log.entries[2].shelve({"a": 1, "b": 2, "c": None})
     log.entries[3].shelve({"a": 2, "b": 2, "c": 3, "d": 4})
 
-    nb = nbf.v4.new_notebook(cells=[
-        nbf.v4.new_code_cell("import pandas as pd"),
-        nbf.v4.new_code_cell("from pandas import read_csv"),
-        nbf.v4.new_code_cell("raise Exception\na, b = 1, 2"),
-        nbf.v4.new_code_cell("raise Exception\nc = None"),
-        nbf.v4.new_code_cell("raise Exception\na, c, d = 2, 3, 4"),
-    ])
+    nb = nbf.v4.new_notebook(
+        cells=[
+            nbf.v4.new_code_cell("import pandas as pd"),
+            nbf.v4.new_code_cell("from pandas import read_csv"),
+            nbf.v4.new_code_cell("raise Exception\na, b = 1, 2"),
+            nbf.v4.new_code_cell("raise Exception\nc = None"),
+            nbf.v4.new_code_cell("raise Exception\na, c, d = 2, 3, 4"),
+        ]
+    )
 
     subm_path = os.path.join(temp_dir, "submission.ipynb")
     nbf.write(nb, subm_path)

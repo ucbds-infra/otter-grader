@@ -6,14 +6,13 @@ import nbformat as nbf
 import os
 import pickle
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional, TYPE_CHECKING, TypeVar, Union
 
 from .abstract_test import TestCase, TestCaseResult, TestFile
 from .exception_test import ExceptionTestFile, test_case
 from .metadata_test import NotebookMetadataExceptionTestFile, NotebookMetadataOKTestFile
 from .ok_test import OKTestFile
 from .ottr_test import OttrTestFile
-
 from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
 from ..utils import format_exception, QuestionNotInLogException
 
@@ -25,6 +24,9 @@ __all__ = [
     "TestCase",
     "TestFile",
 ]
+
+
+T = TypeVar("T")
 
 
 def create_test_file(
@@ -40,7 +42,7 @@ def create_test_file(
 
     Args:
         path (``str``): the path to the test file or notebook
-        test_name (``str``, optional): the name of the test in the notebook metadata, if ``path`` is
+        test_name (``str``): the name of the test in the notebook metadata, if ``path`` is
             the path to a Jupyter notebook
 
     Returns:
@@ -59,7 +61,8 @@ def create_test_file(
 
         else:
             return NotebookMetadataExceptionTestFile.from_nbmeta_config(
-                path, nbmeta_config, test_name)
+                path, nbmeta_config, test_name
+            )
 
     env = {}
     with open(path) as f:
@@ -67,7 +70,8 @@ def create_test_file(
 
     if OK_FORMAT_VARNAME not in env:
         raise RuntimeError(
-            f"Malformed test file: does not define the global variable '{OK_FORMAT_VARNAME}'")
+            f"Malformed test file: does not define the global variable '{OK_FORMAT_VARNAME}'"
+        )
 
     if env[OK_FORMAT_VARNAME]:
         return OKTestFile.from_file(path)
@@ -80,16 +84,16 @@ class GradingResults:
     """
     Stores and wrangles test result objects
 
-    Initialize with a list of ``otter.test_files.abstract_test.TestFile`` subclass objects and 
-    this class will store the results as named tuples so that they can be accessed/manipulated easily. 
-    Also contains methods to put the results into a nice ``dict`` format or into the correct format 
+    Initialize with a list of ``otter.test_files.abstract_test.TestFile`` subclass objects and
+    this class will store the results as named tuples so that they can be accessed/manipulated easily.
+    Also contains methods to put the results into a nice ``dict`` format or into the correct format
     for Gradescope.
 
     Args:
         results (``list[TestFile]``): the list of test file objects summarized in this grade
     """
 
-    results: Dict[str, TestFile]
+    results: dict[str, TestFile]
     """maps test/question names to their ``TestFile`` objects (which store the results)"""
 
     output: Optional[str]
@@ -107,10 +111,16 @@ class GradingResults:
     notebook: Optional[nbf.NotebookNode]
     """the executed notebook with outputs that gave these results"""
 
-    _plugin_data: Dict[str, Any]
+    _plugin_data: dict[str, Any]
     """data requested to be stored in the results by plugins"""
 
-    def __init__(self, test_files: List[TestFile], notebook: Optional[nbf.NotebookNode] = None):
+    file: Optional[str] = None
+    """the submission file that generated these results; not populated by default"""
+
+    _catastrophic_error: Optional[Exception]
+    """an error that prevented grading from completing"""
+
+    def __init__(self, test_files: list[TestFile], notebook: Optional[nbf.NotebookNode] = None):
         self.results = {tf.name: tf for tf in test_files}
         self.output = None
         self.all_hidden = False
@@ -123,7 +133,7 @@ class GradingResults:
         return self.summary()
 
     @classmethod
-    def from_ottr_json(cls, ottr_output):
+    def from_ottr_json(cls, ottr_output: dict[str, Any]) -> "GradingResults":
         """
         Creates a ``GradingResults`` object from the JSON output of Ottr (Otter's R client).
 
@@ -140,19 +150,23 @@ class GradingResults:
 
             for tcr in tfr["test_case_results"]:
                 tc = tcr["test_case"]
-                test_cases.append(TestCase(
-                    name = tc["name"],
-                    body = tc["code"],
-                    hidden = tc["hidden"],
-                    points = tc["points"],
-                    success_message = tc["success_message"],
-                    failure_message = tc["failure_message"],
-                ))
-                test_case_results.append(TestCaseResult(
-                    test_case = test_cases[-1],
-                    message = tcr["error"],
-                    passed = tcr["passed"],
-                ))
+                test_cases.append(
+                    TestCase(
+                        name=tc["name"],
+                        body=tc["code"],
+                        hidden=tc["hidden"],
+                        points=tc["points"],
+                        success_message=tc["success_message"],
+                        failure_message=tc["failure_message"],
+                    )
+                )
+                test_case_results.append(
+                    TestCaseResult(
+                        test_case=test_cases[-1],
+                        message=tcr["error"],
+                        passed=tcr["passed"],
+                    )
+                )
 
             # fix the point values in each test case
             test_cases = TestFile.resolve_test_file_points(tfr.get("points"), test_cases)
@@ -163,9 +177,9 @@ class GradingResults:
                 tcr.test_case = tc
 
             test_file = OttrTestFile(
-                name = os.path.splitext(os.path.basename(tfr["filename"]))[0],
-                path = tfr["filename"],
-                test_cases = test_cases,
+                name=os.path.splitext(os.path.basename(tfr["filename"]))[0],
+                path=tfr["filename"],
+                test_cases=test_cases,
             )
             test_file.test_case_results = test_case_results
 
@@ -174,7 +188,7 @@ class GradingResults:
         return cls(test_files)
 
     @classmethod
-    def without_results(cls, e):
+    def without_results(cls, e: Exception) -> "GradingResults":
         """
         Creates an empty results object that represents an execution failure during autograding.
 
@@ -192,34 +206,42 @@ class GradingResults:
         return instc
 
     @property
-    def test_files(self):
-        """
-        ``list[TestFile]``: the names of all test files tracked in these grading results
-        """
+    def test_files(self) -> list[str]:
+        """the names of all test files tracked in these grading results"""
         return list(self.results.keys())
 
     @property
-    def total(self):
-        """
-        ``int | float``: the total points earned
-        """
+    def total(self) -> Union[int, float]:
+        """the total points earned"""
+        if self._catastrophic_error:
+            return 0
         return sum(tr.score for tr in self.results.values())
 
     @property
-    def possible(self):
-        """
-        ``int | float``: the total points possible
-        """
+    def possible(self) -> Union[int, float]:
+        """the total points possible"""
+        if self._catastrophic_error:
+            return 0
         return sum(tr.possible for tr in self.results.values())
 
     @property
-    def passed_all_public(self):
-        """
-        ``bool``: whether all public tests in these results passed
-        """
+    def percent(self) -> float:
+        """the ratio of points earned, rounded to 4 digits"""
+        if self.possible == 0:
+            return 0
+        return round(self.total / self.possible, 4)
+
+    @property
+    def passed_all_public(self) -> bool:
+        """whether all public tests in these results passed"""
         return all(tr.passed_all_public for tr in self.results.values())
 
-    def get_result(self, test_name):
+    @property
+    def catastrophic_error(self) -> Optional[Exception]:
+        """an error that prevented grading from completing, if applicable"""
+        return self._catastrophic_error
+
+    def get_result(self, test_name: str) -> TestFile:
         """
         Returns the ``TestFile`` corresponding to the test with name ``test_name``
 
@@ -231,7 +253,7 @@ class GradingResults:
         """
         return self.results[test_name]
 
-    def get_score(self, test_name):
+    def get_score(self, test_name: str) -> Union[int, float]:
         """
         Returns the score of a test tracked by these results
 
@@ -239,12 +261,12 @@ class GradingResults:
             test_name (``str``): the name of the test
 
         Returns:
-            ``int`` or ``float``: the score
+            ``int | float``: the score
         """
         result = self.results[test_name]
         return result.score
 
-    def update_score(self, test_name, new_score):
+    def update_score(self, test_name: str, new_score: Union[int, float]):
         """
         Override the score for the specified test file.
 
@@ -254,7 +276,7 @@ class GradingResults:
         """
         self.results[test_name].update_score(new_score)
 
-    def set_output(self, output):
+    def set_output(self, output: str):
         """
         Updates the ``output`` field of the results JSON with text relevant to the entire submission.
         See https://gradescope-autograders.readthedocs.io/en/latest/specs/ for more information.
@@ -276,7 +298,7 @@ class GradingResults:
         """
         self.all_hidden = True
 
-    def set_plugin_data(self, plugin_name, data):
+    def set_plugin_data(self, plugin_name: str, data: Any):
         """
         Stores plugin data for plugin ``plugin_name`` in the results. ``data`` must be picklable.
 
@@ -290,7 +312,7 @@ class GradingResults:
             raise ValueError(f"Data was not picklable: {data}")
         self._plugin_data[plugin_name] = data
 
-    def get_plugin_data(self, plugin_name, default=None):
+    def get_plugin_data(self, plugin_name: str, default: Optional[T] = None) -> T:
         """
         Retrieves data for plugin ``plugin_name`` in the results.
 
@@ -315,9 +337,9 @@ class GradingResults:
         """
         self.pdf_error = error
 
-    def verify_against_log(self, log, ignore_hidden=True) -> List[str]:
+    def verify_against_log(self, log: "Log", ignore_hidden: bool = True) -> list[str]:
         """
-        Verifies these scores against the results stored in this log using the results returned by 
+        Verifies these scores against the results stored in this log using the results returned by
         ``Log.get_results`` for comparison. A discrepancy occurs if the scores differ by more than
         the default tolerance of ``math.isclose``. If ``ignore_hidden`` is ``True``, hidden tests
         are ignored when verifying scores.
@@ -342,16 +364,20 @@ class GradingResults:
             else:
                 score = test_file.score
             try:
-                logged_score = log.get_results(test_name).score
-                if not math.isclose(score, logged_score):
+                tf = log.get_results(test_name)
+                if not isinstance(tf, TestFile):
+                    l.append(f"No score logged for {test_name}")
+                    continue
+                if not math.isclose(score, tf.score):
                     l.append(
-                        f"Score for {test_name} ({score:.3f}) differs from logged score " \
-                        f"({logged_score:.3f})")
+                        f"Score for {test_name} ({score:.3f}) differs from logged score "
+                        f"({tf.score:.3f})"
+                    )
             except QuestionNotInLogException:
                 l.append(f"No score for {test_name} found in this log")
         return l
 
-    def to_report_str(self):
+    def to_report_str(self) -> str:
         """
         Returns these results as a report string generated using the ``__repr__`` of the
         ``TestFile`` class.
@@ -361,7 +387,7 @@ class GradingResults:
         """
         return "\n".join(repr(test_file) for test_file in self.test_files)
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         """
         Converts these results into a dictinary, extending the fields of the named tuples in
         ``results`` into key, value pairs in a ``dict``.
@@ -371,7 +397,7 @@ class GradingResults:
         """
         return {tn: tf.to_dict() for tn, tf in self.results.items()}
 
-    def summary(self, public_only=False):
+    def summary(self, public_only: bool = False) -> str:
         """
         Generate a summary of these results and return it as a string.
 
@@ -381,9 +407,11 @@ class GradingResults:
         Returns:
             ``str``: the summary of results
         """
+        if self._catastrophic_error:
+            return str(self._catastrophic_error)
         return "\n\n".join(tf.summary(public_only=public_only) for _, tf in self.results.items())
 
-    def has_catastrophic_failure(self):
+    def has_catastrophic_failure(self) -> bool:
         """
         Returns whether these results contain a catastrophic error (i.e. an error that prevented
         submission results from being generated or read).
@@ -393,7 +421,7 @@ class GradingResults:
         """
         return self._catastrophic_error is not None
 
-    def to_gradescope_dict(self, ag_config):
+    def to_gradescope_dict(self, ag_config: "AutograderConfig") -> dict[str, Any]:
         """
         Convert these results into a dictionary formatted for Gradescope's autograder.
 
@@ -407,19 +435,23 @@ class GradingResults:
         output = {"tests": []}
 
         if self._catastrophic_error:
-            output["tests"].append({
-                "name": "Autograder Failed",
-                "visibility": "visible",
-                "output": "The autograder failed to produce any results. Please alert your instructor to this failure for assistance in debugging it.",
-                "status": "failed",
-            })
+            output["tests"].append(
+                {
+                    "name": "Autograder Failed",
+                    "visibility": "visible",
+                    "output": "The autograder failed to produce any results. Please alert your instructor to this failure for assistance in debugging it.",
+                    "status": "failed",
+                }
+            )
             tb = format_exception(self._catastrophic_error)
-            output["tests"].append({
-                "name": "Autograder Exception",
-                "visibility": "hidden",
-                "output": f"The exception below was thrown when attempting to read the results from executing the notebook. (This message is not visible to students.)\n\n{tb}",
-                "status": "failed",
-            })
+            output["tests"].append(
+                {
+                    "name": "Autograder Exception",
+                    "visibility": "hidden",
+                    "output": f"The exception below was thrown when attempting to read the results from executing the notebook. (This message is not visible to students.)\n\n{tb}",
+                    "status": "failed",
+                }
+            )
             output["score"] = 0
             return output
 
@@ -435,33 +467,39 @@ class GradingResults:
 
         # start w/ summary of public tests
         if not ag_config.show_hidden or ag_config.force_public_test_summary:
-            output["tests"].append({
-                "name": "Public Tests",
-                "visibility": "visible",
-                "output": self.summary(public_only=True),
-                "status": "passed" if self.passed_all_public else "failed",
-            })
+            output["tests"].append(
+                {
+                    "name": "Public Tests",
+                    "visibility": "visible",
+                    "output": self.summary(public_only=True),
+                    "status": "passed" if self.passed_all_public else "failed",
+                }
+            )
 
         # add PDF error test if indicated
         if ag_config.warn_missing_pdf and self.pdf_error is not None:
-            output["tests"].append({
-                "name": "PDF Generation Failed",
-                "visibility": "visible",
-                "output": str(self.pdf_error),
-                "status": "failed",
-            })
+            output["tests"].append(
+                {
+                    "name": "PDF Generation Failed",
+                    "visibility": "visible",
+                    "output": str(self.pdf_error),
+                    "status": "failed",
+                }
+            )
 
         for test_name in self.test_files:
             test_file = self.get_result(test_name)
             score, possible = test_file.score, test_file.possible
 
-            output["tests"].append({
-                "name": test_file.name,
-                "score": round(score, 5),
-                "max_score": round(possible, 5),
-                "visibility": hidden_test_visibility,
-                "output": test_file.summary(),
-            })
+            output["tests"].append(
+                {
+                    "name": test_file.name,
+                    "score": round(score, 5),
+                    "max_score": round(possible, 5),
+                    "visibility": hidden_test_visibility,
+                    "output": test_file.summary(),
+                }
+            )
 
         if ag_config.show_stdout:
             output["stdout_visibility"] = "after_published"
@@ -486,7 +524,12 @@ class GradingResults:
 
         if self.all_hidden:
             for test in output["tests"]:
-                test["visibility"]  = "hidden"
+                test["visibility"] = "hidden"
             output["stdout_visibility"] = "hidden"
 
         return output
+
+
+if TYPE_CHECKING:
+    from ..check.logs import Log
+    from ..run import AutograderConfig

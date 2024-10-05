@@ -17,7 +17,7 @@ class RateLimiting(AbstractOtterPlugin):
 
     This plugin is configured by defining the duration of the window using the optional keys ``weeks``,
     ``days``, ``hours``, ``minutes``, ``seconds``, ``milliseconds``, and ``microseconds`` (all of which
-    default to 0). The number of submissions allowed during this window is configured with 
+    default to 0). The number of submissions allowed during this window is configured with
     ``allowed_submissions``. For example, to allow only 2 submissions every hour-and-a-half:
 
     .. code-block:: json
@@ -34,8 +34,8 @@ class RateLimiting(AbstractOtterPlugin):
             ]
         }
 
-    When a student submits, the window is caculated as a `datetime.timedelta` object and if the student 
-    has at least `allowed_submissions` in that window, the submission's results are hidden and the 
+    When a student submits, the window is caculated as a `datetime.timedelta` object and if the student
+    has at least `allowed_submissions` in that window, the submission's results are hidden and the
     student is only shown a message; from the example above:
 
     .. code-block::
@@ -44,7 +44,7 @@ class RateLimiting(AbstractOtterPlugin):
 
     The results of submission execution are still visible to instructors.
 
-    If the student's submission is allowed based on the rate limit, the plugin outputs a message in 
+    If the student's submission is allowed based on the rate limit, the plugin outputs a message in
     the plugin report; from the example above:
 
     .. code-block::
@@ -57,7 +57,15 @@ class RateLimiting(AbstractOtterPlugin):
         Returns a string representation of the configured window
         """
         result = ""
-        for base in ["weeks", "days", "hours", "minutes", "seconds", "microseconds", "milliseconds"]:
+        for base in [
+            "weeks",
+            "days",
+            "hours",
+            "minutes",
+            "seconds",
+            "microseconds",
+            "milliseconds",
+        ]:
             if self.plugin_config.get(base, 0):
                 result += f"{self.plugin_config.get(base, 0)} {base} "
         return result.strip()
@@ -88,14 +96,18 @@ class RateLimiting(AbstractOtterPlugin):
                 prev_subms += 1
 
         if prev_subms >= self.plugin_config["allowed_submissions"]:
-            return False, \
-                f"You have exceeded the rate limit for the autograder. Students are allowed {self.plugin_config['allowed_submissions']} " + \
-                f"submissions every {self._window_to_str()}."
+            return (
+                False,
+                f"You have exceeded the rate limit for the autograder. Students are allowed {self.plugin_config['allowed_submissions']} "
+                + f"submissions every {self._window_to_str()}.",
+            )
 
         else:
-            return True, \
-                f"Students are allowed {self.plugin_config['allowed_submissions']} submissions every {self._window_to_str()}. " + \
-                f"You have {prev_subms} submissions in that period."
+            return (
+                True,
+                f"Students are allowed {self.plugin_config['allowed_submissions']} submissions every {self._window_to_str()}. "
+                + f"You have {prev_subms} submissions in that period.",
+            )
 
     def after_grading(self, results):
         """

@@ -1,3 +1,0 @@
-nbconvert
-pdfkit
-pypdf

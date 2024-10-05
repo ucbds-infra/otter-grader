@@ -2,31 +2,30 @@
 Plugin for using Google Sheets to override scores for test cases
 """
 
-import os
 import json
-import tempfile
+import os
 import pandas as pd
+import tempfile
 
-from .. import PluginCollection
 from ..abstract_plugin import AbstractOtterPlugin
 
 
 class GoogleSheetsGradeOverride(AbstractOtterPlugin):
     """
-    Otter plugin for overriding test case scores with values in a Google Sheet on Gradescope. Uses 
+    Otter plugin for overriding test case scores with values in a Google Sheet on Gradescope. Uses
     provided Google Service Account credentials to pull in the spreadsheet as a dataframe and edits
     test case scores by matching on the Gradescope assignment ID, student email, and test case name.
 
-    Implements the ``during_generate``, ``before_grading``, and ``after_grading`` events. Make sure 
-    to list this plugin as ``otter.plugins.builtin.GoogleSheetsGradeOverride``, otherwise the 
+    Implements the ``during_generate``, ``before_grading``, and ``after_grading`` events. Make sure
+    to list this plugin as ``otter.plugins.builtin.GoogleSheetsGradeOverride``, otherwise the
     ``during_generate`` event of this plugin will not work.
 
     The google sheet should have the following format:
 
     =============== ================== =========== ======== ==============
-     Assignment ID   Email              Question    Points   PDF          
+     Assignment ID   Email              Question    Points   PDF
     =============== ================== =========== ======== ==============
-     123456          student@univ.edu   q1a - 1     1        false        
+     123456          student@univ.edu   q1a - 1     1        false
     =============== ================== =========== ======== ==============
 
     ``Assignment ID`` should be the ID of the assignment on Gradescope, ``Email`` should be the email
@@ -47,6 +46,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
             ``pandas.core.frame.DataFrame``: the sheet as a dataframe
         """
         import gspread
+
         try:
             oauth_json = self.plugin_config["service_account_credentials"]
             with tempfile.NamedTemporaryFile(mode="w+", suffix=".json") as ntf:
@@ -65,7 +65,9 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         except Exception as e:
             if self.plugin_config.get("catch_api_error", True):
                 print(f"Error encountered while loading grade override sheet:\n{e}")
-                self._df = pd.DataFrame(columns=["Assignment ID", "Email", "Question", "Points", "PDF"])
+                self._df = pd.DataFrame(
+                    columns=["Assignment ID", "Email", "Question", "Points", "PDF"]
+                )
             else:
                 raise e
 
@@ -80,7 +82,7 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
 
     def after_grading(self, results):
         """
-        Modifies the results of grading by pulling in the Google Sheet as a dataframe and updating 
+        Modifies the results of grading by pulling in the Google Sheet as a dataframe and updating
         the scores for the test cases found.
 
         Args:
@@ -89,8 +91,8 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         if self.submission_metadata:
             df = self.df.copy()
             df = df[
-                df["Email"].isin([user["email"] for user in self.submission_metadata["users"]]) & \
-                (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
+                df["Email"].isin([user["email"] for user in self.submission_metadata["users"]])
+                & (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
             ]
             for _, row in df.iterrows():
                 results.update_score(row["Question"], float(row["Points"]))
@@ -103,19 +105,23 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
 
         Args:
             otter_config (``dict``): the parsed Otter configuration JSON file
-            assignment (``otter.assign.assignment.Assignment``): the assignment configurations if 
+            assignment (``otter.assign.assignment.Assignment``): the assignment configurations if
                 Otter Assign is used
         """
         if assignment is not None:
             curr_dir = os.getcwd()
             os.chdir(assignment.master.parent)
 
-        cfg_idx = [self.IMPORTABLE_NAME in c.keys() for c in otter_config["plugins"] if isinstance(c, dict)].index(True)
+        cfg_idx = [
+            self.IMPORTABLE_NAME in c.keys() for c in otter_config["plugins"] if isinstance(c, dict)
+        ].index(True)
         creds_path = otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["credentials_json_path"]
         with open(creds_path, encoding="utf-8") as f:
             creds = json.load(f)
 
-        otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME]["service_account_credentials"] = creds
+        otter_config["plugins"][cfg_idx][self.IMPORTABLE_NAME][
+            "service_account_credentials"
+        ] = creds
 
         if assignment is not None:
             os.chdir(curr_dir)
@@ -132,8 +138,8 @@ class GoogleSheetsGradeOverride(AbstractOtterPlugin):
         if self.submission_metadata:
             df = self.df.copy()
             df = df[
-                df["Email"].isin([user["email"] for user in self.submission_metadata["users"]]) & \
-                (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
+                df["Email"].isin([user["email"] for user in self.submission_metadata["users"]])
+                & (df["Assignment ID"] == str(self.submission_metadata["assignment"]["id"]))
             ]
 
             for _, row in df.iterrows():

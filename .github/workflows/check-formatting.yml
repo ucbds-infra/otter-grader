@@ -1,0 +1,52 @@
+name: Check formatting
+
+on:
+  push:
+    branches:
+      - master
+      - beta
+      - release
+  pull_request:
+    branches:
+      - master
+      - beta
+      - release
+      - temp
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Check formatting
+    runs-on: ubuntu-latest
+
+    env:
+      TAR: /bin/tar
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: .venv
+          installer-parallel: true
+
+      - name: Install dependencies
+        run: |
+          poetry install --with dev --no-root
+
+      - name: Run formatters
+        run: |
+          source .venv/bin/activate
+          make format CI=true

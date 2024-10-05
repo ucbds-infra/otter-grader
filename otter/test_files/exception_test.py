@@ -3,10 +3,10 @@
 import inspect
 import pathlib
 
-from dataclasses import replace
 from functools import lru_cache
 from textwrap import indent
-from typing import Callable, Optional, Union
+from types import CodeType
+from typing import Any, Callable, Optional, Union
 
 from .abstract_test import TestCase, TestCaseResult, TestFile
 
@@ -52,24 +52,30 @@ class test_case:
         self.failure_message = failure_message
         self.test_func = lambda: None
 
-    def __call__(self, test_func):
+    def __call__(self, test_func: Callable[..., None]) -> "test_case":
         """
         Wrap a test case function as a decorator.
         """
         self.test_func = test_func
         return self
 
-    def to_dataclass(self):
+    def to_dataclass(self) -> TestCase:
         """
         Convert this test case to a ``TestCase`` named tuple for use in Otter's test file internals.
 
         Returns:
             ``otter.test_files.abstract_test.TestCase``: the test case named tuple
         """
-        return TestCase(name=self.name, body=self, hidden=self.hidden, points=self.points, 
-            success_message=self.success_message, failure_message=self.failure_message)
+        return TestCase(
+            name=self.name,
+            body=self,
+            hidden=self.hidden,
+            points=self.points,
+            success_message=self.success_message,
+            failure_message=self.failure_message,
+        )
 
-    def _get_func_params(self):
+    def _get_func_params(self) -> list[str]:
         """
         Get the list of parameters expected by the decorated test case function.
 
@@ -78,12 +84,12 @@ class test_case:
         """
         return list(inspect.signature(self.test_func).parameters.keys())
 
-    def call_func(self, global_environment):
+    def call_func(self, global_environment: dict[str, Any]):
         """
         Call the underlying test case function, passig in parameters from the global environment.
 
         If the signature of ``self.test_func`` contains a parameter called ``env``, the environment
-        is passed in. For all other parameters, that value from the global environment is passed in, 
+        is passed in. For all other parameters, that value from the global environment is passed in,
         defaulting to ``None`` if the key is not present. Thus, a function with the signature
 
         .. code-block:: python
@@ -95,8 +101,8 @@ class test_case:
         .. code-block:: python
 
             foo(
-                env = global_environment, 
-                func_a = global_environment.get("func_a"), 
+                env = global_environment,
+                func_a = global_environment.get("func_a"),
                 func_b = global_environment.get("func_b"),
                 obj = global_environment.get("obj"),
             )
@@ -104,27 +110,26 @@ class test_case:
         Args:
             global_environment (``dict[str, object]``): the global environment from which to
                 retrieve values for the ``test_func`` arguments
-
-        Returns:
-            ``object``: the return value of the test case function
         """
         args = self._get_func_params()
-        call_kwargs = {arg: (global_environment if arg == "env" else \
-                global_environment.get(arg, None)) for arg in args}
-        return self.test_func(**call_kwargs)
-    
-    def __getstate__(self):
+        call_kwargs = {
+            arg: (global_environment if arg == "env" else global_environment.get(arg, None))
+            for arg in args
+        }
+        self.test_func(**call_kwargs)
+
+    def __getstate__(self) -> dict[str, Any]:
         """
-        Creates a representation of the state of the instance. The attributes of the object are 
-        packaged into a dictionary representation excluding certain attributes. ``test_func`` is 
+        Creates a representation of the state of the instance. The attributes of the object are
+        packaged into a dictionary representation excluding certain attributes. ``test_func`` is
         excluded because it cannot be pickled.
 
         Returns:
             ``dict``: a dictionary representation of the instance's state
         """
         state = self.__dict__.copy()
-        if 'test_func' in state:
-            del state['test_func']
+        if "test_func" in state:
+            del state["test_func"]
         return state
 
 
@@ -144,13 +149,13 @@ class ExceptionTestFile(TestFile):
         """
         return self.source.split("\n")
 
-    def _generate_error_message(self, excp, context=0):
+    def _generate_error_message(self, excp: Exception, context: int = 0) -> str:
         """
         Generate an error message including the line that errored from ``self.source``.
 
         Args:
             excp (``Exception``): the exception to generate the message for
-            context (``int``, optional): a number of extra lines of context to include from above
+            context (``int``): a number of extra lines of context to include from above
                 and below the line that caused the exception
 
         Returns:
@@ -162,13 +167,13 @@ class ExceptionTestFile(TestFile):
         err_msg = str(excp).strip("'")
         return f"Error at line {line_idx + 1} in test {self.name}:\n{lines}\n{type(excp).__name__}: {err_msg}"
 
-    def run(self, global_environment):
+    def run(self, global_environment: dict[str, Any]):
         """
-        Run the test cases against ``global_environment``, saving the results in 
+        Run the test cases against ``global_environment``, saving the results in
         ``self.test_case_results``.
 
         Arguments:
-            global_environment (``dict[str, object]``): result of executing a Python notebook/script
+            global_environment (``dict[str, Any]``): result of executing a Python notebook/script
         """
         test_case_results = []
         for tc in self.test_cases:
@@ -184,13 +189,13 @@ class ExceptionTestFile(TestFile):
         self.test_case_results = test_case_results
 
     @staticmethod
-    def _compile_string(s, path="<string>"):
+    def _compile_string(s: str, path: str = "<string>") -> CodeType:
         """
         Compile a string for execution.
 
         Args:
             s (``str``): the string to compile
-            path (``str``, optional): the path to the test file
+            path (``str``): the path to the test file
 
         Returns:
             ``code``: the compiled code of the file
@@ -198,7 +203,7 @@ class ExceptionTestFile(TestFile):
         return compile(s, path, "exec")
 
     @classmethod
-    def _from_compiled_code(cls, code, path=""):
+    def _from_compiled_code(cls, code: CodeType, path: str = "") -> "ExceptionTestFile":
         """
         Parse a compiled exception-based test file and return an ``ExceptionTestFile``.
 
@@ -220,9 +225,9 @@ class ExceptionTestFile(TestFile):
         test_cases = []
         for _, v in env.items():
             if isinstance(v, test_case):
+                if v.name is None:
+                    v.name = f"{name} - {len(test_cases) + 1}"
                 tc = v.to_dataclass()
-                if tc.name is None:
-                    tc = replace(tc, name=f"{name} - {len(test_cases) + 1}")
                 test_cases.append(tc)
 
         test_cases = cls.resolve_test_file_points(points, test_cases)
@@ -231,13 +236,13 @@ class ExceptionTestFile(TestFile):
         return cls(name, path, test_cases, all_or_nothing=False)
 
     @classmethod
-    def from_string(cls, s, path="<string>"):
+    def from_string(cls, s: str, path: str = "<string>") -> "ExceptionTestFile":
         """
         Parse an exception-based test file as a string and return an ``ExceptionTestFile``.
 
         Args:
             s (``str``): the test file contents
-            path (``str``, optional): the path to the test file
+            path (``str``): the path to the test file
 
         Returns:
             ``ExceptionTestFile``: the new ``ExceptionTestFile`` object created from the given file
@@ -248,7 +253,7 @@ class ExceptionTestFile(TestFile):
         return instc
 
     @classmethod
-    def from_file(cls, path):
+    def from_file(cls, path: str) -> "ExceptionTestFile":
         """
         Parse an exception-based test file and return an ``ExceptionTestFile``.
 
@@ -263,7 +268,7 @@ class ExceptionTestFile(TestFile):
         return cls.from_string(source, path=path)
 
     @classmethod
-    def from_metadata(cls, s, path):
+    def from_metadata(cls, s: str, path: str) -> "ExceptionTestFile":
         """
         Parse an exception-based test file from its data stored in a notebook's metadata.
 

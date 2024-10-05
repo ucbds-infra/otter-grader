@@ -17,20 +17,25 @@ jobs:
       TAR: /bin/tar
 
     steps:
-      - name: Set up Python 3.8
+      - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.10
 
       - name: Only allow releases off of master (or temp for patches)
         run: |
           python3 -c 'import os, sys; sys.exit(os.environ["GITHUB_REF"] != "refs/heads/master" and os.environ["GITHUB_REF"] != "refs/heads/temp")'
 
+      - uses: liskin/gh-pipx@v1
+        with:
+          packages: >-
+            poetry
+
       - uses: actions/checkout@v2
 
       - name: Install dependencies
         run: |
-          python3 -m pip install -r requirements.txt twine wheel setuptools
+          poetry install --with dev --no-root
 
       - name: Update versions
         run: |
@@ -53,7 +58,7 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          python3 setup.py sdist bdist_wheel
+          poetry build
           python3 -m twine upload dist/*
 
       - name: Create a release on GitHub

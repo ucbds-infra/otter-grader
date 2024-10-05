@@ -3,6 +3,8 @@
 # suppress all warnings, because otherwise they get printed to stderr which triggers a RuntimeError
 # in the calling code -- see #735
 import warnings
+
+
 warnings.simplefilter("ignore")
 
 import argparse
@@ -25,7 +27,9 @@ def get_parser():
     parser.add_argument("--results-path", required=True)
     return parser
 
+
 warnings.warn("foo", RuntimeWarning)
+
 
 def main():
 
@@ -41,7 +45,7 @@ def main():
             nb_path,
             test_dir=args.tests_dir,
             tests_glob=glob(args.tests_dir + "/*.py"),
-            cwd=os.getcwd()
+            cwd=os.getcwd(),
         )
 
         with open(args.results_path, "wb") as f:

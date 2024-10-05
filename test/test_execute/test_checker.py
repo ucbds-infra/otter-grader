@@ -72,11 +72,14 @@ class TestChecker:
         mocked_create_test_file.assert_called_once_with(path, nbmeta_config, test_name=None)
         mocked_currentframe.assert_called_once()
         mocked_create_test_file.return_value.run.assert_called_once_with(
-            mocked_currentframe.return_value.f_back.f_globals)
+            mocked_currentframe.return_value.f_back.f_globals
+        )
         assert ret is mocked_create_test_file.return_value
 
     @patch("otter.execute.checker.inspect.currentframe")
-    def test_check_path_and_test_name(self, mocked_currentframe, mocked_create_test_file, nbmeta_config):
+    def test_check_path_and_test_name(
+        self, mocked_currentframe, mocked_create_test_file, nbmeta_config
+    ):
         path, test_name = "foo.ipynb", "q1"
 
         ret = Checker.check(path, nbmeta_config, test_name)
@@ -84,11 +87,14 @@ class TestChecker:
         mocked_create_test_file.assert_called_once_with(path, nbmeta_config, test_name=test_name)
         mocked_currentframe.assert_called_once()
         mocked_create_test_file.return_value.run.assert_called_once_with(
-            mocked_currentframe.return_value.f_back.f_globals)
+            mocked_currentframe.return_value.f_back.f_globals
+        )
         assert ret is mocked_create_test_file.return_value
 
     @patch("otter.execute.checker.inspect.currentframe")
-    def test_check_path_and_global_env(self, mocked_currentframe, mocked_create_test_file, nbmeta_config):
+    def test_check_path_and_global_env(
+        self, mocked_currentframe, mocked_create_test_file, nbmeta_config
+    ):
         path, global_env = "foo.ipynb", {}
 
         ret = Checker.check(path, nbmeta_config, global_env=global_env)
@@ -123,7 +129,9 @@ class TestChecker:
 
             if t["want_call"]:
                 global_env = t.get("global_env", mocked_currentframe.return_value.f_back.f_globals)
-                mocked_check.assert_called_once_with(t["path"], nbmeta_config, global_env=global_env)
+                mocked_check.assert_called_once_with(
+                    t["path"], nbmeta_config, global_env=global_env
+                )
                 assert ret is mocked_check.return_value
             else:
                 mocked_check.assert_not_called()

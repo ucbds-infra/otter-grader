@@ -23,6 +23,7 @@ def test_grade_submission(mocked_redirect, mocked_run):
         output_dir=None,
         no_logo=True,
         debug=False,
+        extra_submission_files=None,
     )
     mocked_redirect.assert_not_called()
 

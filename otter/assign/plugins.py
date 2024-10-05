@@ -1,9 +1,10 @@
 """Plugin replacement for Otter Assign"""
 
 import copy
+import nbformat as nbf
 import yaml
 
-from .utils import get_source
+from ..utils import get_source
 
 
 BEGIN = "# BEGIN PLUGIN"
@@ -11,7 +12,7 @@ END = "# END PLUGIN"
 BEGIN_EXPORT = "# BEGIN PLUGIN EXPORT"
 
 
-def replace_plugins(lines):
+def replace_plugins(lines: list[str]) -> list[str]:
     """
     Replace plugin blocks with plugin calls in a cell's source (a list of strings).
 
@@ -47,7 +48,9 @@ def replace_plugins(lines):
         elif plugin:
             stripped[len(starts) - 1].append(line)
 
-    assert len(stripped) == len(starts) + 1 == len(ends) + 1 == len(exports) + 1, f"Error processing plugins in {lines}"
+    assert (
+        len(stripped) == len(starts) + 1 == len(ends) + 1 == len(exports) + 1
+    ), f"Error processing plugins in {lines}"
     assert all(s < e for s, e in zip(starts, ends))
 
     starts.reverse()
@@ -68,18 +71,18 @@ def replace_plugins(lines):
 
         call = f'grader.{call}("{pg}"'
         if args:
-            call += f', {args}'
+            call += f", {args}"
         if kwargs:
-            call += f', {kwargs}'
-        call += ')'
+            call += f", {kwargs}"
+        call += ")"
 
-        del lines[s:e+1]
+        del lines[s : e + 1]
         lines.insert(s, call)
 
     return lines
 
 
-def replace_plugins_with_calls(nb):
+def replace_plugins_with_calls(nb: nbf.NotebookNode) -> nbf.NotebookNode:
     """
     Replace all plugin blocks in a notebook with plugin calls.
 
@@ -91,7 +94,7 @@ def replace_plugins_with_calls(nb):
     """
     nb = copy.deepcopy(nb)
 
-    for cell in nb['cells']:
-        cell['source'] = '\n'.join(replace_plugins(get_source(cell)))
+    for cell in nb["cells"]:
+        cell["source"] = "\n".join(replace_plugins(get_source(cell)))
 
     return nb
