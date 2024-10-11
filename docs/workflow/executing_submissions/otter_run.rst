@@ -69,6 +69,8 @@ console by the grading process during execution when set to ``True`` (default ``
 For more information about grading programmatically, see the :ref:`API reference <api_reference>`.
 
 
+.. _workflow_executing_submissions_otter_run_grading_results:
+
 Grading Results
 +++++++++++++++
 

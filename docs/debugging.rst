@@ -76,6 +76,34 @@ If you need to edit the submission file(s), they are located in the ``/autograde
 directory.
 
 
+Viewing the Executed Notebook
++++++++++++++++++++++++++++++
+
+To view the notebook with its outputs from grading, you can copy the ``results.pkl`` file out from
+the container and extract the notebook from it. On Gradescope, you would use SFTP to connect to the
+container while it's still running and download the file ``/autograder/results/results.pkl``. For
+local grading, run
+
+.. code-block:: console
+
+    docker cp <container id>:/autograder/results/results.pkl results.pkl
+
+to copy the file out of the container.
+
+Once you have obtained the ``results.pkl`` file, run this Python snippet to copy the notebook out of
+it.
+
+.. code-block:: python
+
+    import dill
+    import nbformat
+
+    with open("results.pkl", "rb") as f:
+        res = dill.load(f)
+
+    nbformat.write(res.notebook, "executed.ipynb")
+
+
 .. _debugging_with_otter_run:
 
 Debugging with Otter Run
@@ -85,3 +113,23 @@ Read the :ref:`previous section <debugging_container>` first. Because Otter Run 
 autograder zip file for its configuration intsead of a Docker container, you will need to manually
 edit the ``otter_config.json`` file in your autograder zip file to set ``"debug"`` to ``true``.
 Then, re-zip the zip file's contents and use this new autograder zip file for ``otter run``.
+
+
+Viewing the Executed Notebook
++++++++++++++++++++++++++++++
+
+If you want access to the executed notebook when using Otter Run, you will need to call it from
+Python instead of using the CLI. Run a script like the one below to grade the submission and obtain
+the notebook.
+
+.. code-block:: python
+
+    import nbformat
+    from otter.api import grade_submission
+
+    # res is the GradingResults object, so you can examine it to see the score details
+    res = grade_submission("submission.ipynb", ag_path="autograder.zip", debug=True)
+    nbformat.write(res.notebook, "executed.ipynb")
+
+You can find details about the ``GradingResults`` class
+:ref:`here <workflow_executing_submissions_otter_run_grading_results>`.
