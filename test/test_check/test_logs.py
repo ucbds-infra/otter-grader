@@ -1,14 +1,12 @@
 """Tests for ``otter.check.logs``"""
 
 import os
+import pandas as pd
 import pytest
 import sys
 
-from sklearn.linear_model import LinearRegression
-
-from otter.check.logs import Log
-from otter.check.notebook import Notebook, _OTTER_LOG_FILENAME
-from otter.check.logs import LogEntry, EventType, Log
+from otter.check.logs import EventType, Log, LogEntry
+from otter.check.notebook import Notebook, OTTER_LOG_FILENAME
 
 from ..utils import TestFileManager
 
@@ -19,8 +17,8 @@ FILE_MANAGER = TestFileManager(__file__)
 @pytest.fixture(autouse=True)
 def cleanup_output(cleanup_enabled):
     yield
-    if cleanup_enabled and os.path.isfile(_OTTER_LOG_FILENAME):
-        os.remove(_OTTER_LOG_FILENAME)
+    if cleanup_enabled and os.path.isfile(OTTER_LOG_FILENAME):
+        os.remove(OTTER_LOG_FILENAME)
 
 
 def test_notebook_check():
@@ -38,21 +36,20 @@ def test_notebook_check():
         test_name = os.path.splitext(test_file)[0]
         grading_results[test_name] = grader.check(test_name)
 
-    log = Log.from_file(_OTTER_LOG_FILENAME)
+    log = Log.from_file(OTTER_LOG_FILENAME)
 
     for question in log.get_questions():
         actual_result = grading_results[question]
 
         # checking repr since the results __eq__ method is not defined
-        assert repr(log.get_results(question)) == repr(actual_result), \
-            f"Logged results for {question} are not correct"
-
-        logged_grade = log.get_question_entry(question).get_score_perc()
-        assert logged_grade == actual_result.grade, f"Logged results for {question} are not correct"
+        assert repr(log.get_results(question)) == repr(
+            actual_result
+        ), f"Logged results for {question} are not correct"
 
         # checking repr since the results __eq__ method is not defined
-        assert repr(log.get_question_entry(question).get_results()) == repr(actual_result), \
-            f"Logged results for {question} are not correct"
+        assert repr(log.get_question_entry(question).get_results()) == repr(
+            actual_result
+        ), f"Logged results for {question} are not correct"
 
 
 def test_shelve():
@@ -63,14 +60,14 @@ def test_shelve():
     def square(x):
         return x**2
 
-    import calendar 
+    import calendar
 
     env = {
         "num": 5,
         "func": square,
-        "model": LinearRegression(),
+        "df": pd.DataFrame(),
         "module": sys,
-        "ignored_func": calendar.setfirstweekday
+        "ignored_func": calendar.setfirstweekday,
     }
 
     entry = LogEntry(
@@ -81,21 +78,20 @@ def test_shelve():
         error=None,
     )
 
-
-    entry.shelve(env, delete=True, filename=_OTTER_LOG_FILENAME, ignore_modules=['calendar'])
+    entry.shelve(env, delete=True, filename=OTTER_LOG_FILENAME, ignore_modules=["calendar"])
     assert entry.shelf
     assert entry.not_shelved == ["module", "ignored_func"]
 
-    entry.flush_to_file(_OTTER_LOG_FILENAME) 
+    entry.flush_to_file(OTTER_LOG_FILENAME)
 
     from math import factorial
 
-    log = Log.from_file(_OTTER_LOG_FILENAME)
+    log = Log.from_file(OTTER_LOG_FILENAME)
     entry = log.get_question_entry("foo")
     env = entry.unshelve()
-    assert [*env] == ["num", "func", "model"]
+    assert [*env] == ["num", "func", "df"]
 
-    env_with_factorial = entry.unshelve(dict(factorial = factorial))
+    env_with_factorial = entry.unshelve(dict(factorial=factorial))
     assert "factorial" in env_with_factorial["func"].__globals__
     assert factorial is env_with_factorial["func"].__globals__["factorial"]
 
@@ -104,13 +100,13 @@ def test_log_getitem():
     entry = LogEntry(
         event_type=EventType.AUTH,
         results=[],
-        question=None, 
-        success=True, 
+        question=None,
+        success=True,
         error=None,
     )
-    entry.flush_to_file(_OTTER_LOG_FILENAME)
+    entry.flush_to_file(OTTER_LOG_FILENAME)
 
-    log = Log.from_file(_OTTER_LOG_FILENAME)
+    log = Log.from_file(OTTER_LOG_FILENAME)
     assert log[0].event_type == entry.event_type and log[0].results == entry.results
 
 
@@ -118,32 +114,32 @@ def test_log_iter():
     entry1 = LogEntry(
         event_type=EventType.CHECK,
         results=[],
-        question= "q1", 
-        success=True, 
+        question="q1",
+        success=True,
         error=None,
     )
 
     entry2 = LogEntry(
         event_type=EventType.CHECK,
         results=[],
-        question= "q1", 
-        success=True, 
+        question="q1",
+        success=True,
         error=None,
     )
 
     entry3 = LogEntry(
         event_type=EventType.CHECK,
         results=[],
-        question= "q2", 
-        success=True, 
+        question="q2",
+        success=True,
         error=None,
     )
 
-    entry1.flush_to_file(_OTTER_LOG_FILENAME)
-    entry2.flush_to_file(_OTTER_LOG_FILENAME)
-    entry3.flush_to_file(_OTTER_LOG_FILENAME)
+    entry1.flush_to_file(OTTER_LOG_FILENAME)
+    entry2.flush_to_file(OTTER_LOG_FILENAME)
+    entry3.flush_to_file(OTTER_LOG_FILENAME)
 
-    log = Log.from_file(_OTTER_LOG_FILENAME)
+    log = Log.from_file(OTTER_LOG_FILENAME)
 
     log_iter = log.question_iterator()
     assert log_iter.questions == ["q1", "q2"]

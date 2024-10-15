@@ -1,6 +1,7 @@
 """Functions for converting Assign-formatted R Markdown files to and from notebook objects"""
 
 import jupytext
+import nbformat as nbf
 import os
 import re
 
@@ -11,12 +12,12 @@ from ...utils import get_source, NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
 
 HTML_COMMENT_START = "<!--"
 HTML_COMMENT_END = "-->"
-EXTRACT_COMMENT_REGEX = re.compile(fr"{HTML_COMMENT_START}\s*(#\s*[\w ]+)\s*{HTML_COMMENT_END}")
+EXTRACT_COMMENT_REGEX = re.compile(rf"{HTML_COMMENT_START}\s*(#\s*[\w ]+)\s*{HTML_COMMENT_END}")
 CONFIG_START_REGEX = re.compile(r"#\s+(ASSIGNMENT\s+CONFIG|(BEGIN|END)\s+\w+)", re.IGNORECASE)
 YAML_COMMENT_CHAR = "#"
 
 
-def read_as_notebook(rmd_path):
+def read_as_notebook(rmd_path: str) -> nbf.NotebookNode:
     """
     Read an R Markdown file and convert it to a master notebook to be used with Otter Assign.
 
@@ -42,8 +43,8 @@ def read_as_notebook(rmd_path):
                 continue
 
         if in_comment and l.strip() == HTML_COMMENT_END:
-                new_lines.append("<!-- #endraw -->")
-                in_comment = False
+            new_lines.append("<!-- #endraw -->")
+            in_comment = False
 
         elif l.startswith(HTML_COMMENT_START):
             if HTML_COMMENT_END in l:
@@ -94,13 +95,13 @@ def read_as_notebook(rmd_path):
     return nb
 
 
-def write_as_rmd(nb, rmd_path, has_solutions):
+def write_as_rmd(nb: nbf.NotebookNode, rmd_path: str, has_solutions: bool):
     """
     Write an autograder- or student-formatted R notebook as an R Markdown file.
 
     Args:
         nb (``nbformat.NotebookNode``): the notebook to write
-        rmd_path (``pathlib.Path | str``): the path at which to write the R Markdown file
+        rmd_path (``str``): the path at which to write the R Markdown file
         has_solutions (``bool``): whether the provided notebook is an autograder notebook
     """
     if os.path.splitext(rmd_path)[1] != ".Rmd":
@@ -112,8 +113,11 @@ def write_as_rmd(nb, rmd_path, has_solutions):
     # notebook (resolves whitespace issues caused by the use of prompts for written questions)
     if not has_solutions:
         for i, cell in enumerate(nb["cells"]):
-            if i < len(nb["cells"]) - 1 and cell["cell_type"] == "markdown" and \
-                    nb["cells"][i + 1]["cell_type"] == "markdown":
+            if (
+                i < len(nb["cells"]) - 1
+                and cell["cell_type"] == "markdown"
+                and nb["cells"][i + 1]["cell_type"] == "markdown"
+            ):
                 cell["metadata"]["lines_to_next_cell"] = 0
 
     # add assignment name to Rmd metadata if necessary
@@ -121,7 +125,7 @@ def write_as_rmd(nb, rmd_path, has_solutions):
     if assignment_name:
         config_cell = nb["cells"][0]
         source = get_source(config_cell)
-        source.insert(-1, f"assignment_name: \"{assignment_name}\"")
+        source.insert(-1, f'assignment_name: "{assignment_name}"')
         config_cell["source"] = "\n".join(source)
 
     jupytext.write(nb, rmd_path)

@@ -1,17 +1,25 @@
 """Utilities for Otter Generate"""
 
 import os
+import zipfile
+
+from typing import Any, Optional, Union
 
 
-def zip_folder(zf, path, prefix="", exclude=[]):
+def zip_folder(
+    zf: zipfile.ZipFile, path: str, prefix: str = "", exclude: Optional[list[str]] = None
+):
     """
     Recursively add the contents of a directory into a ``zipfile.ZipFile``.
 
     Args:
         zf (``zipfile.ZipFile``): the open zip file object to add to
         path (``str``): an absolute path to the directory to add to the zip file
-        prefix (``str``, optional): a prefix to add to the basename of the path for the archive name
+        prefix (``str``): a prefix to add to the basename of the path for the archive name
     """
+    if exclude is None:
+        exclude = []
+
     if not os.path.isabs(path):
         raise ValueError("'path' must be absolute path")
 
@@ -29,7 +37,7 @@ def zip_folder(zf, path, prefix="", exclude=[]):
             zip_folder(zf, child_path, prefix=os.path.join(prefix, parent_basename))
 
 
-def _get_dep_name(d):
+def _get_dep_name(d: str) -> str:
     """
     Determine the name of a dependency, ignoring version information.
 
@@ -44,7 +52,7 @@ def _get_dep_name(d):
     return d.split(">")[0].split("<")[0].split("=")[0]
 
 
-def merge_conda_environments(e1, e2, name):
+def merge_conda_environments(e1: dict[str, Any], e2: dict[str, Any], name: str) -> dict[str, Any]:
     """
     Merge two conda environments into a single environment with the specified name.
 
@@ -52,14 +60,14 @@ def merge_conda_environments(e1, e2, name):
     ``e2`` conflict, the values in ``e1`` are taken.
 
     Args:
-        e1 (``dict[str, object]``): the first conda environment
-        e2 (``dict[str, object]``): the second conda environment
+        e1 (``dict[str, Any]``): the first conda environment
+        e2 (``dict[str, Any]``): the second conda environment
         name (``str``): the resulting environment name
 
     Returns:
-        ``dict[str, object]``: the merged conda environment
+        ``dict[str, Any]``: the merged conda environment
     """
-    e = {"name": name, "channels": e1.get("channels", []), "dependencies": []}
+    e: dict[str, Any] = {"name": name, "channels": e1.get("channels", []), "dependencies": []}
     e["channels"].extend([c for c in e2.get("channels", []) if c not in e["channels"]])
 
     if not e["channels"]:
@@ -67,7 +75,7 @@ def merge_conda_environments(e1, e2, name):
 
     seen_deps, dicts = set(), []
 
-    def handle_dep(d, target):
+    def handle_dep(d: Union[str, dict[str, Any]], target: list[str]):
         if isinstance(d, dict):
             dicts.append(d)
             return
@@ -93,7 +101,7 @@ def merge_conda_environments(e1, e2, name):
         e["dependencies"].append({"pip": target})
         for di in dicts:
             if set(di.keys()) != {"pip"}:
-                raise ValueError("Dictionaries should only contain the pip key")
+                raise ValueError("dictionaries should only contain the pip key")
             for d in di["pip"]:
                 handle_dep(d, target)
 

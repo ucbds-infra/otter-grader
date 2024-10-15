@@ -4,6 +4,7 @@ import nbformat
 
 from .assignment import Assignment
 from .feature_toggle import FeatureToggle
+from .question_config import QuestionConfig
 from .utils import lock
 
 
@@ -21,10 +22,10 @@ class CellFactory:
     assignment: Assignment
     """the assignment config"""
 
-    def __init__(self, assignment):
+    def __init__(self, assignment: Assignment):
         self.assignment = assignment
 
-    def check_feature_toggle(self, feature_toggle: FeatureToggle):
+    def check_feature_toggle(self, feature_toggle: FeatureToggle) -> bool:
         """
         Check whether the specified feature is enabled for this assignment.
 
@@ -36,29 +37,33 @@ class CellFactory:
         """
         return feature_toggle.value.is_enabled(self.assignment)
 
-    def create_init_cells(self):
+    def create_init_cells(self) -> list[nbformat.NotebookNode]:
         """
         Generate a cell to initialize Otter in the notebook.
 
         Returns:
             ``list[nbformat.NotebookNode]``: the init cell
         """
-        if self.assignment.runs_on == "colab":
-            args = "colab=True"
-        elif self.assignment.runs_on == "jupyterlite":
-            args = "jupyterlite=True"
-        else:
-            args  = f"\"{self.assignment.master.name}\""
+        args = ""
+        if self.assignment.runs_on == "default":
+            args = f'"{self.assignment.master.name}"'
 
         if self.assignment.tests.url_prefix:
-            args += f", tests_url_prefix=\"{self.assignment.tests.url_prefix}\""
+            args += f"{', ' if args else ''}tests_url_prefix=\"{self.assignment.tests.url_prefix}\""
 
-        contents = f'# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})'
+        contents = f"# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})"
         cell = nbformat.v4.new_code_cell(contents)
         lock(cell)
-        return [cell]
 
-    def create_check_cells(self, question):
+        extra_cells = []
+        if self.assignment.runs_on == "colab":
+            pip_cell = nbformat.v4.new_code_cell("%pip install -q otter-grader")
+            lock(pip_cell)
+            extra_cells.append(pip_cell)
+
+        return extra_cells + [cell]
+
+    def create_check_cells(self, question: QuestionConfig) -> list[nbformat.NotebookNode]:
         """
         Create a cell calling ``otter.Notebook.check`` for the specified question.
 
@@ -73,7 +78,7 @@ class CellFactory:
         lock(cell)
         return [cell]
 
-    def create_check_all_cells(self):
+    def create_check_all_cells(self) -> list[nbformat.NotebookNode]:
         """
         Generate a check-all cell and a Markdown cell with instructions to run all tests in the
         notebook.
@@ -82,8 +87,10 @@ class CellFactory:
             ``list[nbformat.NotebookNode]``: the check-all cells
         """
         instructions = nbformat.v4.new_markdown_cell()
-        instructions.source = "---\n\nTo double-check your work, the cell below will rerun all " \
+        instructions.source = (
+            "---\n\nTo double-check your work, the cell below will rerun all "
             "of the autograder tests."
+        )
 
         check_all = nbformat.v4.new_code_cell("grader.check_all()")
 
@@ -92,9 +99,9 @@ class CellFactory:
 
         return [instructions, check_all]
 
-    def create_export_cells(self):
+    def create_export_cells(self) -> list[nbformat.NotebookNode]:
         """
-        Generate export cells that instruct the student the run a code cell calling 
+        Generate export cells that instruct the student the run a code cell calling
         ``otter.Notebook.export`` to generate and download their submission.
 
         Returns:
@@ -104,16 +111,18 @@ class CellFactory:
             return []
 
         instructions = nbformat.v4.new_markdown_cell()
-        instructions.source = "## Submission\n\nMake sure you have run all cells in your " \
-            "notebook in order before running the cell below, so that all images/graphs appear " \
+        instructions.source = (
+            "## Submission\n\nMake sure you have run all cells in your "
+            "notebook in order before running the cell below, so that all images/graphs appear "
             "in the output. The cell below will generate a zip file for you to submit."
+        )
 
         # only include save text if force_save is false
         if not self.assignment.export_cell.force_save:
             instructions.source += " **Please save before exporting!**"
 
         if self.assignment.export_cell.instructions:
-            instructions.source += '\n\n' + self.assignment.export_cell.instructions
+            instructions.source += "\n\n" + self.assignment.export_cell.instructions
 
         export = nbformat.v4.new_code_cell()
         source_lines = []
@@ -121,7 +130,8 @@ class CellFactory:
         # only include save text if force_save is false
         if not self.assignment.export_cell.force_save:
             source_lines.append(
-                "# Save your notebook first, then run this cell to export your submission.")
+                "# Save your notebook first, then run this cell to export your submission."
+            )
 
         args = []
         if not self.assignment.export_cell.filtering:
@@ -132,8 +142,11 @@ class CellFactory:
             args += ["force_save=True"]
         if self.assignment.export_cell.run_tests:
             args += ["run_tests=True"]
-        if len(self.assignment.export_cell.files) != 0:
-            args += [f"files={self.assignment.export_cell.files}"]
+        if self.assignment.export_cell.ignore_log:
+            args += ["ignore_log=True"]
+        if self.assignment.export_cell.files or self.assignment.student_files:
+            l = [*self.assignment.export_cell.files, *self.assignment.student_files]
+            args += [f"files={l}"]
         source_lines.append(f"grader.export({', '.join(args)})")
         export.source = "\n".join(source_lines)
 
@@ -147,7 +160,7 @@ class CellFactory:
         return cells
 
     @staticmethod
-    def create_markdown_response_cell():
+    def create_markdown_response_cell() -> nbformat.NotebookNode:
         """
         Generate a Markdown response cell with the following contents:
 

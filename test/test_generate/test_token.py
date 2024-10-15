@@ -23,7 +23,7 @@ def mocked_requests_post(*args, **kwargs):
 
 @mock.patch("otter.generate.token.getpass.getpass")
 @mock.patch.object(APIClient, "post")
-@mock.patch('builtins.input', return_value='user')
+@mock.patch("builtins.input", return_value="user")
 def test_get_token(mocked_getpass, mocked_post, _):
     """
     Tests happy path for ``otter.generate.token.APIClient.get_token``, which asks the user for their
@@ -33,7 +33,7 @@ def test_get_token(mocked_getpass, mocked_post, _):
     mocked_getpass.return_value = "password"
     token = client.get_token()
     assert mocked_post.return_value.status_code == 200
-    assert token == 'value1'
+    assert token == "value1"
 
 
 @mock.patch.object(APIClient, "post")
@@ -43,7 +43,7 @@ def test_upload_pdf(mocked_post, _):
     Tests happy path for ``otter.generate.token.APIClient.upload_pdf``.
     """
     mocked_post.return_value = mocked_requests_post()
-    client.upload_pdf_submission('123', '1', 'email', 'file.txt')
+    client.upload_pdf_submission("123", "1", "email", "file.txt")
     assert mocked_post.return_value.status_code == 200
 
 
@@ -54,7 +54,7 @@ def test_replace_pdf(mocked_post, _):
     Tests happy path for ``otter.generate.token.APIClient.replace_pdf``.
     """
     mocked_post.return_value = mocked_requests_post()
-    client.replace_pdf_submission('123', '1', 'email', 'file.txt')
+    client.replace_pdf_submission("123", "1", "email", "file.txt")
     assert mocked_post.return_value.status_code == 200
 
 
@@ -65,5 +65,5 @@ def test_upload_programming(mocked_post, _):
     Tests happy path for ``otter.generate.token.APIClient.upload_programming_submission``.
     """
     mocked_post.return_value = mocked_requests_post()
-    client.upload_programming_submission('123', '1', 'email', ['python.py', 'nb.ipynb'])
+    client.upload_programming_submission("123", "1", "email", ["python.py", "nb.ipynb"])
     assert mocked_post.return_value.status_code == 200

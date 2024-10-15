@@ -4,7 +4,7 @@ channels:
   - conda-forge
   - r
 dependencies:
-  - python=3.9
+  - python=3.12
   - pip
   - nb_conda_kernels
   - gcc_linux-64
@@ -38,5 +38,5 @@ dependencies:
       - numpy
       - gspread
       - pypdf
-      - otter-grader==5.7.1
+      - otter-grader[grading,plugins]==5.7.1
       - rpy2

@@ -22,7 +22,7 @@ def test_merge_conda_environments():
                     "p4<=10",
                 ],
             },
-        ]
+        ],
     }
     e2 = {
         "name": "bar",
@@ -42,7 +42,7 @@ def test_merge_conda_environments():
                     "p5",
                 ],
             },
-        ]
+        ],
     }
     expected = {
         "name": "baz",
@@ -65,6 +65,6 @@ def test_merge_conda_environments():
                     "p5",
                 ],
             },
-        ]
+        ],
     }
     assert merge_conda_environments(e1, e2, "baz") == expected

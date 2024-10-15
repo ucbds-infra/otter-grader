@@ -4,39 +4,22 @@ channels:
   - conda-forge
   - r
 dependencies:
-  - python=3.9
+  - python=3.12
   - pip
   - nb_conda_kernels
   - gcc_linux-64
   - gxx_linux-64
-  - r-base>=4.0.0
-  - r-essentials
-  - r-devtools
   - libgit2
   - libgomp
+  - r-base>=4.0.0
+  - r-devtools
+  - r-essentials
   - r-gert
-  - r-usethis
-  - r-testthat
-  - r-startup
   - r-rmarkdown
+  - r-startup
   - r-stringi
+  - r-testthat
+  - r-usethis
   - r-ottr==1.5.0
   - pip:
-      - datascience
-      - jupyter_client
-      - ipykernel
-      - matplotlib
-      - pandas
-      - ipywidgets
-      - scipy
-      - seaborn
-      - scikit-learn
-      - jinja2
-      - nbconvert
-      - nbformat
-      - dill
-      - numpy
-      - gspread
-      - pypdf
-      - otter-grader==5.7.1
-      - rpy2
+      - otter-grader[grading,plugins,r]==5.7.1

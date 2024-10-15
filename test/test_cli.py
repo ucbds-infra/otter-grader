@@ -11,7 +11,7 @@ from unittest import mock
 from otter import __version__
 from otter.cli import cli
 from otter.generate import main as generate
-from otter.grade import _ALLOWED_EXTENSIONS, main as grade
+from otter.grade import ALLOWED_EXTENSIONS, main as grade
 from otter.run import main as run
 from otter.test_files import GradingResults
 
@@ -20,8 +20,9 @@ def assert_cli_result(result, expect_error):
     """
     Asserts that the ``CliRunner`` result exited with code 0.
     """
-    assert result.exit_code != 0 if expect_error else result.exit_code == 0, \
-        result.stdout_bytes.decode("utf-8")
+    assert (
+        result.exit_code != 0 if expect_error else result.exit_code == 0
+    ), result.stdout_bytes.decode("utf-8")
 
 
 @pytest.fixture()
@@ -54,24 +55,24 @@ def test_version(mocked_version, run_cli):
 
 
 @mock.patch("otter.cli.assign")
-@mock.patch("otter.cli.loggers")
-def test_verbosity(mocked_loggers, _, run_cli):
+@mock.patch("otter.cli.logging")
+def test_verbosity(mocked_logging, _, run_cli):
     """
     Tests setting the verbosity of Otter's message logging system.
     """
     open("foo.ipynb", "w+").close()
 
     run_cli(["assign", "foo.ipynb", "dist"])
-    mocked_loggers.set_level.assert_called_with(logging.WARNING)
+    mocked_logging.set_level.assert_called_with(logging.WARNING)
 
     run_cli(["assign", "foo.ipynb", "dist", "-v"])
-    mocked_loggers.set_level.assert_called_with(logging.INFO)
+    mocked_logging.set_level.assert_called_with(logging.INFO)
 
     run_cli(["assign", "foo.ipynb", "dist", "-vv"])
-    mocked_loggers.set_level.assert_called_with(logging.DEBUG)
+    mocked_logging.set_level.assert_called_with(logging.DEBUG)
 
     run_cli(["assign", "foo.ipynb", "dist", "-vvv"])
-    mocked_loggers.set_level.assert_called_with(logging.DEBUG)
+    mocked_logging.set_level.assert_called_with(logging.DEBUG)
 
 
 @mock.patch("otter.cli.assign")
@@ -435,7 +436,7 @@ def test_grade(mocked_grade, run_cli):
     os.mkdir("notebooks")
     result = run_cli([*cmd_start, "notebooks"])
     assert_cli_result(result, expect_error=False)
-    mocked_grade.assert_called_with(**{**std_kwargs, "paths": ("notebooks", )})
+    mocked_grade.assert_called_with(**{**std_kwargs, "paths": ("notebooks",)})
 
     open("foo.ipynb", "w+").close()
     result = run_cli([*cmd_start, "foo.ipynb"])
@@ -446,7 +447,9 @@ def test_grade(mocked_grade, run_cli):
     open("baz.ipynb", "w+").close()
     result = run_cli([*cmd_start, "foo.ipynb", "bar.ipynb", "baz.ipynb"])
     assert_cli_result(result, expect_error=False)
-    mocked_grade.assert_called_with(**{**std_kwargs, "paths": ("foo.ipynb", "bar.ipynb", "baz.ipynb")})
+    mocked_grade.assert_called_with(
+        **{**std_kwargs, "paths": ("foo.ipynb", "bar.ipynb", "baz.ipynb")}
+    )
 
     result = run_cli([*cmd_start, "-n", "hw01"])
     assert_cli_result(result, expect_error=False)
@@ -474,7 +477,7 @@ def test_grade(mocked_grade, run_cli):
     assert_cli_result(result, expect_error=False)
     mocked_grade.assert_called_with(**{**std_kwargs, "output_dir": "output"})
 
-    for ext in _ALLOWED_EXTENSIONS:
+    for ext in ALLOWED_EXTENSIONS:
         result = run_cli([*cmd_start, "--ext", ext])
         assert_cli_result(result, expect_error=False)
         mocked_grade.assert_called_with(**{**std_kwargs, "ext": ext})
@@ -543,6 +546,8 @@ def test_run(mocked_run, run_cli):
         submission="foo.ipynb",
         **run.__kwdefaults__,
     )
+    # extra_submission_files is not used by the CLI
+    std_kwargs.pop("extra_submission_files")
 
     result = run_cli([*cmd_start])
     assert_cli_result(result, expect_error=False)

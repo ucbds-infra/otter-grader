@@ -12,7 +12,7 @@ import zipfile
 
 from contextlib import contextmanager
 
-from otter.check.notebook import _OTTER_LOG_FILENAME
+from otter.check.notebook import OTTER_LOG_FILENAME
 from otter.test_files import OK_FORMAT_VARNAME
 
 
@@ -30,14 +30,18 @@ class TestFileManager:
 
     def assert_path_exists(self, path, file_okay=True, dir_okay=True):
         path = self.get_path(path)
-        assert os.path.exists(path) and (file_okay or os.path.isdir(path)) and \
-            (dir_okay or os.path.isfile(path))
+        assert (
+            os.path.exists(path)
+            and (file_okay or os.path.isdir(path))
+            and (dir_okay or os.path.isfile(path))
+        )
 
     @classmethod
     def create_fixture(cls, file_dir):
         @pytest.fixture
         def file_manager():
             return cls(file_dir)
+
         return file_manager
 
 
@@ -55,7 +59,7 @@ def assert_notebooks_equal(p1, p2):
 
 def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
     """
-    Assert that two files have the same conents, optionally ignoring trailing whitespace.
+    Assert that two files have the same conentsly ignoring trailing whitespace.
     """
     assert os.path.splitext(p1)[1] == os.path.splitext(p2)[1]
     if os.path.splitext(p1)[1] == ".ipynb":
@@ -93,9 +97,9 @@ def assert_dirs_equal(
     Args:
         dir1 (``str``): the first directory
         dir1 (``str``): the second directory
-        ignore_ext (``list[str]``, optional): a list of extensions for which the contents of any
+        ignore_ext (``list[str]``): a list of extensions for which the contents of any
             such files will not be compared when checking directories
-        ignore_dirs (``list[str]``, optional): a list of directory names whose contents should
+        ignore_dirs (``list[str]``): a list of directory names whose contents should
             be assumed to be the same (i.e. not to check)
         variable_path_exts(``list[str]``. optional): a list of extensions for paths whose stems
             may be different; if present, the number of files with these extensions is compared,
@@ -106,8 +110,9 @@ def assert_dirs_equal(
     assert os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type"
 
     if os.path.isfile(dir1):
-        if os.path.splitext(dir1)[1] not in ignore_ext and \
-                (not ignore_log or os.path.split(dir1)[1] != _OTTER_LOG_FILENAME):
+        if os.path.splitext(dir1)[1] not in ignore_ext and (
+            not ignore_log or os.path.split(dir1)[1] != OTTER_LOG_FILENAME
+        ):
             assert_files_equal(dir1, dir2)
 
     else:
@@ -117,28 +122,35 @@ def assert_dirs_equal(
                 for f in os.listdir(dir1)
                 if not (os.path.isdir(os.path.join(dir1, f)) and f in ignore_dirs)
                 and os.path.splitext(f)[1] not in variable_path_exts
-            ], 
+            ],
             [
                 f
                 for f in os.listdir(dir2)
                 if not (os.path.isdir(os.path.join(dir2, f)) and f in ignore_dirs)
                 and os.path.splitext(f)[1] not in variable_path_exts
-            ], 
+            ],
         )
-        assert sorted(dir1_contents) == sorted(dir2_contents), \
-            f"{dir1} and {dir2} have different contents: {dir1_contents} != {dir2_contents}"
+        assert sorted(dir1_contents) == sorted(
+            dir2_contents
+        ), f"{dir1} and {dir2} have different contents: {dir1_contents} != {dir2_contents}"
 
         # check that for each variable path ext, there are the same number of files in each dir
         # with that ext
         for ext in variable_path_exts:
-            assert len([f for f in os.listdir(dir1) if os.path.splitext(f)[1] == ext]) == \
-                len([f for f in os.listdir(dir2) if os.path.splitext(f)[1] == ext]), \
-                f"Variable path extension check failed for {dir1} and {dir2} with ext {ext}"
+            assert len([f for f in os.listdir(dir1) if os.path.splitext(f)[1] == ext]) == len(
+                [f for f in os.listdir(dir2) if os.path.splitext(f)[1] == ext]
+            ), f"Variable path extension check failed for {dir1} and {dir2} with ext {ext}"
 
         for f1, f2 in zip(dir1_contents, dir2_contents):
             f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
-            assert_dirs_equal(f1, f2, ignore_ext=ignore_ext, ignore_dirs=ignore_dirs, 
-                variable_path_exts=variable_path_exts, ignore_log=ignore_log)
+            assert_dirs_equal(
+                f1,
+                f2,
+                ignore_ext=ignore_ext,
+                ignore_dirs=ignore_dirs,
+                variable_path_exts=variable_path_exts,
+                ignore_log=ignore_log,
+            )
 
 
 def delete_paths(paths, error_if_absent=False):
@@ -186,9 +198,9 @@ def write_ok_test(
                         "success_message": success_message,
                         "failure_message": failure_message,
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
     with open(path, "w+") as f:

@@ -2,18 +2,25 @@
 
 import os
 
-from .utils import WkhtmltopdfNotFoundError
+from typing import Any, Optional
+
+from .exporters import ExporterType
 
 
-def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
+def export_notebook(
+    nb_path: str,
+    dest: Optional[str] = None,
+    exporter_type: Optional[ExporterType] = None,
+    **kwargs: Any,
+):
     """
     Exports a notebook file at ``nb_path`` to a PDF with optional filtering and pagebreaks. Accepts
     other ``kwargs`` passed to the exporter class's ``convert_notebook`` class method.
 
     Args:
         nb_path (``str``): path to notebook
-        dest (``str``, optional): path to write PDF
-        exporter_type (``str``, optional): the type of exporter to use; one of ``['html', 'latex']``
+        dest (``str | None``): path to write PDF
+        exporter_type (``"html" | "latex" | None``): the type of exporter to use
         **kwargs: additional configurations passed to exporter
 
     Returns:
@@ -38,15 +45,23 @@ def export_notebook(nb_path, dest=None, exporter_type=None, **kwargs):
     return pdf_name
 
 
-def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, save=False, 
-         xecjk=False):
+def main(
+    src: str,
+    *,
+    dest: Optional[str] = None,
+    exporter: Optional[ExporterType] = None,
+    filtering: bool = False,
+    pagebreaks: bool = False,
+    save: bool = False,
+    xecjk: bool = False,
+):
     """
     Runs Otter Export
 
     Args:
         src (``str``): path to source notebook
-        dest (``Optional[str]``): path at which to write PDF
-        exporter (``Optional[str]``): exporter name
+        dest (``str | None``): path at which to write PDF
+        exporter (``str | None``): exporter name
         filtering (``bool``): whether to filter cells using HTML comments
         pagebreaks (``bool``): whether to pagebreak between filtered regions; ignored if ``filtering``
             is ``False``
@@ -55,11 +70,11 @@ def main(src, *, dest=None, exporter=None, filtering=False, pagebreaks=False, sa
     """
     export_notebook(
         src,
-        dest = dest,
-        exporter_type = exporter,
-        filtering = filtering,
-        pagebreaks = pagebreaks,
-        save_tex = save,
-        save_html = save,
+        dest=dest,
+        exporter_type=exporter,
+        filtering=filtering,
+        pagebreaks=pagebreaks,
+        save_tex=save,
+        save_html=save,
         xecjk=xecjk,
     )

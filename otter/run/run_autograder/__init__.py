@@ -1,26 +1,29 @@
 """Autograding process internals for Otter-Grader"""
 
-import os
 import json
+import os
 import pandas as pd
 import zipfile
 
+from contextlib import nullcontext
 from glob import glob
+from typing import Any, Union
 
+from .autograder_config import AutograderConfig
 from .runners import create_runner
 from .utils import capture_run_output, OtterRuntimeError, print_output
-
+from ... import logging
+from ...utils import chdir, OTTER_CONFIG_FILENAME
 from ...version import LOGO_WITH_VERSION
-from ...utils import chdir, loggers, nullcontext, OTTER_CONFIG_FILENAME
 
 
-__all__ = ["capture_run_output", "main"]
+__all__ = ["AutograderConfig", "capture_run_output", "main"]
 
 
-LOGGER = loggers.get_logger(__name__)
+LOGGER = logging.get_logger(__name__)
 
 
-def main(autograder_dir, otter_run=False, **kwargs):
+def main(autograder_dir: str, *, otter_run: bool = False, **kwargs: Any):
     """
     Run the autograding process.
 
@@ -42,11 +45,11 @@ def main(autograder_dir, otter_run=False, **kwargs):
         config = {}
 
     runner = create_runner(config, autograder_dir=autograder_dir, **kwargs)
-    runner.ag_config._otter_run = otter_run
+    runner.ag_config.otter_run = otter_run
 
     ctx = nullcontext()
     if runner.ag_config.log_level is not None:
-        ctx = loggers.level_context(runner.ag_config.log_level)
+        ctx = logging.level_context(runner.ag_config.log_level)
 
     with ctx:
         LOGGER.debug(f"Detected containerized grading (T/F): {'F' if otter_run else 'T'}")
@@ -65,15 +68,17 @@ def main(autograder_dir, otter_run=False, **kwargs):
                     with chdir("./submission"):
                         zips = glob("*.zip")
                         if len(zips) > 1:
-                            raise OtterRuntimeError("More than one zip file found in submission and 'zips' config is true")
+                            raise OtterRuntimeError(
+                                "More than one zip file found in submission and 'zips' config is true"
+                            )
 
-                        with zipfile.ZipFile(zips[0])  as zf:
+                        with zipfile.ZipFile(zips[0]) as zf:
                             zf.extractall()
 
                 runner.prepare_files()
                 scores = runner.run()
                 with open("results/results.pkl", "wb+") as f:
-                        dill.dump(scores, f)
+                    dill.dump(scores, f)
 
                 output = scores.to_gradescope_dict(runner.ag_config)
 
@@ -93,13 +98,15 @@ def main(autograder_dir, otter_run=False, **kwargs):
             finally:
                 if "output" in vars():
                     with open("./results/results.json", "w+") as f:
-                        json.dump(output, f, indent=4)                
+                        json.dump(output, f, indent=4)
 
         print_output("\n\n", end="")
 
         df = pd.DataFrame(output["tests"])
 
-        if runner.ag_config.print_score  and "score" in df.columns:
+        if runner.ag_config.print_score and "score" in df.columns:
+            total: Union[int, float]
+            possible: Union[int, float]
             total, possible = df["score"].sum(), df["max_score"].sum()
             if "score" in output:
                 total, possible = output["score"], runner.ag_config.points_possible or possible
