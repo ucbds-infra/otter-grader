@@ -405,6 +405,7 @@ class Notebook(Loggable):
         display_link: bool = True,
         force_save: bool = False,
         run_tests: bool = False,
+        ignore_log: bool = False,
     ):
         """
         Export a submission zip file.
@@ -430,6 +431,7 @@ class Notebook(Loggable):
                 notebook (only works in Jupyter Notebook classic, not JupyterLab)
             run_tests (``bool``): whether to validating the resulting submission zip against local
                 test cases
+            ignore_log (``bool``): whether to exclude the .OTTER_LOG file from the submission zip
         """
         self._log_event(EventType.BEGIN_EXPORT)
 
@@ -485,7 +487,7 @@ class Notebook(Loggable):
                 warnings.warn("Could not locate a PDF to include")
 
         def continue_export():
-            if os.path.isfile(OTTER_LOG_FILENAME):
+            if not ignore_log and os.path.isfile(OTTER_LOG_FILENAME):
                 zf.write(OTTER_LOG_FILENAME)
                 self._logger.debug("Added Otter log to zip file")
 

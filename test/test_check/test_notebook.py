@@ -161,6 +161,27 @@ def test_export(mocked_export, mocked_zf, mocked_dt, write_notebook):
 
 
 @mock.patch("otter.check.notebook.zipfile.ZipFile")
+@mock.patch("otter.check.notebook.export_notebook")
+def test_export_ignore_log(mocked_export, mocked_zf, write_notebook):
+    """
+    Checks the ``ignore_log`` argument of ``Notebook.export``
+    """
+    write_notebook(nbf.v4.new_notebook())
+
+    grader = Notebook(tests_dir=TESTS_DIR)
+
+    with mock.patch.object(grader, "_resolve_nb_path") as mocked_resolve:
+        mocked_resolve.return_value = NB_PATH
+
+        grader.export(ignore_log=True)
+
+        # There is no assert_not_called_with method on the MagicMock class, so check that asserting
+        # the undesired call raises an AssertionError instead.
+        with pytest.raises(AssertionError):
+            mocked_zf.return_value.write.assert_any_call(OTTER_LOG_FILENAME)
+
+
+@mock.patch("otter.check.notebook.zipfile.ZipFile")
 def test_export_with_directory_in_files(mocked_zf, write_notebook):
     """
     Checks that ``Notebook.export`` correctly recurses into subdirectories to find files when a
