@@ -54,7 +54,14 @@ class CellFactory:
         contents = f"# Initialize Otter\nimport otter\ngrader = otter.Notebook({args})"
         cell = nbformat.v4.new_code_cell(contents)
         lock(cell)
-        return [cell]
+
+        extra_cells = []
+        if self.assignment.runs_on == "colab":
+            pip_cell = nbformat.v4.new_code_cell("%pip install -q otter-grader")
+            lock(pip_cell)
+            extra_cells.append(pip_cell)
+
+        return extra_cells + [cell]
 
     def create_check_cells(self, question: QuestionConfig) -> list[nbformat.NotebookNode]:
         """
