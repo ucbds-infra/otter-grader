@@ -116,6 +116,12 @@ class Assignment(fica.Config, Loggable):
             subkey_container=RequireNoPDFAckValue,
         )
 
+        ignore_log: bool = fica.Key(
+            description="whether to exclude the .OTTER_LOG file from the submission zip file",
+            default=False,
+            type_=bool,
+        )
+
     export_cell: ExportCellValue = fica.Key(
         description="whether to include an Otter export cell in the output notebooks",
         subkey_container=ExportCellValue,

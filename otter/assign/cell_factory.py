@@ -142,6 +142,8 @@ class CellFactory:
             args += ["force_save=True"]
         if self.assignment.export_cell.run_tests:
             args += ["run_tests=True"]
+        if self.assignment.export_cell.ignore_log:
+            args += ["ignore_log=True"]
         if self.assignment.export_cell.files or self.assignment.student_files:
             l = [*self.assignment.export_cell.files, *self.assignment.student_files]
             args += [f"files={l}"]
