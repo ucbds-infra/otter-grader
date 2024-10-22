@@ -35,6 +35,11 @@ class QuestionConfig(fica.Config):
         default=False,
     )
 
+    all_or_nothing: bool = fica.Key(
+        description="whether points should be assigned on an all-or-nothing basis",
+        default=False,
+    )
+
     def __init__(
         self,
         user_config: Optional[dict[str, Any]] = None,
