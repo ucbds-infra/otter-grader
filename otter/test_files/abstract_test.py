@@ -222,6 +222,8 @@ class TestFile(ABC):
         """the total points earned in this test file"""
         if self._score is not None:
             return self._score
+        if self.all_or_nothing:
+            return self.grade * self.possible
         return sum(tcr.test_case.points for tcr in self.test_case_results if tcr.passed)
 
     @property

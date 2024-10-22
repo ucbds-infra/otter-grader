@@ -84,6 +84,7 @@ class RAssignmentTestsManager(AssignmentTestsManager):
         self,
         name: str,
         points: Optional[Union[int, float, list[Optional[Union[int, float]]]]],
+        all_or_nothing: bool,
         test_cases: list[TestCase],
     ) -> str:
         template_data = {"name": name, "test_cases": test_cases}

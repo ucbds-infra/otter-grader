@@ -222,6 +222,7 @@ class ExceptionTestFile(TestFile):
 
         name = env["name"]
         points = env.get("points", None)
+        all_or_nothing = env.get("all_or_nothing", False)
         test_cases = []
         for _, v in env.items():
             if isinstance(v, test_case):
@@ -233,7 +234,7 @@ class ExceptionTestFile(TestFile):
         test_cases = cls.resolve_test_file_points(points, test_cases)
 
         path = str(pathlib.Path(path).as_posix())
-        return cls(name, path, test_cases, all_or_nothing=False)
+        return cls(name, path, test_cases, all_or_nothing=all_or_nothing)
 
     @classmethod
     def from_string(cls, s: str, path: str = "<string>") -> "ExceptionTestFile":

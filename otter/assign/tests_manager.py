@@ -31,7 +31,8 @@ from otter.test_files import test_case
 {{ OK_FORMAT_VARNAME }} = False
 
 name = "{{ name }}"
-points = {{ points }}
+points = {{ points }}{% if all_or_nothing %}
+all_or_nothing = True{% endif %}
 
 {% for tc in test_cases %}@test_case(points={{ tc.points }}, hidden={{ tc.hidden }}{% if tc.success_message is not none %}, 
     success_message="{{ tc.success_message }}"{% endif %}{% if tc.failure_message is not none %}, 
@@ -229,6 +230,7 @@ class AssignmentTestsManager:
         return {
             "name": question.name,
             "points": points,
+            "all_or_nothing": question.all_or_nothing,
             "test_cases": test_cases,
         }
 
@@ -281,6 +283,7 @@ class AssignmentTestsManager:
         self,
         name: str,
         points: Union[int, float, list[Union[int, float, None]], None],
+        all_or_nothing: bool,
         test_cases: list[TestCase],
     ) -> Union[str, dict[str, Any]]:
         """
@@ -290,6 +293,8 @@ class AssignmentTestsManager:
             name (``str``): the name of the question
             points (``int | float | list[int | float | None] | None``): the ``points`` configuration
                 from the question config
+            all_or_nothing (``bool``): the ``all_or_nothing`` configuration from the question
+                config
             test_cases (``list[TestCase]``): the test cases for the question
 
         Returns:
@@ -299,13 +304,17 @@ class AssignmentTestsManager:
             test = {
                 "name": name,
                 "points": points,
-                "suites": [self._create_ok_test_suite(test_cases)],
             }
+            # Only set all_or_nothing if it's true, since it defaults to false.
+            if all_or_nothing:
+                test["all_or_nothing"] = True
+            test["suites"] = [self._create_ok_test_suite(test_cases)]
 
         else:
             template_kwargs = {
                 "name": name,
                 "points": points,
+                "all_or_nothing": all_or_nothing,
                 "test_cases": test_cases,
                 "OK_FORMAT_VARNAME": OK_FORMAT_VARNAME,
             }
@@ -350,7 +359,10 @@ class AssignmentTestsManager:
                     ]
 
             test = self._format_test(
-                test_info["name"], test_info["points"], test_info["test_cases"]
+                test_info["name"],
+                test_info["points"],
+                test_info["all_or_nothing"],
+                test_info["test_cases"],
             )
 
             if use_files:

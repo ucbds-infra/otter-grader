@@ -23,6 +23,9 @@
 * Added handling of student-created files with the `student_files` configuration in Otter Assign per [#737](https://github.com/ucbds-infra/otter-grader/issues/737)
 * Updated Otter Assign to add a cell to install Otter at the top of Colab notebooks per [#861](https://github.com/ucbds-infra/otter-grader/issues/861)
 * Added the ability to ignore the `.OTTER_LOG` file to `Notebook.export` and Otter Assign per [#857](https://github.com/ucbds-infra/otter-grader/issues/857)
+* Fixed OK-test support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
+* Added exception-based test support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
+* Added Otter Assign support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
 
 **v5.7.1:**
 

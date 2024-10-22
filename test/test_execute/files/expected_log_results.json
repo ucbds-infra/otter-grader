@@ -14,7 +14,7 @@
                 "failure_message": null
             }
         ],
-        "all_or_nothing": true,
+        "all_or_nothing": false,
         "test_case_results": [
             {
                 "test_case": {
@@ -45,7 +45,7 @@
                 "failure_message": null
             }
         ],
-        "all_or_nothing": true,
+        "all_or_nothing": false,
         "test_case_results": [
             {
                 "test_case": {
@@ -76,7 +76,7 @@
                 "failure_message": null
             }
         ],
-        "all_or_nothing": true,
+        "all_or_nothing": false,
         "test_case_results": [
             {
                 "test_case": {

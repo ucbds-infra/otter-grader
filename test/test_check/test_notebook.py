@@ -103,7 +103,7 @@ def test_check():
         if q != "q2":
             assert result.grade == 1, "Test {} failed".format(q)
         else:
-            assert result.grade == 0, "Test {} passed".format(q)
+            assert result.grade == 0.5, "Test {} passed".format(q)
 
         assert repr(result) == expected_reprs[q]
 
@@ -112,7 +112,7 @@ def test_check():
         if q != "q2":
             assert result.grade == 1, "Test {} failed".format(q)
         else:
-            assert result.grade == 0, "Test {} passed".format(q)
+            assert result.grade == 0.5, "Test {} passed".format(q)
 
 
 @mock.patch("otter.check.notebook.export_notebook")
