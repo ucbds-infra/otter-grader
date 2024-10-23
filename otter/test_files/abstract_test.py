@@ -98,7 +98,7 @@ class TestFile(ABC):
                 if not tcr.passed and tcr.test_case.failure_message is not None:
                     ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> message:</strong> {tcr.test_case.failure_message}</p>"
                 ret += f"<p><strong><pre style='display: inline;'>{tcr.test_case.name}</pre> result:</strong></p>"
-                ret += f"<pre>{indent(tcr.message, '    ')}</pre>"
+                ret += f"<pre>{indent(tcr.message or '', '    ')}</pre>"
 
             return ret
 
@@ -145,7 +145,7 @@ class TestFile(ABC):
             total_points = None
 
         elif total_points is not None and not isinstance(total_points, (int, float)):
-            raise TypeError(f"Test spec points has invalid type: {total_points}")
+            raise TypeError(f"Test spec points has invalid type: {type(total_points)}")
 
         point_values = []
         for test_case in test_cases:
@@ -162,7 +162,7 @@ class TestFile(ABC):
         pre_specified = sum(p for p in point_values if p is not None)
         if total_points is not None:
             if pre_specified > total_points:
-                raise ValueError(f"More points specified in test cases than allowed for test")
+                raise ValueError("More points specified in test cases than allowed for test")
 
             else:
                 try:
@@ -179,9 +179,6 @@ class TestFile(ABC):
                     per_remaining = 1 / sum(p is None for p in point_values)
                 except ZeroDivisionError:
                     per_remaining = 0.0
-
-            elif pre_specified == 0:
-                per_remaining = 1 / len(point_values)
 
             else:
                 # assume all other tests are worth 0 points
@@ -269,12 +266,12 @@ class TestFile(ABC):
         """
         if (not public_only and self.passed_all) or (public_only and self.passed_all_public):
             ret = f"{self.name} results: All test cases passed!"
-            if (not public_only and self.passed_all) and any(
-                tcr.test_case.success_message is not None for tcr in self.test_case_results
-            ):
-                for tcr in self.test_case_results:
-                    if tcr.test_case.success_message is not None:
-                        ret += f"\n{tcr.test_case.name} message: {tcr.test_case.success_message}"
+            all_tcrs = self.test_case_results
+            if public_only:
+                all_tcrs = [tcr for tcr in self.test_case_results if not tcr.test_case.hidden]
+            for tcr in all_tcrs:
+                if tcr.test_case.success_message is not None:
+                    ret += f"\n{tcr.test_case.name} message: {tcr.test_case.success_message}"
             return ret
 
         tcrs = self.test_case_results
@@ -289,7 +286,7 @@ class TestFile(ABC):
             if not tcr.passed and tcr.test_case.failure_message is not None:
                 smry += f"{tcr.test_case.name} message: {tcr.test_case.failure_message}\n\n"
             smry += f"{tcr.test_case.name} result:\n"
-            smry += f"{indent(tcr.message.strip(), '    ')}\n\n"
+            smry += f"{indent((tcr.message or '').strip(), '    ')}\n\n"
 
             tcr_summaries.append(smry.strip())
 

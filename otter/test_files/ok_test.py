@@ -66,6 +66,7 @@ class OKTestFile(TestFile):
         Arguments:
             ``global_environment`` (``dict``): result of executing a Python notebook/script
         """
+        self.test_case_results = []
         for i, test_case in enumerate(self.test_cases):
             passed, result = run_doctest(
                 self.name + " " + str(i), test_case.body, global_environment

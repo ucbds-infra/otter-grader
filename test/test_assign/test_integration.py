@@ -19,10 +19,6 @@ from otter.utils import dump_yaml
 from ..utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 
 
-# prevent pytest from thinking TestCase is a testing class
-TestCase.__test__ = False
-
-
 FILE_MANAGER = TestFileManager(__file__)
 
 
