@@ -8,3 +8,4 @@ dependencies:
     - r-essentials
     - r-devtools
     - pip
+    - nb_conda_kernels

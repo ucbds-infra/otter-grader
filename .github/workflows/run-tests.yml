@@ -46,7 +46,7 @@ jobs:
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('pyproject.toml', 'poetry.lock') }}
+          cache-environment-key: requirements-${{ hashFiles('environment.yml') }}
 
       - name: Install dependencies
         run: |
