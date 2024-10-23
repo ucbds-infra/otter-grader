@@ -51,6 +51,7 @@ jobs:
       - name: Install dependencies
         run: |
           micromamba activate otter-grader
+          poetry env info
           poetry install --with dev,test --all-extras
 
       - name: Install ottr
