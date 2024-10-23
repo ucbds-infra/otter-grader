@@ -52,6 +52,17 @@ class test_case:
         self.failure_message = failure_message
         self.test_func = lambda: None
 
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, type(self)):
+            return False
+        return (
+            self.name == other.name
+            and self.points == other.points
+            and self.hidden == other.hidden
+            and self.success_message == other.success_message
+            and self.failure_message == other.failure_message
+        )
+
     def __call__(self, test_func: Callable[..., None]) -> "test_case":
         """
         Wrap a test case function as a decorator.
@@ -175,7 +186,7 @@ class ExceptionTestFile(TestFile):
         Arguments:
             global_environment (``dict[str, Any]``): result of executing a Python notebook/script
         """
-        test_case_results = []
+        self.test_case_results = []
         for tc in self.test_cases:
             test_case = tc.body
             passed, message = True, "✅ Test case passed"
@@ -184,9 +195,9 @@ class ExceptionTestFile(TestFile):
             except Exception as e:
                 passed, message = False, "❌ Test case failed\n" + self._generate_error_message(e)
 
-            test_case_results.append(TestCaseResult(test_case=tc, message=message, passed=passed))
-
-        self.test_case_results = test_case_results
+            self.test_case_results.append(
+                TestCaseResult(test_case=tc, message=message, passed=passed)
+            )
 
     @staticmethod
     def _compile_string(s: str, path: str = "<string>") -> CodeType:

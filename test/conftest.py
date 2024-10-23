@@ -9,6 +9,7 @@ from python_on_whales import docker
 from unittest import mock
 
 from otter import __file__ as OTTER_PATH
+from otter.test_files import TestCase, TestCaseResult, TestFile
 
 from .utils import TestFileManager
 
@@ -16,6 +17,11 @@ from .utils import TestFileManager
 FILE_MANAGER = TestFileManager(__file__)
 REPO_DIR = os.getcwd()
 REAL_DOCKER_BUILD = docker.build
+
+# prevent pytest from thinking these classes are testing classes
+TestCase.__test__ = False
+TestCaseResult.__test__ = False
+TestFile.__test__ = False
 
 
 def pytest_addoption(parser):
