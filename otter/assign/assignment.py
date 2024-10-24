@@ -18,6 +18,13 @@ class Assignment(fica.Config, Loggable):
     Configurations for the assignment.
     """
 
+
+    traceback_length: Optional[str] = fica.Key(
+        description="how much of the traceback message to print upon test failure",
+        default="assertion_msg",
+        validator=fica.validators.choice(["full", "assertion_msg", "none"])
+    )
+
     name: Optional[str] = fica.Key(
         description = "a name for the assignment (to validate that students submit to the correct " \
             "autograder)",
