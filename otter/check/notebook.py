@@ -5,6 +5,7 @@ import inspect
 import json
 import nbformat as nbf
 import os
+import sys
 import warnings
 import zipfile
 
@@ -273,7 +274,12 @@ class Notebook(Loggable):
         # pass the correct global environment
         if global_env is None:
             self._logger.debug(f"Collecting calling global environment")
-            global_env = inspect.currentframe().f_back.f_back.f_globals
+            frame = inspect.currentframe().f_back.f_back
+            # I have NO IDEA why but in python 3.13 we need to go back an additional frame. I spent
+            # h o u r s trying to figure out why but I was unsuccessful.
+            if sys.version_info.minor >= 13 or sys.version_info.major > 3:
+                frame = frame.f_back
+            global_env = frame.f_globals
 
         # run the check
         self._logger.debug(f"Calling checker")
