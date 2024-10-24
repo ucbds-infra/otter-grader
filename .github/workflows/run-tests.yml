@@ -21,6 +21,10 @@ jobs:
     name: Test suite
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
     env:
       TAR: /bin/tar
 
@@ -43,10 +47,12 @@ jobs:
       - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: environment.yml
+          create-args: >-
+            python=${{ matrix.python_version }}
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('environment.yml') }}
+          cache-environment-key: mamba-${{ hashFiles('environment.yml') }}
 
       - name: Install dependencies
         run: |
