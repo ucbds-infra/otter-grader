@@ -26,6 +26,15 @@ poetry install --with dev,test
 ```
 
 
+## Code Formatting
+
+The Python files in this repo are formatted with isort and black. Installing the `dev` dependencies
+with poetry will install these as well. You can run `make format` with your conda/virtual environment
+activated to format the files in-place.
+
+Note that code formatting is enforced by a CI test.
+
+
 ## Running Tests
 
 To run the tests for Otter-Grader, use the `test` `Makefile` target:
