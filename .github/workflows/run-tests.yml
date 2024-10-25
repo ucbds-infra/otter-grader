@@ -71,3 +71,15 @@ jobs:
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
+        with:
+          parallel: true
+          flag-name: run ${{ join(matrix.*, ' - ') }}
+
+  finish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true

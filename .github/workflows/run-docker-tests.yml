@@ -49,10 +49,12 @@ jobs:
       - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: environment.yml
+          create-args: >-
+            python=3.9
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('pyproject.toml') }}
+          cache-environment-key: requirements-${{ hashFiles('environment.yml') }}
 
       - name: Install dependencies
         run: |
