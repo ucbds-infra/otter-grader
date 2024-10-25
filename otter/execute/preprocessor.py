@@ -1,5 +1,4 @@
 import ast
-import astunparse
 import json
 import nbformat as nbf
 import os
@@ -241,7 +240,7 @@ class ImportCollector(ast.NodeVisitor):
         self.imports.append(node)
 
     def to_module(self):
-        return ast.Module(body=self.imports)
+        return ast.Module(body=self.imports, type_ignores=[])
 
     def to_script(self):
-        return astunparse.unparse(self.to_module())
+        return ast.unparse(self.to_module())

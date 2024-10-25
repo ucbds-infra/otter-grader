@@ -27,6 +27,7 @@
 * Added exception-based test support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
 * Added Otter Assign support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
 * Updated Otter Assign to only allow a function definition and statement to call the test function in exception-based test cells and automatically ignore the latter statement instead of requiring an explicit `# IGNORE` comment per [#516](https://github.com/ucbds-infra/otter-grader/issues/516)
+* Added additional package versions to the output of `otter --version` per [#843](https://github.com/ucbds-infra/otter-grader/issues/843)
 
 **v5.7.1:**
 
