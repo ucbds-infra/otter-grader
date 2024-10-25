@@ -287,6 +287,37 @@ To customize the message in the acknowledgement, set the ``message`` key of ``re
             message: 'A PDF of your notebook could not be generated. Please acknowledge to contiue submissione export.'
 
 
+Question Structure
+------------------
+
+Questions, whether autograded or manually-graded, have the following cell structure:
+
+1. A raw cell containing ``# BEGIN QUESTION`` and a question config. (The question config is
+   described in the sections below.)
+2. Zero or more question cells (of any type) containing the question text. These cells will not be
+   editable by students in the generated notebooks.
+3. (Optionally) To create a custom prompt for manually-graded questions:
+
+   1. A raw cell containing ``# BEGIN PROMPT``.
+   2. Zero or more prompt cells of any type.
+   3. A raw cell containing ``# END PROMPT``.
+
+4. A raw cell containing ``# BEGIN SOLUTION``. (This can be omitted if there is no solution.)
+5. Zero or more solution cells (of any type). Code cells in this block follow the solution removal
+   rules :ref:`below<otter_assign_python_solution_removal>`.
+6. A raw cell containing ``# END SOLUTION``. (This can be omitted if there is no solution.)
+7. For autograded questions:
+
+   1. A raw cell containing ``# BEGIN TESTS``.
+   2. Zero or more :ref:`test cells<otter_assign_python_test_cells>`.
+   3. A raw cell containing ``# END TESTS``.
+
+8.  A raw cell containing ``# END QUESTION``.
+
+All of the delimiting raw cells and test cells are removed from the generated notebooks. All cells
+besides the student's response cells are not editable or deletable in the generated notebooks.
+
+
 Autograded Questions
 --------------------
 
@@ -310,6 +341,11 @@ included in the filtered PDF.
     # BEGIN QUESTION
     name: q1
     export: true
+
+After the ``# BEGIN QUESTION`` cell, you can include 0 or more cells (of any type) that contain the
+question text. After the question text cells, you can include 0 or more solution cells which must
+be fenced by raw cells containing ``# BEGIN SOLUTION`` and ``# END SOLUTION``. After the solution
+cells, you can include :ref:`test cells<otter_assign_python_test_cells>`.
 
 
 .. _otter_assign_python_solution_removal:
@@ -404,6 +440,8 @@ would be presented to students  as
     ...
     x2 <- square(25)
 
+
+.. _otter_assign_python_test_cells:
 
 Test Cells
 ++++++++++
