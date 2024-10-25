@@ -25,7 +25,10 @@ holds metadata about the test case. The ``test_case`` decorator takes (optional)
 The test file should also declare the global variable ``name``, which should be a string containing
 the name of the test case, and (optionally) ``points``, which should be the total point value of the
 question. If this is absent (or set to ``None``), it will be inferred from the point values of each
-test case as described :ref:`below <test_files_python_resolve_point_values>`. Because Otter also supports
+test case as described :ref:`below <test_files_python_resolve_point_values>`. You can also set an
+``all_or_nothing`` global variable to a boolean value indicating whether points for the test file
+should be assigned on an all-or-nothing basis; that is, full points are assigned if all test cases
+pass, otherwise 0 points are assigned (default ``False``). Because Otter also supports
 OK-formatted test files, the global variable ``OK_FORMAT`` must be set to ``False`` in exception-based
 test files.
 
@@ -166,9 +169,10 @@ Here is an annotated sample OK test:
     OK_FORMAT = True
 
     test = {
-        "name": "q1",       # name of the test
-        "points": 1,        # number of points for the entire suite
-        "suites": [         # list of suites, only 1 suite allowed!
+        "name": "q1",             # name of the test
+        "points": 1,              # number of points for the entire suite
+        "all_or_nothing": False,  # whether points for this test file are all-or-nothing
+        "suites": [               # list of suites, only 1 suite allowed!
             {
                 "cases": [                  # list of test cases
                     {                       # each case is a dict
