@@ -342,11 +342,6 @@ included in the filtered PDF.
     name: q1
     export: true
 
-After the ``# BEGIN QUESTION`` cell, you can include 0 or more cells (of any type) that contain the
-question text. After the question text cells, you can include 0 or more solution cells which must
-be fenced by raw cells containing ``# BEGIN SOLUTION`` and ``# END SOLUTION``. After the solution
-cells, you can include :ref:`test cells<otter_assign_python_test_cells>`.
-
 
 .. _otter_assign_python_solution_removal:
 
