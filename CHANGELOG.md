@@ -26,6 +26,7 @@
 * Fixed OK-test support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
 * Added exception-based test support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
 * Added Otter Assign support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
+* Added additional package versions to the output of `otter --version` per [#843](https://github.com/ucbds-infra/otter-grader/issues/843)
 
 **v5.7.1:**
 

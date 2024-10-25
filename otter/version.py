@@ -1,8 +1,9 @@
 """Version and printable logo"""
 
+import importlib
 import sys
 
-from textwrap import dedent
+from textwrap import dedent, indent
 
 
 __version__ = "5.7.1"
@@ -23,6 +24,15 @@ LOGO_WITH_VERSION = rf"""
 ]  # remove beginning newline
 
 
+_ADDITIONAL_PACKAGES = [
+    "dill",
+    "fica",
+    "IPython",
+    "nbconvert",
+    "nbformat",
+]
+
+
 def print_version_info(logo: bool = False):
     """
     Prints the Otter logo and version information to stdout
@@ -35,7 +45,23 @@ def print_version_info(logo: bool = False):
     print(
         dedent(
             f"""\
-        Python version: {".".join(str(v) for v in sys.version_info[:3])}
-        Otter-Grader version: {__version__}"""
+                Python version: {".".join(str(v) for v in sys.version_info[:3])}
+                Otter-Grader version: {__version__}
+
+                Additional package versions:
+            """
         )
+        + indent(_list_addl_package_versions(), "    ")
     )
+
+
+def _list_addl_package_versions() -> str:
+    """Generate a string listing versions of additional packages of interest."""
+    versions = []
+    for p in _ADDITIONAL_PACKAGES:
+        try:
+            m = importlib.import_module(p)
+            versions.append(f"{p}: {m.__version__}")
+        except Exception as e:
+            versions.append(f"{p}: (failed) {type(e).__name__}: {e}")
+    return "\n".join(versions)
