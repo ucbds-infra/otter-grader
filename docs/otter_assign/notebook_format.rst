@@ -462,10 +462,11 @@ Exception-Based Test Cells
 
 To use Otter's exception-based tests, you must set ``tests: ok_format: false`` in your assignment 
 config. Your test cells should define
-a test case function as described :ref:`here <test_files_python_exception_based>`. You can run the
-test in the master notebook by calling the function, but you should make  sure that this call is 
-"ignored" by Otter Assign so that it's not included in the test file by appending ``# IGNORE`` to the
-end of line. You should *not* add the ``test_case`` decorator; Otter Assign will do this for you. 
+a test case function as described :ref:`here <test_files_python_exception_based>`. You can also run the
+test in the master notebook by calling the function. However, no other statements besides a single
+``def`` and (optionally) a call to the test function may be included in the cell; Otter enforces
+this by parsing the cell's code into an AST, which it uses to identify the test case function.
+You should *not* add the ``test_case`` decorator; Otter Assign will do this for you. 
 
 For example,
 
@@ -478,7 +479,7 @@ For example,
         assert len(arr) == 10
         assert (0 <= arr <= 1).all()
 
-    test_validity(arr)  # IGNORE
+    test_validity(arr)
 
 It is important to note that the exception-based test files are executed before the student's global
 environment is provided, so no work should be performed outside the test case function that relies
@@ -585,13 +586,13 @@ Ignoring Cells
 --------------
 
 For any cells that you don't want to be included in *either* of the output notebooks that are 
-present in the master notebook, include a line at the top of the cell with the ``## Ignore ##`` 
+present in the master notebook, include a line at the top of the cell with the ``# IGNORE`` 
 comment (case insensitive) just like with test cells. Note that this also works for Markdown cells 
 with the same syntax.
 
 .. code-block:: python
 
-    ## Ignore ##
+    # IGNORE
     print("This cell won't appear in the output.")
 
 

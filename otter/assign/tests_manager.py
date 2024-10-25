@@ -14,7 +14,6 @@ from typing import Any, Union
 
 from .assignment import Assignment
 from .question_config import QuestionConfig
-from .solutions import remove_ignored_lines
 from .utils import str_to_doctest
 from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
 from ..test_files.abstract_test import TestCase, TestFile
@@ -38,6 +37,7 @@ all_or_nothing = True{% endif %}
     success_message="{{ tc.success_message }}"{% endif %}{% if tc.failure_message is not none %}, 
     failure_message="{{ tc.failure_message }}"{% endif %})
 {{ tc.body }}
+
 {% endfor %}
 """
 )
@@ -151,12 +151,22 @@ class AssignmentTestsManager:
         success_message = config.get("success_message", None)
         failure_message = config.get("failure_message", None)
 
-        body: str = "\n".join(remove_ignored_lines(get_source(cell)[test_start_line + 1 :]))
+        test_source = get_source(cell)[test_start_line + 1 :]
+        test_ast = ast.parse("\n".join(test_source))
+        body: str = ""
         if self.assignment.tests.ok_format:
-            inp = ast.unparse(_AnnotationRemover().visit(ast.parse(body)))
+            inp = ast.unparse(_AnnotationRemover().visit(test_ast))
             body_lines = str_to_doctest(inp.split("\n"), [])
             body_lines.extend(output.split("\n"))
             body = "\n".join(body_lines)
+        else:
+            if len(test_ast.body) > 2 or not isinstance(test_ast.body[0], ast.FunctionDef):
+                raise ValueError(
+                    f"Error in question {question.name}: an exception-based test cell may have at "
+                    "most a function definition and a call to that function definition but a test "
+                    f"cell with {len(test_ast.body)} nodes in its AST was encountered"
+                )
+            body = ast.unparse(test_ast.body[0])
 
         self._add_test_case(
             question,
