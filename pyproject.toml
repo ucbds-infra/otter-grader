@@ -28,7 +28,6 @@ gmail_oauth2 = "otter.plugins.builtin.gmail_notifications.bin.gmail_oauth2:main"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-astunparse = "^1.6.3"
 click = "^8.1.7"
 dill = "^0.3.8"
 fica = ">=0.4.1"
