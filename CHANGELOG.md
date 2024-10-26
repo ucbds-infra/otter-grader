@@ -1,6 +1,6 @@
 # Changelog
 
-**v6.0.0 (unreleased):**
+**v6.0.0:**
 
 * Switched to [poetry](https://python-poetry.org/) for packaging
 * Removed compatibility patches for nbconvert < 6 per [#777](https://github.com/ucbds-infra/otter-grader/issues/777)
