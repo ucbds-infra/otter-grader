@@ -1,6 +1,6 @@
 # Changelog
 
-**v6.0.1 (unreleased):**
+**v6.0.1:**
 
 * Updated dependency specifications to support any new minor version within the matching major version
 * Fixed `SyntaxError` thrown by `gmail_oauth2` binary
