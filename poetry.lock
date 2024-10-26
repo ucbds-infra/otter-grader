@@ -1563,13 +1563,13 @@ test-ui = ["calysto-bash"]
 
 [[package]]
 name = "keyring"
-version = "25.4.1"
+version = "25.5.0"
 description = "Store and access your passwords safely."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "keyring-25.4.1-py3-none-any.whl", hash = "sha256:5426f817cf7f6f007ba5ec722b1bcad95a75b27d780343772ad76b17cb47b0bf"},
-    {file = "keyring-25.4.1.tar.gz", hash = "sha256:b07ebc55f3e8ed86ac81dd31ef14e81ace9dd9c3d4b5d77a6e9a2016d0d71a1b"},
+    {file = "keyring-25.5.0-py3-none-any.whl", hash = "sha256:e67f8ac32b04be4714b42fe84ce7dad9c40985b9ca827c592cc303e7c26d9741"},
+    {file = "keyring-25.5.0.tar.gz", hash = "sha256:4c753b3ec91717fe713c4edd522d625889d8973a349b0e582622f49766de58e6"},
 ]
 
 [package.dependencies]
@@ -2218,9 +2218,9 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
     {version = ">=1.22.4", markers = "python_version < \"3.11\""},
     {version = ">=1.23.2", markers = "python_version == \"3.11\""},
+    {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
 python-dateutil = ">=2.8.2"
 pytz = ">=2020.1"
@@ -2627,8 +2627,8 @@ files = [
 annotated-types = ">=0.6.0"
 pydantic-core = "2.23.4"
 typing-extensions = [
-    {version = ">=4.12.2", markers = "python_version >= \"3.13\""},
     {version = ">=4.6.1", markers = "python_version < \"3.13\""},
+    {version = ">=4.12.2", markers = "python_version >= \"3.13\""},
 ]
 
 [package.extras]
@@ -2904,23 +2904,24 @@ six = ">=1.5"
 
 [[package]]
 name = "python-on-whales"
-version = "0.72.0"
+version = "0.73.0"
 description = "A Docker client for Python, designed to be fun and intuitive!"
 optional = false
 python-versions = "<4,>=3.8"
 files = [
-    {file = "python_on_whales-0.72.0-py3-none-any.whl", hash = "sha256:092b440f43a34bbe90536b82a41ae3c199018dfc66d7e0dc52d4d659b82683c2"},
-    {file = "python_on_whales-0.72.0.tar.gz", hash = "sha256:280da91724ae728ac2baf503584938ecfdee2f83bb88e65413eed14b1fe74d41"},
+    {file = "python_on_whales-0.73.0-py3-none-any.whl", hash = "sha256:66f31749c2544a0aacb4e3ba03772c2e9227235ea1aecd58aa7a4cdcf26f559a"},
+    {file = "python_on_whales-0.73.0.tar.gz", hash = "sha256:c76bf3633550e5c948fb4215918364f45efaddb2e09df5ddd169132f7ffdc249"},
 ]
 
 [package.dependencies]
-pydantic = ">=1.9,<2.0.dev0 || >=2.1.dev0,<3"
+pydantic = ">=2.1.dev0,<3"
 requests = "*"
 tqdm = "*"
 typer = ">=0.4.1"
 typing-extensions = "*"
 
 [package.extras]
+dev = ["ruff (==0.5.6)"]
 test = ["pytest"]
 
 [[package]]
@@ -4049,4 +4050,4 @@ r = ["rpy2"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "33f32bf6dd37a1ea5cb63ff696009fa9360a670199c1ba649b238a85bf883bcf"
+content-hash = "db4b80bee164da239d7f90cd970ee699364a1ceef12830d58b9f260463a78ff3"

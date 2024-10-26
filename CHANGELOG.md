@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.0.1 (unreleased):**
+
+* Updated dependency specifications to support any new minor version within the matching major version
+
 **v6.0.0:**
 
 * Switched to [poetry](https://python-poetry.org/) for packaging
