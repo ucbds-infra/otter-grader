@@ -1,18 +1,19 @@
 """Solution removal for Otter Assign"""
 
 import copy
+import nbformat as nbf
 import re
 
 from .r_adapter import solutions as r_solutions
-from .utils import get_notebook_language, get_source, has_tag, is_cell_type, remove_output, \
-    remove_tag
+from .utils import get_notebook_language, has_tag, is_cell_type, remove_output, remove_tag
+from ..utils import get_source
 
 
 BLOCK_PROMPT = "..."
 SOLUTION_CELL_TAG = "otter_assign_solution_cell"
 
 
-def has_seed(cell):
+def has_seed(cell: nbf.NotebookNode) -> bool:
     """
     Determine whether a cell contains a seed line (a line ending in ``# SEED``).
 
@@ -25,10 +26,10 @@ def has_seed(cell):
     if not is_cell_type(cell, "code"):
         return False
     source = get_source(cell)
-    return source and any([l.strip().endswith('# SEED') for l in source])
+    return bool(source) and any([l.strip().endswith("# SEED") for l in source])
 
 
-def overwrite_seed_vars(nb, seed_variable, seed):
+def overwrite_seed_vars(nb: nbf.NotebookNode, seed_variable: str, seed: int) -> nbf.NotebookNode:
     """
     Overwrite any assignments of the variable named ``seed_variable`` with the value ``seed`` in a
     notebook.
@@ -45,44 +46,50 @@ def overwrite_seed_vars(nb, seed_variable, seed):
     for cell in nb["cells"]:
         source = get_source(cell)
         for i, line in enumerate(source):
-            match = re.match(fr"(\s*){seed_variable}\s*(=|<-)\s*", line)
-            if  match:
+            match = re.match(rf"(\s*){seed_variable}\s*(=|<-)\s*", line)
+            if match:
                 source[i] = match.group(1) + f"{seed_variable} {match.group(2)} {seed}"
         cell["source"] = "\n".join(source)
     return nb
 
 
-solution_assignment_regex = re.compile(r"(\s*(?:[\w.]+(?=[^\w.])(?:\[['\"]?.*['\"]?\])*(?:,\s*)?)+\s*=).* ?# ?SOLUTION")
-def solution_assignment_sub(match):
+solution_assignment_regex = re.compile(
+    r"(\s*(?:[\w.]+(?=[^\w.])(?:\[['\"]?.*['\"]?\])*(?:,\s*)?)+\s*=).* ?# ?SOLUTION"
+)
+
+
+def solution_assignment_sub(match: re.Match[str]) -> str:
     """
     Substitutes the first matching group  with `` ...``
     """
     prefix = match.group(1)
-    return prefix + ' ...'
+    return prefix + " ..."
 
 
 solution_line_regex = re.compile(r"(\s*).* ?# ?SOLUTION")
-def solution_line_sub(match):
+
+
+def solution_line_sub(match: re.Match[str]) -> str:
     """
     Substitutes the first matching group  with ``...``
     """
     prefix = match.group(1)
-    return prefix + '...'
+    return prefix + "..."
 
 
 begin_solution_regex = re.compile(r"(\s*)# BEGIN SOLUTION( NO PROMPT)?")
-skip_suffixes = ['# SOLUTION NO PROMPT', '# BEGIN PROMPT', '# END PROMPT', '# SEED']
+skip_suffixes = ["# SOLUTION NO PROMPT", "# BEGIN PROMPT", "# END PROMPT", "# SEED"]
 
 SUBSTITUTIONS = {
-    "python":  [
+    "python": [
         (solution_assignment_regex, solution_assignment_sub),
         (solution_line_regex, solution_line_sub),
     ],
-    "r":  r_solutions.SUBSTITUTIONS,
+    "r": r_solutions.SUBSTITUTIONS,
 }
 
 
-def replace_solutions(lines, lang):
+def replace_solutions(lines: list[str], lang: str) -> list[str]:
     """
     Replace solutions in ``lines``.
 
@@ -93,10 +100,11 @@ def replace_solutions(lines, lang):
     Returns:
         ``list[str]``: stripped version of lines without solutions
     """
+    block_prompt: str
     if lang == "r":
-        from .r_adapter.solutions import BLOCK_PROMPT
+        from .r_adapter.solutions import BLOCK_PROMPT as block_prompt
     else:
-        BLOCK_PROMPT = globals()["BLOCK_PROMPT"]
+        block_prompt = globals()["BLOCK_PROMPT"]
 
     stripped = []
     solution = False
@@ -107,11 +115,11 @@ def replace_solutions(lines, lang):
             continue
 
         # don't keep the line if inside a solution block
-        if solution and not line.rstrip().endswith('# END SOLUTION'):
+        if solution and not line.rstrip().endswith("# END SOLUTION"):
             continue
 
         # process the end of a solution block
-        if line.rstrip().endswith('# END SOLUTION'):
+        if line.rstrip().endswith("# END SOLUTION"):
             assert solution, f"END SOLUTION without BEGIN SOLUTION in {lines}"
             solution = False
             continue
@@ -122,7 +130,7 @@ def replace_solutions(lines, lang):
             assert not solution, f"Nested BEGIN SOLUTION in {lines}"
             solution = True
             if not begin_solution.group(2):
-                line = begin_solution.group(1) + BLOCK_PROMPT
+                line = begin_solution.group(1) + block_prompt
             else:
                 continue
         for exp, sub in SUBSTITUTIONS[lang]:
@@ -138,7 +146,7 @@ def replace_solutions(lines, lang):
     return stripped
 
 
-def remove_ignored_lines(lines):
+def remove_ignored_lines(lines: list[str]) -> list[str]:
     """
     Remove ignored lines in ``lines``.
 
@@ -158,11 +166,11 @@ def remove_ignored_lines(lines):
             continue
 
         # don't keep the line if we're in an ignore block
-        if in_block and not line.rstrip().endswith('# END IGNORE'):
+        if in_block and not line.rstrip().endswith("# END IGNORE"):
             continue
 
         # process the end of an ignore block
-        if line.rstrip().endswith('# END IGNORE'):
+        if line.rstrip().endswith("# END IGNORE"):
             assert in_block, f"END IGNORE without BEGIN IGNORE in {lines}"
             in_block = False
             continue
@@ -180,7 +188,7 @@ def remove_ignored_lines(lines):
     return stripped
 
 
-def strip_ignored_lines(nb):
+def strip_ignored_lines(nb: nbf.NotebookNode) -> nbf.NotebookNode:
     """
     Create a copy of a notebook with ignored lines stripped.
 
@@ -191,13 +199,15 @@ def strip_ignored_lines(nb):
         ``nbformat.NotebookNode``: a copy of ``nb`` with ignored line stripped
     """
     nb = copy.deepcopy(nb)
-    for cell in nb['cells']:
-        cell['source'] = '\n'.join(remove_ignored_lines(get_source(cell)))
+    for cell in nb["cells"]:
+        cell["source"] = "\n".join(remove_ignored_lines(get_source(cell)))
     return nb
+
 
 OTTER_INCLUDE_TAG = "otter_include"
 
-def strip_solutions_and_output(nb):
+
+def strip_solutions_and_output(nb: nbf.NotebookNode) -> nbf.NotebookNode:
     """
     Create a copy of a notebook with solutions and outputs stripped.
 
@@ -211,20 +221,20 @@ def strip_solutions_and_output(nb):
 
     del_md_solutions = []
     lang = get_notebook_language(nb)
-    for i, cell in enumerate(nb['cells']):
+    for i, cell in enumerate(nb["cells"]):
         if has_tag(cell, SOLUTION_CELL_TAG):
             if is_cell_type(cell, "code"):
-                cell['source'] = '\n'.join(replace_solutions(get_source(cell), lang))
+                cell["source"] = "\n".join(replace_solutions(get_source(cell), lang))
             elif is_cell_type(cell, "markdown"):
                 if has_tag(cell, OTTER_INCLUDE_TAG):
                     cell = remove_tag(cell, OTTER_INCLUDE_TAG)
                 else:
                     del_md_solutions.append(i)
-            nb['cells'][i] = remove_tag(cell, SOLUTION_CELL_TAG)
+            nb["cells"][i] = remove_tag(cell, SOLUTION_CELL_TAG)
 
     del_md_solutions.reverse()
     for i in del_md_solutions:
-        del nb['cells'][i]
+        del nb["cells"][i]
 
     # remove output from student version
     remove_output(nb)

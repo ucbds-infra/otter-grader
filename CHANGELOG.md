@@ -1,5 +1,35 @@
 # Changelog
 
+**v6.0.0 (unreleased):**
+
+* Switched to [poetry](https://python-poetry.org/) for packaging
+* Removed compatibility patches for nbconvert < 6 per [#777](https://github.com/ucbds-infra/otter-grader/issues/777)
+* Updated Otter Export to throw an error if nbconvert<6.0.0 is found
+* Converted Otter Export's PDF via HTML exporter to use nbconvert's WebPDF exporter per [#781](https://github.com/ucbds-infra/otter-grader/issues/781)
+* Removed pdfkit from dependencies
+* Added ability to export PDFs via HTML in grading containers per [#782](https://github.com/ucbds-infra/otter-grader/issues/782)
+* Set default Python version for grading images to 3.12
+* Remove support for Python versions < 3.9 per [#668](https://github.com/ucbds-infra/otter-grader/issues/668)
+* Removed `setuptools` and `pkg_resources` dependencies
+* Remove dependencies not strictly required by Otter in the grading environment per [#739](https://github.com/ucbds-infra/otter-grader/issues/739)
+* Handle empty assignment configs in Otter Assign per [#795](https://github.com/ucbds-infra/otter-grader/issues/795)
+* Removed `Notebook` `colab` and `jupyterlite` arguments, switching to always determining the interpreter automatically
+* Made `dill` a required dependency
+* Removed `variables` key of assignment config in favor of `generate.serialized_variables` in Otter Assign per [#628](https://github.com/ucbds-infra/otter-grader/issues/628)
+* Update Otter Assign to add cell metadata so that questions with no check cell have their tests run after the last solution cell per [#798](https://github.com/ucbds-infra/otter-grader/issues/798)
+* Updated Otter Assign to strip type annotations from generated test code per [#796](https://github.com/ucbds-infra/otter-grader/issues/796)
+* Updated Otter Grade Docker image to create an empty `submission_metadata.json` file in the grading image to prevent plugins from erroring per [#811](https://github.com/ucbds-infra/otter-grader/issues/811)
+* Added ability to monitor grading progress to Otter Grade per [#827](https://github.com/ucbds-infra/otter-grader/issues/827)
+* Added handling of student-created files with the `student_files` configuration in Otter Assign per [#737](https://github.com/ucbds-infra/otter-grader/issues/737)
+* Updated Otter Assign to add a cell to install Otter at the top of Colab notebooks per [#861](https://github.com/ucbds-infra/otter-grader/issues/861)
+* Added the ability to ignore the `.OTTER_LOG` file to `Notebook.export` and Otter Assign per [#857](https://github.com/ucbds-infra/otter-grader/issues/857)
+* Fixed OK-test support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
+* Added exception-based test support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
+* Added Otter Assign support for the `all_or_nothing` config per [#751](https://github.com/ucbds-infra/otter-grader/issues/751)
+* Updated Otter Assign to only allow a function definition and statement to call the test function in exception-based test cells and automatically ignore the latter statement instead of requiring an explicit `# IGNORE` comment per [#516](https://github.com/ucbds-infra/otter-grader/issues/516)
+* Added additional package versions to the output of `otter --version` per [#843](https://github.com/ucbds-infra/otter-grader/issues/843)
+* Fixed bug in converting test cells containing indented functions to doctests in Otter Assign per [#840](https://github.com/ucbds-infra/otter-grader/issues/840)
+
 **v5.7.1:**
 
 * Removed testing code unintentioanlly committed in v5.7.0 per [#849](https://github.com/ucbds-infra/otter-grader/issues/849)

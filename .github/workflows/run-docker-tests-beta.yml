@@ -44,7 +44,7 @@ jobs:
         with:
           ref: beta
 
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-buildx-action@v3
         if: ${{ steps.check-branch.outputs.run == 'true' }}
         with:
           install: true
@@ -65,16 +65,18 @@ jobs:
         if: ${{ steps.check-branch.outputs.run == 'true' }}
         with:
           environment-file: environment.yml
+          create-args: >-
+            python=3.9
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('pyproject.toml') }}
+          cache-environment-key: requirements-${{ hashFiles('environment.yml') }}
 
       - name: Install dependencies
         if: ${{ steps.check-branch.outputs.run == 'true' }}
         run: |
           micromamba activate otter-grader
-          poetry install --with test --all-extras
+          poetry install --with dev,test --all-extras
 
       - name: Install ottr
         if: ${{ steps.check-branch.outputs.run == 'true' }}

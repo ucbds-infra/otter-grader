@@ -2,8 +2,8 @@
 
 import copy
 import json
-import nbformat
 import nbconvert
+import nbformat
 import os
 import pytest
 import re
@@ -32,23 +32,25 @@ def cleanup_output(cleanup_enabled):
         crmd = f.read()
     yield
     if cleanup_enabled:
-        delete_paths([
-            FILE_MANAGER.get_path("autograder/results/results.json"),
-            FILE_MANAGER.get_path("autograder/results/results.pkl"),
-            FILE_MANAGER.get_path("autograder/__init__.py"),
-            FILE_MANAGER.get_path("autograder/submission/test"),
-            FILE_MANAGER.get_path("autograder/submission/tests"),
-            FILE_MANAGER.get_path("autograder/submission/fails2and6H.pdf"),
-            FILE_MANAGER.get_path("autograder/submission/__init__.py"),
-            FILE_MANAGER.get_path("autograder/submission/.OTTER_LOG"),
-            FILE_MANAGER.get_path("rmd-autograder/results/results.json"),
-            FILE_MANAGER.get_path("rmd-autograder/results/results.pkl"),
-            FILE_MANAGER.get_path("rmd-autograder/__init__.py"),
-            FILE_MANAGER.get_path("rmd-autograder/submission/test"),
-            FILE_MANAGER.get_path("rmd-autograder/submission/tests"),
-            FILE_MANAGER.get_path("rmd-autograder/submission/__init__.py"),
-            FILE_MANAGER.get_path("rmd-autograder/submission/.OTTER_LOG"),
-        ])
+        delete_paths(
+            [
+                FILE_MANAGER.get_path("autograder/results/results.json"),
+                FILE_MANAGER.get_path("autograder/results/results.pkl"),
+                FILE_MANAGER.get_path("autograder/__init__.py"),
+                FILE_MANAGER.get_path("autograder/submission/test"),
+                FILE_MANAGER.get_path("autograder/submission/tests"),
+                FILE_MANAGER.get_path("autograder/submission/fails2and6H.pdf"),
+                FILE_MANAGER.get_path("autograder/submission/__init__.py"),
+                FILE_MANAGER.get_path("autograder/submission/.OTTER_LOG"),
+                FILE_MANAGER.get_path("rmd-autograder/results/results.json"),
+                FILE_MANAGER.get_path("rmd-autograder/results/results.pkl"),
+                FILE_MANAGER.get_path("rmd-autograder/__init__.py"),
+                FILE_MANAGER.get_path("rmd-autograder/submission/test"),
+                FILE_MANAGER.get_path("rmd-autograder/submission/tests"),
+                FILE_MANAGER.get_path("rmd-autograder/submission/__init__.py"),
+                FILE_MANAGER.get_path("rmd-autograder/submission/.OTTER_LOG"),
+            ]
+        )
         with FILE_MANAGER.open("autograder/source/otter_config.json", "w") as f:
             f.write(cpy)
         with FILE_MANAGER.open("rmd-autograder/source/otter_config.json", "w") as f:
@@ -77,43 +79,43 @@ def expected_results():
                 "score": 0.0,
                 "max_score": 0.0,
                 "visibility": "hidden",
-                "output": "q1 results: All test cases passed!"
+                "output": "q1 results: All test cases passed!",
             },
             {
                 "name": "q2",
                 "score": 0,
                 "max_score": 2.0,
                 "visibility": "hidden",
-                "output": "q2 results:\n    q2 - 1 result:\n        ❌ Test case failed\n        Trying:\n            negate(True)\n        Expecting:\n            False\n        **********************************************************************\n        Line 2, in q2 0\n        Failed example:\n            negate(True)\n        Expected:\n            False\n        Got:\n            True\n\n    q2 - 2 result:\n        ❌ Test case failed\n        Trying:\n            negate(False)\n        Expecting:\n            True\n        **********************************************************************\n        Line 2, in q2 1\n        Failed example:\n            negate(False)\n        Expected:\n            True\n        Got:\n            False\n\n    q2 - 3 result:\n        ❌ Test case failed\n        Trying:\n            negate(\"\")\n        Expecting:\n            True\n        **********************************************************************\n        Line 2, in q2 2\n        Failed example:\n            negate(\"\")\n        Expected:\n            True\n        Got:\n            ''\n\n    q2 - 4 result:\n        ❌ Test case failed\n        Trying:\n            negate(1)\n        Expecting:\n            False\n        **********************************************************************\n        Line 2, in q2 3\n        Failed example:\n            negate(1)\n        Expected:\n            False\n        Got:\n            1"
+                "output": 'q2 results:\n    q2 - 1 result:\n        ❌ Test case failed\n        Trying:\n            negate(True)\n        Expecting:\n            False\n        **********************************************************************\n        Line 2, in q2 0\n        Failed example:\n            negate(True)\n        Expected:\n            False\n        Got:\n            True\n\n    q2 - 2 result:\n        ❌ Test case failed\n        Trying:\n            negate(False)\n        Expecting:\n            True\n        **********************************************************************\n        Line 2, in q2 1\n        Failed example:\n            negate(False)\n        Expected:\n            True\n        Got:\n            False\n\n    q2 - 3 result:\n        ❌ Test case failed\n        Trying:\n            negate("")\n        Expecting:\n            True\n        **********************************************************************\n        Line 2, in q2 2\n        Failed example:\n            negate("")\n        Expected:\n            True\n        Got:\n            \'\'\n\n    q2 - 4 result:\n        ❌ Test case failed\n        Trying:\n            negate(1)\n        Expecting:\n            False\n        **********************************************************************\n        Line 2, in q2 3\n        Failed example:\n            negate(1)\n        Expected:\n            False\n        Got:\n            1',
             },
             {
                 "name": "q3",
                 "score": 2.0,
                 "max_score": 2.0,
                 "visibility": "hidden",
-                "output": "q3 results: All test cases passed!"
+                "output": "q3 results: All test cases passed!",
             },
             {
                 "name": "q4",
                 "score": 1.0,
                 "max_score": 1.0,
                 "visibility": "hidden",
-                "output": "q4 results: All test cases passed!"
+                "output": "q4 results: All test cases passed!",
             },
             {
                 "name": "q6",
                 "score": 2.5,
                 "max_score": 5.0,
                 "visibility": "hidden",
-                "output": "q6 results:\n    q6 - 1 result:\n        ✅ Test case passed\n\n    q6 - 2 result:\n        ❌ Test case failed\n        Trying:\n            fib = fiberator()\n        Expecting nothing\n        ok\n        Trying:\n            for _ in range(10):\n                print(next(fib))\n        Expecting:\n            0\n            1\n            1\n            2\n            3\n            5\n            8\n            13\n            21\n            34\n        **********************************************************************\n        Line 3, in q6 1\n        Failed example:\n            for _ in range(10):\n                print(next(fib))\n        Expected:\n            0\n            1\n            1\n            2\n            3\n            5\n            8\n            13\n            21\n            34\n        Got:\n            0\n            1\n            1\n            1\n            2\n            3\n            5\n            8\n            13\n            21"
+                "output": "q6 results:\n    q6 - 1 result:\n        ✅ Test case passed\n\n    q6 - 2 result:\n        ❌ Test case failed\n        Trying:\n            fib = fiberator()\n        Expecting nothing\n        ok\n        Trying:\n            for _ in range(10):\n                print(next(fib))\n        Expecting:\n            0\n            1\n            1\n            2\n            3\n            5\n            8\n            13\n            21\n            34\n        **********************************************************************\n        Line 3, in q6 1\n        Failed example:\n            for _ in range(10):\n                print(next(fib))\n        Expected:\n            0\n            1\n            1\n            2\n            3\n            5\n            8\n            13\n            21\n            34\n        Got:\n            0\n            1\n            1\n            1\n            2\n            3\n            5\n            8\n            13\n            21",
             },
             {
                 "name": "q7",
                 "score": 1.0,
                 "max_score": 1.0,
                 "visibility": "hidden",
-                "output": "q7 results: All test cases passed!"
-            }
+                "output": "q7 results: All test cases passed!",
+            },
         ],
         "output": "Students are allowed 1 submissions every 1 days. You have 0 submissions in that period.",
     }
@@ -146,7 +148,7 @@ def alternate_config(config_path, new_config):
         contents = f.read()
     with open(config_path, "w") as f:
         json.dump(new_config, f)
-    try: 
+    try:
         yield
     finally:
         with open(config_path, "w") as f:
@@ -171,7 +173,7 @@ def alternate_submission(subm_path, new_nb):
     with open(subm_path) as f:
         contents = f.read()
     nbformat.write(new_nb, subm_path)
-    try: 
+    try:
         yield
     finally:
         with open(subm_path, "w") as f:
@@ -180,13 +182,15 @@ def alternate_submission(subm_path, new_nb):
 
 @contextmanager
 def alternate_tests(test_files):
-    src, dst = FILE_MANAGER.get_path("autograder/source/tests"), FILE_MANAGER.get_path("autograder/source/tests_orig")
+    src, dst = FILE_MANAGER.get_path("autograder/source/tests"), FILE_MANAGER.get_path(
+        "autograder/source/tests_orig"
+    )
     os.rename(src, dst)
     os.makedirs(src, exist_ok=True)
     for fn, contents in test_files.items():
         with open(os.path.join(src, fn), "w+") as f:
             f.write(contents)
-    try: 
+    try:
         yield
     finally:
         shutil.rmtree(src)
@@ -196,20 +200,25 @@ def alternate_tests(test_files):
 @pytest.fixture(autouse=True)
 def mock_export_notebook(cleanup_enabled):
     empty_pdfs = []
+
     def make_empty_pdf(*args, **kwargs):
         p = kwargs["dest"]
         open(p, "wb+").close()
         empty_pdfs.append((os.getcwd(), p))
 
-    with mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook") as mocked_export_notebook:
+    with mock.patch(
+        "otter.run.run_autograder.runners.python_runner.export_notebook"
+    ) as mocked_export_notebook:
         mocked_export_notebook.side_effect = make_empty_pdf
-        yield
+        yield mocked_export_notebook
 
-    if not cleanup_enabled: return
+    if not cleanup_enabled:
+        return
 
     for wd, p in empty_pdfs:
         full_path = os.path.join(wd, p)
-        if os.path.exists(full_path): os.remove(full_path)
+        if os.path.exists(full_path):
+            os.remove(full_path)
 
 
 @pytest.fixture
@@ -217,6 +226,7 @@ def get_config_path():
     def do_get_config_path(rmd=False):
         dirname = "autograder" if not rmd else "rmd-autograder"
         return FILE_MANAGER.get_path(f"{dirname}/source/otter_config.json")
+
     return do_get_config_path
 
 
@@ -225,18 +235,20 @@ def load_config(get_config_path):
     def load_config_file(rmd=False):
         with open(get_config_path(rmd=rmd)) as f:
             return json.load(f)
+
     return load_config_file
 
 
 def test_notebook(load_config, expected_results):
     config = load_config()
-    run_autograder(config['autograder_dir'])
+    run_autograder(config["autograder_dir"])
 
     with FILE_MANAGER.open("autograder/results/results.json") as f:
         actual_results = json.load(f)
 
-    assert actual_results == expected_results, \
-        f"Actual results did not matched expected:\n{actual_results}"
+    assert (
+        actual_results == expected_results
+    ), f"Actual results did not matched expected:\n{actual_results}"
 
 
 @mock.patch("otter.run.run_autograder.runners.python_runner.export_notebook")
@@ -245,22 +257,26 @@ def test_pdf_generation_failure(mocked_export, get_config_path, load_config, exp
     config["warn_missing_pdf"] = True
     config["token"] = "abc123"
 
-    expected_results["tests"].insert(1, {
-        "name": "PDF Generation Failed",
-        "visibility": "visible",
-        "output": "nu-uh",
-        "status": "failed",
-    })
+    expected_results["tests"].insert(
+        1,
+        {
+            "name": "PDF Generation Failed",
+            "visibility": "visible",
+            "output": "nu-uh",
+            "status": "failed",
+        },
+    )
 
     with alternate_config(get_config_path(), config):
         mocked_export.side_effect = ValueError("nu-uh")
-        run_autograder(config['autograder_dir'])
+        run_autograder(config["autograder_dir"])
 
     with FILE_MANAGER.open("autograder/results/results.json") as f:
         actual_results = json.load(f)
 
-    assert actual_results == expected_results, \
-        f"Actual results did not matched expected:\n{actual_results}"
+    assert (
+        actual_results == expected_results
+    ), f"Actual results did not matched expected:\n{actual_results}"
 
 
 @mock.patch.object(APIClient, "upload_pdf_submission")
@@ -279,7 +295,7 @@ def test_use_submission_pdf(
     FILE_MANAGER.open("autograder/submission/fails2and6H.pdf", "wb+").close()
 
     with alternate_config(get_config_path(), config):
-        run_autograder(config['autograder_dir'])
+        run_autograder(config["autograder_dir"])
 
     with FILE_MANAGER.open("autograder/results/results.json") as f:
         actual_results = json.load(f)
@@ -288,11 +304,12 @@ def test_use_submission_pdf(
     mocked_upload_pdf_submission.assert_called_with(
         config["course_id"],
         config["assignment_id"],
-        "student@univ.edu", # from submission_metadata.json in autograder dir
+        "student@univ.edu",  # from submission_metadata.json in autograder dir
         "fails2and6H.pdf",
     )
-    assert actual_results == expected_results, \
-        f"Actual results did not matched expected:\n{actual_results}"
+    assert (
+        actual_results == expected_results
+    ), f"Actual results did not matched expected:\n{actual_results}"
 
 
 def test_force_public_test_summary(get_config_path, load_config):
@@ -301,7 +318,7 @@ def test_force_public_test_summary(get_config_path, load_config):
         config["show_hidden"] = show_hidden
         config["force_public_test_summary"] = force_public_test_summary
         with alternate_config(get_config_path(), config):
-            run_autograder(config['autograder_dir'])
+            run_autograder(config["autograder_dir"])
 
         with FILE_MANAGER.open("autograder/results/results.json") as f:
             actual_results = json.load(f)
@@ -337,13 +354,14 @@ def test_script(load_config, expected_results, get_config_path):
             f.write(py)
 
         with alternate_config(get_config_path(), config):
-            run_autograder(config['autograder_dir'])
+            run_autograder(config["autograder_dir"])
 
         with FILE_MANAGER.open("autograder/results/results.json") as f:
             actual_results = json.load(f)
 
-        assert actual_results == expected_results, \
-            f"Actual results did not matched expected:\n{actual_results}"
+        assert (
+            actual_results == expected_results
+        ), f"Actual results did not matched expected:\n{actual_results}"
 
     finally:
         delete_paths([FILE_MANAGER.get_path("autograder/submission/fails2and6H.py")])
@@ -361,19 +379,24 @@ def test_assignment_name(load_config, expected_results):
     def perform_test(nb, expected_results, error=None, **kwargs):
         nbformat.write(nb, nb_path)
 
-        cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
+        cm = (
+            pytest.raises(OtterRuntimeError, match=re.escape(error))
+            if error is not None
             else nullcontext()
+        )
         with cm:
-            run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
+            run_autograder(config["autograder_dir"], assignment_name=name, **kwargs)
 
         with FILE_MANAGER.open("autograder/results/results.json") as f:
             actual_results = json.load(f)
 
-        assert actual_results == expected_results, \
-            f"Actual results did not matched expected:\n{actual_results}"
+        assert (
+            actual_results == expected_results
+        ), f"Actual results did not matched expected:\n{actual_results}"
 
-    error_message_template = "Received submission for assignment '{got}' (this is assignment " \
-            "'{want}')"
+    error_message_template = (
+        "Received submission for assignment '{got}' (this is assignment " "'{want}')"
+    )
 
     try:
         # test with correct name
@@ -404,25 +427,30 @@ def test_rmd(load_config, expected_rmd_results):
     with open(rmd_path) as f:
         orig_rmd = f.read()
 
-    sub_name = lambda n: re.sub(r"assignment_name: \"\w+\"", f"assignment_name: \"{n}\"", orig_rmd)
+    sub_name = lambda n: re.sub(r"assignment_name: \"\w+\"", f'assignment_name: "{n}"', orig_rmd)
 
     def perform_test(rmd, expected_results, error=None, **kwargs):
         with open(rmd_path, "w") as f:
             f.write(rmd)
 
-        cm = pytest.raises(OtterRuntimeError, match=re.escape(error)) if error is not None \
+        cm = (
+            pytest.raises(OtterRuntimeError, match=re.escape(error))
+            if error is not None
             else nullcontext()
+        )
         with cm:
-            run_autograder(config["autograder_dir"], assignment_name = name, **kwargs)
+            run_autograder(config["autograder_dir"], assignment_name=name, **kwargs)
 
         with FILE_MANAGER.open("rmd-autograder/results/results.json") as f:
             actual_results = json.load(f)
 
-        assert actual_results == expected_results, \
-            f"Actual results did not matched expected:\n{actual_results}"
+        assert (
+            actual_results == expected_results
+        ), f"Actual results did not matched expected:\n{actual_results}"
 
-    error_message_template = "Received submission for assignment '{got}' (this is assignment " \
-            "'{want}')"
+    error_message_template = (
+        "Received submission for assignment '{got}' (this is assignment " "'{want}')"
+    )
 
     try:
         # test with correct name
@@ -432,7 +460,8 @@ def test_rmd(load_config, expected_rmd_results):
         bad_name = "lab01"
         error_message = error_message_template.format(got=bad_name, want=name)
         perform_test(
-            sub_name(bad_name), get_expected_error_results(error_message), error=error_message)
+            sub_name(bad_name), get_expected_error_results(error_message), error=error_message
+        )
 
         # test with no name in Rmd
         error_message = error_message_template.format(got=None, want=name)
@@ -457,14 +486,24 @@ def test_token_sanitization(mocked_upload, get_config_path, load_config, expecte
     config["token"] = "abc123"
     config.pop("plugins")
 
-    nb = nbformat.v4.new_notebook(cells=[nbformat.v4.new_code_cell(dedent("""\
+    nb = nbformat.v4.new_notebook(
+        cells=[
+            nbformat.v4.new_code_cell(
+                dedent(
+                    """\
         import json
         with open("../source/otter_config.json") as f:
             config = json.load(f)
         token = config.get("token")
-    """))])
+    """
+                )
+            )
+        ]
+    )
 
-    tests = {"q1.py": dedent("""\
+    tests = {
+        "q1.py": dedent(
+            """\
         OK_FORMAT = False
 
         from otter.test_files import test_case
@@ -474,7 +513,9 @@ def test_token_sanitization(mocked_upload, get_config_path, load_config, expecte
         @test_case()
         def q1_1(env):
             assert env["token"] is None
-    """)}
+    """
+        )
+    }
 
     expected_results = {
         "tests": [
@@ -489,7 +530,7 @@ def test_token_sanitization(mocked_upload, get_config_path, load_config, expecte
                 "score": 1.0,
                 "max_score": 1.0,
                 "visibility": "hidden",
-                "output": "q1 results: All test cases passed!"
+                "output": "q1 results: All test cases passed!",
             },
         ],
     }
@@ -498,15 +539,42 @@ def test_token_sanitization(mocked_upload, get_config_path, load_config, expecte
 
     mocked_upload.return_value.status_code = 200
 
-    with alternate_config(get_config_path(), config), \
-            alternate_submission(FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb"), nb), \
-            alternate_tests(tests):
-        run_autograder(config['autograder_dir'])
+    with (
+        alternate_config(get_config_path(), config),
+        alternate_submission(FILE_MANAGER.get_path("autograder/submission/fails2and6H.ipynb"), nb),
+        alternate_tests(tests),
+    ):
+        run_autograder(config["autograder_dir"])
 
     with FILE_MANAGER.open("autograder/results/results.json") as f:
         actual_results = json.load(f)
 
-    assert actual_results == expected_results, \
-        f"Actual results did not matched expected:\n{actual_results}"
+    assert (
+        actual_results == expected_results
+    ), f"Actual results did not matched expected:\n{actual_results}"
 
     mocked_upload.assert_called()
+
+
+@mock.patch.object(APIClient, "upload_pdf_submission")
+def test_pdf_via_html(_, mock_export_notebook, get_config_path, load_config, expected_results):
+    config = load_config()
+    config["pdf_via_html"] = True
+    config["token"] = "abc123"
+
+    with alternate_config(get_config_path(), config):
+        run_autograder(config["autograder_dir"])
+
+    with FILE_MANAGER.open("autograder/results/results.json") as f:
+        actual_results = json.load(f)
+
+    assert (
+        actual_results == expected_results
+    ), f"Actual results did not matched expected:\n{actual_results}"
+    mock_export_notebook.assert_called_with(
+        "fails2and6H.ipynb",
+        dest="fails2and6H.pdf",
+        filtering=False,
+        pagebreaks=False,
+        exporter_type="html",
+    )

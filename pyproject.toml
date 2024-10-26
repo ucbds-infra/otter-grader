@@ -1,0 +1,115 @@
+[tool.poetry]
+name = "otter-grader"
+version = "5.6.0"
+description = "A Python and R autograding solution"
+authors = ["Christopher Pyles <cpyles@berkeley.edu>"]
+license = "BSD-3-Clause"
+readme = "README.md"
+homepage = "https://otter-grader.readthedocs.io/"
+repository = "https://github.com/ucbds-infra/otter-grader"
+documentation = "https://otter-grader.readthedocs.io/"
+classifiers = [
+		"Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+packages = [
+  { include = "otter" },
+]
+include = [
+  { path = "otter/export/exporters/templates/**/*" },
+  { path = "otter/generate/templates/**/*" },
+  { path = "otter/grade/Dockerfile" },
+]
+
+[tool.poetry.scripts]
+otter = "otter.cli:cli"
+gmail_oauth2 = "otter.plugins.builtin.gmail_notifications.bin.gmail_oauth2:main"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.7"
+dill = "^0.3.8"
+fica = ">=0.4.1"
+google-api-python-client = { version = "*", optional = true }
+google-auth-oauthlib = { version = "*", optional = true }
+six = { version = "*", optional = true }
+gspread = { version = "*", optional = true }
+ipykernel = { version = "*", optional = true}
+ipylab = "^1.0.0"
+ipython = "*"
+ipywidgets = "^8.1.5"
+jinja2 = "^3.1.4"
+jupyter_client = { version = "*", optional = true}
+jupytext = "^1.16.4"
+nbconvert = { version = ">=6.0.0", extras = ["webpdf"], markers = "sys_platform != 'emscripten' and sys_platform != 'wasi'" }
+nbformat = ">=5.0.0"
+pandas = ">=2.0.0"
+pypdf = { version = "*", optional = true }
+python-on-whales = "^0.72.0"
+pyyaml = "^6.0.2"
+requests = "^2.32.3"
+rpy2 = { version = "^3.5.16", optional = true }
+wrapt = "^1.16.0"
+
+[tool.poetry.extras]
+grading = ["ipykernel", "jupyter_client", "pypdf"]
+plugins = ["google-api-python-client", "google-auth-oauthlib", "gspread", "six"]
+r = ["rpy2"]
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+isort = "^5.13.2"
+twine = "^5.1.1"
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+coverage = "^7.2.0"
+matplotlib = "*"
+pytest = "^8.2.2"
+pytest-html = "*"
+responses = "^0.25.3"
+tqdm = "*"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = ">=5.0.0"
+sphinx-book-theme = "1.1.0"
+sphinx-click = "*"
+sphinx_markdown_tables = "*"
+sphinxcontrib-apidoc = "*"
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+extend-exclude = """
+(
+  .*.ipynb               # exclude ipynb files
+  | test/.*/files/.*.py  # exclude test goldens
+)
+"""
+
+[tool.isort]
+py_version = "39"
+skip_glob = ["test/**/files/*"]
+line_length = 100
+sections = ["THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+multi_line_output = 3
+use_parentheses = true
+order_by_type = false
+lines_after_imports = 2
+lines_between_types = 1
+include_trailing_comma = true
+reverse_relative = true
+combine_as_imports = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

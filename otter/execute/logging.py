@@ -1,17 +1,17 @@
 """A logging server for receiving logs from the grading process"""
 
-import pickle
 import logging
 import logging.handlers
+import pickle
 import socket
 import socketserver
 import struct
 import threading
 
-from ..utils import loggers
+from ..logging import get_level, get_logger
 
 
-LOGGER = loggers.get_logger(__name__)
+LOGGER = get_logger(__name__)
 
 
 class LogLevelFilter(logging.Filter):
@@ -21,7 +21,7 @@ class LogLevelFilter(logging.Filter):
     """
 
     def filter(self, record: logging.LogRecord):
-        return record.levelno >= loggers.get_level()
+        return record.levelno >= get_level()
 
 
 class LogRecordStreamHandler(socketserver.StreamRequestHandler):
@@ -43,7 +43,7 @@ class LogRecordStreamHandler(socketserver.StreamRequestHandler):
             chunk = self.connection.recv(4)
             if len(chunk) < 4:
                 break
-            slen = struct.unpack('>L', chunk)[0]
+            slen = struct.unpack(">L", chunk)[0]
             chunk = self.connection.recv(slen)
             while len(chunk) < slen:
                 chunk = chunk + self.connection.recv(slen - len(chunk))
@@ -51,11 +51,11 @@ class LogRecordStreamHandler(socketserver.StreamRequestHandler):
             record = logging.makeLogRecord(obj)
             self.handle_log_record(record)
 
-    def unpickle(self, data):
+    def unpickle(self, data: bytes):
         return pickle.loads(data)
 
-    def handle_log_record(self, record):
-        logger = loggers.get_logger(record.name)
+    def handle_log_record(self, record: logging.LogRecord):
+        logger = get_logger(record.name)
         if self.filter.filter(record):
             logger.handle(record)
 
@@ -71,15 +71,16 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
     abort = False
 
     def __init__(
-            self,
-            host="localhost",
-            port=0,
-            handler=LogRecordStreamHandler,
-        ):
+        self,
+        host: str = "localhost",
+        port: int = 0,
+        handler: type[logging.Handler] = LogRecordStreamHandler,
+    ):
         super().__init__((host, port), handler)
 
     def serve_until_stopped(self):
         import select
+
         abort = False
         while not abort:
             rd = None

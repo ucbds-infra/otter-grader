@@ -35,25 +35,25 @@ def test_otter_check_script():
         with contextlib.redirect_stdout(output):
             check(
                 FILE_MANAGER.get_path("file0.py"),
-                question = os.path.split(file)[1][:-3],
-                tests_path = os.path.split(file)[0],
+                question=os.path.split(file)[1][:-3],
+                tests_path=os.path.split(file)[0],
             )
 
         if os.path.split(file)[1] != "q2.py":
-            assert output.getvalue().strip().split("\n")[-1].strip() == \
-                "All tests passed!", \
-                "Did not pass test at {}".format(file)
+            assert (
+                output.getvalue().strip().split("\n")[-1].strip() == "All tests passed!"
+            ), "Did not pass test at {}".format(file)
 
     # run the file for all questions
     output = StringIO()
     with contextlib.redirect_stdout(output):
         check(
-            FILE_MANAGER.get_path("file0.py"), 
-            tests_path = os.path.split(file)[0],
+            FILE_MANAGER.get_path("file0.py"),
+            tests_path=os.path.split(file)[0],
         )
 
-    assert output.getvalue().strip() == \
-        dedent("""\
+    assert output.getvalue().strip() == dedent(
+        """\
             q1 results: All test cases passed!
             q2 results:
                 q2 - 1 result:
@@ -75,8 +75,8 @@ def test_otter_check_script():
                     ✅ Test case passed
             q3 results: All test cases passed!
             q4 results: All test cases passed!
-            q5 results: All test cases passed!"""), \
-        "Did not pass correct tests"
+            q5 results: All test cases passed!"""
+    ), "Did not pass correct tests"
 
 
 def test_otter_check_notebook():
@@ -89,26 +89,26 @@ def test_otter_check_notebook():
         output = StringIO()
         with contextlib.redirect_stdout(output):
             check(
-                FILE_MANAGER.get_path("test-nb.ipynb"), 
-                question = os.path.split(file)[1][:-3],
-                tests_path = os.path.split(file)[0],
+                FILE_MANAGER.get_path("test-nb.ipynb"),
+                question=os.path.split(file)[1][:-3],
+                tests_path=os.path.split(file)[0],
             )
 
         if os.path.split(file)[1] != "q2.py":
-            assert output.getvalue().strip().split("\n")[-1].strip() == \
-                "All tests passed!", \
-                "Did not pass test at {}".format(file)
+            assert (
+                output.getvalue().strip().split("\n")[-1].strip() == "All tests passed!"
+            ), "Did not pass test at {}".format(file)
 
     # run the file for all questions
     output = StringIO()
     with contextlib.redirect_stdout(output):
         check(
-            FILE_MANAGER.get_path("test-nb.ipynb"), 
-            tests_path = os.path.split(file)[0],
+            FILE_MANAGER.get_path("test-nb.ipynb"),
+            tests_path=os.path.split(file)[0],
         )
 
-    assert output.getvalue().strip() == \
-        dedent("""\
+    assert output.getvalue().strip() == dedent(
+        """\
             q1 results: All test cases passed!
             q2 results:
                 q2 - 1 result:
@@ -130,5 +130,5 @@ def test_otter_check_notebook():
                     ✅ Test case passed
             q3 results: All test cases passed!
             q4 results: All test cases passed!
-            q5 results: All test cases passed!"""), \
-        "Did not pass correct tests"
+            q5 results: All test cases passed!"""
+    ), "Did not pass correct tests"

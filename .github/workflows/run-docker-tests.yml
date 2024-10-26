@@ -33,7 +33,7 @@ jobs:
         with:
           ref: ${{ matrix.branch }}
 
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-buildx-action@v3
         with:
           install: true
 
@@ -41,13 +41,25 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
+      - uses: liskin/gh-pipx@v1
+        with:
+          packages: >-
+            poetry
+
       - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: environment.yml
+          create-args: >-
+            python=3.9
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('requirements*.txt') }}
+          cache-environment-key: requirements-${{ hashFiles('environment.yml') }}
+
+      - name: Install dependencies
+        run: |
+          micromamba activate otter-grader
+          poetry install --with dev,test --all-extras
 
       - name: Install ottr
         run: |

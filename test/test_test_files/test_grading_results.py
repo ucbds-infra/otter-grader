@@ -2,7 +2,7 @@
 
 import traceback
 
-from otter.run.run_autograder.autograder_config import AutograderConfig
+from otter.run import AutograderConfig
 from otter.test_files import GradingResults
 
 
@@ -15,6 +15,7 @@ class TestGradingResults:
         """
         Tests for ``otter.test_files.GradingResults.wtihout_results``.
         """
+
         def foo():
             raise Exception("nope")
 
@@ -30,15 +31,15 @@ class TestGradingResults:
         assert r.to_gradescope_dict(AutograderConfig()) == {
             "tests": [
                 {
-                    "name": "Autograder Failed", 
-                    "visibility": "visible", 
+                    "name": "Autograder Failed",
+                    "visibility": "visible",
                     "output": "The autograder failed to produce any results. Please alert your instructor to this failure for assistance in debugging it.",
                     "status": "failed",
                 },
                 {
-                    "name": "Autograder Exception", 
-                    "visibility": "hidden", 
-                    "output": f"The exception below was thrown when attempting to read the results from executing the notebook. (This message is not visible to students.)\n\n{tb}", 
+                    "name": "Autograder Exception",
+                    "visibility": "hidden",
+                    "output": f"The exception below was thrown when attempting to read the results from executing the notebook. (This message is not visible to students.)\n\n{tb}",
                     "status": "failed",
                 },
             ],

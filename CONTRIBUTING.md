@@ -6,19 +6,33 @@ any updates. Make sure to update the changelog with any information about the co
 
 ## Environment Setup
 
-To set up an environment for working on Otter, we recommend using 
-[Conda](https://docs.conda.io/en/latest/miniconda.html). This repo contains an 
+To set up an environment for working on Otter, we recommend using [Mamba](https://mamba.readthedocs.io/en/latest/) (or Conda). This repo contains an 
 [`environment.yml`](environment.yml) file which defines all of the requirements for an environment
 used to work on Otter.
 
 Running
 
 ```
-conda env create -f environment.yml
+mamba env create -f environment.yml
 ```
 
-will create a conda environment called `otter-grader` with the necessary packages installed for both
-Python and R.
+will create a conda environment called `otter-grader` with the necessary Python and R versions.
+
+To install development dependencies, use [`poetry`](https://python-poetry.org/) to update the environment:
+
+```
+mamba activate otter-grader
+poetry install --with dev,test
+```
+
+
+## Code Formatting
+
+The Python files in this repo are formatted with isort and black. Installing the `dev` dependencies
+with poetry will install these as well. You can run `make format` with your conda/virtual environment
+activated to format the files in-place.
+
+Note that code formatting is enforced by a CI test.
 
 
 ## Running Tests

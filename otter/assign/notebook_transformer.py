@@ -2,7 +2,10 @@
 
 import copy
 import fica
-import nbformat
+import nbformat as nbf
+import pathlib
+
+from typing import Union
 
 from .assignment import Assignment
 from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
@@ -14,8 +17,8 @@ from .r_adapter import rmarkdown_converter
 from .r_adapter.cell_factory import RCellFactory
 from .solutions import (
     has_seed,
-    SOLUTION_CELL_TAG,
     overwrite_seed_vars,
+    SOLUTION_CELL_TAG,
     strip_ignored_lines,
     strip_solutions_and_output,
 )
@@ -23,15 +26,13 @@ from .tests_manager import AssignmentTestsManager
 from .utils import (
     add_tag,
     AssignNotebookFormatException,
-    get_source,
     is_cell_type,
     is_ignore_cell,
     lock,
     remove_cell_ids_if_applicable,
 )
-
 from ..nbmeta_config import NBMetadataConfig
-from ..utils import NOTEBOOK_METADATA_KEY
+from ..utils import get_source, NOTEBOOK_METADATA_KEY
 
 
 class NotebookTransformer:
@@ -61,12 +62,12 @@ class NotebookTransformer:
     tests_mgr: AssignmentTestsManager
     """the tests manager to populate"""
 
-    def __init__(self, assignment, tests_mgr):
+    def __init__(self, assignment: Assignment, tests_mgr: AssignmentTestsManager):
         self.assignment = assignment
         self.cell_factory = (RCellFactory if self.assignment.is_r else CellFactory)(self.assignment)
         self.tests_mgr = tests_mgr
 
-    def add_export_tag_to_cell(self, cell, end=False):
+    def add_export_tag_to_cell(self, cell: nbf.NotebookNode, end: bool = False) -> nbf.NotebookNode:
         """
         Add an HTML comment to open or close question export for PDF filtering to the top of
         ``cell``. ``cell`` should be a Markdown cell.
@@ -84,12 +85,15 @@ class NotebookTransformer:
         source = get_source(cell)
         tag = "<!-- " + ("END" if end else "BEGIN") + " QUESTION -->"
         source = [tag, ""] + source
-        cell['source'] = "\n".join(source)
+        cell["source"] = "\n".join(source)
         lock(cell)
         return cell
 
     @staticmethod
-    def add_point_value_info_to_cell(cell, points):
+    def add_point_value_info_to_cell(
+        cell: nbf.NotebookNode,
+        points: Union[int, float],
+    ) -> nbf.NotebookNode:
         """
         Add the point value information to the provided cell, returning a copy.
 
@@ -106,7 +110,7 @@ class NotebookTransformer:
         cell["source"] = "\n".join(source)
         return cell
 
-    def transform_notebook(self, nb) -> "TransformedNotebookContainer":
+    def transform_notebook(self, nb: nbf.NotebookNode) -> "TransformedNotebookContainer":
         """
         Transform a master notebook into an autograder-formatted notebook.
 
@@ -116,7 +120,7 @@ class NotebookTransformer:
         Returns:
             ``TransformedNotebookContainer``: the autograder-formatted notebook
         """
-        transformed_cells = self._get_transformed_cells(nb['cells'])
+        transformed_cells = self._get_transformed_cells(nb["cells"])
 
         if self.assignment.init_cell:
             transformed_cells = self.cell_factory.create_init_cells() + transformed_cells
@@ -128,7 +132,7 @@ class NotebookTransformer:
             transformed_cells += self.cell_factory.create_export_cells()
 
         transformed_nb = copy.deepcopy(nb)
-        transformed_nb['cells'] = transformed_cells
+        transformed_nb["cells"] = transformed_cells
 
         # replace plugins
         transformed_nb = replace_plugins_with_calls(transformed_nb)
@@ -140,19 +144,19 @@ class NotebookTransformer:
 
         return TransformedNotebookContainer(transformed_nb, self)
 
-    def _get_transformed_cells(self, cells):
+    def _get_transformed_cells(self, cells: list[nbf.NotebookNode]) -> list[nbf.NotebookNode]:
         """
         Takes in a list of cells from the master notebook and returns a list of cells for the
         autograder notebook.
 
         Args:
-            cells (``list[nbformat.NotebookNode]``): the cells of the master notebook
+            cells (``list[nbf.NotebookNode]``): the cells of the master notebook
 
         Returns:
-            ``list[nbformat.NotebookNode]``: the cells of the autograder notebook
+            ``list[nbf.NotebookNode]``: the cells of the autograder notebook
         """
-        curr_block = []  # allow nested blocks
-        transformed_cells = []
+        curr_block: list[BlockType] = []  # allow nested blocks
+        transformed_cells: list[nbf.NotebookNode] = []
 
         question, has_prompt, no_solution, last_question_md_cell = None, False, False, None
 
@@ -187,19 +191,30 @@ class NotebookTransformer:
 
                         # only add to notebook if there's a response cell or if there are public tests;
                         # don't add cell if the 'check_cell' key of question is false
-                        if (not no_solution or self.tests_mgr.any_public_tests(question)) and \
-                                question.check_cell:
+                        if (
+                            not no_solution or self.tests_mgr.any_public_tests(question)
+                        ) and question.check_cell:
                             transformed_cells.extend(check_cells)
+                        else:
+                            last_cell_meta = transformed_cells[-1]["metadata"]
+                            last_cell_meta.setdefault(NOTEBOOK_METADATA_KEY, {})
+                            last_cell_meta[NOTEBOOK_METADATA_KEY]["tests"] = [question.name]
 
                     # add points to question cell if specified
                     if self.assignment.show_question_points and last_question_md_cell is not None:
                         points = self.tests_mgr.determine_question_point_value(question)
-                        transformed_cells[last_question_md_cell] = \
+                        transformed_cells[last_question_md_cell] = (
                             self.add_point_value_info_to_cell(
-                                transformed_cells[last_question_md_cell], points)
+                                transformed_cells[last_question_md_cell], points
+                            )
+                        )
 
-                    question, has_prompt, no_solution, last_question_md_cell = \
-                        None, False, False, None
+                    question, has_prompt, no_solution, last_question_md_cell = (
+                        None,
+                        False,
+                        False,
+                        None,
+                    )
                     solution_has_md_cells, prompt_insertion_index = False, None
 
                 elif block_type is BlockType.SOLUTION:
@@ -207,7 +222,8 @@ class NotebookTransformer:
                         if prompt_insertion_index is None:
                             raise RuntimeError("Could not find prompt insertion index")
                         transformed_cells.insert(
-                            prompt_insertion_index, CellFactory.create_markdown_response_cell())
+                            prompt_insertion_index, CellFactory.create_markdown_response_cell()
+                        )
                         has_prompt = True
 
                 continue  # if this is an end to the last nested block, we're OK
@@ -219,14 +235,19 @@ class NotebookTransformer:
                     # if a child is missing an end block cell, raise an error
                     if block_type in curr_block:
                         raise AssignNotebookFormatException(
-                            f"Found an end {block_type.value} cell with an un-ended child " + \
-                                f"{curr_block[-1].value} block", question, i)
+                            f"Found an end {block_type.value} cell with an un-ended child "
+                            + f"{curr_block[-1].value} block",
+                            question,
+                            i,
+                        )
 
                     # otherwise raise an error for an end with no begin
                     else:
                         raise AssignNotebookFormatException(
                             f"Found an end {block_type.value} cell with no begin block cell",
-                            question, i)
+                            question,
+                            i,
+                        )
 
             # check for begin blocks
             found_begin = False
@@ -238,20 +259,26 @@ class NotebookTransformer:
             if found_begin:
                 if len(curr_block) == 0 and block_type is not BlockType.QUESTION:
                     raise AssignNotebookFormatException(
-                        f"Found a begin {block_type.value} cell outside a question", 
-                        question, i)
+                        f"Found a begin {block_type.value} cell outside a question", question, i
+                    )
                 elif len(curr_block) > 0 and block_type is BlockType.QUESTION:
                     raise AssignNotebookFormatException(
-                        f"Found a begin {block_type.value} cell inside another question", 
-                        question, i)
+                        f"Found a begin {block_type.value} cell inside another question",
+                        question,
+                        i,
+                    )
                 elif len(curr_block) > 1:
                     raise AssignNotebookFormatException(
-                        f"Found a begin {block_type.value} cell inside a {curr_block[-1].value} " \
-                            "block", question, i)
+                        f"Found a begin {block_type.value} cell inside a {curr_block[-1].value} "
+                        "block",
+                        question,
+                        i,
+                    )
                 elif block_type is BlockType.PROMPT and has_prompt:
                     # has_prompt was set by the solution block
                     raise AssignNotebookFormatException(
-                        "Found a prompt block after a solution block", question, i)
+                        "Found a prompt block after a solution block", question, i
+                    )
 
                 # if not an invalid begin cell, update state
                 if block_type is BlockType.PROMPT:
@@ -267,7 +294,8 @@ class NotebookTransformer:
                     question_config = get_cell_config(cell)
                     if not isinstance(question_config, dict):
                         raise AssignNotebookFormatException(
-                            "Found a begin question cell with no config", None, i)
+                            "Found a begin question cell with no config", None, i
+                        )
 
                     question = QuestionConfig(question_config)
                     if question.manual or question.export:
@@ -281,7 +309,8 @@ class NotebookTransformer:
                 if curr_block[-1] == BlockType.TESTS:
                     if not is_cell_type(cell, "code"):
                         raise AssignNotebookFormatException(
-                            "Found a non-code cell in tests block", question, i)
+                            "Found a non-code cell in tests block", question, i
+                        )
                     self.tests_mgr.read_test(cell, question)
                     continue
 
@@ -300,7 +329,7 @@ class NotebookTransformer:
                 if is_cell_type(cell, "markdown"):
                     cell = self.add_export_tag_to_cell(cell)
                 elif FeatureToggle.PDF_FILTERING_COMMENTS.value.is_enabled(self.assignment):
-                    export_delim_cell = nbformat.v4.new_markdown_cell()
+                    export_delim_cell = nbf.v4.new_markdown_cell()
                     export_delim_cell = self.add_export_tag_to_cell(export_delim_cell)
                 need_begin_export = False
             if need_end_export:
@@ -308,7 +337,7 @@ class NotebookTransformer:
                     cell = self.add_export_tag_to_cell(cell, end=True)
                 elif FeatureToggle.PDF_FILTERING_COMMENTS.value.is_enabled(self.assignment):
                     if export_delim_cell is None:
-                        export_delim_cell = nbformat.v4.new_markdown_cell()
+                        export_delim_cell = nbf.v4.new_markdown_cell()
                     export_delim_cell = self.add_export_tag_to_cell(export_delim_cell, end=True)
                 need_end_export = False
 
@@ -328,7 +357,8 @@ class NotebookTransformer:
         # if the last cell was the end of a manually-graded question, add a close export tag
         if need_end_export:
             transformed_cells.append(
-                self.add_export_tag_to_cell(nbformat.v4.new_markdown_cell(), end=True))
+                self.add_export_tag_to_cell(nbf.v4.new_markdown_cell(), end=True)
+            )
 
         return transformed_cells
 
@@ -345,7 +375,7 @@ class TransformedNotebookContainer:
             ``transformed_nb``
     """
 
-    transformed_nb: nbformat.NotebookNode
+    transformed_nb: nbf.NotebookNode
     """the autograder notebook"""
 
     nb_transformer: NotebookTransformer
@@ -354,25 +384,27 @@ class TransformedNotebookContainer:
     nbmeta_config: NBMetadataConfig
     """the notebook metadata config to include when writing the notebook"""
 
-    def __init__(self, transformed_nb, nb_transformer):
+    def __init__(self, transformed_nb: nbf.NotebookNode, nb_transformer: NotebookTransformer):
         self.transformed_nb = transformed_nb
         self.nb_transformer = nb_transformer
-        self._populate_nbmeta_config(self.nb_transformer.assignment)
 
-    def _populate_nbmeta_config(self, a: Assignment):
-        """
-        Copy configurations from the ``Assignment`` into the ``NBMetadataConfig``.
-        """
+        # populate NBMetadataConfig
         self.nbmeta_config = NBMetadataConfig({})
-        if a.name:
-            self.nbmeta_config.assignment_name = a.name
-        if a.export_cell and a.export_cell.require_no_pdf_ack:
+        if self.assignment.name:
+            self.nbmeta_config.assignment_name = self.assignment.name
+        if self.assignment.export_cell and self.assignment.export_cell.require_no_pdf_ack:
             self.nbmeta_config.require_no_pdf_confirmation = True
-            if isinstance(a.export_cell.require_no_pdf_ack, fica.Config):
-                self.nbmeta_config.export_pdf_failure_message = \
-                    a.export_cell.require_no_pdf_ack.message
+            if isinstance(self.assignment.export_cell.require_no_pdf_ack, fica.Config):
+                self.nbmeta_config.export_pdf_failure_message = (
+                    self.assignment.export_cell.require_no_pdf_ack.message
+                )
 
-    def _get_sanitized_nb(self):
+    @property
+    def assignment(self) -> Assignment:
+        """the assignment config for this notebook"""
+        return self.nb_transformer.assignment
+
+    def _get_sanitized_nb(self) -> nbf.NotebookNode:
         """
         Return a copy of ``self.transformed_nb`` with solutions and outputs stripped and seed
         variables replaced.
@@ -389,7 +421,7 @@ class TransformedNotebookContainer:
             )
         return nb
 
-    def _add_nbmeta_config(self, nb):
+    def _add_nbmeta_config(self, nb: nbf.NotebookNode):
         """
         Add the notebook metadata config to the provided notebook's metadata in-place.
         """
@@ -397,7 +429,7 @@ class TransformedNotebookContainer:
         if uc:
             nb["metadata"][NOTEBOOK_METADATA_KEY] = uc
 
-    def write_transformed_nb(self, output_path, sanitize):
+    def write_transformed_nb(self, output_path: Union[pathlib.Path, str], sanitize: bool):
         """
         Write the transformed notebook (either as an autograder or student notebook) to the
         specified file, converting to R Markdown if necessary.
@@ -419,9 +451,14 @@ class TransformedNotebookContainer:
                 normalize = lambda nb: (0, nb)
 
             _, nb = normalize(nb)
-            nbformat.write(nb, str(output_path))
+            nbf.write(nb, str(output_path))
 
-    def write_tests(self, tests_dir, include_hidden, force_files):
+    def write_tests(
+        self,
+        tests_dir: Union[pathlib.Path, str, None],
+        include_hidden: bool,
+        force_files: bool,
+    ):
         """
         Write the tests, either to the notebook metadata or files in ``tests_dir`` as indicated by
         the assignment config.

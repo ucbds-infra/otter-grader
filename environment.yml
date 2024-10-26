@@ -3,13 +3,9 @@ channels:
     - conda-forge
     - defaults
 dependencies:
-    - python>=3.6,<3.11
+    - python>=3.9
     - r-base>=4.0.0
     - r-essentials
     - r-devtools
     - pip
-    - pip:
-        - -r requirements.txt
-        - -r requirements-export.txt
-        - -r requirements-test.txt
-        - -r docs/requirements.txt
+    - nb_conda_kernels

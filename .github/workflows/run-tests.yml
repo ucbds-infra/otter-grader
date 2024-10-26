@@ -21,6 +21,10 @@ jobs:
     name: Test suite
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python_version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
     env:
       TAR: /bin/tar
 
@@ -35,13 +39,26 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
+      - uses: liskin/gh-pipx@v1
+        with:
+          packages: >-
+            poetry
+
       - uses: mamba-org/setup-micromamba@v2
         with:
           environment-file: environment.yml
+          create-args: >-
+            python=${{ matrix.python_version }}
           init-shell: >-
             bash
           cache-environment: true
-          cache-environment-key: requirements-${{ hashFiles('requirements*.txt') }}
+          cache-environment-key: mamba-${{ hashFiles('environment.yml') }}
+
+      - name: Install dependencies
+        run: |
+          micromamba activate otter-grader
+          poetry env info
+          poetry install --with dev,test --all-extras
 
       - name: Install ottr
         run: |
@@ -54,3 +71,15 @@ jobs:
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
+        with:
+          parallel: true
+          flag-name: run ${{ join(matrix.*, ' - ') }}
+
+  finish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true

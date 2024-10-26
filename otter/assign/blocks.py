@@ -5,8 +5,10 @@ import re
 import yaml
 
 from enum import Enum
+from typing import Any
 
-from .utils import get_source, is_cell_type
+from .utils import is_cell_type
+from ..utils import get_source
 
 
 class BlockType(Enum):
@@ -20,7 +22,7 @@ class BlockType(Enum):
     TESTS = "tests"
 
 
-def extract_fenced_otter_cell(cell):
+def extract_fenced_otter_cell(cell: nbformat.NotebookNode) -> nbformat.NotebookNode:
     """
     Converts a Markdown config cell to a raw config cell.
 
@@ -51,14 +53,21 @@ def extract_fenced_otter_cell(cell):
         return cell
 
     source = get_source(cell)
-    if source[0].strip() == "```otter" and \
-            all(not l.strip() == "```" for l in source[1:-1]) and source[-1].strip() == "```":
+    if (
+        source[0].strip() == "```otter"
+        and all(not l.strip() == "```" for l in source[1:-1])
+        and source[-1].strip() == "```"
+    ):
         return nbformat.v4.new_raw_cell("\n".join(source[1:-1]))
 
     return cell
 
 
-def is_block_boundary_cell(cell, block_type, end=False):
+def is_block_boundary_cell(
+    cell: nbformat.NotebookNode,
+    block_type: BlockType,
+    end: bool = False,
+) -> bool:
     """
     Determine whether ``cell`` is a boundary cell for a ``block_type`` block. If ``end`` is true,
     the block should be an end block; otherwise, it should be a begin block.
@@ -66,19 +75,19 @@ def is_block_boundary_cell(cell, block_type, end=False):
     Args:
         cell (``nbformat.NotebookNode``): the cell to check
         block_type (``BlockType``): the block type to check for
-        end (``bool``, optional): whether to check for an end boundary instead of a begin
+        end (``bool``): whether to check for an end boundary instead of a begin
 
     Returns:
         ``bool``: whether the cell is a boundary cell of type ``block_type``
     """
     cell = extract_fenced_otter_cell(cell)
-    begin_or_end = 'end' if end else 'begin'
-    regex = fr"#\s+{ begin_or_end }\s+{ block_type.value }\s*"
+    begin_or_end = "end" if end else "begin"
+    regex = rf"#\s+{ begin_or_end }\s+{ block_type.value }\s*"
     source = get_source(cell)
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 
 
-def is_assignment_config_cell(cell):
+def is_assignment_config_cell(cell: nbformat.NotebookNode) -> bool:
     """
     Determine whether ``cell`` is an assignment configuration cell.
 
@@ -104,7 +113,7 @@ def is_assignment_config_cell(cell):
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 
 
-def get_cell_config(cell):
+def get_cell_config(cell: nbformat.NotebookNode) -> dict[str, Any]:
     """
     Parse a cell's contents as YAML and return the resulting dictionary.
 
@@ -119,6 +128,8 @@ def get_cell_config(cell):
     """
     source = get_source(extract_fenced_otter_cell(cell))
     config = yaml.full_load("\n".join(source))
-    if not isinstance(config, dict) and config is not None:
+    if config is None:
+        config = {}
+    if not isinstance(config, dict):
         raise TypeError(f"Found a begin cell configuration that is not a dictionary: {cell}")
     return config

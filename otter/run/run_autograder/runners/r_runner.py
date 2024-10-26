@@ -12,9 +12,7 @@ from nbconvert.exporters import ScriptExporter
 from rpy2.robjects.packages import importr
 
 from .abstract_runner import AbstractLanguageRunner
-
 from ..utils import OtterRuntimeError
-
 from ....export import export_notebook
 from ....test_files import GradingResults
 from ....utils import chdir, get_source, knit_rmd_file, NBFORMAT_VERSION
@@ -33,7 +31,7 @@ class RRunner(AbstractLanguageRunner):
     subm_path_deletion_required = False
     """whether the submission path needs to be deleted (because it was created with tempfile)"""
 
-    def validate_submission(self, submission_path):
+    def validate_submission(self, submission_path: str):
         assignment_name = False
         ext = os.path.splitext(submission_path)[1].lower()
         if ext == ".ipynb":
@@ -52,7 +50,7 @@ class RRunner(AbstractLanguageRunner):
         if assignment_name is not False:
             self.validate_assignment_name(assignment_name)
 
-    def filter_cells_with_syntax_errors(self, nb):
+    def filter_cells_with_syntax_errors(self, nb: nbf.NotebookNode) -> nbf.NotebookNode:
         """
         Filter out cells in an R notebook with syntax errors.
         """
@@ -67,7 +65,7 @@ class RRunner(AbstractLanguageRunner):
         nb["cells"] = new_cells
         return nb
 
-    def add_seeds_to_rmd_file(self, rmd_path):
+    def add_seeds_to_rmd_file(self, rmd_path: str):
         """
         Add intercell seeding to an Rmd file.
         """
@@ -90,7 +88,7 @@ class RRunner(AbstractLanguageRunner):
         with open(rmd_path, "w") as f:
             f.write("\n".join(lines))
 
-    def add_seed_to_script(self, script_path):
+    def add_seed_to_script(self, script_path: str):
         """
         Add a line calling ``set.seed`` to the top of the R script at the specified path.
         """
@@ -102,7 +100,7 @@ class RRunner(AbstractLanguageRunner):
         with open(script_path, "w") as f:
             f.write(script)
 
-    def resolve_submission_path(self):
+    def resolve_submission_path(self) -> str:
         # create a temporary file at which to write a script if necessary
         _, script_path = tempfile.mkstemp(suffix=".R")
 
@@ -157,11 +155,11 @@ class RRunner(AbstractLanguageRunner):
             raise OtterRuntimeError("No gradable files found in submission")
 
         if self.ag_config.seed is not None:
-            self.add_seed_to_script(scripts[0]) 
+            self.add_seed_to_script(scripts[0])
 
         return scripts[0]
 
-    def write_pdf(self, _):
+    def write_pdf(self, submission_path: str) -> str:
         # NOTE: this method ignores the submission_path argument, and instead resolves it again
         # manually
         nbs = glob("*.ipynb")
@@ -183,9 +181,9 @@ class RRunner(AbstractLanguageRunner):
             export_notebook(
                 subm_path,
                 dest=pdf_path,
-                filtering=self.ag_config.filtering, 
+                filtering=self.ag_config.filtering,
                 pagebreaks=self.ag_config.pagebreaks,
-                exporter_type="latex",
+                exporter_type="html" if self.ag_config.pdf_via_html else "latex",
             )
 
         else:
@@ -194,7 +192,7 @@ class RRunner(AbstractLanguageRunner):
         return pdf_path
 
     def run(self):
-        os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH")
+        os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH", "")
 
         with chdir("./submission"):
             pdf_error = None
@@ -205,10 +203,12 @@ class RRunner(AbstractLanguageRunner):
 
             subm_path = self.resolve_submission_path()
             output = R_PACKAGES["ottr"].run_autograder(
-                subm_path, ignore_errors = not self.ag_config.debug, test_dir = "./tests")[0]
+                subm_path, ignore_errors=not self.ag_config.debug, test_dir="./tests"
+            )[0]
             scores = GradingResults.from_ottr_json(output)
 
-            if pdf_error: scores.set_pdf_error(pdf_error)
+            if pdf_error:
+                scores.set_pdf_error(pdf_error)
 
         # delete the script if necessary
         if self.subm_path_deletion_required:
