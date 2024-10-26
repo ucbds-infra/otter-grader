@@ -36,6 +36,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install --with dev --no-root
+          pip install twine
 
       - name: Update versions
         run: |
