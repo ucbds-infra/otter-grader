@@ -29,7 +29,7 @@ gmail_oauth2 = "otter.plugins.builtin.gmail_notifications.bin.gmail_oauth2:main"
 [tool.poetry.dependencies]
 python = "^3.9"
 click = "^8.1.7"
-dill = "^0.3.8"
+dill = ">=0.3.0"
 fica = ">=0.4.1"
 google-api-python-client = { version = "*", optional = true }
 google-auth-oauthlib = { version = "*", optional = true }
@@ -46,7 +46,7 @@ nbconvert = { version = ">=6.0.0", extras = ["webpdf"], markers = "sys_platform 
 nbformat = ">=5.0.0"
 pandas = ">=2.0.0"
 pypdf = { version = "*", optional = true }
-python-on-whales = "^0.72.0"
+python-on-whales = ">=0.72.0,<1.0.0"
 pyyaml = "^6.0.2"
 requests = "^2.32.3"
 rpy2 = { version = "^3.5.16", optional = true }
@@ -73,7 +73,7 @@ coverage = "^7.2.0"
 matplotlib = "*"
 pytest = "^8.2.2"
 pytest-html = "*"
-responses = "^0.25.3"
+responses = ">=0.25.3"
 tqdm = "*"
 
 [tool.poetry.group.docs]
