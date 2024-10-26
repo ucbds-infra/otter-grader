@@ -60,6 +60,8 @@ IMAPFE and pass it as the second argument to the AUTHENTICATE command.
     a AUTHENTICATE XOAUTH2 a9sha9sfs[...]9dfja929dk==
 """
 
+from __future__ import print_function
+
 import base64
 import imaplib
 import json
@@ -68,7 +70,6 @@ import smtplib
 import sys
 import urllib
 
-from __future__ import print_function
 from optparse import OptionParser
 
 
@@ -357,3 +358,7 @@ def main():
         options_parser.print_help()
         print("Nothing to do, exiting.")
         return
+
+
+if __name__ == "__main__":
+    main()
