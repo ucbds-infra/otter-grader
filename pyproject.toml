@@ -39,7 +39,7 @@ ipykernel = { version = "*", optional = true}
 ipylab = "^1.0.0"
 ipython = "*"
 ipywidgets = "^8.1.5"
-jinja2 = "^3.1.4"
+jinja2 = "^3.1"
 jupyter_client = { version = "*", optional = true}
 jupytext = "^1.16.4"
 nbconvert = { version = ">=6.0.0", extras = ["webpdf"], markers = "sys_platform != 'emscripten' and sys_platform != 'wasi'" }
@@ -47,8 +47,8 @@ nbformat = ">=5.0.0"
 pandas = ">=2.0.0"
 pypdf = { version = "*", optional = true }
 python-on-whales = ">=0.72.0,<1.0.0"
-pyyaml = "^6.0.2"
-requests = "^2.32.3"
+pyyaml = "^6"
+requests = "^2.31"
 rpy2 = { version = "^3.5.16", optional = true }
 wrapt = "^1.16.0"
 

@@ -1,6 +1,5 @@
 """PDF via LaTeX exporter"""
 
-import nbconvert
 import os
 import warnings
 
@@ -8,6 +7,16 @@ from textwrap import indent
 from typing import Any
 
 from .base_exporter import BaseExporter, ExportFailedException, TEMPLATE_DIR
+
+
+# nbconvert can't be used on jupyterlite, so try importing it and raise an error if it's not found
+# when the exporter is used
+_NBCONVERT_ERROR = None
+try:
+    import nbconvert
+except ImportError as e:
+    nbconvert = None
+    _NBCONVERT_ERROR = e
 
 
 class PDFViaLatexExporter(BaseExporter):
@@ -28,6 +37,9 @@ class PDFViaLatexExporter(BaseExporter):
 
     @classmethod
     def convert_notebook(cls, nb_path: str, dest: str, *, xecjk: bool = False, **kwargs: Any):
+        if nbconvert is None:
+            raise _NBCONVERT_ERROR
+
         warnings.filterwarnings("ignore", r"invalid escape sequence '\\c'", DeprecationWarning)
 
         options = cls.default_options.copy()
