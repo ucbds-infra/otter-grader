@@ -147,7 +147,6 @@ class _Interpreter:
             ``bool``: whether this interpreter is running
         """
         ipython_interp = str(get_ipython())
-        print(ipython_interp)
         return any(c in ipython_interp for c in self.check_strs)
 
 

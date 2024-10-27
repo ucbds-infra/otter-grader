@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.0.2:**
+
+* Fixed dependency issues when installing on JupyterLite per [#875](https://github.com/ucbds-infra/otter-grader/issues/875)
+
 **v6.0.1:**
 
 * Updated dependency specifications to support any new minor version within the matching major version
