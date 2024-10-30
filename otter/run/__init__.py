@@ -71,7 +71,7 @@ def main(
         else:
             shutil.copy(submission, os.path.join(ag_dir, "submission"))
 
-        for file in (extra_submission_files or []):
+        for file in extra_submission_files or []:
             fp = pathlib.Path(os.path.join(ag_dir, file))
             # create any intermediate directories before copying the file
             fp.parents[0].mkdir(parents=True, exist_ok=True)
