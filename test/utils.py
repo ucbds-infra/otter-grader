@@ -22,6 +22,10 @@ class TestFileManager:
     def __init__(self, test_file_path):
         self.dir = pathlib.Path(os.path.join(os.path.split(test_file_path)[0], "files"))
 
+    @property
+    def path(self) -> str:
+        return str(self.dir)
+
     def get_path(self, path):
         return str(self.dir / path)
 

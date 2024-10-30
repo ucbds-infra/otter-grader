@@ -1,22 +1,27 @@
 """Tests for ``otter.run``"""
 
 import copy
+import dill
 import json
 import nbconvert
 import nbformat
 import os
+import pathlib
 import pytest
 import re
 import shutil
+import zipfile
 
 from contextlib import contextmanager, nullcontext
 from textwrap import dedent
 from unittest import mock
 
 from otter.generate.token import APIClient
+from otter.run import main as run_main
 from otter.run.run_autograder import main as run_autograder
 from otter.run.run_autograder.utils import OtterRuntimeError
-from otter.utils import NBFORMAT_VERSION
+from otter.test_files import GradingResults
+from otter.utils import chdir, NBFORMAT_VERSION
 
 from ..utils import delete_paths, TestFileManager
 
@@ -49,6 +54,7 @@ def cleanup_output(cleanup_enabled):
                 FILE_MANAGER.get_path("rmd-autograder/submission/tests"),
                 FILE_MANAGER.get_path("rmd-autograder/submission/__init__.py"),
                 FILE_MANAGER.get_path("rmd-autograder/submission/.OTTER_LOG"),
+                FILE_MANAGER.get_path("results.json"),
             ]
         )
         with FILE_MANAGER.open("autograder/source/otter_config.json", "w") as f:
@@ -237,6 +243,58 @@ def load_config(get_config_path):
             return json.load(f)
 
     return load_config_file
+
+
+@mock.patch("otter.run.tempfile")
+@mock.patch("otter.run.run_autograder_main")
+def test_otter_run_main(mocked_run_autograder_main, mocked_tempfile, tmp_path):
+    """Tests ``otter.run.main``."""
+    zf_path = tmp_path / "autograder.zip"
+    with zipfile.ZipFile(zf_path, mode="w") as zf:
+        zf.writestr("a_file", "ooh-ee-ooh-ah-ah-ting-tang-walla-walla-bing-bang")
+
+    subm_path = tmp_path / "submission.ipynb"
+    with open(subm_path, "w+") as f:
+        f.write("I told the witch doctor you didn't love me true")
+
+    def check_dir_contents(ag_path, *args, **kwargs):
+        with chdir(ag_path):
+            for subdir in ["source", "submission", "results"]:
+                assert os.path.isdir(subdir)
+
+            assert os.listdir("source") == ["a_file"]
+            assert (
+                pathlib.Path("source/a_file").read_text()
+                == "ooh-ee-ooh-ah-ah-ting-tang-walla-walla-bing-bang"
+            )
+
+            assert os.listdir("submission") == ["submission.ipynb"]
+            assert (
+                pathlib.Path("submission/submission.ipynb").read_text()
+                == "I told the witch doctor you didn't love me true"
+            )
+
+            assert os.path.isfile("submission_metadata.json")
+
+            # write output files
+            with open("results/results.json", "w+") as f:
+                f.write('{"ooh": "ee"}')
+
+            with open("results/results.pkl", "wb+") as f:
+                dill.dump(GradingResults([]), f)
+
+    # use the mock's side effect function to check that the autograder directory was set up
+    # correctly
+    mocked_run_autograder_main.side_effect = check_dir_contents
+    mocked_tempfile.mkdtemp.return_value = str(tmp_path / "autograder_dir")
+
+    res = run_main(str(subm_path), autograder=str(zf_path), output_dir=FILE_MANAGER.path)
+
+    mocked_run_autograder_main.assert_called_once_with(
+        str(tmp_path / "autograder_dir" / "autograder"), logo=True, debug=False, otter_run=True
+    )
+    assert isinstance(res, GradingResults)
+    assert open(FILE_MANAGER.get_path("results.json")).read() == '{"ooh": "ee"}'
 
 
 def test_notebook(load_config, expected_results):
