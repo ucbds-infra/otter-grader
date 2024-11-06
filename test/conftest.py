@@ -8,7 +8,7 @@ from contextlib import nullcontext
 from python_on_whales import docker
 from unittest import mock
 
-from otter import __file__ as OTTER_PATH
+from otter import __file__ as OTTER_PATH, logging
 from otter.test_files import TestCase, TestCaseResult, TestFile
 
 from .utils import TestFileManager
@@ -22,6 +22,9 @@ REAL_DOCKER_BUILD = docker.build
 TestCase.__test__ = False
 TestCaseResult.__test__ = False
 TestFile.__test__ = False
+
+# enable debug logging for tests
+logging.set_level(logging.DEBUG)
 
 
 def pytest_addoption(parser):
