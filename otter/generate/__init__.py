@@ -51,6 +51,7 @@ class CondaEnvironment:
                 f"python={self.python_version}",
                 "pip",
                 "nb_conda_kernels",
+                "jupyter_server",
             ],
         }
 
