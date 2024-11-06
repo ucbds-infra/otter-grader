@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.0.4:**
+
+* Added `jupyter_server` to grading environment to allow for installation of `nb_conda_kernels`
+
 **v6.0.3:**
 
 * Fixed `TypeError` thrown by Otter Run
