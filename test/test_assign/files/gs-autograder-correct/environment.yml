@@ -8,4 +8,4 @@ dependencies:
   - nb_conda_kernels
   - jupyter_server
   - pip:
-      - otter-grader[grading,plugins]==6.0.3
+      - otter-grader[grading,plugins]==6.0.4
