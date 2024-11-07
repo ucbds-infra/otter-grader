@@ -176,11 +176,12 @@ def grade_submission(
         if pdf_dir:
             volumes.append((pdf_path, f"/autograder/submission/{nb_name}.pdf"))
 
-        args = {}
-        if not network:
-            args["networks"] = "none"
-
-        container = docker.container.create(image, command=["/autograder/run_autograder"], **args)
+        container = docker.container.create(
+            image,
+            command=["/autograder/run_autograder"],
+            networks=["none"] if not network else [],
+            remove=True,
+        )
 
         for local_path, container_path in volumes:
             docker.container.copy(local_path, (container, container_path))
