@@ -3,7 +3,6 @@
 **v6.0.4:**
 
 * Added `jupyter_server` to grading environment to allow for installation of `nb_conda_kernels`
-* Updated Otter Grade to remove grading containers automatically
 
 **v6.0.3:**
 

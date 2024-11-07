@@ -211,9 +211,6 @@ def grade_submission(
         logs = docker.container.logs(container)
         LOGGER.debug(f"Container {container_id} logs:\n{indent(logs, '    ')}")
 
-        docker.container.remove(container)
-        LOGGER.debug(f"Removed container {container_id}")
-
         # Close our file handles since docker cp will delete the original file when performing the
         # copy.
         os.close(temp_subm_file)
