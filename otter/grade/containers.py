@@ -248,7 +248,9 @@ def grade_submission(
         LOGGER.error(f'Submission "{nb_basename}" timed out during grading')
     except Exception as e:
         scores = GradingResults.without_results(e)
-        LOGGER.error(f'An error occurred while grading "{nb_basename}":\n{indent(format_exception(e), '  > ')}')
+        LOGGER.error(
+            f'An error occurred while grading "{nb_basename}":\n{indent(format_exception(e), "  > ")}'
+        )
 
     finally:
         scores.file = nb_basename
