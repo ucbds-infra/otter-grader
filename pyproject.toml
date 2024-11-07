@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "otter-grader"
-version = "6.0.3"
+version = "6.0.4"
 description = "A Python and R autograding solution"
 authors = ["Christopher Pyles <cpyles@berkeley.edu>"]
 license = "BSD-3-Clause"
