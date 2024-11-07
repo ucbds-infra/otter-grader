@@ -14,7 +14,7 @@ from textwrap import indent
 from typing import Any, Optional
 
 from . import __name__ as pkg_name
-from .utils import OTTER_DOCKER_IMAGE_NAME, TimeoutException
+from .utils import format_exception, OTTER_DOCKER_IMAGE_NAME, TimeoutException
 from .. import logging
 from ..run import AutograderConfig
 from ..test_files import GradingResults
@@ -245,10 +245,10 @@ def grade_submission(
 
     except TimeoutException as te:
         scores = GradingResults.without_results(te)
-        LOGGER.error(f"Notebook Grading Timeout Error: {nb_basename}")
+        LOGGER.error(f'Submission "{nb_basename}" timed out during grading')
     except Exception as e:
         scores = GradingResults.without_results(e)
-        LOGGER.error(f"Notebook Grading Error: {nb_basename}")
+        LOGGER.error(f'An error occurred while grading "{nb_basename}":\n{indent(format_exception(e), '  > ')}')
 
     finally:
         scores.file = nb_basename
