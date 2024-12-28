@@ -412,7 +412,7 @@ class TransformedNotebookContainer:
         Returns:
             ``nbformat.NotebookNode``: the student notebook
         """
-        nb = strip_solutions_and_output(self.transformed_nb)
+        nb = strip_solutions_and_output(self.assignment, self.transformed_nb)
         if self.nb_transformer.assignment.seed.variable:
             nb = overwrite_seed_vars(
                 nb,

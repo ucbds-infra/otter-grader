@@ -4,8 +4,9 @@ import copy
 import nbformat as nbf
 import re
 
+from .assignment import Assignment
 from .r_adapter import solutions as r_solutions
-from .utils import get_notebook_language, has_tag, is_cell_type, remove_output, remove_tag
+from .utils import has_tag, is_cell_type, remove_output, remove_tag
 from ..utils import get_source
 
 
@@ -207,11 +208,12 @@ def strip_ignored_lines(nb: nbf.NotebookNode) -> nbf.NotebookNode:
 OTTER_INCLUDE_TAG = "otter_include"
 
 
-def strip_solutions_and_output(nb: nbf.NotebookNode) -> nbf.NotebookNode:
+def strip_solutions_and_output(assignment: Assignment, nb: nbf.NotebookNode) -> nbf.NotebookNode:
     """
     Create a copy of a notebook with solutions and outputs stripped.
 
     Args:
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
         nb (``nbformat.NotebookNode``): the notebook to strip
 
     Returns:
@@ -220,11 +222,10 @@ def strip_solutions_and_output(nb: nbf.NotebookNode) -> nbf.NotebookNode:
     nb = copy.deepcopy(nb)
 
     del_md_solutions = []
-    lang = get_notebook_language(nb)
     for i, cell in enumerate(nb["cells"]):
         if has_tag(cell, SOLUTION_CELL_TAG):
             if is_cell_type(cell, "code"):
-                cell["source"] = "\n".join(replace_solutions(get_source(cell), lang))
+                cell["source"] = "\n".join(replace_solutions(get_source(cell), assignment.lang))
             elif is_cell_type(cell, "markdown"):
                 if has_tag(cell, OTTER_INCLUDE_TAG):
                     cell = remove_tag(cell, OTTER_INCLUDE_TAG)
