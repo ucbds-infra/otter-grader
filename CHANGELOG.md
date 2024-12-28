@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.1.0 (unreleased):**
+
+* Update Otter Assign to handle notebooks with an invalid kernelspec by assuming the language is Python per [#895](https://github.com/ucbds-infra/otter-grader/issues/895)
+
 **v6.0.4:**
 
 * Added `jupyter_server` to grading environment to allow for installation of `nb_conda_kernels`

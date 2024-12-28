@@ -7,8 +7,7 @@ import os
 import pathlib
 import re
 import shutil
-import tempfile
-import zipfile
+import warnings
 
 from textwrap import indent
 from typing import Any, Optional, TYPE_CHECKING
@@ -70,8 +69,15 @@ def get_notebook_language(nb: nbf.NotebookNode) -> str:
 
     Returns:
         ``str``: the name of the language as a lowercased string
+
+    Warns:
+        if there is no ``language`` key in the notebook's kernelspec
     """
-    return nb["metadata"]["kernelspec"]["language"].lower()
+    kernelspec = nb["metadata"]["kernelspec"]
+    if "language" in kernelspec:
+        return kernelspec["language"].lower()
+    warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
+    return "python"
 
 
 def is_ignore_cell(cell: nbf.NotebookNode) -> bool:
