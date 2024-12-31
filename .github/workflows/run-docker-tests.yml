@@ -30,13 +30,6 @@ jobs:
           echo "Before cleanup:"
           df -h
           sudo rm -rf /opt/hostedtoolcache
-          # echo "Listing 100 largest packages:"
-          # dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
-          # echo "Removing large packages..."
-          # sudo apt-get remove -y '^dotnet-.*'
-          # sudo apt-get remove -y '^llvm-.*'
-          # sudo apt-get autoremove -y
-          # sudo apt-get clean
           echo "After cleanup:"
           df -h
 

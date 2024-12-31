@@ -26,6 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free disk space
+        run: |
+          echo "Before cleanup:"
+          df -h
+          sudo rm -rf /opt/hostedtoolcache
+          echo "After cleanup:"
+          df -h
+
       - name: Fetch origin
         run: |
           git fetch origin
