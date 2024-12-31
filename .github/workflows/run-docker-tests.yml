@@ -25,6 +25,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - run: df -h
+
       - name: Fetch origin
         run: |
           git fetch origin
