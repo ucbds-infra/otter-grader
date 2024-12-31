@@ -28,7 +28,8 @@ jobs:
       - name: Free disk space
         run: |
           df -h
-          rm -rf /usr/share/dotnet/
+          echo "Listing 100 largest packages:"
+          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
           df -h
 
       - name: Fetch origin
