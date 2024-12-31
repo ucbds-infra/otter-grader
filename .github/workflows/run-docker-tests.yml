@@ -25,7 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: df -h
+      - name: Free disk space
+        run: |
+          df -h
+          rm -rf /usr/share/dotnet/
+          df -h
 
       - name: Fetch origin
         run: |
