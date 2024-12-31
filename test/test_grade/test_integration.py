@@ -100,6 +100,13 @@ def test_timeout_some_notebooks_finish():
     res = subprocess.run(["docker", "images"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     print(res.stdout.decode())
     print(res.stderr.decode())
+    res = subprocess.run(
+        ["docker", "image", "history", "--no-trunc", "otter-grade:otter-grade-test"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    print(res.stdout.decode())
+    print(res.stderr.decode())
     assert False
 
 
@@ -125,6 +132,13 @@ def test_timeout_no_notebooks_finish():
     assert re.match(pattern10s, df_test.iloc[0]["grading_status"]) is not None
     assert re.match(pattern1min, df_test.iloc[1]["grading_status"]) is not None
     res = subprocess.run(["docker", "images"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print(res.stdout.decode())
+    print(res.stderr.decode())
+    res = subprocess.run(
+        ["docker", "image", "history", "--no-trunc", "otter-grade:otter-grade-test"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     print(res.stdout.decode())
     print(res.stderr.decode())
     assert False
