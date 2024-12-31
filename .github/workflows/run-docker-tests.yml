@@ -78,8 +78,6 @@ jobs:
           df -h
 
       - name: Run tests
-        env:
-          ENABLE_OTTER_DOCKER_GHA_CACHE: "true"
         run: |
           micromamba activate otter-grader
           make testcov PYTESTOPTS="-vv" && coverage lcov -i

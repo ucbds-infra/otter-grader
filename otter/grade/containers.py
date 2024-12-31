@@ -21,7 +21,6 @@ from ..test_files import GradingResults
 from ..utils import format_exception, OTTER_CONFIG_FILENAME
 
 
-_OTTER_GHA_CACHING_ENV_VAR_NAME = "ENABLE_OTTER_DOCKER_GHA_CACHE"
 LOGGER = logging.get_logger(__name__)
 
 
@@ -58,10 +57,6 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
         old_config.update(config.get_user_config())
         config_path.write_text(json.dumps(old_config.get_user_config()))
 
-        cache_from, cache_to = None, None
-        if os.environ.get(_OTTER_GHA_CACHING_ENV_VAR_NAME, None):
-            cache_from, cache_to = "type=gha", "type=gha,mode=max"
-
         try:
             docker.build(
                 temp_dir,
@@ -69,9 +64,6 @@ def build_image(ag_zip_path: str, base_image: str, tag: str, config: AutograderC
                 tags=[image],
                 file=dockerfile_path,
                 load=True,
-                cache=True,
-                cache_from=cache_from,
-                cache_to=cache_to,
             )
         except TypeError as e:
             raise TypeError(
