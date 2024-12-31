@@ -23,7 +23,7 @@ from otter.run.run_autograder.utils import OtterRuntimeError
 from otter.test_files import GradingResults
 from otter.utils import chdir, NBFORMAT_VERSION
 
-from ..utils import delete_paths, TestFileManager
+from ..utils import alternate_file, delete_paths, TestFileManager
 
 
 FILE_MANAGER = TestFileManager(__file__)
@@ -176,14 +176,8 @@ def get_expected_error_results(error):
 
 @contextmanager
 def alternate_submission(subm_path, new_nb):
-    with open(subm_path) as f:
-        contents = f.read()
-    nbformat.write(new_nb, subm_path)
-    try:
+    with alternate_file(subm_path, write_callback=lambda fp: nbformat.write(new_nb, fp)):
         yield
-    finally:
-        with open(subm_path, "w") as f:
-            f.write(contents)
 
 
 @contextmanager
