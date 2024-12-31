@@ -26,6 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # This solution comes from this comment: https://github.com/orgs/community/discussions/25678#discussioncomment-5242487
       - name: Free disk space
         run: |
           echo "Before cleanup:"
