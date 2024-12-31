@@ -25,15 +25,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # This solution comes from this comment: https://github.com/orgs/community/discussions/25678#discussioncomment-5242487
-      - name: Free disk space
-        run: |
-          echo "Before cleanup:"
-          df -h
-          sudo rm -rf /opt/hostedtoolcache
-          echo "After cleanup:"
-          df -h
-
       - name: Fetch origin
         run: |
           git fetch origin
@@ -74,14 +65,21 @@ jobs:
         run: |
           micromamba run -n otter-grader Rscript -e 'install.packages("ottr", dependencies=TRUE, repos="https://cran.r-project.org/")'
 
-      - name: Maximize build space
+      # This solution comes from this comment: https://github.com/orgs/community/discussions/25678#discussioncomment-5242487
+      - name: Free disk space
         run: |
+          echo "Before cleanup:"
+          df -h
+          sudo rm -rf /opt/hostedtoolcache
           sudo swapoff -a
           sudo rm -f /swapfile
           sudo apt clean
+          echo "After cleanup:"
           df -h
 
       - name: Run tests
+        env:
+          ENABLE_OTTER_DOCKER_GHA_CACHE: "true"
         run: |
           micromamba activate otter-grader
           make testcov PYTESTOPTS="-vv" && coverage lcov -i
