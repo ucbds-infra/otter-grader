@@ -29,7 +29,7 @@ jobs:
         run: |
           echo "Before cleanup:"
           df -h
-          du -h -d1 /opt/hostedtoolcache
+          sudo rm -rf /opt/hostedtoolcache
           # echo "Listing 100 largest packages:"
           # dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
           # echo "Removing large packages..."
