@@ -211,33 +211,3 @@ def write_ok_test(
     with open(path, "w+") as f:
         f.write(f"{OK_FORMAT_VARNAME} = True\n\ntest = ")
         pprint.pprint(test, f, indent=4, width=200, depth=None)
-
-
-@contextmanager
-def alternate_file(
-    fp: Union[pathlib.Path, str],
-    write=None,
-    append=None,
-    src_path=False,
-    write_callback=None,
-):
-    assert write_callback or (
-        write or append and not (write and append)
-    ), "one of write xor append must be specified"
-    if src_path:
-        if write:
-            with open(write, "r") as f:
-                write = f.read()
-        if append:
-            with open(append, "r") as f:
-                append = f.read()
-    with open(fp, "r") as f:
-        contents = f
-    if write_callback:
-        write_callback(fp)
-    else:
-        with open(fp, "a" if append else "w") as f:
-            f.write(append or write)
-    yield
-    with open(fp, "w") as f:
-        f.write(contents)
