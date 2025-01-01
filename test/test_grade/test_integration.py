@@ -1,11 +1,9 @@
 """Tests for ``otter.grade``"""
 
-import logging
 import os
 import pandas as pd
 import pytest
 import re
-import shutil
 import zipfile
 
 from contextlib import ExitStack
@@ -20,7 +18,7 @@ from otter.grade.utils import POINTS_POSSIBLE_LABEL
 from otter.run import AutograderConfig
 from otter.test_files import GradingResults
 
-from ..utils import TestFileManager
+from ..utils import delete_paths, TestFileManager
 
 
 ASSIGNMENT_NAME = "otter-grade-test"
@@ -33,18 +31,18 @@ ZIP_SUBM_PATH = "test/subm.zip"
 def cleanup_output(cleanup_enabled):
     yield
     if cleanup_enabled:
-        if os.path.exists("test/final_grades.csv"):
-            os.remove("test/final_grades.csv")
-        if os.path.exists("test/submission_pdfs"):
-            shutil.rmtree("test/submission_pdfs")
-        if os.path.exists(ZIP_SUBM_PATH):
-            os.remove(ZIP_SUBM_PATH)
-        if os.path.exists("test/grading-summaries"):
-            shutil.rmtree("test/grading-summaries")
+        delete_paths(
+            [
+                "test/final_grades.csv",
+                "test/grading-summaries",
+                "test/submission_pdfs",
+                ZIP_SUBM_PATH,
+            ]
+        )
 
 
 @pytest.fixture(autouse=True, scope="module")
-def generate_zip_file():
+def generate_zip_file(cleanup_enabled):
     """
     Generate an autograder zip file for use in these tests.
     """
@@ -59,8 +57,8 @@ def generate_zip_file():
     with logging.level_context(logging.DEBUG):
         yield
 
-    if os.path.isfile(AG_ZIP_PATH):
-        os.remove(AG_ZIP_PATH)
+    if cleanup_enabled:
+        delete_paths([AG_ZIP_PATH])
 
 
 @pytest.fixture

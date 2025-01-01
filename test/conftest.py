@@ -52,7 +52,7 @@ def pytest_configure(config):
     )
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def cleanup_enabled(pytestconfig):
     """
     A fixture indicating whether test cleanup is enabled.
@@ -93,7 +93,7 @@ def disable_assign_pdf_generation(pdfs_enabled):
 
 
 @pytest.fixture(autouse=True, scope="session")
-def update_grade_dockerfile():
+def update_grade_dockerfile(cleanup_enabled):
     """
     Update the Dockerfile used in otter grade to install the contents of this repo.
     """
@@ -108,8 +108,9 @@ def update_grade_dockerfile():
 
     yield
 
-    with open("otter/grade/Dockerfile", "w") as f:
-        f.write(contents)
+    if cleanup_enabled:
+        with open("otter/grade/Dockerfile", "w") as f:
+            f.write(contents)
 
 
 def add_repo_dir_to_context_then_build(*args, **kwargs):
