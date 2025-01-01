@@ -97,7 +97,7 @@ class test_case:
 
     def call_func(self, global_environment: dict[str, Any]):
         """
-        Call the underlying test case function, passig in parameters from the global environment.
+        Call the underlying test case function, passing in parameters from the global environment.
 
         If the signature of ``self.test_func`` contains a parameter called ``env``, the environment
         is passed in. For all other parameters, that value from the global environment is passed in,

@@ -43,7 +43,7 @@ OTTER_CONFIG_FILENAME = "otter_config.json"
 def hide_outputs():
     """
     Context manager for hiding outputs from ``display()`` calls. IPython handles matplotlib outputs
-    specially, so those are supressed too.
+    specially, so those are suppressed too.
     """
     ipy = get_ipython()
     if ipy is None:

@@ -257,7 +257,7 @@ class Assignment(fica.Config, Loggable):
     _ag_zip_name: Optional[str] = None
     """
     the file name for the autograder zip file; this value is generated the first time it is accessed
-    since it contians a timestamp
+    since it contains a timestamp
     """
 
     def __init__(self, user_config: Optional[dict[str, Any]] = None, **kwargs: Any) -> None:
