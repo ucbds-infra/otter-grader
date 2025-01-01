@@ -81,7 +81,7 @@ jobs:
       - name: Run tests
         run: |
           micromamba activate otter-grader
-          make testcov TESTPATH=test/test_grade/test_integration.py PYTESTOPTS="-vv" && coverage lcov -i
+          make testcov PYTESTOPTS="-vv" && coverage lcov -i
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
