@@ -4,8 +4,6 @@ import os
 import pandas as pd
 import pytest
 import re
-import shutil
-import subprocess
 import zipfile
 
 from contextlib import ExitStack

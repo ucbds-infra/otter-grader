@@ -90,7 +90,7 @@ jobs:
           df -h
           sudo rm -rf /opt/hostedtoolcache
           sudo swapoff -a
-          sudo rm -f /swapfile
+          sudo rm -rf /swapfile /usr/local/.ghcup /usr/local/lib/android
           sudo apt clean
           echo "After cleanup:"
           df -h

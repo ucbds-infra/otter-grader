@@ -11,7 +11,6 @@ import tempfile
 import zipfile
 
 from contextlib import contextmanager
-from typing import Union
 
 from otter.check.notebook import OTTER_LOG_FILENAME
 from otter.test_files import OK_FORMAT_VARNAME
