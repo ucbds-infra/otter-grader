@@ -76,7 +76,7 @@ jobs:
           sudo apt clean
           echo "After cleanup:"
           df -h
-          du -h -d2 /
+          du -h -d2 /usr/local | sort -h --reverse
 
       - name: Run tests
         run: |
