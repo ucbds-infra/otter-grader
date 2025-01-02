@@ -224,7 +224,7 @@ def run_tests(assignment: "Assignment", debug: bool = False) -> None:
     Grade a notebook and throw an error if it does not receive a perfect score.
 
     Args:
-        assignment (``otter.assgin.assignment.Assignment``): the assignment config
+        assignment (``otter.assign.assignment.Assignment``): the assignment config
         debug (``bool``): whether to throw errors instead of swallowing them during grading
 
     Raises:

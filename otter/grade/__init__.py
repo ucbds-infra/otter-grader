@@ -83,7 +83,7 @@ def main(
         raise ValueError("You must specify an assignment name")
     elif not re.match(r"^[\w\-.]+$", name):
         raise ValueError(
-            "Assignment names may only contain letters, nubers, underscores, dashes, and periods"
+            "Assignment names may only contain letters, numbers, underscores, dashes, and periods"
         )
 
     if not isinstance(paths, tuple) and not isinstance(paths, list):

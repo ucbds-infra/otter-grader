@@ -316,7 +316,7 @@ class GradingResults:
         """
         Retrieves data for plugin ``plugin_name`` in the results.
 
-        This method uses ``dict.get`` to retrive the data, so a ``KeyError`` is never raised if
+        This method uses ``dict.get`` to retrieve the data, so a ``KeyError`` is never raised if
         ``plugin_name`` is not found; rather, it returns ``None``.
 
         Args:
@@ -389,7 +389,7 @@ class GradingResults:
 
     def to_dict(self) -> dict[str, Any]:
         """
-        Converts these results into a dictinary, extending the fields of the named tuples in
+        Converts these results into a dictionary, extending the fields of the named tuples in
         ``results`` into key, value pairs in a ``dict``.
 
         Returns:

@@ -41,8 +41,8 @@ def run_doctest(
 
     doctestrunner = doctest.DocTestRunner(verbose=True)
 
-    runresults = io.StringIO()
-    with redirect_stdout(runresults), redirect_stderr(runresults), hide_outputs():
+    run_results = io.StringIO()
+    with redirect_stdout(run_results), redirect_stderr(run_results), hide_outputs():
         doctestrunner.run(test, clear_globs=False)
     with open(os.devnull, "w") as f, redirect_stderr(f), redirect_stdout(f):
         result = doctestrunner.summarize(verbose=True)
@@ -50,7 +50,7 @@ def run_doctest(
     if result.failed == 0:
         return (True, "")
     else:
-        return False, runresults.getvalue()
+        return False, run_results.getvalue()
 
 
 class OKTestFile(TestFile):

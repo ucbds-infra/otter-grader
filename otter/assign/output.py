@@ -64,7 +64,7 @@ def write_output_dir(
                     raise FileNotFoundError(f"{file} is not a file")
                 if str(assignment.master.parent) not in os.path.abspath(file):
                     raise ValueError(
-                        f"{file} is not in a subdirectory of the master notebook direcotry"
+                        f"{file} is not in a subdirectory of the master notebook directory"
                     )
                 file_path = pathlib.Path(file).resolve()
                 rel_path = file_path.parent.relative_to(assignment.master.parent)
