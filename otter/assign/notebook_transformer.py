@@ -174,6 +174,10 @@ class NotebookTransformer:
                 if config.get("config_file"):
                     self.assignment.load_config_file(config["config_file"])
                 self.assignment.update(config)
+                if self.assignment.runs_on == "colab" and not self.assignment.tests.files:
+                    raise ValueError(
+                        "notebooks that run on Colab must use test files and not notebook metadata tests"
+                    )
                 continue
 
             # check for an end to the current block
