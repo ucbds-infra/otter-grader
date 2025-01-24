@@ -1,6 +1,6 @@
 # Changelog
 
-**v6.0.5 (unreleased):**
+**v6.0.5:**
 
 * Added `liblzma-devel`, `zlib-devel-amzn2-aarch64`, and `zlib` to R grading environment
 
