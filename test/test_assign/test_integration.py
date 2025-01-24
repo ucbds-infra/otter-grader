@@ -238,6 +238,22 @@ def test_jupyterlite(generate_master_notebook):
     )
 
 
+def test_colab_no_metadata_tests(generate_master_notebook):
+    """
+    Tests that Otter Assign does not allow metadata tests for Colab notebooks.
+    """
+    master_nb_path = generate_master_notebook({"runs_on": "colab", "tests": {"files": False}})
+    with pytest.raises(
+        ValueError,
+        match="notebooks that run on Colab must use test files and not notebook metadata tests",
+    ):
+        assign_and_check_output(
+            master_nb_path,
+            FILE_MANAGER.get_path("jupyterlite-correct"),
+            assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
+        )
+
+
 def test_require_no_pdf_ack(generate_master_notebook):
     """
     Tests that Otter Assign produces correct notebooks when configured to require students to
