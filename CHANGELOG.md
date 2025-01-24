@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.0.5 (unreleased):**
+
+* Added `liblzma-devel`, `zlib-devel-amzn2-aarch64`, and `zlib` to R grading environment
+
 **v6.0.4:**
 
 * Added `jupyter_server` to grading environment to allow for installation of `nb_conda_kernels`
