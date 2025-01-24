@@ -231,7 +231,6 @@ def strip_solutions_and_output(assignment: Assignment, nb: nbf.NotebookNode) -> 
                     cell = remove_tag(cell, OTTER_INCLUDE_TAG)
                 else:
                     del_md_solutions.append(i)
-            nb["cells"][i] = remove_tag(cell, SOLUTION_CELL_TAG)
 
     del_md_solutions.reverse()
     for i in del_md_solutions:

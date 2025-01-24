@@ -5,6 +5,7 @@ import nbformat
 from .assignment import Assignment
 from .feature_toggle import FeatureToggle
 from .question_config import QuestionConfig
+from .solutions import SOLUTION_CELL_TAG
 from .utils import lock
 
 
@@ -174,4 +175,6 @@ class CellFactory:
         Returns:
             ``nbformat.NotebookNode``: the response cell
         """
-        return nbformat.v4.new_markdown_cell("_Type your answer here, replacing this text._")
+        return nbformat.v4.new_markdown_cell(
+            "_Type your answer here, replacing this text._", metadata={"tags": [SOLUTION_CELL_TAG]}
+        )

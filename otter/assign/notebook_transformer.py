@@ -315,6 +315,9 @@ class NotebookTransformer:
                     self.tests_mgr.read_test(cell, question)
                     continue
 
+                elif curr_block[-1] == BlockType.PROMPT:
+                    cell = add_tag(cell, SOLUTION_CELL_TAG)
+
                 elif curr_block[-1] == BlockType.SOLUTION:
                     cell = add_tag(cell, SOLUTION_CELL_TAG)
 
