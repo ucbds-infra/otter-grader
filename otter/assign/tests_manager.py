@@ -85,13 +85,8 @@ class AssignmentTestsManager:
             question (``otter.assign.question_config.QuestionConfig``): the question config
             test_case (``TestCase``): the test case to track
         """
-        question_name = question["name"]
-        self._questions[question_name] = question
-
-        if question_name not in self._tests_by_question:
-            self._tests_by_question[question_name] = []
-
-        self._tests_by_question[question_name].append(test_case)
+        self.add_question(question)
+        self._tests_by_question[question.name].append(test_case)
 
     def _parse_test_config(self, source: list[str]) -> tuple[dict[str, Any], Union[int, None]]:
         """
@@ -113,6 +108,17 @@ class AssignmentTestsManager:
             assert isinstance(config, dict), f"Invalid test config in cell {source}"
 
         return config, i
+
+    def add_question(self, question: QuestionConfig):
+        """
+        Add a question for tracking and inclusion in the assignment summary
+
+        Args:
+            question (``otter.assign.question_config.QuestionConfig``): the question config
+        """
+        self._questions[question.name] = question
+        if question.name not in self._tests_by_question:
+            self._tests_by_question[question.name] = []
 
     def read_test(self, cell: nbf.NotebookNode, question: QuestionConfig):
         """
@@ -184,7 +190,7 @@ class AssignmentTestsManager:
         Returns:
             ``bool``: whether the question has any test cases
         """
-        return question.name in self._tests_by_question
+        return len(self._tests_by_question.get(question.name, [])) > 0
 
     @staticmethod
     def _resolve_test_file_points(
@@ -356,6 +362,9 @@ class AssignmentTestsManager:
 
         test_ext = ".py" if self.assignment.is_python else ".R"
         for test_name in self._tests_by_question.keys():
+            if not self._tests_by_question[test_name]:
+                continue
+
             test_info = self._create_test_file_info(test_name)
             test_path = os.path.join(test_dir, test_name + test_ext)
 
@@ -397,6 +406,9 @@ class AssignmentTestsManager:
         Returns:
             ``int | float``: the point value of the question
         """
+        if question.manual:
+            return question.points or 0
+
         test_cases = self._tests_by_question.get(question.name, [])
 
         points = question.points
@@ -430,7 +442,7 @@ class AssignmentTestsManager:
         for question_name in sorted(self._tests_by_question.keys()):
             config = self._questions[question_name]
             points = self.determine_question_point_value(config)
-            rows.append({"name": question_name, "points": points})
+            rows.append({"name": question_name, "points": points, "manual": config.manual})
             total += points
             if config.manual:
                 manual += points

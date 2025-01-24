@@ -298,6 +298,7 @@ class NotebookTransformer:
                         )
 
                     question = QuestionConfig(question_config)
+                    self.tests_mgr.add_question(question)
                     if question.manual or question.export:
                         need_begin_export = True
 
