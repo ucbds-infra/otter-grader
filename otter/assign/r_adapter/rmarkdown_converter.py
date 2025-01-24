@@ -7,6 +7,8 @@ import re
 
 from copy import deepcopy
 
+from ..solutions import ANSWER_CELL_TAG, SOLUTION_CELL_TAG
+from ..utils import remove_tag
 from ...utils import get_source, NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
 
 
@@ -113,6 +115,15 @@ def write_as_rmd(nb: nbf.NotebookNode, rmd_path: str, has_solutions: bool):
     # notebook (resolves whitespace issues caused by the use of prompts for written questions)
     if not has_solutions:
         for i, cell in enumerate(nb["cells"]):
+            # remove tags from all cells since they aren't needed for Rmd files
+            if "tags" in cell["metadata"]:
+                tags = cell["metadata"]["tags"]
+                if SOLUTION_CELL_TAG in tags:
+                    tags.remove(SOLUTION_CELL_TAG)
+                if ANSWER_CELL_TAG in tags:
+                    tags.remove(ANSWER_CELL_TAG)
+                if not tags:
+                    cell["metadata"].pop("tags")
             if (
                 i < len(nb["cells"]) - 1
                 and cell["cell_type"] == "markdown"

@@ -16,6 +16,7 @@ from .question_config import QuestionConfig
 from .r_adapter import rmarkdown_converter
 from .r_adapter.cell_factory import RCellFactory
 from .solutions import (
+    ANSWER_CELL_TAG,
     has_seed,
     overwrite_seed_vars,
     SOLUTION_CELL_TAG,
@@ -318,6 +319,9 @@ class NotebookTransformer:
                         )
                     self.tests_mgr.read_test(cell, question)
                     continue
+
+                elif curr_block[-1] == BlockType.PROMPT:
+                    cell = add_tag(cell, ANSWER_CELL_TAG)
 
                 elif curr_block[-1] == BlockType.SOLUTION:
                     cell = add_tag(cell, SOLUTION_CELL_TAG)

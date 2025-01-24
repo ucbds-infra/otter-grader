@@ -67,8 +67,9 @@ nine <- square(3) # SOLUTION
 
 **Question 4.** What does equilateral mean?
 
-
+<!-- #region tags=["otter_answer_cell"] -->
 _Type your answer here, replacing this text._
+<!-- #endregion -->
 
 <!-- #region tags=["otter_assign_solution_cell"] -->
 Having equal side lengths.
@@ -109,14 +110,15 @@ circumference <- function(r) {
 **Question 6.** Write something
 
 _This question has a custom prompt below, so that prompt should be in the output. It also has no solution!_
-
+<!-- #region tags=["otter_answer_cell"] -->
 _Write your thing here._
-
+<!-- #endregion -->
 
 **Question 7:** What is the answer?
 
-
+<!-- #region tags=["otter_answer_cell"] -->
 _Type your answer here, replacing this text._
+<!-- #endregion -->
 
 <!-- #region tags=["otter_assign_solution_cell"] -->
 42

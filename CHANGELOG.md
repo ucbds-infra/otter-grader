@@ -6,6 +6,7 @@
 * Fixed assignment summary in Otter Assign so that manual questions are included per [#886](https://github.com/ucbds-infra/otter-grader/issues/886)
 * Wrap `ModuleNotFoundError` for `otter` in grading image to include debugging instructions per [#907](https://github.com/ucbds-infra/otter-grader/issues/907)
 * Updated Otter Assign to disallow metadata tests for Colab notebooks per [#901](https://github.com/ucbds-infra/otter-grader/issues/901)
+* Updated Otter Assign to leave solution cell tags in student notebooks per [#893](https://github.com/ucbds-infra/otter-grader/issues/893)
 
 **v6.0.5:**
 
