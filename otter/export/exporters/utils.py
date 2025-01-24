@@ -53,7 +53,7 @@ def has_end(line: str) -> bool:
 
 def sub_end_for_new_page(line: str) -> str:
     """
-    Subsitutes an end question comment for a newpage comment
+    Substitutes an end question comment for a newpage comment
 
     The end question HTML comment (cf. ``otter.export.filter.has_end``) is replaced with the following
     HTML comment to indicate a pagebreak in the LaTeX template.

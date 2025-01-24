@@ -233,7 +233,7 @@ class TestFile(ABC):
         Override the score for this test file to a specified value.
 
         Args:
-            new_score (``int | foat``): the new score
+            new_score (``int | float``): the new score
         """
         self._score = new_score
 

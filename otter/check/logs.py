@@ -262,7 +262,7 @@ class LogEntry:
             tf.seek(0)
             shelf = dill.load(tf)
 
-        # add the unpickeld env and global_env to all function __globals__
+        # add the unpickled env and global_env to all function __globals__
         for v in shelf.values():
             if type(v) == types.FunctionType:
                 v.__globals__.update(shelf)
@@ -333,8 +333,8 @@ class LogEntry:
             env (``dict[str, Any]``): the environment to shelve
             variables (``dict[str, str] | list[str] | None``): a map of variable name to type string
                 indicating **only** variables to include (all variables not in this dictionary will
-                be ignored) or a list of variable names to include regardless of tpye
-            ignore_modules (``list[str] | None``): the module names to igonre
+                be ignored) or a list of variable names to include regardless of type
+            ignore_modules (``list[str] | None``): the module names to ignore
 
         Returns:
             ``tuple[bytes, list[str]``: the pickled environment and list of variable names that were
@@ -432,7 +432,7 @@ class Log(Iterable[LogEntry]):
 
     def sort(self, ascending: bool = True):
         """
-        Sorts this logs entries by timestmap using ``LogEntry.sort_log``.
+        Sorts this logs entries by timestamp using ``LogEntry.sort_log``.
 
         Args:
             ascending (``bool``): whether to sort the log chronologically; defaults to ``True``

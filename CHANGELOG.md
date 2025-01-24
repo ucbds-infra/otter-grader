@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.1.0 (unreleased):**
+
+* Update Otter Assign to handle notebooks with an invalid kernelspec by assuming the language is Python per [#895](https://github.com/ucbds-infra/otter-grader/issues/895)
+
 **v6.0.5:**
 
 * Added `liblzma-devel`, `zlib-devel-amzn2-aarch64`, and `zlib` to R grading environment

@@ -75,13 +75,13 @@ defaults = check.__kwdefaults__
 @cli.command("check")
 @_verbosity
 @click.argument("file", type=click.Path(exists=True, dir_okay=False))
-@click.option("-q", "--question", help="A specific quetsion to grade")
+@click.option("-q", "--question", help="A specific question to grade")
 @click.option(
     "-t",
     "--tests-path",
     default=defaults["tests_path"],
     type=click.Path(exists=True, file_okay=False),
-    help="Path to the direcotry of test files",
+    help="Path to the directory of test files",
 )
 @click.option("--seed", type=click.INT, help="A random seed to be executed before each cell")
 def check_cli(*args: Any, **kwargs: Any):
@@ -159,7 +159,7 @@ defaults = generate.__kwdefaults__
 @click.option(
     "--no-requirements",
     is_flag=True,
-    help="Disable auto-inclusion of unespecified requirements file at ./requirements.txt",
+    help="Disable auto-inclusion of unspecified requirements file at ./requirements.txt",
 )
 @click.option(
     "--overwrite-requirements",
@@ -175,7 +175,7 @@ defaults = generate.__kwdefaults__
 @click.option(
     "--no-environment",
     is_flag=True,
-    help="Disable auto-inclusion of unespecified environment file at ./environment.yml",
+    help="Disable auto-inclusion of unspecified environment file at ./environment.yml",
 )
 @click.option("-l", "--lang", help="Assignment programming language; defaults to Python")
 @click.option("--username", help="Gradescope username for generating a token")
@@ -190,7 +190,7 @@ defaults = generate.__kwdefaults__
 @click.option(
     "--exclude-conda-defaults",
     is_flag=True,
-    help="Whether to exlucde conda's defaults channel from the environment.yml file",
+    help="Whether to exclude conda's defaults channel from the environment.yml file",
 )
 @click.argument("files", nargs=-1)
 def generate_cli(*args: Any, **kwargs: Any):

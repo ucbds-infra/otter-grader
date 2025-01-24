@@ -181,7 +181,7 @@ class AbstractLanguageRunner(ABC):
         Sanitize any references to the PDF submission upload token to prevent unauthorized access
         when executing student code.
 
-        This method should be invokved from inside ``{self.ag_config.autograder_dir}/submission``
+        This method should be invoked from inside ``{self.ag_config.autograder_dir}/submission``
         as part of ``run``.
         """
         self.ag_config.token = None

@@ -139,7 +139,7 @@ def grade_submission(
     """
     Grade a submission in a Docker container.
 
-    If a sumbission times out, based on the timeout parameter or the container
+    If a submission times out, based on the timeout parameter or the container
     exits in an error state a ``GradingResults`` object is created by using the
     ``GradingResults.without_results`` function and returned.
 

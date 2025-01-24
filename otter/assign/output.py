@@ -64,7 +64,7 @@ def write_output_dir(
                     raise FileNotFoundError(f"{file} is not a file")
                 if str(assignment.master.parent) not in os.path.abspath(file):
                     raise ValueError(
-                        f"{file} is not in a subdirectory of the master notebook direcotry"
+                        f"{file} is not in a subdirectory of the master notebook directory"
                     )
                 file_path = pathlib.Path(file).resolve()
                 rel_path = file_path.parent.relative_to(assignment.master.parent)
@@ -113,11 +113,7 @@ def write_output_directories(assignment: Assignment):
         nb = nbformat.read(assignment.master, as_version=NBFORMAT_VERSION)
 
     if assignment.lang is None:
-        try:
-            assignment.lang = get_notebook_language(nb)
-        except KeyError:
-            warnings.warn("Could not auto-parse kernelspec from notebook; assuming Python")
-            assignment.lang = "python"
+        assignment.lang = get_notebook_language(nb)
 
     tests_mgr = (RAssignmentTestsManager if assignment.is_r else AssignmentTestsManager)(assignment)
     nb_transformer = NotebookTransformer(assignment, tests_mgr)
