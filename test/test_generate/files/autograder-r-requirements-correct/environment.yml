@@ -12,6 +12,9 @@ dependencies:
   - gxx_linux-64
   - libgit2
   - libgomp
+  - liblzma-devel
+  - zlib-devel-amzn2-aarch64
+  - zlib
   - r-base>=4.0.0
   - r-devtools
   - r-essentials
