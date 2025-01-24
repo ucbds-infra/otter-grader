@@ -4,6 +4,9 @@ channels:
     - defaults
 dependencies:
     - python>=3.9
+    - liblzma-devel
+    - zlib-devel-amzn2-aarch64
+    - zlib
     - r-base>=4.0.0
     - r-essentials
     - r-devtools
