@@ -6,11 +6,13 @@ import re
 
 from .assignment import Assignment
 from .r_adapter import solutions as r_solutions
-from .utils import has_tag, is_cell_type, remove_output, remove_tag
+from .utils import add_tag, has_tag, is_cell_type, remove_output, remove_tag
 from ..utils import get_source
 
 
+ANSWER_CELL_TAG = "otter_answer_cell"
 BLOCK_PROMPT = "..."
+OTTER_INCLUDE_TAG = "otter_include"
 SOLUTION_CELL_TAG = "otter_assign_solution_cell"
 
 
@@ -205,9 +207,6 @@ def strip_ignored_lines(nb: nbf.NotebookNode) -> nbf.NotebookNode:
     return nb
 
 
-OTTER_INCLUDE_TAG = "otter_include"
-
-
 def strip_solutions_and_output(assignment: Assignment, nb: nbf.NotebookNode) -> nbf.NotebookNode:
     """
     Create a copy of a notebook with solutions and outputs stripped.
@@ -231,6 +230,7 @@ def strip_solutions_and_output(assignment: Assignment, nb: nbf.NotebookNode) -> 
                     cell = remove_tag(cell, OTTER_INCLUDE_TAG)
                 else:
                     del_md_solutions.append(i)
+            nb["cells"][i] = add_tag(remove_tag(cell, SOLUTION_CELL_TAG), ANSWER_CELL_TAG)
 
     del_md_solutions.reverse()
     for i in del_md_solutions:
