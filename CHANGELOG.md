@@ -3,6 +3,7 @@
 **v6.1.0 (unreleased):**
 
 * Update Otter Assign to handle notebooks with an invalid kernelspec by assuming the language is Python per [#895](https://github.com/ucbds-infra/otter-grader/issues/895)
+* Fixed assignment summary in Otter Assign so that manual questions are included per [#886](https://github.com/ucbds-infra/otter-grader/issues/886)
 * Wrap `ModuleNotFoundError` for `otter` in grading image to include debugging instructions per [#907](https://github.com/ucbds-infra/otter-grader/issues/907)
 
 **v6.0.5:**

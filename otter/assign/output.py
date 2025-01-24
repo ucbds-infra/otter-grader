@@ -5,7 +5,6 @@ import os
 import pathlib
 import shutil
 import tempfile
-import warnings
 
 from .assignment import Assignment
 from .notebook_transformer import NotebookTransformer, TransformedNotebookContainer
