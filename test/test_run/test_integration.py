@@ -18,7 +18,18 @@ from unittest import mock
 
 from otter.generate.token import APIClient
 from otter.run import main as run_main
-from otter.run.run_autograder import main as run_autograder
+
+
+try:
+    from otter.run.run_autograder import main as run_autograder
+except ModuleNotFoundError as e:
+    if "'otter'" in str(e):
+        raise RuntimeError(
+            "The 'otter' module could not be imported. This is usually caused by errors while building the "
+            "grading image, so check the image build logs and include them when requesting "
+            "support."
+        )
+    raise e
 from otter.run.run_autograder.utils import OtterRuntimeError
 from otter.test_files import GradingResults
 from otter.utils import chdir, NBFORMAT_VERSION
