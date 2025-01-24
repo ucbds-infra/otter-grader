@@ -6,7 +6,7 @@ import sys
 from textwrap import dedent, indent
 
 
-__version__ = "6.0.4"
+__version__ = "6.0.5"
 
 
 LOGO_WITH_VERSION = rf"""
