@@ -1,11 +1,12 @@
 """A Python module for validating that a submission zip file passes test cases"""
 
-# suppress all warnings, because otherwise they get printed to stderr which triggers a RuntimeError
-# in the calling code -- see #735
 import warnings
 
 
+# suppress all warnings, because otherwise they get printed to stderr which triggers a RuntimeError
+# in the calling code -- see #735
 warnings.simplefilter("ignore")
+
 
 import argparse
 import dill
@@ -28,11 +29,7 @@ def get_parser():
     return parser
 
 
-warnings.warn("foo", RuntimeWarning)
-
-
 def main():
-
     args = get_parser().parse_args()
 
     nb_dir = tempfile.mkdtemp()

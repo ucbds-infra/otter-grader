@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 import time
+import warnings
 import wrapt
 
 from dataclasses import dataclass
@@ -111,7 +112,7 @@ def grade_zip_file(zip_path: str, nb_arcname: str, tests_dir: str) -> GradingRes
         print(results.stdout.decode("utf-8"))
 
         if results.stderr:
-            raise RuntimeError(results.stderr.decode("utf-8"))
+            warnings.warn(results.stderr.decode("utf-8"), RuntimeWarning)
 
         with open(results_path, "rb") as f:
             results = dill.load(f)

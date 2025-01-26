@@ -7,6 +7,7 @@
 * Wrap `ModuleNotFoundError` for `otter` in grading image to include debugging instructions per [#907](https://github.com/ucbds-infra/otter-grader/issues/907)
 * Updated Otter Assign to disallow metadata tests for Colab notebooks per [#901](https://github.com/ucbds-infra/otter-grader/issues/901)
 * Updated Otter Assign to leave solution cell tags in student notebooks per [#893](https://github.com/ucbds-infra/otter-grader/issues/893)
+* Updated `Notebook.export` zip validation to emit a `RuntimeWarning` instead of a `RuntimeError` when anything is written to stderr per [#915](https://github.com/ucbds-infra/otter-grader/issues/915)
 
 **v6.0.5:**
 
