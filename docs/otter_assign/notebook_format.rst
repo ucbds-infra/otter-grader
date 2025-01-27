@@ -2,7 +2,7 @@ Notebook Format
 ===============
 
 Otter's notebook format groups prompts, solutions, and tests together into questions. Autograder tests 
-are specified as cells in the notebook and their output is used as the expected output of the 
+are specified as cells in the notebook and each cell's output is used as the expected output of the 
 autograder when generating tests. Each question has metadata, expressed in raw YAML config cell
 when the question is declared.
 
@@ -488,6 +488,12 @@ To use OK-formatted tests, which are the default for Otter Assign, you can write
 cell; Otter Assign will parse the output of the cell to write a doctest for the question, which will 
 be used for the test case. **Make sure that only the last line of the cell produces any output, 
 otherwise the test will fail.**
+
+.. important::
+    Because Otter Assign parses the output of the cell, you must save the notebook without
+    clearing the cell outputs. If you run Otter Assign on a notebook with the outputs cleared, every
+    test case will be parsed in such a way that it expects no output to be printed at all, which will
+    likely result in failing test cases for correct answers.
 
 
 Exception-Based Test Cells

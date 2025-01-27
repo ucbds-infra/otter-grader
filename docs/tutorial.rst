@@ -46,6 +46,12 @@ Otter Assign on this notebook, run
 
     otter assign demo.ipynb dist
 
+
+.. important::
+    If you have viewed/edited the ``demo.ipynb`` notebook, make sure that you run all of the
+    cells and save the notebook with the cell outputs included, otherwise Otter Assign will generate
+    incorrect test cases.
+
 Otter Assign should create a ``dist`` directory which contains two further subdirectories: 
 ``autograder`` and ``student``. The ``autograder`` directory contains the Gradescope autograder, 
 solutions PDF, and the notebook with solutions. The ``student`` directory contains just the 
