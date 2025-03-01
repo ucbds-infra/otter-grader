@@ -4,10 +4,8 @@ import pathlib
 import pytest
 import shutil
 
-from _pytest.fixtures import pytestconfig
 from contextlib import nullcontext
 from python_on_whales import docker
-from turtle import update
 from unittest import mock
 
 from otter import __file__ as OTTER_PATH, logging
