@@ -23,3 +23,4 @@ htmlcov/
 .pytest_cache/
 /sync.sh
 pytest-report.html
+/test_output

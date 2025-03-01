@@ -11,7 +11,7 @@ from unittest import mock
 from otter import __file__ as OTTER_PATH, logging
 from otter.test_files import TestCase, TestCaseResult, TestFile
 
-from .utils import TestFileManager
+from .utils import OUTPUT_DIR, TestFileManager, update_goldens
 
 
 FILE_MANAGER = TestFileManager(__file__)
@@ -38,6 +38,7 @@ def pytest_addoption(parser):
         default=False,
         help="force PDF generation instead of blocking it where it is mocked",
     )
+    parser.addoption("--update-goldens", action="store_true", default=False, help="update goldens")
 
 
 def pytest_configure(config):
@@ -50,6 +51,23 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "docker: marks tests as requiring Docker (deselect with '-m \"not docker\"')"
     )
+
+
+def pytest_sessionstart(session: pytest.Session):
+    """
+    A fixture indicating whether test cleanup is enabled.
+    """
+    # Update goldens and exit if indicated.
+    do_update = session.config.getoption("--update-goldens")
+    if do_update:
+        update_goldens()
+        if not session.config.getoption("--nocleanup"):
+            shutil.rmtree(OUTPUT_DIR)
+        pytest.exit("successfully updated goldens", 0)
+
+    # Clean up test_output directory from previous runs
+    if OUTPUT_DIR.exists():
+        shutil.rmtree(OUTPUT_DIR)
 
 
 @pytest.fixture(scope="session")

@@ -44,6 +44,9 @@ testcov:
 htmlcov: testcov
 	$(COVERAGE) html
 
+goldens:
+	$(PYTEST) --update-goldens $(_PYTESTOPTS)
+
 .PHONY: docs
 docs:
 	$(MAKE) -C docs html

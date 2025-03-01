@@ -6,7 +6,6 @@ import pathlib
 import pprint
 import pytest
 import shutil
-import subprocess
 import tempfile
 import zipfile
 
@@ -14,6 +13,10 @@ from contextlib import contextmanager
 
 from otter.check.notebook import OTTER_LOG_FILENAME
 from otter.test_files import OK_FORMAT_VARNAME
+
+
+OUTPUT_DIR = pathlib.Path("test_output")
+TEST_DIR = pathlib.Path("test").resolve()
 
 
 class TestFileManager:
@@ -49,47 +52,62 @@ class TestFileManager:
         return file_manager
 
 
-def assert_notebooks_equal(p1, p2):
-    nb1, nb2 = nbf.read(p1, as_version=nbf.NO_CONVERT), nbf.read(p2, as_version=nbf.NO_CONVERT)
+def update_goldens():
+    for p in OUTPUT_DIR.rglob("*"):
+        if not os.path.isfile(p):
+            continue
+        shutil.copy(p, TEST_DIR / pathlib.Path(*p.parts[1:]))
+
+
+def save_test_output(got_file, golden_file):
+    path = OUTPUT_DIR / pathlib.Path(golden_file).resolve().relative_to(TEST_DIR)
+    os.makedirs(path.parent, exist_ok=True)
+    shutil.copyfile(got_file, path)
+
+
+def check_notebooks_equal(got_file, golden_file):
+    nb1 = nbf.read(got_file, as_version=nbf.NO_CONVERT)
+    nb2 = nbf.read(golden_file, as_version=nbf.NO_CONVERT)
     # ignore cell IDs
     for c in [*nb1.cells, *nb2.cells]:
         c.pop("id", None)
-    diff = subprocess.run(
-        ["diff", "--context=5", p1, p2],
-        stdout=subprocess.PIPE,
-    ).stdout.decode("utf-8")
-    assert nb1 == nb2, f"Contents of {p1} did not equal contents of {p2}:\n{diff}"
+    ok = nb1 == nb2
+    if not ok:
+        save_test_output(got_file, golden_file)
+    return ok
 
 
-def assert_files_equal(p1, p2, ignore_trailing_whitespace=True):
+def check_files_equal(got_file, golden_file, ignore_trailing_whitespace=True):
     """
-    Assert that two files have the same conentsly ignoring trailing whitespace.
+    Check that two files have the same conentsly ignoring trailing whitespace.
     """
-    assert os.path.splitext(p1)[1] == os.path.splitext(p2)[1]
-    if os.path.splitext(p1)[1] == ".ipynb":
-        assert_notebooks_equal(p1, p2)
-        return
+    assert os.path.splitext(got_file)[1] == os.path.splitext(golden_file)[1]
+
+    if os.path.splitext(got_file)[1] == ".ipynb":
+        return check_notebooks_equal(got_file, golden_file)
+
     try:
-        with open(p1) as f1:
-            with open(p2) as f2:
+        with open(got_file) as f1:
+            with open(golden_file) as f2:
                 c1, c2 = f1.read(), f2.read()
                 if ignore_trailing_whitespace:
                     c1, c2 = c1.rstrip(), c2.rstrip()
-                diff = subprocess.run(
-                    ["diff", "--context=5", p1, p2],
-                    stdout=subprocess.PIPE,
-                ).stdout.decode("utf-8")
-                assert c1 == c2, f"Contents of {p1} did not equal contents of {p2}:\n{diff}"
+                ok = c1 == c2
 
     except UnicodeDecodeError:
-        with open(p1, "rb") as f1:
-            with open(p2, "rb") as f2:
-                assert f1.read() == f2.read(), f"Contents of {p1} did not equal contents of {p2}"
+        with open(got_file, "rb") as f1:
+            with open(golden_file, "rb") as f2:
+                ok = f1.read() == f2.read()
+
+    if not ok:
+        save_test_output(got_file, golden_file)
+
+    return ok
 
 
 def assert_dirs_equal(
-    dir1,
-    dir2,
+    output_dir,
+    golden_dir,
     ignore_ext=[],
     ignore_dirs=[],
     variable_path_exts=[],
@@ -99,8 +117,8 @@ def assert_dirs_equal(
     Assert that the contents of two directories are equal recursively.
 
     Args:
-        dir1 (``str``): the first directory
-        dir1 (``str``): the second directory
+        output_dir (``str``): the directory produced by the test
+        golden_dir (``str``): the golden directory
         ignore_ext (``list[str]``): a list of extensions for which the contents of any
             such files will not be compared when checking directories
         ignore_dirs (``list[str]``): a list of directory names whose contents should
@@ -109,45 +127,52 @@ def assert_dirs_equal(
             may be different; if present, the number of files with these extensions is compared,
             although their contents and stems are ignored
     """
-    assert os.path.exists(dir1), f"{dir1} does not exist"
-    assert os.path.exists(dir2), f"{dir2} does not exist"
-    assert os.path.isfile(dir1) == os.path.isfile(dir2), f"{dir1} and {dir2} have different type"
+    assert os.path.exists(output_dir), f"{output_dir} does not exist"
+    assert os.path.exists(golden_dir), f"{golden_dir} does not exist"
+    assert os.path.isfile(output_dir) == os.path.isfile(
+        golden_dir
+    ), f"{output_dir} and {golden_dir} have different type"
 
-    if os.path.isfile(dir1):
-        if os.path.splitext(dir1)[1] not in ignore_ext and (
-            not ignore_log or os.path.split(dir1)[1] != OTTER_LOG_FILENAME
+    if os.path.isfile(output_dir):
+        if os.path.splitext(output_dir)[1] not in ignore_ext and (
+            not ignore_log or os.path.split(output_dir)[1] != OTTER_LOG_FILENAME
         ):
-            assert_files_equal(dir1, dir2)
+            return check_files_equal(output_dir, golden_dir)
 
     else:
-        dir1_contents, dir2_contents = (
-            [
-                f
-                for f in os.listdir(dir1)
-                if not (os.path.isdir(os.path.join(dir1, f)) and f in ignore_dirs)
-                and os.path.splitext(f)[1] not in variable_path_exts
-            ],
-            [
-                f
-                for f in os.listdir(dir2)
-                if not (os.path.isdir(os.path.join(dir2, f)) and f in ignore_dirs)
-                and os.path.splitext(f)[1] not in variable_path_exts
-            ],
+        output_dir_contents, golden_dir_contents = (
+            sorted(
+                [
+                    f
+                    for f in os.listdir(output_dir)
+                    if not (os.path.isdir(os.path.join(output_dir, f)) and f in ignore_dirs)
+                    and os.path.splitext(f)[1] not in variable_path_exts
+                ]
+            ),
+            sorted(
+                [
+                    f
+                    for f in os.listdir(golden_dir)
+                    if not (os.path.isdir(os.path.join(golden_dir, f)) and f in ignore_dirs)
+                    and os.path.splitext(f)[1] not in variable_path_exts
+                ]
+            ),
         )
-        assert sorted(dir1_contents) == sorted(
-            dir2_contents
-        ), f"{dir1} and {dir2} have different contents: {dir1_contents} != {dir2_contents}"
+        assert (
+            output_dir_contents == golden_dir_contents
+        ), f"{output_dir} and {golden_dir} have different contents: {output_dir_contents} != {golden_dir_contents}"
 
         # check that for each variable path ext, there are the same number of files in each dir
         # with that ext
         for ext in variable_path_exts:
-            assert len([f for f in os.listdir(dir1) if os.path.splitext(f)[1] == ext]) == len(
-                [f for f in os.listdir(dir2) if os.path.splitext(f)[1] == ext]
-            ), f"Variable path extension check failed for {dir1} and {dir2} with ext {ext}"
+            assert len([f for f in os.listdir(output_dir) if os.path.splitext(f)[1] == ext]) == len(
+                [f for f in os.listdir(golden_dir) if os.path.splitext(f)[1] == ext]
+            ), f"Variable path extension check failed for {output_dir} and {golden_dir} with ext {ext}"
 
-        for f1, f2 in zip(dir1_contents, dir2_contents):
-            f1, f2 = os.path.join(dir1, f1), os.path.join(dir2, f2)
-            assert_dirs_equal(
+        failures = []
+        for f1, f2 in zip(output_dir_contents, golden_dir_contents):
+            f1, f2 = os.path.join(output_dir, f1), os.path.join(golden_dir, f2)
+            ok = assert_dirs_equal(
                 f1,
                 f2,
                 ignore_ext=ignore_ext,
@@ -155,6 +180,13 @@ def assert_dirs_equal(
                 variable_path_exts=variable_path_exts,
                 ignore_log=ignore_log,
             )
+            if not ok:
+                failures.append(f1)
+
+        failures_list = "- " + "\n- ".join(failures)
+        assert not failures, f"{output_dir} has diff in files:\n{failures_list}"
+
+    return True
 
 
 def delete_paths(paths, error_if_absent=False):
