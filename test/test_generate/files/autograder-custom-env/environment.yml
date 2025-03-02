@@ -9,5 +9,5 @@ dependencies:
   - jupyter_server
   - pip:
       - statsmodels
-      - otter-grader[grading,plugins]==6.1.0
+      - otter-grader[grading,plugins]==6.1.1
       - tqdm
