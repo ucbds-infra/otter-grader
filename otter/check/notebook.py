@@ -275,9 +275,10 @@ class Notebook(Loggable):
         if global_env is None:
             self._logger.debug(f"Collecting calling global environment")
             frame = inspect.currentframe().f_back.f_back
-            # I have NO IDEA why but in python 3.13 we need to go back an additional frame. I spent
-            # h o u r s trying to figure out why but I was unsuccessful.
-            if sys.version_info.minor >= 13 or sys.version_info.major > 3:
+            # I have NO IDEA why but in python 3.13 ONLY WHEN RUNNING TESTS (?!?!) there is an
+            # additional frame for wrapt. I spent h o u r s trying to figure out why but I was
+            # unsuccessful.
+            if f"{os.path.sep}wrapt{os.path.sep}" in frame.f_code.co_filename:
                 frame = frame.f_back
             global_env = frame.f_globals
 
@@ -565,7 +566,13 @@ class Notebook(Loggable):
 
         tests = list_available_tests(self._tests_dir, self._nbmeta_config)
 
-        global_env = inspect.currentframe().f_back.f_back.f_back.f_globals
+        frame = inspect.currentframe().f_back.f_back
+        # I have NO IDEA why but in python 3.13 ONLY WHEN RUNNING TESTS (?!?!) there is an
+        # additional frame for wrapt. I spent h o u r s trying to figure out why but I was
+        # unsuccessful.
+        if f"{os.path.sep}wrapt{os.path.sep}" in frame.f_code.co_filename:
+            frame = frame.f_back
+        global_env = frame.f_globals
 
         self._logger.debug(f"Found available tests: {', '.join(tests)}")
 
