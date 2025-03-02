@@ -1,6 +1,6 @@
 # Changelog
 
-**v6.1.1 (unreleased):**
+**v6.1.1:**
 
 * Update `Notebook` checking methods to only go back a third frame if that frame is from the `wrapt` package since apparently on Python 3.13 and only when running pytest there is an extra call frame
 
