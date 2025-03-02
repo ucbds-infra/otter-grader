@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.1.1 (unreleased):**
+
+* Update `Notebook` checking methods to only go back a third frame if that frame is from the `wrapt` package since apparently on Python 3.13 and only when running pytest there is an extra call frame
+
 **v6.1.0:**
 
 * Update Otter Assign to handle notebooks with an invalid kernelspec by assuming the language is Python per [#895](https://github.com/ucbds-infra/otter-grader/issues/895)
