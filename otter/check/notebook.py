@@ -572,6 +572,11 @@ class Notebook(Loggable):
         # unsuccessful.
         if f"{os.path.sep}wrapt{os.path.sep}" in frame.f_code.co_filename:
             frame = frame.f_back
+        # do it again since there are 2 decorators on this method
+        frame = frame.f_back
+        if f"{os.path.sep}wrapt{os.path.sep}" in frame.f_code.co_filename:
+            frame = frame.f_back
+
         global_env = frame.f_globals
 
         self._logger.debug(f"Found available tests: {', '.join(tests)}")
