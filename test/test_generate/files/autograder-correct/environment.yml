@@ -5,7 +5,6 @@ channels:
 dependencies:
   - python=3.12
   - pip
-  - nb_conda_kernels
   - jupyter_server
   - pip:
       - otter-grader[grading,plugins]==6.1.2

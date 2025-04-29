@@ -32,7 +32,8 @@ export TAR="/bin/tar"
 
 # install dependencies with mamba
 mamba env create -f /autograder/source/environment.yml
-mamba run -n otter-env playwright install chromium
+mamba install -n otter-env -c conda-forge nb_conda_kernels
+mamba run -n otter-env bash -c "playwright install-deps && playwright install chromium"
 
 # set mamba shell
-mamba init --all
+mamba shell init --shell bash
