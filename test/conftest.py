@@ -60,6 +60,8 @@ def pytest_sessionstart(session: pytest.Session):
     # Update goldens and exit if indicated.
     do_update = session.config.getoption("--update-goldens")
     if do_update:
+        if not OUTPUT_DIR.exists():
+            raise RuntimeError(f"{OUTPUT_DIR} does not exist; did you run the tests already?")
         update_goldens()
         if not session.config.getoption("--nocleanup"):
             shutil.rmtree(OUTPUT_DIR)

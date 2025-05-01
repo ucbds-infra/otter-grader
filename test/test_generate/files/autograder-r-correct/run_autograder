@@ -1,6 +1,5 @@
-#!/usr/bin/env bash
-export PATH="/root/miniforge3/bin:$PATH"
-source /root/miniforge3/etc/profile.d/conda.sh
-source /root/miniforge3/etc/profile.d/mamba.sh
+#!/bin/bash
+export PATH=/root/miniforge3/bin:$PATH
+eval "$(mamba shell hook --shell bash)"
 mamba activate otter-env
 python /autograder/source/run_otter.py

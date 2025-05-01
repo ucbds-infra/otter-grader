@@ -33,8 +33,9 @@ export TAR="/bin/tar"
 # install dependencies with mamba{% if channel_priority_strict %}
 mamba config --set channel_priority strict{% endif %}
 mamba env create -f {{ autograder_dir }}/source/environment.yml
-mamba run -n {{ otter_env_name }} playwright install chromium{% if has_r_requirements %}
+mamba install -n otter-env -c conda-forge nb_conda_kernels
+mamba run -n {{ otter_env_name }} bash -c "playwright install-deps && playwright install chromium"{% if has_r_requirements %}
 mamba run -n {{ otter_env_name }} Rscript {{ autograder_dir }}/source/requirements.r{% endif %}
 
 # set mamba shell
-mamba init --all
+mamba shell init --shell bash

@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.1.3 (unreleased):**
+
+* Updated grading image build scripts to fix breakages caused by changes to Mamba
+
 **v6.1.2:**
 
 * Fix a bug in `Notebook.check_all` that prevented it from selecting the correct frame for the global environment
