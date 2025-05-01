@@ -1,6 +1,6 @@
 # Changelog
 
-**v6.1.3 (unreleased):**
+**v6.1.3:**
 
 * Updated grading image build scripts to fix breakages caused by changes to Mamba
 
