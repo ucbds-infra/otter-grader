@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash
+source /root/.bashrc
 export PATH="/root/miniforge3/bin:$PATH"
 source /root/miniforge3/etc/profile.d/conda.sh
 source /root/miniforge3/etc/profile.d/mamba.sh
