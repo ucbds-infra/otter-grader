@@ -25,4 +25,4 @@ dependencies:
   - r-usethis
   - r-ottr==1.5.0
   - pip:
-      - otter-grader[grading,plugins,r]==6.1.3
+      - otter-grader[grading,plugins,r]==6.1.4
