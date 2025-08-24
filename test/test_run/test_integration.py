@@ -513,6 +513,8 @@ def test_rmd(load_config, expected_rmd_results):
         with FILE_MANAGER.open("rmd-autograder/results/results.json") as f:
             actual_results = json.load(f)
 
+        # print(actual_results["tests"][1]["output"])
+
         assert (
             actual_results == expected_results
         ), f"Actual results did not matched expected:\n{actual_results}"
@@ -539,6 +541,31 @@ def test_rmd(load_config, expected_rmd_results):
             get_expected_error_results(error_message),
             error=error_message,
         )
+
+        # test that partial credit is awarded
+        pc_rmd = re.sub(r"^x <- 2$", "x <- 50", orig_rmd, flags=re.MULTILINE)
+        expected_results = copy.deepcopy(expected_rmd_results)
+        expected_results["tests"][1]["score"] = 2
+        expected_results["tests"][1]["output"] = dedent(
+            """\
+                q1 results:
+                    q1 - 1 result:
+
+                    q1 - 2 result:
+
+                    q1 - 3 result:
+                        `x` not equal to 2.
+                        1/1 mismatches
+                        [1] 50 - 2 == 48
+
+                    q1d result:
+                        as.character(x) not equal to "2".
+                        1/1 mismatches
+                        x[1]: "50"
+                        y[1]: "2"
+            """.rstrip()
+        )
+        perform_test(pc_rmd, expected_results)
 
     finally:
         delete_paths([rmd_path])
