@@ -180,6 +180,7 @@ class GradingResults:
                 name=os.path.splitext(os.path.basename(tfr["filename"]))[0],
                 path=tfr["filename"],
                 test_cases=test_cases,
+                all_or_nothing=False,
             )
             test_file.test_case_results = test_case_results
 

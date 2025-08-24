@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.1.4:**
+
+* Fixed R assignment grading to assign partial credit for all test cases (restoring an unintended change to pre-v6 behavior) per [#935](https://github.com/ucbds-infra/otter-grader/issues/935)
+
 **v6.1.3:**
 
 * Updated grading image build scripts to fix breakages caused by changes to Mamba

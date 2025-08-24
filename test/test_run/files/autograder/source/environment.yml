@@ -8,5 +8,5 @@ dependencies:
   - nb_conda_kernels
   - jupyter_server
   - pip:
-      - otter-grader[grading,plugins]==6.1.3
+      - otter-grader[grading,plugins]==6.1.4
       - tqdm
