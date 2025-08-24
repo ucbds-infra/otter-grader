@@ -513,8 +513,6 @@ def test_rmd(load_config, expected_rmd_results):
         with FILE_MANAGER.open("rmd-autograder/results/results.json") as f:
             actual_results = json.load(f)
 
-        # print(actual_results["tests"][1]["output"])
-
         assert (
             actual_results == expected_results
         ), f"Actual results did not matched expected:\n{actual_results}"
