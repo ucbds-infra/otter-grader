@@ -23,6 +23,6 @@ dependencies:
   - r-stringi
   - r-testthat
   - r-usethis
-  - r-ottr==1.5.0
+  - r-ottr==1.5.2
   - pip:
       - otter-grader[grading,plugins,r]==6.1.4

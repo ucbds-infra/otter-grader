@@ -23,8 +23,9 @@ from ..version import __version__
 
 DEFAULT_PYTHON_VERSION = "3.12"
 JINJA_ENV = Environment(loader=PackageLoader(__name__), keep_trailing_newline=True)
+MINIFORGE_VERSION = "25.3.1-0"
 OTTER_ENV_NAME = "otter-env"
-OTTR_VERSION = "1.5.0"
+OTTR_VERSION = "1.5.2"
 TEMPLATE_DIR = importlib.resources.files(__name__) / "templates"
 
 
@@ -251,6 +252,7 @@ def main(
         "ottr_version": OTTR_VERSION,
         "channel_priority_strict": channel_priority_strict,
         "has_r_requirements": False,
+        "miniforge_version": MINIFORGE_VERSION,
     }
 
     if plugin_collection is None:
