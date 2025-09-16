@@ -1,5 +1,10 @@
 # Changelog
 
+**v6.1.5 (unreleased):**
+
+* Pin miniforge version in grading image to v25.3.1-0
+* Upgrade ottr in grading image to v1.5.2
+
 **v6.1.4:**
 
 * Fixed R assignment grading to assign partial credit for all test cases (restoring an unintended change to pre-v6 behavior) per [#935](https://github.com/ucbds-infra/otter-grader/issues/935)
