@@ -7,5 +7,5 @@ dependencies:
   - pip
   - jupyter_server
   - pip:
-      - otter-grader[grading,plugins]==6.1.4
+      - otter-grader[grading,plugins]==6.1.5
       - tqdm
