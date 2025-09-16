@@ -1,6 +1,6 @@
 # Changelog
 
-**v6.1.5 (unreleased):**
+**v6.1.5:**
 
 * Pin miniforge version in grading image to v25.3.1-0
 * Upgrade ottr in grading image to v1.5.2
