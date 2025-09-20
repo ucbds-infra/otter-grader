@@ -79,18 +79,15 @@ class CondaEnvironment:
                     "r-testthat",
                     "r-usethis",
                     f"r-ottr=={OTTR_VERSION}",
+                    "rpy2",
                 ]
             )
-
-        r_extra = ""
-        if self.is_r:
-            r_extra = ",r"
 
         pip_deps = (
             self.requirements
             if self.overwrite_requirements
             else [
-                f"otter-grader[grading,plugins{r_extra}]=={__version__}",
+                f"otter-grader[grading,plugins]=={__version__}",
                 *self.requirements,
             ]
         )

@@ -24,5 +24,6 @@ dependencies:
   - r-testthat
   - r-usethis
   - r-ottr==1.5.2
+  - rpy2
   - pip:
-      - otter-grader[grading,plugins,r]==6.1.5
+      - otter-grader[grading,plugins]==6.1.5
