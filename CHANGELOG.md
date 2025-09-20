@@ -1,5 +1,9 @@
 # Changelog
 
+**v6.1.6:**
+
+* Fix R grading image builds by updating grading image to install rpy2 from conda-forge instead of using the `otter-grader[r]` extra per [#947](https://github.com/ucbds-infra/otter-grader/issues/947)
+
 **v6.1.5:**
 
 * Pin miniforge version in grading image to v25.3.1-0

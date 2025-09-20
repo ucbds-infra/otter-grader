@@ -55,6 +55,8 @@ wrapt = "^1.16.0"
 [tool.poetry.extras]
 grading = ["ipykernel", "jupyter_client", "pypdf"]
 plugins = ["google-api-python-client", "google-auth-oauthlib", "gspread", "six"]
+# IMPORTANT: The r extra is not used to construct the grading environment, so any new dependencies
+# for R grading  also need to be added to the generated R environment.yml file in otter generate.
 r = ["rpy2"]
 
 [tool.poetry.group.dev]
