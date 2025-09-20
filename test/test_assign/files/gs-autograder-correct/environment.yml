@@ -7,4 +7,4 @@ dependencies:
   - pip
   - jupyter_server
   - pip:
-      - otter-grader[grading,plugins]==6.1.5
+      - otter-grader[grading,plugins]==6.1.6
