@@ -5,9 +5,9 @@ import re
 import yaml
 
 from enum import Enum
-from typing import Any
+from typing import Any, List
 
-from .utils import is_cell_type
+from .utils import AssignNotebookFormatException, is_cell_type
 from ..utils import get_source
 
 
@@ -61,6 +61,65 @@ def extract_fenced_otter_cell(cell: nbformat.NotebookNode) -> nbformat.NotebookN
         return nbformat.v4.new_raw_cell("\n".join(source[1:-1]))
 
     return cell
+
+
+def extract_all_fenced_otter_cells(cells: List[nbformat.NotebookNode]):
+    """ """
+    new_cells = []
+    for cell_idx, cell in enumerate(cells):
+        source = get_source(cell)
+        starts = []
+        for i, l in enumerate(source):
+            if l.strip() == "```otter":
+                starts.append(i)
+
+        if not starts:
+            new_cells.append(cell)
+            continue
+
+        ends = []
+        for i in starts:
+            for j, l in enumerate(source[i + 1 :]):
+                if l.strip() == "```":
+                    ends.append(i + 1 + j)
+                    break
+
+        # Check that every block is closed and that every block end occurs before the next block start.
+        if len(starts) != len(ends) or not all(
+            ends[i] < starts[i + 1] for i in range(len(starts) - 1)
+        ):
+            raise AssignNotebookFormatException('Unclosed "```otter" block', None, cell_idx)
+
+        def add_cell(source, cell_type):
+            # Ignore whitespace-only cells.
+            if not any(l.strip() for l in source):
+                return
+            factory = getattr(nbformat.v4, f"new_{cell_type}_cell")
+            new_cells.append(factory("\n".join(source)))
+
+        for idx in range(len(starts)):
+            i, j = starts[idx], ends[idx]
+
+            begin, end = 0, len(source) + 1
+            if idx > 0:
+                begin = ends[idx - 1] + 1
+            if idx < len(starts) - 1:
+                end = starts[idx + 1]
+
+            # If the line after the closing "```" is empty, skip it to prevent an extra newline
+            # between paragraphs after the block is removed.
+            after_start_offset = 1
+            if j + 1 < len(source) and not source[j + 1].strip():
+                after_start_offset = 2
+
+            if idx == 0:
+                # We only need to add the pre-block text if this is the first block, otherwise we will
+                # end up duplicating the between-block cells.
+                add_cell(source[begin:i], "markdown")
+            add_cell(source[i + 1 : j], "raw")
+            add_cell(source[j + after_start_offset : end], "markdown")
+
+    return new_cells
 
 
 def is_block_boundary_cell(

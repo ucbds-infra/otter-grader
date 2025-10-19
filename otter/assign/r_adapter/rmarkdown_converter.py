@@ -1,5 +1,6 @@
-"""Functions for converting Assign-formatted R Markdown files to and from notebook objects"""
+"""Functions for converting Assign-formatted RMarkdown and Quarto files to and from notebook objects"""
 
+import frontmatter
 import jupytext
 import nbformat as nbf
 import os
@@ -8,7 +9,6 @@ import re
 from copy import deepcopy
 
 from ..solutions import ANSWER_CELL_TAG, SOLUTION_CELL_TAG
-from ..utils import remove_tag
 from ...utils import get_source, NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
 
 
@@ -31,6 +31,9 @@ def read_as_notebook(rmd_path: str) -> nbf.NotebookNode:
     """
     with open(rmd_path) as f:
         lines = [l.strip("\n") for l in f.readlines()]
+
+    if os.path.splitext(rmd_path)[1] == ".qmd":
+        return _read_qmd(lines)
 
     new_lines = []
     in_comment = False
@@ -91,10 +94,20 @@ def read_as_notebook(rmd_path: str) -> nbf.NotebookNode:
     if in_comment:
         raise ValueError("R Markdown file ends with an unclosed HTML comment")
 
-    nb = jupytext.reads("\n".join(new_lines), "Rmd", as_version=NBFORMAT_VERSION)
+    fmt = "Rmd"  # os.path.splitext(rmd_path)[1][1:]  # trim leading "."
+    nb = jupytext.reads("\n".join(new_lines), fmt, as_version=NBFORMAT_VERSION)
     nb["metadata"]["kernelspec"] = {"language": "r"}
 
     return nb
+
+
+def _read_qmd(lines):
+    # Update frontmatter so Quarto knows to create an R notebook.
+    post = frontmatter.loads("\n".join(lines))
+    post["jupyter"] = "ir"
+    return jupytext.reads(
+        frontmatter.dumps(post, sort_keys=False), "quarto", as_version=NBFORMAT_VERSION
+    )
 
 
 def write_as_rmd(nb: nbf.NotebookNode, rmd_path: str, has_solutions: bool):
@@ -106,8 +119,8 @@ def write_as_rmd(nb: nbf.NotebookNode, rmd_path: str, has_solutions: bool):
         rmd_path (``str``): the path at which to write the R Markdown file
         has_solutions (``bool``): whether the provided notebook is an autograder notebook
     """
-    if os.path.splitext(rmd_path)[1] != ".Rmd":
-        raise ValueError("The provided path does not have the .Rmd extension")
+    if os.path.splitext(rmd_path)[1] not in {".Rmd", ".qmd"}:
+        raise ValueError("The provided path does not have the .Rmd or .qmd extension")
 
     nb = deepcopy(nb)
 
@@ -131,12 +144,37 @@ def write_as_rmd(nb: nbf.NotebookNode, rmd_path: str, has_solutions: bool):
             ):
                 cell["metadata"]["lines_to_next_cell"] = 0
 
-    # add assignment name to Rmd metadata if necessary
+    # add assignment name to frontmatter if necessary
     assignment_name = nb["metadata"].get(NOTEBOOK_METADATA_KEY, {}).get("assignment_name", None)
     if assignment_name:
         config_cell = nb["cells"][0]
         source = get_source(config_cell)
-        source.insert(-1, f'assignment_name: "{assignment_name}"')
+        for i in range(-1, -len(source), -1):
+            if source[i].strip() == "---":
+                break
+        source.insert(i, f'assignment_name: "{assignment_name}"')
         config_cell["source"] = "\n".join(source)
 
-    jupytext.write(nb, rmd_path)
+    if os.path.splitext(rmd_path)[1] == ".Rmd":
+        jupytext.write(nb, rmd_path)
+        return
+
+    # Remove jupyter metadata from frontmatter for qmd files
+    out = jupytext.writes(nb, "qmd").split("\n")
+    start, end = None, None
+    for i, l in enumerate(out):
+        if l.strip() == "jupyter:":
+            start = i
+        # Stop at first line that does not have leading whitespace (i.e. is outside of the jupyter
+        # frontmatter block).
+        elif start is not None and l.lstrip() == l:
+            end = i
+            break
+
+    if (start is not None) ^ (end is not None):
+        raise ValueError("Failed to strip Jupyter metadata from Quarto output")
+    elif start is not None and end is not None:
+        out = out[:start] + out[end:]
+
+    with open(rmd_path, "w+") as f:
+        f.write("\n".join(out))

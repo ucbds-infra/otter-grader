@@ -1,6 +1,7 @@
 """Autograder runner for R assignments"""
 
 import copy
+import frontmatter
 import nbformat as nbf
 import os
 import re
@@ -15,15 +16,10 @@ from .abstract_runner import AbstractLanguageRunner
 from ..utils import OtterRuntimeError
 from ....export import export_notebook
 from ....test_files import GradingResults
-from ....utils import chdir, get_source, knit_rmd_file, NBFORMAT_VERSION
+from ....utils import chdir, get_source, knit_rmd_file, NBFORMAT_VERSION, qmd_to_pdf
 
 
-R_PACKAGES = {
-    "knitr": importr("knitr"),
-    "ottr": importr("ottr"),
-}
-
-RMD_YAML_REGEX = r"^\n*---\n([\s\S]+?)\n---"
+_OTTR = importr("ottr")
 
 
 class RRunner(AbstractLanguageRunner):
@@ -38,14 +34,12 @@ class RRunner(AbstractLanguageRunner):
             nb = nbf.read(submission_path, as_version=nbf.NO_CONVERT)
             assignment_name = self.get_notebook_assignment_name(nb)
 
-        elif ext == ".rmd":
-            assignment_name = None
-            with open(submission_path) as f:
-                rmd = f.read()
-            config = re.match(RMD_YAML_REGEX, rmd)
-            if config:
-                config = config.group(1)
-                assignment_name = yaml.full_load(config).get("assignment_name", None)
+        elif ext == ".rmd" or ext == ".qmd":
+            post = frontmatter.load(submission_path)
+            assignment_name = post.get("assignment_name", None)
+
+        else:
+            raise ValueError(f"Unexpected submission path extension: {ext}")
 
         if assignment_name is not False:
             self.validate_assignment_name(assignment_name)
@@ -58,7 +52,7 @@ class RRunner(AbstractLanguageRunner):
         for cell in nb["cells"]:
             if cell["cell_type"] == "code":
                 source = "\n".join(get_source(cell))
-                valid_syntax = R_PACKAGES["ottr"].valid_syntax(source)[0]
+                valid_syntax = _OTTR.valid_syntax(source)[0]
                 if valid_syntax:
                     new_cells.append(cell)
         nb = copy.deepcopy(nb)
@@ -83,6 +77,11 @@ class RRunner(AbstractLanguageRunner):
             seed = f"{self.ag_config.seed_variable} = {self.ag_config.seed}"
 
         for i in insertions[::-1]:
+            # Put the seed on the first non-comment line; this prevents the seed from being inserted
+            # before Quarto cell metadata, which prevents it from being respected. (Esp. important
+            # for cells with "eval: false".)
+            while i + 1 < len(lines) and lines[i + 1].startswith("#"):
+                i += 1
             lines.insert(i + 1, seed)
 
         with open(rmd_path, "w") as f:
@@ -102,7 +101,7 @@ class RRunner(AbstractLanguageRunner):
 
     def resolve_submission_path(self) -> str:
         # create a temporary file at which to write a script if necessary
-        _, script_path = tempfile.mkstemp(suffix=".R")
+        script_fd, script_path = tempfile.mkstemp(suffix=".R")
 
         # convert IPYNB files to Rmd files
         nbs = glob("*.ipynb")
@@ -123,10 +122,10 @@ class RRunner(AbstractLanguageRunner):
             self.subm_path_deletion_required = True
             return script_path
 
-        # convert Rmd files to R files
-        rmds = glob("*.Rmd")
+        # convert Rmd/qmd files to R scripts
+        rmds = glob("*.[Rq]md")
         if len(rmds) > 1:
-            raise OtterRuntimeError("More than one Rmd file found in submission")
+            raise OtterRuntimeError("More than one Rmd or qmd file found in submission")
 
         elif len(rmds) == 1:
             rmd_path = rmds[0]
@@ -139,11 +138,22 @@ class RRunner(AbstractLanguageRunner):
 
             # create the R script
             rmd_path = os.path.abspath(rmd_path)
-            R_PACKAGES["knitr"].purl(rmd_path, script_path)
+            if os.path.splitext(rmd_path)[1] == ".Rmd":
+                importr("knitr").purl(rmd_path, script_path)
+            else:
+                # delete the script tempfile since quarto::qmd_to_r_script requires no file to exist
+                # at the output path
+                os.close(script_fd)
+                os.remove(script_path)
+                # use quarto::qmd_to_r_script for the conversion because it will ensure that cells
+                # marked with "eval: false" are commented out in the resulting script (precenting a
+                # fork bomb caused by ottr::export)
+                importr("quarto").qmd_to_r_script(rmd_path, script=script_path)
 
             self.subm_path_deletion_required = True
             return script_path
 
+        os.close(script_fd)
         os.remove(script_path)
 
         # get the R script
@@ -168,7 +178,7 @@ class RRunner(AbstractLanguageRunner):
             ipynb = True
 
         else:
-            rmds = glob("*.Rmd")
+            rmds = glob("*.[Rq]md")
             if rmds:
                 subm_path = rmds[0]
                 ipynb = False
@@ -186,6 +196,9 @@ class RRunner(AbstractLanguageRunner):
                 exporter_type="html" if self.ag_config.pdf_via_html else "latex",
             )
 
+        elif os.path.splitext(subm_path)[1] == ".qmd":
+            qmd_to_pdf(subm_path, pdf_path)
+
         else:
             knit_rmd_file(subm_path, pdf_path)
 
@@ -202,7 +215,7 @@ class RRunner(AbstractLanguageRunner):
             self.sanitize_tokens()
 
             subm_path = self.resolve_submission_path()
-            output = R_PACKAGES["ottr"].run_autograder(
+            output = _OTTR.run_autograder(
                 subm_path, ignore_errors=not self.ag_config.debug, test_dir="./tests"
             )[0]
             scores = GradingResults.from_ottr_json(output)

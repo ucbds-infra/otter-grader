@@ -4,9 +4,9 @@ channels:
   - conda-forge
   - r
 dependencies:
-  - python=3.9
+  - python=3.10
   - pip
-  - nb_conda_kernels
+  - jupyter_server
   - gcc_linux-64
   - gxx_linux-64
   - libgit2
@@ -23,6 +23,7 @@ dependencies:
   - r-stringi
   - r-testthat
   - r-usethis
-  - r-ottr==1.5.0
+  - r-ottr==1.5.2
+  - rpy2
   - pip:
-      - otter-grader[grading,plugins,r]==6.1.6
+      - otter-grader[grading,plugins]==6.1.6

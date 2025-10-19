@@ -1,0 +1,5 @@
+#!/bin/bash
+export PATH=/root/miniforge3/bin:$PATH
+eval "$(mamba shell hook --shell bash)"
+mamba activate otter-env
+python /autograder/source/run_otter.py

@@ -1,0 +1,29 @@
+name: otter-env
+channels:
+  - defaults
+  - conda-forge
+  - r
+dependencies:
+  - python=3.13
+  - pip
+  - jupyter_server
+  - gcc_linux-64
+  - gxx_linux-64
+  - libgit2
+  - libgomp
+  - liblzma-devel
+  - zlib-devel-amzn2-aarch64
+  - zlib
+  - r-base>=4.0.0
+  - r-devtools
+  - r-essentials
+  - r-gert
+  - r-rmarkdown
+  - r-startup
+  - r-stringi
+  - r-testthat
+  - r-usethis
+  - r-ottr==1.5.2
+  - rpy2
+  - pip:
+      - otter-grader[grading,plugins]==6.1.6

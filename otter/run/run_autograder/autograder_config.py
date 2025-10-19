@@ -174,7 +174,7 @@ class AutograderConfig(fica.Config):
 
     pdf_via_html: bool = fica.Key(
         description="use the PDF via HTML exporter to export the submission PDF; ignored for Rmd "
-        "submissions",
+        "or qmd submissions",
         default=False,
     )
 

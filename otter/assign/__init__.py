@@ -12,7 +12,7 @@ from .utils import run_generate_autograder, run_tests, write_otter_config_file
 from .. import logging
 from ..export import export_notebook
 from ..plugins import PluginCollection
-from ..utils import chdir, get_relpath, knit_rmd_file
+from ..utils import chdir, get_relpath, knit_rmd_file, qmd_to_pdf
 
 
 __all__ = ["Assignment", "main"]
@@ -108,6 +108,13 @@ def main(
                     exporter_type="html",
                 )
                 LOGGER.debug("PDF via HTML export successful")
+
+            elif assignment.is_quarto:
+                LOGGER.debug(f"Exporting {src} to {dst}")
+                if filtering:
+                    raise ValueError("Filtering is not supported with Quarto assignments")
+
+                qmd_to_pdf(src, dst)
 
             else:
                 LOGGER.debug(f"Knitting {src} to {dst}")

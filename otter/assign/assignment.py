@@ -308,9 +308,18 @@ class Assignment(fica.Config, Loggable):
     @property
     def is_rmd(self):
         """
-        Whether the input file is an RMarkdown document
+        Whether the input file is an RMarkdown *OR* Quarto document
         """
-        return self.master.suffix.lower() == ".rmd"
+        ext = self.master.suffix.lower()
+        return ext == ".rmd" or ext == ".qmd"
+
+    @property
+    def is_quarto(self):
+        """
+        Whether the input file is a Quarto document
+        """
+        ext = self.master.suffix.lower()
+        return ext == ".qmd"
 
     @property
     def generate_enabled(self) -> bool:

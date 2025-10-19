@@ -105,7 +105,7 @@ extension exposes a hook that ``ottr::export`` uses by running JavaScript to sav
 
     ottr::export("hw01.ipynb", force_save=TRUE)
 
-Force saving is not supported for Rmd files, and the argument is ignored if used when not running
+Force saving is not supported for Rmd or Quarto files, and the argument is ignored if used when not running
 on Jupyter.
 
 

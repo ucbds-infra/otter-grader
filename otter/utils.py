@@ -1,5 +1,6 @@
 """Various utilities for Otter-Grader"""
 
+import frontmatter
 import nbformat
 import os
 import pathlib
@@ -247,6 +248,39 @@ def knit_rmd_file(rmd_path: str, pdf_path: str):
         pdf_path = os.path.abspath(pdf_path)
         rmarkdown = importr("rmarkdown")
         rmarkdown.render(ntf.name, "pdf_document", pdf_path)
+
+
+def qmd_to_pdf(qmd_path: str, pdf_path: str):
+    """
+    Use ``rpy2`` and ``quarto::quarto_render`` to knit a Quarto file to a PDF, allowing errors.
+
+    Args:
+        qmd_path (``str``): the path to the Rmd file
+        pdf_path (``str``): the path at which to write the PDF
+    """
+    from rpy2.robjects import ListVector
+    from rpy2.robjects.packages import importr
+
+    with tempfile.TemporaryDirectory() as td:
+        # Copy the qmd file to a temporary directory so that Quarto doesn't overwrite anything in
+        # the source directory when it generates the PDF (since it always writes the output file to
+        # the same directory as the input file).
+        in_file = os.path.join(td, os.path.split(qmd_path)[1])
+        shutil.copy(qmd_path, in_file)
+
+        _, pdf_name = os.path.split(os.path.abspath(pdf_path))
+        quarto = importr("quarto")
+        quarto.quarto_render(
+            in_file,
+            output_format="pdf",
+            output_file=pdf_name,
+            # Update frontmatter to allow errors during execution.
+            metadata=ListVector({"execute": ListVector({"error": True})}),
+        )
+
+        # Quarto writes the output to the same directory that contains the input, so move the PDF
+        # from td to the desired location.
+        os.rename(os.path.join(td, pdf_name), pdf_path)
 
 
 class _CorrectIndentationDumper(yaml.Dumper):
