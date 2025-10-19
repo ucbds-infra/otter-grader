@@ -99,7 +99,7 @@ lieu of a path to a `requirements.txt` file; for exmaple:
 
 This structure is also compatible with the `overwrite_requirements` key.
 
-By default, Otter's grading images uses Python 3.9. If you need a different version, you can
+By default, Otter's grading images uses Python 3.14. If you need a different version, you can
 specify one using the ``python_version`` config:
 
 .. code-block:: yaml

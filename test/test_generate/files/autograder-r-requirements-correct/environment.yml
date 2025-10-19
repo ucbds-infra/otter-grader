@@ -4,7 +4,7 @@ channels:
   - conda-forge
   - r
 dependencies:
-  - python=3.12
+  - python=3.14
   - pip
   - jupyter_server
   - gcc_linux-64

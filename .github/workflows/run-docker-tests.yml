@@ -50,7 +50,7 @@ jobs:
         with:
           environment-file: environment.yml
           create-args: >-
-            python=3.9
+            python=3.13
           init-shell: >-
             bash
           cache-environment: true
