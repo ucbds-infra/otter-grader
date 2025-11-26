@@ -552,12 +552,14 @@ def test_rmd(load_config, expected_rmd_results):
                     q1 - 2 result:
 
                     q1 - 3 result:
-                        `x` not equal to 2.
+                        Expected `x` to equal 2.
+                        Differences:
                         1/1 mismatches
                         [1] 50 - 2 == 48
 
                     q1d result:
-                        as.character(x) not equal to "2".
+                        Expected `as.character(x)` to equal "2".
+                        Differences:
                         1/1 mismatches
                         x[1]: "50"
                         y[1]: "2"
