@@ -129,3 +129,19 @@ def test_load_notebook():
     assert filecmp.cmp(
         FILE_MANAGER.get_path("output.ipynb"), FILE_MANAGER.get_path(f"correct/{test_file}.ipynb")
     )
+
+
+def test_different_language_encoding(pdfs_enabled):
+    """
+    Tests that a notebook with non-UTF-8 characters can be exported
+    """
+    test_file = "different-language-encoding-test"
+    run_export(
+        FILE_MANAGER.get_path(f"{test_file}.ipynb"),
+        filtering=False,
+        exporter="html",
+        save=True,
+    )
+
+    # check existence of pdf
+    FILE_MANAGER.assert_path_exists(FILE_MANAGER.get_path(f"{test_file}.pdf"), dir_okay=False)

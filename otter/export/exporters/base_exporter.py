@@ -68,7 +68,7 @@ class BaseExporter(ABC):
         Returns:
             ``nbformat.NotebookNode``: the parsed and (optionally) filtered notebook
         """
-        with open(nb_path) as f:
+        with open(nb_path, encoding="utf-8") as f:
             notebook = nbformat.read(f, as_version=NBFORMAT_VERSION)
         if filtering:
             notebook = cls.filter_cells(notebook, pagebreaks=pagebreaks)
