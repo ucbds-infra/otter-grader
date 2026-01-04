@@ -61,7 +61,7 @@ class PDFViaHTMLExporter(BaseExporter):
         pdf_path = os.path.splitext(dest)[0] + ".pdf"
         with open(pdf_path, "wb+") as f:
             if isinstance(pdf, str):
-                f.write(pdf.encode('utf-8'))
+                f.write(pdf.encode("utf-8"))
             else:
                 f.write(pdf)
 
