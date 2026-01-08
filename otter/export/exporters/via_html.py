@@ -60,6 +60,9 @@ class PDFViaHTMLExporter(BaseExporter):
 
         pdf_path = os.path.splitext(dest)[0] + ".pdf"
         with open(pdf_path, "wb+") as f:
-            f.write(pdf)
+            if isinstance(pdf, str):
+                f.write(pdf.encode("utf-8"))
+            else:
+                f.write(pdf)
 
         nbconvert.TemplateExporter.template_name = orig_template_name
