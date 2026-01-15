@@ -92,7 +92,7 @@ Otter Grade has only one required flag, the ``-n`` flag for the assignment name 
     otter grade -n hw01 *.ipynb
 
 Because our configuration file is at ``./autograder.zip``, and we don't mind output to ``./``, we
-can use the defualt values of the ``-a`` and ``-o`` flags. This leaves only ``-n`` and the
+can use the default values of the ``-a`` and ``-o`` flags. This leaves only ``-n`` and the
 submission paths as the required arguments.
 
 Note that the submission path(s) can also be specified as directories, in which case the ``--ext``

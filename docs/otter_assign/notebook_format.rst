@@ -650,7 +650,7 @@ fully-qualified importable string that evaluates to a plugin that inherits from
 There are two optional configurations: ``args`` and ``kwargs``. ``args`` should be a list of 
 additional arguments to pass to the plugin. These will be left unquoted as-is, so you can pass 
 variables in the notebook to the plugin just by listing them. ``kwargs`` should be a dictionary that 
-mappins keyword argument names to values; thse will also be added to the call in ``key=value`` 
+mapping keyword argument names to values; these will also be added to the call in ``key=value`` 
 format.
 
 Here is an example of plugin replacement in Otter Assign:

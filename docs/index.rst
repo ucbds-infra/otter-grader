@@ -29,14 +29,14 @@ any scale by abstracting away the autograding internals in a way that is compati
 instructor's assignment distribution and collection pipeline. Otter supports local grading through 
 parallel Docker containers, grading using the autograding platforms of 3rd-party learning management 
 systems (LMSs), non-containerized grading on an instructor's machine, and a client package 
-that allows students to check and instructors to grade assignments their own machines. Otter is 
+that allows students to check and instructors to grade assignments on their own machines. Otter is 
 designed to grade Python and R executables, Jupyter Notebooks, and RMarkdown documents and is 
 compatible with a few different LMSs, including Canvas and Gradescope.
 
 The core abstraction of Otter, as compared to other autograders like nbgrader_ and OkPy_, is this:
-you provide the compute, and Otter takes care of the rest. All a instructor needs to do in order to 
+you provide the compute, and Otter takes care of the rest. All an instructor needs to do in order to 
 autograde is find a place to run Otter (a server, a JupyterHub, their laptop, etc.) and Otter will
-take care of generating assignments and tests, creating and managing grading environents, and 
+take care of generating assignments and tests, creating and managing grading environments, and 
 grading submissions. Otter is platform-agnostic, allowing you to put and grade your assignments 
 anywhere you want.
 
@@ -48,10 +48,10 @@ each with a command-line interface:
 
 * :ref:`Otter Assign <otter_assign>` is an assignment development and distribution tool that 
   allows instructors to create assignments with prompts, solutions, and tests in a simple notebook 
-  format that it then converts into santized versions for distribution to students and autograders.
+  format that it then converts into sanitized versions for distribution to students and autograders.
 * :ref:`Otter Generate <workflow_otter_generate>` creates the necessary setup files so that 
   instructors can autograde assignments.
-* :ref:`Otter Check <otter_check>` allows students to run publically distributed tests written 
+* :ref:`Otter Check <otter_check>` allows students to run publicly distributed tests written 
   by instructors against their solutions as they work through assignments to verify their thought 
   processes and implementations.
 * :ref:`Otter Export <pdfs>` generates PDFs with optional filtering of Jupyter Notebooks for manually 

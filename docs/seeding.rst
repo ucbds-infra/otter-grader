@@ -157,7 +157,7 @@ loaded by the autograder and provided in the global environment that the script 
 Caveats
 --------
 
-Remekber, when writing assignments or using assignment generation tools like Otter Assign, the instructor 
+Remember, when writing assignments or using assignment generation tools like Otter Assign, the instructor 
 must **seed the solutions themselves** before writing hidden tests in order to ensure they are 
 grading the correct values. Also, students will not have access to the random seed, so any values 
 they compute in the notebook may be different from the results of their submission when it is run 
