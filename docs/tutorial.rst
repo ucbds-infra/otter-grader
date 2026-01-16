@@ -35,7 +35,7 @@ covers Otter Assign, Otter Generate, and Otter Grade.
 Otter Assign
 ------------
 
-Start by moving into the ``tutorial`` directrory. This directory includes the master notebook 
+Start by moving into the ``tutorial`` directory. This directory includes the master notebook 
 ``demo.ipynb``. Look over this notebook to get an idea of its structure. It contains five questions, 
 four code and one Markdown (two of which are manually-graded). Also note that the assignment 
 configuration in the first cell tells Otter Assign to generate a solutions PDF and an 
