@@ -48,5 +48,5 @@ jobs:
 
       - name: Run formatters
         run: |
-          source .venv/bin/active
+          source .venv/bin/activate
           make format CI=true
