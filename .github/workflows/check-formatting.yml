@@ -43,6 +43,7 @@ jobs:
         run: |
           python -m venv .venv
           source .venv/bin/activate
+          poetry env info
           poetry install --with dev --no-root
 
       - name: Run formatters
