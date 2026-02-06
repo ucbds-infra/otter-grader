@@ -41,9 +41,11 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python -m venv .venv
+          source .venv/bin/activate
           poetry install --with dev --no-root
 
       - name: Run formatters
         run: |
-          source .venv/bin/activate
+          source .venv/bin/active
           make format CI=true
