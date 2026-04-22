@@ -11,13 +11,26 @@ apt-get install -y libnlopt-dev cmake libfreetype6-dev libpng-dev libtiff5-dev l
     build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese \
     libxft-dev
 
+# Detect archtecture
+if [ $(uname -m) != "unknown" ]; then
+    ARCH=$(uname -m)
+else
+    ARCH=$(uname -p)
+fi
+
 # install pandoc
-wget -nv https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-1-amd64.deb \
-    -O /tmp/pandoc.deb
-dpkg -i /tmp/pandoc.deb
+if [ "$ARCH" = "aarch64" || "$ARCH" = "arm" ]; then
+    wget -nv https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-1-arm64.deb \
+        -O /tmp/pandoc.deb
+    dpkg -i /tmp/pandoc.deb
+else
+    wget -nv https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-1-amd64.deb \
+        -O /tmp/pandoc.deb
+    dpkg -i /tmp/pandoc.deb
+endif
 
 # install mamba
-if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
+if [ "$ARCH" = "arm" ] || [ "$ARCH" = "aarch64" ] ; \
     then wget -nv https://github.com/conda-forge/miniforge/releases/download/{{ miniforge_version }}/Miniforge3-Linux-aarch64.sh \
         -O {{ autograder_dir }}/source/mamba_install.sh ; \
     else wget -nv https://github.com/conda-forge/miniforge/releases/download/{{ miniforge_version }}/Miniforge3-Linux-x86_64.sh \
