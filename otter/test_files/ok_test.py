@@ -4,6 +4,7 @@ import doctest
 import io
 import os
 import pathlib
+import re
 
 from contextlib import redirect_stderr, redirect_stdout
 from textwrap import dedent
@@ -11,6 +12,38 @@ from typing import Any
 
 from .abstract_test import TestCase, TestCaseResult, TestFile
 from ..utils import hide_outputs
+
+
+class _NumpyBoolOutputChecker(doctest.OutputChecker):
+    """Normalize numpy 2.x boolean reprs before string comparison.
+
+    numpy 2.0 changed repr(np.bool_) from 'True'/'False' to
+    'np.True_'/'np.False_'. This checker normalizes those forms in the actual
+    output so that test cases written with plain 'True'/'False' continue to
+    pass against numpy 2.x.
+    """
+
+    _NORM = [
+        (re.compile(r"\bnp\.True_\b"), "True"),
+        (re.compile(r"\bnp\.False_\b"), "False"),
+    ]
+
+    def _normalize(self, s: str) -> str:
+        for pattern, replacement in self._NORM:
+            s = pattern.sub(replacement, s)
+        return s
+
+    def check_output(self, want: str, got: str, optionflags: int) -> bool:
+        if super().check_output(want, got, optionflags):
+            return True
+        return super().check_output(want, self._normalize(got), optionflags)
+
+    def output_difference(
+        self, example: doctest.Example, got: str, optionflags: int
+    ) -> str:
+        return super().output_difference(
+            example, self._normalize(got), optionflags
+        )
 
 
 def run_doctest(
@@ -39,7 +72,9 @@ def run_doctest(
         doctest_string,
     )
 
-    doctestrunner = doctest.DocTestRunner(verbose=True)
+    doctestrunner = doctest.DocTestRunner(
+        verbose=True, checker=_NumpyBoolOutputChecker()
+    )
 
     run_results = io.StringIO()
     with redirect_stdout(run_results), redirect_stderr(run_results), hide_outputs():
