@@ -3,7 +3,7 @@
 **v7.0.0 (Unreleased):**
 
 * Remove support for Python 3.9
-* Set default Python version for grading images to 3.14
+* Set default Python version for grading images to 3.13
 
 **v6.1.6:**
 
