@@ -21,7 +21,7 @@ from ..utils import dump_yaml, load_default_file, OTTER_CONFIG_FILENAME
 from ..version import __version__
 
 
-DEFAULT_PYTHON_VERSION = "3.12"
+DEFAULT_PYTHON_VERSION = "3.13"
 JINJA_ENV = Environment(loader=PackageLoader(__name__), keep_trailing_newline=True)
 MINIFORGE_VERSION = "25.3.1-0"
 OTTER_ENV_NAME = "otter-env"

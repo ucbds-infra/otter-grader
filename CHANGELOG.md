@@ -1,5 +1,10 @@
 # Changelog
 
+**v7.0.0 (Unreleased):**
+
+* Remove support for Python 3.9
+* Set default Python version for grading images to 3.13
+
 **v6.1.6:**
 
 * Fix R grading image builds by updating grading image to install rpy2 from conda-forge instead of using the `otter-grader[r]` extra per [#947](https://github.com/ucbds-infra/otter-grader/issues/947)
