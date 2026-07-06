@@ -204,10 +204,21 @@ class RRunner(AbstractLanguageRunner):
 
         return pdf_path
 
+    def _check_ottr_version(self):
+        if glob("*.qmd"):
+            # Require ottr>=1.6.0 for qmd submissions
+            version = importr("utils").packageVersion("ottr")[0]
+            if version[0] <= 1 and version[1] < 6:
+                raise ValueError(
+                    f"Grading qmd files requires ottr>=1.6.0 but found version {'.'.join(str(i) for i in version)}"
+                )
+
     def run(self):
         os.environ["PATH"] = f"{self.ag_config.miniconda_path}/bin:" + os.environ.get("PATH", "")
 
         with chdir("./submission"):
+            self._check_ottr_version()
+
             pdf_error = None
             if self.pdf_enabled:
                 pdf_error = self.write_and_maybe_submit_pdf(None)

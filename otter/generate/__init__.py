@@ -25,7 +25,7 @@ DEFAULT_PYTHON_VERSION = "3.13"
 JINJA_ENV = Environment(loader=PackageLoader(__name__), keep_trailing_newline=True)
 MINIFORGE_VERSION = "25.3.1-0"
 OTTER_ENV_NAME = "otter-env"
-OTTR_VERSION = "1.5.2"
+OTTR_VERSION = "1.6.0"
 TEMPLATE_DIR = importlib.resources.files(__name__) / "templates"
 
 
