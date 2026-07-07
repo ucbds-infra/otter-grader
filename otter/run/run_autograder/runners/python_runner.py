@@ -97,7 +97,7 @@ class PythonRunner(AbstractLanguageRunner):
                 plugin_collection.run("before_grading", self.ag_config)
 
             pdf_error = None
-            if self.ag_config.token is not None or self.ag_config.pdf:
+            if self.pdf_enabled:
                 pdf_error = self.write_and_maybe_submit_pdf(subm_path)
 
             self.sanitize_tokens()
