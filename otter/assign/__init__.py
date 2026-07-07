@@ -58,7 +58,10 @@ def main(
 
     with chdir(assignment.master.parent):
         LOGGER.info("Generating views")
-        write_output_directories(assignment)
+        any_tests = write_output_directories(assignment)
+
+        if not assignment.suppress_no_tests_warning and not any_tests:
+            LOGGER.warning("No autograded tests were found in the assignment")
 
         # update seed variables
         if assignment.seed.variable:
@@ -82,8 +85,9 @@ def main(
             LOGGER.debug("Adding plugin configurations to Otter Generate configuration")
             assignment.generate.plugins = assignment.generate.plugins + plugins
 
-        LOGGER.info("Generating autograder zipfile")
-        run_generate_autograder(assignment, username, password, plugin_collection=pc)
+        if assignment.generate_enabled:
+            LOGGER.info("Generating autograder zipfile")
+            run_generate_autograder(assignment, username, password, plugin_collection=pc)
 
         # generate PDF of solutions
         if assignment.solutions_pdf and not no_pdfs:
@@ -150,7 +154,7 @@ def main(
                 write_otter_config_file(assignment)
 
         # run tests on autograder notebook
-        if assignment.run_tests and not no_run_tests:
+        if assignment.run_tests and not no_run_tests and any_tests:
             LOGGER.info("Running tests against the solutions notebook")
 
             run_tests(assignment, debug=debug)

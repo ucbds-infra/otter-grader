@@ -113,15 +113,17 @@ def is_assignment_config_cell(cell: nbformat.NotebookNode) -> bool:
     return is_cell_type(cell, "raw") and bool(re.match(regex, source[0], flags=re.IGNORECASE))
 
 
-def get_cell_config(cell: nbformat.NotebookNode) -> dict[str, Any]:
+def get_cell_config(cell: nbformat.NotebookNode) -> Any:
     """
-    Parse a cell's contents as YAML and return the resulting dictionary.
+    Parse a cell's contents as YAML and return the result.
+
+    Does not check whether the result is a dictionary.
 
     Args:
         cell (``nbformat.NotebookNode``): the cell to check
 
     Returns:
-        ``dict[str, object]``: the parsed configurations
+        ``object``: the parsed configurations
 
     Raises:
         ``TypeError``: if parsing the YAML does not return a dictionary
@@ -130,6 +132,4 @@ def get_cell_config(cell: nbformat.NotebookNode) -> dict[str, Any]:
     config = yaml.full_load("\n".join(source))
     if config is None:
         config = {}
-    if not isinstance(config, dict):
-        raise TypeError(f"Found a begin cell configuration that is not a dictionary: {cell}")
     return config

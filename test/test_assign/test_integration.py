@@ -290,3 +290,15 @@ def test_require_no_pdf_ack_with_message(generate_master_notebook):
         FILE_MANAGER.get_path("no-pdf-ack-with-message-correct"),
         assert_dirs_equal_kwargs=dict(variable_path_exts=[".zip"]),
     )
+
+
+def test_lecture_notebook():
+    """
+    Checks that otter assign generates "lecture notebooks" correctly
+
+    See: https://github.com/ucbds-infra/otter-grader/issues/980
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("lecture-notebook.ipynb"),
+        FILE_MANAGER.get_path("lecture-notebook-correct"),
+    )

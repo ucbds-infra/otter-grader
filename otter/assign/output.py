@@ -99,12 +99,15 @@ def write_output_dir(
             shutil.copy(file, str(output_dir / rel_path))
 
 
-def write_output_directories(assignment: Assignment):
+def write_output_directories(assignment: Assignment) -> bool:
     """
     Process a master notebook and write the results to the output directories.
 
     Args:
         assignment (``otter.assign.assignment.Assignment``): the assignment config
+
+    Returns:
+        ``bool``: whether there are any autograded questions
     """
     if assignment.is_rmd:
         nb = rmarkdown_converter.read_as_notebook(assignment.master)
@@ -139,3 +142,5 @@ def write_output_directories(assignment: Assignment):
 
     # print assignment summary
     LOGGER.info(nb_transformer.tests_mgr.generate_assignment_summary())
+
+    return tests_mgr.any_tests()
