@@ -222,7 +222,15 @@ def strip_solutions_and_output(assignment: Assignment, nb: nbf.NotebookNode) -> 
 
     del_md_solutions = []
     for i, cell in enumerate(nb["cells"]):
-        if has_tag(cell, SOLUTION_CELL_TAG):
+        if assignment.strip_solutions_from_all_cells:
+            # In this mode, apply solution stripping to all code cells but only remove Markdown cells
+            # that are marked as solutions.
+            if is_cell_type(cell, "code"):
+                cell["source"] = "\n".join(replace_solutions(get_source(cell), assignment.lang))
+            elif is_cell_type(cell, "markdown") and has_tag(cell, SOLUTION_CELL_TAG):
+                del_md_solutions.append(i)
+
+        elif has_tag(cell, SOLUTION_CELL_TAG):
             if is_cell_type(cell, "code"):
                 cell["source"] = "\n".join(replace_solutions(get_source(cell), assignment.lang))
             elif is_cell_type(cell, "markdown"):

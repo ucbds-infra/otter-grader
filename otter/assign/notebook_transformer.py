@@ -18,6 +18,7 @@ from .r_adapter.cell_factory import RCellFactory
 from .solutions import (
     ANSWER_CELL_TAG,
     has_seed,
+    OTTER_INCLUDE_TAG,
     overwrite_seed_vars,
     SOLUTION_CELL_TAG,
     strip_ignored_lines,
@@ -299,7 +300,7 @@ class NotebookTransformer:
                     question_config = get_cell_config(cell)
                     if not isinstance(question_config, dict):
                         raise AssignNotebookFormatException(
-                            "Found a begin question cell with no config", None, i
+                            "Found a begin question cell with an invalid config", None, i
                         )
 
                     question = QuestionConfig(question_config)
