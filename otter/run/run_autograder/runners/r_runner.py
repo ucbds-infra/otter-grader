@@ -196,7 +196,7 @@ class RRunner(AbstractLanguageRunner):
 
         with chdir("./submission"):
             pdf_error = None
-            if self.ag_config.token is not None or self.ag_config.pdf:
+            if self.pdf_enabled:
                 pdf_error = self.write_and_maybe_submit_pdf(None)
 
             self.sanitize_tokens()

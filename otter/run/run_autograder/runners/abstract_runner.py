@@ -90,6 +90,13 @@ class AbstractLanguageRunner(ABC):
         nbmc = NBMetadataConfig.from_notebook(nb)
         return nbmc.assignment_name
 
+    @property
+    def pdf_enabled(self) -> bool:
+        """Whether ``write_and_maybe_submit_pdf`` should be called."""
+        # IMPORTANT: This logic must be kept in-sync with the logic that determines whether to install
+        # PDF generation dependencies in the setup.sh templates.
+        return self.ag_config.token is not None or self.ag_config.pdf
+
     def write_and_maybe_submit_pdf(self, submission_path: str) -> Optional[Exception]:
         """
         Upload a PDF to a Gradescope assignment for manual grading.
