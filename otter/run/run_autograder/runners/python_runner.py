@@ -122,7 +122,7 @@ class PythonRunner(AbstractLanguageRunner):
 
             scores = grade_notebook(
                 subm_path,
-                tests_glob=glob("./tests/*.py"),
+                tests_glob=sorted(glob("./tests/*.py")),
                 cwd=os.getcwd(),
                 test_dir="./tests",
                 ignore_errors=not self.ag_config.debug,
