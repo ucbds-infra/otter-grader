@@ -36,7 +36,7 @@ export PATH=/root/miniforge3/bin:$PATH
 export TAR="/bin/tar"
 
 # install dependencies with mamba
-mamba config --set channel_priority strict
+mamba config set channel_priority strict
 mamba env create -f /autograder/source/environment.yml
 mamba install -n otter-env -c conda-forge nb_conda_kernels
 mamba run -n otter-env bash -c "playwright install-deps && playwright install chromium"
