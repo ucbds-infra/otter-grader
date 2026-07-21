@@ -6,13 +6,26 @@ apt-get update
 apt-get install -y wget texlive-xetex texlive-fonts-recommended texlive-plain-generic \
     build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev libgit2-dev texlive-lang-chinese
 
+# Detect archtecture
+if [ $(uname -m) != "unknown" ]; then
+    ARCH=$(uname -m)
+else
+    ARCH=$(uname -p)
+fi
+
 # install pandoc
-wget -nv https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-1-amd64.deb \
-    -O /tmp/pandoc.deb
-dpkg -i /tmp/pandoc.deb
+if [ "$ARCH" = "aarch64" || "$ARCH" = "arm" ]; then
+    wget -nv https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-1-arm64.deb \
+        -O /tmp/pandoc.deb
+    dpkg -i /tmp/pandoc.deb
+else
+    wget -nv https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-1-amd64.deb \
+        -O /tmp/pandoc.deb
+    dpkg -i /tmp/pandoc.deb
+fi
 
 # install mamba
-if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
+if [ "$ARCH" = "aarch64" || "$ARCH" = "arm" ] ; \
     then wget -nv https://github.com/conda-forge/miniforge/releases/download/{{ miniforge_version }}/Miniforge3-Linux-aarch64.sh \
         -O {{ autograder_dir }}/source/mamba_install.sh ; \
     else wget -nv https://github.com/conda-forge/miniforge/releases/download/{{ miniforge_version }}/Miniforge3-Linux-x86_64.sh \
