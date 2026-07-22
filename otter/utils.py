@@ -274,6 +274,7 @@ def qmd_to_pdf(qmd_path: str, pdf_path: str):
             in_file,
             output_format="pdf",
             output_file=pdf_name,
+            execute_dir=os.getcwd(),
             # Update frontmatter to allow errors during execution.
             metadata=ListVector({"execute": ListVector({"error": True})}),
         )
