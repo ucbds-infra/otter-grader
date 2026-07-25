@@ -4,6 +4,11 @@
 
 * Remove support for Python 3.9
 * Set default Python version for grading images to 3.13
+* Ensure that test globs are sorted per [#955](https://github.com/ucbds-infra/otter-grader/issues/955)
+* Fix suppression of image build failures on Gradescope per [#966](https://github.com/ucbds-infra/otter-grader/issues/966)
+* Add option to strip solutions from all cells to Otter Assign per [#980](https://github.com/ucbds-infra/otter-grader/issues/980)
+* Add a warning when there are no test cases in the assignment to Otter Assign per [#980](https://github.com/ucbds-infra/otter-grader/issues/980)
+* Updated grading images to only install pandoc and LaTeX if PDF generation is enabled per [#898](https://github.com/ucbds-infra/otter-grader/issues/898)
 
 **v6.1.6:**
 
