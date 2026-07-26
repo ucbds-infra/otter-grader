@@ -13,9 +13,9 @@ dpkg -i /tmp/pandoc.deb
 
 # install mamba
 if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
-    then wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh \
+    then wget -nv https://github.com/conda-forge/miniforge/releases/download//Miniforge3-Linux-aarch64.sh \
         -O /autograder/source/mamba_install.sh ; \
-    else wget -nv https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh \
+    else wget -nv https://github.com/conda-forge/miniforge/releases/download//Miniforge3-Linux-x86_64.sh \
         -O /autograder/source/mamba_install.sh ; \
 fi
 chmod +x /autograder/source/mamba_install.sh
@@ -27,7 +27,8 @@ export TAR="/bin/tar"
 
 # install dependencies with mamba
 mamba env create -f /autograder/source/environment.yml
-mamba run -n otter-env playwright install chromium
+mamba install -n otter-env -c conda-forge nb_conda_kernels
+mamba run -n otter-env bash -c "playwright install-deps && playwright install chromium"
 
 # set mamba shell
-mamba init --all
+mamba shell init --shell bash

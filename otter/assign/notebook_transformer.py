@@ -8,7 +8,13 @@ import pathlib
 from typing import Union
 
 from .assignment import Assignment
-from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
+from .blocks import (
+    BlockType,
+    extract_all_fenced_otter_cells,
+    get_cell_config,
+    is_assignment_config_cell,
+    is_block_boundary_cell,
+)
 from .cell_factory import CellFactory
 from .feature_toggle import FeatureToggle
 from .plugins import replace_plugins_with_calls
@@ -157,6 +163,8 @@ class NotebookTransformer:
         Returns:
             ``list[nbf.NotebookNode]``: the cells of the autograder notebook
         """
+        cells = extract_all_fenced_otter_cells(cells)
+
         curr_block: list[BlockType] = []  # allow nested blocks
         transformed_cells: list[nbf.NotebookNode] = []
 

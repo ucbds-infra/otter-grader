@@ -234,11 +234,6 @@ class Assignment(fica.Config, Loggable):
         default=True,
     )
 
-    exclude_conda_defaults: bool = fica.Key(
-        description="whether to exclude conda's defaults channel in the generated environment.yml file",
-        default=False,
-    )
-
     strip_solutions_from_all_cells: bool = fica.Key(
         description="whether to apply solution stripping to all cells, not just those in a SOLUTION block (does not apply to Markdown cells)",
         default=False,
@@ -308,9 +303,18 @@ class Assignment(fica.Config, Loggable):
     @property
     def is_rmd(self):
         """
-        Whether the input file is an RMarkdown document
+        Whether the input file is an RMarkdown *OR* Quarto document
         """
-        return self.master.suffix.lower() == ".rmd"
+        ext = self.master.suffix.lower()
+        return ext == ".rmd" or ext == ".qmd"
+
+    @property
+    def is_quarto(self):
+        """
+        Whether the input file is a Quarto document
+        """
+        ext = self.master.suffix.lower()
+        return ext == ".qmd"
 
     @property
     def generate_enabled(self) -> bool:

@@ -74,7 +74,7 @@ optional = true
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.0"
 matplotlib = "*"
-pytest = "^8.2.2"
+pytest = "^9.0.0"
 pytest-html = "*"
 responses = ">=0.25.3"
 tqdm = "*"

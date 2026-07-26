@@ -187,6 +187,27 @@ def test_rmd_example():
     )
 
 
+def test_qmd_example():
+    """
+    Checks that otter assign works for qmd files
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("qmd-example.qmd"),
+        FILE_MANAGER.get_path("qmd-correct"),
+        assert_dirs_equal_kwargs=dict(
+            ignore_ext=[".pdf"],
+            ignore_dirs=["qmd-example-sol_files"],
+            variable_path_exts=[".zip"],
+        ),
+    )
+
+    # check gradescope zip file
+    check_gradescope_zipfile(
+        glob(FILE_MANAGER.get_path("output/autograder/*.zip"))[0],
+        FILE_MANAGER.get_path("qmd-autograder-correct"),
+    )
+
+
 def test_point_value_rounding():
     """
     Tests that point values are rounded appropriately.

@@ -112,6 +112,7 @@ def assert_dirs_equal(
     ignore_dirs=[],
     variable_path_exts=[],
     ignore_log=False,
+    collector=None,
 ):
     """
     Assert that the contents of two directories are equal recursively.
@@ -126,6 +127,8 @@ def assert_dirs_equal(
         variable_path_exts(``list[str]``. optional): a list of extensions for paths whose stems
             may be different; if present, the number of files with these extensions is compared,
             although their contents and stems are ignored
+        collector (``list[str] | None``): collect failures in this list instead of raising an
+            exception; if ``None``, raise if the assertion fails
     """
     assert os.path.exists(output_dir), f"{output_dir} does not exist"
     assert os.path.exists(golden_dir), f"{golden_dir} does not exist"
@@ -133,11 +136,15 @@ def assert_dirs_equal(
         golden_dir
     ), f"{output_dir} and {golden_dir} have different type"
 
+    ok = True
     if os.path.isfile(output_dir):
         if os.path.splitext(output_dir)[1] not in ignore_ext and (
             not ignore_log or os.path.split(output_dir)[1] != OTTER_LOG_FILENAME
         ):
-            return check_files_equal(output_dir, golden_dir)
+            ok = check_files_equal(output_dir, golden_dir)
+            if not ok and collector is not None:
+                collector.append(output_dir)
+            return ok
 
     else:
         output_dir_contents, golden_dir_contents = (
@@ -169,7 +176,11 @@ def assert_dirs_equal(
                 [f for f in os.listdir(golden_dir) if os.path.splitext(f)[1] == ext]
             ), f"Variable path extension check failed for {output_dir} and {golden_dir} with ext {ext}"
 
+        # Catch AssertionErrors in the directory comparison and collect the failures in collector
+        # if specified.
         failures = []
+        if collector is not None:
+            failures = collector
         for f1, f2 in zip(output_dir_contents, golden_dir_contents):
             f1, f2 = os.path.join(output_dir, f1), os.path.join(golden_dir, f2)
             ok = assert_dirs_equal(
@@ -179,14 +190,14 @@ def assert_dirs_equal(
                 ignore_dirs=ignore_dirs,
                 variable_path_exts=variable_path_exts,
                 ignore_log=ignore_log,
+                collector=failures,
             )
-            if not ok:
-                failures.append(f1)
 
-        failures_list = "- " + "\n- ".join(failures)
-        assert not failures, f"{output_dir} has diff in files:\n{failures_list}"
+        if collector is None:
+            failures_list = "- " + "\n- ".join(failures)
+            assert not failures, f"{output_dir} has diff in files:\n{failures_list}"
 
-    return True
+    return ok
 
 
 def delete_paths(paths, error_if_absent=False):

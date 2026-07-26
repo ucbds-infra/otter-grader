@@ -187,11 +187,6 @@ defaults = generate.__kwdefaults__
     is_flag=True,
     help="Whether to set conda's channel_priority to strict in the setup.sh file",
 )
-@click.option(
-    "--exclude-conda-defaults",
-    is_flag=True,
-    help="Whether to exclude conda's defaults channel from the environment.yml file",
-)
 @click.argument("files", nargs=-1)
 def generate_cli(*args: Any, **kwargs: Any):
     """

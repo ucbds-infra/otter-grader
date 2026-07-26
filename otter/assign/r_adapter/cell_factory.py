@@ -18,7 +18,9 @@ class RCellFactory(CellFactory):
     def create_check_cells(self, question):
         cell = nbformat.v4.new_code_cell()
         cell.source = ['. = ottr::check("tests/{}.R")'.format(question.name)]
-        lock(cell)
+        # Lock cells for ipynb assignments.
+        if not self.assignment.is_rmd:
+            lock(cell)
         return [cell]
 
     def create_check_all_cells(self):
@@ -63,11 +65,18 @@ class RCellFactory(CellFactory):
         source_lines.append(f'ottr::export("{self.assignment.notebook_basename}"{args})')
         export.source = "\n".join(source_lines)
 
-        lock(instructions)
-        lock(export)
+        # For Quarto assignments, make sure the export cell isn't evaluated during PDF generation,
+        # otherwise this will create a fork bomb.
+        if self.assignment.is_quarto:
+            export.metadata["eval"] = False
 
         cells = [instructions, export]
         if self.check_feature_toggle(FeatureToggle.EMPTY_MD_BOUNDARY_CELLS):
             cells.append(nbformat.v4.new_markdown_cell(" "))  # add buffer cell
+
+        # Lock cells for ipynb assignments.
+        if not self.assignment.is_rmd:
+            for c in cells:
+                lock(c)
 
         return cells
