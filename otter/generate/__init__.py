@@ -54,16 +54,11 @@ class CondaEnvironment:
         }
 
         if self.is_r:
-            # environment["channels"].append("r")
             environment["dependencies"].extend(
                 [
-                    # "gcc_linux-64",
-                    # "gxx_linux-64",
                     "c-compiler",
                     "cxx-compiler",
-                    # "libgit2",
                     "zlib",
-                    # "r-base>=4.0.0",
                     "r-base=4.5.*",
                     "r-devtools",
                     "r-essentials",

@@ -94,8 +94,7 @@ def read_as_notebook(rmd_path: str) -> nbf.NotebookNode:
     if in_comment:
         raise ValueError("R Markdown file ends with an unclosed HTML comment")
 
-    fmt = "Rmd"  # os.path.splitext(rmd_path)[1][1:]  # trim leading "."
-    nb = jupytext.reads("\n".join(new_lines), fmt, as_version=NBFORMAT_VERSION)
+    nb = jupytext.reads("\n".join(new_lines), fmt="Rmd", as_version=NBFORMAT_VERSION)
     nb["metadata"]["kernelspec"] = {"language": "r"}
 
     return nb

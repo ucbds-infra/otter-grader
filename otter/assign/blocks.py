@@ -63,8 +63,18 @@ def extract_fenced_otter_cell(cell: nbformat.NotebookNode) -> nbformat.NotebookN
     return cell
 
 
-def extract_all_fenced_otter_cells(cells: List[nbformat.NotebookNode]):
-    """ """
+def extract_all_fenced_otter_cells(
+    cells: List[nbformat.NotebookNode],
+) -> list[nbformat.NotebookNode]:
+    """
+    Converts all fenced otter cells in a list of notebook cells to raw cells.
+
+    Args:
+        cells (``list[nbformat.NotebookNode]``): the notebook cells
+
+    Returns:
+        ``list[nbformat.NotebookNode]``: the notebook cells with extraction applied
+    """
     new_cells = []
     for cell_idx, cell in enumerate(cells):
         source = get_source(cell)
