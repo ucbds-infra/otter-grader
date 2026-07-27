@@ -1,29 +1,24 @@
 name: otter-env
 channels:
-  - defaults
   - conda-forge
-  - r
 dependencies:
   - python=3.10
   - pip
   - jupyter_server
-  - gcc_linux-64
-  - gxx_linux-64
-  - libgit2
-  - libgomp
-  - liblzma-devel
-  - zlib-devel-amzn2-aarch64
+  - c-compiler
+  - cxx-compiler
   - zlib
-  - r-base>=4.0.0
+  - r-base=4.5.*
   - r-devtools
   - r-essentials
   - r-gert
   - r-rmarkdown
+  - r-quarto
   - r-startup
   - r-stringi
   - r-testthat
   - r-usethis
-  - r-ottr==1.5.2
+  - r-ottr==1.6.0
   - rpy2
   - pip:
       - otter-grader[grading,plugins]==6.1.6
