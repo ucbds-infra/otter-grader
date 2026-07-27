@@ -35,12 +35,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry config virtualenvs.create false --local
           poetry install --with dev --no-root
 
       - name: Update versions
         run: |
-          python3 release.py ${{ github.event.inputs.version }}
+          poetry run python3 release.py ${{ github.event.inputs.version }}
 
       - name: Build tutorial
         run: |
@@ -60,7 +59,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           poetry build
-          python3 -m twine upload dist/*
+          poetry run python3 -m twine upload dist/*
 
       - name: Create a release on GitHub
         env:
