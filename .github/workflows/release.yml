@@ -35,8 +35,9 @@ jobs:
 
       - name: Install dependencies
         run: |
+          poetry config virtualenvs.create false --local
+          poetry config virtualenvs.prefer-active-python true --local   
           poetry install --with dev --no-root
-          pip install twine
 
       - name: Update versions
         run: |
