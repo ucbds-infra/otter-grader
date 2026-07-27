@@ -13,6 +13,7 @@ Creating Assignments
 
    notebook_format
    rmd_format
+   qmd_format
    usage
 
 Otter ships with an assignment development and distribution tool called Otter Assign, an 

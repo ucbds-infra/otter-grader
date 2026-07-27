@@ -77,6 +77,15 @@ class AssignmentTestsManager:
         """
         return any(not tc.hidden for tc in self._tests_by_question[question["name"]])
 
+    def any_tests(self) -> bool:
+        """
+        Check whether this assignment has any autogader tests.
+
+        Returns:
+            ``bool``: whether there are any tests
+        """
+        return any(len(tests) > 0 for tests in self._tests_by_question.values())
+
     def _add_test_case(self, question: QuestionConfig, test_case: TestCase):
         """
         Track a test case for the specified question.

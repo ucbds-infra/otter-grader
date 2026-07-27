@@ -8,7 +8,13 @@ import pathlib
 from typing import Union
 
 from .assignment import Assignment
-from .blocks import BlockType, get_cell_config, is_assignment_config_cell, is_block_boundary_cell
+from .blocks import (
+    BlockType,
+    extract_all_fenced_otter_cells,
+    get_cell_config,
+    is_assignment_config_cell,
+    is_block_boundary_cell,
+)
 from .cell_factory import CellFactory
 from .feature_toggle import FeatureToggle
 from .plugins import replace_plugins_with_calls
@@ -18,6 +24,7 @@ from .r_adapter.cell_factory import RCellFactory
 from .solutions import (
     ANSWER_CELL_TAG,
     has_seed,
+    OTTER_INCLUDE_TAG,
     overwrite_seed_vars,
     SOLUTION_CELL_TAG,
     strip_ignored_lines,
@@ -156,6 +163,8 @@ class NotebookTransformer:
         Returns:
             ``list[nbf.NotebookNode]``: the cells of the autograder notebook
         """
+        cells = extract_all_fenced_otter_cells(cells)
+
         curr_block: list[BlockType] = []  # allow nested blocks
         transformed_cells: list[nbf.NotebookNode] = []
 
@@ -299,7 +308,7 @@ class NotebookTransformer:
                     question_config = get_cell_config(cell)
                     if not isinstance(question_config, dict):
                         raise AssignNotebookFormatException(
-                            "Found a begin question cell with no config", None, i
+                            "Found a begin question cell with an invalid config", None, i
                         )
 
                     question = QuestionConfig(question_config)

@@ -226,7 +226,7 @@ Intercell Seeding
 +++++++++++++++++
 
 The autograder supports intercell seeding with the use of the ``seed`` key. *This behavior is not 
-supported for Rmd and R script assignments, but is supported for R Jupyter notebooks.* Passing it an 
+supported for Rmd, Quarto, and R script assignments, but is supported for R Jupyter notebooks.* Passing it an 
 integer will cause the autograder to seed NumPy and Python's ``random`` library or call ``set.seed`` 
 in R between *every* pair of code cells. This is useful for writing deterministic hidden tests. More 
 information about Otter seeding can be found :ref:`here <seeding>`. As an example, you can set 

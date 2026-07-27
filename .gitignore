@@ -24,3 +24,4 @@ htmlcov/
 /sync.sh
 pytest-report.html
 /test_output
+.quarto

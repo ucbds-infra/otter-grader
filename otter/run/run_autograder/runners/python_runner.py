@@ -97,7 +97,7 @@ class PythonRunner(AbstractLanguageRunner):
                 plugin_collection.run("before_grading", self.ag_config)
 
             pdf_error = None
-            if self.ag_config.token is not None or self.ag_config.pdf:
+            if self.pdf_enabled:
                 pdf_error = self.write_and_maybe_submit_pdf(subm_path)
 
             self.sanitize_tokens()
@@ -122,7 +122,7 @@ class PythonRunner(AbstractLanguageRunner):
 
             scores = grade_notebook(
                 subm_path,
-                tests_glob=glob("./tests/*.py"),
+                tests_glob=sorted(glob("./tests/*.py")),
                 cwd=os.getcwd(),
                 test_dir="./tests",
                 ignore_errors=not self.ag_config.debug,

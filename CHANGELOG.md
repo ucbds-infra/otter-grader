@@ -1,5 +1,19 @@
 # Changelog
 
+**v7.0.0 (Unreleased):**
+
+* Remove support for Python 3.9
+* Set default Python version for grading images to 3.13
+* Ensure that test globs are sorted per [#955](https://github.com/ucbds-infra/otter-grader/issues/955)
+* Fix suppression of image build failures on Gradescope per [#966](https://github.com/ucbds-infra/otter-grader/issues/966)
+* Add option to strip solutions from all cells to Otter Assign per [#980](https://github.com/ucbds-infra/otter-grader/issues/980)
+* Add a warning when there are no test cases in the assignment to Otter Assign per [#980](https://github.com/ucbds-infra/otter-grader/issues/980)
+* Updated grading images to only install pandoc and LaTeX if PDF generation is enabled per [#898](https://github.com/ucbds-infra/otter-grader/issues/898)
+* Add support for Quarto (`.qmd`) assignments per [#934](https://github.com/ucbds-infra/otter-grader/issues/934)
+* Updated R grading image to use R 4.5
+* Remove use of Anaconda `defaults` and `r` channels in grading image environments
+* Use tinytex instead of texlive for PDF rendering in R grading images
+
 **v6.1.6:**
 
 * Fix R grading image builds by updating grading image to install rpy2 from conda-forge instead of using the `otter-grader[r]` extra per [#947](https://github.com/ucbds-infra/otter-grader/issues/947)

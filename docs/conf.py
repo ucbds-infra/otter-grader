@@ -253,7 +253,7 @@ def setup(app):
     make_setup_sh_files()
 
     with open("_static/grading-environment.yml", "w+") as f:
-        f.write(CondaEnvironment("3.9", False, [], False, None, False).to_str())
+        f.write(CondaEnvironment("3.10", False, [], False, None, False).to_str())
 
     with open("_static/grading-environment-r.yml", "w+") as f:
-        f.write(CondaEnvironment("3.9", True, [], False, None, False).to_str())
+        f.write(CondaEnvironment("3.10", True, [], False, None, False).to_str())

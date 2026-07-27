@@ -21,11 +21,11 @@ from ..utils import dump_yaml, load_default_file, OTTER_CONFIG_FILENAME
 from ..version import __version__
 
 
-DEFAULT_PYTHON_VERSION = "3.12"
+DEFAULT_PYTHON_VERSION = "3.13"
 JINJA_ENV = Environment(loader=PackageLoader(__name__), keep_trailing_newline=True)
 MINIFORGE_VERSION = "25.3.1-0"
 OTTER_ENV_NAME = "otter-env"
-OTTR_VERSION = "1.5.2"
+OTTR_VERSION = "1.6.0"
 TEMPLATE_DIR = importlib.resources.files(__name__) / "templates"
 
 
@@ -42,12 +42,10 @@ class CondaEnvironment:
 
     user_environment: Optional[dict[str, Any]]
 
-    exclude_conda_defaults: bool
-
     def to_dict(self):
         environment: dict[str, Any] = {
             "name": OTTER_ENV_NAME,
-            "channels": ["defaults", "conda-forge"],
+            "channels": ["conda-forge"],
             "dependencies": [
                 f"python={self.python_version}",
                 "pip",
@@ -55,25 +53,18 @@ class CondaEnvironment:
             ],
         }
 
-        if self.exclude_conda_defaults:
-            environment["channels"].remove("defaults")
-
         if self.is_r:
-            environment["channels"].append("r")
             environment["dependencies"].extend(
                 [
-                    "gcc_linux-64",
-                    "gxx_linux-64",
-                    "libgit2",
-                    "libgomp",
-                    "liblzma-devel",
-                    "zlib-devel-amzn2-aarch64",
+                    "c-compiler",
+                    "cxx-compiler",
                     "zlib",
-                    "r-base>=4.0.0",
+                    "r-base=4.5.*",
                     "r-devtools",
                     "r-essentials",
                     "r-gert",
                     "r-rmarkdown",
+                    "r-quarto",
                     "r-startup",
                     "r-stringi",
                     "r-testthat",
@@ -144,7 +135,6 @@ def main(
     plugin_collection: Optional[PluginCollection] = None,
     python_version: Optional[str] = None,
     channel_priority_strict: bool = True,
-    exclude_conda_defaults: bool = False,
 ):
     """
     Run Otter Generate.
@@ -171,8 +161,6 @@ def main(
         python_version (``str | None``): the version of Python to use (installed with conda)
         channel_priority_strict (``bool``): whether to set conda's channel_priority to strict in
             the ``setup.sh`` file
-        exclude_conda_defaults (``bool``): whether to exclude conda's defaults channel in the
-            generated ``environment.yml`` file
 
     Raises:
         ``FileNotFoundError``: if the specified Otter configuration JSON file could not be found
@@ -291,7 +279,6 @@ def main(
         extra_requirements,
         overwrite_requirements,
         user_environment,
-        exclude_conda_defaults,
     )
 
     rendered = {}

@@ -27,7 +27,7 @@ otter = "otter.cli:cli"
 gmail_oauth2 = "otter.plugins.builtin.gmail_notifications.bin.gmail_oauth2:main"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 click = "^8.1.7"
 dill = ">=0.3.0"
 fica = ">=0.4.1"
@@ -41,11 +41,12 @@ ipython = "*"
 ipywidgets = "^8.1.5"
 jinja2 = "^3.1"
 jupyter_client = { version = "*", optional = true}
-jupytext = "^1.16.4"
+jupytext = "^1.19.3"
 nbconvert = { version = ">=6.0.0", extras = ["webpdf"], markers = "sys_platform != 'emscripten' and sys_platform != 'wasi'" }
 nbformat = ">=5.0.0"
 pandas = ">=2.0.0"
 pypdf = { version = "*", optional = true }
+python-frontmatter = "^1.3.0"
 python-on-whales = ">=0.72.0,<1.0.0"
 pyyaml = "^6"
 requests = "^2.31"
@@ -73,7 +74,7 @@ optional = true
 [tool.poetry.group.test.dependencies]
 coverage = "^7.2.0"
 matplotlib = "*"
-pytest = "^8.2.2"
+pytest = "^9.0.0"
 pytest-html = "*"
 responses = ">=0.25.3"
 tqdm = "*"

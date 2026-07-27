@@ -7,7 +7,7 @@ Otter Assign is called using the ``otter assign`` command. This command takes in
 arguments. The first is ``master``, the path to the master notebook (the one formatted as described 
 above), and the second is ``result``, the path at which output shoud be written. **Otter Assign will 
 automatically recognize the language of the notebook** by looking at the kernel metadata; similarly, 
-if using an Rmd file, it will automatically choose the language as R. This behavior can be 
+if using an Rmd or Quarto file, it will automatically choose the language as R. This behavior can be 
 overridden using the ``-l`` flag which takes the name of the language as its argument.
 
 The default behavior of Otter Assign is to do the following:

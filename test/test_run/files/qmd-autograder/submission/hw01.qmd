@@ -1,0 +1,16 @@
+---
+title: "Homework 1"
+output: pdf_document
+date: '2022-07-17'
+assignment_name: "hw01"
+---
+
+**Question 1:** Assign `x` to the value `2`.
+
+```{r}
+x <- 2
+```
+
+```{r}
+. = ottr::check("tests/q1.R")
+```

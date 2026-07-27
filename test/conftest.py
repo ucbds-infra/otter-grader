@@ -104,11 +104,12 @@ def disable_assign_pdf_generation(pdfs_enabled):
 
         cm1 = mock.patch("otter.assign.export_notebook", side_effect=create_fake_pdf)
         cm2 = mock.patch("otter.assign.knit_rmd_file", side_effect=create_fake_pdf)
+        cm3 = mock.patch("otter.assign.qmd_to_pdf", side_effect=create_fake_pdf)
 
     else:
-        cm1, cm2 = nullcontext(), nullcontext()
+        cm1, cm2, cm3 = nullcontext(), nullcontext(), nullcontext()
 
-    with cm1, cm2:
+    with cm1, cm2, cm3:
         yield
 
 

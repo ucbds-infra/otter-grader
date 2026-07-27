@@ -1,9 +1,8 @@
 name: otter-env
 channels:
-  - defaults
   - conda-forge
 dependencies:
-  - python=3.12
+  - python=3.13
   - pip
   - jupyter_server
   - pip:
