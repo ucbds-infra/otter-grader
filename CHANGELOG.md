@@ -1,6 +1,6 @@
 # Changelog
 
-**v7.0.0 (Unreleased):**
+**v7.0.0:**
 
 * Remove support for Python 3.9
 * Set default Python version for grading images to 3.13
