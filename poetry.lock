@@ -3619,6 +3619,27 @@ pygments = ">=2.13.0,<3.0.0"
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
+name = "ripgrep-python"
+version = "0.1.0"
+description = "A Python native binding for ripgrep"
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "ripgrep_python-0.1.0-cp38-abi3-macosx_10_12_x86_64.whl", hash = "sha256:5ff217f9bcfddcec9bcb6b55311c67d5731152710e67e514a3182cb3e165cba1"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:8aa4f646e93a1341b779c1870de5e62169495a0b93e0c619476e931777c36bca"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5928262ba81d922ccce8a8a387e96d3aa9217a4b1a7be12ff18d87e0334643b0"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:37aaca93eac7fadfcf5f946a360129ce589f8e4aae60c8048a7d33f5227a444b"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:3f7ed9c704d894bc01982a35037547b90267d6bbf799a6a48045dabf67f19ec4"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:254bbc06e6ff3bf50f248c1077b1a160fd20ffe310d5c6776a13063285e9c26c"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5e12708281f7162c4d98b7cd0e867dee2717024f1db0a1b07edbf20853b25d7a"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:fbec833152ee45535d1d72d6862e283a5153ccd16b73e9ea01745c33ba8a165f"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-win32.whl", hash = "sha256:c73d8d79e92a03b4435b53e4833bc4af332bfe59f028d2f7e1779e0080540398"},
+    {file = "ripgrep_python-0.1.0-cp38-abi3-win_amd64.whl", hash = "sha256:2fe265a967c5c753efa44557e35d577834902601972a24fd965362b8eea54203"},
+    {file = "ripgrep_python-0.1.0.tar.gz", hash = "sha256:0024b2209a8ef8fb7abf9d2c0ecca6e24e218b097475e0df56496d0337eac176"},
+]
+
+[[package]]
 name = "rpds-py"
 version = "0.30.0"
 description = "Python bindings to Rust's persistent data structures (rpds)"
@@ -4542,4 +4563,4 @@ r = ["rpy2"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "393112aaf33e47daf252534acb3f5d8434790e56e7119e939ef0d105f31cd2ee"
+content-hash = "5d4153be21e15f0c93b14a3bc8d4b6941000861389caee77263e052e23a1a66e"

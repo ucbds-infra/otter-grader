@@ -66,6 +66,7 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
 isort = "^5.13.2"
+ripgrep-python = "^0.1.0"
 twine = "^5.1.1"
 
 [tool.poetry.group.test]

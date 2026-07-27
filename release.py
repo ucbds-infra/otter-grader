@@ -1,23 +1,9 @@
 import argparse
 import datetime as dt
+import pyripgrep
 import re
 import subprocess
 import sys
-
-
-FILES_WITH_VERSIONS = [  # do not include pyproject.toml, CITATION.cff, otter/version.py
-    "docs/_static/grading-environment.yml",
-    "docs/_static/grading-environment-r.yml",
-    "test/test_generate/files/autograder-correct/environment.yml",
-    "test/test_generate/files/autograder-token-correct/environment.yml",
-    "test/test_generate/files/autograder-custom-env/environment.yml",
-    "test/test_generate/files/autograder-r-correct/environment.yml",
-    "test/test_generate/files/autograder-r-requirements-correct/environment.yml",
-    "test/test_run/files/autograder/source/environment.yml",
-    "test/test_assign/files/example-autograder-correct/environment.yml",
-    "test/test_assign/files/gs-autograder-correct/environment.yml",
-    "test/test_assign/files/rmd-autograder-correct/environment.yml",
-]
 
 
 PARSER = argparse.ArgumentParser()
@@ -40,6 +26,14 @@ PARSER.add_argument(
 OLD_VERSION_REGEX = r"otter-grader(?:\[[\w,]+\])?==\d+\.\d+\.\d+(?:\.\w+)?"
 
 
+def _find_files_with_versions() -> list[str]:
+    rg = pyripgrep.Grep()
+    return [
+        *rg.search(r"otter-grader(\[[\w,]+\])?==\d+\.\d+\.\d+", path="./test", glob="*.yml"),
+        *rg.search(r"otter-grader(\[[\w,]+\])?==\d+\.\d+\.\d+", path="./docs", glob="*.yml"),
+    ]
+
+
 if __name__ == "__main__":
     args = PARSER.parse_args()
 
@@ -58,14 +52,15 @@ if __name__ == "__main__":
         new_version_number = args.new_version
         to_beta = "b" in new_version_number.split(".")[-1]
 
-    with open(FILES_WITH_VERSIONS[0]) as f:
+    files = _find_files_with_versions()
+    with open(files[0]) as f:
         contents = f.read()
 
     from_beta = bool(re.search(r"otter-grader(?:\[[\w,]+\])?==\d+\.\d+\.\d+\.b\d+", contents))
 
     assert "new_version_number" in vars(), "Could not find a version -- did you specify one?"
 
-    for file in FILES_WITH_VERSIONS:
+    for file in files:
         with open(file) as f:
             contents = f.read()
 
