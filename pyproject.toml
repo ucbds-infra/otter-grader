@@ -67,7 +67,7 @@ optional = true
 black = "^24.8.0"
 isort = "^5.13.2"
 ripgrep-python = "^0.1.0"
-twine = "^5.1.1"
+twine = "^6.2.0"
 
 [tool.poetry.group.test]
 optional = true
