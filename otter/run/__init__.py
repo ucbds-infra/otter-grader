@@ -25,6 +25,8 @@ def main(
     no_logo: bool = False,
     debug: bool = False,
     extra_submission_files: Optional[list[str]] = None,
+    log_server: bool = True,
+    precomputed_results: Optional[str] = None,
 ) -> GradingResults:
     """
     Grades a single submission using the autograder configuration ``autograder`` without
@@ -78,7 +80,7 @@ def main(
             shutil.copy(file, os.path.join(ag_dir, "submission", file))
 
         logo = not no_logo
-        run_autograder_main(ag_dir, logo=logo, debug=debug, otter_run=True)
+        run_autograder_main(ag_dir, logo=logo, debug=debug, otter_run=True, log_server=log_server, precomputed_results=precomputed_results)
 
         results_path = os.path.join(ag_dir, "results", "results.json")
         if output_dir:
