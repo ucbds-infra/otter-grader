@@ -328,7 +328,7 @@ files = [
     {file = "cffi-2.1.0-cp315-cp315t-win_arm64.whl", hash = "sha256:cbb7640ce37159548d2147b5b8c241f962143d4c71231431820783f4dc78f210"},
     {file = "cffi-2.1.0.tar.gz", hash = "sha256:efc1cdd798b1aaf39b4610bba7aad28c9bea9b910f25c784ccf9ec1fa719d1f9"},
 ]
-markers = {main = "(extra == \"grading\" or extra == \"r\" or sys_platform != \"emscripten\" and sys_platform != \"wasi\" or platform_python_implementation != \"PyPy\") and (implementation_name == \"pypy\" or platform_python_implementation != \"PyPy\" or extra == \"r\")", dev = "platform_machine != \"ppc64le\" and platform_machine != \"s390x\" and sys_platform == \"linux\" and platform_python_implementation != \"PyPy\""}
+markers = {main = "(platform_python_implementation != \"PyPy\" or sys_platform != \"emscripten\" and sys_platform != \"wasi\" or extra == \"r\" or extra == \"grading\") and (platform_python_implementation != \"PyPy\" or implementation_name == \"pypy\" or extra == \"r\") and (python_version >= \"3.13\" or extra == \"plugins\" or extra == \"grading\" or extra == \"r\" or sys_platform != \"emscripten\" and sys_platform != \"wasi\") and (implementation_name == \"pypy\" or extra == \"plugins\" or extra == \"r\") and (extra == \"plugins\" or extra == \"r\" or extra == \"grading\" or sys_platform != \"emscripten\" and sys_platform != \"wasi\")", dev = "platform_machine != \"ppc64le\" and platform_machine != \"s390x\" and sys_platform == \"linux\" and platform_python_implementation != \"PyPy\""}
 
 [package.dependencies]
 pycparser = {version = "*", markers = "implementation_name != \"PyPy\""}
@@ -715,7 +715,7 @@ files = [
     {file = "cryptography-50.0.0-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:c99c003e088647b8a5b7c145d6f78c335f6348332b62e142d411c4b63d1460b9"},
     {file = "cryptography-50.0.0.tar.gz", hash = "sha256:eeac2acb5a20ed25e0ad6d1df9891a520b78b404266b6d11778f25d5d691a6c9"},
 ]
-markers = {dev = "platform_machine != \"ppc64le\" and platform_machine != \"s390x\" and sys_platform == \"linux\""}
+markers = {main = "extra == \"plugins\"", dev = "platform_machine != \"ppc64le\" and platform_machine != \"s390x\" and sys_platform == \"linux\""}
 
 [package.dependencies]
 cffi = {version = ">=2.0.0", markers = "platform_python_implementation != \"PyPy\""}
@@ -2893,7 +2893,7 @@ files = [
     {file = "pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"},
     {file = "pycparser-3.0.tar.gz", hash = "sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"},
 ]
-markers = {main = "(extra == \"grading\" or extra == \"r\" or sys_platform != \"emscripten\" and sys_platform != \"wasi\" or platform_python_implementation != \"PyPy\") and (platform_python_implementation != \"PyPy\" or extra == \"r\" or implementation_name == \"pypy\") and implementation_name != \"PyPy\"", dev = "platform_machine != \"ppc64le\" and platform_machine != \"s390x\" and sys_platform == \"linux\" and platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\""}
+markers = {main = "(platform_python_implementation != \"PyPy\" or sys_platform != \"emscripten\" and sys_platform != \"wasi\" or extra == \"r\" or extra == \"grading\") and (platform_python_implementation != \"PyPy\" or implementation_name == \"pypy\" or extra == \"r\") and (python_version >= \"3.13\" or extra == \"plugins\" or extra == \"grading\" or extra == \"r\" or sys_platform != \"emscripten\" and sys_platform != \"wasi\") and (implementation_name == \"pypy\" or extra == \"plugins\" or extra == \"r\") and implementation_name != \"PyPy\" and (sys_platform != \"emscripten\" and sys_platform != \"wasi\" or extra == \"plugins\" or extra == \"r\" or extra == \"grading\")", dev = "platform_machine != \"ppc64le\" and platform_machine != \"s390x\" and sys_platform == \"linux\" and platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\""}
 
 [[package]]
 name = "pydantic"
@@ -3130,15 +3130,15 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pypdf"
-version = "6.14.2"
+version = "6.15.0"
 description = "A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files"
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
 markers = "extra == \"grading\""
 files = [
-    {file = "pypdf-6.14.2-py3-none-any.whl", hash = "sha256:3f07891af76dc002657e04993ab9b4de81de29f9013b9761d0b7968bff12e946"},
-    {file = "pypdf-6.14.2.tar.gz", hash = "sha256:7873f502fe4385e79539b21d872392dc0c4e3714327c15881cbc7fbfd1f95b25"},
+    {file = "pypdf-6.15.0-py3-none-any.whl", hash = "sha256:14e001d6504822cb1ca9c7ed9a69bccb320f59b320730f55af804361abe4d5ee"},
+    {file = "pypdf-6.15.0.tar.gz", hash = "sha256:d39c4d955a76409284a905e2d65b40076d77ab76129e0faaeeb6612403ecfc79"},
 ]
 
 [package.dependencies]
@@ -3150,8 +3150,9 @@ cryptodome = ["PyCryptodome"]
 dev = ["flit", "pip-tools", "pre-commit", "pytest-cov", "pytest-socket", "pytest-timeout", "pytest-xdist", "wheel"]
 docs = ["myst_parser", "sphinx", "sphinx_rtd_theme"]
 fonts = ["fonttools"]
-full = ["Pillow (>=8.0.0)", "cryptography (>3.0)", "fonttools"]
+full = ["Pillow (>=8.0.0)", "arabic-reshaper", "cryptography (>3.0)", "fonttools", "python-bidi"]
 image = ["Pillow (>=8.0.0)"]
+rtl-text = ["arabic-reshaper", "python-bidi"]
 
 [[package]]
 name = "pytest"
