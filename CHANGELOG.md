@@ -13,6 +13,7 @@
 * Updated R grading image to use R 4.5
 * Remove use of Anaconda `defaults` and `r` channels in grading image environments
 * Use tinytex instead of texlive for PDF rendering in R grading images
+* Fix Otter Assign reporting that all autograder tests passed when grading the solutions notebook produced no results per [#1020](https://github.com/ucbds-infra/otter-grader/issues/1020)
 
 **v6.1.6:**
 

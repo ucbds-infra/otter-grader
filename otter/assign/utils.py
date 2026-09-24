@@ -228,7 +228,8 @@ def run_tests(assignment: "Assignment", debug: bool = False) -> None:
         debug (``bool``): whether to throw errors instead of swallowing them during grading
 
     Raises:
-        ``RuntimeError``: if the grade received by the notebook is not 100%
+        ``RuntimeError``: if the grade received by the notebook is not 100% or if grading the
+            notebook did not produce results
     """
     with capture_run_output() as run_output:
         results = grade_submission(
@@ -239,6 +240,12 @@ def run_tests(assignment: "Assignment", debug: bool = False) -> None:
         )
 
     LOGGER.debug(f"Otter Run output:\n{run_output.getvalue()}")
+
+    if results.has_catastrophic_failure():
+        raise RuntimeError(
+            "Grading the autograder notebook did not produce any results:\n"
+            + indent(results.summary(), "    ")
+        )
 
     if results.total != results.possible:
         raise RuntimeError(
