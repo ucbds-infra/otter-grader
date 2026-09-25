@@ -1,5 +1,9 @@
 # Changelog
 
+**v7.0.1 (Unreleased)**
+
+* Fix Otter Assign reporting that all autograder tests passed when grading the solutions notebook produced no results per [#1020](https://github.com/ucbds-infra/otter-grader/issues/1020)
+
 **v7.0.0:**
 
 * Remove support for Python 3.9
