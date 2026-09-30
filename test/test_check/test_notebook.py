@@ -365,10 +365,105 @@ def test_grading_mode(mocked_resolve_nb_path, mocked_resolve_test_info, _):
         grader.check("q1")
     except FileNotFoundError:
         pass
-    mocked_resolve_test_info.assert_called_once_with("foo", None, None, "q1")
+    mocked_resolve_test_info.assert_called_once_with(
+        "foo", None, None, "q1", nbmeta_config=mock.ANY, grading_mode=True
+    )
 
     mocked_resolve_nb_path.reset_mock()
 
     grader.export()
     # if export is called, this method would be called first
     mocked_resolve_nb_path.assert_not_called()
+
+
+@pytest.fixture
+def metadata_tests_nb(tmp_path):
+    """
+    Create a notebook with a metadata test for ``q1`` that checks ``x == 2`` and return a function
+    that writes a ``tests`` directory next to it, optionally with a file-based ``q1`` test that
+    checks ``x == 3``.
+    """
+    nb = nbf.v4.new_notebook()
+    nb.metadata[NOTEBOOK_METADATA_KEY] = {
+        "OK_FORMAT": True,
+        "tests": {
+            "q1": {
+                "name": "q1",
+                "points": 1,
+                "suites": [
+                    {
+                        "cases": [{"code": ">>> x == 2\nTrue", "hidden": False, "locked": False}],
+                        "scored": True,
+                        "setup": "",
+                        "teardown": "",
+                        "type": "doctest",
+                    },
+                ],
+            },
+        },
+    }
+    nb_path = str(tmp_path / "hw.ipynb")
+    nbf.write(nb, nb_path)
+
+    def make_tests_dir(with_q1):
+        tests_dir = tmp_path / "tests"
+        tests_dir.mkdir()
+        if with_q1:
+            (tests_dir / "q1.py").write_text(
+                dedent(
+                    """\
+                    OK_FORMAT = True
+
+                    test = {
+                        "name": "q1",
+                        "points": 1,
+                        "suites": [
+                            {
+                                "cases": [
+                                    {"code": ">>> x == 3\\nTrue", "hidden": False, "locked": False},
+                                ],
+                                "scored": True,
+                                "setup": "",
+                                "teardown": "",
+                                "type": "doctest",
+                            },
+                        ],
+                    }
+                    """
+                )
+            )
+        return str(tests_dir)
+
+    return nb_path, make_tests_dir
+
+
+@pytest.mark.parametrize("with_q1", [False, True])
+@mock.patch.object(Notebook, "_tests_dir_override", None)
+@mock.patch.object(Notebook, "_grading_mode", False)
+def test_metadata_tests_preferred_over_tests_dir(metadata_tests_nb, with_q1):
+    """
+    Checks that metadata tests are used instead of the tests directory when not in grading mode.
+    """
+    nb_path, make_tests_dir = metadata_tests_nb
+    tests_dir = make_tests_dir(with_q1)
+
+    grader = Notebook(nb_path, tests_dir=tests_dir)
+    result = grader.check("q1", global_env={"x": 2})
+    assert result.grade == 1
+
+
+@mock.patch.object(Notebook, "_tests_dir_override", None)
+@mock.patch.object(Notebook, "_grading_mode", False)
+def test_tests_dir_preferred_in_grading_mode(metadata_tests_nb):
+    """
+    Checks that the tests directory is used instead of metadata tests when in grading mode.
+    """
+    nb_path, make_tests_dir = metadata_tests_nb
+    tests_dir = make_tests_dir(True)
+
+    Notebook._grading_mode = True
+    Notebook._tests_dir_override = tests_dir
+
+    grader = Notebook(nb_path)
+    result = grader.check("q1", global_env={"x": 2})
+    assert result.grade == 0

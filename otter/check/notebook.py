@@ -258,6 +258,8 @@ class Notebook(Loggable):
             self._notebook,
             self._tests_url_prefix,
             question,
+            nbmeta_config=self._nbmeta_config,
+            grading_mode=type(self)._grading_mode,
         )
 
         self._logger.debug(f"Resolved test path: {test_path}")

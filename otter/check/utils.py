@@ -303,6 +303,8 @@ def resolve_test_info(
     nb_path: Optional[str],
     tests_url_prefix: Optional[str],
     question: str,
+    nbmeta_config: Optional[NBMetadataConfig] = None,
+    grading_mode: bool = False,
 ) -> tuple[str, Optional[str]]:
     """
     Determine the test path and test name.
@@ -311,11 +313,17 @@ def resolve_test_info(
     ``{tests_url_prefix}/{question}.py`` and saved to the file ``{tests_dir}/{question}.py``. If
     ``tests_dir`` does not already exist, it is created.
 
+    Outside of grading mode, a test for ``question`` in the notebook's metadata is preferred over the
+    tests directory. In grading mode, the tests directory is preferred, since it contains the hidden
+    tests.
+
     Args:
         tests_dir (``str``): the path to the directory of tests
         nb_path (``str | None``): the path to the notebook
         tests_url_prefix (``str | None``): the prefix of a URL to the test file
         question (``str``): the question name
+        nbmeta_config (``NBMetadataConfig | None``): the config from the notebook's metadata
+        grading_mode (``bool``): whether Otter is in grading mode
 
     Returns:
         ``tuple[str, str | None]``: the test path and test name (if applicable)
@@ -338,6 +346,15 @@ def resolve_test_info(
 
         with open(test_path, "w+") as f:
             f.write(text)
+
+    elif (
+        not grading_mode
+        and nb_path is not None
+        and nbmeta_config is not None
+        and question in (nbmeta_config.tests or {})
+    ):
+        test_path = nb_path
+        test_name = question
 
     elif tests_dir and os.path.isdir(tests_dir):
         if not os.path.isfile(os.path.join(tests_dir, question + ".py")):
