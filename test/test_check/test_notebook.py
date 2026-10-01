@@ -51,6 +51,67 @@ def write_notebook(cleanup_enabled):
         delete_paths([NB_PATH])
 
 
+@pytest.fixture
+def metadata_tests_nb(tmp_path):
+    """
+    Create a notebook with a metadata test for ``q1`` that checks ``x == 2`` and return a function
+    that writes a ``tests`` directory next to it, optionally with a file-based ``q1`` test that
+    checks ``x == 3``.
+    """
+    nb = nbf.v4.new_notebook()
+    nb.metadata[NOTEBOOK_METADATA_KEY] = {
+        "OK_FORMAT": True,
+        "tests": {
+            "q1": {
+                "name": "q1",
+                "points": 1,
+                "suites": [
+                    {
+                        "cases": [{"code": ">>> x == 2\nTrue", "hidden": False, "locked": False}],
+                        "scored": True,
+                        "setup": "",
+                        "teardown": "",
+                        "type": "doctest",
+                    },
+                ],
+            },
+        },
+    }
+    nb_path = str(tmp_path / "hw.ipynb")
+    nbf.write(nb, nb_path)
+
+    def make_tests_dir(with_q1):
+        tests_dir = tmp_path / "tests"
+        tests_dir.mkdir()
+        if with_q1:
+            (tests_dir / "q1.py").write_text(
+                dedent(
+                    """\
+                    OK_FORMAT = True
+
+                    test = {
+                        "name": "q1",
+                        "points": 1,
+                        "suites": [
+                            {
+                                "cases": [
+                                    {"code": ">>> x == 3\\nTrue", "hidden": False, "locked": False},
+                                ],
+                                "scored": True,
+                                "setup": "",
+                                "teardown": "",
+                                "type": "doctest",
+                            },
+                        ],
+                    }
+                    """
+                )
+            )
+        return str(tests_dir)
+
+    return nb_path, make_tests_dir
+
+
 def test_check():
     """
     Checks that the cor checking behavior of ``otter.Notebook.check`` works correctly.
@@ -374,67 +435,6 @@ def test_grading_mode(mocked_resolve_nb_path, mocked_resolve_test_info, _):
     grader.export()
     # if export is called, this method would be called first
     mocked_resolve_nb_path.assert_not_called()
-
-
-@pytest.fixture
-def metadata_tests_nb(tmp_path):
-    """
-    Create a notebook with a metadata test for ``q1`` that checks ``x == 2`` and return a function
-    that writes a ``tests`` directory next to it, optionally with a file-based ``q1`` test that
-    checks ``x == 3``.
-    """
-    nb = nbf.v4.new_notebook()
-    nb.metadata[NOTEBOOK_METADATA_KEY] = {
-        "OK_FORMAT": True,
-        "tests": {
-            "q1": {
-                "name": "q1",
-                "points": 1,
-                "suites": [
-                    {
-                        "cases": [{"code": ">>> x == 2\nTrue", "hidden": False, "locked": False}],
-                        "scored": True,
-                        "setup": "",
-                        "teardown": "",
-                        "type": "doctest",
-                    },
-                ],
-            },
-        },
-    }
-    nb_path = str(tmp_path / "hw.ipynb")
-    nbf.write(nb, nb_path)
-
-    def make_tests_dir(with_q1):
-        tests_dir = tmp_path / "tests"
-        tests_dir.mkdir()
-        if with_q1:
-            (tests_dir / "q1.py").write_text(
-                dedent(
-                    """\
-                    OK_FORMAT = True
-
-                    test = {
-                        "name": "q1",
-                        "points": 1,
-                        "suites": [
-                            {
-                                "cases": [
-                                    {"code": ">>> x == 3\\nTrue", "hidden": False, "locked": False},
-                                ],
-                                "scored": True,
-                                "setup": "",
-                                "teardown": "",
-                                "type": "doctest",
-                            },
-                        ],
-                    }
-                    """
-                )
-            )
-        return str(tests_dir)
-
-    return nb_path, make_tests_dir
 
 
 @pytest.mark.parametrize("with_q1", [False, True])
