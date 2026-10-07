@@ -178,5 +178,15 @@ class AutograderConfig(fica.Config):
         default=False,
     )
 
+    log_server: bool = fica.Key(
+        description="Whether to start a logging server for the autograder",
+        default=True,
+    )
+
+    precomputed_results: Optional[str] = fica.Key(
+        description="Optional path to the precomputed results file. If this path is provided, the notebook will not be executed.",
+        default=None,
+    )
+
     otter_run: bool = False
     """whether this autograder run is being run by Otter Run (i.e. without containerization)"""
