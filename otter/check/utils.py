@@ -22,7 +22,6 @@ from ..nbmeta_config import NBMetadataConfig
 from ..test_files import GradingResults
 from ..utils import format_exception
 
-
 T = TypeVar("T")
 
 
@@ -42,15 +41,11 @@ def save_notebook(filename: str, timeout: Union[int, float] = 10) -> bool:
         start = time.time()
 
         # For classic notebooks
-        display(
-            Javascript(
-                """
+        display(Javascript("""
             if (typeof Jupyter !== 'undefined') {
                 Jupyter.notebook.save_checkpoint();
             }
-        """
-            )
-        )
+        """))
 
         # For JupyterLab
         try:

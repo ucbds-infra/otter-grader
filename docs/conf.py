@@ -15,7 +15,6 @@
 import os
 import sys
 
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -28,7 +27,6 @@ from jinja2 import Template
 
 from otter.generate import CondaEnvironment
 from otter.utils import print_full_width
-
 
 # -- Project information -----------------------------------------------------
 

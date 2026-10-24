@@ -10,7 +10,6 @@ import threading
 
 from ..logging import get_level, get_logger
 
-
 LOGGER = get_logger(__name__)
 
 

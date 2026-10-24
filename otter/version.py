@@ -5,7 +5,6 @@ import sys
 
 from textwrap import dedent, indent
 
-
 __version__ = "7.0.0"
 
 
@@ -19,9 +18,7 @@ LOGO_WITH_VERSION = rf"""
 |  \_____/  |     |  |_       |  |_    | |_____   |  |
  \_________/       \ __|       \ __|    \______|  |__|
                                                 v{__version__}
-"""[
-    1:
-]  # remove beginning newline
+"""[1:]  # remove beginning newline
 
 
 _ADDITIONAL_PACKAGES = [
@@ -42,17 +39,12 @@ def print_version_info(logo: bool = False):
     """
     if logo:
         print(LOGO_WITH_VERSION)
-    print(
-        dedent(
-            f"""\
+    print(dedent(f"""\
                 Python version: {".".join(str(v) for v in sys.version_info[:3])}
                 Otter-Grader version: {__version__}
 
                 Additional package versions:
-            """
-        )
-        + indent(_list_addl_package_versions(), "    ")
-    )
+            """) + indent(_list_addl_package_versions(), "    "))
 
 
 def _list_addl_package_versions() -> str:

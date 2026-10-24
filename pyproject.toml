@@ -64,7 +64,7 @@ r = ["rpy2"]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.8.0"
+black = ">=24.8,<27.0"
 isort = "^5.13.2"
 ripgrep-python = "^0.1.0"
 twine = "^6.2.0"
@@ -108,7 +108,7 @@ sections = ["FUTURE", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 multi_line_output = 3
 use_parentheses = true
 order_by_type = false
-lines_after_imports = 2
+lines_after_imports = -1
 lines_between_types = 1
 include_trailing_comma = true
 reverse_relative = true

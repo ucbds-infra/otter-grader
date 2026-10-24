@@ -6,7 +6,6 @@ from .base_exporter import BaseExporter
 from .via_html import PDFViaHTMLExporter
 from .via_latex import PDFViaLatexExporter
 
-
 ExporterType = Union[Literal["html"], Literal["latex"]]
 
 

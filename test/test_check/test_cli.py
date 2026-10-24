@@ -13,7 +13,6 @@ from otter.check import main as check
 
 from ..utils import TestFileManager
 
-
 FILE_MANAGER = TestFileManager(__file__)
 
 
@@ -52,8 +51,7 @@ def test_otter_check_script():
             tests_path=os.path.split(file)[0],
         )
 
-    assert output.getvalue().strip() == dedent(
-        """\
+    assert output.getvalue().strip() == dedent("""\
             q1 results: All test cases passed!
             q2 results:
                 q2 - 1 result:
@@ -75,8 +73,7 @@ def test_otter_check_script():
                     ✅ Test case passed
             q3 results: All test cases passed!
             q4 results: All test cases passed!
-            q5 results: All test cases passed!"""
-    ), "Did not pass correct tests"
+            q5 results: All test cases passed!"""), "Did not pass correct tests"
 
 
 def test_otter_check_notebook():
@@ -107,8 +104,7 @@ def test_otter_check_notebook():
             tests_path=os.path.split(file)[0],
         )
 
-    assert output.getvalue().strip() == dedent(
-        """\
+    assert output.getvalue().strip() == dedent("""\
             q1 results: All test cases passed!
             q2 results:
                 q2 - 1 result:
@@ -130,5 +126,4 @@ def test_otter_check_notebook():
                     ✅ Test case passed
             q3 results: All test cases passed!
             q4 results: All test cases passed!
-            q5 results: All test cases passed!"""
-    ), "Did not pass correct tests"
+            q5 results: All test cases passed!"""), "Did not pass correct tests"

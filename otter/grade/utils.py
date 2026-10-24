@@ -8,7 +8,6 @@ from python_on_whales import docker
 
 from ..test_files import GradingResults
 
-
 OTTER_DOCKER_IMAGE_NAME = "otter-grade"
 
 POINTS_POSSIBLE_LABEL = "points-per-question"

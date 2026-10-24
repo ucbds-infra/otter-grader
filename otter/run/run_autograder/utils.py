@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from io import StringIO
 from typing import Any, Optional
 
-
 _output: Optional[StringIO] = None
 """a StringIO object to write output to instead of stdout when it is being captured"""
 

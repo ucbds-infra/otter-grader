@@ -5,7 +5,6 @@ from typing import Callable
 
 from .assignment import Assignment
 
-
 _NOT_RMD: Callable[[Assignment], bool] = lambda a: not a.is_rmd
 """a function that returns ``True`` if the assignment is not an R Markdown assignment"""
 

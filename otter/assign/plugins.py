@@ -6,7 +6,6 @@ import yaml
 
 from ..utils import get_source
 
-
 BEGIN = "# BEGIN PLUGIN"
 END = "# END PLUGIN"
 BEGIN_EXPORT = "# BEGIN PLUGIN EXPORT"

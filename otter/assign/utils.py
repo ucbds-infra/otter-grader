@@ -19,7 +19,6 @@ from ..plugins import PluginCollection
 from ..run import capture_run_output
 from ..utils import chdir, get_source, OTTER_CONFIG_FILENAME
 
-
 LOGGER = logging.get_logger(__name__)
 
 

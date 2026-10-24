@@ -14,7 +14,6 @@ from contextlib import contextmanager
 from otter.check.notebook import OTTER_LOG_FILENAME
 from otter.test_files import OK_FORMAT_VARNAME
 
-
 OUTPUT_DIR = pathlib.Path("test_output")
 TEST_DIR = pathlib.Path("test").resolve()
 

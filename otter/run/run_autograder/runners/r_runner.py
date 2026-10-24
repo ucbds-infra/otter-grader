@@ -18,7 +18,6 @@ from ....export import export_notebook
 from ....test_files import GradingResults
 from ....utils import chdir, get_source, knit_rmd_file, NBFORMAT_VERSION, qmd_to_pdf
 
-
 _OTTR = importr("ottr")
 
 

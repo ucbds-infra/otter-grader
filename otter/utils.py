@@ -17,7 +17,6 @@ from contextlib import contextmanager
 from IPython.core.getipython import get_ipython
 from typing import Any, Optional
 
-
 NBFORMAT_VERSION = 4
 """the version of the Jupyter notebook format to use"""
 

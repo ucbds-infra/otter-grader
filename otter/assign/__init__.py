@@ -14,7 +14,6 @@ from ..export import export_notebook
 from ..plugins import PluginCollection
 from ..utils import chdir, get_relpath, knit_rmd_file, qmd_to_pdf
 
-
 __all__ = ["Assignment", "main"]
 
 

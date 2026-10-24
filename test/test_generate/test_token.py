@@ -4,7 +4,6 @@ from unittest import mock
 
 from otter.generate.token import APIClient
 
-
 client = APIClient("token1")
 
 

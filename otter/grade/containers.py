@@ -20,7 +20,6 @@ from ..run import AutograderConfig
 from ..test_files import GradingResults
 from ..utils import format_exception, OTTER_CONFIG_FILENAME
 
-
 LOGGER = logging.get_logger(__name__)
 
 

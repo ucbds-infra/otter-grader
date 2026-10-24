@@ -16,7 +16,6 @@ from .ottr_test import OttrTestFile
 from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
 from ..utils import format_exception, QuestionNotInLogException
 
-
 __all__ = [
     "create_test_file",
     "GradingResults",

@@ -20,7 +20,6 @@ from otter.test_files import GradingResults
 
 from ..utils import delete_paths, TestFileManager
 
-
 ASSIGNMENT_NAME = "otter-grade-test"
 FILE_MANAGER = TestFileManager(__file__)
 AG_ZIP_PATH = FILE_MANAGER.get_path("autograder.zip")

@@ -13,7 +13,6 @@ from otter.execute import grade_notebook
 
 from ..utils import TestFileManager, write_ok_test
 
-
 FILE_MANAGER = TestFileManager(__file__)
 
 

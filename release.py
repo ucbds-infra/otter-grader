@@ -5,7 +5,6 @@ import re
 import subprocess
 import sys
 
-
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("new_version", nargs="?", default=None, help="Old version for regex search")
 PARSER.add_argument(

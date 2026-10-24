@@ -5,7 +5,6 @@ import requests
 
 from typing import Any, Optional
 
-
 BASE_URL = "https://www.gradescope.com"
 
 

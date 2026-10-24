@@ -14,7 +14,6 @@ from .. import logging
 from ..run import AutograderConfig
 from ..utils import assert_path_exists
 
-
 ALLOWED_EXTENSIONS = ["ipynb", "py", "qmd", "Rmd", "R", "r", "zip"]
 LOGGER = logging.get_logger(__name__)
 

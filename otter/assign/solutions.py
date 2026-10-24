@@ -9,7 +9,6 @@ from .r_adapter import solutions as r_solutions
 from .utils import add_tag, has_tag, is_cell_type, remove_output, remove_tag
 from ..utils import get_source
 
-
 ANSWER_CELL_TAG = "otter_answer_cell"
 BLOCK_PROMPT = "..."
 OTTER_INCLUDE_TAG = "otter_include"

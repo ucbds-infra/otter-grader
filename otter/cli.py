@@ -14,7 +14,6 @@ from .grade import ALLOWED_EXTENSIONS, main as grade
 from .run import main as run
 from .version import print_version_info
 
-
 _VERBOSITY_LEVELS = {
     0: logging.WARNING,
     1: logging.INFO,
