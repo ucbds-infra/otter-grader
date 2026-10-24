@@ -64,7 +64,7 @@ r = ["rpy2"]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.8.0"
+black = ">=24.8,<27.0"
 isort = "^5.13.2"
 ripgrep-python = "^0.1.0"
 twine = "^6.2.0"
