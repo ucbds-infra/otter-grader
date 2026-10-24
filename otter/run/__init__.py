@@ -13,7 +13,6 @@ from typing import Optional
 from .run_autograder import AutograderConfig, capture_run_output, main as run_autograder_main
 from ..test_files import GradingResults
 
-
 __all__ = ["AutograderConfig", "capture_run_output", "main"]
 
 

@@ -12,10 +12,8 @@ from ..tests_manager import AssignmentTestsManager
 from ...test_files.abstract_test import TestCase, TestFile
 from ...utils import get_source
 
-
 # DON'T change this template or the regex that removes hidden tests will break in the R adapter!
-OTTR_TEST_FILE_TEMPLATE = Template(
-    """\
+OTTR_TEST_FILE_TEMPLATE = Template("""\
 test = list(
   name = "{{ name }}",
   cases = list({% for tc in test_cases %}
@@ -30,8 +28,7 @@ test = list(
       }
     ){% if not loop.last %},{% endif %}{% endfor %}
   )
-)"""
-)
+)""")
 OTTR_TEST_FILE_TEMPLATE.globals["indent"] = indent
 
 

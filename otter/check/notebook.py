@@ -34,7 +34,6 @@ from ..nbmeta_config import NBMetadataConfig
 from ..plugins import PluginCollection
 from ..test_files import GradingResults, TestFile
 
-
 OTTER_LOG_FILENAME = ".OTTER_LOG"
 _ZIP_NAME_FILENAME = "__zip_filename__"
 

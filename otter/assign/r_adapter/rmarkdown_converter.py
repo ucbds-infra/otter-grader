@@ -11,7 +11,6 @@ from copy import deepcopy
 from ..solutions import ANSWER_CELL_TAG, SOLUTION_CELL_TAG
 from ...utils import get_source, NBFORMAT_VERSION, NOTEBOOK_METADATA_KEY
 
-
 HTML_COMMENT_START = "<!--"
 HTML_COMMENT_END = "-->"
 EXTRACT_COMMENT_REGEX = re.compile(rf"{HTML_COMMENT_START}\s*(#\s*[\w ]+)\s*{HTML_COMMENT_END}")

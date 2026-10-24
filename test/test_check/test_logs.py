@@ -10,7 +10,6 @@ from otter.check.notebook import Notebook, OTTER_LOG_FILENAME
 
 from ..utils import TestFileManager
 
-
 FILE_MANAGER = TestFileManager(__file__)
 
 

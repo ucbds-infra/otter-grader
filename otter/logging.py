@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from multiprocessing import Queue
 from typing import Optional
 
-
 ERROR = logging.ERROR
 WARNING = logging.WARNING
 INFO = logging.INFO

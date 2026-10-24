@@ -19,12 +19,10 @@ from ..nbmeta_config import NBMetadataConfig, OK_FORMAT_VARNAME
 from ..test_files.abstract_test import TestCase, TestFile
 from ..utils import get_source
 
-
 BEGIN_TEST_CONFIG_REGEX = r'(?:.\s*=\s*)?""?"?\s*#\s*BEGIN\s*TEST\s*CONFIG'
 END_TEST_CONFIG_REGEX = r'""?"?\s*#\s*END\s*TEST\s*CONFIG'
 
-EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template(
-    """\
+EXCEPTION_BASED_TEST_FILE_TEMPLATE = Template("""\
 from otter.test_files import test_case
 
 {{ OK_FORMAT_VARNAME }} = False
@@ -39,8 +37,7 @@ all_or_nothing = True{% endif %}
 {{ tc.body }}
 
 {% endfor %}
-"""
-)
+""")
 
 
 class AssignmentTestsManager:

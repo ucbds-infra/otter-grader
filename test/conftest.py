@@ -13,7 +13,6 @@ from otter.test_files import TestCase, TestCaseResult, TestFile
 
 from .utils import OUTPUT_DIR, TestFileManager, update_goldens
 
-
 FILE_MANAGER = TestFileManager(__file__)
 REPO_DIR = os.getcwd()
 REAL_DOCKER_BUILD = docker.build

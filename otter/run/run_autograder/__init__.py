@@ -16,7 +16,6 @@ from ... import logging
 from ...utils import chdir, OTTER_CONFIG_FILENAME
 from ...version import LOGO_WITH_VERSION
 
-
 __all__ = ["AutograderConfig", "capture_run_output", "main"]
 
 

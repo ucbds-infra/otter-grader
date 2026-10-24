@@ -12,8 +12,7 @@ from otter.test_files.exception_test import ExceptionTestFile, test_case
 
 @pytest.fixture
 def exception_test_contents():
-    return dedent(
-        """\
+    return dedent("""\
         from otter.test_files import test_case
 
         OK_FORMAT = False
@@ -27,14 +26,12 @@ def exception_test_contents():
         @test_case(hidden=True, points=2)
         def q1_2(x):
             assert x == 4
-        """
-    )
+        """)
 
 
 @pytest.fixture
 def exception_test_contents_with_messages():
-    return dedent(
-        """\
+    return dedent("""\
         from otter.test_files import test_case
 
         OK_FORMAT = False
@@ -48,8 +45,7 @@ def exception_test_contents_with_messages():
         @test_case(hidden=True, points=2, failure_message="bar")
         def q1_2(x):
             assert x == 4
-        """
-    )
+        """)
 
 
 def q1_1(x):

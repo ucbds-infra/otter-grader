@@ -2,7 +2,6 @@
 
 import re
 
-
 BLOCK_PROMPT = "# YOUR CODE HERE"
 
 

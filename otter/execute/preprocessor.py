@@ -13,7 +13,6 @@ from typing import Optional, TypeVar
 from ..check.logs import Log
 from ..utils import id_generator, NOTEBOOK_METADATA_KEY
 
-
 T = TypeVar("T")
 
 
@@ -178,10 +177,7 @@ class GradingPreprocessor(Preprocessor):
         for e in self.otter_log.entries:
             e.flush_to_file(log_fn)
 
-        nb.cells.append(
-            nbf.v4.new_code_cell(
-                dedent(
-                    f"""\
+        nb.cells.append(nbf.v4.new_code_cell(dedent(f"""\
             import json
             from otter import Notebook
             from otter.check.logs import Log
@@ -207,10 +203,7 @@ class GradingPreprocessor(Preprocessor):
                 logged_questions.append(entry.question)
 
             print(f"Questions executed from log: {{', '.join(logged_questions)}}")
-        """
-                )
-            )
-        )
+        """)))
 
     def filter_out_non_imports(self, nb: nbf.NotebookNode):
         e = PythonExporter()

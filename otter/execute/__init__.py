@@ -14,7 +14,6 @@ from ..plugins import PluginCollection
 from ..test_files import GradingResults
 from ..utils import NBFORMAT_VERSION
 
-
 __all__ = ["Checker", "grade_notebook"]
 
 

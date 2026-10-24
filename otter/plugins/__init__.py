@@ -10,7 +10,6 @@ from typing import Any, TypeVar, Union
 from .abstract_plugin import AbstractOtterPlugin, PluginEventNotSupportedException
 from ..utils import format_full_width
 
-
 __all__ = ["AbstractOtterPlugin", "PluginCollection"]
 
 

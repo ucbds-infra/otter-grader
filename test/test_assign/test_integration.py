@@ -18,7 +18,6 @@ from otter.utils import dump_yaml
 
 from ..utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 
-
 FILE_MANAGER = TestFileManager(__file__)
 
 

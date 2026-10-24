@@ -15,7 +15,6 @@ from .utils import get_notebook_language
 from .. import logging
 from ..utils import NBFORMAT_VERSION
 
-
 LOGGER = logging.get_logger(__name__)
 
 

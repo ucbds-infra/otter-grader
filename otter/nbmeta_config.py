@@ -7,7 +7,6 @@ from typing import Any, Optional
 
 from .utils import NOTEBOOK_METADATA_KEY
 
-
 OK_FORMAT_VARNAME = "OK_FORMAT"
 
 

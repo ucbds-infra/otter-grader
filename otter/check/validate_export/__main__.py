@@ -2,7 +2,6 @@
 
 import warnings
 
-
 # suppress all warnings, because otherwise they get printed to stderr which triggers a RuntimeError
 # in the calling code -- see #735
 warnings.simplefilter("ignore")

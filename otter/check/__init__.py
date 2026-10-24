@@ -11,7 +11,6 @@ from .. import logging
 from ..execute import grade_notebook
 from ..test_files import GradingResults
 
-
 ALLOWED_EXTENSIONS = {".py", ".ipynb"}
 LOGGER = logging.get_logger(__name__)
 

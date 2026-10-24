@@ -317,7 +317,7 @@ def RequireOptions(options, *args):
 def main():
     argv = sys.argv
     options_parser = SetupOptionParser()
-    (options, args) = options_parser.parse_args()
+    options, args = options_parser.parse_args()
     if options.refresh_token:
         RequireOptions(options, "client_id", "client_secret")
         response = RefreshToken(options.client_id, options.client_secret, options.refresh_token)

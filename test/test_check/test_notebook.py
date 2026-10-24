@@ -21,7 +21,6 @@ from otter.utils import (
 
 from ..utils import delete_paths, TestFileManager
 
-
 FILE_MANAGER = TestFileManager(__file__)
 TESTS_DIR = FILE_MANAGER.get_path("tests")
 TESTS_GLOB = glob(FILE_MANAGER.get_path("tests/*.py"))
@@ -84,9 +83,7 @@ def metadata_tests_nb(tmp_path):
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
         if with_q1:
-            (tests_dir / "q1.py").write_text(
-                dedent(
-                    """\
+            (tests_dir / "q1.py").write_text(dedent("""\
                     OK_FORMAT = True
 
                     test = {
@@ -104,9 +101,7 @@ def metadata_tests_nb(tmp_path):
                             },
                         ],
                     }
-                    """
-                )
-            )
+                    """))
         return str(tests_dir)
 
     return nb_path, make_tests_dir
@@ -131,8 +126,7 @@ def test_check():
 
     expected_reprs = {
         "q1": "q1 results: All test cases passed!",
-        "q2": dedent(
-            """\
+        "q2": dedent("""\
             q2 results:
                 q2 - 1 result:
                     ❌ Test case failed
@@ -151,8 +145,7 @@ def test_check():
 
                 q2 - 2 result:
                     ✅ Test case passed
-        """
-        ).strip(),
+        """).strip(),
         "q3": "q3 results: All test cases passed!",
         "q4": "q4 results: All test cases passed!",
         "q5": "q5 results: All test cases passed!",

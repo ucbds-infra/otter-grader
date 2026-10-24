@@ -19,7 +19,6 @@ from unittest import mock
 from otter.generate.token import APIClient
 from otter.run import main as run_main
 
-
 try:
     from otter.run.run_autograder import main as run_autograder
 except ModuleNotFoundError as e:
@@ -35,7 +34,6 @@ from otter.test_files import GradingResults
 from otter.utils import chdir, NBFORMAT_VERSION
 
 from ..utils import delete_paths, TestFileManager
-
 
 FILE_MANAGER = TestFileManager(__file__)
 
@@ -586,8 +584,7 @@ def test_rmd(load_config, expected_rmd_results, subtests):
             pc_rmd = re.sub(r"^x <- 2$", "x <- 50", orig_rmd, flags=re.MULTILINE)
             expected_results = copy.deepcopy(expected_rmd_results)
             expected_results["tests"][1]["score"] = 2
-            expected_results["tests"][1]["output"] = dedent(
-                """\
+            expected_results["tests"][1]["output"] = dedent("""\
                     q1 results:
                         q1 - 1 result:
 
@@ -605,8 +602,7 @@ def test_rmd(load_config, expected_rmd_results, subtests):
                             1/1 mismatches
                             x[1]: "50"
                             y[1]: "2"
-                """.rstrip()
-            )
+                """.rstrip())
             perform_test(pc_rmd, expected_results)
 
     finally:
@@ -676,8 +672,7 @@ def test_qmd(load_config, expected_qmd_results, subtests):
             pc_qmd = re.sub(r"^x <- 2$", "x <- 50", orig_qmd, flags=re.MULTILINE)
             expected_results = copy.deepcopy(expected_qmd_results)
             expected_results["tests"][1]["score"] = 2
-            expected_results["tests"][1]["output"] = dedent(
-                """\
+            expected_results["tests"][1]["output"] = dedent("""\
                     q1 results:
                         q1 - 1 result:
 
@@ -695,8 +690,7 @@ def test_qmd(load_config, expected_qmd_results, subtests):
                             1/1 mismatches
                             x[1]: "50"
                             y[1]: "2"
-                """.rstrip()
-            )
+                """.rstrip())
             perform_test(pc_qmd, expected_results)
 
     finally:
@@ -714,24 +708,14 @@ def test_token_sanitization(mocked_upload, get_config_path, load_config, expecte
     config["token"] = "abc123"
     config.pop("plugins")
 
-    nb = nbformat.v4.new_notebook(
-        cells=[
-            nbformat.v4.new_code_cell(
-                dedent(
-                    """\
+    nb = nbformat.v4.new_notebook(cells=[nbformat.v4.new_code_cell(dedent("""\
         import json
         with open("../source/otter_config.json") as f:
             config = json.load(f)
         token = config.get("token")
-    """
-                )
-            )
-        ]
-    )
+    """))])
 
-    tests = {
-        "q1.py": dedent(
-            """\
+    tests = {"q1.py": dedent("""\
         OK_FORMAT = False
 
         from otter.test_files import test_case
@@ -741,9 +725,7 @@ def test_token_sanitization(mocked_upload, get_config_path, load_config, expecte
         @test_case()
         def q1_1(env):
             assert env["token"] is None
-    """
-        )
-    }
+    """)}
 
     expected_results = {
         "tests": [

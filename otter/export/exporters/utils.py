@@ -2,7 +2,6 @@
 
 import re
 
-
 BEGIN_QUESTION_REGEX = r"<!--\s*BEGIN QUESTION\s*-->"
 END_QUESTION_REGEX = r"<!--\s*END QUESTION\s*-->"
 NEW_PAGE_REGEX = r"<!--\s*NEW PAGE\s*-->"

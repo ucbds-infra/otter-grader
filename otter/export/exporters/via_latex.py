@@ -8,7 +8,6 @@ from typing import Any
 
 from .base_exporter import BaseExporter, ExportFailedException, TEMPLATE_DIR
 
-
 # nbconvert can't be used on jupyterlite, so try importing it and raise an error if it's not found
 # when the exporter is used
 _NBCONVERT_ERROR = None

@@ -6,7 +6,6 @@ import datetime as dt
 
 from ..abstract_plugin import AbstractOtterPlugin
 
-
 STRPTIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%f%z"
 
 

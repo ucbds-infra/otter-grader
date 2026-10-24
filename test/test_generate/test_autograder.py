@@ -9,7 +9,6 @@ from otter.generate import main as generate
 
 from ..utils import assert_dirs_equal, TestFileManager, unzip_to_temp
 
-
 FILE_MANAGER = TestFileManager(__file__)
 OUTPUT_PATH = FILE_MANAGER.get_path("autograder.zip")
 

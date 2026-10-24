@@ -18,7 +18,6 @@ from otter.export.exporters.base_exporter import BaseExporter
 
 from ..utils import TestFileManager
 
-
 FILE_MANAGER = TestFileManager(__file__)
 
 
