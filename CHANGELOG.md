@@ -4,7 +4,8 @@
 
 * Fix Otter Assign reporting that all autograder tests passed when grading the solutions notebook produced no results per [#1020](https://github.com/ucbds-infra/otter-grader/issues/1020)
 * Prefer notebook metadata tests over the tests directory in `Notebook.check` unless grading mode is enabled per [#931](https://github.com/ucbds-infra/otter-grader/issues/931)
-* Add the init cell below a leading level-one heading in Otter Assign per [#985](https://github.com/ucbds-infra/otter-grader/issues/985)
+* Fix the tutorial notebook's `np.isclose` tests failing with numpy 2 per [#809](https://github.com/ucbds-infra/otter-grader/issues/809)
+* Add the `init_cell_below_heading` configuration to add the init cell below a leading level-one heading in Otter Assign per [#985](https://github.com/ucbds-infra/otter-grader/issues/985)
 
 **v7.0.0:**
 
