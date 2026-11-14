@@ -334,3 +334,26 @@ def test_init_cell_below_heading():
         FILE_MANAGER.get_path("init-cell-below-heading.ipynb"),
         FILE_MANAGER.get_path("init-cell-below-heading-correct"),
     )
+
+
+def test_init_cell_below_heading_disabled_by_default(tmp_path):
+    """
+    Checks that otter assign keeps the init cell at the top of the notebook when
+    ``init_cell_below_heading`` is not set
+
+    See: https://github.com/ucbds-infra/otter-grader/issues/985
+    """
+    nb = nbf.read(FILE_MANAGER.get_path("init-cell-below-heading.ipynb"), as_version=nbf.NO_CONVERT)
+    nb.cells[0].source = nb.cells[0].source.replace("init_cell_below_heading: true\n", "")
+    nb_path = tmp_path / "init-cell-below-heading.ipynb"
+    nbf.write(nb, nb_path)
+
+    assign(str(nb_path), str(tmp_path / "output"))
+
+    for subdir in ["autograder", "student"]:
+        output_nb = nbf.read(
+            tmp_path / "output" / subdir / "init-cell-below-heading.ipynb",
+            as_version=nbf.NO_CONVERT,
+        )
+        assert "grader = otter.Notebook(" in output_nb.cells[0].source
+        assert output_nb.cells[1].source.startswith("# Homework 1")
