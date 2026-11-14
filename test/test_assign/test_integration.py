@@ -322,3 +322,15 @@ def test_lecture_notebook():
         FILE_MANAGER.get_path("lecture-notebook.ipynb"),
         FILE_MANAGER.get_path("lecture-notebook-correct"),
     )
+
+
+def test_init_cell_below_heading():
+    """
+    Checks that otter assign puts the init cell below a leading level-one heading
+
+    See: https://github.com/ucbds-infra/otter-grader/issues/985
+    """
+    assign_and_check_output(
+        FILE_MANAGER.get_path("init-cell-below-heading.ipynb"),
+        FILE_MANAGER.get_path("init-cell-below-heading-correct"),
+    )

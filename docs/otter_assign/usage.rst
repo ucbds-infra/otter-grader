@@ -44,6 +44,9 @@ By default, Otter Assign adds an initialization cell at the *top* of the noteboo
 
 To prevent this behavior, add the ``init_cell: false`` configuration in your assignment metadata.
 
+If the first cell of the notebook is a Markdown cell with a level-one heading, the initialization
+cell is added below that cell instead, so that the heading stays at the top of the notebook.
+
 Otter Assign also automatically adds a check-all cell and an export cell to the end of the notebook. 
 The check-all cells consist of a Markdown cell:
 
