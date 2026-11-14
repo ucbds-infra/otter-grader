@@ -64,6 +64,12 @@ class Assignment(fica.Config, Loggable):
         default=True,
     )
 
+    init_cell_below_heading: bool = fica.Key(
+        description="whether to add the Otter initialization cell below the first cell of the "
+        "notebook instead of above it when the first cell is a Markdown cell with a level-one heading",
+        default=False,
+    )
+
     check_all_cell: bool = fica.Key(
         description="whether to include an Otter check-all cell in the output notebooks",
         default=False,

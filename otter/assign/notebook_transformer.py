@@ -34,6 +34,7 @@ from .tests_manager import AssignmentTestsManager
 from .utils import (
     add_tag,
     AssignNotebookFormatException,
+    has_level_one_heading,
     is_cell_type,
     is_ignore_cell,
     lock,
@@ -131,7 +132,17 @@ class NotebookTransformer:
         transformed_cells = self._get_transformed_cells(nb["cells"])
 
         if self.assignment.init_cell:
-            transformed_cells = self.cell_factory.create_init_cells() + transformed_cells
+            init_cells = self.cell_factory.create_init_cells()
+            # if configured, keep a leading level-one heading as the first cell of the notebook so
+            # that the heading order stays accessible
+            if (
+                self.assignment.init_cell_below_heading
+                and transformed_cells
+                and has_level_one_heading(transformed_cells[0])
+            ):
+                transformed_cells = transformed_cells[:1] + init_cells + transformed_cells[1:]
+            else:
+                transformed_cells = init_cells + transformed_cells
 
         if self.assignment.check_all_cell:
             transformed_cells += self.cell_factory.create_check_all_cells()

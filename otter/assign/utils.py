@@ -109,6 +109,45 @@ def is_cell_type(cell: nbf.NotebookNode, cell_type: str) -> bool:
     return cell["cell_type"] == cell_type
 
 
+ATX_H1_REGEX = re.compile(r"^ {0,3}#(?:[ \t]|$)")
+SETEXT_H1_UNDERLINE_REGEX = re.compile(r"^ {0,3}=+[ \t]*$")
+HTML_H1_REGEX = re.compile(r"<h1[\s>]", re.IGNORECASE)
+CODE_FENCE_REGEX = re.compile(r"^ {0,3}(```|~~~)")
+
+
+def has_level_one_heading(cell: nbf.NotebookNode) -> bool:
+    """
+    Determine whether a cell is a Markdown cell that contains a level-one heading, written as
+    ``# Title``, as a line underlined with ``=``, or as an HTML ``<h1>`` element. Lines inside
+    fenced code blocks are ignored.
+
+    Args:
+        cell (``nbformat.NotebookNode``): the cell to check
+
+    Returns:
+        ``bool``: whether ``cell`` is a Markdown cell with a level-one heading
+    """
+    if not is_cell_type(cell, "markdown"):
+        return False
+
+    in_code_fence = False
+    previous_line = ""
+    for line in get_source(cell):
+        if CODE_FENCE_REGEX.match(line):
+            in_code_fence = not in_code_fence
+            previous_line = ""
+            continue
+        if in_code_fence:
+            continue
+        if ATX_H1_REGEX.match(line) or HTML_H1_REGEX.search(line):
+            return True
+        if previous_line.strip() and SETEXT_H1_UNDERLINE_REGEX.match(line):
+            return True
+        previous_line = line
+
+    return False
+
+
 def remove_output(nb: nbf.NotebookNode) -> None:
     """
     Remove all outputs from a notebook in-place.
