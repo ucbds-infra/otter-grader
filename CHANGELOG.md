@@ -6,6 +6,7 @@
 * Prefer notebook metadata tests over the tests directory in `Notebook.check` unless grading mode is enabled per [#931](https://github.com/ucbds-infra/otter-grader/issues/931)
 * Fix the tutorial notebook's `np.isclose` tests failing with numpy 2 per [#809](https://github.com/ucbds-infra/otter-grader/issues/809)
 * Add the `init_cell_below_heading` configuration to add the init cell below a leading level-one heading in Otter Assign per [#985](https://github.com/ucbds-infra/otter-grader/issues/985)
+* Detect the architecture with `uname -m` and download the pandoc package for the container's architecture in the autograder setup scripts per [#977](https://github.com/ucbds-infra/otter-grader/issues/977)
 
 **v7.0.0:**
 
