@@ -11,7 +11,7 @@ apt-get install -y wget jq build-essential libcurl4-gnutls-dev libxml2-dev libss
     libmagick++-dev libxft-dev
 
 # install mamba
-if [ $(uname -p) = "arm" ] || [ $(uname -p) = "aarch64" ] ; \
+if [ $(uname -m) = "arm" ] || [ $(uname -m) = "aarch64" ] ; \
     then wget -nv https://github.com/conda-forge/miniforge/releases/download/25.3.1-0/Miniforge3-Linux-aarch64.sh \
         -O /autograder/source/mamba_install.sh ; \
     else wget -nv https://github.com/conda-forge/miniforge/releases/download/25.3.1-0/Miniforge3-Linux-x86_64.sh \
@@ -32,7 +32,7 @@ mamba run -n otter-env bash -c "playwright install-deps && playwright install ch
 # install PDF generation dependencies if enabled
 if cat /autograder/source/otter_config.json | jq -e '[.pdf, .token] | any'; then
     # install pandoc
-    wget -nv https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-1-amd64.deb \
+    wget -nv https://github.com/jgm/pandoc/releases/download/3.1.11.1/pandoc-3.1.11.1-1-$(dpkg --print-architecture).deb \
         -O /tmp/pandoc.deb
     dpkg -i /tmp/pandoc.deb
 
